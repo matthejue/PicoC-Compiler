@@ -1,0 +1,41 @@
+******************************************************************************
+*                      Arithmetic Expressions (code_ae) - Lecture            *
+******************************************************************************
+
+e     : <vi>
+e     : <ci>
+e     : <c>
+e     : <e> <binop> <e>
+e     : <unop> <e>
+binop : '+' | '-' | '*' | '/' | '%' | '&' | '|' | '^'
+unop  : '-' | '~'
+
+****************************************************************************
+*                 Arithmetic Expressions (coade_ae) - Extented                *
+*******************************************************************************
+
+prec2        : <prec1> <binops_prec2> <prec2> | <prec1> <binops_prec2> <prec1> | <prec1>
+prec1        : <ao> <binops_prec1> <prec1> | <ao> <binops_prec1> <ao> | <ao>
+ao           : <unops> <ao>
+ao           : <vi>
+ao           : <ci>
+ao           : <c>
+ao           : '(' <prec2> ')'
+c            : <digit>  // value provied by lexer
+binops_prec2 : '+' | '-'
+binops_prec1 : '*' | '/' | '%'
+unops        : '-' | '~'
+
+** implemented by lexer: **
+digit                   : <digit_with_zero> <digit_without_zero>
+digit_with_zero         : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+digit_without_zero      : <digit_without_zero> <digit_without_zero> | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+** still has to be implemented: **
+binop_prec3 : '&' | '|' | '^'
+
+*******************************************************************************
+*                        Variable Assignment (code_va)                        *
+*******************************************************************************
+
+va : vi = e

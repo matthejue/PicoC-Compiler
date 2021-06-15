@@ -1,0 +1,19 @@
+{
+  "configurations": {
+    "Debug": {
+      "adapter": "debugpy",
+      "configuration": {
+        "name": "Debug",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}",
+        "python": "/usr/bin/python",
+        "stopOnEntry": true,
+        "console": "externalTerminal",
+        "debugOptions": [],
+        "program": "${workspaceFolder}/pico_c_compiler.py",
+        "args": [ "input.picoc", "output.reti", "-p", "-a" ]
+      }
+    }
+  }
+}
