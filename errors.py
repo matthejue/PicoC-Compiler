@@ -39,4 +39,4 @@ class IllegalCharacterError(Error):
 
     def __init__(self, md, char):
         super().__init__(md, "IllegalCharError",
-                         "Character " + char + " is not permitted")
+                         "Character " + char + " is not permitted here")

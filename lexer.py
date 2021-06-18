@@ -46,33 +46,17 @@ class Lexer:
                 tokens += [Token(T_SEMICOLON, self.md.copy())]
                 self.next_char()
             elif self.md.current_char in DIGITS:
-                constant = ""
+                tokens, error = self._create_number(tokens)
 
-                while self.md.current_char in DIGITS_WITH_ZERO:
-                    constant += self.md.current_char
-                    self.next_char()
-
-                tokens += [Token(T_CONSTANT, self.md.copy(int(constant)))]
+                if error:
+                    return [], error
             elif self.md.current_char in LETTERS:
-                identifier = ""
+                tokens, error = self._create_word(tokens)
 
-                while self.md.current_char in LETTERS_DIGITS:
-                    identifier += self.md.current_char
-                    self.next_char()
-
-                tokens += [Token(T_IDENTIFIER, self.md.copy(identifier))]
+                if error:
+                    return [], error
             elif self.md.current_char in BINOPS:
-                if self.md.current_char == '-':
-                    tokens += [Token([T_UNOP, T_BINOP, T_PRECEDENCE_2],
-                                     self.md.copy())]
-                else:
-                    if self.md.current_char in OP_PRECEDENCE_1:
-                        tokens += [Token([T_BINOP, T_PRECEDENCE_1],
-                                         self.md.copy())]
-                    else:  # self.current_char in OP_PRECEDENCE_2:
-                        tokens += [Token([T_BINOP, T_PRECEDENCE_2],
-                                         self.md.copy())]
-                self.next_char()
+                tokens = self._deal_with_binops(tokens)
             elif self.md.current_char in UNOPS:  # for ~ operator
                 tokens += [Token(T_UNOP, self.md.copy())]
                 self.next_char()
@@ -89,3 +73,62 @@ class Lexer:
                 char = self.md.current_char
                 return [], IllegalCharacterError(self.md.copy(), char)
         return tokens + [Token(T_EOF, self.md.copy())], None
+
+    def _create_number(self, tokens):
+        """creates a number for the Lexer
+
+        :returns: tokens, error
+
+        """
+        constant = ""
+
+        while True:
+            if self.md.current_char in " " or self.md.col >= len(self.md.code[self.md.row]):
+                break
+            elif self.md.current_char not in DIGITS_WITH_ZERO:
+                char = self.md.current_char
+                return [], IllegalCharacterError(self.md.copy(), char)
+            constant += self.md.current_char
+            self.next_char()
+
+        tokens += [Token(T_CONSTANT, self.md.copy(int(constant)))]
+        return tokens, None
+
+    def _create_word(self, tokens):
+        """creates a word for the Lexer
+
+        :returns: tokens, error
+
+        """
+        identifier = ""
+
+        while True:
+            if self.md.current_char in " " or self.md.col >= len(self.md.code[self.md.row]):
+                break
+            elif self.md.current_char not in LETTERS_DIGITS:
+                char = self.md.current_char
+                return [], IllegalCharacterError(self.md.copy(), char)
+            identifier += self.md.current_char
+            self.next_char()
+
+        tokens += [Token(T_IDENTIFIER, self.md.copy(identifier))]
+        return tokens, None
+
+    def _deal_with_binops(self, tokens):
+        """deals with binary operators for the lexer
+
+        :returns: tokens
+
+        """
+        if self.md.current_char == '-':
+            tokens += [Token([T_UNOP, T_BINOP, T_PRECEDENCE_2],
+                             self.md.copy())]
+        else:
+            if self.md.current_char in OP_PRECEDENCE_1:
+                tokens += [Token([T_BINOP, T_PRECEDENCE_1],
+                                 self.md.copy())]
+            else:  # self.current_char in OP_PRECEDENCE_2:
+                tokens += [Token([T_BINOP, T_PRECEDENCE_2],
+                                 self.md.copy())]
+        self.next_char()
+        return tokens
