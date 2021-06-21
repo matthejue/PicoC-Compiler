@@ -11,8 +11,6 @@ class Token:
         self.type, self.md = type, md
 
     def __repr__(self):
-        if self.type == self.md.value:
-            return f'{self.type}'
         return f'{self.type}:{self.md.value}'
 
 ###############################################################################

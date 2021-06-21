@@ -5,13 +5,12 @@ import string
 ###############################################################################
 
 T_CONSTANT = 'CONSTANT'
-T_VARIABLE = 'VARIABLE'
-T_CONSTANT_IDENTIFIER = 'CONSTANT_IDENTIFIER'
+T_IDENTIFIER = 'IDENTIFIER'
 T_UNOP = 'UNOP'
 T_BINOP = 'BINOP'
-T_SEMICOLON = ';'
-T_L_PAREN = '('
-T_R_PAREN = ')'
+T_SEMICOLON = 'SEMICOLON'
+T_L_PAREN = 'L_PAREN'
+T_R_PAREN = 'R_PAREN'
 T_PRECEDENCE_1 = 'PRECEDENCE_1'
 T_PRECEDENCE_2 = 'PRECEDENCE_2'
 T_PRECEDENCE_3 = 'PRECEDENCE_3'
@@ -23,8 +22,7 @@ T_EOF = 'EOF'
 #                             Variable assignment                             #
 ###############################################################################
 
-T_IDENTIFIER = 'IDENTIFIER'
-T_EQUAL = '='
+T_EQUALS = 'EQUALS'
 
 ###############################################################################
 #                                   Values                                    #

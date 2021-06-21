@@ -17,9 +17,7 @@ def code_ae(self):
 
     if error:
         return None, error
-    elif T_EOF != self.current_tok.type:
-        return None, SyntaxError(self.current_tok.md.copy(),
-                                 "operator like '+', '-', '*', '/' etc.")
+
     return expression, None
 
 
@@ -68,7 +66,7 @@ def arithmetic_operand(self):
     """
     if T_UNOP in self.current_tok.type:
         return self.unary_op()
-    elif set([T_VARIABLE, T_CONSTANT, T_CONSTANT_IDENTIFIER]) > set([self.current_tok.type]):
+    elif set([T_IDENTIFIER, T_CONSTANT]) > set([self.current_tok.type]):
         return self.leave()
     elif T_L_PAREN == self.current_tok.type:
         return self.parenthesis()

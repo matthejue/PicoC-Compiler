@@ -5,6 +5,23 @@ from tokentypes import *  # pylint: disable=unused-wildcard-import
 ##########################################################################
 
 
+def code_ss(self):
+    """The whole program as sequence of statements
+
+    :returns: The whole program as sequence of statementes
+
+    """
+    sequence, error = self.statement_sequence()
+
+    if error:
+        return None, error
+    elif T_EOF != self.current_tok.type:
+        return None, SyntaxError(self.current_tok.md.copy(),
+                                 "operator like '=', '+', '-', '*', '/' etc.")
+
+    return sequence, None
+
+
 def statement_sequence(self):
     """Sequence of Statements
 
@@ -31,7 +48,7 @@ def statement(self):
     :returns: Subtree of this statement
 
     """
-    if T_IDENTIFIER == self.current_char.type:
+    if T_IDENTIFIER == self.current_tok.type:
         return self.variable_assignment()
     # else if T_IF
     # else if T_WHILE

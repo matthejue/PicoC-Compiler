@@ -1,4 +1,5 @@
 from errors import SyntaxError
+from tokentypes import *  # pylint: disable=unused-wildcard-import
 
 # TODO: later for initialization needed
 from symbol_table import STEntryType
@@ -15,10 +16,9 @@ def variable_assignment(self):
     :sreturns: Binary subtree with the Assignment
 
     """
-
     left_node = self.leave()
 
-    while T_EQUAL == self.current_tok:
+    while T_EQUALS == self.current_tok.type:
         left_node, error = self.binary_op(left_node, self.code_ae)
 
         if error:

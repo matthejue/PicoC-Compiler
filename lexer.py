@@ -67,7 +67,7 @@ class Lexer:
                 tokens += [Token(T_R_PAREN, self.md.copy())]
                 self.next_char()
             elif self.md.current_char == '=':
-                tokens += [Token(T_EQUAL, self.md.copy())]
+                tokens += [Token(T_EQUALS, self.md.copy())]
                 self.next_char()
             else:
                 char = self.md.current_char

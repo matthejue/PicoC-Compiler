@@ -60,10 +60,10 @@ class Parser:
         :returns: rootnode of sub-syntax tree.
 
         """
-        code_ae, error = self.code_ae()
-        return code_ae, error
+        code_ss, error = self.code_ss()
+        return code_ss, error
 
-    from _statement_sequences import statement_sequence, statement
+    from _statement_sequences import code_ss, statement_sequence, statement
 
     from _allocation_assignment_expressions import variable_assignment
 
