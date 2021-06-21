@@ -66,3 +66,5 @@ class Parser:
     from _arithmetic_expressions import code_ae, arithmetic_operand, unary_op, \
         constant, binary_op, special_case_minus, precedence_1, precedence_2, \
         parenthesis
+
+    from _assignment_expression import assignment

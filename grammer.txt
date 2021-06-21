@@ -17,9 +17,9 @@ unop  : '-' | '~'
 prec2        : <prec1> <binops_prec2> <prec2> | <prec1> <binops_prec2> <prec1> | <prec1>
 prec1        : <ao> <binops_prec1> <prec1> | <ao> <binops_prec1> <ao> | <ao>
 ao           : <unops> <ao>
-ao           : <vi>
-ao           : <ci>
+ao           : <v>
 ao           : <c>
+ao           : <ci>
 ao           : '(' <prec2> ')'
 c            : <digit>  // value provied by lexer
 binops_prec2 : '+' | '-'
@@ -38,4 +38,4 @@ binop_prec3 : '&' | '|' | '^'
 *                        Variable Assignment (code_va)                        *
 *******************************************************************************
 
-va : vi = e
+va : v = e

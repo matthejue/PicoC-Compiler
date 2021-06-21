@@ -75,7 +75,8 @@ def shell():
 
     """
     # shell is always executed with print
-    global args; args.print = True
+    global args
+    args.print = True
 
     while True:
         pico_c_in = input('pico_c > ')
@@ -103,7 +104,8 @@ def read_file(infile, outfile):
 
         output, error = compile(infile, pico_c_in)
 
-        if error: exit(1)
+        if error:
+            exit(1)
 
         fout.writelines(str(output))
 
@@ -121,7 +123,9 @@ def compile(fname, code):
     tokens, error = lexer.create_tokens()
 
     # Don't continue if an error occured during token creation
-    if error: print(error); return [], error
+    if error:
+        print(error)
+        return [], error
 
     # Deal with --tokens option
     global args
@@ -135,7 +139,9 @@ def compile(fname, code):
     syntax_tree_rootnode, error = parser.parse()
 
     # Don't print anything else out if an error occured
-    if error: print(error); return None, error
+    if error:
+        print(error)
+        return None, error
 
     # Deal with --ast option
     if args.ast:

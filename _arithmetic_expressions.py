@@ -64,8 +64,8 @@ def arithmetic_operand(self):
     """
     if T_UNOP in self.current_tok.type:
         return self.unary_op()
-    elif T_CONSTANT == self.current_tok.type:
-        return self.constant()
+    elif [T_VARIABLE, T_CONSTANT, T_CONSTANT_IDENTIFIER] > [self.current_tok.type]:
+        return self.leave()
     elif T_L_PAREN == self.current_tok.type:
         return self.parenthesis()
 
@@ -74,14 +74,15 @@ def arithmetic_operand(self):
                              identifier")
 
 
-def constant(self):
-    """Constant
-    :returns: Leave with number.
+def leave(self):
+    """either variable, constant or constant identifier
+
+    :returns: Leave with variable
 
     """
-    left_node = ConstantNode(self.current_tok)
+    node = LeaveNode(self.current_tok)
     self.next_tok()
-    return left_node, None
+    return node, None
 
 
 def parenthesis(self):

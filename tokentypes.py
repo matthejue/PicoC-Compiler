@@ -5,6 +5,8 @@ import string
 ###############################################################################
 
 T_CONSTANT = 'CONSTANT'
+T_VARIABLE = 'VARIABLE'
+T_CONSTANT_IDENTIFIER = 'CONSTANT_IDENTIFIER'
 T_UNOP = 'UNOP'
 T_BINOP = 'BINOP'
 T_SEMICOLON = ';'
