@@ -38,5 +38,5 @@ class IllegalCharacterError(Error):
     """Doing sth which is not permitted in the grammer rules."""
 
     def __init__(self, md, char):
-        super().__init__(md, "IllegalCharError",
+        super().__init__(md, "IllegalCharacterError",
                          "Character " + char + " is not permitted here")

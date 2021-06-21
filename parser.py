@@ -1,5 +1,5 @@
 ###############################################################################
-#                                 Tree Nodes                                  #
+#                                 Tree nodes                                  #
 ###############################################################################
 
 
@@ -63,8 +63,10 @@ class Parser:
         code_ae, error = self.code_ae()
         return code_ae, error
 
-    from _arithmetic_expressions import code_ae, arithmetic_operand, unary_op, \
-        constant, binary_op, special_case_minus, precedence_1, precedence_2, \
-        parenthesis
+    from _statement_sequences import statement_sequence, statement
 
-    from _assignment_expression import assignment
+    from _allocation_assignment_expressions import variable_assignment
+
+    from _arithmetic_expressions import code_ae, arithmetic_operand, unary_op, \
+        leave, binary_op, special_case_minus, precedence_1, precedence_2, \
+        parenthesis

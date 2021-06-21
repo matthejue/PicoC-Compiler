@@ -1,7 +1,10 @@
+from tok import Token
 from tokentypes import *  # pylint: disable=unused-wildcard-import
+from parser import LeaveNode, BinaryNode, UnaryNode
+from errors import SyntaxError
 
 ###############################################################################
-#                           Arithmetic Expressions                            #
+#                      Arithmetic expressions (code_ae)                       #
 ###############################################################################
 
 
@@ -45,11 +48,12 @@ def precedence_1(self):
 
     """
     left_node, error = self.arithmetic_operand()
+
     if error:
         return None, error
 
     while T_PRECEDENCE_1 in self.current_tok.type:
-        left_node, error = self.binop(left_node, self.arithmetic_operand)
+        left_node, error = self.binary_op(left_node, self.arithmetic_operand)
 
         if error:
             return None, error
@@ -64,14 +68,13 @@ def arithmetic_operand(self):
     """
     if T_UNOP in self.current_tok.type:
         return self.unary_op()
-    elif [T_VARIABLE, T_CONSTANT, T_CONSTANT_IDENTIFIER] > [self.current_tok.type]:
+    elif set([T_VARIABLE, T_CONSTANT, T_CONSTANT_IDENTIFIER]) > set([self.current_tok.type]):
         return self.leave()
     elif T_L_PAREN == self.current_tok.type:
         return self.parenthesis()
 
-    return None, SyntaxError(self.current_tok.md.copy(), "operand like a \
-                             constant, constant identifier or variable \
-                             identifier")
+    return None, SyntaxError(self.current_tok.md.copy(), "operand like a " +
+                             "constant, constant identifier or variable")
 
 
 def leave(self):
@@ -114,7 +117,7 @@ def binary_op(self, left_node, expression):
     if error:
         return None, error
 
-    return BinaryOpNode(left_node, tok_operation, right_node), None
+    return BinaryNode(left_node, tok_operation, right_node), None
 
 
 def unary_op(self):

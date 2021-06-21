@@ -19,10 +19,11 @@ badd +1 ~/Documents/Studium/pico-c-compiler/tok.py
 badd +1 ~/Documents/Studium/pico-c-compiler/input.picoc
 badd +1 ~/Documents/Studium/pico-c-compiler/output.reti
 badd +1 ~/Documents/Studium/pico-c-compiler/grammer.txt
-badd +1 term://.//2622:/usr/bin/zsh
-badd +0 ~/Documents/Studium/pico-c-compiler/_assignment_expression.py
-badd +17 ~/Documents/Studium/pico-c-compiler/symbol_table.py
-badd +1 ~/Documents/Studium/pico-c-compiler/globals.py
+badd +1 term://.//81972:/usr/bin/zsh
+badd +1 ~/Documents/Studium/pico-c-compiler/_assignment_expressions.py
+badd +26 ~/Documents/Studium/pico-c-compiler/symbol_table.py
+badd +3 ~/Documents/Studium/pico-c-compiler/globals.py
+badd +0 ~/Documents/Studium/pico-c-compiler/_statement_sequences.py
 argglobal
 %argdel
 $argadd _arithmetic_expressions.py
@@ -63,7 +64,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 12
-normal! 04|
+normal! 08|
 tabedit ~/Documents/Studium/pico-c-compiler/errors.py
 set splitbelow splitright
 set nosplitbelow
@@ -89,7 +90,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 42
-normal! 067|
+normal! 072|
 tabedit ~/Documents/Studium/pico-c-compiler/symbol_table.py
 set splitbelow splitright
 set nosplitbelow
@@ -111,12 +112,38 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 25 - ((24 * winheight(0) + 22) / 45)
+let s:l = 26 - ((25 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-25
-normal! 029|
+26
+normal! 041|
+tabedit ~/Documents/Studium/pico-c-compiler/globals.py
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+argglobal
+if bufexists("~/Documents/Studium/pico-c-compiler/globals.py") | buffer ~/Documents/Studium/pico-c-compiler/globals.py | else | edit ~/Documents/Studium/pico-c-compiler/globals.py | endif
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 2 - ((1 * winheight(0) + 22) / 45)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+2
+normal! 0
 tabedit ~/Documents/Studium/pico-c-compiler/lexer.py
 set splitbelow splitright
 set nosplitbelow
@@ -142,7 +169,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 5
-normal! 04|
+normal! 046|
 tabedit ~/Documents/Studium/pico-c-compiler/parser.py
 set splitbelow splitright
 set nosplitbelow
@@ -163,13 +190,13 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 22) / 45)
+let s:l = 70 - ((44 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 010|
-tabedit ~/Documents/Studium/pico-c-compiler/globals.py
+70
+normal! 034|
+tabedit ~/Documents/Studium/pico-c-compiler/_statement_sequences.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -179,7 +206,7 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-if bufexists("~/Documents/Studium/pico-c-compiler/globals.py") | buffer ~/Documents/Studium/pico-c-compiler/globals.py | else | edit ~/Documents/Studium/pico-c-compiler/globals.py | endif
+if bufexists("~/Documents/Studium/pico-c-compiler/_statement_sequences.py") | buffer ~/Documents/Studium/pico-c-compiler/_statement_sequences.py | else | edit ~/Documents/Studium/pico-c-compiler/_statement_sequences.py | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -189,13 +216,13 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 3 - ((2 * winheight(0) + 22) / 45)
+let s:l = 1 - ((0 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-3
-normal! 021|
-tabedit ~/Documents/Studium/pico-c-compiler/_arithmetic_expressions.py
+1
+normal! 0
+tabedit ~/Documents/Studium/pico-c-compiler/_assignment_expressions.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -206,6 +233,7 @@ set winminwidth=0
 set winwidth=1
 argglobal
 1argu
+if bufexists("~/Documents/Studium/pico-c-compiler/_assignment_expressions.py") | buffer ~/Documents/Studium/pico-c-compiler/_assignment_expressions.py | else | edit ~/Documents/Studium/pico-c-compiler/_assignment_expressions.py | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -215,13 +243,13 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 112 - ((44 * winheight(0) + 22) / 45)
+let s:l = 1 - ((0 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-112
-normal! 06|
-tabedit ~/Documents/Studium/pico-c-compiler/_assignment_expression.py
+1
+normal! 010|
+tabedit ~/Documents/Studium/pico-c-compiler/_arithmetic_expressions.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -231,7 +259,6 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-if bufexists("~/Documents/Studium/pico-c-compiler/_assignment_expression.py") | buffer ~/Documents/Studium/pico-c-compiler/_assignment_expression.py | else | edit ~/Documents/Studium/pico-c-compiler/_assignment_expression.py | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -241,12 +268,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 7 - ((6 * winheight(0) + 22) / 45)
+let s:l = 149 - ((44 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-7
-normal! 021|
+149
+normal! 031|
 tabedit ~/Documents/Studium/pico-c-compiler/tok.py
 set splitbelow splitright
 set nosplitbelow
@@ -267,12 +294,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 22) / 45)
+let s:l = 2 - ((1 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 044|
+2
+normal! 05|
 tabedit ~/Documents/Studium/pico-c-compiler/tokentypes.py
 set splitbelow splitright
 set nosplitbelow
@@ -298,7 +325,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 9
-normal! 07|
+normal! 045|
 tabedit ~/Documents/Studium/pico-c-compiler/input.picoc
 set splitbelow splitright
 set nosplitbelow
@@ -371,12 +398,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 21 - ((20 * winheight(0) + 22) / 45)
+let s:l = 7 - ((6 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-21
-normal! 010|
+7
+normal! 011|
 tabnew
 set splitbelow splitright
 set nosplitbelow
@@ -387,7 +414,7 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 argglobal
-if bufexists("term://.//2622:/usr/bin/zsh") | buffer term://.//2622:/usr/bin/zsh | else | edit term://.//2622:/usr/bin/zsh | endif
+if bufexists("term://.//81972:/usr/bin/zsh") | buffer term://.//81972:/usr/bin/zsh | else | edit term://.//81972:/usr/bin/zsh | endif
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -401,7 +428,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 3
-normal! 07|
+normal! 013|
 tabedit ~/Documents/Studium/pico-c-compiler/test_errors.py
 set splitbelow splitright
 set nosplitbelow
@@ -422,12 +449,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 22) / 45)
+let s:l = 3 - ((2 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 017|
+3
+normal! 0
 tabedit ~/Documents/Studium/pico-c-compiler/test_parser.py
 set splitbelow splitright
 set nosplitbelow
@@ -448,13 +475,13 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 22) / 45)
+let s:l = 3 - ((2 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 019|
-tabnext 3
+3
+normal! 0
+tabnext 7
 set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

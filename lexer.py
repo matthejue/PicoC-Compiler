@@ -82,12 +82,7 @@ class Lexer:
         """
         constant = ""
 
-        while True:
-            if self.md.current_char in " " or self.md.col >= len(self.md.code[self.md.row]):
-                break
-            elif self.md.current_char not in DIGITS_WITH_ZERO:
-                char = self.md.current_char
-                return [], IllegalCharacterError(self.md.copy(), char)
+        while self.md.current_char in DIGITS_WITH_ZERO:
             constant += self.md.current_char
             self.next_char()
 
@@ -102,12 +97,7 @@ class Lexer:
         """
         identifier = ""
 
-        while True:
-            if self.md.current_char in " " or self.md.col >= len(self.md.code[self.md.row]):
-                break
-            elif self.md.current_char not in LETTERS_DIGITS:
-                char = self.md.current_char
-                return [], IllegalCharacterError(self.md.copy(), char)
+        while self.md.current_char in LETTERS_DIGITS:
             identifier += self.md.current_char
             self.next_char()
 
