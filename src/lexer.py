@@ -36,10 +36,10 @@ class Lexer:
     """Identifies tokens in the picoC code
 
     :Info: The Lexer doesn't check if the token is also at the right position
-    to folow the grammer rules (that's the task of the parser). That's why 12ab
-    will be split into a number an identifier Token and it's the task of the
-    Parser to raise an error. That's also the reason why self.next_char() is
-    used instead of self.match()
+    to follow the grammer rules (that's the task of the parser). That's why
+    12ab will be split into a number an identifier Token and it's the task of
+    the Parser to raise an error. That's also the reason why self.next_char()
+    is used instead of self.match()
     """
 
     EOF_CHAR = "EOF"
