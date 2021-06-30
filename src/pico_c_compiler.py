@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from sys import exit
-from lexer import Lexer
-from parser import Parser
+from lexer import Lexer, TT
+# from parser import Parser
 import argparse
 
 ###############################################################################
@@ -16,14 +16,14 @@ args = None
 ###############################################################################
 
 
-def basename(fname):
-    """stips of the file extension
-    :fname: filename
-    :returns: basename of the file
+# def basename(fname):
+# """stips of the file extension
+# :fname: filename
+# :returns: basename of the file
 
-    """
-    index_of_extension = fname.index(".")
-    return fname[0:index_of_extension]
+# """
+# index_of_extension = fname.index(".")
+# return fname[0:index_of_extension]
 
 
 def main():
@@ -49,20 +49,20 @@ def main():
     if not args.infile:
         shell()
 
-    if args.infile:
-        infile = args.infile
+    # if args.infile:
+        # infile = args.infile
 
-    if args.outfile:
-        outfile = args.outfile
-    else:
-        outfile = basename(infile) + ".reti"
+    # if args.outfile:
+        # outfile = args.outfile
+    # else:
+        # outfile = basename(infile) + ".reti"
 
-    try:
-        read_file(infile, outfile)
-    except FileNotFoundError:
-        print("File does not exist")
-    else:
-        print("Compiled successfully")
+    # try:
+        # read_file(infile, outfile)
+    # except FileNotFoundError:
+        # print("File does not exist")
+    # else:
+        # print("Compiled successfully")
 
 ###############################################################################
 #                                    Shell                                    #
@@ -86,28 +86,29 @@ def shell():
         elif pico_c_in == '':
             continue
 
-        compile('<stdin>', pico_c_in.split('\n'))
+        # compile('<stdin>', pico_c_in.split('\n'))
+        compile('<stdin>', pico_c_in)
 
 ###############################################################################
 #                                  Read File                                  #
 ###############################################################################
 
 
-def read_file(infile, outfile):
-    """reads a pico_c file and compiles it
-    :returns: pico_c Code compiled in RETI Assembler
+# def read_file(infile, outfile):
+    # """reads a pico_c file and compiles it
+    # :returns: pico_c Code compiled in RETI Assembler
 
-    """
-    with open(infile, encoding="utf-8") as fin, \
-            open(outfile, 'w', encoding="utf-8") as fout:
-        pico_c_in = fin.readlines()
+    # """
+    # with open(infile, encoding="utf-8") as fin, \
+        # open(outfile, 'w', encoding="utf-8") as fout:
+        # pico_c_in = fin.readlines()
 
-        output, error = compile(infile, pico_c_in)
+        # output, error = compile(infile, pico_c_in)
 
-        if error:
-            exit(1)
+        # if error:
+        # exit(1)
 
-        fout.writelines(str(output))
+        # fout.writelines(str(output))
 
 ###############################################################################
 #                                   Compile                                   #
@@ -116,46 +117,43 @@ def read_file(infile, outfile):
 
 def compile(fname, code):
     # remove any \n from the code
-    code_without_cr = list(map(lambda line: line.strip(), code))
+    # code_without_cr = list(map(lambda line: line.strip(), code))
 
     # Generate tokens
-    lexer = Lexer(fname, code_without_cr)
-    tokens, error = lexer.create_tokens()
-
-    # Don't continue if an error occured during token creation
-    if error:
-        print(error)
-        return [], error
+    # lexer = Lexer(fname, code_without_cr)
+    lexer = Lexer(fname, code)
 
     # Deal with --tokens option
     global args
     if args.tokens:
+        tokens = []
+        t = lexer.next_token()
+        while t.type != TT.EOF:
+            tokens += [t]
+            t = lexer.next_token()
+
         if args.print:
             print(tokens)
-        return tokens, None
 
-    # Generate ast
-    parser = Parser(tokens)
-    syntax_tree_rootnode, error = parser.parse()
+        return tokens
 
-    # Don't print anything else out if an error occured
-    if error:
-        print(error)
-        return None, error
+    # # Generate ast
+    # parser = Parser(tokens)
+    # syntax_tree_rootnode, error = parser.parse()
 
-    # Deal with --ast option
-    if args.ast:
-        if args.print:
-            print(syntax_tree_rootnode)
-        return syntax_tree_rootnode, None
+    # # Deal with --ast option
+    # if args.ast:
+        # if args.print:
+        # print(syntax_tree_rootnode)
+        # return syntax_tree_rootnode, None
 
-    # TODO: CodeGenerator belongs here
+    # # TODO: CodeGenerator belongs here
 
-    # Deal with print option
-    if args.print:
-        print("Placeholder for RETI Code")
+    # # Deal with print option
+    # if args.print:
+        # print("Placeholder for RETI Code")
 
-    return "Placeholder for RETI Code", None
+    # return "Placeholder for RETI Code", None
 
 
 if __name__ == '__main__':

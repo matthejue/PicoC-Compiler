@@ -1,10 +1,13 @@
 TEST_BINARIES = $(wildcard ./test/*_test.py)
 .PHONY: all run test clean
 
-all: run clean
+all: run-shell clean
 
-run:
+run-compile:
 	./src/pico_c_compiler.py -a -p ./src/input.picoc ./src/output.reti
+
+run-shell:
+	./src/pico_c_compiler.py -t
 
 test: $(TEST_BINARIES)
 	S^
