@@ -11,8 +11,13 @@
         "stopOnEntry": true,
         "console": "externalTerminal",
         "debugOptions": [],
-        "program": "${workspaceFolder}/pico_c_compiler.py",
-        "args": [ "input.picoc", "output.reti", "-p", "-a" ]
+        "program": "${workspaceFolder}/src/pico_c_compiler.py",
+        "args": [
+          "./src/input.picoc",
+          "./src/output.reti",
+          "-p",
+          "-a"
+        ]
       }
     }
   }
