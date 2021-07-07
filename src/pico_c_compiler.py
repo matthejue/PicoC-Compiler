@@ -2,7 +2,7 @@
 
 from sys import exit
 from lexer import Lexer, TT
-# from parser import Parser
+from arithmetic_expression import ArithmeticExpression
 import argparse
 
 ###############################################################################
@@ -137,21 +137,21 @@ def compile(fname, code):
 
         return tokens
 
-    # # Generate ast
-    # parser = Parser(tokens)
-    # syntax_tree_rootnode, error = parser.parse()
+    # Generate ast
+    parser = ArithmeticExpression(lexer, 1)
+    parser.code_ae()
 
     # # Deal with --ast option
     # if args.ast:
-        # if args.print:
-        # print(syntax_tree_rootnode)
-        # return syntax_tree_rootnode, None
+    # if args.print:
+    # print(syntax_tree_rootnode)
+    # return syntax_tree_rootnode, None
 
     # # TODO: CodeGenerator belongs here
 
     # # Deal with print option
     # if args.print:
-        # print("Placeholder for RETI Code")
+    # print("Placeholder for RETI Code")
 
     # return "Placeholder for RETI Code", None
 

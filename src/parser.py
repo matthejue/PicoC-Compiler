@@ -4,18 +4,18 @@ class Parser:
     Lexer using  k>1 lookahead tokens
     """
 
-    def __init__(self, lexer, num_tks):
+    def __init__(self, lexer, num_lts):
         """
-        :lk_tokens: lookahead tokens
-        :k: number of lookahead tokens
-        :lkt_idx: lookahead token index
+        :lts: lookahead tokens
+        :num_lts: number of lookahead tokens
+        :lt_idx: lookahead token index
 
         """
         self.lexer = lexer
-        self.lk_tokens = []
-        self.num_tks = num_tks
-        self.lkt_idx = 0
-        for _ in range(k):
+        self.num_lts = num_lts
+        self.lts = [None] * self.num_lts
+        self.lt_idx = 0
+        for _ in range(self.num_lts):
             self.next_token()
 
     def next_token(self):
@@ -24,31 +24,31 @@ class Parser:
         :returns: None
 
         """
-        self.lk_tokens[self.lkt_idx] = lexer.next_token()
-        self.lkt_idx = (self.lkt_idx + 1) % self.num_tks
+        self.lts[self.lt_idx] = self.lexer.next_token()
+        self.lt_idx = (self.lt_idx + 1) % self.num_lts
 
     def LT(self, i):
         """Lookahead Token
 
         :returns: find out token looking ahead i tokens
         """
-        return self.lk_tokens[(self.lk_idx + i - 1) % self.num_tks]
+        return self.lts[(self.lt_idx + i - 1) % self.num_lts]
 
     def LTT(self, i):
         """Lookahead tokentype
 
         :returns: find out type locking ahead i tokens
         """
-        return self.LKT(i).type
+        return self.LT(i).type
 
-    def match(self, t):
+    def match(self, tt):
         """Check if t is the next token in the lexer to match
 
-        :t: possibly matching token
+        :tt: possibly matching tokentype
         :returns: TODO
 
         """
-        if (self.LTT(1) == t):
+        if (self.LTT(1) == tt):
             self.next_token()
         else:
-            raise SyntaxError(t, self.LTT(1))
+            raise SyntaxError(tt, self.LTT(1))

@@ -14,7 +14,7 @@
         "program": "${workspaceFolder}/src/pico_c_compiler.py",
         "_comment": "args: [./src/input.picoc, ./src/output.reti, -p, -a]",
         "args": [
-          "-t"
+          "-a"
         ]
       }
     }
