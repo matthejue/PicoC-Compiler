@@ -4,8 +4,8 @@ class SyntaxError(Exception):
     permitted by the grammer rules"""
 
     def __init__(self, expected, found):
-        self.description = "SyntaxError: Expected " + "expected" + ", found " \
-            + found
+        self.description = "SyntaxError: Expected " + str(expected) + \
+            ", found " + str(found)
         super().__init__(self.description)
 
 

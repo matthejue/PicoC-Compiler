@@ -52,7 +52,6 @@ class Lexer:
         """
         :lc: lookahead character
         :c: character
-        :returns: Token
 
         """
         self.fname = fname
@@ -123,7 +122,7 @@ class Lexer:
             raise SyntaxError(m, self.c)
 
     def _number(self):
-        """Subrule for Number creation
+        """
 
         :grammer: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
@@ -139,7 +138,7 @@ class Lexer:
         return Token(TT.NUMBER, int(number))
 
     def _identifier(self):
-        """Subrule for Identifier creation
+        """
 
         :grammer: <letter> <letter_digit>*
         :returns: Identifier Token
