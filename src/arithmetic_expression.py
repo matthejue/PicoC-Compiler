@@ -1,10 +1,11 @@
 from parser import Parser
-from lexer import Lexer, TT
+from lexer import TT
 from errors import SyntaxError
 
 
 class ArithmeticExpression(Parser):
-    """Context free grammer of the piocC language"""
+    """The arithmetic expression part of the context free grammer of the piocC
+    language"""
 
     def __init__(self, lexer, num_lts):
         super().__init__(lexer, num_lts)
@@ -26,7 +27,7 @@ class ArithmeticExpression(Parser):
 
         """
         self.prec1()
-        while self.LTT(1) == TT.BINOP_PREC_1:
+        while self.LTT(1) == TT.BINOP_PREC_2:
             self.match(TT.BINOP_PREC_2)
             self.prec1()
 
@@ -38,7 +39,7 @@ class ArithmeticExpression(Parser):
 
         """
         self.ao()
-        while self.LTT(1) == TT.BINOP_PREC_2:
+        while self.LTT(1) == TT.BINOP_PREC_1:
             self.match(TT.BINOP_PREC_1)
             self.ao()
 
@@ -50,7 +51,7 @@ class ArithmeticExpression(Parser):
 
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            selt.match(TT.IDENTIFIER)
+            self.match(TT.IDENTIFIER)
         elif self.LTT(1) == TT.NUMBER:
             self.match(TT.NUMBER)
         elif self.LTT(1) == TT.L_PAREN:
@@ -58,4 +59,4 @@ class ArithmeticExpression(Parser):
             self.code_ae()
             self.match(TT.R_PAREN)
         else:
-            raise SyntaxError("aritmetic operand", self.LTT(1))
+            raise SyntaxError("aritmetic operand", self.LT(1))

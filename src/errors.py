@@ -4,8 +4,8 @@ class SyntaxError(Exception):
     permitted by the grammer rules"""
 
     def __init__(self, expected, found):
-        self.description = f"SyntaxError: Expected {expected} \
-            , found {found}"
+        self.description = f"SyntaxError: Expected {expected}"\
+            f", found {found.value}"
         super().__init__(self.description)
 
 
@@ -15,6 +15,6 @@ class InvalidCharacterError(Exception):
     permitted by the grammer rules"""
 
     def __init__(self, found):
-        self.description = "InvalidCharacterError: " + \
-            str(found) + " is not a permitted character"
+        self.description = f"InvalidCharacterError: "\
+            f"{found} is not a permitted character"
         super().__init__(self.description)

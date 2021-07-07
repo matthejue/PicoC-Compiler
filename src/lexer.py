@@ -25,10 +25,10 @@ class TT(Enum):
     UNOP = "UNOP"
     BINOP_PREC_1 = "BINOP_PREC_1"
     BINOP_PREC_2 = "BINOP_PREC_2"
-    EQUALS = "EQUALS"
-    L_PAREN = "L_PAREN"
-    R_PAREN = "R_PAREN"
-    SEMICOLON = "SEMICOLON"
+    EQUALS = "="
+    L_PAREN = "("
+    R_PAREN = ")"
+    SEMICOLON = ";"
 
 
 class Lexer:
