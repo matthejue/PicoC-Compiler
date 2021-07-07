@@ -54,4 +54,4 @@ class Parser:
         if (self.LTT(1) == tt):
             self.next_token()
         else:
-            raise SyntaxError(tt.value, self.LT(1))
+            raise SyntaxError("'" + tt.value + "'", self.LT(1))
