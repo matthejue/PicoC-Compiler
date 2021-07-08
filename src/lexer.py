@@ -20,15 +20,16 @@ class TT(Enum):
     """Tokentypes that are part of the grammer"""
 
     EOF = "EOF"
-    NUMBER = "NUMBER"
-    IDENTIFIER = "IDENTIFIER"
-    UNOP = "UNOP"
-    BINOP_PREC_1 = "BINOP_PREC_1"
-    BINOP_PREC_2 = "BINOP_PREC_2"
+    NUMBER = "number"
+    IDENTIFIER = "identifier"
+    UNOP = "unary operator"
+    BINOP_PREC_1 = "binary operator with precedence 1"
+    BINOP_PREC_2 = "binary operator with precedence 2"
     EQUALS = "="
     L_PAREN = "("
     R_PAREN = ")"
     SEMICOLON = ";"
+    MINUS = "-"
 
 
 class Lexer:
@@ -61,7 +62,7 @@ class Lexer:
         self.c = None
 
     def next_token(self):
-        """identifies the next Token
+        """identifies the next Token in the picoC code
 
         :returns: Token
 
@@ -75,9 +76,19 @@ class Lexer:
             elif self.lc in '*/':
                 self.next_char()
                 return Token(TT.BINOP_PREC_1, self.c)
-            elif self.lc in '+-':
+            elif self.lc == '+':
                 self.next_char()
                 return Token(TT.BINOP_PREC_2, self.c)
+            elif self.lc == '-':
+                # minus has a special role because it can be both a unary and
+                # binary operator
+                self.next_char()
+                return Token(TT.MINUS, self.c)
+            elif self.lc == '~':
+                # minus has a special role because it can be both a unary and
+                # binary operator
+                self.next_char()
+                return Token(TT.UNOP, self.c)
             elif self.lc == '(':
                 self.next_char()
                 return Token(TT.L_PAREN, self.c)

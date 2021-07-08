@@ -1,10 +1,13 @@
 from parser import Parser
-from lexer import TT
+
+from abstract_syntax_tree import ASTNode
 from errors import SyntaxError
+from lexer import TT
+from grammer import Grammer
 
 
-class ArithmeticExpression(Parser):
-    """The arithmetic expression part of the context free grammer of the piocC
+class ArithmeticExpression(ASTBuilder):
+    """the arithmetic expression part of the context free grammer of the piocC
     language"""
 
     def __init__(self, lexer, num_lts):
@@ -17,36 +20,41 @@ class ArithmeticExpression(Parser):
         :returns: None
 
         """
-        self.prec2()
+        self._prec2()
 
-    def prec2(self):
+    def _prec2(self):
         """precedence 2
 
-        :grammer: <prec1> (<binop_prec2> <prec1>)*
+        :grammer: <prec1> ((<binop_prec2>|<minus>) <prec1>)*
         :returns: None
 
         """
-        self.prec1()
-        while self.LTT(1) == TT.BINOP_PREC_2:
-            self.match(TT.BINOP_PREC_2)
-            self.prec1()
+        sn = self.down(TT.BINOP_PREC_2, NC.ArithOpNode, self.LTT(1))
+        self._prec1()
+        while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
+            if self.LTT(1) == TT.BINOP_PREC_2:
+                self.match(TT.BINOP_PREC_2)
+            elif self.LTT(1) == TT.MINUS:
+                self.match(TT.MINUS)
+            self._prec1()
+        self.up(sn)
 
-    def prec1(self):
+    def _prec1(self):
         """precedence 1
 
-        :grammer: <ao> (<binop_prec2> <ao>)*
+        :grammer: <ao> (<binop_prec1> <ao>)*
         :returns: None
 
         """
-        self.ao()
+        self._ao()
         while self.LTT(1) == TT.BINOP_PREC_1:
             self.match(TT.BINOP_PREC_1)
-            self.ao()
+            self._ao()
 
-    def ao(self):
+    def _ao(self):
         """arithmetic operand
 
-        :grammer: <identifier> | <number> | '(' <code_ae> ')'
+        :grammer: <identifier> | <number> | <paren> | <unop>
         :returns: None
 
         """
@@ -55,8 +63,36 @@ class ArithmeticExpression(Parser):
         elif self.LTT(1) == TT.NUMBER:
             self.match(TT.NUMBER)
         elif self.LTT(1) == TT.L_PAREN:
-            self.match(TT.L_PAREN)
-            self.code_ae()
-            self.match(TT.R_PAREN)
+            self._paren()
+        elif self.LTT(1) in [TT.MINUS, TT.UNOP]:
+            self._unop()
         else:
             raise SyntaxError("aritmetic operand", self.LT(1))
+
+    def _paren(self):
+        """parenthesis
+
+        :grammer: '(' <code_ae> ')'
+        :returns: None
+
+        """
+        self.match(TT.L_PAREN)
+        self.code_ae()
+        self.match(TT.R_PAREN)
+
+    def _unop(self, ):
+        """unary operator
+
+        :grammer: (<unop>|<minus>)+ number
+        :returns: None
+
+        """
+        while True:  # do while loop
+            if self.LTT(1) == TT.MINUS:
+                self.match(TT.MINUS)
+            elif self.LTT(1) == TT.UNOP:
+                self.match(TT.UNOP)
+
+            if self.LTT(1) not in [TT.MINUS, TT.UNOP]:
+                break
+        self.match(TT.NUMBER)
