@@ -6,7 +6,7 @@ from lexer import TT
 from grammer import Grammer
 
 
-class ArithmeticExpression(ASTBuilder):
+class ArithmeticExpressionGrammer(Grammer):
     """the arithmetic expression part of the context free grammer of the piocC
     language"""
 
@@ -29,7 +29,8 @@ class ArithmeticExpression(ASTBuilder):
         :returns: None
 
         """
-        sn = self.down(TT.BINOP_PREC_2, NC.ArithOpNode, self.LTT(1))
+        # savestate_node = self.ast_builder.down(NC.ArithOpNode, TT.BINOP_PREC_2)
+
         self._prec1()
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
             if self.LTT(1) == TT.BINOP_PREC_2:
@@ -37,7 +38,7 @@ class ArithmeticExpression(ASTBuilder):
             elif self.LTT(1) == TT.MINUS:
                 self.match(TT.MINUS)
             self._prec1()
-        self.up(sn)
+            # self.ast_builder.up(savestate_node)
 
     def _prec1(self):
         """precedence 1

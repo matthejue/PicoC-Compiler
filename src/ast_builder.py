@@ -1,26 +1,26 @@
-from parser import Parser
-
-from abstract_syntax_tree import ASTNode
-from errors import SyntaxError
-from lexer import TT
-
-
-class ASTBuilder(Parser):
+class ASTBuilder:
 
     """Provides methods for ast contrustion"""
 
-    def __init__(self, lexer, num_lts):
+    def __init__(self):
         self.root = None
         self.current_node = None
-        super().__init__(lexer, num_lts)
 
-    def down(self, match_tok, cls, token):
+    def addChild(self, token_or_node):
+        """
+
+        :returns: None
+
+        """
+        self.current_node.addChild(token_or_node)
+
+    def down(self, classname, token):
         """go one layer down in the abstract syntax tree
 
         :returns: None
 
         """
-        new_node = cls(token)
+        new_node = classname(token)
         if not self.root:
             self.root = new_node
         else:
@@ -41,7 +41,3 @@ class ASTBuilder(Parser):
         # grammer rules called on the same layer have to be called with the
         # same old current_node again
         self.current_node = savestate_node
-
-   def match(self, tt):
-       self.current_node.addChild(self.LT(1))
-       super().match(tt)

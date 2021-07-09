@@ -2,7 +2,7 @@
 
 from sys import exit
 from lexer import Lexer, TT
-from arithmetic_expression import ArithmeticExpression
+from arithmetic_expression_grammer import ArithmeticExpressionGrammer
 import argparse
 
 ###############################################################################
@@ -138,7 +138,7 @@ def compile(fname, code):
         return tokens
 
     # Generate ast
-    parser = ArithmeticExpression(lexer, 1)
+    parser = ArithmeticExpressionGrammer(lexer, 1)
     parser.code_ae()
 
     # # Deal with --ast option

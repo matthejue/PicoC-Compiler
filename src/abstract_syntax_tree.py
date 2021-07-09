@@ -18,14 +18,14 @@ class ASTNode:
         """
         return self.token.type
 
-    def addChild(self, t):
+    def addChild(self, token_or_node):
         """
 
         :t: subtree
         :returns: None
 
         """
-        self.children += [t]
+        self.children += [token_or_node]
 
     def isEmpty(self):
         return not self.token
