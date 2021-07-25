@@ -53,3 +53,31 @@ digit_without_zero      : <digit_without_zero> <digit_without_zero> | '1' | '2' 
 
 ** still has to be implemented: **
 binop_prec3 : '&' | '|' | '^'
+
+**************************************************************************
+*                             Grammer translation                        *
+**************************************************************************
+
+if ( «lookahead-predicts-alt1» ) {
+  down(classname, token)
+  «match-alt1»
+} else if ( «lookahead-predicts-alt2» ) {
+  down(classname, token)
+  «match-alt2»
+} else if ( «lookahead-predicts-altN» ) {
+  down(classname, token)
+  «match-altN»
+} else «throw-exception» // parse error (no viable alternative)
+
+if ( «lookahead-is-T» ) {
+  down()
+  match(T);
+} // no error else clause
+
+while ( «lookahead-predicts-an-alt-of-subrule» ) {
+  «code-matching-alternatives»
+}
+
+do {
+  «code-matching-alternatives»
+} while ( «lookahead-predicts-an-alt-of-subrule» );

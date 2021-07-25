@@ -1,6 +1,6 @@
 class ASTBuilder:
 
-    """Provides methods for ast contrustion"""
+    """Provides methods for ast construction"""
 
     def __init__(self):
         self.root = None
@@ -27,7 +27,7 @@ class ASTBuilder:
             self.current_node.addChild(new_node)
         savestate_node = self.current_node
 
-        # deeper grammer rules have to be called with a new current_node
+        # deeper grammar rules have to be called with a new current_node
         self.current_node = new_node
 
         return savestate_node
@@ -38,6 +38,6 @@ class ASTBuilder:
         :returns: None
 
         """
-        # grammer rules called on the same layer have to be called with the
+        # grammar rules called on the same layer have to be called with the
         # same old current_node again
         self.current_node = savestate_node
