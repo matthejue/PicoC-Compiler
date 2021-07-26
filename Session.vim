@@ -3,29 +3,29 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium/pico-c-compiler
+cd ~/Documents/Studium/pico-c-compiler/src
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +19 src/errors.py
-badd +16 src/ast_builder.py
-badd +12 src/lexer.py
-badd +20 src/parser.py
-badd +142 src/pico_c_compiler.py
+badd +19 ~/Documents/Studium/pico-c-compiler/src/errors.py
+badd +16 ~/Documents/Studium/pico-c-compiler/src/ast_builder.py
+badd +12 ~/Documents/Studium/pico-c-compiler/src/lexer.py
+badd +20 ~/Documents/Studium/pico-c-compiler/src/parser.py
+badd +142 ~/Documents/Studium/pico-c-compiler/src/pico_c_compiler.py
 badd +3 term://~/Documents/Studium/pico-c-compiler//119220:/usr/bin/zsh
 badd +14 term:///home/areo/Documents/Studium/pico-c-compiler//137332:/usr/bin/python
-badd +1 .vimspector.json
+badd +1 ~/Documents/Studium/pico-c-compiler/.vimspector.json
 badd +14 term:///home/areo/Documents/Studium/pico-c-compiler//145432:/usr/bin/python
 badd +14 term:///home/areo/Documents/Studium/pico-c-compiler//149035:/usr/bin/python
-badd +1 test.cpp
-badd +1 doc/grammer.txt
-badd +1 src/arithmetic_expression.py
-badd +37 src/abstract_syntax_tree.py
-badd +10 src/grammer.py
-badd +106 src/arithmetic_expression_grammer.py
-badd +21 src/function_grammer.py
-badd +7 Makefile
+badd +1 ~/Documents/Studium/pico-c-compiler/test.cpp
+badd +1 ~/Documents/Studium/pico-c-compiler/doc/grammer.txt
+badd +1 ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression.py
+badd +50 ~/Documents/Studium/pico-c-compiler/src/abstract_syntax_tree.py
+badd +1 ~/Documents/Studium/pico-c-compiler/src/grammer.py
+badd +108 ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py
+badd +21 ~/Documents/Studium/pico-c-compiler/src/function_grammer.py
+badd +7 ~/Documents/Studium/pico-c-compiler/Makefile
 badd +1 term://~/Documents/Studium/pico-c-compiler//353172:/usr/bin/python
 badd +7 term://~/Documents/Studium/pico-c-compiler//353362:/usr/bin/python
 badd +5 term://~/Documents/Studium/pico-c-compiler//357695:/usr/bin/python
@@ -33,18 +33,18 @@ badd +14 term://~/Documents/Studium/pico-c-compiler//391793:/usr/bin/python
 badd +3 term://~/Documents/Studium/pico-c-compiler//429467:/usr/bin/python
 badd +13 term://~/Documents/Studium/pico-c-compiler//429880:/usr/bin/python
 badd +3 term://~/Documents/Studium/pico-c-compiler//436259:/usr/bin/python
-badd +0 term://~/Documents/Studium/pico-c-compiler//437955:/usr/bin/python
+badd +1 term://~/Documents/Studium/pico-c-compiler//437955:/usr/bin/python
 badd +14 term://~/Documents/Studium/pico-c-compiler//439231:/usr/bin/python
 badd +14 term://~/Documents/Studium/pico-c-compiler//453191:/usr/bin/python
 badd +14 term://~/Documents/Studium/pico-c-compiler//459114:/usr/bin/python
 badd +14 term://~/Documents/Studium/pico-c-compiler//470832:/usr/bin/python
 argglobal
 %argdel
-$argadd src/errors.py
-$argadd src/ast_builder.py
-$argadd src/lexer.py
-$argadd src/parser.py
-$argadd src/pico_c_compiler.py
+$argadd errors.py
+$argadd ast_builder.py
+$argadd lexer.py
+$argadd parser.py
+$argadd pico_c_compiler.py
 set stal=2
 tabnew
 tabnew
@@ -54,10 +54,10 @@ tabnew
 tabnew
 tabnew
 tabrewind
-edit src/pico_c_compiler.py
+edit ~/Documents/Studium/pico-c-compiler/src/pico_c_compiler.py
 argglobal
 5argu
-balt src/parser.py
+balt ~/Documents/Studium/pico-c-compiler/src/parser.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -75,10 +75,10 @@ normal! zt
 keepjumps 86
 normal! 018|
 tabnext
-edit src/errors.py
+edit ~/Documents/Studium/pico-c-compiler/src/errors.py
 argglobal
 1argu
-balt src/pico_c_compiler.py
+balt ~/Documents/Studium/pico-c-compiler/src/pico_c_compiler.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -94,15 +94,15 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 19
-normal! 020|
+normal! 022|
 tabnext
-edit src/lexer.py
+edit ~/Documents/Studium/pico-c-compiler/src/lexer.py
 argglobal
-if bufexists("src/lexer.py") | buffer src/lexer.py | else | edit src/lexer.py | endif
+if bufexists("~/Documents/Studium/pico-c-compiler/src/lexer.py") | buffer ~/Documents/Studium/pico-c-compiler/src/lexer.py | else | edit ~/Documents/Studium/pico-c-compiler/src/lexer.py | endif
 if &buftype ==# 'terminal'
-  silent file src/lexer.py
+  silent file ~/Documents/Studium/pico-c-compiler/src/lexer.py
 endif
-balt src/errors.py
+balt ~/Documents/Studium/pico-c-compiler/src/errors.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -113,17 +113,17 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 6 - ((5 * winheight(0) + 22) / 45)
+let s:l = 8 - ((7 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 6
-normal! 09|
+keepjumps 8
+normal! 02|
 tabnext
-edit src/parser.py
+edit ~/Documents/Studium/pico-c-compiler/src/parser.py
 argglobal
 4argu
-balt src/lexer.py
+balt ~/Documents/Studium/pico-c-compiler/src/lexer.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -139,16 +139,16 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 38
-normal! 014|
+normal! 022|
 tabnext
-edit src/grammer.py
+edit ~/Documents/Studium/pico-c-compiler/src/grammer.py
 argglobal
 1argu
-if bufexists("src/grammer.py") | buffer src/grammer.py | else | edit src/grammer.py | endif
+if bufexists("~/Documents/Studium/pico-c-compiler/src/grammer.py") | buffer ~/Documents/Studium/pico-c-compiler/src/grammer.py | else | edit ~/Documents/Studium/pico-c-compiler/src/grammer.py | endif
 if &buftype ==# 'terminal'
-  silent file src/grammer.py
+  silent file ~/Documents/Studium/pico-c-compiler/src/grammer.py
 endif
-balt src/parser.py
+balt ~/Documents/Studium/pico-c-compiler/src/parser.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -164,9 +164,9 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 10
-normal! 017|
+normal! 023|
 tabnext
-edit src/arithmetic_expression_grammer.py
+edit ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -186,11 +186,11 @@ set winwidth=1
 exe 'vert 1resize ' . ((&columns * 92 + 95) / 190)
 exe 'vert 2resize ' . ((&columns * 97 + 95) / 190)
 argglobal
-if bufexists("src/arithmetic_expression_grammer.py") | buffer src/arithmetic_expression_grammer.py | else | edit src/arithmetic_expression_grammer.py | endif
+if bufexists("~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py") | buffer ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py | else | edit ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py | endif
 if &buftype ==# 'terminal'
-  silent file src/arithmetic_expression_grammer.py
+  silent file ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammer.py
 endif
-balt src/parser.py
+balt ~/Documents/Studium/pico-c-compiler/src/parser.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -201,19 +201,19 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 106 - ((32 * winheight(0) + 22) / 45)
+let s:l = 102 - ((44 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 106
-normal! 035|
+keepjumps 102
+normal! 0
 wincmd w
 argglobal
-if bufexists("doc/grammer.txt") | buffer doc/grammer.txt | else | edit doc/grammer.txt | endif
+if bufexists("~/Documents/Studium/pico-c-compiler/doc/grammer.txt") | buffer ~/Documents/Studium/pico-c-compiler/doc/grammer.txt | else | edit ~/Documents/Studium/pico-c-compiler/doc/grammer.txt | endif
 if &buftype ==# 'terminal'
-  silent file doc/grammer.txt
+  silent file ~/Documents/Studium/pico-c-compiler/doc/grammer.txt
 endif
-balt src/arithmetic_expression.py
+balt ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -224,16 +224,15 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 53 - ((4 * winheight(0) + 22) / 45)
+let s:l = 54 - ((43 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 53
+keepjumps 54
 normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 92 + 95) / 190)
 exe 'vert 2resize ' . ((&columns * 97 + 95) / 190)
-if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico-c-compiler | endif
 tabnext
 edit ~/Documents/Studium/pico-c-compiler/src/ast_builder.py
 argglobal
@@ -252,12 +251,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 18 - ((14 * winheight(0) + 22) / 45)
+let s:l = 19 - ((15 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 18
-normal! 037|
+keepjumps 19
+normal! 06|
 tabnext
 edit ~/Documents/Studium/pico-c-compiler/src/abstract_syntax_tree.py
 argglobal
@@ -277,13 +276,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 35 - ((28 * winheight(0) + 22) / 45)
+let s:l = 46 - ((39 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 35
-normal! 09|
-if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico-c-compiler | endif
+keepjumps 46
+normal! 0
 tabnext 6
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

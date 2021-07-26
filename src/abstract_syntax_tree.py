@@ -42,9 +42,9 @@ class ASTNode:
         return acc
 
 
-# class ArithExprNode(ASTNode):
+class Prec1Node(ASTNode):
 
-    # """Abstract Syntax Tree for Arithmetic Expressions"""
+    """Abstract Syntax Tree for Arithmetic Expressions"""
 
-    # def __init__(self):
-        # super()__init__(self, token)
+    def __init__(self, token):
+        super().__init__(self, token)

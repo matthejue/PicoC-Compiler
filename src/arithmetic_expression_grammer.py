@@ -25,7 +25,7 @@ class ArithmeticExpressionGrammer(Grammer):
     def _prec2(self):
         """precedence 2
 
-        :grammer: <prec1> ((<binop_prec2>|<minus>) <prec1>)*
+        :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         :returns: None
 
         """
@@ -45,7 +45,7 @@ class ArithmeticExpressionGrammer(Grammer):
     def _prec1(self):
         """precedence 1
 
-        :grammer: <ao> (<binop_prec1> <ao>)*
+        :grammer:  #2 <ao> (<binop_prec1> #2 <ao>)*
         :returns: None
 
         """
@@ -94,20 +94,19 @@ class ArithmeticExpressionGrammer(Grammer):
     def _unop(self, ):
         """unary operator
 
-        :grammer: (<unop>|<minus>)+ number
+        :grammer: #1 (<unop>|<minus> #1)+ number
         :returns: None
 
         """
         savestate_node = self.ast_builder.down(ASTNode, TT.UNOP)
 
         while True:  # do while loop
-            self.ast_builder.down(ASTNode, TT.UNOP)
-
             self.match_and_add([TT.MINUS, TT.UNOP])
-
             if self.LTT(1) not in [TT.MINUS, TT.UNOP]:
                 break
 
-        self.match([TT.NUMBER])
+            self.ast_builder.down(ASTNode, TT.UNOP)
+
+        self.match_and_add([TT.NUMBER])
 
         self.ast_builder.up(savestate_node)
