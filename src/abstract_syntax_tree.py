@@ -7,6 +7,7 @@ class ASTNode:
     relationships the parser came across"""
 
     def __init__(self, token):
+        # TODO: rename it to t_or_tt
         self.token = token
         self.children = []
 
@@ -31,8 +32,9 @@ class ASTNode:
         return not self.token
 
     def __repr__(self):
-        if not self.children:
-            return str(self.token)
+        if len(self.children) == 1:
+            return f"{self.children[0]}"
+
         acc = f"({self.token}"
         for child in self.children:
             acc += f" {child}"

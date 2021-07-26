@@ -59,25 +59,33 @@ binop_prec3 : '&' | '|' | '^'
 **************************************************************************
 
 if ( «lookahead-predicts-alt1» ) {
-  down(classname, token)
+  savestate_node = down(classname, token)
   «match-alt1»
+  up(savestate_node)
 } else if ( «lookahead-predicts-alt2» ) {
-  down(classname, token)
+  savestate_node = down(classname, token)
   «match-alt2»
+  up(savestate_node)
 } else if ( «lookahead-predicts-altN» ) {
-  down(classname, token)
+  savestate_node = down(classname, token)
   «match-altN»
+  up(savestate_node)
 } else «throw-exception» // parse error (no viable alternative)
 
 if ( «lookahead-is-T» ) {
-  down()
+  savestate_node = down(classname, token)
   match(T);
+  up(savestate_node)
 } // no error else clause
 
 while ( «lookahead-predicts-an-alt-of-subrule» ) {
+  savestate_node = down(classname, token)
   «code-matching-alternatives»
+  up(savestate_node)
 }
 
 do {
+  savestate_node = down(classname, token)
   «code-matching-alternatives»
+  up(savestate_node)
 } while ( «lookahead-predicts-an-alt-of-subrule» );

@@ -29,16 +29,18 @@ class ArithmeticExpressionGrammer(Grammer):
         :returns: None
 
         """
-        # savestate_node = self.ast_builder.down(NC.ArithOpNode, TT.BINOP_PREC_2)
+        savestate_node = self.ast_builder.down(ASTNode, TT.BINOP_PREC_2)
 
         self._prec1()
+
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
-            if self.LTT(1) == TT.BINOP_PREC_2:
-                self.match(TT.BINOP_PREC_2)
-            elif self.LTT(1) == TT.MINUS:
-                self.match(TT.MINUS)
+            self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
+
+            self.ast_builder.down(ASTNode, TT.BINOP_PREC_2)
+
             self._prec1()
-            # self.ast_builder.up(savestate_node)
+
+        self.ast_builder.up(savestate_node)
 
     def _prec1(self):
         """precedence 1
@@ -47,10 +49,18 @@ class ArithmeticExpressionGrammer(Grammer):
         :returns: None
 
         """
+        savestate_node = self.ast_builder.down(ASTNode, TT.BINOP_PREC_1)
+
         self._ao()
+
         while self.LTT(1) == TT.BINOP_PREC_1:
-            self.match(TT.BINOP_PREC_1)
+            self.match_and_add([TT.BINOP_PREC_1])
+
+            self.ast_builder.down(ASTNode, TT.BINOP_PREC_1)
+
             self._ao()
+
+        self.ast_builder.up(savestate_node)
 
     def _ao(self):
         """arithmetic operand
@@ -60,9 +70,9 @@ class ArithmeticExpressionGrammer(Grammer):
 
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.match(TT.IDENTIFIER)
+            self.match_and_add([TT.IDENTIFIER])
         elif self.LTT(1) == TT.NUMBER:
-            self.match(TT.NUMBER)
+            self.match_and_add([TT.NUMBER])
         elif self.LTT(1) == TT.L_PAREN:
             self._paren()
         elif self.LTT(1) in [TT.MINUS, TT.UNOP]:
@@ -77,9 +87,9 @@ class ArithmeticExpressionGrammer(Grammer):
         :returns: None
 
         """
-        self.match(TT.L_PAREN)
+        self.match([TT.L_PAREN])
         self.code_ae()
-        self.match(TT.R_PAREN)
+        self.match([TT.R_PAREN])
 
     def _unop(self, ):
         """unary operator
@@ -88,12 +98,16 @@ class ArithmeticExpressionGrammer(Grammer):
         :returns: None
 
         """
+        savestate_node = self.ast_builder.down(ASTNode, TT.UNOP)
+
         while True:  # do while loop
-            if self.LTT(1) == TT.MINUS:
-                self.match(TT.MINUS)
-            elif self.LTT(1) == TT.UNOP:
-                self.match(TT.UNOP)
+            self.ast_builder.down(ASTNode, TT.UNOP)
+
+            self.match_and_add([TT.MINUS, TT.UNOP])
 
             if self.LTT(1) not in [TT.MINUS, TT.UNOP]:
                 break
-        self.match(TT.NUMBER)
+
+        self.match([TT.NUMBER])
+
+        self.ast_builder.up(savestate_node)

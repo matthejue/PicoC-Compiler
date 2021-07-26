@@ -44,14 +44,14 @@ class Parser:
         """
         return self.LT(i).type
 
-    def match(self, tt):
+    def match(self, tts):
         """Check if t is the next token in the lexer to match
 
         :tt: possibly matching tokentype
         :returns: TODO
 
         """
-        if (self.LTT(1) == tt):
+        if (self.LTT(1) in tts):
             self.next_token()
         else:
-            raise SyntaxError("'" + tt.value + "'", self.LT(1))
+            raise SyntaxError("'" + tts.value + "'", self.LT(1))

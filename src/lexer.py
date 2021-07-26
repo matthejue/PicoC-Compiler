@@ -19,6 +19,7 @@ class TT(Enum):
 
     """Tokentypes that are part of the grammer"""
 
+    ROOT = "ROOT"
     EOF = "EOF"
     NUMBER = "number"
     IDENTIFIER = "identifier"

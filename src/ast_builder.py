@@ -3,6 +3,7 @@ class ASTBuilder:
     """Provides methods for ast construction"""
 
     def __init__(self):
+        # TODO: root in ast umbennen
         self.root = None
         self.current_node = None
 
@@ -24,7 +25,7 @@ class ASTBuilder:
         if not self.root:
             self.root = new_node
         else:
-            self.current_node.addChild(new_node)
+            self.addChild(new_node)
         savestate_node = self.current_node
 
         # deeper grammar rules have to be called with a new current_node

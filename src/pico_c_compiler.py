@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from sys import exit
+# from sys import exit
 from lexer import Lexer, TT
-from arithmetic_expression_grammer import ArithmeticExpressionGrammer
+from function_grammer import FunctionGrammer
 import argparse
 
 ###############################################################################
@@ -138,8 +138,9 @@ def compile(fname, code):
         return tokens
 
     # Generate ast
-    parser = ArithmeticExpressionGrammer(lexer, 1)
-    parser.code_ae()
+    grammer = FunctionGrammer(lexer, 1)
+    grammer.parse()
+    print(grammer.ast_builder.root)
 
     # # Deal with --ast option
     # if args.ast:
