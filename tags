@@ -27,7 +27,6 @@ EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
 EQUALS	src/lexer.py	/^    EQUALS = "="$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(AssignmentGrammar):$/;"	c
-IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
 LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
 LETTER_DIGIT	src/lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
@@ -55,6 +54,7 @@ TokenNode	src/abstract_syntax_tree.py	/^class TokenNode:$/;"	c
 UNOP	src/lexer.py	/^    UNOP = "unary operator"$/;"	v	class:TT
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
 Used Resources	README.md	/^## Used Resources$/;"	s	chapter:Pico-C Compiler
+WORD	src/lexer.py	/^    WORD = "word"$/;"	v	class:TT
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:Prec1Node
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:TokenNode
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, tokentypes):$/;"	m	class:ASTNode
@@ -103,6 +103,7 @@ error	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v
 error	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 expected_output	.misc/test_errors	/^    expected_output = "(CONSTANT:12, ['BINOP', 'PRECEDENCE_1']:*, (CONSTANT:165, ['BINOP', 'PREC/;"	v	class:TestErrors
 getNodeType	src/abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
+init	src/assignment_grammar.py	/^    def init(self):$/;"	m	class:AssignmentGrammar
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
 lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:TestErrors
 main	.misc/pico_c_compiler	/^def main():$/;"	f
@@ -131,15 +132,17 @@ run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
 s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 19 - ((18 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 125 - ((32 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 15 - ((14 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 2 - ((1 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 24 - ((23 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 28 - ((27 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 35 - ((34 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 42 - ((41 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 44 - ((41 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 35 - ((16 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 45 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 9 - ((8 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 47 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 5 - ((4 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 50 - ((36 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 68 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	src/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	src/Session.vim	/^let s:l = 16 - ((15 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	src/Session.vim	/^let s:l = 18 - ((17 * winheight(0) + 22) \/ 45)$/;"	v

@@ -65,12 +65,12 @@ class ArithmeticExpressionGrammar(Parser):
     def _ao(self):
         """arithmetic operand
 
-        :grammer: <identifier> | <number> | <paren> | <unop>
+        :grammer: <word> | <number> | <paren> | <unop>
         :returns: None
 
         """
-        if self.LTT(1) == TT.IDENTIFIER:
-            self.match_and_add([TT.IDENTIFIER])
+        if self.LTT(1) == TT.WORD:
+            self.match_and_add([TT.WORD])
         elif self.LTT(1) == TT.NUMBER:
             self.match_and_add([TT.NUMBER])
         elif self.LTT(1) == TT.L_PAREN:

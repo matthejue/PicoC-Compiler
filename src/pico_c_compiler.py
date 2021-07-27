@@ -114,15 +114,15 @@ def compile(fname, code):
         return tokens
 
     # Generate ast
-    grammer = FunctionGrammar(lexer, 2)
-    # Assignment Grammer needs 2 num_lts for <va>
-    grammer.start_parse()
+    grammar = FunctionGrammar(lexer, 2)
+    # Assignment grammar needs 2 num_lts for <va>
+    grammar.start_parse()
 
     # Deal with --ast option
     if globals.args.ast:
         if globals.args.print:
-            print(grammer.ast_builder.root)
-        return grammer.ast_builder.root
+            print(grammar.ast_builder.root)
+        return grammar.ast_builder.root
 
     # TODO: CodeGenerator belongs here
 

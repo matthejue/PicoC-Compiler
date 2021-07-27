@@ -1,7 +1,7 @@
 class SyntaxError(Exception):
 
     """If there're Token sequences generated from the input that are not
-    permitted by the grammer rules"""
+    permitted by the grammar rules"""
 
     def __init__(self, expected, found):
         self.description = f"SyntaxError: Expected {expected}"\
@@ -12,7 +12,7 @@ class SyntaxError(Exception):
 class InvalidCharacterError(Exception):
 
     """If there're Token sequences generated from the input that are not
-    permitted by the grammer rules"""
+    permitted by the grammar rules"""
 
     def __init__(self, found):
         self.description = f"InvalidCharacterError: "\

@@ -4,7 +4,7 @@ from lexer import TT
 
 
 class AssignmentGrammar(ArithmeticExpressionGrammar):
-    """The assignment expression part of the context free grammer of the piocC
+    """The assignment expression part of the context free grammar of the piocC
     language"""
 
     def __init__(self, lexer, num_lts):
@@ -13,7 +13,7 @@ class AssignmentGrammar(ArithmeticExpressionGrammar):
     def code_a(self):
         """assignment expression
 
-        :grammer: <va>
+        :grammar: <va>
         :returns: None
 
         """
@@ -22,14 +22,14 @@ class AssignmentGrammar(ArithmeticExpressionGrammar):
     def va(self):
         """variable assignment
 
-        :grammer: #2 (<v> = #2)+ <e>
+        :grammar: #2 (<word> = #2)+ <ae>
         :returns: None
 
         """
         savestate_node = self.ast_builder.down(ASTNode, [TT.EQUALS])
 
         while True:
-            self.match_and_add([TT.IDENTIFIER])
+            self.match_and_add([TT.WORD])
             self.match_and_add([TT.EQUALS])
 
             if self.LTT(2) != TT.EQUALS:
@@ -40,3 +40,14 @@ class AssignmentGrammar(ArithmeticExpressionGrammar):
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
+
+    def init(self):
+        """initialisation of a variable
+
+        :grammar: <word> <word> = <ae>
+        :returns: None
+
+        """
+        # TODO: Testen, ob int var = zar = 12 funktioniert
+        self.match_and_add([TT.WORD])
+        self.match_and_add([TT.WORD])

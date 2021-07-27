@@ -20,12 +20,12 @@ class Token():
 
 class TT(Enum):
 
-    """Tokentypes that are part of the grammer"""
+    """Tokentypes that are part of the grammar"""
 
     ROOT = "ROOT"
     EOF = "EOF"
     NUMBER = "number"
-    IDENTIFIER = "identifier"
+    WORD = "word"
     UNOP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
@@ -41,7 +41,7 @@ class Lexer:
     """Identifies tokens in the picoC code
 
     :Info: The Lexer doesn't check if the token is also at the right position
-    to follow the grammer rules (that's the task of the parser). That's why
+    to follow the grammar rules (that's the task of the parser). That's why
     12ab will be split into a number an identifier Token and it's the task of
     the Parser to raise an error. That's also the reason why self.next_char()
     is used instead of self.match()
@@ -140,7 +140,7 @@ class Lexer:
     def _number(self):
         """
 
-        :grammer: <digit_without_zero> <digit_with_zero>*
+        :grammar: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
 
         """
@@ -156,7 +156,7 @@ class Lexer:
     def _identifier(self):
         """
 
-        :grammer: <letter> <letter_digit>*
+        :grammar: <letter> <letter_digit>*
         :returns: Identifier Token
 
         """
@@ -166,4 +166,4 @@ class Lexer:
             self.next_char()
             identifier += self.c
 
-        return Token(TT.IDENTIFIER, identifier)
+        return Token(TT.WORD, identifier)
