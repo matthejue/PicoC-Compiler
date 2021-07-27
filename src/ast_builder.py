@@ -7,13 +7,13 @@ class ASTBuilder:
         self.root = None
         self.current_node = None
 
-    def addChild(self, token_or_node):
+    def addChild(self, node):
         """
 
         :returns: None
 
         """
-        self.current_node.addChild(token_or_node)
+        self.current_node.addChild(node)
 
     def down(self, classname, token):
         """go one layer down in the abstract syntax tree

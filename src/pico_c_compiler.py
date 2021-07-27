@@ -1,29 +1,14 @@
 #!/usr/bin/env python
 
 # from sys import exit
+import argparse
 from lexer import Lexer, TT
 from function_grammer import FunctionGrammer
-import argparse
-
-###############################################################################
-#                              Gloabel Variables                              #
-###############################################################################
-
-args = None
+import globals
 
 ###############################################################################
 #                                    Main                                     #
 ###############################################################################
-
-
-# def basename(fname):
-# """stips of the file extension
-# :fname: filename
-# :returns: basename of the file
-
-# """
-# index_of_extension = fname.index(".")
-# return fname[0:index_of_extension]
 
 
 def main():
@@ -34,35 +19,47 @@ def main():
     cli_args_parser.add_argument("outfile", nargs='?',
                                  help="Output file with RETI Code")
     cli_args_parser.add_argument('-p', '--print', action='store_true',
-                                 help="Print the file output also out \
-                                 to the terminal")
+                                 help="Also output the file output to \
+                                 the terminal")
     cli_args_parser.add_argument('-a', '--ast', action='store_true',
                                  help="Output the Abstract Syntax Tree \
                                  instead of RETI Code")
     cli_args_parser.add_argument('-t', '--tokens', action='store_true',
                                  help="Output the Tokenlist instead of \
                                  RETI Code")
+    cli_args_parser.add_argument('-v', '--verbose', action='store_true',
+                                 help="Create verbose output for the ast")
 
-    global args
-    args = cli_args_parser.parse_args()
+    globals.args = cli_args_parser.parse_args()
 
-    if not args.infile:
+    if not globals.args.infile:
         shell()
 
-    # if args.infile:
-        # infile = args.infile
+    if globals.args.infile:
+        infile = globals.args.infile
 
-    # if args.outfile:
-        # outfile = args.outfile
-    # else:
-        # outfile = basename(infile) + ".reti"
+    if globals.args.outfile:
+        outfile = globals.args.outfile
+    else:
+        outfile = _basename(infile) + ".reti"
 
-    # try:
-        # read_file(infile, outfile)
-    # except FileNotFoundError:
-        # print("File does not exist")
-    # else:
-        # print("Compiled successfully")
+    try:
+        read_file(infile, outfile)
+    except FileNotFoundError:
+        print("File does not exist")
+    else:
+        print("Compiled successfully")
+
+
+def _basename(fname):
+    """stips of the file extension
+    :fname: filename
+    :returns: basename of the file
+
+    """
+    index_of_extension = fname.index(".")
+    return fname[0:index_of_extension]
+
 
 ###############################################################################
 #                                    Shell                                    #
@@ -75,8 +72,7 @@ def shell():
 
     """
     # shell is always executed with print
-    global args
-    args.print = True
+    globals.args.print = True
 
     while True:
         pico_c_in = input('pico_c > ')
@@ -94,67 +90,63 @@ def shell():
 ###############################################################################
 
 
-# def read_file(infile, outfile):
-    # """reads a pico_c file and compiles it
-    # :returns: pico_c Code compiled in RETI Assembler
+def read_file(infile, outfile):
+    """reads a pico_c file and compiles it
+    :returns: pico_c Code compiled in RETI Assembler
 
-    # """
-    # with open(infile, encoding="utf-8") as fin, \
-        # open(outfile, 'w', encoding="utf-8") as fout:
-        # pico_c_in = fin.readlines()
+    """
+    with open(infile, encoding="utf-8") as fin, \
+            open(outfile, 'w', encoding="utf-8") as fout:
+        pico_c_in = fin.readlines()[0]
+        # TODO: remove temporary solution to only read first line
 
-        # output, error = compile(infile, pico_c_in)
+        output = compile(infile, pico_c_in)
 
-        # if error:
-        # exit(1)
+        fout.writelines(str(output))
 
-        # fout.writelines(str(output))
-
-###############################################################################
-#                                   Compile                                   #
-###############################################################################
+##############################################################################
+#                                   Compile                                  #
+##############################################################################
 
 
 def compile(fname, code):
-    # remove any \n from the code
-    # code_without_cr = list(map(lambda line: line.strip(), code))
+    # remove all \n from the code
+    code_without_cr = list(map(lambda line: line.strip(), code))
 
     # Generate tokens
-    # lexer = Lexer(fname, code_without_cr)
-    lexer = Lexer(fname, code)
+    lexer = Lexer(fname, code_without_cr)
+    # lexer = Lexer(fname, code)
 
     # Deal with --tokens option
-    global args
-    if args.tokens:
+    if globals.args.tokens:
         tokens = []
         t = lexer.next_token()
         while t.type != TT.EOF:
             tokens += [t]
             t = lexer.next_token()
 
-        if args.print:
+        if globals.args.print:
             print(tokens)
 
         return tokens
 
     # Generate ast
     grammer = FunctionGrammer(lexer, 1)
-    grammer.parse()
-    print(grammer.ast_builder.root)
+    grammer.start_parse()
 
-    # # Deal with --ast option
-    # if args.ast:
-    # if args.print:
-    # print(syntax_tree_rootnode)
-    # return syntax_tree_rootnode, None
+    # Deal with --ast option
+    if globals.args.ast:
+        if globals.args.print:
+            print(grammer.ast_builder.root)
+        return grammer.ast_builder.root
 
-    # # TODO: CodeGenerator belongs here
+    # TODO: CodeGenerator belongs here
 
-    # # Deal with print option
-    # if args.print:
-    # print("Placeholder for RETI Code")
+    # Deal with print option
+    if globals.args.print:
+        print("Placeholder for RETI Code")
 
-    # return "Placeholder for RETI Code", None
+    return "Placeholder for RETI Code", None
 
 
 if __name__ == '__main__':

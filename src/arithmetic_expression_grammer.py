@@ -3,10 +3,9 @@ from parser import Parser
 from abstract_syntax_tree import ASTNode
 from errors import SyntaxError
 from lexer import TT
-from grammer import Grammer
 
 
-class ArithmeticExpressionGrammer(Grammer):
+class ArithmeticExpressionGrammer(Parser):
     """the arithmetic expression part of the context free grammer of the piocC
     language"""
 
@@ -91,7 +90,7 @@ class ArithmeticExpressionGrammer(Grammer):
         self.code_ae()
         self.match([TT.R_PAREN])
 
-    def _unop(self, ):
+    def _unop(self):
         """unary operator
 
         :grammer: #1 (<unop>|<minus> #1)+ number

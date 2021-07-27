@@ -1,6 +1,7 @@
 from errors import SyntaxError, InvalidCharacterError
 from enum import Enum
 import string
+import globals
 
 
 class Token():
@@ -12,7 +13,9 @@ class Token():
         self.value = value
 
     def __repr__(self):
-        return f"<{self.type},'{self.value}'>"
+        if globals.args.verbose:
+            return f"<{self.type},'{self.value}'>"
+        return f"'{self.value}'"
 
 
 class TT(Enum):
@@ -69,6 +72,7 @@ class Lexer:
 
         """
         while self.lc != self.EOF_CHAR:
+            # TODO: remove \n again
             if self.lc in ' \t':
                 self.next_char()
             elif self.lc == ';':

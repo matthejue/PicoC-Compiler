@@ -11,7 +11,7 @@ class FunctionGrammer(ArithmeticExpressionGrammer):
     def __init__(self, lexer, num_lts):
         super().__init__(lexer, num_lts)
 
-    def parse(self):
+    def start_parse(self):
         """start parsing the grammer
 
         :returns: None

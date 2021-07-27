@@ -1,4 +1,6 @@
 from errors import SyntaxError
+from ast_builder import ASTBuilder
+from abstract_syntax_tree import TokenNode
 
 
 class Parser:
@@ -20,12 +22,12 @@ class Parser:
         self.lt_idx = 0
         for _ in range(self.num_lts):
             self.next_token()
+        self.ast_builder = ASTBuilder()
 
     def next_token(self):
         """fills next position in the lookahead tokenlist with token
 
         :returns: None
-
         """
         self.lts[self.lt_idx] = self.lexer.next_token()
         self.lt_idx = (self.lt_idx + 1) % self.num_lts
@@ -45,13 +47,23 @@ class Parser:
         return self.LT(i).type
 
     def match(self, tts):
-        """Check if t is the next token in the lexer to match
+        """Check if tts are the next token in the lexer to match
 
-        :tt: possibly matching tokentype
-        :returns: TODO
-
+        :tts: possibly matching tokentypes
+        :returns: None, possibly an exception
         """
         if (self.LTT(1) in tts):
             self.next_token()
         else:
             raise SyntaxError("'" + tts.value + "'", self.LT(1))
+
+    def match_and_add(self, tts):
+        """add the current token to the ast and check if tts are the next token in
+        the lexer to match
+
+        :tts: possibly matching tokentypes
+        :returns: None, possibly an exception
+        """
+        # if (self.ast_builder.current_node.token not in tts):
+        self.ast_builder.addChild(TokenNode(self.LT(1)))
+        self.match(tts)
