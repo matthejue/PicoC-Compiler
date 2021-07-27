@@ -1,6 +1,5 @@
 from enum import Enum
 from lexer import Token
-import globals
 
 
 class TokenNode:
@@ -30,10 +29,14 @@ class ASTNode(TokenNode):
     """Abstract Syntax Tree holds the relevant Tokens and represents grammatical
     relationships the parser came across"""
 
-    def __init__(self, tokentype):
+    def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
         self.children = []
-        super().__init__(Token(tokentype, None))
+        # the first tokentype is always the actual tokentype and the others are
+        # for symbols like e.g. '-' which had to get a seperate tokentype
+        # because they overlap with e.g. unary and binary operations
+        super().__init__(Token(tokentypes[0], None))
+        self.tokentypes = tokentypes
 
     def addChild(self, node):
         """
@@ -46,7 +49,7 @@ class ASTNode(TokenNode):
         # TokenNode, the token of self can finally register the right value
         # being not instance of ASTNode means being instance of TokenNode
         if not isinstance(node, ASTNode) and \
-                self.token.type == node.token.type:
+                node.token.type in self.tokentypes:
             self.token.value = node.token.value
             return
 

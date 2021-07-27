@@ -15,13 +15,13 @@ class ASTBuilder:
         """
         self.current_node.addChild(node)
 
-    def down(self, classname, token):
+    def down(self, classname, tokens):
         """go one layer down in the abstract syntax tree
 
         :returns: None
 
         """
-        new_node = classname(token)
+        new_node = classname(tokens)
         if not self.root:
             self.root = new_node
         else:

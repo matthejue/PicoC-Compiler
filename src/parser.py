@@ -49,7 +49,7 @@ class Parser:
     def match(self, tts):
         """Check if tts are the next token in the lexer to match
 
-        :tts: possibly matching tokentypes
+        :tts: possibly matching tokentypes (because of symbols like e.g. '-')
         :returns: None, possibly an exception
         """
         if (self.LTT(1) in tts):
@@ -58,10 +58,10 @@ class Parser:
             raise SyntaxError("'" + tts.value + "'", self.LT(1))
 
     def match_and_add(self, tts):
-        """add the current token to the ast and check if tts are the next token in
+        """Add the current token to the ast and check if tts are the next token in
         the lexer to match
 
-        :tts: possibly matching tokentypes
+        :tts: possibly matching tokentypes (because of symbols like e.g. '-')
         :returns: None, possibly an exception
         """
         # if (self.ast_builder.current_node.token not in tts):

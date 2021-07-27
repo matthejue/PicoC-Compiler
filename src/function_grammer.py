@@ -17,5 +17,5 @@ class FunctionGrammer(ArithmeticExpressionGrammer):
         :returns: None
 
         """
-        self.ast_builder.down(ASTNode, TT.ROOT)
+        self.ast_builder.down(ASTNode, [TT.ROOT])
         self.code_ae()

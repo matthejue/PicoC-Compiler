@@ -28,14 +28,15 @@ class ArithmeticExpressionGrammer(Parser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, TT.BINOP_PREC_2)
+        savestate_node = self.ast_builder.down(
+            ASTNode, [TT.BINOP_PREC_2, TT.MINUS])
 
         self._prec1()
 
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
             self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
 
-            self.ast_builder.down(ASTNode, TT.BINOP_PREC_2)
+            self.ast_builder.down(ASTNode, [TT.BINOP_PREC_2, TT.MINUS])
 
             self._prec1()
 
@@ -48,14 +49,14 @@ class ArithmeticExpressionGrammer(Parser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, TT.BINOP_PREC_1)
+        savestate_node = self.ast_builder.down(ASTNode, [TT.BINOP_PREC_1])
 
         self._ao()
 
         while self.LTT(1) == TT.BINOP_PREC_1:
             self.match_and_add([TT.BINOP_PREC_1])
 
-            self.ast_builder.down(ASTNode, TT.BINOP_PREC_1)
+            self.ast_builder.down(ASTNode, [TT.BINOP_PREC_1])
 
             self._ao()
 
@@ -75,6 +76,10 @@ class ArithmeticExpressionGrammer(Parser):
         elif self.LTT(1) == TT.L_PAREN:
             self._paren()
         elif self.LTT(1) in [TT.MINUS, TT.UNOP]:
+            # for overlapping symbols liks e.g. '-' which overlap both with
+            # e.g. binary and unary operators, a seperate type (here: TT.MINUS)
+            # had  to be made and for unary opeartions one has to check both
+            # TT.MINUS and TT.UNOP
             self._unop()
         else:
             raise SyntaxError("aritmetic operand", self.LT(1))
@@ -97,14 +102,14 @@ class ArithmeticExpressionGrammer(Parser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, TT.UNOP)
+        savestate_node = self.ast_builder.down(ASTNode, [TT.UNOP, TT.MINUS])
 
         while True:  # do while loop
-            self.match_and_add([TT.MINUS, TT.UNOP])
-            if self.LTT(1) not in [TT.MINUS, TT.UNOP]:
+            self.match_and_add([TT.UNOP, TT.MINUS])
+            if self.LTT(1) not in [TT.UNOP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ASTNode, TT.UNOP)
+            self.ast_builder.down(ASTNode, [TT.UNOP, TT.MINUS])
 
         self.match_and_add([TT.NUMBER])
 
