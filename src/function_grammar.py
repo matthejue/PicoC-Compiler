@@ -1,9 +1,11 @@
-from arithmetic_expression_grammer import ArithmeticExpressionGrammer
+from assignment_grammar import AssignmentGrammar
 from abstract_syntax_tree import ASTNode
 from lexer import TT
 
+# TODO: FunctionGrammar zu Grammar umbennenen
 
-class FunctionGrammer(ArithmeticExpressionGrammer):
+
+class FunctionGrammar(AssignmentGrammar):
 
     """the function part of the context free grammer of the piocC
     language"""
@@ -18,4 +20,4 @@ class FunctionGrammer(ArithmeticExpressionGrammer):
 
         """
         self.ast_builder.down(ASTNode, [TT.ROOT])
-        self.code_ae()
+        self.code_a()

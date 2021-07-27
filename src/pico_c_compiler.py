@@ -3,12 +3,8 @@
 # from sys import exit
 import argparse
 from lexer import Lexer, TT
-from function_grammer import FunctionGrammer
+from function_grammar import FunctionGrammar
 import globals
-
-###############################################################################
-#                                    Main                                     #
-###############################################################################
 
 
 def main():
@@ -61,11 +57,6 @@ def _basename(fname):
     return fname[0:index_of_extension]
 
 
-###############################################################################
-#                                    Shell                                    #
-###############################################################################
-
-
 def shell():
     """reads pico_c input and prints corresponding reti assembler code
     :returns: None (terminal output of reti assembler code)
@@ -85,10 +76,6 @@ def shell():
         # compile('<stdin>', pico_c_in.split('\n'))
         compile('<stdin>', pico_c_in)
 
-###############################################################################
-#                                  Read File                                  #
-###############################################################################
-
 
 def read_file(infile, outfile):
     """reads a pico_c file and compiles it
@@ -103,10 +90,6 @@ def read_file(infile, outfile):
         output = compile(infile, pico_c_in)
 
         fout.writelines(str(output))
-
-##############################################################################
-#                                   Compile                                  #
-##############################################################################
 
 
 def compile(fname, code):
@@ -131,7 +114,8 @@ def compile(fname, code):
         return tokens
 
     # Generate ast
-    grammer = FunctionGrammer(lexer, 1)
+    grammer = FunctionGrammar(lexer, 2)
+    # Assignment Grammer needs 2 num_lts for <va>
     grammer.start_parse()
 
     # Deal with --ast option

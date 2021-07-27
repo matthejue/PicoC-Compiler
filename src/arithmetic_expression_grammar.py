@@ -5,8 +5,8 @@ from errors import SyntaxError
 from lexer import TT
 
 
-class ArithmeticExpressionGrammer(Parser):
-    """the arithmetic expression part of the context free grammer of the piocC
+class ArithmeticExpressionGrammar(Parser):
+    """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
     def __init__(self, lexer, num_lts):

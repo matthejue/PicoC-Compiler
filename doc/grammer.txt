@@ -58,8 +58,6 @@ binop_prec3 : '&' | '|' | '^'
 *                             Grammer translation                        *
 **************************************************************************
 
-
-
 if ( «lookahead-predicts-alt1» ) {
   «match-alt1»
 } else if ( «lookahead-predicts-alt2» ) {
