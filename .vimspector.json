@@ -17,6 +17,7 @@
           "./src/input.picoc",
           "./src/output.reti",
           "-a",
+          "-v",
           "-p"
         ]
       }

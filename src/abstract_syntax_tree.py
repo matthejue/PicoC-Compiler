@@ -7,8 +7,8 @@ class TokenNode:
 
     """Abstract Syntax Tree for Arithmetic Expressions"""
 
-    def __init__(self, tokentype):
-        self.token = Token(tokentype, None)
+    def __init__(self, token):
+        self.token = token
 
     def getNodeType(self):
         """
@@ -33,7 +33,7 @@ class ASTNode(TokenNode):
     def __init__(self, tokentype):
         # at the time of creation the tokenvalue is unknown
         self.children = []
-        super().__init__(tokentype)
+        super().__init__(Token(tokentype, None))
 
     def addChild(self, node):
         """
