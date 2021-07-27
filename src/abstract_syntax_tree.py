@@ -42,9 +42,14 @@ class ASTNode(TokenNode):
         :returns: None
 
         """
-        if self.token.type == node.token.type:
+        # in case the representative token of self appears as attribute of a
+        # TokenNode, the token of self can finally register the right value
+        # being not instance of ASTNode means being instance of TokenNode
+        if not isinstance(node, ASTNode) and \
+                self.token.type == node.token.type:
             self.token.value = node.token.value
             return
+
         self.children += [node]
 
     def __repr__(self):

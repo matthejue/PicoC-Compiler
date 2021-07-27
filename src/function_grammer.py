@@ -1,6 +1,6 @@
 from arithmetic_expression_grammer import ArithmeticExpressionGrammer
 from abstract_syntax_tree import ASTNode
-from lexer import Token, TT
+from lexer import TT
 
 
 class FunctionGrammer(ArithmeticExpressionGrammer):
