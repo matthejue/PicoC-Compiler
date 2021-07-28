@@ -1,1 +1,1 @@
-(<TT.ASSIGNMENT,'='> (<TT.ALLOC,'int'> <TT.WORD,'car'>) (<TT.ASSIGNMENT,'='> <TT.WORD,'var'> (<TT.ASSIGNMENT,'='> <TT.WORD,'gar'> (<TT.BINOP_PREC_2,'+'> <TT.WORD,'zar'> <TT.NUMBER,'48'>))))
+('=' ('int' 'var') ('=' 'car' ('=' 'tar' ('+' ('*' ('-' '12') ('-' 'car' ('-' ('-' '3')))) '1'))))

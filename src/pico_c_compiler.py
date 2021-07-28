@@ -74,7 +74,7 @@ def shell():
             continue
 
         # compile('<stdin>', pico_c_in.split('\n'))
-        compile('<stdin>', pico_c_in)
+        compile('<stdin>', [pico_c_in])
 
 
 def read_file(infile, outfile):

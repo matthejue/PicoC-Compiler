@@ -12,7 +12,7 @@ badd +19 src/errors.py
 badd +34 src/ast_builder.py
 badd +153 src/lexer.py
 badd +45 src/parser.py
-badd +120 src/pico_c_compiler.py
+badd +74 src/pico_c_compiler.py
 badd +3 term://~/Documents/Studium/pico-c-compiler//119220:/usr/bin/zsh
 badd +14 term:///home/areo/Documents/Studium/pico-c-compiler//137332:/usr/bin/python
 badd +20 .vimspector.json
@@ -48,15 +48,15 @@ badd +2 src/globals.py
 badd +1 assignment_expression_grammer.py
 badd +1 statement_expression_grammer.py
 badd +1 src/statement_sequence_grammar.py
-badd +13 src/arithmetic_expression_grammar.py
+badd +1 src/arithmetic_expression_grammar.py
 badd +1 src/assignment_grammar.py
 badd +23 src/function_grammar.py
 badd +1 term://~/Documents/Studium/pico-c-compiler//163116:/usr/bin/python
 badd +1 term://~/Documents/Studium/pico-c-compiler//168044:/usr/bin/python
 badd +1 term://~/Documents/Studium/pico-c-compiler//177776:/usr/bin/python
-badd +34 src/assignment_allocation_grammar.py
-badd +0 term://~/Documents/Studium/pico-c-compiler//68352:/usr/bin/python
-badd +0 term://~/Documents/Studium/pico-c-compiler//70358:/usr/bin/python
+badd +42 src/assignment_allocation_grammar.py
+badd +1 term://~/Documents/Studium/pico-c-compiler//68352:/usr/bin/python
+badd +1 term://~/Documents/Studium/pico-c-compiler//70358:/usr/bin/python
 argglobal
 %argdel
 $argadd src/errors.py
@@ -91,12 +91,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 98 - ((32 * winheight(0) + 22) / 45)
+let s:l = 74 - ((13 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 98
-normal! 07|
+keepjumps 74
+normal! 020|
 tabnext
 edit src/errors.py
 argglobal
@@ -117,7 +117,7 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 15
-normal! 025|
+normal! 027|
 tabnext
 edit src/globals.py
 argglobal
@@ -160,12 +160,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 128 - ((30 * winheight(0) + 22) / 45)
+let s:l = 129 - ((31 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 128
-normal! 016|
+keepjumps 129
+normal! 02|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico-c-compiler | endif
 tabnext
 edit ~/Documents/Studium/pico-c-compiler/src/parser.py
@@ -187,7 +187,7 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 45
-normal! 03|
+normal! 05|
 tabnext
 edit ~/Documents/Studium/pico-c-compiler/src/arithmetic_expression_grammar.py
 argglobal
@@ -212,7 +212,7 @@ if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
 keepjumps 80
-normal! 023|
+normal! 025|
 tabnext
 edit ~/Documents/Studium/pico-c-compiler/src/assignment_allocation_grammar.py
 let s:save_splitbelow = &splitbelow
@@ -249,12 +249,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 34 - ((24 * winheight(0) + 22) / 45)
+let s:l = 41 - ((24 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 34
-normal! 014|
+keepjumps 41
+normal! 0
 wincmd w
 argglobal
 if bufexists("~/Documents/Studium/pico-c-compiler/doc/grammer.txt") | buffer ~/Documents/Studium/pico-c-compiler/doc/grammer.txt | else | edit ~/Documents/Studium/pico-c-compiler/doc/grammer.txt | endif
@@ -404,7 +404,7 @@ keepjumps exe s:l
 normal! zt
 keepjumps 1
 normal! 05|
-tabnext 7
+tabnext 1
 set stal=1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

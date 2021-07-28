@@ -14,6 +14,8 @@
 2	.vimspector.json	/^          "-a",$/;"	s	array:configurations.Debug.configuration.args
 3	.vimspector.json	/^          "-v",$/;"	s	array:configurations.Debug.configuration.args
 4	.vimspector.json	/^          "-p"$/;"	s	array:configurations.Debug.configuration.args
+ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
+ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
 ASTNode	src/abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
 ArithmeticExpressionGrammar	src/arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(Parser):$/;"	c
@@ -25,7 +27,6 @@ DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Le
 Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
 EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
-EQUALS	src/lexer.py	/^    EQUALS = "="$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(AssignmentAllocationGrammar):$/;"	c
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
 LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
@@ -83,6 +84,7 @@ adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configuratio
 addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
 addChild	src/ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
 all	Makefile	/^all: run-shell-ast clean$/;"	t
+alloc	src/assignment_allocation_grammar.py	/^    def alloc(self):$/;"	m	class:AssignmentAllocationGrammar
 args	.misc/pico_c_compiler	/^args = None$/;"	v
 args	.vimspector.json	/^        "args": [$/;"	a	object:configurations.Debug.configuration
 args	src/globals.py	/^args = None$/;"	v
@@ -103,7 +105,6 @@ error	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v
 error	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 expected_output	.misc/test_errors	/^    expected_output = "(CONSTANT:12, ['BINOP', 'PRECEDENCE_1']:*, (CONSTANT:165, ['BINOP', 'PREC/;"	v	class:TestErrors
 getNodeType	src/abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
-init	src/assignment_allocation_grammar.py	/^    def init(self):$/;"	m	class:AssignmentAllocationGrammar
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
 lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:TestErrors
 main	.misc/pico_c_compiler	/^def main():$/;"	f
@@ -134,15 +135,15 @@ run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
 s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 10 - ((9 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 128 - ((30 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 129 - ((31 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 15 - ((14 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 2 - ((1 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 24 - ((23 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 34 - ((24 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 41 - ((24 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 45 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 48 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
+s:l	Session.vim	/^let s:l = 74 - ((13 * winheight(0) + 22) \/ 45)$/;"	v
 s:l	Session.vim	/^let s:l = 80 - ((38 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 98 - ((32 * winheight(0) + 22) \/ 45)$/;"	v
 s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
 s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
@@ -165,4 +166,3 @@ test_varying_spacing	.misc/test_parser	/^    def test_varying_spacing(self):$/;"
 tokens	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 type	.vimspector.json	/^        "type": "python",$/;"	s	object:configurations.Debug.configuration
 up	src/ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
-va	src/assignment_allocation_grammar.py	/^    def va(self):$/;"	m	class:AssignmentAllocationGrammar
