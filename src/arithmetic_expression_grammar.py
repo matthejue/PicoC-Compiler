@@ -13,7 +13,7 @@ class ArithmeticExpressionGrammar(Parser):
         super().__init__(lexer, num_lts)
 
     def code_ae(self):
-        """arithmetic expression
+        """arithmetic expression startpoint
 
         :grammer: <prec2>
         :returns: None

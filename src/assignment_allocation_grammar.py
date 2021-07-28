@@ -11,7 +11,7 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
         super().__init__(lexer, num_lts)
 
     def code_aa(self):
-        """assignment expression
+        """assignment and allocation startpoint
 
         :grammar: <aa>
         :returns: None
@@ -20,7 +20,7 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
         self.aa()
 
     def aa(self):
-        """assignment or allocation
+        """assignment and allocation
 
         :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2)* <ae>)
         :returns: None

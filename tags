@@ -27,7 +27,8 @@ DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Le
 Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
 EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
-FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(AssignmentAllocationGrammar):$/;"	c
+FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
+FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
 LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
 LETTER_DIGIT	src/lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
@@ -44,6 +45,7 @@ ROOT	src/lexer.py	/^    ROOT = "ROOT"$/;"	v	class:TT
 R_PAREN	src/lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
 SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
+StatementSequenceGrammar	src/statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
 SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARIES	Makefile	/^TEST_BINARIES = $(wildcard .\/test\/*_test.py)$/;"	m
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
@@ -67,6 +69,7 @@ __init__	src/function_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m
 __init__	src/lexer.py	/^    def __init__(self, fname, input):$/;"	m	class:Lexer
 __init__	src/lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
 __init__	src/parser.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:Parser
+__init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:StatementSequenceGrammar
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
 __repr__	src/lexer.py	/^    def __repr__(self):$/;"	m	class:Token
@@ -93,6 +96,7 @@ clean	Makefile	/^clean:$/;"	t
 code_aa	src/assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
 code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
 code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
+code_ss	src/statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
 compile	.misc/pico_c_compiler	/^def compile(fname, code):$/;"	f
 compile	src/pico_c_compiler.py	/^def compile(fname, code):$/;"	f
 configuration	.vimspector.json	/^      "configuration": {$/;"	o	object:configurations.Debug
@@ -133,27 +137,15 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 10 - ((9 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 129 - ((31 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 15 - ((14 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 2 - ((1 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 24 - ((23 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 41 - ((24 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 45 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 48 - ((44 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 74 - ((13 * winheight(0) + 22) \/ 45)$/;"	v
-s:l	Session.vim	/^let s:l = 80 - ((38 * winheight(0) + 22) \/ 45)$/;"	v
-s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
-s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
-s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
-s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
+s	src/statement_sequence_grammar.py	/^    def s(self):$/;"	m	class:StatementSequenceGrammar
+s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 23) \/ 46)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
 shell	src/pico_c_compiler.py	/^def shell():$/;"	f
+ss	src/statement_sequence_grammar.py	/^    def ss(self):$/;"	m	class:StatementSequenceGrammar
 start_parse	src/function_grammar.py	/^    def start_parse(self):$/;"	m	class:FunctionGrammar
 stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
 syntax_tree_rootnode	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors

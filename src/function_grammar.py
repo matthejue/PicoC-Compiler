@@ -1,11 +1,13 @@
-from assignment_allocation_grammar import AssignmentAllocationGrammar
+# from assignment_allocation_grammar import AssignmentAllocationGrammar
+from statement_sequence_grammar import StatementSequenceGrammar
 from abstract_syntax_tree import ASTNode
 from lexer import TT
 
 # TODO: FunctionGrammar zu Grammar umbennenen
 
 
-class FunctionGrammar(AssignmentAllocationGrammar):
+# class FunctionGrammar(AssignmentAllocationGrammar):
+class FunctionGrammar(StatementSequenceGrammar):
 
     """the function part of the context free grammar of the piocC
     language"""
@@ -19,5 +21,10 @@ class FunctionGrammar(AssignmentAllocationGrammar):
         :returns: None
 
         """
-        self.ast_builder.down(ASTNode, [TT.ROOT])
-        self.code_aa()
+        self.ast_builder.down(ASTNode, [TT.FUNCTION])
+        self.code_ss()
+        # self.code_aa()
+
+        # little check to make the second statement visible, TODO: remove it
+        # later
+        self.ast_builder.current_node.token.value = "my_function"

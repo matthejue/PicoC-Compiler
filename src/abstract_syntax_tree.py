@@ -41,7 +41,6 @@ class ASTNode(TokenNode):
     def addChild(self, node):
         """
 
-        :t: subtree
         :returns: None
 
         """
