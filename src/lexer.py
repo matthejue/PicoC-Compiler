@@ -29,11 +29,12 @@ class TT(Enum):
     UNOP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
-    EQUALS = "="
+    ASSIGNMENT = "="
     L_PAREN = "("
     R_PAREN = ")"
     SEMICOLON = ";"
     MINUS = "-"
+    ALLOC = "allocation"
 
 
 class Lexer:
@@ -103,10 +104,10 @@ class Lexer:
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
             elif self.lc in self.LETTER:
-                return self._identifier()
+                return self._word()
             elif self.lc == "=":
                 self.next_char()
-                return Token(TT.EQUALS, self.c)
+                return Token(TT.ASSIGNMENT, self.c)
             else:
                 raise InvalidCharacterError(self.lc)
         return Token(TT.EOF, self.lc)
@@ -144,7 +145,6 @@ class Lexer:
         :returns: Number Token
 
         """
-
         self.next_char()
         number = self.c
         while self.lc in self.DIGIT_WITH_ZERO:
@@ -153,7 +153,7 @@ class Lexer:
 
         return Token(TT.NUMBER, int(number))
 
-    def _identifier(self):
+    def _word(self):
         """
 
         :grammar: <letter> <letter_digit>*
@@ -161,9 +161,9 @@ class Lexer:
 
         """
         self.next_char()
-        identifier = self.c
+        word = self.c
         while self.lc in self.LETTER_DIGIT:
             self.next_char()
-            identifier += self.c
+            word += self.c
 
-        return Token(TT.WORD, identifier)
+        return Token(TT.WORD, word)

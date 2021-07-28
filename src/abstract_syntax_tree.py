@@ -45,10 +45,12 @@ class ASTNode(TokenNode):
         :returns: None
 
         """
-        # in case the representative token of self appears as attribute of a
+        # in case the representative tokens of self appear as attribute of a
         # TokenNode, the token of self can finally register the right value
-        # being not instance of ASTNode means being instance of TokenNode
-        if not isinstance(node, ASTNode) and \
+        # being not instance of ASTNode means being instance of TokenNode.
+        # Because of e.g. <alloc>: <word> <word> ... one should only take the
+        # first TokenNode matching the possible representative tokens
+        if not self.token.value and not isinstance(node, ASTNode) and \
                 node.token.type in self.tokentypes:
             self.token.value = node.token.value
             return

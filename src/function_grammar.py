@@ -1,11 +1,11 @@
-from assignment_grammar import AssignmentGrammar
+from assignment_allocation_grammar import AssignmentAllocationGrammar
 from abstract_syntax_tree import ASTNode
 from lexer import TT
 
 # TODO: FunctionGrammar zu Grammar umbennenen
 
 
-class FunctionGrammar(AssignmentGrammar):
+class FunctionGrammar(AssignmentAllocationGrammar):
 
     """the function part of the context free grammar of the piocC
     language"""
@@ -20,4 +20,4 @@ class FunctionGrammar(AssignmentGrammar):
 
         """
         self.ast_builder.down(ASTNode, [TT.ROOT])
-        self.code_a()
+        self.code_aa()

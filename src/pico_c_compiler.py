@@ -87,14 +87,15 @@ def read_file(infile, outfile):
         pico_c_in = fin.readlines()[0]
         # TODO: remove temporary solution to only read first line
 
-        output = compile(infile, pico_c_in)
+        output = compile(infile, [pico_c_in])
 
         fout.writelines(str(output))
 
 
 def compile(fname, code):
     # remove all \n from the code
-    code_without_cr = list(map(lambda line: line.strip(), code))
+    code_without_cr = list(map(lambda line: line.strip(), code))[0]
+    # TODO: remove temporary solution to only read first line
 
     # Generate tokens
     lexer = Lexer(fname, code_without_cr)
@@ -114,7 +115,7 @@ def compile(fname, code):
         return tokens
 
     # Generate ast
-    grammar = FunctionGrammar(lexer, 2)
+    grammar = FunctionGrammar(lexer, 3)
     # Assignment grammar needs 2 num_lts for <va>
     grammar.start_parse()
 

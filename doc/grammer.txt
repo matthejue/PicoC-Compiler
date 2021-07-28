@@ -2,7 +2,7 @@
 *                        Statement Sequences (code_ss)                        *
 *******************************************************************************
 
-ss = <s> <ss>
+ss = <s> ; <ss>
 ss = <emptyword>
 s = <code_a>
 s = <code_cs>
@@ -13,9 +13,9 @@ s = <code_ls>
 *******************************************************************************
 
 va   : <v> = <va>
-va   : <v> = <e>;
+va   : <v> = <e>
 init : <t> <va>
-init : <t> <v>;
+init : <t> <v>
 init : const <t> <va>
 
 *******************************************************************************
@@ -47,7 +47,7 @@ binops_prec1 : '*' | '/' | '%'
 unops        : '-' | '~'
 
 ** implemented by lexer: **
-number                   : <digit_with_zero> <digit_without_zero>
+number                  : <digit_with_zero> <digit_without_zero>
 digit_with_zero         : '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 digit_without_zero      : <digit_without_zero> <digit_without_zero> | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 
