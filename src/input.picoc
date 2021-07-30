@@ -1,1 +1,1 @@
-int var = car = -12 * (car - 3) + 1; var = car = tar = 12 - --3;
+int var = -12; car = var;
