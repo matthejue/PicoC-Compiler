@@ -37,6 +37,9 @@ class ASTNode(TokenNode):
         # because they overlap with e.g. unary and binary operations
         super().__init__(Token(tokentypes[0], None))
         self.tokentypes = tokentypes
+        # decide whether a node should be ignored and just show his children if
+        # he has any
+        self.ignore = True
 
     def addChild(self, node):
         """
@@ -52,16 +55,29 @@ class ASTNode(TokenNode):
         if not self.token.value and not isinstance(node, ASTNode) and \
                 node.token.type in self.tokentypes:
             self.token.value = node.token.value
+            self.ignore = False
             return
 
         self.children += [node]
+
+    def activate(self):
+        """Stop ignoring the node. If a node hasn't a activation token it can
+        be activated to not be ignored anymore by this function
+
+        :returns: None
+
+        """
+        self.ignore = False
 
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
         # and should be skipped
         if not self.children:
             return f"{self.token}"
-        elif not self.token.value:
+        # TODO: swap the order of this conditional statements when finishing
+        # the project because if a node isn't activated it should never be
+        # seen, it's just useful for debugging to have it the other way round
+        elif self.ignore:
             return f"{self.children[0]}"
 
         acc = f"({self.token}"

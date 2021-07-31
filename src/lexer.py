@@ -35,6 +35,7 @@ class TT(Enum):
     SEMICOLON = ";"
     MINUS = "-"
     ALLOC = "allocation"
+    STATEMENT = "statement"
     FUNCTION = "function"
 
 

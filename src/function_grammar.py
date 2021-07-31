@@ -1,12 +1,10 @@
-# from assignment_allocation_grammar import AssignmentAllocationGrammar
 from statement_sequence_grammar import StatementSequenceGrammar
 from abstract_syntax_tree import ASTNode
 from lexer import TT
 
-# TODO: FunctionGrammar zu Grammar umbennenen
+# TODO: Grammar irgendwo als oberste Grammar noch einrichten
 
 
-# class FunctionGrammar(AssignmentAllocationGrammar):
 class FunctionGrammar(StatementSequenceGrammar):
 
     """the function part of the context free grammar of the piocC
@@ -22,9 +20,10 @@ class FunctionGrammar(StatementSequenceGrammar):
 
         """
         self.ast_builder.down(ASTNode, [TT.FUNCTION])
-        self.code_ss()
-        # self.code_aa()
 
-        # little check to make the second statement visible, TODO: remove it
+        # little heck to make the second statement visible, TODO: remove it
         # later
         self.ast_builder.current_node.token.value = "my_function"
+        self.ast_builder.activate()
+
+        self.code_ss()

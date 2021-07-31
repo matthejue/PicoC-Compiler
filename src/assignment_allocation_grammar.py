@@ -26,7 +26,8 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
+        savestate_node = self.ast_builder.down(
+            ASTNode, [TT.STATEMENT, TT.ASSIGNMENT])
 
         if self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.WORD])

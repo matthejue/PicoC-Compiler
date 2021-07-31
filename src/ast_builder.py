@@ -42,3 +42,12 @@ class ASTBuilder:
         # grammar rules called on the same layer have to be called with the
         # same old current_node again
         self.current_node = savestate_node
+
+    def activate(self):
+        """Activate the current_node to not be ignored anymore, if he himself
+        doesn't have a activation token which could do this for him
+
+        :returns: None
+
+        """
+        self.current_node.activate()
