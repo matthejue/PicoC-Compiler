@@ -40,7 +40,6 @@ class TT(Enum):
     NOT = "not operator or not as part of logical expression grammar"
     AND_OP = "and operator"
     OR_OP = "or operator"
-    NOT = "not as part of logical expression grammar"
     AND = "and as part of logical expression grammar"
     OR = "or as part of logical expression grammar"
 

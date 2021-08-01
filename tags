@@ -15,7 +15,8 @@
 3	.vimspector.json	/^          "-v",$/;"	s	array:configurations.Debug.configuration.args
 4	.vimspector.json	/^          "-p"$/;"	s	array:configurations.Debug.configuration.args
 ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
-AND	src/lexer.py	/^    AND = "and"$/;"	v	class:TT
+AND	src/lexer.py	/^    AND = "and as part of logical expression grammar"$/;"	v	class:TT
+AND_OP	src/lexer.py	/^    AND_OP = "and operator"$/;"	v	class:TT
 ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
 ASTNode	src/abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
@@ -23,7 +24,7 @@ ArithmeticExpressionGrammar	src/arithmetic_expression_grammar.py	/^class Arithme
 AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):$/;"	c
 BINOP_PREC_1	src/lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
 BINOP_PREC_2	src/lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 2"$/;"	v	class:TT
-COMP_OP	src/lexer.py	/^    COMP_OP = "comparision operator"$/;"	v	class:TT
+COMP_OPERATOR	src/lexer.py	/^    COMP_OPERATOR = ['==', '<=', '>=', '<', '>']$/;"	v	class:Lexer
 ConditionalGrammar	src/conditional_grammar.py	/^class ConditionalGrammar(LogicExpressionGrammar):$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
 DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
@@ -41,9 +42,11 @@ L_PAREN	src/lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
 Lexer	src/lexer.py	/^class Lexer:$/;"	c
 LogicExpressionGrammar	src/logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
 MINUS	src/lexer.py	/^    MINUS = "-"$/;"	v	class:TT
-NOT	src/lexer.py	/^    NOT = "negation"$/;"	v	class:TT
+NOT	src/lexer.py	/^    NOT = "not as part of logical expression grammar"$/;"	v	class:TT
+NOT	src/lexer.py	/^    NOT = "not operator or not as part of logical expression grammar"$/;"	v	class:TT
 NUMBER	src/lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
-OR	src/lexer.py	/^    OR = "OR"$/;"	v	class:TT
+OR	src/lexer.py	/^    OR = "or as part of logical expression grammar"$/;"	v	class:TT
+OR_OP	src/lexer.py	/^    OR_OP = "or operator"$/;"	v	class:TT
 Parser	src/parser.py	/^class Parser:$/;"	c
 Pico-C Compiler	README.md	/^# Pico-C Compiler$/;"	c
 Prec1Node	src/abstract_syntax_tree.py	/^class Prec1Node(ASTNode):$/;"	c
@@ -60,7 +63,7 @@ TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
 TokenNode	src/abstract_syntax_tree.py	/^class TokenNode:$/;"	c
-UNOP	src/lexer.py	/^    UNOP = "unary operator"$/;"	v	class:TT
+UNARY_OP	src/lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
 Used Resources	README.md	/^## Used Resources$/;"	s	chapter:Pico-C Compiler
 WORD	src/lexer.py	/^    WORD = "word"$/;"	v	class:TT
@@ -88,6 +91,7 @@ _and	src/lexer.py	/^    def _and(self):$/;"	m	class:Lexer
 _ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
 _basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
 _comment	.vimspector.json	/^        "_comment": "args: [.\/src\/input.picoc, .\/src\/output.reti, -p, -a]",$/;"	s	object:configurations.Debug.configuration
+_comp_operator	src/lexer.py	/^    def _comp_operator(self):$/;"	m	class:Lexer
 _is_assignment	src/statement_sequence_grammar.py	/^    def _is_assignment(self):$/;"	m	class:StatementSequenceGrammar
 _is_statement	src/statement_sequence_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementSequenceGrammar
 _number	src/lexer.py	/^    def _number(self):$/;"	m	class:Lexer
@@ -154,7 +158,7 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 206 - ((89 * winheight(0) + 23) \/ 46)$/;"	v
+s:l	Session.vim	/^let s:l = 4 - ((3 * winheight(0) + 23) \/ 46)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
