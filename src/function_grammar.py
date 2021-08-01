@@ -24,6 +24,6 @@ class FunctionGrammar(StatementSequenceGrammar):
         # little heck to make the second statement visible, TODO: remove it
         # later
         self.ast_builder.current_node.token.value = "my_function"
-        self.ast_builder.activate()
+        self.ast_builder.current_node.ignore = False
 
         self.code_ss()

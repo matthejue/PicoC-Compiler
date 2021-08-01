@@ -1,7 +1,7 @@
-from arith
+from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 
 
-class LogicExpressionGrammar(Arithmet):
+class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
     """The logic expression part of the context free grammar of the piocC
     language"""
@@ -18,11 +18,11 @@ class LogicExpressionGrammar(Arithmet):
         """
         pass
 
-    def function(self, arg1):
-        """TODO: Docstring for function.
+    def le(self):
+        """logic expression
 
-        :function: TODO
-        :returns: TODO
+        :grammar: !<le>
+        :returns: None
 
         """
         pass

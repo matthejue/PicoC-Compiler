@@ -1,1 +1,1 @@
-(<TT.FUNCTION,'my_function'> (<TT.STATEMENT,'='> (<TT.ALLOC,'int'> <TT.WORD,'var'>) (<TT.UNOP,'-'> <TT.NUMBER,'12'>)) (<TT.STATEMENT,'='> <TT.WORD,'car'> <TT.WORD,'var'>))
+('my_function' ('=' ('int' 'var') ('-' '12')) ('=' 'car' 'var'))

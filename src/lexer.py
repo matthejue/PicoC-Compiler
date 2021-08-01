@@ -26,7 +26,7 @@ class TT(Enum):
     EOF = "EOF"
     NUMBER = "number"
     WORD = "word"
-    UNOP = "unary operator"
+    UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
     ASSIGNMENT = "="
@@ -37,6 +37,12 @@ class TT(Enum):
     ALLOC = "allocation"
     STATEMENT = "statement"
     FUNCTION = "function"
+    NOT = "not operator or not as part of logical expression grammar"
+    AND_OP = "and operator"
+    OR_OP = "or operator"
+    NOT = "not as part of logical expression grammar"
+    AND = "and as part of logical expression grammar"
+    OR = "or as part of logical expression grammar"
 
 
 class Lexer:
@@ -55,6 +61,7 @@ class Lexer:
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
+    COMP_OPERATOR = ['==', '<=', '>=', '<', '>']
 
     def __init__(self, fname, input):
         """
@@ -96,7 +103,7 @@ class Lexer:
                 # minus has a special role because it can be both a unary and
                 # binary operator
                 self.next_char()
-                return Token(TT.UNOP, self.c)
+                return Token(TT.UNARY_OP, self.c)
             elif self.lc == '(':
                 self.next_char()
                 return Token(TT.L_PAREN, self.c)
@@ -110,6 +117,15 @@ class Lexer:
             elif self.lc == "=":
                 self.next_char()
                 return Token(TT.ASSIGNMENT, self.c)
+            elif self.lc == "!":
+                self.next_char()
+                return Token(TT.NOT, self.c)
+            elif self.lc == "&":
+                return self._and()
+            elif self.lc == "|":
+                return self._or()
+            elif self.lc in self.COMP_OPERATOR:
+                return self._comp_operator()
             else:
                 raise InvalidCharacterError(self.lc)
         return Token(TT.EOF, self.lc)
@@ -169,3 +185,37 @@ class Lexer:
             word += self.c
 
         return Token(TT.WORD, word)
+
+    def _and(self):
+        """
+
+        :grammar: &&?
+        :returns: None
+
+        """
+        self.next_char()
+        if self.lc == '&':
+            self.next_char()
+            return Token(TT.AND, self.c)
+        return Token(TT.AND_OP, self.c)
+
+    def _or(self):
+        """
+
+        :grammar: '|''|'?
+        :returns: None
+
+        """
+        self.next_char()
+        if self.lc == '|':
+            self.next_char()
+            return Token(TT.OR, self.c)
+        return Token(TT.OR_OP, self.c)
+
+    def _comp_operator(self):
+        """
+
+        :grammar: == | <=? | >=?
+        :returns: None
+
+        """

@@ -3,7 +3,7 @@ class ASTBuilder:
     """Provides methods for ast construction"""
 
     def __init__(self):
-        # TODO: root in ast umbennen
+        # TODO: root in ast umbenennen
         self.root = None
         self.current_node = None
 

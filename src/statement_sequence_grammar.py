@@ -18,9 +18,9 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         :returns: None
 
         """
-        self.ss()
+        self._ss()
 
-    def ss(self):
+    def _ss(self):
         """statement sequence
 
         :grammar: (<s>? ;)+
@@ -28,30 +28,35 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
 
         """
         while True:
-            self.s()
+            if self._is_statement():
+                self._s()
             self.match([TT.SEMICOLON])
 
             # TODO: add in other statement types by replacing the false
-            if not (self.is_assignment() or False):
+            if not (self._is_statement() or self.LTT(1) == TT.SEMICOLON):
                 break
 
-    def s(self):
+    def _s(self):
         """statement
 
         :grammar: <code_aa> | ...
         :returns: None
 
         """
-        if self.is_assignment():
+        if self._is_assignment():
             self.code_aa()
         # TODO: elif ...
         else:
             raise SyntaxError("statement", self.LT(1))
 
-    def is_assignment(self):
+    def _is_assignment(self):
         """Test whether the next statement is a assignment.
 
         :returns: boolean
 
         """
-        return self.LTT(2) == TT.ASSIGNMENT or self.LTT(3) == TT.ASSIGNMENT
+        return self.LTT(2) == TT.ASSIGNMENT or (self.LTT(1) == TT.WORD and
+                                                self.LTT(2) == TT.WORD)
+
+    def _is_statement(self):
+        return self._is_assignment() or False

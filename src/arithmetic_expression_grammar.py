@@ -1,5 +1,4 @@
 from parser import Parser
-
 from abstract_syntax_tree import ASTNode
 from errors import SyntaxError
 from lexer import TT
@@ -75,7 +74,7 @@ class ArithmeticExpressionGrammar(Parser):
             self.match_and_add([TT.NUMBER])
         elif self.LTT(1) == TT.L_PAREN:
             self._paren()
-        elif self.LTT(1) in [TT.MINUS, TT.UNOP]:
+        elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
             # for overlapping symbols liks e.g. '-' which overlap both with
             # e.g. binary and unary operators, a seperate type (here: TT.MINUS)
             # had  to be made and for unary opeartions one has to check both
@@ -102,14 +101,15 @@ class ArithmeticExpressionGrammar(Parser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.UNOP, TT.MINUS])
+        savestate_node = self.ast_builder.down(
+            ASTNode, [TT.UNARY_OP, TT.MINUS])
 
         while True:  # do while loop
-            self.match_and_add([TT.UNOP, TT.MINUS])
-            if self.LTT(1) not in [TT.UNOP, TT.MINUS]:
+            self.match_and_add([TT.UNARY_OP, TT.MINUS])
+            if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ASTNode, [TT.UNOP, TT.MINUS])
+            self.ast_builder.down(ASTNode, [TT.UNARY_OP, TT.MINUS])
 
         self.match_and_add([TT.NUMBER])
 
