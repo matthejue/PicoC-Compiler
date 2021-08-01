@@ -60,15 +60,6 @@ class ASTNode(TokenNode):
 
         self.children += [node]
 
-    def activate(self):
-        """Stop ignoring the node. If a node hasn't a activation token it can
-        be activated to not be ignored anymore by this function
-
-        :returns: None
-
-        """
-        self.ignore = False
-
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
         # and should be skipped
