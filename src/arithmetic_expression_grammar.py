@@ -68,8 +68,8 @@ class ArithmeticExpressionGrammar(Parser):
         :returns: None
 
         """
-        if self.LTT(1) == TT.WORD:
-            self.match_and_add([TT.WORD])
+        if self.LTT(1) == TT.IDENTIFIER:
+            self.match_and_add([TT.IDENTIFIER])
         elif self.LTT(1) == TT.NUMBER:
             self.match_and_add([TT.NUMBER])
         elif self.LTT(1) == TT.L_PAREN:

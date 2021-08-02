@@ -26,8 +26,8 @@ class TokenNode:
 
 class ASTNode(TokenNode):
 
-    """Abstract Syntax Tree holds the relevant Tokens and represents grammatical
-    relationships the parser came across"""
+    """Abstract Syntax Tree holds the relevant Tokens and represents
+    grammatical relationships the parser came across"""
 
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown

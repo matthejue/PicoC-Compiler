@@ -25,7 +25,7 @@ class TT(Enum):
     ROOT = "ROOT"
     EOF = "EOF"
     NUMBER = "number"
-    WORD = "word"
+    IDENTIFIER = "word"
     UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
@@ -42,6 +42,12 @@ class TT(Enum):
     OR_OP = "or operator"
     AND = "and as part of logical expression grammar"
     OR = "or as part of logical expression grammar"
+    COMP_OP = "comparison operator"
+    BITSHIFT = "bitshift"
+    PRIM_DT = "primitive datatype"
+    IF = "if"
+    ELSE = "else"
+    WHILE = "while"
 
 
 class Lexer:
@@ -60,7 +66,7 @@ class Lexer:
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
-    COMP_OPERATOR = ['==', '<=', '>=', '<', '>']
+    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']
 
     def __init__(self, fname, input):
         """
@@ -112,10 +118,7 @@ class Lexer:
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
             elif self.lc in self.LETTER:
-                return self._word()
-            elif self.lc == "=":
-                self.next_char()
-                return Token(TT.ASSIGNMENT, self.c)
+                return self._identifier_special_keyword()
             elif self.lc == "!":
                 self.next_char()
                 return Token(TT.NOT, self.c)
@@ -123,8 +126,8 @@ class Lexer:
                 return self._and()
             elif self.lc == "|":
                 return self._or()
-            elif self.lc in self.COMP_OPERATOR:
-                return self._comp_operator()
+            elif self.lc in self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
+                return self._comp_operator_assignment_bitshift()
             else:
                 raise InvalidCharacterError(self.lc)
         return Token(TT.EOF, self.lc)
@@ -170,7 +173,7 @@ class Lexer:
 
         return Token(TT.NUMBER, int(number))
 
-    def _word(self):
+    def _identifier_special_keyword(self):
         """
 
         :grammar: <letter> <letter_digit>*
@@ -178,12 +181,15 @@ class Lexer:
 
         """
         self.next_char()
+        self._if()
+        self._int()
+        self._while()
         word = self.c
         while self.lc in self.LETTER_DIGIT:
             self.next_char()
             word += self.c
 
-        return Token(TT.WORD, word)
+        return Token(TT.IDENTIFIER, word)
 
     def _and(self):
         """
@@ -195,7 +201,7 @@ class Lexer:
         self.next_char()
         if self.lc == '&':
             self.next_char()
-            return Token(TT.AND, self.c)
+            return Token(TT.AND, "&&")
         return Token(TT.AND_OP, self.c)
 
     def _or(self):
@@ -208,13 +214,52 @@ class Lexer:
         self.next_char()
         if self.lc == '|':
             self.next_char()
-            return Token(TT.OR, self.c)
+            return Token(TT.OR, "||")
         return Token(TT.OR_OP, self.c)
 
-    def _comp_operator(self):
+    def _comp_operator_assignment_bitshift(self):
         """
 
-        :grammar: == | <=? | >=?
+        :grammar: ((<i(<|=)?|>(>|=)?|==?))
         :returns: None
 
         """
+        if self.lc == '=':
+            self.next_char()
+            if self.lc == '=':
+                self.next_char()
+                return Token(TT.COMP_OP, "==")
+            return Token(TT.ASSIGNMENT, '=')
+        elif self.lc == '<':
+            self.next_char()
+            if self.lc == '=':
+                self.next_char()
+                return Token(TT.COMP_OP, "<=")
+            elif self.lc == '<':
+                self.next_char()
+                return Token(TT.BITSHIFT, "<<")
+            return Token(TT.COMP_OP, self.c)
+        elif self.lc == '>':
+            self.next_char()
+            if self.lc == '=':
+                self.next_char()
+                return Token(TT.COMP_OP, ">=")
+            elif self.lc == '>':
+                self.next_char()
+                return Token(TT.BITSHIFT, ">>")
+            return Token(TT.COMP_OP, self.c)
+
+    def _if(self):
+        """if
+
+        :grammar: if
+        :returns: None
+
+        """
+        for match_char in "if":
+            if self.lc != match_char:
+                break
+            self.next_char()
+        else:
+            if self.lc not in self.LETTER_DIGIT:
+                return Token(TT.IF, "if")
