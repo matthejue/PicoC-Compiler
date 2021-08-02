@@ -1,4 +1,4 @@
-from enum import Enum
+# from enum import Enum
 from lexer import Token
 
 
@@ -49,16 +49,24 @@ class ASTNode(TokenNode):
         """
         # in case the representative tokens of self appear as attribute of a
         # TokenNode, the token of self can finally register the right value
-        # being not instance of ASTNode means being instance of TokenNode.
         # Because of e.g. <alloc>: <word> <word> ... one should only take the
         # first TokenNode matching the possible representative tokens
-        if not self.token.value and not isinstance(node, ASTNode) and \
-                node.token.type in self.tokentypes:
+        if self._is_tokennode(node) and node.token.type in\
+                self.tokentypes:
             self.token.value = node.token.value
             self.ignore = False
             return
 
         self.children += [node]
+
+    def _is_tokennode(self, node):
+        """checks is something is a TokenNode
+
+        :returns: boolean
+
+        """
+        # being not instance of ASTNode means being instance of TokenNode
+        return not isinstance(node, ASTNode)
 
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary

@@ -55,8 +55,8 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         :returns: boolean
 
         """
-        return self.LTT(2) == TT.ASSIGNMENT or (self.LTT(1) == TT.IDENTIFIER and
-                                                self.LTT(2) == TT.IDENTIFIER)
+        return self.LTT(2) == TT.ASSIGNMENT or\
+            (self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER)
 
     def _is_statement(self):
         return self._is_assignment() or False

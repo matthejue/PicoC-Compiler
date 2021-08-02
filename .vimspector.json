@@ -16,7 +16,7 @@
         "args": [
           "./src/input.picoc",
           "./src/output.reti",
-          "-a",
+          "-t",
           "-v",
           "-p"
         ]

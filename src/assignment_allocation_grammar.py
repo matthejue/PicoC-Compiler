@@ -32,7 +32,7 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
         if self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER])
         # elif self.LTT(3) == TT.ASSIGNMENT:
-        elif self.LTT(1) == TT.IDENTIFIER and self.LTT(2) == TT.IDENTIFIER:
+        elif self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER:
             self._alloc()
         else:
             raise SyntaxError(
@@ -44,7 +44,6 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
 
         while self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER])
-
             self.match_and_add([TT.ASSIGNMENT])
 
             self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
@@ -60,10 +59,9 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(
-            ASTNode, [TT.ALLOC, TT.IDENTIFIER])
+        savestate_node = self.ast_builder.down(ASTNode, [TT.ALLOC, TT.PRIM_DT])
 
-        self.match_and_add([TT.IDENTIFIER])
+        self.match_and_add([TT.PRIM_DT])
         self.match_and_add([TT.IDENTIFIER])
 
         self.ast_builder.up(savestate_node)

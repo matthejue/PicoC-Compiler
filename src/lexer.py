@@ -176,14 +176,57 @@ class Lexer:
     def _identifier_special_keyword(self):
         """
 
-        :grammar: <letter> <letter_digit>*
+        :grammar: <identifier> | <if> | <else> | <while> | <int> | <char>
         :returns: Identifier Token
 
         """
+        # check for special keywords
+        token = self._check_word("if", TT.IF)
+        if token:
+            return token
+        token = self._check_word("else", TT.ELSE)
+        if token:
+            return token
+        token = self._check_word("while", TT.WHILE)
+        if token:
+            return token
+        token = self._check_word("int", TT.PRIM_DT)
+        if token:
+            return token
+        token = self._check_word("char", TT.PRIM_DT)
+        if token:
+            return token
+
+        # nothing more left then being a identifier
+        return self._identifier()
+
+    def _check_word(self, word, tokentype):
+        """if
+
+        :grammar: <word>
+        :returns: None
+
+        """
+        c_idx_copy, c_copy, lc_copy = self.c_idx, self.c, self.lc
+
+        for match_char in word:
+            if self.lc != match_char:
+                break
+            self.next_char()
+        else:
+            if self.lc not in self.LETTER_DIGIT:
+                return Token(tokentype, word)
+
+        self.c_idx, self.c, self.lc = c_idx_copy, c_copy, lc_copy
+
+    def _identifier(self):
+        """identifier
+
+        :grammar: <letter> <letter_digit>*
+        :returns: None
+
+        """
         self.next_char()
-        self._if()
-        self._int()
-        self._while()
         word = self.c
         while self.lc in self.LETTER_DIGIT:
             self.next_char()
@@ -220,7 +263,7 @@ class Lexer:
     def _comp_operator_assignment_bitshift(self):
         """
 
-        :grammar: ((<i(<|=)?|>(>|=)?|==?))
+        :grammar: ((==?)|(<(<|=)?)|(>(>|=)?))
         :returns: None
 
         """
@@ -248,18 +291,3 @@ class Lexer:
                 self.next_char()
                 return Token(TT.BITSHIFT, ">>")
             return Token(TT.COMP_OP, self.c)
-
-    def _if(self):
-        """if
-
-        :grammar: if
-        :returns: None
-
-        """
-        for match_char in "if":
-            if self.lc != match_char:
-                break
-            self.next_char()
-        else:
-            if self.lc not in self.LETTER_DIGIT:
-                return Token(TT.IF, "if")
