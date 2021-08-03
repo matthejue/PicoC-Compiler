@@ -86,7 +86,7 @@ class ArithmeticExpressionGrammar(Parser):
     def _paren(self):
         """parenthesis
 
-        :grammer: '(' <code_ae> ')'
+        :grammer: ( <code_ae> )
         :returns: None
 
         """

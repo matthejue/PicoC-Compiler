@@ -48,7 +48,7 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
 
             self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
 
-        self.code_ae()
+        self.code_le()
 
         self.ast_builder.up(savestate_node)
 
