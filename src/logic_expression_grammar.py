@@ -1,7 +1,7 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT
 from abstract_syntax_tree import ASTNode
-from errors import SyntaxError
+from errors import SyntaxError, NoApplicableRuleError
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -11,6 +11,22 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
     def __init__(self, lexer, num_lts):
         super().__init__(lexer, num_lts)
+
+    def code_ae_le(self):
+        """point where it's decided if it's a arithmetic expression only or a
+        logic expression
+
+        :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
+        :returns: None
+
+        """
+        if self.taste(self.code_ae):
+            pass
+        elif self.taste(self.code_le):
+            pass
+        else:
+            raise NoApplicableRuleError("arithmetic expression or logic "
+                                        "expression", self.LT(1))
 
     def code_le(self):
         """logic expression startpoint

@@ -29,7 +29,7 @@ def main():
     globals.args = cli_args_parser.parse_args()
 
     if not globals.args.infile:
-        shell()
+        _shell()
 
     if globals.args.infile:
         infile = globals.args.infile
@@ -40,7 +40,7 @@ def main():
         outfile = _basename(infile) + ".reti"
 
     try:
-        read_file(infile, outfile)
+        _read_file(infile, outfile)
     except FileNotFoundError:
         print("File does not exist")
     else:
@@ -57,7 +57,7 @@ def _basename(fname):
     return fname[0:index_of_extension]
 
 
-def shell():
+def _shell():
     """reads pico_c input and prints corresponding reti assembler code
     :returns: None (terminal output of reti assembler code)
 
@@ -74,10 +74,10 @@ def shell():
             continue
 
         # compile('<stdin>', pico_c_in.split('\n'))
-        compile('<stdin>', [pico_c_in])
+        _compile('<stdin>', [pico_c_in])
 
 
-def read_file(infile, outfile):
+def _read_file(infile, outfile):
     """reads a pico_c file and compiles it
     :returns: pico_c Code compiled in RETI Assembler
 
@@ -87,12 +87,12 @@ def read_file(infile, outfile):
         pico_c_in = fin.readlines()[0]
         # TODO: remove temporary solution to only read first line
 
-        output = compile(infile, [pico_c_in])
+        output = _compile(infile, [pico_c_in])
 
         fout.writelines(str(output))
 
 
-def compile(fname, code):
+def _compile(fname, code):
     # remove all \n from the code
     code_without_cr = list(map(lambda line: line.strip(), code))[0]
     # TODO: remove temporary solution to only read first line

@@ -1,10 +1,10 @@
-from parser import Parser
+from parser import BacktrackingParser
 from abstract_syntax_tree import ASTNode
 from errors import SyntaxError
 from lexer import TT
 
 
-class ArithmeticExpressionGrammar(Parser):
+class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
