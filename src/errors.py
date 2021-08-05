@@ -29,3 +29,13 @@ class NoApplicableRuleError(Exception):
         self.description = f"NoApplicableRuleError: Expected {expected}"\
             f", found {found.value}"
         super().__init__(self.description)
+
+
+class MismatchedTokenError(Exception):
+
+    """If token shouldn't syntactically appear at this position"""
+
+    def __init__(self, expected, found):
+        self.description = f"MismatchedTokenError: Expected {expected}"\
+            f", found {found.value}"
+        super().__init__(self.description)
