@@ -3,7 +3,7 @@
 # from sys import exit
 import argparse
 from lexer import Lexer, TT
-from function_grammar import FunctionGrammar
+from grammar import Grammar
 import globals
 
 
@@ -97,9 +97,7 @@ def _compile(fname, code):
     code_without_cr = list(map(lambda line: line.strip(), code))[0]
     # TODO: remove temporary solution to only read first line
 
-    # Generate tokens
     lexer = Lexer(fname, code_without_cr)
-    # lexer = Lexer(fname, code)
 
     # Deal with --tokens option
     if globals.args.tokens:
@@ -115,15 +113,15 @@ def _compile(fname, code):
         return tokens
 
     # Generate ast
-    grammar = FunctionGrammar(lexer)
+    grammar = Grammar(lexer)
     # Assignment grammar needs 2 num_lts for <va>
     grammar.start_parse()
 
     # Deal with --ast option
     if globals.args.ast:
         if globals.args.print:
-            print(grammar.ast_builder.root)
-        return grammar.ast_builder.root
+            print(grammar.reveal_ast())
+        return grammar.reveal_ast()
 
     # TODO: CodeGenerator belongs here
 

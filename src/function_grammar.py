@@ -13,9 +13,10 @@ class FunctionGrammar(StatementSequenceGrammar):
     def __init__(self, lexer):
         super().__init__(lexer)
 
-    def start_parse(self):
-        """start parsing the grammar
+    def code_f(self):
+        """function grammar startpoint
 
+        :grammar: <f>
         :returns: None
 
         """

@@ -94,7 +94,7 @@ class BacktrackingParser():
         # need the lookahead tokens anymore because there's no self.taste going
         # on
         if self.lt_idx == len(self.lts) and not self._is_tasting():
-            self.lt_idx == 0
+            self.lt_idx = 0
             self.lts = []
         self._sync(1)
 

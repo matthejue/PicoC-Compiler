@@ -22,7 +22,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _aa(self):
         """assignment and allocation
 
-        :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2)* <code_le>)
+        :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2) * <le>)
         :returns: None
 
         """

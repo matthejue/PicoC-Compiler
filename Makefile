@@ -22,7 +22,7 @@ run-shell-tokens:
 	./src/pico_c_compiler.py -t -v
 
 test: $(TEST_BINARIES)
-	S^
+	$^
 
 clean:
 	find . -type f -name "*.pyc" -delete

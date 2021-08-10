@@ -11,9 +11,8 @@
 !_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210110.0/
 0	.vimspector.json	/^          ".\/src\/input.picoc",$/;"	s	array:configurations.Debug.configuration.args
 1	.vimspector.json	/^          ".\/src\/output.reti",$/;"	s	array:configurations.Debug.configuration.args
-2	.vimspector.json	/^          "-t",$/;"	s	array:configurations.Debug.configuration.args
-3	.vimspector.json	/^          "-v",$/;"	s	array:configurations.Debug.configuration.args
-4	.vimspector.json	/^          "-p"$/;"	s	array:configurations.Debug.configuration.args
+2	.vimspector.json	/^          "-a",$/;"	s	array:configurations.Debug.configuration.args
+3	.vimspector.json	/^          "-p"$/;"	s	array:configurations.Debug.configuration.args
 ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
 AND	src/lexer.py	/^    AND = "and as part of logical expression grammar"$/;"	v	class:TT
 AND_OP	src/lexer.py	/^    AND_OP = "and operator"$/;"	v	class:TT
@@ -21,7 +20,7 @@ ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
 ASTNode	src/abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
 ArithmeticExpressionGrammar	src/arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
-AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):$/;"	c
+AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
 BINOP_PREC_1	src/lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
 BINOP_PREC_2	src/lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 2"$/;"	v	class:TT
 BITSHIFT	src/lexer.py	/^    BITSHIFT = "bitshift"$/;"	v	class:TT
@@ -37,6 +36,7 @@ EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
 FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
+Grammar	src/grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
 IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "word"$/;"	v	class:TT
 IF	src/lexer.py	/^    IF = "if"$/;"	v	class:TT
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
@@ -67,6 +67,8 @@ SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARIES	Makefile	/^TEST_BINARIES = $(wildcard .\/test\/*_test.py)$/;"	m
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
+TestArithmeticExpressionGrammar	src/test_grammar.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase):$/;"	c
+TestArithmeticExpressionGrammar	test/test_grammar.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase):$/;"	c
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
 TokenNode	src/abstract_syntax_tree.py	/^class TokenNode:$/;"	c
@@ -77,20 +79,22 @@ WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:Prec1Node
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:TokenNode
 __init__	src/abstract_syntax_tree.py	/^    def __init__(self, tokentypes):$/;"	m	class:ASTNode
-__init__	src/arithmetic_expression_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:ArithmeticExpressionGrammar
-__init__	src/assignment_allocation_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:AssignmentAllocationGrammar
+__init__	src/arithmetic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ArithmeticExpressionGrammar
+__init__	src/assignment_allocation_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:AssignmentAllocationGrammar
 __init__	src/ast_builder.py	/^    def __init__(self):$/;"	m	class:ASTBuilder
-__init__	src/conditional_grammar.py	/^    def __init__(self):$/;"	m	class:ConditionalGrammar
+__init__	src/conditional_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ConditionalGrammar
 __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:MismatchedTokenError
 __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:NoApplicableRuleError
 __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:SyntaxError
 __init__	src/errors.py	/^    def __init__(self, found):$/;"	m	class:InvalidCharacterError
-__init__	src/function_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:FunctionGrammar
+__init__	src/function_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:FunctionGrammar
+__init__	src/grammar.py	/^    def __init__(self, lexer):$/;"	m	class:Grammar
 __init__	src/lexer.py	/^    def __init__(self, fname, input):$/;"	m	class:Lexer
 __init__	src/lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
-__init__	src/logic_expression_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:LogicExpressionGrammar
+__init__	src/logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:LogicExpressionGrammar
 __init__	src/parser.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
-__init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer, num_lts):$/;"	m	class:StatementSequenceGrammar
+__init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
+__init__	src/test_grammar.py	/^    def __init__(self):$/;"	m	class:TestArithmeticExpressionGrammar
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
 __repr__	src/lexer.py	/^    def __repr__(self):$/;"	m	class:Token
@@ -102,7 +106,7 @@ _ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:Arithm
 _atom	src/logic_expression_grammar.py	/^    def _atom(self):$/;"	m	class:LogicExpressionGrammar
 _basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
 _check_word	src/lexer.py	/^    def _check_word(self, word, tokentype):$/;"	m	class:Lexer
-_comment	.vimspector.json	/^        "_comment": "args: [.\/src\/input.picoc, .\/src\/output.reti, -p, -a]",$/;"	s	object:configurations.Debug.configuration
+_comment	.vimspector.json	/^        "_comment": "args: [.\/src\/input.picoc, .\/src\/output.reti, -p, -v, -a]",$/;"	s	object:configurations.Debug.configuration
 _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
 _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
@@ -143,6 +147,7 @@ code_aa	src/assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	clas
 code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
 code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
 code_ae_le	src/logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
+code_f	src/function_grammar.py	/^    def code_f(self):$/;"	m	class:FunctionGrammar
 code_le	src/logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
 code_ss	src/statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
 compile	.misc/pico_c_compiler	/^def compile(fname, code):$/;"	f
@@ -176,6 +181,7 @@ python.linting.flake8Enabled	.vim/coc-settings.json	/^  "python.linting.flake8En
 python.linting.pylintEnabled	.vim/coc-settings.json	/^  "python.linting.pylintEnabled": false,$/;"	b
 read_file	.misc/pico_c_compiler	/^def read_file(infile, outfile):$/;"	f
 request	.vimspector.json	/^        "request": "launch",$/;"	s	object:configurations.Debug.configuration
+reveal_ast	src/grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
 run-read-ast	Makefile	/^run-read-ast:$/;"	t
 run-read-ast-verbose	Makefile	/^run-read-ast-verbose:$/;"	t
 run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
@@ -188,11 +194,12 @@ s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
-start_parse	src/function_grammar.py	/^    def start_parse(self):$/;"	m	class:FunctionGrammar
+start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
 stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
 syntax_tree_rootnode	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors
 taste	src/parser.py	/^    def taste(self, rule):$/;"	m	class:BacktrackingParser
 test	Makefile	/^test: $(TEST_BINARIES)$/;"	t
+test_basic_arithmetic_expression	test/test_grammar.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_illegal_char_error	.misc/test_errors	/^    def test_illegal_char_error()$/;"	m	class:TestErrors
 test_parenthesis	.misc/test_parser	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpreessions
 test_precedence_rules	.misc/test_parser	/^    def test_precedence_rules(self):$/;"	m	class:TestArithmeticExpreessions
