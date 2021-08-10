@@ -115,9 +115,6 @@ class BacktrackingParser():
         # seek:
         self.lt_idx = marker
 
-    # def seek(self, index):
-        # self.lt_idx = index
-
     def is_tasting(self):
         """if in the taste method every mark() found his corresponding
         release()
