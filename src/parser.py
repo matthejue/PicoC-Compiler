@@ -29,7 +29,7 @@ class BacktrackingParser():
 
         :returns: find out token looking ahead i tokens
         """
-        self.sync(i)
+        self._sync(i)
         return self.lts[self.p + i - 1]
 
     def LTT(self, i):
@@ -48,7 +48,7 @@ class BacktrackingParser():
         :returns: None, possibly an exception
         """
         if (self.LTT(1) in tts):
-            self.consume_next_token()
+            self._consume_next_token()
         else:
             raise MismatchedTokenError("'" + tts.value + "'", self.LT(1))
 
@@ -62,7 +62,7 @@ class BacktrackingParser():
         self.ast_builder.addChild(TokenNode(self.LT(1)))
         self.match(tts)
 
-    def sync(self, i):
+    def _sync(self, i):
         """ensures that there're going to be i tokens from current position
         lt_idx
 
@@ -71,9 +71,9 @@ class BacktrackingParser():
         """
         if self.lt_idx + i - 1 > len(self.lts)-1:
             not_filled_up = (self.lt_idx + i - 1) - (len(self.lts) - 1)
-            self.fill(not_filled_up)
+            self._fill(not_filled_up)
 
-    def fill(self, not_filled_up):
+    def _fill(self, not_filled_up):
         """add not_filled_up many tokens
 
         :grammar: grammar specification
@@ -83,19 +83,19 @@ class BacktrackingParser():
         for i in range(0, not_filled_up):
             self.lt += [self.lexer.next_token()]
 
-    def consume_next_token(self):
+    def _consume_next_token(self):
         """fills next position in the lookahead tokenlist with token
 
         :returns: None
 
         """
         self.lt_idx += 1
-        if self.lt_idx == len(self.lts) and not self.is_tasting():
+        if self.lt_idx == len(self.lts) and not self._is_tasting():
             self.lt_idx == 0
             self.lts = []
-        self.sync(1)
+        self._sync(1)
 
-    def mark(self):
+    def _mark(self):
         """rememeber with a marker index where the last taste method call occured
 
         :returns: None
@@ -104,7 +104,7 @@ class BacktrackingParser():
         self.markers += [self.lt_idx]
         return self.lt_idx
 
-    def release(self):
+    def _release(self):
         """go the the last remembered marker and forget about it
 
         :returns: None
@@ -115,7 +115,7 @@ class BacktrackingParser():
         # seek:
         self.lt_idx = marker
 
-    def is_tasting(self):
+    def _is_tasting(self):
         """if in the taste method every mark() found his corresponding
         release()
 
