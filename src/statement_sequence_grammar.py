@@ -8,8 +8,8 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
     """The statement sequence part of the context free grammar of the piocC
     language"""
 
-    def __init__(self, lexer, num_lts):
-        super().__init__(lexer, num_lts)
+    def __init__(self, lexer):
+        super().__init__(lexer)
 
     def code_ss(self):
         """statement sequence startpoint

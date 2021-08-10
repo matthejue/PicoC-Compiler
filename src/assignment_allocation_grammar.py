@@ -1,14 +1,14 @@
-from arithmetic_expression_grammar import ArithmeticExpressionGrammar
+from logic_expression_grammar import LogicExpressionGrammar
 from abstract_syntax_tree import ASTNode
 from lexer import TT
 
 
-class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
+class AssignmentAllocationGrammar(LogicExpressionGrammar):
     """The assignment expression part of the context free grammar of the piocC
     language"""
 
-    def __init__(self, lexer, num_lts):
-        super().__init__(lexer, num_lts)
+    def __init__(self, lexer):
+        super().__init__(lexer)
 
     def code_aa(self):
         """assignment and allocation startpoint
@@ -22,7 +22,7 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
     def _aa(self):
         """assignment and allocation
 
-        :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2)* <ae>)
+        :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2)* <code_le>)
         :returns: None
 
         """
@@ -48,7 +48,8 @@ class AssignmentAllocationGrammar(ArithmeticExpressionGrammar):
 
             self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
 
-        self.code_le()
+        # self.code_le()
+        self.code_ae()
 
         self.ast_builder.up(savestate_node)
 

@@ -8,8 +8,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
-    def __init__(self, lexer, num_lts):
-        super().__init__(lexer, num_lts)
+    def __init__(self, lexer):
+        super().__init__(lexer)
 
     def code_ae(self):
         """arithmetic expression startpoint

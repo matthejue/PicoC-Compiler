@@ -115,7 +115,7 @@ def _compile(fname, code):
         return tokens
 
     # Generate ast
-    grammar = FunctionGrammar(lexer, 3)
+    grammar = FunctionGrammar(lexer)
     # Assignment grammar needs 2 num_lts for <va>
     grammar.start_parse()
 

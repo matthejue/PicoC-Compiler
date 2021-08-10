@@ -9,8 +9,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
     """The logic expression part of the context free grammar of the piocC
     language"""
 
-    def __init__(self, lexer, num_lts):
-        super().__init__(lexer, num_lts)
+    def __init__(self, lexer):
+        # super().__init__(lexer, num_lts)
+        super().__init__(lexer)
 
     def code_ae_le(self):
         """point where it's decided if it's a arithmetic expression only or a
@@ -18,7 +19,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
-
         """
         if self.taste(self.code_ae):
             pass
@@ -33,7 +33,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: <or_expr>
         :returns: None
-
         """
         self._or_expr()
 
@@ -42,7 +41,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
         :returns: None
-
         """
         savestate_node = self.ast_builder.down(ASTNode, [TT.OR])
 
@@ -61,7 +59,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: #2 <lo> (and #2 <lo>)*
         :returns: None
-
         """
         savestate_node = self.ast_builder.down(ASTNode, [TT.AND])
 
@@ -80,7 +77,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: <not_expr>
         :returns: None
-
         """
         if self.LTT(1) == TT.NOT:
             self._not_expr()
@@ -96,7 +92,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: <code_ae> <comp_op> <code_ae>
         :returns: None
-
         """
         savestate_node = self.ast_builder.down(ASTNode, [TT.COMP_OP])
 
@@ -111,7 +106,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: ( <code_le> )
         :returns: None
-
         """
         self.match([TT.L_PAREN])
         self.code_le()
@@ -122,7 +116,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: !+ <code_le>
         :returns: None
-
         """
         savestate_node = self.ast_builder.down(ASTNode, [TT.NOT])
 
