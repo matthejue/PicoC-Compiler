@@ -1,6 +1,6 @@
-from statement_sequence_grammar import StatementSequenceGrammar
-from abstract_syntax_tree import ASTNode
-from lexer import TT
+from src.statement_sequence_grammar import StatementSequenceGrammar
+from src.abstract_syntax_tree import ASTNode
+from src.lexer import TT
 
 # TODO: Grammar irgendwo als oberste Grammar noch einrichten
 

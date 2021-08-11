@@ -1,4 +1,5 @@
-TEST_BINARIES = $(wildcard ./test/*_test.py)
+TEST_BINARIES = $(shell basename --suffix=.py $(wildcard ./test/*_test.py))
+TEST_BINARY_BASENAMES = $(foreach test_binary,$(TEST_BINARIES),test.$(test_binary))
 .PHONY: all run test clean
 
 all: run-shell-ast clean
@@ -21,8 +22,11 @@ run-shell-ast-verbose:
 run-shell-tokens:
 	./src/pico_c_compiler.py -t -v
 
-test: $(TEST_BINARIES)
-	$^
+test:
+	echo $(TEST_BINARIES)
+	for test_binary in $(TEST_BINARY_BASENAMES); do \
+		python -m $$test_binary; \
+	done
 
 clean:
 	find . -type f -name "*.pyc" -delete

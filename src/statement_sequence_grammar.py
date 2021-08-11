@@ -1,6 +1,6 @@
-from assignment_allocation_grammar import AssignmentAllocationGrammar
-from abstract_syntax_tree import ASTNode
-from lexer import TT
+from src.assignment_allocation_grammar import AssignmentAllocationGrammar
+# from src.abstract_syntax_tree import ASTNode
+from src.lexer import TT
 
 
 class StatementSequenceGrammar(AssignmentAllocationGrammar):

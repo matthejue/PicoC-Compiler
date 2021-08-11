@@ -1,6 +1,6 @@
-from logic_expression_grammar import LogicExpressionGrammar
-from abstract_syntax_tree import ASTNode
-from lexer import TT
+from src.logic_expression_grammar import LogicExpressionGrammar
+from src.abstract_syntax_tree import ASTNode
+from src.lexer import TT
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):

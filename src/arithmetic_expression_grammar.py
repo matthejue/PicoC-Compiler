@@ -1,7 +1,7 @@
-from parser import BacktrackingParser
-from abstract_syntax_tree import ASTNode
-from errors import SyntaxError
-from lexer import TT
+from src.parser import BacktrackingParser
+from src.abstract_syntax_tree import ASTNode
+from src.errors import SyntaxError
+from src.lexer import TT
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):

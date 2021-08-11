@@ -9,9 +9,10 @@
         "cwd": "${workspaceFolder}",
         "python": "/usr/bin/python",
         "stopOnEntry": true,
+        "justMyCode": false,
         "console": "externalTerminal",
         "debugOptions": [],
-        "program": "${workspaceFolder}/src/pico_c_compiler.py",
+        "program": "${workspaceFolder}/test/grammar_test.py",
         "_comment": "args: [./src/input.picoc, ./src/output.reti, -p, -v, -a]",
         "args": [
           "./src/input.picoc",

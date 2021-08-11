@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 
-from pico_c_compiler.src.grammar import Grammar
-from pico_c_compiler.src.lexer import Lexer
 import unittest
 import sys
-sys.path.append('../')
+import os
 
 
 class TestArithmeticExpressionGrammar(unittest.TestCase):
 
     def test_basic_arithmetic_expression(self):
         code = "var = 12 + 3;"
-        # TODO: remove temporary solution to only read first line
 
         lexer = Lexer("<test>", code)
 
@@ -23,4 +20,9 @@ class TestArithmeticExpressionGrammar(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    # sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
+    # from lexer import Lexer
+    # from grammar import Grammar
+    from src.lexer import Lexer
+    from src.grammar import Grammar
     unittest.main()

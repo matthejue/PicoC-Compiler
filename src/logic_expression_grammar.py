@@ -1,7 +1,7 @@
-from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-from lexer import TT
-from abstract_syntax_tree import ASTNode
-from errors import SyntaxError, NoApplicableRuleError
+from src.arithmetic_expression_grammar import ArithmeticExpressionGrammar
+from src.lexer import TT
+from src.abstract_syntax_tree import ASTNode
+from src.errors import SyntaxError, NoApplicableRuleError
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):

@@ -1,6 +1,6 @@
-from errors import MismatchedTokenError
-from ast_builder import ASTBuilder
-from abstract_syntax_tree import TokenNode
+from src.errors import MismatchedTokenError
+from src.ast_builder import ASTBuilder
+from src.abstract_syntax_tree import TokenNode
 
 
 class BacktrackingParser():
