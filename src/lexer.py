@@ -1,7 +1,7 @@
-from src.errors import SyntaxError, InvalidCharacterError
+from errors import SyntaxError, InvalidCharacterError
 from enum import Enum
 import string
-from src import globals
+import globals
 
 
 class Token():

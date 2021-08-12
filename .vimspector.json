@@ -9,14 +9,14 @@
         "cwd": "${workspaceFolder}",
         "python": "/usr/bin/python",
         "stopOnEntry": true,
-        "justMyCode": false,
+        "justMyCode": true,
         "console": "externalTerminal",
         "debugOptions": [],
         "program": "${workspaceFolder}/test/grammar_test.py",
-        "_comment": "args: [./src/input.picoc, ./src/output.reti, -p, -v, -a]",
+        "_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]",
         "args": [
-          "./src/input.picoc",
-          "./src/output.reti",
+          "./input.picoc",
+          "./output.reti",
           "-a",
           "-p"
         ]

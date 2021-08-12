@@ -1,7 +1,7 @@
-from src.arithmetic_expression_grammar import ArithmeticExpressionGrammar
-from src.lexer import TT
-from src.abstract_syntax_tree import ASTNode
-from src.errors import SyntaxError, NoApplicableRuleError
+from arithmetic_expression_grammar import ArithmeticExpressionGrammar
+from lexer import TT
+from abstract_syntax_tree import ASTNode
+from errors import SyntaxError, NoApplicableRuleError
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -81,7 +81,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         if self.LTT(1) == TT.NOT:
             self._not_expr()
         elif self.LTT(1) == TT.L_PAREN:
-            self._paren()
+            self._paren_logic()
         elif self.LTT(1) in [TT.NUMBER, TT.IDENTIFIER]:
             self._atom()
         else:
@@ -101,8 +101,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         self.ast_builder.up(savestate_node)
 
-    def _paren(self):
-        """parenthesis
+    def _paren_logic(self):
+        """logic parenthesis
 
         :grammar: ( <code_le> )
         :returns: None

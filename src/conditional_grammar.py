@@ -1,4 +1,4 @@
-from src.logic_expression_grammar import LogicExpressionGrammar
+from logic_expression_grammar import LogicExpressionGrammar
 
 
 class ConditionalGrammar(LogicExpressionGrammar):

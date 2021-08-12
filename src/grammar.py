@@ -1,4 +1,4 @@
-from src.function_grammar import FunctionGrammar
+from function_grammar import FunctionGrammar
 
 
 class Grammar(FunctionGrammar):

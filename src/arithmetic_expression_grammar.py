@@ -1,7 +1,7 @@
-from src.parser import BacktrackingParser
-from src.abstract_syntax_tree import ASTNode
-from src.errors import SyntaxError
-from src.lexer import TT
+from parser_ import BacktrackingParser
+from abstract_syntax_tree import ASTNode
+from errors import SyntaxError
+from lexer import TT
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
@@ -73,7 +73,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         elif self.LTT(1) == TT.NUMBER:
             self.match_and_add([TT.NUMBER])
         elif self.LTT(1) == TT.L_PAREN:
-            self._paren()
+            self._paren_arith()
         elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
             # for overlapping symbols liks e.g. '-' which overlap both with
             # e.g. binary and unary operators, a seperate type (here: TT.MINUS)
@@ -83,8 +83,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         else:
             raise SyntaxError("aritmetic operand", self.LT(1))
 
-    def _paren(self):
-        """parenthesis
+    def _paren_arith(self):
+        """arithmetic parenthesis
 
         :grammer: ( <code_ae> )
         :returns: None

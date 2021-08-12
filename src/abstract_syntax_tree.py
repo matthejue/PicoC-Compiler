@@ -1,5 +1,5 @@
 # from enum import Enum
-from src.lexer import Token
+from lexer import Token
 
 
 class TokenNode:

@@ -2,9 +2,9 @@
 
 # from sys import exit
 import argparse
-from src.lexer import Lexer, TT
-from src.grammar import Grammar
-from src import globals
+from lexer import Lexer, TT
+from grammar import Grammar
+import globals
 
 
 def main():
