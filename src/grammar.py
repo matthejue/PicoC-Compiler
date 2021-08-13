@@ -15,6 +15,9 @@ class Grammar(FunctionGrammar):
         :returns: None
 
         """
+        if self.lexer.input == "var = 12 > 3;":
+            if self.lexer.input == "var = 12 > 3;":
+                pass
         self.code_f()
 
     def reveal_ast(self):

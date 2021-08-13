@@ -20,6 +20,8 @@ class Args(object):
 
 
 class UsefullTools():
+    """Helper class for testing"""
+
     lexer = None
     grammar = None
 
@@ -38,10 +40,30 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()),
                          "('fun' ('=' 'var' ('-' '12' '374')))")
 
+    def test_precedence_1(self):
+        self.set_everything_up("var = 8 * 4 + 2;")
+        self.assertEqual(str(self.grammar.reveal_ast()),
+                         "('fun' ('=' 'var' ('+' ('*' '8' '4') '2')))")
+
+    def test_precedence_2(self):
+        self.set_everything_up("var = 8 + 4 - 2;")
+        self.assertEqual(str(self.grammar.reveal_ast()),
+                         "('fun' ('=' 'var' ('+' '8' ('-' '4' '2'))))")
+
+    def test_precedence_3(self):
+        self.set_everything_up("var = 8 * 4 / 2;")
+        self.assertEqual(str(self.grammar.reveal_ast()),
+                         "('fun' ('=' 'var' ('*' '8' ('/' '4' '2'))))")
+
     def test_parenthesis(self):
         self.set_everything_up("var = (4 + 7) * 3;")
         self.assertEqual(str(self.grammar.reveal_ast()),
                          "('fun' ('=' 'var' ('*' ('+' '4' '7') '3')))")
+
+    def test_negative_parenthesis(self):
+        self.set_everything_up("var = -(-132 / 2);")
+        expected_res = "('fun' ('=' 'var' ('-' ('/' ('-' '132') '2'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_unary_operators(self):
         self.set_everything_up("var = -12 % (---154 - --189);")
@@ -55,6 +77,12 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
     def test_logic_expression(self):
         self.set_everything_up("var = 12 > 3;")
         expected_res = "('fun' ('=' 'var' ('>' '12' '3')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_and(self):
+        self.set_everything_up("var = 12 > 3 && expr <= 4;")
+        expected_res = "('fun' ('=' 'var' ('&&' ('>' '12' '3') "\
+            "('<=' 'expr' '4'))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 

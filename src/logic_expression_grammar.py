@@ -20,17 +20,31 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint 
-        if self.lexer.input == "var = 12 > 3;":
-            if self.lexer.input == "var = 12 > 3;":
-                pass
-        if self.taste(self.code_ae):
-            self.code_ae()
-        elif self.taste(self.code_le):
-            self.code_le()
+        if self.taste(self.taste_consume_ae):
+            self.taste_consume_ae()
+        elif self.taste(self.taste_consume_le):
+            self.taste_consume_le()
         else:
             raise NoApplicableRuleError("arithmetic expression or logic "
                                         "expression", self.LT(1))
+
+    def taste_consume_ae(self):
+        """taste whether the next expression is a arithmetic expression
+
+        :function: <code_ae> ;
+        :returns: None
+        """
+        self.code_ae()
+        self.match([TT.SEMICOLON])
+
+    def taste_consume_le(self):
+        """taste whether the next expression is a logic expression
+
+        :grammar: <code_le> ;
+        :returns: None
+        """
+        self.code_le()
+        self.match([TT.SEMICOLON])
 
     def code_le(self):
         """logic expression startpoint

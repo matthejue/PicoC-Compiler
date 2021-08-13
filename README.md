@@ -26,3 +26,10 @@ optional arguments:
 
 [1] Parr, Terence. Language implementation patterns: create your own
 domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
+
+## TODO
+- if, else, while, Funktionen
+- mehrzeilge Programme
+- Symboltablle korrekt implemtieren
+- const nicht vergessen
+- bessere Anzeige von Fehlern

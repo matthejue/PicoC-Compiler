@@ -97,7 +97,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
     def _unop(self):
         """unary operator
 
-        :grammer: #1 (<unop>|<minus> #1)+ number
+        :grammer: #1 (<unop>|<minus> #1)+ <ao>
         :returns: None
 
         """
@@ -111,7 +111,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
             self.ast_builder.down(ASTNode, [TT.UNARY_OP, TT.MINUS])
 
-        # TODO: auch Klammern sind hier möglich!
-        self.match_and_add([TT.NUMBER])
+        # self.match_and_add([TT.NUMBER])
+        self._ao()
 
         self.ast_builder.up(savestate_node)

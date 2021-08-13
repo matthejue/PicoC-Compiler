@@ -1,6 +1,7 @@
 from errors import MismatchedTokenError
 from ast_builder import ASTBuilder
 from abstract_syntax_tree import TokenNode
+import globals
 
 
 class BacktrackingParser():
@@ -52,8 +53,9 @@ class BacktrackingParser():
         if (self.LTT(1) in tts):
             self._consume_next_token()
         else:
-            # TODO: (vielleicht) Funktion schreiben, die das aufdroesselt in tts[0].value or
-            # tts[1].value. Aber meistens ist der erste Typ der richtige
+            # TODO: (vielleicht) Funktion schreiben, die das aufdroesselt in
+            # tts[0].value or # tts[1].value. Aber meistens ist der erste Typ
+            # der richtige
             raise MismatchedTokenError("'" + tts[0].value + "'", self.LT(1))
 
     def match_and_add(self, tts):
@@ -63,7 +65,8 @@ class BacktrackingParser():
         :returns: None, possibly an exception
         """
         # if (self.ast_builder.current_node.token not in tts):
-        self.ast_builder.addChild(TokenNode(self.LT(1)))
+        if not globals.is_tasting:
+            self.ast_builder.addChild(TokenNode(self.LT(1)))
         self.match(tts)
 
     def _sync(self, i):
@@ -101,12 +104,14 @@ class BacktrackingParser():
         self._sync(1)
 
     def _mark(self):
-        """rememeber with a marker index where the last taste method call occured
+        """rememeber with a marker index where the last taste method call
+        occured
 
         :returns: None
         """
         self.markers += [self.lt_idx]
-        return self.lt_idx
+        globals.is_tasting = True
+        # return self.lt_idx
 
     def _release(self):
         """go the the last remembered marker and forget about it
@@ -114,6 +119,7 @@ class BacktrackingParser():
         :returns: None
         """
         self.lt_idx = self.markers.pop()
+        globals.is_tasting = False
 
     def _is_tasting(self):
         """if in the taste method every mark() found his corresponding

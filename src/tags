@@ -1,0 +1,146 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/areo/Documents/Studium/pico_c_compiler/src/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210110.0/
+ALLOC	lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
+AND	lexer.py	/^    AND = "and as part of logical expression grammar"$/;"	v	class:TT
+AND_OP	lexer.py	/^    AND_OP = "and operator"$/;"	v	class:TT
+ASSIGNMENT	lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
+ASTBuilder	ast_builder.py	/^class ASTBuilder:$/;"	c
+ASTNode	abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
+ArithmeticExpressionGrammar	arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
+AssignmentAllocationGrammar	assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
+BINOP_PREC_1	lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
+BINOP_PREC_2	lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 2"$/;"	v	class:TT
+BITSHIFT	lexer.py	/^    BITSHIFT = "bitshift"$/;"	v	class:TT
+BacktrackingParser	parser_.py	/^class BacktrackingParser():$/;"	c
+COMP_OP	lexer.py	/^    COMP_OP = "comparison operator"$/;"	v	class:TT
+COMP_OPERATOR_ASSIGNMENT_BITSHIFT	lexer.py	/^    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']$/;"	v	class:Lexer
+ConditionalGrammar	conditional_grammar.py	/^class ConditionalGrammar(LogicExpressionGrammar):$/;"	c
+DIGIT_WITHOUT_ZERO	lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
+DIGIT_WITH_ZERO	lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
+ELSE	lexer.py	/^    ELSE = "else"$/;"	v	class:TT
+EOF	lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
+EOF_CHAR	lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
+FUNCTION	lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
+FunctionGrammar	function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
+Grammar	grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
+IDENTIFIER	lexer.py	/^    IDENTIFIER = "word"$/;"	v	class:TT
+IF	lexer.py	/^    IF = "if"$/;"	v	class:TT
+InvalidCharacterError	errors.py	/^class InvalidCharacterError(Exception):$/;"	c
+LETTER	lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
+LETTER_DIGIT	lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
+LT	parser_.py	/^    def LT(self, i):$/;"	m	class:BacktrackingParser
+LTT	parser_.py	/^    def LTT(self, i):$/;"	m	class:BacktrackingParser
+L_PAREN	lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
+Lexer	lexer.py	/^class Lexer:$/;"	c
+LogicExpressionGrammar	logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
+MINUS	lexer.py	/^    MINUS = "-"$/;"	v	class:TT
+MismatchedTokenError	errors.py	/^class MismatchedTokenError(Exception):$/;"	c
+NOT	lexer.py	/^    NOT = "not operator or not as part of logical expression grammar"$/;"	v	class:TT
+NUMBER	lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
+NoApplicableRuleError	errors.py	/^class NoApplicableRuleError(Exception):$/;"	c
+OR	lexer.py	/^    OR = "or as part of logical expression grammar"$/;"	v	class:TT
+OR_OP	lexer.py	/^    OR_OP = "or operator"$/;"	v	class:TT
+PRIM_DT	lexer.py	/^    PRIM_DT = "primitive datatype"$/;"	v	class:TT
+Prec1Node	abstract_syntax_tree.py	/^class Prec1Node(ASTNode):$/;"	c
+ROOT	lexer.py	/^    ROOT = "ROOT"$/;"	v	class:TT
+R_PAREN	lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
+SEMICOLON	lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
+STATEMENT	lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
+StatementSequenceGrammar	statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
+SyntaxError	errors.py	/^class SyntaxError(Exception):$/;"	c
+TT	lexer.py	/^class TT(Enum):$/;"	c
+Token	lexer.py	/^class Token():$/;"	c
+TokenNode	abstract_syntax_tree.py	/^class TokenNode:$/;"	c
+UNARY_OP	lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
+WHILE	lexer.py	/^    WHILE = "while"$/;"	v	class:TT
+__init__	abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:Prec1Node
+__init__	abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:TokenNode
+__init__	abstract_syntax_tree.py	/^    def __init__(self, tokentypes):$/;"	m	class:ASTNode
+__init__	arithmetic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ArithmeticExpressionGrammar
+__init__	assignment_allocation_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:AssignmentAllocationGrammar
+__init__	ast_builder.py	/^    def __init__(self):$/;"	m	class:ASTBuilder
+__init__	conditional_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ConditionalGrammar
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:MismatchedTokenError
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:NoApplicableRuleError
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:SyntaxError
+__init__	errors.py	/^    def __init__(self, found):$/;"	m	class:InvalidCharacterError
+__init__	function_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:FunctionGrammar
+__init__	grammar.py	/^    def __init__(self, lexer):$/;"	m	class:Grammar
+__init__	lexer.py	/^    def __init__(self, fname, input):$/;"	m	class:Lexer
+__init__	lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
+__init__	logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:LogicExpressionGrammar
+__init__	parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
+__init__	statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
+__repr__	abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
+__repr__	abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
+__repr__	lexer.py	/^    def __repr__(self):$/;"	m	class:Token
+_aa	assignment_allocation_grammar.py	/^    def _aa(self):$/;"	m	class:AssignmentAllocationGrammar
+_alloc	assignment_allocation_grammar.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
+_and	lexer.py	/^    def _and(self):$/;"	m	class:Lexer
+_and_expr	logic_expression_grammar.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
+_ao	arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
+_atom	logic_expression_grammar.py	/^    def _atom(self):$/;"	m	class:LogicExpressionGrammar
+_basename	pico_c_compiler.py	/^def _basename(fname):$/;"	f
+_check_word	lexer.py	/^    def _check_word(self, word, tokentype):$/;"	m	class:Lexer
+_comp_operator_assignment_bitshift	lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
+_compile	pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
+_consume_next_token	parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
+_fill	parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
+_identifier	lexer.py	/^    def _identifier(self):$/;"	m	class:Lexer
+_identifier_special_keyword	lexer.py	/^    def _identifier_special_keyword(self):$/;"	m	class:Lexer
+_is_assignment	statement_sequence_grammar.py	/^    def _is_assignment(self):$/;"	m	class:StatementSequenceGrammar
+_is_statement	statement_sequence_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementSequenceGrammar
+_is_tasting	parser_.py	/^    def _is_tasting(self):$/;"	m	class:BacktrackingParser
+_is_tokennode	abstract_syntax_tree.py	/^    def _is_tokennode(self, node):$/;"	m	class:ASTNode
+_lo	logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
+_mark	parser_.py	/^    def _mark(self):$/;"	m	class:BacktrackingParser
+_not_expr	logic_expression_grammar.py	/^    def _not_expr(self):$/;"	m	class:LogicExpressionGrammar
+_number	lexer.py	/^    def _number(self):$/;"	m	class:Lexer
+_or	lexer.py	/^    def _or(self):$/;"	m	class:Lexer
+_or_expr	logic_expression_grammar.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
+_paren_arith	arithmetic_expression_grammar.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
+_paren_logic	logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
+_prec1	arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec2	arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_read_file	pico_c_compiler.py	/^def _read_file(infile, outfile):$/;"	f
+_release	parser_.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
+_s	statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSequenceGrammar
+_shell	pico_c_compiler.py	/^def _shell():$/;"	f
+_ss	statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
+_sync	parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
+_unop	arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
+addChild	abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
+addChild	ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
+args	globals.py	/^args = None$/;"	v
+code_aa	assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
+code_ae	arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
+code_ae_le	logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
+code_f	function_grammar.py	/^    def code_f(self):$/;"	m	class:FunctionGrammar
+code_le	logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
+code_ss	statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
+down	ast_builder.py	/^    def down(self, classname, tokens):$/;"	m	class:ASTBuilder
+getNodeType	abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
+isEmpty	abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
+is_tasting	globals.py	/^is_tasting = False$/;"	v
+main	pico_c_compiler.py	/^def main():$/;"	f
+match	lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
+match	parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
+match_and_add	parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
+next_char	lexer.py	/^    def next_char(self):$/;"	m	class:Lexer
+next_token	lexer.py	/^    def next_token(self):$/;"	m	class:Lexer
+reveal_ast	grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
+start_parse	grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
+taste	parser_.py	/^    def taste(self, rule):$/;"	m	class:BacktrackingParser
+taste_consume_ae	logic_expression_grammar.py	/^    def taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
+taste_consume_le	logic_expression_grammar.py	/^    def taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
+toggle_tasting	parser_.py	/^    def toggle_tasting():$/;"	m	class:BacktrackingParser
+up	ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder

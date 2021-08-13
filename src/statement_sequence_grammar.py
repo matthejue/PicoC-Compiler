@@ -23,16 +23,16 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
     def _ss(self):
         """statement sequence
 
-        :grammar: (<s>? ;)+
+        :grammar: (<s>?)+
         :returns: None
 
         """
         while True:
             if self._is_statement():
                 self._s()
-            self.match([TT.SEMICOLON])
 
             # TODO: add in other statement types by replacing the false
+            # it's possibe to write var = 10;;
             if not (self._is_statement() or self.LTT(1) == TT.SEMICOLON):
                 break
 

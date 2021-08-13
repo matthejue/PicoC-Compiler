@@ -1,3 +1,6 @@
+import globals
+
+
 class ASTBuilder:
 
     """Provides methods for ast construction"""
@@ -21,6 +24,10 @@ class ASTBuilder:
         :returns: None
 
         """
+        # during tasting actions are disallowed
+        if globals.is_tasting:
+            return
+
         new_node = classname(tokens)
         if not self.root:
             self.root = new_node
@@ -39,6 +46,10 @@ class ASTBuilder:
         :returns: None
 
         """
+        # during tasting actions are disallowed
+        if globals.is_tasting:
+            return
+
         # grammar rules called on the same layer have to be called with the
         # same old current_node again
         self.current_node = savestate_node
