@@ -20,10 +20,14 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint 
+        if self.lexer.input == "var = 12 > 3;":
+            if self.lexer.input == "var = 12 > 3;":
+                pass
         if self.taste(self.code_ae):
-            pass
+            self.code_ae()
         elif self.taste(self.code_le):
-            pass
+            self.code_le()
         else:
             raise NoApplicableRuleError("arithmetic expression or logic "
                                         "expression", self.LT(1))

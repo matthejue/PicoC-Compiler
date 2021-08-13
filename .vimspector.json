@@ -13,13 +13,7 @@
         "console": "externalTerminal",
         "debugOptions": [],
         "program": "${workspaceFolder}/test/grammar_test.py",
-        "_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]",
-        "args": [
-          "./input.picoc",
-          "./output.reti",
-          "-a",
-          "-p"
-        ]
+        "_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]"
       }
     }
   }

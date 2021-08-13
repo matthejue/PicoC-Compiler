@@ -93,7 +93,7 @@ class Lexer:
             elif self.lc == ';':
                 self.next_char()
                 return Token(TT.SEMICOLON, self.c)
-            elif self.lc in '*/':
+            elif self.lc in '*/%':
                 self.next_char()
                 return Token(TT.BINOP_PREC_1, self.c)
             elif self.lc == '+':

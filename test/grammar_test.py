@@ -36,17 +36,25 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
     def test_basic_arithmetic_expression(self):
         self.set_everything_up("var = 12 - 374;")
         self.assertEqual(str(self.grammar.reveal_ast()),
-                         "('my_function' ('=' 'var' ('-' '12' '374')))")
+                         "('fun' ('=' 'var' ('-' '12' '374')))")
 
     def test_parenthesis(self):
         self.set_everything_up("var = (4 + 7) * 3;")
         self.assertEqual(str(self.grammar.reveal_ast()),
-                         "('my_function' ('=' 'var' ('*' ('+' '4' '7') '3')))")
+                         "('fun' ('=' 'var' ('*' ('+' '4' '7') '3')))")
 
     def test_unary_operators(self):
-        self.set_everything_up("var = -12 * (---154 - --189)")
-        expected_res = "('my_function' ('=' 'var' ('*' ('-' '12') ('-' ('-' \
-          ('-' ('-' '154'))) ('-' ('-' '189'))))))"
+        self.set_everything_up("var = -12 % (---154 - --189);")
+        expected_res = "('fun' ('=' 'var' ('%' ('-' '12') ('-' ('-' "\
+            "('-' ('-' '154'))) ('-' ('-' '189'))))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+
+class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
+
+    def test_logic_expression(self):
+        self.set_everything_up("var = 12 > 3;")
+        expected_res = "('fun' ('=' 'var' ('>' '12' '3')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 

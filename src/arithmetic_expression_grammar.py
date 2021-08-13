@@ -111,6 +111,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
             self.ast_builder.down(ASTNode, [TT.UNARY_OP, TT.MINUS])
 
+        # TODO: auch Klammern sind hier möglich!
         self.match_and_add([TT.NUMBER])
 
         self.ast_builder.up(savestate_node)
