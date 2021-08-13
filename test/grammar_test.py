@@ -41,9 +41,9 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
                          "('fun' ('=' 'var' ('-' '12' '374')))")
 
     def test_precedence_1(self):
-        self.set_everything_up("var = 8 * 4 + 2;")
+        self.set_everything_up("var = 8 * cars + 2;")
         self.assertEqual(str(self.grammar.reveal_ast()),
-                         "('fun' ('=' 'var' ('+' ('*' '8' '4') '2')))")
+                         "('fun' ('=' 'var' ('+' ('*' '8' 'cars') '2')))")
 
     def test_precedence_2(self):
         self.set_everything_up("var = 8 + 4 - 2;")
@@ -51,18 +51,18 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
                          "('fun' ('=' 'var' ('+' '8' ('-' '4' '2'))))")
 
     def test_precedence_3(self):
-        self.set_everything_up("var = 8 * 4 / 2;")
+        self.set_everything_up("var = cars * 4 / 2;")
         self.assertEqual(str(self.grammar.reveal_ast()),
-                         "('fun' ('=' 'var' ('*' '8' ('/' '4' '2'))))")
+                         "('fun' ('=' 'var' ('*' 'cars' ('/' '4' '2'))))")
 
     def test_parenthesis(self):
-        self.set_everything_up("var = (4 + 7) * 3;")
+        self.set_everything_up("var = (4 + 7) * cars;")
         self.assertEqual(str(self.grammar.reveal_ast()),
-                         "('fun' ('=' 'var' ('*' ('+' '4' '7') '3')))")
+                         "('fun' ('=' 'var' ('*' ('+' '4' '7') 'cars')))")
 
-    def test_negative_parenthesis(self):
-        self.set_everything_up("var = -(-132 / 2);")
-        expected_res = "('fun' ('=' 'var' ('-' ('/' ('-' '132') '2'))))"
+    def test_negative_parenthesis_and_variable(self):
+        self.set_everything_up("var = -(-cars / 2);")
+        expected_res = "('fun' ('=' 'var' ('-' ('/' ('-' 'cars') '2'))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_unary_operators(self):
@@ -79,10 +79,23 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
         expected_res = "('fun' ('=' 'var' ('>' '12' '3')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
-    def test_and(self):
-        self.set_everything_up("var = 12 > 3 && expr <= 4;")
+    def test_connected_logic_expression(self):
+        self.set_everything_up("var = 12 > 3 && dom <= 4;")
         expected_res = "('fun' ('=' 'var' ('&&' ('>' '12' '3') "\
-            "('<=' 'expr' '4'))))"
+            "('<=' 'dom' '4'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_logic_precedence_1(self, ):
+        self.set_everything_up("var = 12 >= dom && 34 < 4 || a == b;")
+        expected_res = "('fun' ('=' 'var' ('||' ('&&' ('>=' '12' 'dom') "\
+            "('<' '34' '4')) ('==' 'a' 'b'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_logic_precedence_2(self, ):
+        # TODO: buf fixen
+        self.set_everything_up("var = 12 == dom || c >= 4 || a != b;")
+        expected_res = "('fun' ('=' 'var' ('||' ('==' '12' 'dom') "\
+            "('||' ('>=' 'c' '4') ('!=' 'a' 'b')))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
