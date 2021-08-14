@@ -20,7 +20,12 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        if self.lexer.input == "var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0;":
+            if self.lexer.input == "var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0;":
+                pass
         if self.taste(self.taste_consume_ae):
+            # TODO: Wäre try statt taste nicht ein besserer Begriff?
             self.taste_consume_ae()
         elif self.taste(self.taste_consume_le):
             self.taste_consume_le()

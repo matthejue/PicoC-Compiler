@@ -120,8 +120,7 @@ class Lexer:
             elif self.lc in self.LETTER:
                 return self._identifier_special_keyword()
             elif self.lc == "!":
-                self.next_char()
-                return Token(TT.NOT, self.c)
+                return self._not()
             elif self.lc == "&":
                 return self._and()
             elif self.lc == "|":
@@ -233,6 +232,19 @@ class Lexer:
             word += self.c
 
         return Token(TT.IDENTIFIER, word)
+
+    def _not(self, ):
+        """
+
+        :grammar: '!''='?
+        :returns: None
+
+        """ 
+        self.next_char()
+        if self.lc == '=':
+            self.next_char()
+            return Token(TT.COMP_OP, '!=')
+        return Token(TT.NOT, self.c)
 
     def _and(self):
         """

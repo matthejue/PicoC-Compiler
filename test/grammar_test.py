@@ -92,10 +92,17 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_logic_precedence_2(self, ):
-        # TODO: buf fixen
         self.set_everything_up("var = 12 == dom || c >= 4 || a != b;")
         expected_res = "('fun' ('=' 'var' ('||' ('==' '12' 'dom') "\
             "('||' ('>=' 'c' '4') ('!=' 'a' 'b')))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_logic_parenthesis_and_arithmetic_parenthesis_mixed(self, ):
+        # TODO: Bug fixen
+        self.set_everything_up(
+            "var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0;")
+        expected_res = "('fun' ('=' 'var' ('&&' ('||' ('<=' '12' ('*' "\
+            "('-' 'dom' '1') '2') ('!=' '42' 'cars'))) ('==' 'cars' '0'))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
