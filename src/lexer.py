@@ -117,6 +117,9 @@ class Lexer:
                 return Token(TT.R_PAREN, self.c)
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
+            elif self.lc == '0':
+                self.next_char()
+                return Token(TT.NUMBER, self.c)
             elif self.lc in self.LETTER:
                 return self._identifier_special_keyword()
             elif self.lc == "!":
@@ -239,7 +242,7 @@ class Lexer:
         :grammar: '!''='?
         :returns: None
 
-        """ 
+        """
         self.next_char()
         if self.lc == '=':
             self.next_char()
