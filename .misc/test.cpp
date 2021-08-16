@@ -1,10 +1,11 @@
 #include <stdio.h>
 
 void while_true() {
-  {
-    {
-      { int car = 10; }
-    }
+  if (true) {
+
+  } else if (true) {
+
+  } else {
   }
 }
 

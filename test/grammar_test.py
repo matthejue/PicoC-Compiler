@@ -127,6 +127,32 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
+class IfElseGrammar(unittest.TestCase, UsefullTools):
+
+    def test_if_else_grammar(self):
+        self.set_everything_up_for_ast(
+            "if (var >= 0) var = 12; else var = var + 1;")
+        expected_res = "('fun' ('if' ('>=' 'var' '0') ('=' 'var' '0') ('else'"\
+            " ('=' 'var' ('+' 'var' '1')))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_if_else_braces(self):
+        self.set_everything_up_for_ast(
+            "if (var == 0) { var == 100; cars = cars + 1; } else "\
+            "{ var = var - 1; b = 1; }")
+        expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'var' '100') "\
+            "('=' 'cars' ('+' 'cars' '1')) ('else' "\
+            "('=' 'var' ('-' 'var' '1')) ('=' 'b' '1'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_else_if(self, ):
+        self.set_everything_up_for_ast(
+            "if (var == 0) var = 100; else if (var == 10) { var = 5; } "\
+            "else var = var + 1;")
+        expected_res = ""
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+
 if __name__ == '__main__':
     sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
     from lexer import Lexer, TT

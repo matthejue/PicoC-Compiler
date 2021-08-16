@@ -45,7 +45,10 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         """
         if self._is_assignment():
             self.code_aa()
-        # TODO: elif ...
+        elif self.LTT(1) == TT.IF:
+            self.code_ie()
+        # elif self.LTT(1) == TT.WHILE:
+        #     self.code_while()
         else:
             raise SyntaxError("statement", self.LT(1))
 
@@ -59,4 +62,7 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
             (self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER)
 
     def _is_statement(self):
-        return self._is_assignment() or False
+        return (self._is_assignment() or self.LTT(1) == TT.IF or 
+                self.LTT(1) == TT.WHILE)
+
+    from if_else_grammar import code_ie, if_exp, else_expr

@@ -32,6 +32,8 @@ class TT(Enum):
     ASSIGNMENT = "="
     L_PAREN = "("
     R_PAREN = ")"
+    L_BRACE = "{"
+    R_BRACE = "}"
     SEMICOLON = ";"
     MINUS = "-"
     ALLOC = "allocation"
@@ -48,6 +50,7 @@ class TT(Enum):
     IF = "if"
     ELSE = "else"
     WHILE = "while"
+    DO_WHILE = "do while"
 
 
 class Lexer:
