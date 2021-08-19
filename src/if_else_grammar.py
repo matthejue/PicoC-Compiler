@@ -29,7 +29,7 @@ def if_exp(self, ):
         self.code_ss()
 
         self.match([TT.R_BRACE])
-    elif self.LTT(1) == self._is_statement():
+    elif self._is_statement():
         self._s()
     else:
         raise NoApplicableRuleError(
@@ -49,7 +49,7 @@ def else_expr(self,):
     """
     savestate_node = self.ast_builder.down(ASTNode, [TT.ELSE])
 
-    self.match_and_add(TT.ELSE)
+    self.match_and_add([TT.ELSE])
 
     if self.LTT(1) == TT.L_BRACE:
         self.match([TT.L_BRACE])

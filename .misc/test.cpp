@@ -2,10 +2,13 @@
 
 void while_true() {
   if (true) {
-
+    if (true) {
+      printf("test");
+    }
   } else if (true) {
-
+    printf("test");
   } else {
+    printf("test");
   }
 }
 

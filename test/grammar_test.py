@@ -119,7 +119,6 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_logic_and_arithmetic_parenthesis_mixed(self, ):
-        # TODO: Bug fixen
         self.set_everything_up_for_ast(
             "var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0;")
         expected_res = "('fun' ('=' 'var' ('&&' ('||' ('<=' '12' ('*' "\
@@ -132,13 +131,13 @@ class IfElseGrammar(unittest.TestCase, UsefullTools):
     def test_if_else_grammar(self):
         self.set_everything_up_for_ast(
             "if (var >= 0) var = 12; else var = var + 1;")
-        expected_res = "('fun' ('if' ('>=' 'var' '0') ('=' 'var' '0') ('else'"\
-            " ('=' 'var' ('+' 'var' '1')))))"
+        expected_res = "('fun' ('if' ('>=' 'var' '0') ('=' 'var' '12') "\
+            "('else' ('=' 'var' ('+' 'var' '1')))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_if_else_braces(self):
         self.set_everything_up_for_ast(
-            "if (var == 0) { var == 100; cars = cars + 1; } else "\
+            "if (var == 0) { var = 100; cars = cars + 1; } else "
             "{ var = var - 1; b = 1; }")
         expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'var' '100') "\
             "('=' 'cars' ('+' 'cars' '1')) ('else' "\
@@ -147,9 +146,27 @@ class IfElseGrammar(unittest.TestCase, UsefullTools):
 
     def test_else_if(self, ):
         self.set_everything_up_for_ast(
-            "if (var == 0) var = 100; else if (var == 10) { var = 5; } "\
+            "if (var == 0) var = 100; else if (var == 10) { var = 5; } "
             "else var = var + 1;")
-        expected_res = ""
+        expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'var' '100') "\
+            "('else' ('if' ('==' 'var' '10') ('=' 'var' '5') ('else' "\
+            "('=' 'var' ('+' 'var' '1')))))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_two_if_after_another(self, ):
+        self.set_everything_up_for_ast(
+            "if (var == 0) cars = 10; if (cars == 10) { var = 42; }")
+        expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'cars' '10')) "\
+            "('if' ('==' 'cars' '10') ('=' 'var' '42')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_mixed_if_else_after_another(self, ):
+        self.set_everything_up_for_ast(
+            "if (var == 0) cars = 10; else cars = cars + 1; if (cars == 10) "
+            "{ var = 42; }")
+        expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'cars' '10') "\
+            "('else' ('=' 'cars' ('+' 'cars' '1')))) "\
+            "('if' ('==' 'cars' '10') ('=' 'var' '42')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 

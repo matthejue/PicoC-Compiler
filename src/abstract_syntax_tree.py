@@ -7,6 +7,7 @@ class TokenNode:
     """Abstract Syntax Tree for Arithmetic Expressions"""
 
     def __init__(self, token):
+
         self.token = token
 
     def getNodeType(self):

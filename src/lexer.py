@@ -118,6 +118,12 @@ class Lexer:
             elif self.lc == ')':
                 self.next_char()
                 return Token(TT.R_PAREN, self.c)
+            elif self.lc == '{':
+                self.next_char()
+                return Token(TT.L_BRACE, self.c)
+            elif self.lc == '}':
+                self.next_char()
+                return Token(TT.R_BRACE, self.c)
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
             elif self.lc == '0':
