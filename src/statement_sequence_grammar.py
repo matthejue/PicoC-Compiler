@@ -47,8 +47,8 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
             self.code_aa()
         elif self.LTT(1) == TT.IF:
             self.code_ie()
-        # elif self.LTT(1) == TT.WHILE:
-        #     self.code_while()
+        elif self._is_loop():
+            self.code_lo()
         else:
             raise SyntaxError("statement", self.LT(1))
 
@@ -62,7 +62,10 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
             (self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER)
 
     def _is_statement(self):
-        return (self._is_assignment() or self.LTT(1) == TT.IF or 
-                self.LTT(1) == TT.WHILE)
+        return self._is_assignment() or self.LTT(1) == TT.IF or self._is_loop()
 
-    from if_else_grammar import code_ie, if_exp, else_expr
+    def _is_loop(self, ):
+        return self.LTT(1) == TT.WHILE or self.LTT(1) == TT.DO_WHILE
+
+    from if_else_grammar import code_ie, if_, else_
+    from loop_grammar import code_lo, loop, while_, do_while

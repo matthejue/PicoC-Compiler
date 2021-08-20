@@ -126,7 +126,7 @@ class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
-class IfElseGrammar(unittest.TestCase, UsefullTools):
+class TestIfElseGrammar(unittest.TestCase, UsefullTools):
 
     def test_if_else_grammar(self):
         self.set_everything_up_for_ast(
@@ -167,6 +167,53 @@ class IfElseGrammar(unittest.TestCase, UsefullTools):
         expected_res = "('fun' ('if' ('==' 'var' '0') ('=' 'cars' '10') "\
             "('else' ('=' 'cars' ('+' 'cars' '1')))) "\
             "('if' ('==' 'cars' '10') ('=' 'var' '42')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+
+class TestLoopGrammar(unittest.TestCase, UsefullTools):
+
+    def test_while_loop(self, ):
+        self.set_everything_up_for_ast(
+            "while ( x < 12 ) { x = x + 1; }")
+        expected_res = "('fun' ('while' ('<' 'x' '12') "\
+            "('=' 'x' ('+' 'x' '1'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_do_while_loop(self, ):
+        self.set_everything_up_for_ast(
+            "do { x = x + 1; } while ( y < 10 );")
+        expected_res = "('fun' ('do while' ('=' 'x' ('+' 'x' '1')) "\
+            "('<' 'y' '10')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_serveral_statements_loop(self, ):
+        self.set_everything_up_for_ast(
+            "do { y = x; x = x + 1; } while ( y < 10 );")
+        expected_res = "('fun' ('do while' ('=' 'y' 'x') ('=' 'x' "\
+            "('+' 'x' '1')) ('<' 'y' '10')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_loop_and_nested_if_else(self, ):
+        self.set_everything_up_for_ast(
+            "while (x < 12) { x = x + 1; if (x == 42) { y = y + 1; } }")
+        expected_res = "('fun' ('while' ('<' 'x' '12') ('=' 'x' "\
+            "('+' 'x' '1')) ('if' ('==' 'x' '12') ('=' 'y' ('+' 'y' '1')))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_nested_loops(self, ):
+        self.set_everything_up_for_ast(
+            "while (x <= 42) { while (y <= 42) { z = x * y; } }")
+        expected_res = "('fun' ('while' ('<=' 'x' '42') ('while' "\
+            "('<=' 'y' '42') ('=' 'z' ('*' 'x' 'y')))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+    def test_loop_statements_after_another(self, ):
+        self.set_everything_up_for_ast(
+            "while (x <= 100) { x = x + 1; } x = 1; do { x = x + 1; } "
+            "while (x <= 100);")
+        expected_res = "('fun' ('while' ('<=' 'x' '100') ('=' 'x' "\
+            "('+' 'x' '1'))) ('=' 'x' ('+' 'x' '1')) ('do while' "\
+            "('=' 'x' ('+' 'x' '1')) ('<=' 'x' '100')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 

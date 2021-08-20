@@ -4,10 +4,10 @@ from errors import NoApplicableRuleError
 
 
 def code_ie(self, ):
-    self.if_exp()
+    self.if_()
 
 
-def if_exp(self, ):
+def if_(self, ):
     """if
 
     :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) <else>?
@@ -36,12 +36,12 @@ def if_exp(self, ):
             "statement in braces or single statement", self.LT(1))
 
     if self.LTT(1) == TT.ELSE:
-        self.else_expr()
+        self.else_()
 
     self.ast_builder.up(savestate_node)
 
 
-def else_expr(self,):
+def else_(self, ):
     """else:
 
     :grammar:

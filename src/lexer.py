@@ -87,7 +87,6 @@ class Lexer:
         """identifies the next Token in the picoC code
 
         :returns: Token
-
         """
         while self.lc != self.EOF_CHAR:
             # TODO: remove \n again
@@ -147,7 +146,6 @@ class Lexer:
         """go to the next character, detect if "end of file" is reached
 
         :returns: None
-
         """
         self.c_idx += 1
         if self.c_idx >= len(self.input):
@@ -162,7 +160,6 @@ class Lexer:
 
         :m: possibly matching character
         :returns: None
-
         """
         if self.lc == m:
             self.next_char()
@@ -174,7 +171,6 @@ class Lexer:
 
         :grammar: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
-
         """
         self.next_char()
         number = self.c
@@ -187,9 +183,9 @@ class Lexer:
     def _identifier_special_keyword(self):
         """
 
-        :grammar: <identifier> | <if> | <else> | <while> | <int> | <char>
+        :grammar: <identifier> | <if> | <else> | <while> | <do> | <int>
+        | <char>
         :returns: Identifier Token
-
         """
         # check for special keywords
         token = self._check_word("if", TT.IF)
@@ -199,6 +195,9 @@ class Lexer:
         if token:
             return token
         token = self._check_word("while", TT.WHILE)
+        if token:
+            return token
+        token = self._check_word("do", TT.DO_WHILE)
         if token:
             return token
         token = self._check_word("int", TT.PRIM_DT)

@@ -17,13 +17,14 @@ badd +1 src/errors.py
 badd +1 src/function_grammar.py
 badd +1 src/globals.py
 badd +1 src/grammar.py
-badd +1 src/lexer.py
+badd +27 src/lexer.py
 badd +37 src/logic_expression_grammar.py
 badd +1 src/parser_.py
 badd +1 src/pico_c_compiler.py
-badd +1 src/statement_sequence_grammar.py
+badd +69 src/statement_sequence_grammar.py
 badd +153 test/grammar_test.py
-badd +3 src/if_else_grammar.py
+badd +1 src/if_else_grammar.py
+badd +6 loop_grammar.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -40,13 +41,13 @@ $argadd src/logic_expression_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit src/if_else_grammar.py
+edit loop_grammar.py
 argglobal
-if bufexists("src/if_else_grammar.py") | buffer src/if_else_grammar.py | else | edit src/if_else_grammar.py | endif
+if bufexists("loop_grammar.py") | buffer loop_grammar.py | else | edit loop_grammar.py | endif
 if &buftype ==# 'terminal'
-  silent file src/if_else_grammar.py
+  silent file loop_grammar.py
 endif
-balt test/grammar_test.py
+balt src/if_else_grammar.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -55,11 +56,11 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 3 - ((2 * winheight(0) + 17) / 35)
+let s:l = 6 - ((5 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 3
+keepjumps 6
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
