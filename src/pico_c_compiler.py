@@ -84,17 +84,17 @@ def _read_file(infile, outfile):
     """
     with open(infile, encoding="utf-8") as fin, \
             open(outfile, 'w', encoding="utf-8") as fout:
-        pico_c_in = fin.readlines()[0]
+        pico_c_in = fin.readlines()
         # TODO: remove temporary solution to only read first line
 
-        output = _compile(infile, [pico_c_in])
+        output = _compile(infile, pico_c_in)
 
         fout.writelines(str(output))
 
 
 def _compile(fname, code):
     # remove all \n from the code
-    code_without_cr = list(map(lambda line: line.strip(), code))[0]
+    code_without_cr = list(map(lambda line: line.strip(), code))
     # TODO: remove temporary solution to only read first line
 
     lexer = Lexer(fname, code_without_cr)

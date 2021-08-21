@@ -14,21 +14,19 @@ class ASTBuilder:
         """
 
         :returns: None
-
         """
         self.current_node.addChild(node)
 
-    def down(self, classname, tokens):
+    def down(self, classname, tokentypes):
         """go one layer down in the abstract syntax tree
 
         :returns: None
-
         """
         # during tasting actions are disallowed
         if globals.is_tasting:
             return
 
-        new_node = classname(tokens)
+        new_node = classname(tokentypes)
         if not self.root:
             self.root = new_node
         else:
@@ -44,7 +42,6 @@ class ASTBuilder:
         """go one layer up in the abstract syntax tree
 
         :returns: None
-
         """
         # during tasting actions are disallowed
         if globals.is_tasting:

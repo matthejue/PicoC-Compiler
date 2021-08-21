@@ -186,7 +186,7 @@ class TestLoopGrammar(unittest.TestCase, UsefullTools):
             "('<' 'y' '10')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
-    def test_serveral_statements_loop(self, ):
+    def test_several_statements_loop(self, ):
         self.set_everything_up_for_ast(
             "do { y = x; x = x + 1; } while ( y < 10 );")
         expected_res = "('fun' ('do while' ('=' 'y' 'x') ('=' 'x' "\
@@ -197,7 +197,7 @@ class TestLoopGrammar(unittest.TestCase, UsefullTools):
         self.set_everything_up_for_ast(
             "while (x < 12) { x = x + 1; if (x == 42) { y = y + 1; } }")
         expected_res = "('fun' ('while' ('<' 'x' '12') ('=' 'x' "\
-            "('+' 'x' '1')) ('if' ('==' 'x' '12') ('=' 'y' ('+' 'y' '1')))))"
+            "('+' 'x' '1')) ('if' ('==' 'x' '42') ('=' 'y' ('+' 'y' '1')))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_nested_loops(self, ):
@@ -209,10 +209,10 @@ class TestLoopGrammar(unittest.TestCase, UsefullTools):
 
     def test_loop_statements_after_another(self, ):
         self.set_everything_up_for_ast(
-            "while (x <= 100) { x = x + 1; } x = 1; do { x = x + 1; } "
+            "while (x <= 100) { x = x + 1; } x = 10; do { x = x + 1; } "
             "while (x <= 100);")
         expected_res = "('fun' ('while' ('<=' 'x' '100') ('=' 'x' "\
-            "('+' 'x' '1'))) ('=' 'x' ('+' 'x' '1')) ('do while' "\
+            "('+' 'x' '1'))) ('=' 'x' '10') ('do while' "\
             "('=' 'x' ('+' 'x' '1')) ('<=' 'x' '100')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 

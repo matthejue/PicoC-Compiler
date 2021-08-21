@@ -79,8 +79,9 @@ class Lexer:
         """
         self.fname = fname
         self.input = input
-        self.c_idx = 0
-        self.lc = input[self.c_idx]
+        self.lc_col = 0
+        self.lc_row = 0
+        self.lc = input[self.lc_row][self.lc_col]
         self.c = None
 
     def next_token(self):
@@ -147,13 +148,23 @@ class Lexer:
 
         :returns: None
         """
-        self.c_idx += 1
-        if self.c_idx >= len(self.input):
+        # next column or next row
+        if self.lc_col + 1 != len(self.input[self.lc_row]):
+            self.lc_col += 1
+        elif (self.lc_col + 1 == len(self.input[self.lc_row]) and
+              self.lc_row + 1 != len(self.input)):
+            self.lc_col += 0
+        else:
+            pass
+
+        # next character
+        if (self.lc_row == len(self.input) and
+                self.lc_col == len(self.input[self.lc_row])):
             self.c = self.lc
             self.lc = self.EOF_CHAR
         else:
             self.c = self.lc
-            self.lc = self.input[self.c_idx]
+            self.lc = self.input[self.lc_row][self.lc_col]
 
     def match(self, m):
         """Check if m is the next character in the input to match
@@ -217,7 +228,8 @@ class Lexer:
         :returns: None
 
         """
-        c_idx_copy, c_copy, lc_copy = self.c_idx, self.c, self.lc
+        lc_row_copy, lc_col_copy, c_copy, lc_copy = self.lc_row, self.lc_col, \
+            self.c, self.lc
 
         for match_char in word:
             if self.lc != match_char:
@@ -227,7 +239,8 @@ class Lexer:
             if self.lc not in self.LETTER_DIGIT:
                 return Token(tokentype, word)
 
-        self.c_idx, self.c, self.lc = c_idx_copy, c_copy, lc_copy
+        self.lc_row, self.lc_col, self.c, self.lc = lc_row_copy, lc_col_copy, \
+            c_copy, lc_copy
 
     def _identifier(self):
         """identifier

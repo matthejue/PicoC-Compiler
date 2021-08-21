@@ -1,10 +1,10 @@
 # from enum import Enum
-from lexer import Token
+from lexer import Token, TT
 
 
 class TokenNode:
 
-    """Abstract Syntax Tree for Arithmetic Expressions"""
+    """Abstract Syntax Tree Node for Leaves"""
 
     def __init__(self, token):
 
@@ -27,8 +27,8 @@ class TokenNode:
 
 class ASTNode(TokenNode):
 
-    """Abstract Syntax Tree holds the relevant Tokens and represents
-    grammatical relationships the parser came across"""
+    """Node of a Abstract Syntax Tree (AST). A AST holds the relevant Tokens
+    and represents grammatical relationships the parser came across"""
 
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
@@ -46,7 +46,6 @@ class ASTNode(TokenNode):
         """
 
         :returns: None
-
         """
         # in case the representative tokens of self appear as attribute of a
         # TokenNode, the token of self can finally register the right value
@@ -89,9 +88,15 @@ class ASTNode(TokenNode):
         return acc
 
 
-class Prec1Node(ASTNode):
+class LoopNode(ASTNode):
 
-    """Abstract Syntax Tree for Arithmetic Expressions"""
+    """Special Abstract Syntax Tree Node for Loop Grammar"""
 
-    def __init__(self, token):
-        super().__init__(self, token)
+    def addChild(self, node):
+        """
+
+        :returns: None
+        """
+        if node.token.type == TT.DO_WHILE:
+            node.token.value += " while"
+        super().addChild(node)

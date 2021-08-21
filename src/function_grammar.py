@@ -27,8 +27,4 @@ class FunctionGrammar(StatementSequenceGrammar):
         self.ast_builder.current_node.token.value = "fun"
         self.ast_builder.current_node.ignore = False
 
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        if self.lexer.input == "if (var == 0) { var == 100; cars = cars + 1; } else { var = var - 1; b = 1; }":
-            if self.lexer.input == "if (var == 0) { var == 100; cars = cars + 1; } else { var = var - 1; b = 1; }":
-                pass
         self.code_ss()
