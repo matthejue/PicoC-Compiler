@@ -26,7 +26,7 @@ class UsefullTools():
 
     def set_everything_up_for_lexer(self, code):
         globals.args = Args()
-        self.lexer = Lexer("<test>", code)
+        self.lexer = Lexer("<test>", [code])
         tokens = []
         t = self.lexer.next_token()
         while t.type != TT.EOF:
@@ -36,7 +36,7 @@ class UsefullTools():
 
     def set_everything_up_for_ast(self, code):
         globals.args = Args()
-        self.lexer = Lexer("<test>", code)
+        self.lexer = Lexer("<test>", [code])
 
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()

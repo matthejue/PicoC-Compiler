@@ -149,16 +149,20 @@ class Lexer:
         :returns: None
         """
         # next column or next row
-        if self.lc_col + 1 != len(self.input[self.lc_row]):
+        if self.lc_col + 1 < len(self.input[self.lc_row]):
             self.lc_col += 1
         elif (self.lc_col + 1 == len(self.input[self.lc_row]) and
-              self.lc_row + 1 != len(self.input)):
-            self.lc_col += 0
+              self.lc_row + 1 < len(self.input)):
+            self.lc_row += 1
+            self.lc_col = 0
+        elif (self.lc_col + 1 == len(self.input[self.lc_row]) and
+              self.lc_row + 1 == len(self.input)):
+            self.lc_col += 1
         else:
             pass
 
         # next character
-        if (self.lc_row == len(self.input) and
+        if (self.lc_row + 1 == len(self.input) and
                 self.lc_col == len(self.input[self.lc_row])):
             self.c = self.lc
             self.lc = self.EOF_CHAR
