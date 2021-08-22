@@ -8,22 +8,23 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +3 src/abstract_syntax_tree.py
-badd +1 src/arithmetic_expression_grammar.py
-badd +1 src/assignment_allocation_grammar.py
-badd +0 src/ast_builder.py
-badd +0 src/errors.py
-badd +0 src/function_grammar.py
-badd +0 src/globals.py
-badd +0 src/grammar.py
-badd +0 src/if_else_grammar.py
-badd +0 src/lexer.py
-badd +0 src/logic_expression_grammar.py
-badd +0 src/loop_grammar.py
-badd +0 src/parser_.py
-badd +0 src/pico_c_compiler.py
-badd +0 src/statement_sequence_grammar.py
-badd +1 test/grammar_test.py
+badd +5 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/errors.py
+badd +8 ~/Documents/Studium/pico_c_compiler/src/function_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/globals.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
+badd +131 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +24 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/parser_.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
+badd +14 ~/Documents/Studium/pico_c_compiler/src/statement_sequence_grammar.py
+badd +44 ~/Documents/Studium/pico_c_compiler/test/grammar_test.py
+badd +12 ~/Documents/Studium/pico_c_compiler/input.picoc
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -41,22 +42,13 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit test/grammar_test.py
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-exe '2resize ' . ((&lines * 7 + 20) / 41)
-exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
+edit ~/Documents/Studium/pico_c_compiler/input.picoc
 argglobal
-if bufexists("test/grammar_test.py") | buffer test/grammar_test.py | else | edit test/grammar_test.py | endif
+if bufexists("~/Documents/Studium/pico_c_compiler/input.picoc") | buffer ~/Documents/Studium/pico_c_compiler/input.picoc | else | edit ~/Documents/Studium/pico_c_compiler/input.picoc | endif
 if &buftype ==# 'terminal'
-  silent file test/grammar_test.py
+  silent file ~/Documents/Studium/pico_c_compiler/input.picoc
 endif
-balt src/assignment_allocation_grammar.py
+balt ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -65,35 +57,18 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 1 - ((0 * winheight(0) + 19) / 39)
+let s:l = 12 - ((11 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 0
-wincmd w
-argglobal
-enew
-balt src/abstract_syntax_tree.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-exe '2resize ' . ((&lines * 7 + 20) / 41)
-exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
+keepjumps 12
+normal! 06|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
-set winheight=1 winwidth=20 shortmess=filnxAoOaFTtI
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
+set winheight=1 winwidth=20 shortmess=filnxIAoOaFTt
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

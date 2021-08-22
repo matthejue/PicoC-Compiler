@@ -96,7 +96,11 @@ class Lexer:
             elif self.lc == ';':
                 self.next_char()
                 return Token(TT.SEMICOLON, self.c)
-            elif self.lc in '*/%':
+            elif self.lc == '/':
+                token = self._division_sign_or_comment()
+                if token:
+                    return token
+            elif self.lc in '*%':
                 self.next_char()
                 return Token(TT.BINOP_PREC_1, self.c)
             elif self.lc == '+':
@@ -305,7 +309,6 @@ class Lexer:
 
         :grammar: ((==?)|(<(<|=)?)|(>(>|=)?))
         :returns: None
-
         """
         if self.lc == '=':
             self.next_char()
@@ -331,3 +334,21 @@ class Lexer:
                 self.next_char()
                 return Token(TT.BITSHIFT, ">>")
             return Token(TT.COMP_OP, self.c)
+
+    def _division_sign_or_comment(self, ):
+        """
+
+        :grammar: /(/|('*'.*'*'/))?
+        :returns: None
+        """
+        self.next_char()
+
+        if self.lc == '/':
+            self.lc_col = 0
+            self.lc_row += 1
+        elif self.lc == '*':
+            while not (self.lc == '/' and self.c == '*'):
+                self.next_char()
+            self.next_char()
+        else:
+            return Token(TT.BINOP_PREC_1, self.c)
