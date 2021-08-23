@@ -1,4 +1,4 @@
-#include <stdio.h>
+/* #include <stdio.h> */
 
 /* void while_true() { */
 /*   do */
@@ -7,5 +7,4 @@
 /* } */
 /*  */
 /* int main(int argc, const char **argv) { while_true(); } */
-/*asdfasdf/
 //

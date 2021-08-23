@@ -1,4 +1,5 @@
 from function_grammar import FunctionGrammar
+from lexer import TT
 
 
 class Grammar(FunctionGrammar):
@@ -13,14 +14,13 @@ class Grammar(FunctionGrammar):
         """start parsing the grammar
 
         :returns: None
-
         """
         self.code_f()
+        self.match([TT.EOF])
 
     def reveal_ast(self):
         """makes the abstract syntax tree of the grammar available
 
         :returns: rootnode of the abstract syntax tree
-
         """
         return self.ast_builder.root

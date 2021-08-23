@@ -1,17 +1,7 @@
-// gcd
-/* Compute the greatest common divisor using the euclidean algorithm. */
-/*  */
-/* Args: */
-/*     A natural number m. */
-/*     A natural number n. */
-/*  */
-/* Returns: */
-/*     Greatest common divisor of m and n. */
 m = 12;
 n = 7;
 while (n > 0) {
   h = m % n;
-  // comment
-  m = /*comment*/ n;
-  n = h; // comment
+  m =  n;
+  n = h;
 }

@@ -74,6 +74,7 @@ TestIfElseGrammar	test/grammar_test.py	/^class TestIfElseGrammar(unittest.TestCa
 TestLexer	test/grammar_test.py	/^class TestLexer(unittest.TestCase, UsefullTools):$/;"	c
 TestLogicExpressionGrammar	test/grammar_test.py	/^class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestLoopGrammar	test/grammar_test.py	/^class TestLoopGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestPrograms	test/grammar_test.py	/^class TestPrograms(unittest.TestCase, UsefullTools):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
 TokenNode	src/abstract_syntax_tree.py	/^class TokenNode:$/;"	c
 UNARY_OP	src/lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
@@ -113,6 +114,7 @@ _comment	.vimspector.json	/^        "_comment": "args: [.\/input.picoc, .\/outpu
 _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
 _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
+_division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
 _identifier	src/lexer.py	/^    def _identifier(self):$/;"	m	class:Lexer
 _identifier_special_keyword	src/lexer.py	/^    def _identifier_special_keyword(self):$/;"	m	class:Lexer
@@ -179,7 +181,6 @@ lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:Tes
 lexer	test/grammar_test.py	/^    lexer = None$/;"	v	class:UsefullTools
 loop	src/loop_grammar.py	/^def loop(self):$/;"	f
 main	.misc/pico_c_compiler	/^def main():$/;"	f
-main	.misc/test.cpp	/^int main(int argc, const char **argv) { while_true(); }$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 match	src/lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
 match	src/parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
@@ -208,7 +209,9 @@ s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 set_everything_up_for_ast	test/grammar_test.py	/^    def set_everything_up_for_ast(self, code):$/;"	m	class:UsefullTools
+set_everything_up_for_ast_multiline	test/grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, code_without_cr):$/;"	m	class:UsefullTools
 set_everything_up_for_lexer	test/grammar_test.py	/^    def set_everything_up_for_lexer(self, code):$/;"	m	class:UsefullTools
+set_everything_up_for_testing_programs	test/grammar_test.py	/^    def set_everything_up_for_testing_programs(self, programpath):$/;"	m	class:UsefullTools
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
 start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
@@ -222,6 +225,7 @@ test_basic_arithmetic_expression	test/grammar_test.py	/^    def test_basic_arith
 test_connected_logic_expression	test/grammar_test.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
 test_do_while_loop	test/grammar_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 test_else_if	test/grammar_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
+test_gcd	test/grammar_test.py	/^    def test_gcd(self, ):$/;"	m	class:TestPrograms
 test_if_else_braces	test/grammar_test.py	/^    def test_if_else_braces(self):$/;"	m	class:TestIfElseGrammar
 test_if_else_grammar	test/grammar_test.py	/^    def test_if_else_grammar(self):$/;"	m	class:TestIfElseGrammar
 test_illegal_char_error	.misc/test_errors	/^    def test_illegal_char_error()$/;"	m	class:TestErrors
@@ -252,4 +256,3 @@ tokens	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class
 type	.vimspector.json	/^        "type": "python",$/;"	s	object:configurations.Debug.configuration
 up	src/ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
 while_	src/loop_grammar.py	/^def while_(self):$/;"	f
-while_true	.misc/test.cpp	/^void while_true() {$/;"	f	typeref:typename:void

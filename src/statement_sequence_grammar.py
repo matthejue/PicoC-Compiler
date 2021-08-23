@@ -23,13 +23,17 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
     def _ss(self):
         """statement sequence
 
-        :grammar: (<s>?)+
+        :grammar: <s>+
         :returns: None
 
         """
         while True:
-            if self._is_statement():
-                self._s()
+            # TODO: Don't forget to remove this improvised conditional breakpoint
+            if self.lexer.fname == "gcd":
+                if self.lexer.fname == "gcd":
+                    pass
+            # if self._is_statement():
+            self._s()
 
             # TODO: add in other statement types by replacing the false
             # it's possibe to write var = 10;;

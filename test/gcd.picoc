@@ -1,0 +1,9 @@
+m = 12;
+n = 7;
+// important comment
+while (n > 0) {
+  h = m % n;
+  m =  /* important **!** comment within line */ n;
+  n = h; // important comment end of line
+}
+// test

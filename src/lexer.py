@@ -344,10 +344,14 @@ class Lexer:
         self.next_char()
 
         if self.lc == '/':
-            self.lc_col = 0
-            self.lc_row += 1
+            # don't go one position over last character else one gets stuck at
+            # this line forever because a character > line end can only be
+            # triggered at the end of the code
+            self.lc_col = len(self.input[self.lc_row]) - 1
+            self.next_char()
         elif self.lc == '*':
-            while not (self.lc == '/' and self.c == '*'):
+            while not (self.lc == '/' and self.c == '*' or 
+                       self.lc == self.EOF_CHAR):
                 self.next_char()
             self.next_char()
         else:

@@ -41,6 +41,20 @@ class UsefullTools():
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()
 
+    def set_everything_up_for_ast_multiline(self, testname, code_without_cr):
+        globals.args = Args()
+        self.lexer = Lexer(testname, code_without_cr)
+
+        self.grammar = Grammar(self.lexer)
+        self.grammar.start_parse()
+
+    def set_everything_up_for_testing_programs(self, programname, programpath):
+        with open(programpath) as input:
+            code_without_cr = list(
+                map(lambda line: line.strip(), input.readlines()))
+            self.set_everything_up_for_ast_multiline(
+                programname, code_without_cr)
+
 
 class TestLexer(unittest.TestCase, UsefullTools):
 
@@ -52,6 +66,11 @@ class TestLexer(unittest.TestCase, UsefullTools):
     def test_numbers(self, ):
         tokens = self.set_everything_up_for_lexer("12 0 10 9876543021")
         self.assertEqual(str(tokens), str(['12', '0', '10', '9876543021']))
+
+    def test_comments(self, ):
+        tokens = self.set_everything_up_for_lexer(
+            "var = /* comment */ 10; // important comment")
+        self.assertEqual(str(tokens), str(['var', '=', '10', ';']))
 
 
 class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
@@ -215,6 +234,31 @@ class TestLoopGrammar(unittest.TestCase, UsefullTools):
             "('+' 'x' '1'))) ('=' 'x' '10') ('do while' "\
             "('=' 'x' ('+' 'x' '1')) ('<=' 'x' '100')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+
+class TestComments(unittest.TestCase, UsefullTools):
+
+    def test_single_line_comment(self, ):
+        self.set_everything_up_for_ast_multiline(
+            "commenttest", ["var = 10;", "// important comment", "var = 0;"])
+        expected_res = "('fun' ('=' 'var' '10') ('=' 'var' '0'))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
+#     def test_single_line_comment_end_of_line(self, ):
+#         self.set_everything_up_for_ast_multiline(
+#             [['int var;']['var = 0; // important comment']['var = var + 1;']])
+#         expected_res = "('fun' ('\t'))"
+#         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+#
+#     def test_multi_line_comments(self, ):
+#         pass
+
+
+class TestPrograms(unittest.TestCase, UsefullTools):
+
+    def test_gcd(self, ):
+        self.set_everything_up_for_testing_programs("gcd",
+                                                    "./test/gcd.picoc")
 
 
 if __name__ == '__main__':
