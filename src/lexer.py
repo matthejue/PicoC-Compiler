@@ -51,6 +51,7 @@ class TT(Enum):
     ELSE = "else"
     WHILE = "while"
     DO_WHILE = "do while"
+    MAIN = "main"
 
 
 class Lexer:
@@ -225,6 +226,12 @@ class Lexer:
         token = self._check_word("char", TT.PRIM_DT)
         if token:
             return token
+        token = self._check_word("void", TT.PRIM_DT)
+        if token:
+            return token
+        token = self._check_word("main", TT.MAIN)
+        if token:
+            return token
 
         # nothing more left then being a identifier
         return self._identifier()
@@ -350,7 +357,7 @@ class Lexer:
             self.lc_col = len(self.input[self.lc_row]) - 1
             self.next_char()
         elif self.lc == '*':
-            while not (self.lc == '/' and self.c == '*' or 
+            while not (self.lc == '/' and self.c == '*' or
                        self.lc == self.EOF_CHAR):
                 self.next_char()
             self.next_char()

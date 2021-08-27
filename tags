@@ -61,6 +61,8 @@ R_PAREN	src/lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
 SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
 STATEMENT	src/lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	src/Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	test/Session.vim	/^let SessionLoad = 1$/;"	v
 StatementSequenceGrammar	src/statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
 SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARY_BASENAMES	Makefile	/^TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard .\/test\/*_test.py))$/;"	m
@@ -69,6 +71,7 @@ TODO	README.md	/^## TODO$/;"	s	chapter:Pico-C Compiler
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
 TestArithmeticExpressionGrammar	test/grammar_test.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestComments	test/grammar_test.py	/^class TestComments(unittest.TestCase, UsefullTools):$/;"	c
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
 TestIfElseGrammar	test/grammar_test.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestLexer	test/grammar_test.py	/^class TestLexer(unittest.TestCase, UsefullTools):$/;"	c
@@ -204,14 +207,26 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 12 - ((11 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	Session.vim	/^let s:l = 11 - ((10 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	src/Session.vim	/^let s:l = 99 - ((3 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	test/Session.vim	/^let s:l = 254 - ((33 * winheight(0) + 21) \/ 43)$/;"	v
+s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
+s:save_winminheight	test/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
+s:save_winminwidth	src/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
+s:save_winminwidth	test/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
+s:so_save	src/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
+s:so_save	test/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	src/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	test/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	src/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	test/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 set_everything_up_for_ast	test/grammar_test.py	/^    def set_everything_up_for_ast(self, code):$/;"	m	class:UsefullTools
-set_everything_up_for_ast_multiline	test/grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, code_without_cr):$/;"	m	class:UsefullTools
+set_everything_up_for_ast_multiline	test/grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, testname, code_without_cr):$/;"	m	class:UsefullTools
 set_everything_up_for_lexer	test/grammar_test.py	/^    def set_everything_up_for_lexer(self, code):$/;"	m	class:UsefullTools
-set_everything_up_for_testing_programs	test/grammar_test.py	/^    def set_everything_up_for_testing_programs(self, programpath):$/;"	m	class:UsefullTools
+set_everything_up_for_testing_programs	test/grammar_test.py	/^    def set_everything_up_for_testing_programs(self, programname, programpath):$/;"	m	class:UsefullTools
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
 start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
@@ -222,6 +237,7 @@ taste_consume_ae	src/logic_expression_grammar.py	/^    def taste_consume_ae(self
 taste_consume_le	src/logic_expression_grammar.py	/^    def taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
 test	Makefile	/^test:$/;"	t
 test_basic_arithmetic_expression	test/grammar_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_comments	test/grammar_test.py	/^    def test_comments(self, ):$/;"	m	class:TestLexer
 test_connected_logic_expression	test/grammar_test.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
 test_do_while_loop	test/grammar_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 test_else_if	test/grammar_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
@@ -246,6 +262,7 @@ test_precedence_2	test/grammar_test.py	/^    def test_precedence_2(self):$/;"	m	
 test_precedence_3	test/grammar_test.py	/^    def test_precedence_3(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_precedence_rules	.misc/test_parser	/^    def test_precedence_rules(self):$/;"	m	class:TestArithmeticExpreessions
 test_several_statements_loop	test/grammar_test.py	/^    def test_several_statements_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_single_line_comment	test/grammar_test.py	/^    def test_single_line_comment(self, ):$/;"	m	class:TestComments
 test_space_and_word_seperation	test/grammar_test.py	/^    def test_space_and_word_seperation(self, ):$/;"	m	class:TestLexer
 test_two_if_after_another	test/grammar_test.py	/^    def test_two_if_after_another(self, ):$/;"	m	class:TestIfElseGrammar
 test_unary_operators	test/grammar_test.py	/^    def test_unary_operators(self):$/;"	m	class:TestArithmeticExpressionGrammar

@@ -16,15 +16,32 @@ class FunctionGrammar(StatementSequenceGrammar):
     def code_f(self):
         """function grammar startpoint
 
-        :grammar: <f>
+        :grammar: <main_function>
         :returns: None
 
         """
-        self.ast_builder.down(ASTNode, [TT.FUNCTION])
+        self._main_function()
 
-        # little heck to make the second statement visible, TODO: remove it
-        # later
-        self.ast_builder.current_node.token.value = "fun"
-        self.ast_builder.current_node.ignore = False
+    def _main_function(self, ):
+        """main function
+
+        :grammar: void main () { <code_ss> }
+        :returns: None
+        """
+        savestate_node = self.ast_builder.down(ASTNode, [TT.FUNCTION, TT.MAIN])
+
+        self.match([TT.PRIM_DT])
+
+        self.match_and_add([TT.MAIN])
+
+        self.match([TT.L_PAREN])
+
+        self.match([TT.R_PAREN])
+
+        self.match([TT.L_BRACE])
 
         self.code_ss()
+
+        self.match([TT.R_BRACE])
+
+        self.ast_builder.up(savestate_node)

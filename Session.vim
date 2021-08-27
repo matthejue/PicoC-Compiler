@@ -8,23 +8,24 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +5 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/errors.py
-badd +8 ~/Documents/Studium/pico_c_compiler/src/function_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/globals.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
-badd +131 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-badd +24 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/parser_.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
-badd +14 ~/Documents/Studium/pico_c_compiler/src/statement_sequence_grammar.py
-badd +44 ~/Documents/Studium/pico_c_compiler/test/grammar_test.py
-badd +12 ~/Documents/Studium/pico_c_compiler/input.picoc
+badd +5 src/abstract_syntax_tree.py
+badd +1 src/arithmetic_expression_grammar.py
+badd +1 src/assignment_allocation_grammar.py
+badd +1 src/ast_builder.py
+badd +1 src/errors.py
+badd +5 src/function_grammar.py
+badd +1 src/globals.py
+badd +1 src/grammar.py
+badd +1 src/if_else_grammar.py
+badd +131 src/lexer.py
+badd +24 src/logic_expression_grammar.py
+badd +1 src/loop_grammar.py
+badd +1 src/parser_.py
+badd +1 src/pico_c_compiler.py
+badd +14 src/statement_sequence_grammar.py
+badd +44 test/grammar_test.py
+badd +7 input.picoc
+badd +11 test/gcd.picoc
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -42,13 +43,13 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit ~/Documents/Studium/pico_c_compiler/input.picoc
+edit test/gcd.picoc
 argglobal
-if bufexists("~/Documents/Studium/pico_c_compiler/input.picoc") | buffer ~/Documents/Studium/pico_c_compiler/input.picoc | else | edit ~/Documents/Studium/pico_c_compiler/input.picoc | endif
+if bufexists("test/gcd.picoc") | buffer test/gcd.picoc | else | edit test/gcd.picoc | endif
 if &buftype ==# 'terminal'
-  silent file ~/Documents/Studium/pico_c_compiler/input.picoc
+  silent file test/gcd.picoc
 endif
-balt ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
+balt src/function_grammar.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -56,13 +57,14 @@ setlocal fdi=#
 setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
-setlocal nofen
-let s:l = 12 - ((11 * winheight(0) + 21) / 43)
+setlocal fen
+let s:l = 11 - ((10 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 12
-normal! 06|
+keepjumps 11
+normal! 04|
+if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
