@@ -27,8 +27,12 @@ class TokenNode:
 
 class ASTNode(TokenNode):
 
-    """Node of a Abstract Syntax Tree (AST). A AST holds the relevant Tokens
-    and represents grammatical relationships the parser came across"""
+    """Node of a Normalized Heterogeneous Abstract Syntax Tree (AST), partially also has
+    some different Normalized Heterogeneous AST Nodes. A AST holds the relevant
+    Tokens and represents grammatical relationships the parser came across.
+    Homogeneous AST means having only one node type and all childs normalized
+    in a list. Normalized Heterogeneous means different Node types and all
+    childs normalized in a list"""
 
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
