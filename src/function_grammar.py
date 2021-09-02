@@ -1,5 +1,5 @@
 from statement_sequence_grammar import StatementSequenceGrammar
-from abstract_syntax_tree import ASTNode
+from abstract_syntax_tree import MainFunctionNode
 from lexer import TT
 
 # TODO: Grammar irgendwo als oberste Grammar noch einrichten
@@ -28,7 +28,7 @@ class FunctionGrammar(StatementSequenceGrammar):
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.FUNCTION, TT.MAIN])
+        savestate_node = self.ast_builder.down(MainFunctionNode, [TT.FUNCTION, TT.MAIN])
 
         self.match([TT.PRIM_DT])
 

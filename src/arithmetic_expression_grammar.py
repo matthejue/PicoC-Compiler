@@ -1,5 +1,5 @@
 from parser_ import BacktrackingParser
-from abstract_syntax_tree import ASTNode
+from abstract_syntax_tree import ArithmeticExpressionNode
 from errors import SyntaxError
 from lexer import TT
 
@@ -28,14 +28,15 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         """
         savestate_node = self.ast_builder.down(
-            ASTNode, [TT.BINOP_PREC_2, TT.MINUS])
+            ArithmeticExpressionNode, [TT.BINOP_PREC_2, TT.MINUS])
 
         self._prec1()
 
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
             self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
 
-            self.ast_builder.down(ASTNode, [TT.BINOP_PREC_2, TT.MINUS])
+            self.ast_builder.down(ArithmeticExpressionNode, [
+                                  TT.BINOP_PREC_2, TT.MINUS])
 
             self._prec1()
 
@@ -48,14 +49,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.BINOP_PREC_1])
+        savestate_node = self.ast_builder.down(ArithmeticExpressionNode, [TT.BINOP_PREC_1])
 
         self._ao()
 
         while self.LTT(1) == TT.BINOP_PREC_1:
             self.match_and_add([TT.BINOP_PREC_1])
 
-            self.ast_builder.down(ASTNode, [TT.BINOP_PREC_1])
+            self.ast_builder.down(ArithmeticExpressionNode, [TT.BINOP_PREC_1])
 
             self._ao()
 
@@ -102,14 +103,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         """
         savestate_node = self.ast_builder.down(
-            ASTNode, [TT.UNARY_OP, TT.MINUS])
+            ArithmeticExpressionNode, [TT.UNARY_OP, TT.MINUS])
 
         while True:  # do while loop
             self.match_and_add([TT.UNARY_OP, TT.MINUS])
             if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ASTNode, [TT.UNARY_OP, TT.MINUS])
+            self.ast_builder.down(ArithmeticExpressionNode, [TT.UNARY_OP, TT.MINUS])
 
         # self.match_and_add([TT.NUMBER])
         self._ao()

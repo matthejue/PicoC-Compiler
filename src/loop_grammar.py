@@ -1,4 +1,4 @@
-from abstract_syntax_tree import LoopNode
+from abstract_syntax_tree import WhileNode, DoWhileNode
 from lexer import TT
 # from errors import NoApplicableRuleError
 
@@ -34,7 +34,7 @@ def while_(self):
     :grammar: <while> ( <code_le> ) { <code_ss> }
     :returns: None
     """
-    savestate_node = self.ast_builder.down(LoopNode, [TT.WHILE])
+    savestate_node = self.ast_builder.down(WhileNode, [TT.WHILE])
 
     self.match_and_add([TT.WHILE])
 
@@ -59,7 +59,7 @@ def do_while(self):
     :grammar: do { <code_ss> } while ( <code_le> ) ;
     :returns: None
     """
-    savestate_node = self.ast_builder.down(LoopNode, [TT.DO_WHILE])
+    savestate_node = self.ast_builder.down(DoWhileNode, [TT.DO_WHILE])
 
     self.match_and_add([TT.DO_WHILE])
 

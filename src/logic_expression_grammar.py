@@ -1,6 +1,6 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT
-from abstract_syntax_tree import ASTNode
+from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode
 from errors import SyntaxError, NoApplicableRuleError
 
 
@@ -60,13 +60,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.OR])
+        savestate_node = self.ast_builder.down(LogicAndOrNode, [TT.OR])
 
         self._and_expr()
         while self.LTT(1) == TT.OR:
             self.match_and_add([TT.OR])
 
-            self.ast_builder.down(ASTNode, [TT.OR])
+            self.ast_builder.down(LogicAndOrNode, [TT.OR])
 
             self._and_expr()
 
@@ -78,13 +78,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <lo> (and #2 <lo>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.AND])
+        savestate_node = self.ast_builder.down(LogicAndOrNode, [TT.AND])
 
         self._lo()
         while self.LTT(1) == TT.AND:
             self.match_and_add([TT.AND])
 
-            self.ast_builder.down(ASTNode, [TT.AND])
+            self.ast_builder.down(LogicAndOrNode, [TT.AND])
 
             self._lo()
 
@@ -111,7 +111,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: <code_ae> <comp_op> <code_ae>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.COMP_OP])
+        savestate_node = self.ast_builder.down(LogicAtomNode, [TT.COMP_OP])
 
         self.code_ae()
         self.match_and_add([TT.COMP_OP])
@@ -135,7 +135,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: !+ <code_le>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.NOT])
+        savestate_node = self.ast_builder.down(LogicNotNode, [TT.NOT])
 
         while True:
             self.match_and_add(TT.NOT)
@@ -143,7 +143,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             if self.LTT(1) != TT.NOT:
                 break
 
-            self.ast_builder.down(ASTNode, [TT.NOT])
+            self.ast_builder.down(LogicNotNode, [TT.NOT])
 
         self._code_le()
 

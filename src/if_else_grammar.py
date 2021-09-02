@@ -1,4 +1,4 @@
-from abstract_syntax_tree import ASTNode
+from abstract_syntax_tree import IfNode, ElseNode
 from lexer import TT
 from errors import NoApplicableRuleError
 
@@ -13,7 +13,7 @@ def if_(self, ):
     :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) <else>?
     :returns: None
     """
-    savestate_node = self.ast_builder.down(ASTNode, [TT.IF])
+    savestate_node = self.ast_builder.down(IfNode, [TT.IF])
 
     self.match_and_add([TT.IF])
 
@@ -47,7 +47,7 @@ def else_(self, ):
     :grammar:
     :returns: else ({ <code_ss> }|<s>)
     """
-    savestate_node = self.ast_builder.down(ASTNode, [TT.ELSE])
+    savestate_node = self.ast_builder.down(ElseNode, [TT.ELSE])
 
     self.match_and_add([TT.ELSE])
 

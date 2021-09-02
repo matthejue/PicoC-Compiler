@@ -1,5 +1,5 @@
 from logic_expression_grammar import LogicExpressionGrammar
-from abstract_syntax_tree import ASTNode
+from abstract_syntax_tree import AssignmentNode, AllocationNode
 from lexer import TT
 
 
@@ -28,7 +28,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         """
         savestate_node = self.ast_builder.down(
-            ASTNode, [TT.STATEMENT, TT.ASSIGNMENT])
+            AssignmentNode, [TT.STATEMENT, TT.ASSIGNMENT])
 
         if self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER])
@@ -41,13 +41,13 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         self.match_and_add([TT.ASSIGNMENT])
 
-        self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
+        self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
 
         while self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER])
             self.match_and_add([TT.ASSIGNMENT])
 
-            self.ast_builder.down(ASTNode, [TT.ASSIGNMENT])
+            self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
 
         # self.code_le()
         self.code_ae_le()
@@ -61,7 +61,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ASTNode, [TT.ALLOC, TT.PRIM_DT])
+        savestate_node = self.ast_builder.down(AllocationNode, [TT.ALLOC, TT.PRIM_DT])
 
         self.match_and_add([TT.PRIM_DT])
         self.match_and_add([TT.IDENTIFIER])
