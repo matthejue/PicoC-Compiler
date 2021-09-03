@@ -1,6 +1,7 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT
-from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode
+from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
+    LogicTopBottomNode
 from errors import SyntaxError, NoApplicableRuleError
 
 
@@ -101,14 +102,40 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_logic()
         elif self.LTT(1) in [TT.NUMBER, TT.IDENTIFIER]:
-            self._atom()
+            self._atom_or_top_bottom()
         else:
             raise SyntaxError("logic operand", self.LT(1))
 
-    def _atom(self):
+    def _atom_or_top_bottom(self):
+        """atomic formula or top / bottom
+
+        :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
+        :returns: None
+        """
+        if self.taste(self._top_bottom):
+            self._top_bottom()
+        elif self.taste(self._atom):
+            self._atom()
+
+    def _top_bottom(self, ):
+        """top / bottom
+
+        :grammar: #1 <code_ae>
+        :returns: None
+        """
+        savestate_node = self.ast_builder.down(
+            LogicTopBottomNode, [TT.LOGICAL])
+
+        # little hack to get
+        self.match_and_add([TT.LOGICAL])
+        self.code_ae()
+
+        self.ast_builder.up(savestate_node)
+
+    def _atom(self, ):
         """atomic formula
 
-        :grammar: <code_ae> <comp_op> <code_ae>
+        :grammar: #2 <code_ae> <comp_op> <code_ae>
         :returns: None
         """
         savestate_node = self.ast_builder.down(LogicAtomNode, [TT.COMP_OP])

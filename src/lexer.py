@@ -52,6 +52,7 @@ class TT(Enum):
     WHILE = "while"
     DO_WHILE = "do while"
     MAIN = "main"
+    LOGICAL = "convert arithmetic expression to logical expression"
 
 
 class Lexer:

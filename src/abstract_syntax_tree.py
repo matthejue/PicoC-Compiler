@@ -255,6 +255,20 @@ class LogicAtomNode(ASTNode):
     lines_of_code = 9
 
 
+class LogicTopBottomNode(ASTNode):
+
+    """Abstract Syntax Tree Node for logic top bottom"""
+
+    reti_code = """
+        # codeaa(e)
+        LOADIN SP ACC 1; # Wert von e in ACC laden
+        JUMP= 3; # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        LOADI ACC 1;
+        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        """
+    lines_of_code = 4
+
+
 class AssignmentNode(ASTNode):
 
     """Abstract Syntax Tree Node for assignement"""

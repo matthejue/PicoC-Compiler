@@ -1,7 +1,7 @@
-from abstract_syntax_tree import (WhileNode, DoWhileNode, IFNode, ElseNode, MainFunctionNode,
-                                  AssignmentNode, AllocationNode,
-                                  ArithmeticExpressionNode, LogicAndOrNode, 
-                                  LogicNotNode, LogicAtomNode)
+from abstract_syntax_tree import (WhileNode, DoWhileNode, IFNode, ElseNode,
+                                  MainFunctionNode, AssignmentNode,
+                                  AllocationNode, ArithmeticExpressionNode,
+                                  LogicAndOrNode, LogicNotNode, LogicAtomNode)
 
 
 class CodeGenerator:
@@ -10,7 +10,7 @@ class CodeGenerator:
     task into a single visitor class"""
 
     def __init__(self, ):
-        asdfd
+        asdf
 
     def visit(self, IfNode):
         self.visit
