@@ -1,5 +1,6 @@
 # from enum import Enum
 from lexer import Token, TT
+from enum import Enum
 
 
 class TokenNode:
@@ -109,7 +110,8 @@ class WhileNode(ASTNode):
         ADDI SP 1; # Stack um eine Zelle verkürzen
         JUMP= {codelength(af) + 2}; # af überspringen, wenn l unerfüllt
         # code(af)
-        JUMP -{(codelength(af) + codelength(l) + 3)}; # zurück zur Auswertung von l
+        # zurück zur Auswertung von l
+        JUMP -{(codelength(af) + codelength(l) + 3)};
         """
     lines_of_code = 4
 
@@ -123,7 +125,8 @@ class DoWhileNode(ASTNode):
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
-        JUMP<> -{(codelength(af) + codelength(l) + 2)}; # zurück zur Ausführung von af
+        # zurück zur Ausführung von af
+        JUMP<> -{(codelength(af) + codelength(l) + 2)};
         """
     lines_of_code = 3
 
@@ -132,8 +135,17 @@ class DoWhileNode(ASTNode):
 
         :returns: None
         """
-        node.token.value += " while"
-        super().addChild(node)
+        # in case the representative tokens of self appear as attribute of a
+        # TokenNode, the token of self can finally register the right value
+        # Because of e.g. <alloc>: <word> <word> ... one should only take the
+        # first TokenNode matching the possible representative tokens
+        if self._is_tokennode(node) and node.token.type in\
+                self.tokentypes:
+            self.token = Token(TT.DO_WHILE, "do while")
+            self.ignore = False
+            return
+
+        self.children += [node]
 
 
 class IfNode(ASTNode):
@@ -178,14 +190,55 @@ class MainFunctionNode(ASTNode):
     lines_of_code = 2
 
 
-class ArithmeticExpressionNode(ASTNode):
+class ArithmeticVariableConstantNode(ASTNode):
 
-    """Abstract Syntax Tree Node for arithmetic expression"""
+    """Abstract Syntax Tree Node for arithmetic variables and constants"""
+
+    reti_code_first_half = "SUBI SP 1\n"
+
+    class reti_code(Enum):
+
+        """reti code variable and constant"""
+
+        variable = "LOAD ACC {a}\n"
+        constant = "LOAD ACC {encode(w)}\n"
+        constant_identifier = "LOAD ACC {encode(c)}\n"
+
+    reti_code_second_half = "STOREIN SP ACC 1"
+    lines_of_code = 13
+
+
+class ArithmeticBinaryOperationNode(ASTNode):
+
+    """Abstract Syntax Tree Node for for arithmetic binary operations"""
 
     reti_code = """
+        # codeaa(e1)
+        # codeaa(e2)
+        LOADIN SP ACC 2; # Wert von e 1 in ACC laden
+        LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+        OP ACC IN2; # e1 binop e2 in ACC laden
+        STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
+        ADDI SP 1; # Stack um eine Zelle verkürzen
+        """
 
-    """
-    lines_of_code = 13
+
+class ArithmeticUnaryOperationNode(ASTNode):
+
+    """Abstract Syntax Tree Node for for arithmetic unary operations"""
+
+    reti_code_first_half = """
+        # codeaa(e1)
+        LOADI ACC 0; # 0 in ACC laden
+        LOADIN SP IN2 1; # Wert von e1 in IN2 laden
+        SUB ACC IN2; # (0 - e1) in ACC laden
+        """
+
+    reti_code_bitwise_negation = "SUBI ACC 1; # transform negation to"\
+        "complement\n"
+
+    reti_code_second_half = "STOREIN SP ACC 1; # Ergebnis in oberste"\
+        "Stack-Zelle"
 
 
 class LogicAndOrNode(ASTNode):
@@ -195,22 +248,22 @@ class LogicAndOrNode(ASTNode):
     reti_code = """
         # start codela(l1)
         # codeaa(e)
-        LOADIN SP ACC 1; # Wert von e in ACC laden
-        JUMP= 3; # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
-        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         # start codela(l2)
         # codeaa(e)
-        LOADIN SP ACC 1; # Wert von e in ACC laden
-        JUMP= 3; # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
-        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         # finished loading
-        LOADIN SP ACC 2; # Wert von l1 in ACC laden
-        LOADIN SP IN2 1; # Wert von l2 in IN2 laden
-        LOP ACC IN2; # l1 lop l 2 in ACC laden
-        STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
-        ADDI SP 1; # Stack um eine Zelle verkürzen
+        LOADIN SP ACC 2;  # Wert von l1 in ACC laden
+        LOADIN SP IN2 1;  # Wert von l2 in IN2 laden
+        LOP ACC IN2;  # l1 lop l 2 in ACC laden
+        STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
     lines_of_code = 13
 
@@ -222,15 +275,15 @@ class LogicNotNode(ASTNode):
     reti_code = """
         # start codela(l1)
         # codeaa(e)
-        LOADIN SP ACC 1; # Wert von e in ACC laden
-        JUMP= 3; # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
-        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         # finished loading
-        LOADI ACC 1; # 1 in ACC laden
-        LOADIN SP IN2 1; # Wert von l1 in IN2 laden
-        OPLUS ACC IN2; # !(l1) in ACC laden
-        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        LOADI ACC 1;  # 1 in ACC laden
+        LOADIN SP IN2 1;  # Wert von l1 in IN2 laden
+        OPLUS ACC IN2;  # !(l1) in ACC laden
+        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """
     lines_of_code = 8
 
@@ -242,15 +295,15 @@ class LogicAtomNode(ASTNode):
     reti_code = """
         # codeaa(e1)
         # codeaa(e2)
-        LOADIN SP ACC 2; # Wert von e1 in ACC laden
-        LOADIN SP IN2 1; # Wert von e2 in IN2 laden
-        SUB ACC IN2; # e1 - e2 in ACC laden
-        JUMPvglop 3; # Ergebnis 1, wenn e1 vglop e2 wahr
-        LOADI ACC 0; # Ergebnis 0, wenn e1 vglop e2 falsch
+        LOADIN SP ACC 2;  # Wert von e1 in ACC laden
+        LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
+        SUB ACC IN2;  # e1 - e2 in ACC laden
+        JUMPvglop 3;  # Ergebnis 1, wenn e1 vglop e2 wahr
+        LOADI ACC 0;  # Ergebnis 0, wenn e1 vglop e2 falsch
         JUMP 2;
-        LOADI ACC 1; # Ergebnis 1, wenn e1 vglop e2 wahr
-        STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
-        ADDI SP 1; # Stack um eine Zelle verkürzen
+        LOADI ACC 1;  # Ergebnis 1, wenn e1 vglop e2 wahr
+        STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
     lines_of_code = 9
 
@@ -261,10 +314,10 @@ class LogicTopBottomNode(ASTNode):
 
     reti_code = """
         # codeaa(e)
-        LOADIN SP ACC 1; # Wert von e in ACC laden
-        JUMP= 3; # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
-        STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle
+        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """
     lines_of_code = 4
 
@@ -275,9 +328,9 @@ class AssignmentNode(ASTNode):
 
     reti_code = """
         # codeaa(e) (oder codela(e), falls logischer Ausdruck)
-        LOADIN SP ACC 1; # Wert von e in ACC laden
-        ADDI SP 1; # Stack um eine Zelle verkürzen
-        STORE ACC a; # Wert von e in Adresse a speichern
+        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
+        STORE ACC a;  # Wert von e in Adresse a speichern
         """
     lines_of_code = 3
 

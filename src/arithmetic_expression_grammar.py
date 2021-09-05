@@ -1,5 +1,7 @@
 from parser_ import BacktrackingParser
-from abstract_syntax_tree import ArithmeticExpressionNode
+from abstract_syntax_tree import (ArithmeticUnaryOperationNode,
+                                  ArithmeticBinaryOperationNode,
+                                  ArithmeticVariableConstantNode)
 from errors import SyntaxError
 from lexer import TT
 
@@ -28,14 +30,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         """
         savestate_node = self.ast_builder.down(
-            ArithmeticExpressionNode, [TT.BINOP_PREC_2, TT.MINUS])
+            ArithmeticBinaryOperationNode, [TT.BINOP_PREC_2, TT.MINUS])
 
         self._prec1()
 
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
             self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
 
-            self.ast_builder.down(ArithmeticExpressionNode, [
+            self.ast_builder.down(ArithmeticBinaryOperationNode, [
                                   TT.BINOP_PREC_2, TT.MINUS])
 
             self._prec1()
@@ -49,14 +51,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(ArithmeticExpressionNode, [TT.BINOP_PREC_1])
+        savestate_node = self.ast_builder.down(
+            ArithmeticBinaryOperationNode, [TT.BINOP_PREC_1])
 
         self._ao()
 
         while self.LTT(1) == TT.BINOP_PREC_1:
             self.match_and_add([TT.BINOP_PREC_1])
 
-            self.ast_builder.down(ArithmeticExpressionNode, [TT.BINOP_PREC_1])
+            self.ast_builder.down(
+                ArithmeticBinaryOperationNode, [TT.BINOP_PREC_1])
 
             self._ao()
 
@@ -70,9 +74,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.match_and_add([TT.IDENTIFIER])
+            self._identifier()
         elif self.LTT(1) == TT.NUMBER:
-            self.match_and_add([TT.NUMBER])
+            self._number()
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
         elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
@@ -83,6 +87,22 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self._unop()
         else:
             raise SyntaxError("aritmetic operand", self.LT(1))
+
+    def _identifier(self, ):
+        savestate_node = self.ast_builder.down(
+            ArithmeticVariableConstantNode, [TT.IDENTIFIER])
+
+        self.match_and_add([TT.IDENTIFIER])
+
+        self.ast_builder.up(savestate_node)
+
+    def _number(self, ):
+        savestate_node = self.ast_builder.down(
+            ArithmeticVariableConstantNode, [TT.NUMBER])
+
+        self.match_and_add([TT.NUMBER])
+
+        self.ast_builder.up(savestate_node)
 
     def _paren_arith(self):
         """arithmetic parenthesis
@@ -103,14 +123,15 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         """
         savestate_node = self.ast_builder.down(
-            ArithmeticExpressionNode, [TT.UNARY_OP, TT.MINUS])
+            ArithmeticUnaryOperationNode, [TT.UNARY_OP, TT.MINUS])
 
         while True:  # do while loop
             self.match_and_add([TT.UNARY_OP, TT.MINUS])
             if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ArithmeticExpressionNode, [TT.UNARY_OP, TT.MINUS])
+            self.ast_builder.down(ArithmeticUnaryOperationNode, [
+                                  TT.UNARY_OP, TT.MINUS])
 
         # self.match_and_add([TT.NUMBER])
         self._ao()

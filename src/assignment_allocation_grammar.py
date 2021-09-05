@@ -61,7 +61,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(AllocationNode, [TT.ALLOC, TT.PRIM_DT])
+        savestate_node = self.ast_builder.down(
+            AllocationNode, [TT.ALLOC, TT.PRIM_DT])
 
         self.match_and_add([TT.PRIM_DT])
         self.match_and_add([TT.IDENTIFIER])

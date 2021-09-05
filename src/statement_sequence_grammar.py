@@ -28,10 +28,6 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
 
         """
         while True:
-            # TODO: Don't forget to remove this improvised conditional breakpoint
-            if self.lexer.fname == "gcd":
-                if self.lexer.fname == "gcd":
-                    pass
             # if self._is_statement():
             self._s()
 

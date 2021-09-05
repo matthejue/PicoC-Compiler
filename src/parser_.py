@@ -110,7 +110,9 @@ class BacktrackingParser():
         :returns: None
         """
         self.markers += [self.lt_idx]
-        globals.is_tasting = True
+        # only if all elements of the list are deleted, actions get executed
+        # again
+        globals.is_tasting += [True]
         # return self.lt_idx
 
     def _release(self):
@@ -119,7 +121,7 @@ class BacktrackingParser():
         :returns: None
         """
         self.lt_idx = self.markers.pop()
-        globals.is_tasting = False
+        globals.is_tasting.pop()
 
     def _is_tasting(self):
         """if in the taste method every mark() found his corresponding

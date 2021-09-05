@@ -28,7 +28,8 @@ class FunctionGrammar(StatementSequenceGrammar):
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(MainFunctionNode, [TT.FUNCTION, TT.MAIN])
+        savestate_node = self.ast_builder.down(
+            MainFunctionNode, [TT.FUNCTION, TT.MAIN])
 
         self.match([TT.PRIM_DT])
 
