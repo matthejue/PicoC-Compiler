@@ -35,6 +35,10 @@ class ASTNode(TokenNode):
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
 
+    reti_code_start = ""
+    reti_code_end = ""
+    reti_code_condition_check = ""
+
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
         self.children = []
@@ -46,6 +50,7 @@ class ASTNode(TokenNode):
         # decide whether a node should be ignored and just show his children if
         # he has any
         self.ignore = True
+        self.lines_of_code = 0
 
     def addChild(self, node):
         """
@@ -65,7 +70,7 @@ class ASTNode(TokenNode):
         self.children += [node]
 
     def _is_tokennode(self, node):
-        """checks is something is a TokenNode
+        """checks if something is a TokenNode
 
         :returns: boolean
 
@@ -92,35 +97,50 @@ class ASTNode(TokenNode):
         acc += ")"
         return acc
 
-    def visit(self, visitor):
+    def generate_code(self):
         """dispatcher
 
         :return: None
         """
-        visitor.visit(self)
+        self.visit()
 
 
 class WhileNode(ASTNode):
 
     """Abstract Syntax Tree Node for while loop"""
 
-    reti_code = """
-        # codela(l)
-        LOADIN SP ACC 1; # Wert von l in ACC laden
-        ADDI SP 1; # Stack um eine Zelle verkürzen
-        JUMP= {codelength(af) + 2}; # af überspringen, wenn l unerfüllt
-        # code(af)
-        # zurück zur Auswertung von l
-        JUMP -{(codelength(af) + codelength(l) + 3)};
-        """
-    lines_of_code = 4
+    def visit(self, ):
+        self.children[0].visit()
+        reti_code_condition_check = """
+            # codela(l)
+            LOADIN SP ACC 1; # Wert von l in ACC laden
+            ADDI SP 1; # Stack um eine Zelle verkürzen
+            JUMP= {codelength(af) + 2}; # af überspringen, wenn l unerfüllt
+            """
+
+        for child in node.children:
+            # skipt first child if there is a condition check at the beginning
+            if first_iteraion and node.reti_code_condition_check:
+                first_iteraion = False
+                continue
+
+            child.visit()
+
+        reti_code_end = """
+            # code(af)
+            # zurück zur Auswertung von l
+            JUMP -{(codelength(af) + codelength(l) + 3)};
+            """
+
+        self.lines_of_code = 4
 
 
 class DoWhileNode(ASTNode):
 
     """Abstract Syntax Tree Node for do while Grammar"""
 
-    reti_code = """
+    # Problem mit code(af)
+    reti_code_condition_check = """
         # code(af)
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
@@ -152,7 +172,7 @@ class IfNode(ASTNode):
 
     """Abstract Syntax Tree Node for If"""
 
-    reti_code = """
+    reti_code_condition_check = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -162,11 +182,11 @@ class IfNode(ASTNode):
     lines_of_code = 3
 
 
-class ElseNode(ASTNode):
+class IfElseNode(ASTNode):
 
     """Abstract Syntax Tree Node for Else"""
 
-    reti_code = """
+    reti_code_condition_check = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -182,7 +202,7 @@ class MainFunctionNode(ASTNode):
 
     """Abstract Syntax Tree Node for main method"""
 
-    reti_code = """
+    reti_code_end = """
         LOADI SP eds
         # code(af)
         JUMP 0
