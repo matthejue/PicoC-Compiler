@@ -1,6 +1,7 @@
 # from enum import Enum
 from lexer import Token, TT
 from enum import Enum
+from code_generator import CodeGenerator
 
 
 class TokenNode:
@@ -35,10 +36,6 @@ class ASTNode(TokenNode):
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
 
-    reti_code_start = ""
-    reti_code_end = ""
-    reti_code_condition_check = ""
-
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
         self.children = []
@@ -50,7 +47,7 @@ class ASTNode(TokenNode):
         # decide whether a node should be ignored and just show his children if
         # he has any
         self.ignore = True
-        self.lines_of_code = 0
+        self.code_generator = CodeGenerator()
 
     def addChild(self, node):
         """
@@ -97,42 +94,36 @@ class ASTNode(TokenNode):
         acc += ")"
         return acc
 
-    def generate_code(self):
-        """dispatcher
-
-        :return: None
-        """
-        self.visit()
-
 
 class WhileNode(ASTNode):
 
     """Abstract Syntax Tree Node for while loop"""
 
-    def visit(self, ):
+    condition_check = """
+        # codela(l)
+        LOADIN SP ACC 1; # Wert von l in ACC laden
+        ADDI SP 1; # Stack um eine Zelle verkürzen
+        JUMP= {codelength(af) + 2}; # af überspringen, wenn l unerfüllt
+        """
+
+    end = """
+        # code(af)
+        # zurück zur Auswertung von l
+        JUMP -{(codelength(af) + codelength(l) + 3)};
+        """
+
+    lines_of_code = 4
+
+    def _visit(self, ):
         self.children[0].visit()
-        reti_code_condition_check = """
-            # codela(l)
-            LOADIN SP ACC 1; # Wert von l in ACC laden
-            ADDI SP 1; # Stack um eine Zelle verkürzen
-            JUMP= {codelength(af) + 2}; # af überspringen, wenn l unerfüllt
-            """
+        self.code_generator.add_code(self.condition_check)
 
-        for child in node.children:
-            # skipt first child if there is a condition check at the beginning
-            if first_iteraion and node.reti_code_condition_check:
-                first_iteraion = False
-                continue
-
+        for child in self.children[1:]:
             child.visit()
 
-        reti_code_end = """
-            # code(af)
-            # zurück zur Auswertung von l
-            JUMP -{(codelength(af) + codelength(l) + 3)};
-            """
+         
 
-        self.lines_of_code = 4
+        self.code_generator.add_code(self.end)
 
 
 class DoWhileNode(ASTNode):
