@@ -121,8 +121,6 @@ class WhileNode(ASTNode):
         for child in self.children[1:]:
             child.visit()
 
-         
-
         self.code_generator.add_code(self.end)
 
 

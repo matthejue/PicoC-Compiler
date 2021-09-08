@@ -67,5 +67,6 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
     def _is_loop(self, ):
         return self.LTT(1) == TT.WHILE or self.LTT(1) == TT.DO_WHILE
 
-    from if_else_grammar import code_ie, if_, else_
-    from loop_grammar import code_lo, loop, while_, do_while
+    from if_else_grammar import code_ie, code_if_if_else, _if_without_else,\
+        _if, _if_else, _taste_consume_if_without_else
+    from loop_grammar import code_lo, _loop, _while, _do_while

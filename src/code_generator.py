@@ -1,12 +1,3 @@
-from loctax_tree import (TokenNode, WhileNode, DoWhileNode, IFNode,
-                         IfElseNode, MainFunctionNode, AssignmentNode,
-                         AllocationNode,
-                         ArithmeticBinaryOperationNode,
-                         ArithmeticUnaryOperationNode,
-                         ArithmeticVariableConstantNode,
-                         LogicAndOrNode, LogicNotNode, LogicAtomNode)
-
-
 class CodeGenerator:
 
     """Encapsulates all tree-walking code associated with a particular
@@ -41,7 +32,7 @@ class CodeGenerator:
     def add_code(self, code, lines_of_code):
         self.generated_code += [code]
 
-        self.loc_stock += [loc_stock[-1] + lines_of_code]
+        self.loc_stock += [self.loc_stock[-1] + lines_of_code]
         self.loc_idx += 1
 
     def add_code_close(self, code, lines_of_code):
@@ -58,7 +49,7 @@ class CodeGenerator:
             self.loc_stock += [0]
             self.loc_idx = 0
         else:
-            self.loc_stock += [loc_stock[-1] + lines_of_code]
+            self.loc_stock += [self.loc_stock[-1] + lines_of_code]
             self.loc_idx += 1
 
     def replace_jump(self, pattern):
@@ -81,7 +72,7 @@ class CodeGenerator:
         """Depending on the Token sometimes different reti code commands have
         to be executed
 
-        :pattern: pattern that should be replaced 
+        :pattern: pattern that should be replaced
         :word: by what the pattern should be replaced
         :returns: None
         """

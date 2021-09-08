@@ -1,3 +1,3 @@
 # options from command-line arguments
 args = None
-is_tasting = []
+is_tasting = 0

@@ -9,26 +9,26 @@ def code_lo(self):
     :grammar: <loop>
     :returns: None
     """
-    self.loop()
+    self._loop()
 
 
-def loop(self):
+def _loop(self):
     """loop
 
     :grammar: <while> | <do_while>
     :returns: None
     """
     if self.LTT(1) == TT.WHILE:
-        self.while_()
+        self._while()
     elif self.LTT(1) == TT.DO_WHILE:
-        self.do_while()
+        self._do_while()
     # eigentlich ergibt hier der Error keinen Sinnn, weil er nie
     # aufgerufen werden kann
     # else:
     #     raise NoApplicableRuleError('while or do while', self.LT(1))
 
 
-def while_(self):
+def _while(self):
     """while loop
 
     :grammar: <while> ( <code_le> ) { <code_ss> }
@@ -53,7 +53,7 @@ def while_(self):
     self.ast_builder.up(savestate_node)
 
 
-def do_while(self):
+def _do_while(self):
     """do while loop
 
     :grammar: do { <code_ss> } while ( <code_le> ) ;
