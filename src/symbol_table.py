@@ -7,7 +7,7 @@ class Symbol:
         self.type = type
 
     def get_name(self, ):
-        return self.namej
+        return self.name
 
     def __repr__(self, ):
         if self.type:

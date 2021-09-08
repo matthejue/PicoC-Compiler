@@ -27,6 +27,7 @@ badd +1 test/grammar_test.py
 badd +1 input.picoc
 badd +1 test/gcd.picoc
 badd +5 src/code_generator.py
+badd +80 src/symbol_table.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -44,26 +45,28 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit src/code_generator.py
+edit src/symbol_table.py
 argglobal
-if bufexists("src/code_generator.py") | buffer src/code_generator.py | else | edit src/code_generator.py | endif
+if bufexists("src/symbol_table.py") | buffer src/symbol_table.py | else | edit src/symbol_table.py | endif
 if &buftype ==# 'terminal'
-  silent file src/code_generator.py
+  silent file src/symbol_table.py
 endif
-balt test/gcd.picoc
+balt src/function_grammar.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
 setlocal fdi=#
-setlocal fdl=1
+setlocal fdl=4
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 5 - ((4 * winheight(0) + 17) / 35)
+3
+normal! zo
+let s:l = 80 - ((32 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 5
+keepjumps 80
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
