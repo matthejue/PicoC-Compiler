@@ -26,7 +26,7 @@ badd +3 src/statement_sequence_grammar.py
 badd +1 test/grammar_test.py
 badd +1 input.picoc
 badd +1 test/gcd.picoc
-badd +1 src/tree_visitor.py
+badd +5 src/code_generator.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -44,13 +44,13 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit src/tree_visitor.py
+edit src/code_generator.py
 argglobal
-if bufexists("src/tree_visitor.py") | buffer src/tree_visitor.py | else | edit src/tree_visitor.py | endif
+if bufexists("src/code_generator.py") | buffer src/code_generator.py | else | edit src/code_generator.py | endif
 if &buftype ==# 'terminal'
-  silent file src/tree_visitor.py
+  silent file src/code_generator.py
 endif
-balt src/abstract_syntax_tree.py
+balt test/gcd.picoc
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -59,11 +59,11 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 17) / 35)
+let s:l = 5 - ((4 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
+keepjumps 5
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
@@ -78,6 +78,7 @@ if filereadable(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
