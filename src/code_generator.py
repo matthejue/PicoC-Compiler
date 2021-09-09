@@ -9,7 +9,7 @@ class CodeGenerator:
 
     _instance = None
     generated_code = []
-    ucp_stock = []
+    ucp_stock = [0]
     loc_stock = [0]
     loc_layer = 0
     loc_idx = 0
@@ -77,5 +77,5 @@ class CodeGenerator:
         :returns: None
         """
         idx = -(self.loc_idx - self.ucp_stock[-1])
-        self.generated_code[idx] = self.generated_code[idx].format(
-            pattern=word)
+        self.generated_code[idx] = self.generated_code[idx].replace(pattern,
+                                                                    str(word))

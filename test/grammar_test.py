@@ -258,6 +258,27 @@ class TestComments(unittest.TestCase, UsefullTools):
 #         pass
 
 
+class TestCodeGenerator(unittest.TestCase):
+
+    def test_code_replacment(self, ):
+        code_generator = CodeGenerator()
+        symbol_table = SymbolTable()
+        var = VariableSymbol('car', 'int')
+        symbol_table.define(var)
+        symbol_table.allocate(var)
+        code = """SUBI SP 1
+        constant = LOAD ACC encode(w)
+        STOREIN SP ACC 1
+        """
+        code_generator.add_code(code, 3)
+        code_generator.replace_code('encode(w)', symbol_table.resolve('car').address)
+        expected_res = """SUBI SP 1
+        constant = LOAD ACC 100
+        STOREIN SP ACC 1
+        """
+        self.assertEqual(code_generator.generated_code[0], expected_res)
+
+
 class TestPrograms(unittest.TestCase, UsefullTools):
 
     def test_gcd(self, ):
@@ -270,4 +291,6 @@ if __name__ == '__main__':
     from lexer import Lexer, TT
     from grammar import Grammar
     import globals
+    from code_generator import CodeGenerator
+    from symbol_table import SymbolTable, VariableSymbol
     unittest.main()

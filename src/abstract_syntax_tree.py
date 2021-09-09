@@ -212,8 +212,8 @@ class ArithmeticVariableConstantNode(ASTNode):
         variable = "LOAD ACC {a}\n"
         constant = "LOAD ACC {encode(w)}\n"
         constant_identifier = "LOAD ACC {encode(c)}\n"
-
     reti_code_second_half = "STOREIN SP ACC 1"
+
     lines_of_code = 13
 
 

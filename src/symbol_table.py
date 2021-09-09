@@ -5,6 +5,7 @@ class Symbol:
     def __init__(self, name, type=None):
         self.name = name
         self.type = type
+        self.address = None
 
     def get_name(self, ):
         return self.name
@@ -20,7 +21,7 @@ class VariableSymbol(Symbol):
     """Represents a variable definition (name, type) in symbol table"""
 
     def __init__(self, name, type):
-        self.super().__init__(name, type)
+        super().__init__(name, type)
 
 
 class BuiltInTypeSymbol(Symbol):
@@ -28,7 +29,7 @@ class BuiltInTypeSymbol(Symbol):
     """Built in types such as int and char"""
 
     def __init__(self, name):
-        self.super().__init__(name)
+        super().__init__(name)
 
 
 class Scope:
@@ -37,6 +38,11 @@ class Scope:
     definitions"""
 
     def __init__(self, ):
+        """
+
+        :fa_pointer: free address pointer
+        :returns: None
+        """
         self.symbols = dict()
 
     def get_scope_name(self, ):
@@ -72,11 +78,18 @@ class SymbolTable(Scope):
     """Datastructure that tracks language symbols"""
 
     def __init__(self):
+        super().__init__()
         self.initTypeSystem()
+        self.fa_pointer = 100
 
     def initTypeSystem(self, ):
-        self.define(BuiltInTypeSymbol("int"))
-        self.define(BuiltInTypeSymbol("char"))
+        self.define(BuiltInTypeSymbol('int'))
+        self.define(BuiltInTypeSymbol('char'))
+
+    def allocate(self, sym):
+        if not self.symbols[sym.name].address:
+            self.symbols[sym.name].address = self.fa_pointer
+            self.fa_pointer += 1
 
     def __repr__(self, ):
-        return self.get_scope_name() + ":" + symbols
+        return self.get_scope_name() + ":" + self.symbols

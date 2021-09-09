@@ -90,6 +90,7 @@ TODO	README.md	/^## TODO$/;"	s	chapter:Pico-C Compiler
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
 TestArithmeticExpressionGrammar	test/grammar_test.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestCodeGenerator	test/grammar_test.py	/^class TestCodeGenerator(unittest.TestCase):$/;"	c
 TestComments	test/grammar_test.py	/^class TestComments(unittest.TestCase, UsefullTools):$/;"	c
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
 TestIfElseGrammar	test/grammar_test.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
@@ -148,17 +149,21 @@ _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignm
 _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
 _division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
+_do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
 _identifier	src/arithmetic_expression_grammar.py	/^    def _identifier(self, ):$/;"	m	class:ArithmeticExpressionGrammar
 _identifier	src/lexer.py	/^    def _identifier(self):$/;"	m	class:Lexer
 _identifier_special_keyword	src/lexer.py	/^    def _identifier_special_keyword(self):$/;"	m	class:Lexer
+_if	src/if_else_grammar.py	/^def _if(self):$/;"	f
+_if_else	src/if_else_grammar.py	/^def _if_else(self, ):$/;"	f
+_if_without_else	src/if_else_grammar.py	/^def _if_without_else(self, ):$/;"	f
 _instance	src/code_generator.py	/^    _instance = None$/;"	v	class:CodeGenerator
 _is_assignment	src/statement_sequence_grammar.py	/^    def _is_assignment(self):$/;"	m	class:StatementSequenceGrammar
 _is_loop	src/statement_sequence_grammar.py	/^    def _is_loop(self, ):$/;"	m	class:StatementSequenceGrammar
 _is_statement	src/statement_sequence_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementSequenceGrammar
-_is_tasting	src/parser_.py	/^    def _is_tasting(self):$/;"	m	class:BacktrackingParser
 _is_tokennode	src/abstract_syntax_tree.py	/^    def _is_tokennode(self, node):$/;"	m	class:ASTNode
 _lo	src/logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
+_loop	src/loop_grammar.py	/^def _loop(self):$/;"	f
 _main_function	src/function_grammar.py	/^    def _main_function(self, ):$/;"	m	class:FunctionGrammar
 _mark	src/parser_.py	/^    def _mark(self):$/;"	m	class:BacktrackingParser
 _not	src/lexer.py	/^    def _not(self, ):$/;"	m	class:Lexer
@@ -177,14 +182,18 @@ _s	src/statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSe
 _shell	src/pico_c_compiler.py	/^def _shell():$/;"	f
 _ss	src/statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
 _sync	src/parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
+_taste_consume_if_without_else	src/if_else_grammar.py	/^def _taste_consume_if_without_else(self):$/;"	f
 _top_bottom	src/logic_expression_grammar.py	/^    def _top_bottom(self, ):$/;"	m	class:LogicExpressionGrammar
 _unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
 _visit	src/abstract_syntax_tree.py	/^    def _visit(self, ):$/;"	m	class:WhileNode
+_while	src/loop_grammar.py	/^def _while(self):$/;"	f
 adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configurations.Debug
 addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
 addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:DoWhileNode
 addChild	src/ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
-add_code	src/code_generator.py	/^    def add_code(self, code):$/;"	m	class:CodeGenerator
+add_code	src/code_generator.py	/^    def add_code(self, code, lines_of_code):$/;"	m	class:CodeGenerator
+add_code_close	src/code_generator.py	/^    def add_code_close(self, code, lines_of_code):$/;"	m	class:CodeGenerator
+add_code_open	src/code_generator.py	/^    def add_code_open(self, code, lines_of_code):$/;"	m	class:CodeGenerator
 all	Makefile	/^all: run-shell-ast clean$/;"	t
 args	.misc/pico_c_compiler	/^args = None$/;"	v
 args	src/globals.py	/^args = None$/;"	v
@@ -196,6 +205,7 @@ code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	clas
 code_ae_le	src/logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
 code_f	src/function_grammar.py	/^    def code_f(self):$/;"	m	class:FunctionGrammar
 code_ie	src/if_else_grammar.py	/^def code_ie(self, ):$/;"	f
+code_if_if_else	src/if_else_grammar.py	/^def code_if_if_else(self):$/;"	f
 code_le	src/logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
 code_lo	src/loop_grammar.py	/^def code_lo(self):$/;"	f
 code_ss	src/statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
@@ -209,24 +219,20 @@ constant_identifier	src/abstract_syntax_tree.py	/^        constant_identifier = 
 cwd	.vimspector.json	/^        "cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
 debugOptions	.vimspector.json	/^        "debugOptions": [],$/;"	a	object:configurations.Debug.configuration
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
-do_while	src/loop_grammar.py	/^def do_while(self):$/;"	f
 down	src/ast_builder.py	/^    def down(self, classname, tokentypes):$/;"	m	class:ASTBuilder
-else_	src/if_else_grammar.py	/^def else_(self, ):$/;"	f
 end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:WhileNode
 error	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors
 error	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 expected_output	.misc/test_errors	/^    expected_output = "(CONSTANT:12, ['BINOP', 'PRECEDENCE_1']:*, (CONSTANT:165, ['BINOP', 'PREC/;"	v	class:TestErrors
-finish	src/code_generator.py	/^    def finish(self, ):$/;"	m	class:CodeGenerator
 generated_code	src/code_generator.py	/^    generated_code = []$/;"	v	class:CodeGenerator
 getNodeType	src/abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
 get_enclosing_scope	src/symbol_table.py	/^    def get_enclosing_scope(self, ):$/;"	m	class:Scope
 get_name	src/symbol_table.py	/^    def get_name(self, ):$/;"	m	class:Symbol
 get_scope_name	src/symbol_table.py	/^    def get_scope_name(self, ):$/;"	m	class:Scope
 grammar	test/grammar_test.py	/^    grammar = None$/;"	v	class:UsefullTools
-if_	src/if_else_grammar.py	/^def if_(self, ):$/;"	f
 initTypeSystem	src/symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:SymbolTable
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
-is_tasting	src/globals.py	/^is_tasting = []$/;"	v
+is_tasting	src/globals.py	/^is_tasting = 0$/;"	v
 justMyCode	.vimspector.json	/^        "justMyCode": true,$/;"	b	object:configurations.Debug.configuration
 lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:TestErrors
 lexer	test/grammar_test.py	/^    lexer = None$/;"	v	class:UsefullTools
@@ -242,7 +248,9 @@ lines_of_code	src/abstract_syntax_tree.py	/^    lines_of_code = 4$/;"	v	class:Lo
 lines_of_code	src/abstract_syntax_tree.py	/^    lines_of_code = 4$/;"	v	class:WhileNode
 lines_of_code	src/abstract_syntax_tree.py	/^    lines_of_code = 8$/;"	v	class:LogicNotNode
 lines_of_code	src/abstract_syntax_tree.py	/^    lines_of_code = 9$/;"	v	class:LogicAtomNode
-loop	src/loop_grammar.py	/^def loop(self):$/;"	f
+loc_idx	src/code_generator.py	/^    loc_idx = 0$/;"	v	class:CodeGenerator
+loc_layer	src/code_generator.py	/^    loc_layer = 0$/;"	v	class:CodeGenerator
+loc_stock	src/code_generator.py	/^    loc_stock = [0]$/;"	v	class:CodeGenerator
 main	.misc/pico_c_compiler	/^def main():$/;"	f
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 match	src/lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
@@ -259,8 +267,8 @@ python.linting.enabled	.vim/coc-settings.json	/^  "python.linting.enabled": true
 python.linting.flake8Enabled	.vim/coc-settings.json	/^  "python.linting.flake8Enabled": true$/;"	b
 python.linting.pylintEnabled	.vim/coc-settings.json	/^  "python.linting.pylintEnabled": false,$/;"	b
 read_file	.misc/pico_c_compiler	/^def read_file(infile, outfile):$/;"	f
-replace_code	src/code_generator.py	/^    def replace_code(self, code, word):$/;"	m	class:CodeGenerator
-replace_jump	src/code_generator.py	/^    def replace_jump(self, code, num_lines):$/;"	m	class:CodeGenerator
+replace_code	src/code_generator.py	/^    def replace_code(self, pattern, word):$/;"	m	class:CodeGenerator
+replace_jump	src/code_generator.py	/^    def replace_jump(self, pattern):$/;"	m	class:CodeGenerator
 request	.vimspector.json	/^        "request": "launch",$/;"	s	object:configurations.Debug.configuration
 resolve	src/symbol_table.py	/^    def resolve(self, name):$/;"	m	class:Scope
 reti_code	src/abstract_syntax_tree.py	/^    class reti_code(Enum):$/;"	c	class:ArithmeticVariableConstantNode
@@ -287,7 +295,7 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 5 - ((4 * winheight(0) + 17) \/ 35)$/;"	v
+s:l	Session.vim	/^let s:l = 80 - ((32 * winheight(0) + 17) \/ 35)$/;"	v
 s:l	src/Session.vim	/^let s:l = 99 - ((3 * winheight(0) + 21) \/ 43)$/;"	v
 s:l	test/Session.vim	/^let s:l = 254 - ((33 * winheight(0) + 21) \/ 43)$/;"	v
 s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
@@ -317,6 +325,7 @@ taste_consume_ae	src/logic_expression_grammar.py	/^    def taste_consume_ae(self
 taste_consume_le	src/logic_expression_grammar.py	/^    def taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
 test	Makefile	/^test:$/;"	t
 test_basic_arithmetic_expression	test/grammar_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_code_replacment	test/grammar_test.py	/^    def test_code_replacment(self, ):$/;"	m	class:TestCodeGenerator
 test_comments	test/grammar_test.py	/^    def test_comments(self, ):$/;"	m	class:TestLexer
 test_connected_logic_expression	test/grammar_test.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
 test_do_while_loop	test/grammar_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
@@ -351,6 +360,6 @@ test_varying_spacing	.misc/test_parser	/^    def test_varying_spacing(self):$/;"
 test_while_loop	test/grammar_test.py	/^    def test_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 tokens	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 type	.vimspector.json	/^        "type": "python",$/;"	s	object:configurations.Debug.configuration
+ucp_stock	src/code_generator.py	/^    ucp_stock = [0]$/;"	v	class:CodeGenerator
 up	src/ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
 variable	src/abstract_syntax_tree.py	/^        variable = "LOAD ACC {a}\\n"$/;"	v	class:ArithmeticVariableConstantNode.reti_code
-while_	src/loop_grammar.py	/^def while_(self):$/;"	f
