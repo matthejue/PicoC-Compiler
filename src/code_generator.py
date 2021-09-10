@@ -1,3 +1,5 @@
+
+
 class CodeGenerator:
 
     """Encapsulates all tree-walking code associated with a particular
@@ -8,16 +10,16 @@ class CodeGenerator:
     """
 
     _instance = None
-    generated_code = []
-    ucp_stock = [0]
-    loc_stock = [0]
-    loc_layer = 0
-    loc_idx = 0
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(CodeGenerator, cls).__new__(cls)
             # Initialization
+            cls._instance.generated_code = []
+            cls._instance.ucp_stock = [0]
+            cls._instance.loc_stock = [0]
+            cls._instance.loc_layer = 0
+            cls._instance.loc_idx = 0
         return cls._instance
 
     def add_code_open(self, code, lines_of_code):
@@ -79,3 +81,14 @@ class CodeGenerator:
         idx = -(self.loc_idx - self.ucp_stock[-1])
         self.generated_code[idx] = self.generated_code[idx].replace(pattern,
                                                                     str(word))
+
+    def show_code(self, ):
+        """Sets the generated / modified code pieces together to one unified
+        generated code
+
+        :returns: unified generated code
+        """
+        code_acc = ""
+        for code_piece in self.generated_code:
+            code_acc += code_piece
+        return code_acc

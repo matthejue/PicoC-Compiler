@@ -2,6 +2,7 @@
 from lexer import Token, TT
 from enum import Enum
 from code_generator import CodeGenerator
+from symbol_table import SymbolTable
 
 
 class TokenNode:
@@ -48,6 +49,7 @@ class ASTNode(TokenNode):
         # he has any
         self.ignore = True
         self.code_generator = CodeGenerator()
+        self.symbol_table = SymbolTable()
 
     def addChild(self, node):
         """

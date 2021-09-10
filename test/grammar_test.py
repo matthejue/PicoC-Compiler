@@ -260,23 +260,40 @@ class TestComments(unittest.TestCase, UsefullTools):
 
 class TestCodeGenerator(unittest.TestCase):
 
+    code = """SUBI SP 1
+    LOAD ACC encode(w)
+    STOREIN SP ACC 1
+    """
+    code = [i.lstrip() for i in code.split('\n')]
+    code.pop()
+    code_acc = ""
+    for line in code:
+        code_acc += line
+        
+
     def test_code_replacment(self, ):
         code_generator = CodeGenerator()
         symbol_table = SymbolTable()
+
         var = VariableSymbol('car', 'int')
         symbol_table.define(var)
         symbol_table.allocate(var)
-        code = """SUBI SP 1
-        constant = LOAD ACC encode(w)
-        STOREIN SP ACC 1
-        """
-        code_generator.add_code(code, 3)
-        code_generator.replace_code('encode(w)', symbol_table.resolve('car').address)
+
         expected_res = """SUBI SP 1
-        constant = LOAD ACC 100
+        LOAD ACC 100
         STOREIN SP ACC 1
         """
-        self.assertEqual(code_generator.generated_code[0], expected_res)
+        expected_res = [i.lstrip() for i in expected_res.split('\n')]
+        expected_res.pop()
+        expected_res_acc = ""
+        for line in expected_res:
+            expected_res_acc += line
+
+        code_generator.add_code(self.code_acc, 3)
+
+        code_generator.replace_code(
+            'encode(w)', symbol_table.resolve('car').address)
+        self.assertEqual(code_generator.show_code(), expected_res_acc)
 
 
 class TestPrograms(unittest.TestCase, UsefullTools):

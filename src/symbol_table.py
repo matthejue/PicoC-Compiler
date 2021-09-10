@@ -77,10 +77,10 @@ class SymbolTable(Scope):
 
     """Datastructure that tracks language symbols"""
 
-    def __init__(self):
+    def __init__(self, address=100):
         super().__init__()
         self.initTypeSystem()
-        self.fa_pointer = 100
+        self.fa_pointer = address
 
     def initTypeSystem(self, ):
         self.define(BuiltInTypeSymbol('int'))
