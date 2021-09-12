@@ -264,12 +264,6 @@ class TestCodeGenerator(unittest.TestCase):
     LOAD ACC encode(w)
     STOREIN SP ACC 1
     """
-    code = [i.lstrip() for i in code.split('\n')]
-    code.pop()
-    code_acc = ""
-    for line in code:
-        code_acc += line
-        
 
     def test_code_replacment(self, ):
         code_generator = CodeGenerator()
@@ -279,21 +273,30 @@ class TestCodeGenerator(unittest.TestCase):
         symbol_table.define(var)
         symbol_table.allocate(var)
 
-        expected_res = """SUBI SP 1
+        expected_res = self.strip_multinline_string("""SUBI SP 1
         LOAD ACC 100
         STOREIN SP ACC 1
-        """
-        expected_res = [i.lstrip() for i in expected_res.split('\n')]
-        expected_res.pop()
-        expected_res_acc = ""
-        for line in expected_res:
-            expected_res_acc += line
+        """)
 
-        code_generator.add_code(self.code_acc, 3)
+        code_generator.add_code(self.strip_multinline_string(self.code), 3)
 
         code_generator.replace_code(
             'encode(w)', symbol_table.resolve('car').address)
-        self.assertEqual(code_generator.show_code(), expected_res_acc)
+        self.assertEqual(code_generator.show_code(), expected_res)
+
+    def strip_multinline_string(self, mutline_string):
+        """helper function to make mutlineline string usable on different
+        indent levels
+
+        :grammar: grammar specification
+        :returns: None
+        """
+        mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
+        mutline_string.pop()
+        mutline_string_acc = ""
+        for line in mutline_string:
+            mutline_string_acc += line
+        return mutline_string_acc
 
 
 class TestPrograms(unittest.TestCase, UsefullTools):
