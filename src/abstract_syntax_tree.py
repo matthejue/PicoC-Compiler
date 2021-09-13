@@ -2,7 +2,7 @@
 from lexer import Token, TT
 from enum import Enum
 from code_generator import CodeGenerator
-from symbol_table import SymbolTable
+from symbol_table import SymbolTable, VariableSymbol
 
 
 class TokenNode:
@@ -36,6 +36,9 @@ class ASTNode(TokenNode):
     across.  Homogeneous AST means having only one node type and all childs
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
+
+    lines_of_code = 0
+    reti_code = ""
 
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
@@ -118,7 +121,7 @@ class WhileNode(ASTNode):
 
     end_loc = 1
 
-    def _visit(self, ):
+    def visit(self, ):
         self.children[0].visit()
 
         self.code_generator.add_code_open(
@@ -129,9 +132,9 @@ class WhileNode(ASTNode):
 
         self.code_generator.replace_jump("codelength(af) + 2", 2)
 
-        self.code_generator.replace_jump_backwards([self.end],
-                                                   "(codelength(af) +"
-                                                   " codelength(l) + 3)")
+        self.code_generator.replace_jump_directly([self.end],
+                                                  "(codelength(af) +"
+                                                  " codelength(l) + 3)")
         # + 3 sind schon mit drin
 
         self.code_generator.add_code_close(self.end, self.end_loc)
@@ -153,18 +156,18 @@ class DoWhileNode(ASTNode):
 
     condition_check_loc = 3
 
-    def _visit(self, ):
+    def visit(self, ):
         # little hack to get a artificial ucp_stock entry
         self.code_generator.add_code_open("", 0)
 
         for child in self.children[1:]:
             child.visit()
 
-        self.children[0]._visit()
+        self.children[0].visit()
 
-        self.code_generator.replace_jump_backwards([self.condition_check],
-                                                   "(codelength(af) + "
-                                                   "codelength(l) + 2), 2")
+        self.code_generator.replace_jump_directly([self.condition_check],
+                                                  "(codelength(af) + "
+                                                  "codelength(l) + 2), 2")
 
         self.code_generator.add_code_close(self.condition_check,
                                            self.condition_check_loc)
@@ -191,21 +194,29 @@ class IfNode(ASTNode):
 
     """Abstract Syntax Tree Node for If"""
 
-    reti_code_condition_check = """
+    # TODO
+
+    end = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
         JUMP= {codelength(af) + 1}; # af überspringen
         # code(af)
         """
-    lines_of_code = 3
+
+    end_loc = 3
+
+    def visit(self, ):
+        pass
 
 
 class IfElseNode(ASTNode):
 
     """Abstract Syntax Tree Node for Else"""
 
-    reti_code_condition_check = """
+    # TODO
+
+    end = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -214,44 +225,73 @@ class IfElseNode(ASTNode):
         JUMP {codelength(af2) + 1};
         # code(af2)
         """
-    lines_of_code = 4
+
+    end_loc = 4
+
+    def visit(self, ):
+        pass
 
 
 class MainFunctionNode(ASTNode):
 
     """Abstract Syntax Tree Node for main method"""
 
-    reti_code_end = """
+    start = """
         LOADI SP eds
+        """
+
+    start_loc = 1
+
+    end = """
         # code(af)
         JUMP 0
         """
-    lines_of_code = 2
+
+    end_loc = 2
+
+    def visit(self, ):
+        self.code_generator.add_code(self.start, self.start_loc)
+
+        for child in self.children:
+            child.visit()
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class ArithmeticVariableConstantNode(ASTNode):
 
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
-    reti_code_first_half = "SUBI SP 1\n"
+    start = "SUBI SP 1\n"
+    variable_identifier = "LOAD ACC var_identifier\n"
+    constant = "LOAD ACC encode(w)\n"
+    constant_identifier = "LOAD ACC {encode(c)}\n"
+    end = "STOREIN SP ACC 1"
 
-    class reti_code(Enum):
+    all_loc = 1
 
-        """reti code variable and constant"""
+    def visit(self, ):
+        self.code_generator.add_code(self.start, self.all_loc)
 
-        variable = "LOAD ACC {a}\n"
-        constant = "LOAD ACC {encode(w)}\n"
-        constant_identifier = "LOAD ACC {encode(c)}\n"
-    reti_code_second_half = "STOREIN SP ACC 1"
+        if self.token.type == TT.IDENTIFIER:
+            var_value = self.symbol_table.resolve(self.token.value)
+            self.code_generator.replace_code_directly_(
+                [self.variable_identifier], "var_identifier", var_value)
+            self.code_generator.add_code(self.identifier, self.all_loc)
+        elif self.token.type == TT.NUMBER:
+            self.code_generator.replace_code_directly(
+                [self.constant], "encode(w)", str(self.token.value))
+            self.code_generator.add_code(self.constant, self.all_loc)
+        # elif constant identifier
 
-    lines_of_code = 13
+        self.code_generator.add_code(self.end, self.all_loc)
 
 
 class ArithmeticBinaryOperationNode(ASTNode):
 
     """Abstract Syntax Tree Node for for arithmetic binary operations"""
 
-    reti_code = """
+    end = """
         # codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2; # Wert von e 1 in ACC laden
@@ -261,77 +301,95 @@ class ArithmeticBinaryOperationNode(ASTNode):
         ADDI SP 1; # Stack um eine Zelle verkürzen
         """
 
+    end_loc = 5
+
+    def visit(self, ):
+        self.children[0].visit()
+        self.children[1].visit()
+        self.code_generator.add_code(self.end, self.end_loc)
+
 
 class ArithmeticUnaryOperationNode(ASTNode):
 
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
-    reti_code_first_half = """
+    start = """
         # codeaa(e1)
         LOADI ACC 0; # 0 in ACC laden
         LOADIN SP IN2 1; # Wert von e1 in IN2 laden
         SUB ACC IN2; # (0 - e1) in ACC laden
         """
 
-    reti_code_bitwise_negation = "SUBI ACC 1; # transform negation to"\
-        "complement\n"
+    start_loc = 3
 
-    reti_code_second_half = "STOREIN SP ACC 1; # Ergebnis in oberste"\
-        "Stack-Zelle"
+    bitwise_negation = "SUBI ACC 1; # transform negation to complement\n"
+
+    bitwise_negation_loc = 1
+
+    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"
+
+    end_loc = 1
+
+    def visit(self, ):
+        self.children[0].visit()
+
+        self.code_generator.add_code(self.start, self.start_loc)
+
+        if self.token.value == "~":
+            self.code_generator.add_code(self.bitwise_negation,
+                                         self.bitwise_negation_loc)
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class LogicAndOrNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic 'and' and 'or'"""
 
-    reti_code = """
-        # start codela(l1)
-        # codeaa(e)
-        LOADIN SP ACC 1;  # Wert von e in ACC laden
-        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
-        LOADI ACC 1;
-        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
-        # start codela(l2)
-        # codeaa(e)
-        LOADIN SP ACC 1;  # Wert von e in ACC laden
-        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
-        LOADI ACC 1;
-        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
-        # finished loading
+    end = """
+        # codela(l1)
+        # codela(l2)
         LOADIN SP ACC 2;  # Wert von l1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l2 in IN2 laden
         LOP ACC IN2;  # l1 lop l 2 in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
-    lines_of_code = 13
+
+    end_loc = 5
+
+    def visit(self, ):
+        self.children[0].visit()
+        self.children[1].visit()
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class LogicNotNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic not"""
 
-    reti_code = """
-        # start codela(l1)
-        # codeaa(e)
-        LOADIN SP ACC 1;  # Wert von e in ACC laden
-        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
-        LOADI ACC 1;
-        STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
-        # finished loading
+    end = """
+        # codela(l1)
         LOADI ACC 1;  # 1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l1 in IN2 laden
         OPLUS ACC IN2;  # !(l1) in ACC laden
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """
-    lines_of_code = 8
+
+    end_loc = 4
+
+    def visit(self, ):
+        self.children[0].visit()
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class LogicAtomNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic atom"""
 
-    reti_code = """
+    end = """
         # codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2;  # Wert von e1 in ACC laden
@@ -344,42 +402,67 @@ class LogicAtomNode(ASTNode):
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
-    lines_of_code = 9
+
+    end_loc = 9
+
+    def visit(self, ):
+        self.children[0].visit()
+        self.children[1].visit()
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class LogicTopBottomNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic top bottom"""
 
-    reti_code = """
+    end = """
         # codeaa(e)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """
-    lines_of_code = 4
+
+    end_loc = 4
+
+    def visit(self, ):
+        self.children[0].visit()
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class AssignmentNode(ASTNode):
 
     """Abstract Syntax Tree Node for assignement"""
 
-    reti_code = """
+    # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
+
+    end = """
         # codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        STORE ACC a;  # Wert von e in Adresse a speichern
+        STORE ACC var_identifier;  # Wert von e in Adresse a speichern
         """
-    lines_of_code = 3
 
-    def _visit(self, ):
-        pass
+    end_loc = 3
+
+    def visit(self, ):
+        self.children[1].visit()
+
+        var_value = self.symbol_table.resolve(self.children[0].token.value)
+        self.code_generator.replace_code_directly(self.end, "var_identifier",
+                                                  var_value)
+
+        self.code_generator.add_code(self.end, self.end_loc)
 
 
 class AllocationNode(ASTNode):
 
     """Abstract Syntax Tree Node for allocation"""
 
-    reti_code = None
-    lines_of_code = 0
+    def visit(self, ):
+        var = VariableSymbol(
+            self.children[1].token.value, self.children[0].token.value)
+
+        self.symbol_table.define(var)

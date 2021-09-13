@@ -72,7 +72,7 @@ class CodeGenerator:
         self.generated_code[idx] = self.generated_code[idx].replace(pattern,
                                                                     str(loc))
 
-    def replace_jump_backwards(self, code_as_ref, pattern, offset=0):
+    def replace_jump_directly(self, code_as_ref, pattern, offset=0):
         """Jumps backwards are e.g. needed for while loops.
 
         :returns: None
@@ -98,6 +98,13 @@ class CodeGenerator:
         idx = -self.loc_idx + self.ucp_stock[-1]
         self.generated_code[idx] = self.generated_code[idx].replace(pattern,
                                                                     str(word))
+
+    def replace_code_directly(self, code_as_ref, pattern, word):
+        """Jumps backwards are e.g. needed for while loops.
+
+        :returns: None
+        """
+        code_as_ref[0] = code_as_ref[0].replace(pattern, str(word))
 
     def show_code(self, ):
         """Sets the generated / modified code pieces together to one unified

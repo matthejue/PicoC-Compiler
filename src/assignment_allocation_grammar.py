@@ -23,7 +23,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _aa(self):
         """assignment and allocation
 
-        :grammar: #2 <alloc> | ((<word> | <alloc>) = #2 (<word> = #2) * <le>)
+        :grammar: #2 ((<identifier> | <alloc>) = #2 (<identifier> = #2)* <le>)
         :returns: None
 
         """
@@ -57,7 +57,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _alloc(self):
         """allocation of a variable
 
-        :grammar: #2 <word> <word> (= <va>)?
+        :grammar: #2 <prim_dt> <identifier>
         :returns: None
 
         """
