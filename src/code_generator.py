@@ -42,7 +42,10 @@ class CodeGenerator:
 
         :returns: None
         """
-        self.generated_code += [code]
+        # e.g. a if statement has no end code for closing, but needs to be
+        # closed
+        if code:
+            self.generated_code += [code]
 
         self.loc_layer -= 1
         self.ucp_stock.pop()
@@ -51,7 +54,8 @@ class CodeGenerator:
             self.loc_stock.clear()
             self.loc_stock += [0]
         else:
-            self.loc_idx += 1
+            if code:
+                self.loc_idx += 1
             self.loc_stock += [self.loc_stock[-1] + lines_of_code]
 
     def replace_jump(self, pattern, offset=0):
@@ -72,7 +76,7 @@ class CodeGenerator:
         self.generated_code[idx] = self.generated_code[idx].replace(pattern,
                                                                     str(loc))
 
-    def replace_jump_directly(self, code_as_ref, pattern, offset=0):
+    def replace_jump_back(self, code_as_ref, pattern, offset=0):
         """Jumps backwards are e.g. needed for while loops.
 
         :returns: None
@@ -86,6 +90,24 @@ class CodeGenerator:
 
         # the pythonic way to pass a string as reference (in a list)
         code_as_ref[0] = code_as_ref[0].replace(pattern, str(loc))
+
+    def replace_jump_marker(self, code_as_ref, pattern, offset=0):
+        """Jumps backwards are e.g. needed for while loops.
+
+        :returns: None
+        """
+        # One does not only have to jump to the start of the while, but has to
+        # jump before the while and it's condition evaluation. We want to know
+        # the LOC difference between e.g. the end of the while and the start
+        # of the while statement.
+        loc = self.loc_stock[-1] - \
+            self.loc_stock[self.marker] + offset
+
+        # the pythonic way to pass a string as reference (in a list)
+        code_as_ref[0] = code_as_ref[0].replace(pattern, str(loc))
+
+    def set_marker(self, ):
+        self.marker = self.loc_idx
 
     def replace_code(self, pattern, word):
         """Depending on the Token sometimes different reti code commands have

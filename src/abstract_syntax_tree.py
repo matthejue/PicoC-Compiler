@@ -132,9 +132,9 @@ class WhileNode(ASTNode):
 
         self.code_generator.replace_jump("codelength(af) + 2", 2)
 
-        self.code_generator.replace_jump_directly([self.end],
-                                                  "(codelength(af) +"
-                                                  " codelength(l) + 3)")
+        self.code_generator.replace_jump_back([self.end],
+                                              "(codelength(af) +"
+                                              " codelength(l) + 3)")
         # + 3 sind schon mit drin
 
         self.code_generator.add_code_close(self.end, self.end_loc)
@@ -165,9 +165,9 @@ class DoWhileNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.replace_jump_directly([self.condition_check],
-                                                  "(codelength(af) + "
-                                                  "codelength(l) + 2), 2")
+        self.code_generator.replace_jump_back([self.condition_check],
+                                              "(codelength(af) + "
+                                              "codelength(l) + 2), 2")
 
         self.code_generator.add_code_close(self.condition_check,
                                            self.condition_check_loc)
@@ -196,18 +196,27 @@ class IfNode(ASTNode):
 
     # TODO
 
-    end = """
+    start = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
-        JUMP= {codelength(af) + 1}; # af überspringen
+        JUMP= codelength(af) + 1; # af überspringen
         # code(af)
         """
 
-    end_loc = 3
+    start_loc = 3
 
     def visit(self, ):
-        pass
+        self.children[0].visit()
+
+        self.code_generator.add_code_open(self.start, self.start_loc)
+
+        for child in self.children[1:]:
+            child.visit()
+
+        self.code_generator.replace_jump("codelength(af) + 1", 1)
+
+        self.code_generator.add_code_close("", 0)
 
 
 class IfElseNode(ASTNode):
@@ -216,20 +225,44 @@ class IfElseNode(ASTNode):
 
     # TODO
 
-    end = """
+    start = """
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
-        JUMP= {codelength(af1) + 2}; # af1 überspringen
+        JUMP= codelength(af1) + 2; # af1 überspringen
         # code(af1)
+        """
+
+    start_loc = 3
+
+    middle = """
         JUMP {codelength(af2) + 1};
         # code(af2)
         """
 
-    end_loc = 4
+    middle_loc = 1
 
     def visit(self, ):
-        pass
+        self.children[0].visit()
+
+        self.code_generator.add_code_open(self.start, self.start_loc)
+
+        for child in self.children[1:]:
+            child.visit()
+
+        self.code_generator.replace_jump("codelength(af1) + 2", 2)
+
+        self.code_generator.add_code(self.middle, self.middle_loc)
+
+        self.code_generator.set_marker()
+
+        for child in self.children[1:]:
+            child.visit()
+
+        self.code_generator.replace_jump_marker(
+            self.end, "codelength(af2) + 1", 1)
+
+        self.code_generator.add_code_close("", 0)
 
 
 class MainFunctionNode(ASTNode):
