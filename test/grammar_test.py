@@ -273,18 +273,21 @@ class TestCodeGenerator(unittest.TestCase):
         symbol_table.define(var)
         symbol_table.allocate(var)
 
-        expected_res = self.strip_multinline_string("""SUBI SP 1
+        expected_res = self.strip_multiline_string("""SUBI SP 1
         LOAD ACC 100
         STOREIN SP ACC 1
         """)
 
-        code_generator.add_code(self.strip_multinline_string(self.code), 3)
+        code_generator.add_code(self.strip_multiline_string(self.code), 3)
 
         code_generator.replace_code(
             'encode(w)', symbol_table.resolve('car').address)
         self.assertEqual(code_generator.show_code(), expected_res)
 
-    def strip_multinline_string(self, mutline_string):
+    def test_while_generation(self, ):
+        code_generator = CodeGenerator()
+
+    def strip_multiline_string(self, mutline_string):
         """helper function to make mutlineline string usable on different
         indent levels
 
@@ -313,4 +316,9 @@ if __name__ == '__main__':
     import globals
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
+    from abstract_syntax_tree import (ArithmeticBinaryOperationNode,
+                                      ArithmeticVariableConstantNode,
+                                      MainFunctionNode, WhileNode, IfNode,
+                                      LogicAtomNode, AssignmentNode,
+                                      AllocationNode)
     unittest.main()

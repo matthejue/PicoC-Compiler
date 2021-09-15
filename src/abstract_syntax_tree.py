@@ -1,6 +1,5 @@
 # from enum import Enum
 from lexer import Token, TT
-from enum import Enum
 from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol
 
