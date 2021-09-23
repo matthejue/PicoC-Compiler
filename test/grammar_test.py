@@ -285,7 +285,20 @@ class TestCodeGenerator(unittest.TestCase):
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
-        code_generator = CodeGenerator()
+        test_code = """
+        int main()
+        {
+          n = 0;
+          while (n > 0) {
+            n = n + 1;
+          }
+        }
+        """
+        lexer = Lexer("<while_generation>", test_code)
+        grammar = Grammar(lexer)
+        grammar.start_parse()
+        # abstract_syntax_tree = grammar.reveal_ast()
+        # abstract_syntax_tree.visit()
 
     def strip_multiline_string(self, mutline_string):
         """helper function to make mutlineline string usable on different
