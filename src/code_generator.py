@@ -120,7 +120,7 @@ class _CodeGenerator:
 
         :returns: None
         """
-        code_as_ref[0] = code_as_ref[0].replace(pattern, str(word))
+        return code_as_ref.replace(pattern, str(word))
 
     def show_code(self, ):
         """Sets the generated / modified code pieces together to one unified

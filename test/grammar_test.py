@@ -285,6 +285,8 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
+        globals.test_name = "while_generation"
+
         test_code = ["int main()",
                      "{",
                      "  n = 0;",
@@ -293,7 +295,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                      "  }",
                      "}"]
         globals.args = Args()
-        self.lexer = Lexer("<test>", test_code)
+        self.lexer = Lexer("<while_generation>", test_code)
 
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()

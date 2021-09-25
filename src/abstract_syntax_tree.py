@@ -302,6 +302,12 @@ class MainFunctionNode(ASTNode):
     end_loc = 2
 
     def visit(self, ):
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "while_generation":
+            if globals.test_name == "while_generation":
+                pass
+
         self.code_generator.add_code(
             strip_multiline_string(self.start), self.start_loc)
 
@@ -330,13 +336,13 @@ class ArithmeticVariableConstantNode(ASTNode):
 
         if self.token.type == TT.IDENTIFIER:
             var_value = self.symbol_table.resolve(self.token.value)
-            self.code_generator.replace_code_directly_(
-                [self.variable_identifier], "var_identifier", var_value)
+            self.variable_identifier = self.code_generator.replace_code_directly_(
+                self.variable_identifier, "var_identifier", var_value)
             self.code_generator.add_code(
                 strip_multiline_string(self.identifier), self.all_loc)
         elif self.token.type == TT.NUMBER:
-            self.code_generator.replace_code_directly(
-                [self.constant], "encode(w)", str(self.token.value))
+            self.constant = self.code_generator.replace_code_directly(
+                self.constant, "encode(w)", str(self.token.value))
             self.code_generator.add_code(
                 strip_multiline_string(self.constant), self.all_loc)
         # elif constant identifier
@@ -362,6 +368,9 @@ class ArithmeticBinaryOperationNode(ASTNode):
     end_loc = 5
 
     def visit(self, ):
+        if len(self.children) == 1:
+            self.children[0].visit()
+
         self.children[0].visit()
         self.children[1].visit()
         self.code_generator.add_code(
@@ -513,11 +522,15 @@ class AssignmentNode(ASTNode):
     end_loc = 3
 
     def visit(self, ):
+        # empty
+        if len(self.children) == 1:
+            self.children[0].visit()
+
         self.children[1].visit()
 
         var_value = self.symbol_table.resolve(self.children[0].token.value)
-        self.code_generator.replace_code_directly(self.end, "var_identifier",
-                                                  var_value)
+        self.end = self.code_generator.replace_code_directly(self.end, "var_identifier",
+                                                             var_value)
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
