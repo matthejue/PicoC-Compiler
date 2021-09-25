@@ -73,9 +73,11 @@ class Scope:
         return self.symbols[name]
 
 
-class SymbolTable(Scope):
+class _SymbolTable(Scope):
 
     """Datastructure that tracks language symbols"""
+
+    _instance = None
 
     def __init__(self, address=100):
         super().__init__()
@@ -93,3 +95,15 @@ class SymbolTable(Scope):
 
     def __repr__(self, ):
         return self.get_scope_name() + ":" + self.symbols
+
+
+def SymbolTable():
+    """Factory Function as possible way to implement Singleton Pattern.
+    Taken from here:
+    https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
+
+    :returns: None
+    """
+    if _SymbolTable._instance is None:
+        _SymbolTable._instance = _SymbolTable()
+    return _SymbolTable._instance

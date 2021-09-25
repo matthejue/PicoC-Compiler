@@ -1,6 +1,4 @@
-
-
-class CodeGenerator:
+class _CodeGenerator:
 
     """Encapsulates all tree-walking code associated with a particular
     task into a single visitor class. Implenents the Singleton pattern
@@ -11,16 +9,12 @@ class CodeGenerator:
 
     _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(CodeGenerator, cls).__new__(cls)
-            # Initialization
-            cls._instance.generated_code = []
-            cls._instance.ucp_stock = [0]
-            cls._instance.loc_stock = [0]
-            cls._instance.loc_layer = 0
-            cls._instance.loc_idx = 0
-        return cls._instance
+    def __init__(self):
+        self.generated_code = []
+        self.ucp_stock = [0]
+        self.loc_stock = [0]
+        self.loc_layer = 0
+        self.loc_idx = 0
 
     def add_code_open(self, code, lines_of_code):
         """Add raw reti code to the generated code.
@@ -138,3 +132,15 @@ class CodeGenerator:
         for code_piece in self.generated_code:
             code_acc += code_piece
         return code_acc
+
+
+def CodeGenerator():
+    """Factory Function as possible way to implement Singleton Pattern.
+    Taken from here:
+    https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
+
+    :returns: None
+    """
+    if _CodeGenerator._instance is None:
+        _CodeGenerator._instance = _CodeGenerator()
+    return _CodeGenerator._instance
