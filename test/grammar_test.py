@@ -258,7 +258,7 @@ class TestComments(unittest.TestCase, UsefullTools):
 #         pass
 
 
-class TestCodeGenerator(unittest.TestCase):
+class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     code = """SUBI SP 1
     LOAD ACC encode(w)
@@ -285,34 +285,20 @@ class TestCodeGenerator(unittest.TestCase):
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
-        test_code = """
-        int main()
-        {
-          n = 0;
-          while (n > 0) {
-            n = n + 1;
-          }
-        }
-        """
-        lexer = Lexer("<while_generation>", test_code)
-        grammar = Grammar(lexer)
-        grammar.start_parse()
-        # abstract_syntax_tree = grammar.reveal_ast()
-        # abstract_syntax_tree.visit()
+        test_code = ["int main()",
+                     "{",
+                     "  n = 0;",
+                     "  while (n > 0) {",
+                     "    n = n + 1;",
+                     "  }",
+                     "}"]
+        globals.args = Args()
+        self.lexer = Lexer("<test>", test_code)
 
-    def strip_multiline_string(self, mutline_string):
-        """helper function to make mutlineline string usable on different
-        indent levels
-
-        :grammar: grammar specification
-        :returns: None
-        """
-        mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
-        mutline_string.pop()
-        mutline_string_acc = ""
-        for line in mutline_string:
-            mutline_string_acc += line
-        return mutline_string_acc
+        self.grammar = Grammar(self.lexer)
+        self.grammar.start_parse()
+        abstract_syntax_tree = self.grammar.reveal_ast()
+        abstract_syntax_tree.visit()
 
 
 class TestPrograms(unittest.TestCase, UsefullTools):
@@ -334,4 +320,5 @@ if __name__ == '__main__':
                                       MainFunctionNode, WhileNode, IfNode,
                                       LogicAtomNode, AssignmentNode,
                                       AllocationNode)
+    from abstract_syntax_tree import strip_multiline_string
     unittest.main()
