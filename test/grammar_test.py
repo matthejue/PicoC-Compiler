@@ -269,7 +269,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         code_generator = CodeGenerator()
         symbol_table = SymbolTable()
 
-        var = VariableSymbol('car', 'int')
+        var = VariableSymbol('car', symbol_table.resolve('int'))
         symbol_table.define(var)
         symbol_table.allocate(var)
 
@@ -289,15 +289,17 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
         test_code = ["int main()",
                      "{",
-                     "  n = 0;",
-                     "  while (n > 0) {",
-                     "    n = n + 1;",
+                     "  int i = 0;",
+                     "  while (i < 10) {",
+                     "    i = i + 1;",
                      "  }",
                      "}"]
         globals.args = Args()
         self.lexer = Lexer("<while_generation>", test_code)
 
         self.grammar = Grammar(self.lexer)
+        # create new Singleton SymbolTable and remove old
+        SymbolTable().new(100)
         self.grammar.start_parse()
         abstract_syntax_tree = self.grammar.reveal_ast()
         abstract_syntax_tree.visit()

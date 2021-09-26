@@ -10,6 +10,12 @@ class Symbol:
     def get_name(self, ):
         return self.name
 
+    def set_address(self, address):
+        self.address = address
+
+    def get_address(self,):
+        return self.address
+
     def __repr__(self, ):
         if self.type:
             return '<' + self.get_name() + ':' + self.type + '>'
@@ -79,7 +85,7 @@ class _SymbolTable(Scope):
 
     _instance = None
 
-    def __init__(self, address=100):
+    def __init__(self, address):
         super().__init__()
         self.initTypeSystem()
         self.fa_pointer = address
@@ -90,14 +96,19 @@ class _SymbolTable(Scope):
 
     def allocate(self, sym):
         if not self.symbols[sym.name].address:
-            self.symbols[sym.name].address = self.fa_pointer
+            self.symbols[sym.name].set_address(self.fa_pointer)
             self.fa_pointer += 1
+
+    def new(self, address=100):
+        self.symbols = {}
+        self.fa_pointer = address
+        self.initTypeSystem()
 
     def __repr__(self, ):
         return self.get_scope_name() + ":" + self.symbols
 
 
-def SymbolTable():
+def SymbolTable(address=100):
     """Factory Function as possible way to implement Singleton Pattern.
     Taken from here:
     https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
@@ -105,5 +116,5 @@ def SymbolTable():
     :returns: None
     """
     if _SymbolTable._instance is None:
-        _SymbolTable._instance = _SymbolTable()
+        _SymbolTable._instance = _SymbolTable(address)
     return _SymbolTable._instance

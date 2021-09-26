@@ -4,21 +4,6 @@ from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol
 
 
-def strip_multiline_string(mutline_string):
-    """helper function to make mutlineline string usable on different
-    indent levels
-
-    :grammar: grammar specification
-    :returns: None
-    """
-    mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
-    mutline_string.pop()
-    mutline_string_acc = ""
-    for line in mutline_string:
-        mutline_string_acc += line
-    return mutline_string_acc
-
-
 class TokenNode:
 
     """Abstract Syntax Tree Node for Leaves"""
@@ -66,7 +51,7 @@ class ASTNode(TokenNode):
         # he has any
         self.ignore = True
         self.code_generator = CodeGenerator()
-        self.symbol_table = SymbolTable()
+        self.symbol_table = SymbolTable(100)
 
     def addChild(self, node):
         """
@@ -326,7 +311,7 @@ class ArithmeticVariableConstantNode(ASTNode):
     variable_identifier = "LOAD ACC var_identifier\n"
     constant = "LOAD ACC encode(w)\n"
     constant_identifier = "LOAD ACC {encode(c)}\n"
-    end = "STOREIN SP ACC 1"
+    end = "STOREIN SP ACC 1\n"
 
     all_loc = 1
 
@@ -370,6 +355,7 @@ class ArithmeticBinaryOperationNode(ASTNode):
     def visit(self, ):
         if len(self.children) == 1:
             self.children[0].visit()
+            return
 
         self.children[0].visit()
         self.children[1].visit()
@@ -522,15 +508,21 @@ class AssignmentNode(ASTNode):
     end_loc = 3
 
     def visit(self, ):
-        # empty
+        # if it's just a throw-away node that had to be taken
         if len(self.children) == 1:
             self.children[0].visit()
+            return
 
+        self.children[0].visit()
         self.children[1].visit()
 
-        var_value = self.symbol_table.resolve(self.children[0].token.value)
+        var_value = self.symbol_table.resolve(
+            self.children[0].children[0].token.value).get_address()
         self.end = self.code_generator.replace_code_directly(self.end, "var_identifier",
                                                              var_value)
+
+        # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
+        # SymbolTable speichern sollte oder ob der SRAM ausreicht
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
@@ -542,6 +534,23 @@ class AllocationNode(ASTNode):
 
     def visit(self, ):
         var = VariableSymbol(
-            self.children[1].token.value, self.children[0].token.value)
+            self.children[0].token.value,
+            self.symbol_table.resolve(self.token.value))
 
         self.symbol_table.define(var)
+        self.symbol_table.allocate(var)
+
+
+def strip_multiline_string(mutline_string):
+    """helper function to make mutlineline string usable on different
+    indent levels
+
+    :grammar: grammar specification
+    :returns: None
+    """
+    mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
+    mutline_string.pop()
+    mutline_string_acc = ''
+    for line in mutline_string:
+        mutline_string_acc += line + '\n'
+    return mutline_string_acc

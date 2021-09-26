@@ -1,0 +1,275 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/areo/Documents/Studium/pico_c_compiler/src/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
+ALLOC	lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
+AND	lexer.py	/^    AND = "and as part of logical expression grammar"$/;"	v	class:TT
+AND_OP	lexer.py	/^    AND_OP = "and operator"$/;"	v	class:TT
+ASSIGNMENT	lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
+ASTBuilder	ast_builder.py	/^class ASTBuilder:$/;"	c
+ASTNode	abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
+AllocationNode	abstract_syntax_tree.py	/^class AllocationNode(ASTNode):$/;"	c
+ArithmeticBinaryOperationNode	abstract_syntax_tree.py	/^class ArithmeticBinaryOperationNode(ASTNode):$/;"	c
+ArithmeticExpressionGrammar	arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
+ArithmeticUnaryOperationNode	abstract_syntax_tree.py	/^class ArithmeticUnaryOperationNode(ASTNode):$/;"	c
+ArithmeticVariableConstantNode	abstract_syntax_tree.py	/^class ArithmeticVariableConstantNode(ASTNode):$/;"	c
+AssignmentAllocationGrammar	assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
+AssignmentNode	abstract_syntax_tree.py	/^class AssignmentNode(ASTNode):$/;"	c
+BINOP_PREC_1	lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
+BINOP_PREC_2	lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 2"$/;"	v	class:TT
+BITSHIFT	lexer.py	/^    BITSHIFT = "bitshift"$/;"	v	class:TT
+BacktrackingParser	parser_.py	/^class BacktrackingParser():$/;"	c
+BuiltInTypeSymbol	symbol_table.py	/^class BuiltInTypeSymbol(Symbol):$/;"	c
+COMP_OP	lexer.py	/^    COMP_OP = "comparison operator"$/;"	v	class:TT
+COMP_OPERATOR_ASSIGNMENT_BITSHIFT	lexer.py	/^    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']$/;"	v	class:Lexer
+CodeGenerator	code_generator.py	/^def CodeGenerator():$/;"	f
+DIGIT_WITHOUT_ZERO	lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
+DIGIT_WITH_ZERO	lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
+DO_WHILE	lexer.py	/^    DO_WHILE = "do while"$/;"	v	class:TT
+DoWhileNode	abstract_syntax_tree.py	/^class DoWhileNode(ASTNode):$/;"	c
+ELSE	lexer.py	/^    ELSE = "else"$/;"	v	class:TT
+EOF	lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
+EOF_CHAR	lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
+FUNCTION	lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
+FunctionGrammar	function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
+Grammar	grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
+IDENTIFIER	lexer.py	/^    IDENTIFIER = "word"$/;"	v	class:TT
+IF	lexer.py	/^    IF = "if"$/;"	v	class:TT
+IfElseNode	abstract_syntax_tree.py	/^class IfElseNode(ASTNode):$/;"	c
+IfNode	abstract_syntax_tree.py	/^class IfNode(ASTNode):$/;"	c
+InvalidCharacterError	errors.py	/^class InvalidCharacterError(Exception):$/;"	c
+LETTER	lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
+LETTER_DIGIT	lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
+LOGICAL	lexer.py	/^    LOGICAL = "convert arithmetic expression to logical expression"$/;"	v	class:TT
+LT	parser_.py	/^    def LT(self, i):$/;"	m	class:BacktrackingParser
+LTT	parser_.py	/^    def LTT(self, i):$/;"	m	class:BacktrackingParser
+L_BRACE	lexer.py	/^    L_BRACE = "{"$/;"	v	class:TT
+L_PAREN	lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
+Lexer	lexer.py	/^class Lexer:$/;"	c
+LogicAndOrNode	abstract_syntax_tree.py	/^class LogicAndOrNode(ASTNode):$/;"	c
+LogicAtomNode	abstract_syntax_tree.py	/^class LogicAtomNode(ASTNode):$/;"	c
+LogicExpressionGrammar	logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
+LogicNotNode	abstract_syntax_tree.py	/^class LogicNotNode(ASTNode):$/;"	c
+LogicTopBottomNode	abstract_syntax_tree.py	/^class LogicTopBottomNode(ASTNode):$/;"	c
+MAIN	lexer.py	/^    MAIN = "main"$/;"	v	class:TT
+MINUS	lexer.py	/^    MINUS = "-"$/;"	v	class:TT
+MainFunctionNode	abstract_syntax_tree.py	/^class MainFunctionNode(ASTNode):$/;"	c
+MismatchedTokenError	errors.py	/^class MismatchedTokenError(Exception):$/;"	c
+NOT	lexer.py	/^    NOT = "not operator or not as part of logical expression grammar"$/;"	v	class:TT
+NUMBER	lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
+NoApplicableRuleError	errors.py	/^class NoApplicableRuleError(Exception):$/;"	c
+OR	lexer.py	/^    OR = "or as part of logical expression grammar"$/;"	v	class:TT
+OR_OP	lexer.py	/^    OR_OP = "or operator"$/;"	v	class:TT
+PRIM_DT	lexer.py	/^    PRIM_DT = "primitive datatype"$/;"	v	class:TT
+ROOT	lexer.py	/^    ROOT = "ROOT"$/;"	v	class:TT
+R_BRACE	lexer.py	/^    R_BRACE = "}"$/;"	v	class:TT
+R_PAREN	lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
+SEMICOLON	lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
+STATEMENT	lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
+Scope	symbol_table.py	/^class Scope:$/;"	c
+StatementSequenceGrammar	statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
+Symbol	symbol_table.py	/^class Symbol:$/;"	c
+SymbolTable	symbol_table.py	/^def SymbolTable(address=100):$/;"	f
+SyntaxError	errors.py	/^class SyntaxError(Exception):$/;"	c
+TT	lexer.py	/^class TT(Enum):$/;"	c
+Token	lexer.py	/^class Token():$/;"	c
+TokenNode	abstract_syntax_tree.py	/^class TokenNode:$/;"	c
+UNARY_OP	lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
+VariableSymbol	symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
+WHILE	lexer.py	/^    WHILE = "while"$/;"	v	class:TT
+WhileNode	abstract_syntax_tree.py	/^class WhileNode(ASTNode):$/;"	c
+_CodeGenerator	code_generator.py	/^class _CodeGenerator:$/;"	c
+_SymbolTable	symbol_table.py	/^class _SymbolTable(Scope):$/;"	c
+__init__	abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:TokenNode
+__init__	abstract_syntax_tree.py	/^    def __init__(self, tokentypes):$/;"	m	class:ASTNode
+__init__	arithmetic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ArithmeticExpressionGrammar
+__init__	assignment_allocation_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:AssignmentAllocationGrammar
+__init__	ast_builder.py	/^    def __init__(self):$/;"	m	class:ASTBuilder
+__init__	code_generator.py	/^    def __init__(self):$/;"	m	class:_CodeGenerator
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:MismatchedTokenError
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:NoApplicableRuleError
+__init__	errors.py	/^    def __init__(self, expected, found):$/;"	m	class:SyntaxError
+__init__	errors.py	/^    def __init__(self, found):$/;"	m	class:InvalidCharacterError
+__init__	function_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:FunctionGrammar
+__init__	grammar.py	/^    def __init__(self, lexer):$/;"	m	class:Grammar
+__init__	lexer.py	/^    def __init__(self, fname, input):$/;"	m	class:Lexer
+__init__	lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
+__init__	logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:LogicExpressionGrammar
+__init__	parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
+__init__	statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
+__init__	symbol_table.py	/^    def __init__(self, ):$/;"	m	class:Scope
+__init__	symbol_table.py	/^    def __init__(self, address):$/;"	m	class:_SymbolTable
+__init__	symbol_table.py	/^    def __init__(self, name):$/;"	m	class:BuiltInTypeSymbol
+__init__	symbol_table.py	/^    def __init__(self, name, type):$/;"	m	class:VariableSymbol
+__init__	symbol_table.py	/^    def __init__(self, name, type=None):$/;"	m	class:Symbol
+__repr__	abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
+__repr__	abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
+__repr__	lexer.py	/^    def __repr__(self):$/;"	m	class:Token
+__repr__	symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:Symbol
+__repr__	symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:_SymbolTable
+_aa	assignment_allocation_grammar.py	/^    def _aa(self):$/;"	m	class:AssignmentAllocationGrammar
+_alloc	assignment_allocation_grammar.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
+_and	lexer.py	/^    def _and(self):$/;"	m	class:Lexer
+_and_expr	logic_expression_grammar.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
+_ao	arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
+_atom	logic_expression_grammar.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
+_atom_or_top_bottom	logic_expression_grammar.py	/^    def _atom_or_top_bottom(self):$/;"	m	class:LogicExpressionGrammar
+_basename	pico_c_compiler.py	/^def _basename(fname):$/;"	f
+_check_word	lexer.py	/^    def _check_word(self, word, tokentype):$/;"	m	class:Lexer
+_comp_operator_assignment_bitshift	lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
+_compile	pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
+_consume_next_token	parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
+_division_sign_or_comment	lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
+_do_while	loop_grammar.py	/^def _do_while(self):$/;"	f
+_fill	parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
+_identifier	arithmetic_expression_grammar.py	/^    def _identifier(self, ):$/;"	m	class:ArithmeticExpressionGrammar
+_identifier	lexer.py	/^    def _identifier(self):$/;"	m	class:Lexer
+_identifier_special_keyword	lexer.py	/^    def _identifier_special_keyword(self):$/;"	m	class:Lexer
+_if	if_else_grammar.py	/^def _if(self):$/;"	f
+_if_else	if_else_grammar.py	/^def _if_else(self, ):$/;"	f
+_if_without_else	if_else_grammar.py	/^def _if_without_else(self, ):$/;"	f
+_instance	code_generator.py	/^    _instance = None$/;"	v	class:_CodeGenerator
+_instance	symbol_table.py	/^    _instance = None$/;"	v	class:_SymbolTable
+_is_assignment	statement_sequence_grammar.py	/^    def _is_assignment(self):$/;"	m	class:StatementSequenceGrammar
+_is_loop	statement_sequence_grammar.py	/^    def _is_loop(self, ):$/;"	m	class:StatementSequenceGrammar
+_is_statement	statement_sequence_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementSequenceGrammar
+_is_tokennode	abstract_syntax_tree.py	/^    def _is_tokennode(self, node):$/;"	m	class:ASTNode
+_lo	logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
+_loop	loop_grammar.py	/^def _loop(self):$/;"	f
+_main_function	function_grammar.py	/^    def _main_function(self, ):$/;"	m	class:FunctionGrammar
+_mark	parser_.py	/^    def _mark(self):$/;"	m	class:BacktrackingParser
+_not	lexer.py	/^    def _not(self, ):$/;"	m	class:Lexer
+_not_expr	logic_expression_grammar.py	/^    def _not_expr(self):$/;"	m	class:LogicExpressionGrammar
+_number	arithmetic_expression_grammar.py	/^    def _number(self, ):$/;"	m	class:ArithmeticExpressionGrammar
+_number	lexer.py	/^    def _number(self):$/;"	m	class:Lexer
+_or	lexer.py	/^    def _or(self):$/;"	m	class:Lexer
+_or_expr	logic_expression_grammar.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
+_paren_arith	arithmetic_expression_grammar.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
+_paren_logic	logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
+_prec1	arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec2	arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_read_file	pico_c_compiler.py	/^def _read_file(infile, outfile):$/;"	f
+_release	parser_.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
+_s	statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSequenceGrammar
+_shell	pico_c_compiler.py	/^def _shell():$/;"	f
+_ss	statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
+_sync	parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
+_taste_consume_if_without_else	if_else_grammar.py	/^def _taste_consume_if_without_else(self):$/;"	f
+_top_bottom	logic_expression_grammar.py	/^    def _top_bottom(self, ):$/;"	m	class:LogicExpressionGrammar
+_unop	arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
+_while	loop_grammar.py	/^def _while(self):$/;"	f
+addChild	abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
+addChild	abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:DoWhileNode
+addChild	ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
+add_code	code_generator.py	/^    def add_code(self, code, lines_of_code):$/;"	m	class:_CodeGenerator
+add_code_close	code_generator.py	/^    def add_code_close(self, code, lines_of_code):$/;"	m	class:_CodeGenerator
+add_code_open	code_generator.py	/^    def add_code_open(self, code, lines_of_code):$/;"	m	class:_CodeGenerator
+all_loc	abstract_syntax_tree.py	/^    all_loc = 1$/;"	v	class:ArithmeticVariableConstantNode
+allocate	symbol_table.py	/^    def allocate(self, sym):$/;"	m	class:_SymbolTable
+args	globals.py	/^args = None$/;"	v
+bitwise_negation	abstract_syntax_tree.py	/^    bitwise_negation = "SUBI ACC 1; # transform negation to complement\\n"$/;"	v	class:ArithmeticUnaryOperationNode
+bitwise_negation_loc	abstract_syntax_tree.py	/^    bitwise_negation_loc = 1$/;"	v	class:ArithmeticUnaryOperationNode
+code_aa	assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
+code_ae	arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
+code_ae_le	logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
+code_f	function_grammar.py	/^    def code_f(self):$/;"	m	class:FunctionGrammar
+code_generator	globals.py	/^code_generator = None$/;"	v
+code_ie	if_else_grammar.py	/^def code_ie(self, ):$/;"	f
+code_if_if_else	if_else_grammar.py	/^def code_if_if_else(self):$/;"	f
+code_le	logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
+code_lo	loop_grammar.py	/^def code_lo(self):$/;"	f
+code_ss	statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
+condition_check	abstract_syntax_tree.py	/^    condition_check = """$/;"	v	class:DoWhileNode
+condition_check	abstract_syntax_tree.py	/^    condition_check = """$/;"	v	class:WhileNode
+condition_check_loc	abstract_syntax_tree.py	/^    condition_check_loc = 3$/;"	v	class:DoWhileNode
+condition_check_loc	abstract_syntax_tree.py	/^    condition_check_loc = 3$/;"	v	class:WhileNode
+constant	abstract_syntax_tree.py	/^    constant = "LOAD ACC encode(w)\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant_identifier	abstract_syntax_tree.py	/^    constant_identifier = "LOAD ACC {encode(c)}\\n"$/;"	v	class:ArithmeticVariableConstantNode
+define	symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
+down	ast_builder.py	/^    def down(self, classname, tokentypes):$/;"	m	class:ASTBuilder
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:ArithmeticBinaryOperationNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:AssignmentNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicAndOrNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicAtomNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicNotNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicTopBottomNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:MainFunctionNode
+end	abstract_syntax_tree.py	/^    end = """$/;"	v	class:WhileNode
+end	abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"$/;"	v	class:ArithmeticUnaryOperationNode
+end	abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:ArithmeticUnaryOperationNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:WhileNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 2$/;"	v	class:MainFunctionNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 3$/;"	v	class:AssignmentNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 4$/;"	v	class:LogicNotNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 4$/;"	v	class:LogicTopBottomNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 5$/;"	v	class:ArithmeticBinaryOperationNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 5$/;"	v	class:LogicAndOrNode
+end_loc	abstract_syntax_tree.py	/^    end_loc = 9$/;"	v	class:LogicAtomNode
+getNodeType	abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
+get_address	symbol_table.py	/^    def get_address(self,):$/;"	m	class:Symbol
+get_enclosing_scope	symbol_table.py	/^    def get_enclosing_scope(self, ):$/;"	m	class:Scope
+get_name	symbol_table.py	/^    def get_name(self, ):$/;"	m	class:Symbol
+get_scope_name	symbol_table.py	/^    def get_scope_name(self, ):$/;"	m	class:Scope
+initTypeSystem	symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:_SymbolTable
+isEmpty	abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
+is_tasting	globals.py	/^is_tasting = 0$/;"	v
+lines_of_code	abstract_syntax_tree.py	/^    lines_of_code = 0$/;"	v	class:ASTNode
+main	pico_c_compiler.py	/^def main():$/;"	f
+match	lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
+match	parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
+match_and_add	parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
+middle	abstract_syntax_tree.py	/^    middle = """$/;"	v	class:IfElseNode
+middle_loc	abstract_syntax_tree.py	/^    middle_loc = 1$/;"	v	class:IfElseNode
+new	symbol_table.py	/^    def new(self, address=100):$/;"	m	class:_SymbolTable
+next_char	lexer.py	/^    def next_char(self):$/;"	m	class:Lexer
+next_token	lexer.py	/^    def next_token(self):$/;"	m	class:Lexer
+replace_code	code_generator.py	/^    def replace_code(self, pattern, word):$/;"	m	class:_CodeGenerator
+replace_code_directly	code_generator.py	/^    def replace_code_directly(self, code_as_ref, pattern, word):$/;"	m	class:_CodeGenerator
+replace_jump	code_generator.py	/^    def replace_jump(self, pattern, offset=0):$/;"	m	class:_CodeGenerator
+replace_jump_back	code_generator.py	/^    def replace_jump_back(self, code_as_ref, pattern, offset=0):$/;"	m	class:_CodeGenerator
+replace_jump_marker	code_generator.py	/^    def replace_jump_marker(self, code_as_ref, pattern, offset=0):$/;"	m	class:_CodeGenerator
+resolve	symbol_table.py	/^    def resolve(self, name):$/;"	m	class:Scope
+reti_code	abstract_syntax_tree.py	/^    reti_code = ""$/;"	v	class:ASTNode
+reveal_ast	grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
+set_address	symbol_table.py	/^    def set_address(self, address):$/;"	m	class:Symbol
+set_marker	code_generator.py	/^    def set_marker(self, ):$/;"	m	class:_CodeGenerator
+show_code	code_generator.py	/^    def show_code(self, ):$/;"	m	class:_CodeGenerator
+start	abstract_syntax_tree.py	/^    start = """$/;"	v	class:ArithmeticUnaryOperationNode
+start	abstract_syntax_tree.py	/^    start = """$/;"	v	class:IfElseNode
+start	abstract_syntax_tree.py	/^    start = """$/;"	v	class:IfNode
+start	abstract_syntax_tree.py	/^    start = """$/;"	v	class:MainFunctionNode
+start	abstract_syntax_tree.py	/^    start = "SUBI SP 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
+start_loc	abstract_syntax_tree.py	/^    start_loc = 1$/;"	v	class:MainFunctionNode
+start_loc	abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:ArithmeticUnaryOperationNode
+start_loc	abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:IfElseNode
+start_loc	abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:IfNode
+start_parse	grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
+strip_multiline_string	abstract_syntax_tree.py	/^def strip_multiline_string(mutline_string):$/;"	f
+taste	parser_.py	/^    def taste(self, rule):$/;"	m	class:BacktrackingParser
+taste_consume_ae	logic_expression_grammar.py	/^    def taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
+taste_consume_le	logic_expression_grammar.py	/^    def taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
+test_name	globals.py	/^test_name = ""$/;"	v
+up	ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
+variable_identifier	abstract_syntax_tree.py	/^    variable_identifier = "LOAD ACC var_identifier\\n"$/;"	v	class:ArithmeticVariableConstantNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:AllocationNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:ArithmeticBinaryOperationNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:ArithmeticUnaryOperationNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:ArithmeticVariableConstantNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:AssignmentNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:DoWhileNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:IfElseNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:IfNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicAndOrNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicAtomNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicNotNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicTopBottomNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:MainFunctionNode
+visit	abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:WhileNode
