@@ -2,21 +2,18 @@ class Symbol:
 
     """Name for a program entity like a variable or function"""
 
-    def __init__(self, name, type=None):
+    def __init__(self, name, type, value):
         self.name = name
         self.type = type
-        self.address = None
+        self.value = value
 
     def get_name(self, ):
         return self.name
 
-    def set_address(self, address):
-        self.address = address
-
     def __repr__(self, ):
         if self.type:
-            return '<' + self.get_name() + ':' + self.type + '>'
-        return self.get_name()
+            return '<' + self.name + ':' + self.type + '>'
+        return self.name
 
 
 class VariableSymbol(Symbol):
@@ -24,7 +21,15 @@ class VariableSymbol(Symbol):
     """Represents a variable definition (name, type) in symbol table"""
 
     def __init__(self, name, type):
-        super().__init__(name, type)
+        super().__init__(name, type, None)
+
+
+class ConstantSymbol(Symbol):
+
+    """Represents a variable definition (name, type) in symbol table"""
+
+    def __init__(self, name, type, value):
+        super().__init__(name, type, value)
 
 
 class BuiltInTypeSymbol(Symbol):
@@ -32,7 +37,7 @@ class BuiltInTypeSymbol(Symbol):
     """Built in types such as int and char"""
 
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__(name, None, None)
 
 
 class Scope:
@@ -82,25 +87,25 @@ class _SymbolTable(Scope):
 
     _instance = None
 
-    def __init__(self, address):
+    def __init__(self, address_start):
         super().__init__()
         self.initTypeSystem()
-        self.fa_pointer = address
+        self.fa_pointer = address_start
 
     def initTypeSystem(self, ):
         self.define(BuiltInTypeSymbol('int'))
         self.define(BuiltInTypeSymbol('char'))
 
     def allocate(self, sym):
-        if not self.symbols[sym.name].address:
-            self.symbols[sym.name].set_address(self.fa_pointer)
+        if not self.symbols[sym.name].value:
+            self.symbols[sym.name].value = self.fa_pointer
             self.fa_pointer += 1
 
     def __repr__(self, ):
         return self.get_scope_name() + ":" + self.symbols
 
 
-def SymbolTable(address=100):
+def SymbolTable(address_start=100):
     """Factory Function as possible way to implement Singleton Pattern.
     Taken from here:
     https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
@@ -108,5 +113,5 @@ def SymbolTable(address=100):
     :returns: None
     """
     if _SymbolTable._instance is None:
-        _SymbolTable._instance = _SymbolTable(address)
+        _SymbolTable._instance = _SymbolTable(address_start)
     return _SymbolTable._instance

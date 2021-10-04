@@ -30,7 +30,9 @@ BacktrackingParser	src/parser_.py	/^class BacktrackingParser():$/;"	c
 BuiltInTypeSymbol	src/symbol_table.py	/^class BuiltInTypeSymbol(Symbol):$/;"	c
 COMP_OP	src/lexer.py	/^    COMP_OP = "comparison operator"$/;"	v	class:TT
 COMP_OPERATOR_ASSIGNMENT_BITSHIFT	src/lexer.py	/^    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']$/;"	v	class:Lexer
+CONST	src/lexer.py	/^    CONST = "constant qualifier"$/;"	v	class:TT
 CodeGenerator	src/code_generator.py	/^def CodeGenerator():$/;"	f
+ConstantSymbol	src/symbol_table.py	/^class ConstantSymbol(Symbol):$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
 DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
 DO_WHILE	src/lexer.py	/^    DO_WHILE = "do while"$/;"	v	class:TT
@@ -42,7 +44,7 @@ EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
 FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
 Grammar	src/grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
-IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "word"$/;"	v	class:TT
+IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
 IF	src/lexer.py	/^    IF = "if"$/;"	v	class:TT
 IfElseNode	src/abstract_syntax_tree.py	/^class IfElseNode(ASTNode):$/;"	c
 IfNode	src/abstract_syntax_tree.py	/^class IfNode(ASTNode):$/;"	c
@@ -80,7 +82,7 @@ Scope	src/symbol_table.py	/^class Scope:$/;"	c
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
 StatementSequenceGrammar	src/statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
 Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
-SymbolTable	src/symbol_table.py	/^def SymbolTable(address=100):$/;"	f
+SymbolTable	src/symbol_table.py	/^def SymbolTable(address_start=100):$/;"	f
 SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARY_BASENAMES	Makefile	/^TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard .\/test\/*_test.py))$/;"	m
 TEST_BINARY_PATHS	Makefile	/^TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test\/$(test_binary))$/;"	m
@@ -102,6 +104,7 @@ UNARY_OP	src/lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
 Used Resources	README.md	/^## Used Resources$/;"	s	chapter:Pico-C Compiler
 UsefullTools	test/grammar_test.py	/^class UsefullTools():$/;"	c
+VAR	src/lexer.py	/^    VAR = "variable qualifier"$/;"	v	class:TT
 VariableSymbol	src/symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
 WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
 WhileNode	src/abstract_syntax_tree.py	/^class WhileNode(ASTNode):$/;"	c
@@ -125,13 +128,15 @@ __init__	src/logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	
 __init__	src/parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
 __init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
 __init__	src/symbol_table.py	/^    def __init__(self, ):$/;"	m	class:Scope
-__init__	src/symbol_table.py	/^    def __init__(self, address):$/;"	m	class:_SymbolTable
+__init__	src/symbol_table.py	/^    def __init__(self, address_start):$/;"	m	class:_SymbolTable
 __init__	src/symbol_table.py	/^    def __init__(self, name):$/;"	m	class:BuiltInTypeSymbol
 __init__	src/symbol_table.py	/^    def __init__(self, name, type):$/;"	m	class:VariableSymbol
-__init__	src/symbol_table.py	/^    def __init__(self, name, type=None):$/;"	m	class:Symbol
+__init__	src/symbol_table.py	/^    def __init__(self, name, type, value):$/;"	m	class:ConstantSymbol
+__init__	src/symbol_table.py	/^    def __init__(self, name, type, value):$/;"	m	class:Symbol
 __init__	test/grammar_test.py	/^    def __init__(self):$/;"	m	class:Args
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
+__repr__	src/abstract_syntax_tree.py	/^    def __repr__(self, ):$/;"	m	class:AllocationNode
 __repr__	src/lexer.py	/^    def __repr__(self):$/;"	m	class:Token
 __repr__	src/symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:Symbol
 __repr__	src/symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:_SymbolTable
@@ -140,10 +145,11 @@ _alloc	src/assignment_allocation_grammar.py	/^    def _alloc(self):$/;"	m	class:
 _and	src/lexer.py	/^    def _and(self):$/;"	m	class:Lexer
 _and_expr	src/logic_expression_grammar.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
 _ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
+_assign_number_to_constant_identifier	src/abstract_syntax_tree.py	/^    def _assign_number_to_constant_identifier(self):$/;"	m	class:AssignmentNode
 _atom	src/logic_expression_grammar.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
 _atom_or_top_bottom	src/logic_expression_grammar.py	/^    def _atom_or_top_bottom(self):$/;"	m	class:LogicExpressionGrammar
 _basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
-_check_word	src/lexer.py	/^    def _check_word(self, word, tokentype):$/;"	m	class:Lexer
+_check_word	src/lexer.py	/^    def _check_word(self, tokentype, word):$/;"	m	class:Lexer
 _comment	.vimspector.json	/^        "_comment": "args: [.\/input.picoc, .\/output.reti, -p, -v, -a]"$/;"	s	object:configurations.Debug.configuration
 _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
 _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
@@ -151,6 +157,7 @@ _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	cl
 _division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
 _do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
+_get_identifier_name	src/abstract_syntax_tree.py	/^    def _get_identifier_name(self, idx=0):$/;"	m	class:AssignmentNode
 _identifier	src/arithmetic_expression_grammar.py	/^    def _identifier(self, ):$/;"	m	class:ArithmeticExpressionGrammar
 _identifier	src/lexer.py	/^    def _identifier(self):$/;"	m	class:Lexer
 _identifier_special_keyword	src/lexer.py	/^    def _identifier_special_keyword(self):$/;"	m	class:Lexer
@@ -160,7 +167,10 @@ _if_without_else	src/if_else_grammar.py	/^def _if_without_else(self, ):$/;"	f
 _instance	src/code_generator.py	/^    _instance = None$/;"	v	class:_CodeGenerator
 _instance	src/symbol_table.py	/^    _instance = None$/;"	v	class:_SymbolTable
 _is_assignment	src/statement_sequence_grammar.py	/^    def _is_assignment(self):$/;"	m	class:StatementSequenceGrammar
+_is_constant_identifier	src/abstract_syntax_tree.py	/^    def _is_constant_identifier(self, idx):$/;"	m	class:AssignmentNode
+_is_last_assignment	src/abstract_syntax_tree.py	/^    def _is_last_assignment(self, ):$/;"	m	class:AssignmentNode
 _is_loop	src/statement_sequence_grammar.py	/^    def _is_loop(self, ):$/;"	m	class:StatementSequenceGrammar
+_is_single_value_on_right_side	src/abstract_syntax_tree.py	/^    def _is_single_value_on_right_side(self, ):$/;"	m	class:AssignmentNode
 _is_statement	src/statement_sequence_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementSequenceGrammar
 _is_tokennode	src/abstract_syntax_tree.py	/^    def _is_tokennode(self, node):$/;"	m	class:ASTNode
 _lo	src/logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
@@ -209,40 +219,39 @@ code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
 code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
 code_ae_le	src/logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
 code_f	src/function_grammar.py	/^    def code_f(self):$/;"	m	class:FunctionGrammar
-code_generator	src/globals.py	/^code_generator = None$/;"	v
 code_ie	src/if_else_grammar.py	/^def code_ie(self, ):$/;"	f
 code_if_if_else	src/if_else_grammar.py	/^def code_if_if_else(self):$/;"	f
 code_le	src/logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
 code_lo	src/loop_grammar.py	/^def code_lo(self):$/;"	f
 code_ss	src/statement_sequence_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementSequenceGrammar
 compile	.misc/pico_c_compiler	/^def compile(fname, code):$/;"	f
-condition_check	src/abstract_syntax_tree.py	/^    condition_check = """$/;"	v	class:DoWhileNode
-condition_check	src/abstract_syntax_tree.py	/^    condition_check = """$/;"	v	class:WhileNode
+condition_check	src/abstract_syntax_tree.py	/^    condition_check = """# code(af)$/;"	v	class:DoWhileNode
+condition_check	src/abstract_syntax_tree.py	/^    condition_check = """# codela(l)$/;"	v	class:WhileNode
 condition_check_loc	src/abstract_syntax_tree.py	/^    condition_check_loc = 3$/;"	v	class:DoWhileNode
 condition_check_loc	src/abstract_syntax_tree.py	/^    condition_check_loc = 3$/;"	v	class:WhileNode
 configuration	.vimspector.json	/^      "configuration": {$/;"	o	object:configurations.Debug
 configurations	.vimspector.json	/^  "configurations": {$/;"	o
 console	.vimspector.json	/^        "console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
-constant	src/abstract_syntax_tree.py	/^    constant = "LOAD ACC encode(w)\\n"$/;"	v	class:ArithmeticVariableConstantNode
-constant_identifier	src/abstract_syntax_tree.py	/^    constant_identifier = "LOAD ACC {encode(c)}\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant	src/abstract_syntax_tree.py	/^    constant = "LOADI ACC encode(w)\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant_identifier	src/abstract_syntax_tree.py	/^    constant_identifier = "LOADI ACC encode(c)\\n"$/;"	v	class:ArithmeticVariableConstantNode
 cwd	.vimspector.json	/^        "cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
 debugOptions	.vimspector.json	/^        "debugOptions": [],$/;"	a	object:configurations.Debug.configuration
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
 down	src/ast_builder.py	/^    def down(self, classname, tokentypes):$/;"	m	class:ASTBuilder
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:ArithmeticBinaryOperationNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:AssignmentNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicAndOrNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicAtomNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicNotNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:LogicTopBottomNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:MainFunctionNode
-end	src/abstract_syntax_tree.py	/^    end = """$/;"	v	class:WhileNode
+end	src/abstract_syntax_tree.py	/^    end = """# code(af)$/;"	v	class:MainFunctionNode
+end	src/abstract_syntax_tree.py	/^    end = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)$/;"	v	class:AssignmentNode
+end	src/abstract_syntax_tree.py	/^    end = """# codeaa(e)$/;"	v	class:LogicTopBottomNode
+end	src/abstract_syntax_tree.py	/^    end = """# codeaa(e1)$/;"	v	class:ArithmeticBinaryOperationNode
+end	src/abstract_syntax_tree.py	/^    end = """# codeaa(e1)$/;"	v	class:LogicAtomNode
+end	src/abstract_syntax_tree.py	/^    end = """# codela(l1)$/;"	v	class:LogicAndOrNode
+end	src/abstract_syntax_tree.py	/^    end = """# codela(l1)$/;"	v	class:LogicNotNode
+end	src/abstract_syntax_tree.py	/^    end = """# zurück zur Auswertung von l$/;"	v	class:WhileNode
 end	src/abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"$/;"	v	class:ArithmeticUnaryOperationNode
 end	src/abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:ArithmeticUnaryOperationNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:WhileNode
+end_loc	src/abstract_syntax_tree.py	/^    end_loc = 2$/;"	v	class:AssignmentNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 2$/;"	v	class:MainFunctionNode
-end_loc	src/abstract_syntax_tree.py	/^    end_loc = 3$/;"	v	class:AssignmentNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 4$/;"	v	class:LogicNotNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 4$/;"	v	class:LogicTopBottomNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 5$/;"	v	class:ArithmeticBinaryOperationNode
@@ -252,10 +261,11 @@ error	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v
 error	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 expected_output	.misc/test_errors	/^    expected_output = "(CONSTANT:12, ['BINOP', 'PRECEDENCE_1']:*, (CONSTANT:165, ['BINOP', 'PREC/;"	v	class:TestErrors
 getNodeType	src/abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
-get_address	src/symbol_table.py	/^    def get_address(self,):$/;"	m	class:Symbol
+get_childvalue	src/abstract_syntax_tree.py	/^    def get_childvalue(self, idx):$/;"	m	class:ASTNode
 get_enclosing_scope	src/symbol_table.py	/^    def get_enclosing_scope(self, ):$/;"	m	class:Scope
 get_name	src/symbol_table.py	/^    def get_name(self, ):$/;"	m	class:Symbol
 get_scope_name	src/symbol_table.py	/^    def get_scope_name(self, ):$/;"	m	class:Scope
+get_token	src/abstract_syntax_tree.py	/^    def get_token(self, idx):$/;"	m	class:ASTNode
 grammar	test/grammar_test.py	/^    grammar = None$/;"	v	class:UsefullTools
 initTypeSystem	src/symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:_SymbolTable
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
@@ -265,14 +275,14 @@ lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:Tes
 lexer	test/grammar_test.py	/^    lexer = None$/;"	v	class:UsefullTools
 lines_of_code	src/abstract_syntax_tree.py	/^    lines_of_code = 0$/;"	v	class:ASTNode
 main	.misc/pico_c_compiler	/^def main():$/;"	f
+main	.misc/test.cpp	/^int main() {$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 match	src/lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
 match	src/parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
 match_and_add	src/parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
-middle	src/abstract_syntax_tree.py	/^    middle = """$/;"	v	class:IfElseNode
+middle	src/abstract_syntax_tree.py	/^    middle = """JUMP {codelength(af2) + 1};$/;"	v	class:IfElseNode
 middle_loc	src/abstract_syntax_tree.py	/^    middle_loc = 1$/;"	v	class:IfElseNode
 name	.vimspector.json	/^        "name": "Debug",$/;"	s	object:configurations.Debug.configuration
-new	src/symbol_table.py	/^    def new(self, address=100):$/;"	m	class:_SymbolTable
 next_char	src/lexer.py	/^    def next_char(self):$/;"	m	class:Lexer
 next_token	src/lexer.py	/^    def next_token(self):$/;"	m	class:Lexer
 parser	.misc/test_errors	/^    parser = Parser(tokens)$/;"	v	class:TestErrors
@@ -298,13 +308,10 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 162 - ((35 * winheight(0) + 21) \/ 43)$/;"	v
-s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
-s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
+s:l	Session.vim	/^let s:l = 610 - ((17 * winheight(0) + 17) \/ 35)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
-set_address	src/symbol_table.py	/^    def set_address(self, address):$/;"	m	class:Symbol
 set_everything_up_for_ast	test/grammar_test.py	/^    def set_everything_up_for_ast(self, code):$/;"	m	class:UsefullTools
 set_everything_up_for_ast_multiline	test/grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, testname, code_without_cr):$/;"	m	class:UsefullTools
 set_everything_up_for_lexer	test/grammar_test.py	/^    def set_everything_up_for_lexer(self, code):$/;"	m	class:UsefullTools
@@ -313,10 +320,10 @@ set_marker	src/code_generator.py	/^    def set_marker(self, ):$/;"	m	class:_Code
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
 show_code	src/code_generator.py	/^    def show_code(self, ):$/;"	m	class:_CodeGenerator
-start	src/abstract_syntax_tree.py	/^    start = """$/;"	v	class:ArithmeticUnaryOperationNode
-start	src/abstract_syntax_tree.py	/^    start = """$/;"	v	class:IfElseNode
-start	src/abstract_syntax_tree.py	/^    start = """$/;"	v	class:IfNode
-start	src/abstract_syntax_tree.py	/^    start = """$/;"	v	class:MainFunctionNode
+start	src/abstract_syntax_tree.py	/^    start = """# codeaa(e1)$/;"	v	class:ArithmeticUnaryOperationNode
+start	src/abstract_syntax_tree.py	/^    start = """# codela(l)$/;"	v	class:IfElseNode
+start	src/abstract_syntax_tree.py	/^    start = """# codela(l)$/;"	v	class:IfNode
+start	src/abstract_syntax_tree.py	/^    start = """LOADI SP eds$/;"	v	class:MainFunctionNode
 start	src/abstract_syntax_tree.py	/^    start = "SUBI SP 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 1$/;"	v	class:MainFunctionNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:ArithmeticUnaryOperationNode
@@ -324,6 +331,8 @@ start_loc	src/abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:IfElseNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:IfNode
 start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
 stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
+store_more	src/abstract_syntax_tree.py	/^    store_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\\n"$/;"	v	class:AssignmentNode
+store_more_loc	src/abstract_syntax_tree.py	/^    store_more_loc = 1$/;"	v	class:AssignmentNode
 strip_multiline_string	src/abstract_syntax_tree.py	/^def strip_multiline_string(mutline_string):$/;"	f
 syntax_tree_rootnode	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors
 taste	src/parser_.py	/^    def taste(self, rule):$/;"	m	class:BacktrackingParser
@@ -383,4 +392,5 @@ visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicAtom
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicNotNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:LogicTopBottomNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:MainFunctionNode
+visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:TokenNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:WhileNode

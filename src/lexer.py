@@ -45,7 +45,7 @@ class TT(Enum):
     COMP_OP = "comparison operator"
     BITSHIFT = "bitshift"
     NUMBER = "number"
-    IDENTIFIER = "word"
+    IDENTIFIER = "identifier"
     CONST = "constant qualifier"
     VAR = "variable qualifier"
     PRIM_DT = "primitive datatype"

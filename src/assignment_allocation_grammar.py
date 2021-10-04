@@ -65,7 +65,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         savestate_node = self.ast_builder.down(
             AllocationNode, [TT.ALLOC, TT.PRIM_DT])
 
-        if self.LLT(1) == TT.CONST:
+        if self.LTT(1) == TT.CONST:
             self.match_and_add([TT.CONST])
         else:
             self.ast_builder.addChild(TokenNode(Token(TT.VAR, "")))

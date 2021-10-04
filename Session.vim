@@ -8,17 +8,17 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +534 src/abstract_syntax_tree.py
-badd +113 src/arithmetic_expression_grammar.py
-badd +13 src/assignment_allocation_grammar.py
-badd +1 src/ast_builder.py
+badd +610 src/abstract_syntax_tree.py
+badd +100 src/arithmetic_expression_grammar.py
+badd +37 src/assignment_allocation_grammar.py
+badd +5 src/ast_builder.py
 badd +1 src/errors.py
 badd +1 src/function_grammar.py
-badd +1 src/globals.py
+badd +3 src/globals.py
 badd +1 src/grammar.py
 badd +14 src/if_else_grammar.py
-badd +131 src/lexer.py
-badd +15 src/logic_expression_grammar.py
+badd +3 src/lexer.py
+badd +25 src/logic_expression_grammar.py
 badd +1 src/loop_grammar.py
 badd +1 src/parser_.py
 badd +104 src/pico_c_compiler.py
@@ -26,9 +26,8 @@ badd +3 src/statement_sequence_grammar.py
 badd +307 test/grammar_test.py
 badd +1 input.picoc
 badd +1 test/gcd.picoc
-badd +82 src/code_generator.py
-badd +95 src/symbol_table.py
-badd +0 term://~/Documents/Studium/pico_c_compiler//20994:/usr/bin/python
+badd +12 src/code_generator.py
+badd +117 src/symbol_table.py
 badd +1 output.reti
 argglobal
 %argdel
@@ -47,13 +46,9 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit output.reti
+edit src/abstract_syntax_tree.py
 argglobal
-if bufexists("output.reti") | buffer output.reti | else | edit output.reti | endif
-if &buftype ==# 'terminal'
-  silent file output.reti
-endif
-balt test/grammar_test.py
+balt src/arithmetic_expression_grammar.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -61,13 +56,39 @@ setlocal fdi=#
 setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
-setlocal nofen
-let s:l = 1 - ((0 * winheight(0) + 21) / 43)
+setlocal fen
+542
+normal! zo
+546
+normal! zo
+559
+normal! zo
+565
+normal! zo
+570
+normal! zo
+575
+normal! zo
+576
+normal! zo
+589
+normal! zo
+596
+normal! zo
+604
+normal! zo
+607
+normal! zo
+613
+normal! zo
+618
+normal! zo
+let s:l = 610 - ((17 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 0
+keepjumps 610
+normal! 034|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

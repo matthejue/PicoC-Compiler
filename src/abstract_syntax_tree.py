@@ -1,7 +1,7 @@
 # from enum import Enum
 from lexer import Token, TT
 from code_generator import CodeGenerator
-from symbol_table import SymbolTable, VariableSymbol
+from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
 
 
 class TokenNode:
@@ -82,8 +82,11 @@ class ASTNode(TokenNode):
         # being not instance of ASTNode means being instance of TokenNode
         return not isinstance(node, ASTNode)
 
-    def get_value(self, idx):
+    def get_childvalue(self, idx):
         return self.children[idx].token.value
+
+    def get_childtoken(self, idx):
+        return self.children[idx].token
 
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
@@ -326,9 +329,9 @@ class ArithmeticVariableConstantNode(ASTNode):
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
     start = "SUBI SP 1\n"
-    variable_identifier = "LOAD ACC var_identifier\n"
     constant = "LOADI ACC encode(w)\n"
     constant_identifier = "LOADI ACC encode(c)\n"
+    variable_identifier = "LOAD ACC var_identifier\n"
     end = "STOREIN SP ACC 1\n"
 
     all_loc = 1
@@ -340,17 +343,22 @@ class ArithmeticVariableConstantNode(ASTNode):
             strip_multiline_string(self.start), self.all_loc)
 
         if self.token.type == TT.IDENTIFIER:
-            var = self.symbol_table.resolve(self.token.value)
-            self.variable_identifier = self.code_generator.replace_code_directly(
-                self.variable_identifier, "var_identifier", str(var.address))
-            self.code_generator.add_code(
-                strip_multiline_string(self.variable_identifier), self.all_loc)
+            var_or_const = self.symbol_table.resolve(self.token.value)
+            if isinstance(var_or_const, VariableSymbol):
+                self.variable_identifier = self.code_generator.replace_code_directly(
+                    self.variable_identifier, "var_identifier", str(var_or_const.value))
+                self.code_generator.add_code(
+                    strip_multiline_string(self.variable_identifier), self.all_loc)
+            elif isinstance(var_or_const, ConstantSymbol):
+                self.constant_identifier = self.code_generator.replace_code_directly(
+                    self.constant_identifier, "encode(c)", str(var_or_const.value))
+                self.code_generator.add_code(
+                    strip_multiline_string(self.constant_identifier), self.all_loc)
         elif self.token.type == TT.NUMBER:
             self.constant = self.code_generator.replace_code_directly(
                 self.constant, "encode(w)", str(self.token.value))
             self.code_generator.add_code(
                 strip_multiline_string(self.constant), self.all_loc)
-        # elif constant identifier
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.all_loc)
@@ -546,18 +554,40 @@ class AssignmentNode(ASTNode):
     end = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        STORE ACC var_identifier;  # Wert von e in Adresse a speichern
         """
 
-    end_loc = 3
+    end_loc = 2
 
-    def get_value(self, idx):
+    store_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\n"
+
+    store_more_loc = 1
+
+    def _get_identifier_name(self, idx=0):
         # AllocationNode needs a special treatment, because it it's token only
         # tells the type but not the value
         if isinstance(self.children[idx], AllocationNode):
-            return self.children[idx].children[idx].token.value
+            return self.children[idx].children[1].token.value
         else:
             return self.children[idx].token.value
+
+    def _is_constant_identifier(self, idx):
+        return isinstance(self.symbol_table.resolve(
+            self._get_identifier_name(idx)), ConstantSymbol)
+
+    def _is_single_value_on_right_side(self, ):
+        return len(self.children[1].children[0].children) == 1
+
+    def _assign_number_to_constant_identifier(self):
+        self.symbol_table.resolve(self._get_identifier_name(0)).value =\
+            self.children[1].children[0].children[0].children[0].token.value
+
+    # def _assign_constant_to_constant_identifier(self):
+    #     self.symbol_table.resolve(
+    #         self._get_identifier_name(0)).value = self.symbol_table.resolve(self._get_identifier_name(1)).value
+
+    def _is_last_assignment(self, ):
+        return not (isinstance(self.children[1], AllocationNode) or
+                    isinstance(self.children[1], TokenNode))
 
     def visit(self, ):
         # if it's just a throw-away node that had to be taken
@@ -565,22 +595,37 @@ class AssignmentNode(ASTNode):
             self.children[0].visit()
             return
 
-        self.code_generator.add_code("# Assignment start\n", 0)
+        # # look at the next node if it's a also a constant
+        # if _is_constant_identifier(1):
+        #     self.children[1].visit()
+        #     _assign_to_constant_identifier()
+        # in case of a ConstantSymbol and a assignment with a number on the
+        # right side of the =, the value gets assigned immediately
+        if self._is_constant_identifier(0) and self._is_single_value_on_right_side():
+            _assign_number_to_constant_identifier()
 
-        self.children[0].visit()
-        self.children[1].visit()
+        # case of a VariableSymbol
+        else:
+            self.code_generator.add_code("# Assignment start\n", 0)
 
-        self.end = self.code_generator.replace_code_directly(
-            self.end, "var_identifier",
-            self.symbol_table.resolve(self.get_value(0)).address)
+            self.children[0].visit()
+            self.children[1].visit()
 
-        # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
-        # SymbolTable speichern sollte oder ob der SRAM ausreicht
+            if self._is_last_assignment():
+                self.code_generator.add_code(strip_multiline_string(self.end),
+                                             self.end_loc)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.end_loc)
+            self._store_more = self.code_generator.replace_code_directly(
+                self._store_more, "var_address",
+                self.symbol_table.resolve(self._get_identifier_name(0)).value)
 
-        self.code_generator.add_code("# Assignment end\n", 0)
+            # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
+            # SymbolTable speichern sollte oder ob der SRAM ausreicht
+
+            self.code_generator.add_code(
+                strip_multiline_string(self.store_more), self.store_more_loc)
+
+            self.code_generator.add_code("# Assignment end\n", 0)
 
 
 class AllocationNode(ASTNode):
@@ -590,17 +635,28 @@ class AllocationNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# Allocation start\n", 0)
 
-        var = VariableSymbol(
-            self.get_value(0),
-            self.symbol_table.resolve(self.token.value))
-
-        self.symbol_table.define(var)
-        self.symbol_table.allocate(var)
+        if self.get_childvalue(0) == 'const':
+            # the value of a ConstantNode is the name of the Constantnode if
+            # there wasn't assigned a value directly to the constant which has
+            # to be resolved internally in the RETI or by a RETI Code Interpreter
+            const = ConstantSymbol(
+                self.get_childvalue(1),
+                self.symbol_table.resolve(self.token.value), self.get_childvalue(1))
+            self.symbol_table.define(const)
+        else:  # self.get_childvalue(0) == 'var'
+            var = VariableSymbol(
+                self.get_childvalue(1),
+                self.symbol_table.resolve(self.token.value))
+            self.symbol_table.define(var)
+            self.symbol_table.allocate(var)
 
         self.code_generator.add_code(
-            "# successfully allocated " + str(self.get_value(0)) + "\n", 0)
+            "# successfully allocated " + str(self.get_childvalue(0)) + "\n", 0)
         self.code_generator.add_code("# Allocation end\n", 0)
 
+    def __repr__(self, ):
+        acc = f"({self.get_childvalue(0)} {self.token} {self.get_childtoken(1)})"
+        return acc
 
 def strip_multiline_string(mutline_string):
     """helper function to make mutlineline string usable on different
