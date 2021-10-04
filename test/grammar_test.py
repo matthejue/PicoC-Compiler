@@ -273,18 +273,21 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         symbol_table.define(var)
         symbol_table.allocate(var)
 
-        expected_res = self.strip_multiline_string("""SUBI SP 1
+        expected_res = strip_multiline_string("""SUBI SP 1
         LOAD ACC 100
         STOREIN SP ACC 1
         """)
 
-        code_generator.add_code(self.strip_multiline_string(self.code), 3)
+        code_generator.add_code(strip_multiline_string(self.code), 3)
 
         code_generator.replace_code(
             'encode(w)', symbol_table.resolve('car').address)
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
+        # create new Singleton SymbolTable and CodeGenerator and remove old
+        SymbolTable().__init__(100)
+        CodeGenerator().__init__()
         globals.test_name = "while_generation"
 
         test_code = ["int main()",
@@ -298,11 +301,12 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.lexer = Lexer("<while_generation>", test_code)
 
         self.grammar = Grammar(self.lexer)
-        # create new Singleton SymbolTable and remove old
-        SymbolTable().new(100)
         self.grammar.start_parse()
         abstract_syntax_tree = self.grammar.reveal_ast()
         abstract_syntax_tree.visit()
+
+        with open("./output.reti", 'w', encoding="utf-8") as fout:
+            fout.writelines(abstract_syntax_tree.code_generator.show_code())
 
 
 class TestPrograms(unittest.TestCase, UsefullTools):

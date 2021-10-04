@@ -26,6 +26,9 @@ class TokenNode:
     def __repr__(self):
         return f"{self.token}"
 
+    def visit(self, ):
+        pass
+
 
 class ASTNode(TokenNode):
 
@@ -79,6 +82,9 @@ class ASTNode(TokenNode):
         # being not instance of ASTNode means being instance of TokenNode
         return not isinstance(node, ASTNode)
 
+    def get_value(self, idx):
+        return self.children[idx].token.value
+
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
         # and should be skipped
@@ -103,8 +109,7 @@ class WhileNode(ASTNode):
 
     """Abstract Syntax Tree Node for while loop"""
 
-    condition_check = """
-        # codela(l)
+    condition_check = """# codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
         JUMP= codelength(af) + 2; # af überspringen, wenn l unerfüllt
@@ -113,14 +118,15 @@ class WhileNode(ASTNode):
 
     condition_check_loc = 3
 
-    end = """
-        # zurück zur Auswertung von l
+    end = """# zurück zur Auswertung von l
         JUMP -(codelength(af) + codelength(l) + 3);
         """
 
     end_loc = 1
 
     def visit(self, ):
+        self.code_generator.add_code("# While start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code_open(
@@ -140,14 +146,15 @@ class WhileNode(ASTNode):
         self.code_generator.add_code_close(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# While end\n", 0)
+
 
 class DoWhileNode(ASTNode):
 
     """Abstract Syntax Tree Node for do while Grammar"""
 
     # Problem mit code(af)
-    condition_check = """
-        # code(af)
+    condition_check = """# code(af)
         # codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -158,6 +165,8 @@ class DoWhileNode(ASTNode):
     condition_check_loc = 3
 
     def visit(self, ):
+        self.code_generator.add_code("# Do While start\n", 0)
+
         # little hack to get a artificial ucp_stock entry
         self.code_generator.add_code_open("", 0)
 
@@ -172,6 +181,8 @@ class DoWhileNode(ASTNode):
 
         self.code_generator.add_code_close(strip_multiline_string(self.condition_check),
                                            self.condition_check_loc)
+
+        self.code_generator.add_code("# Do While end\n", 0)
 
     def addChild(self, node):
         """do while loops should be called 'do while' and not 'do'
@@ -197,8 +208,7 @@ class IfNode(ASTNode):
 
     # TODO
 
-    start = """
-        # codela(l)
+    start = """# codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
         JUMP= codelength(af) + 1; # af überspringen
@@ -208,6 +218,8 @@ class IfNode(ASTNode):
     start_loc = 3
 
     def visit(self, ):
+        self.code_generator.add_code("# If start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code_open(
@@ -220,6 +232,8 @@ class IfNode(ASTNode):
 
         self.code_generator.add_code_close("", 0)
 
+        self.code_generator.add_code("# If end\n", 0)
+
 
 class IfElseNode(ASTNode):
 
@@ -227,8 +241,7 @@ class IfElseNode(ASTNode):
 
     # TODO
 
-    start = """
-        # codela(l)
+    start = """# codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
         JUMP= codelength(af1) + 2; # af1 überspringen
@@ -237,14 +250,15 @@ class IfElseNode(ASTNode):
 
     start_loc = 3
 
-    middle = """
-        JUMP {codelength(af2) + 1};
+    middle = """JUMP {codelength(af2) + 1};
         # code(af2)
         """
 
     middle_loc = 1
 
     def visit(self, ):
+        self.code_generator.add_code("# If Else start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code_open(
@@ -268,25 +282,27 @@ class IfElseNode(ASTNode):
 
         self.code_generator.add_code_close("", 0)
 
+        self.code_generator.add_code("# If Else end\n", 0)
+
 
 class MainFunctionNode(ASTNode):
 
     """Abstract Syntax Tree Node for main method"""
 
-    start = """
-        LOADI SP eds
+    start = """LOADI SP eds
         """
 
     start_loc = 1
 
-    end = """
-        # code(af)
+    end = """# code(af)
         JUMP 0
         """
 
     end_loc = 2
 
     def visit(self, ):
+        self.code_generator.add_code("# Main start\n", 0)
+
         # TODO: Don't forget to remove this improvised conditional breakpoint
         import globals
         if globals.test_name == "while_generation":
@@ -302,6 +318,8 @@ class MainFunctionNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# Main end\n", 0)
+
 
 class ArithmeticVariableConstantNode(ASTNode):
 
@@ -309,22 +327,24 @@ class ArithmeticVariableConstantNode(ASTNode):
 
     start = "SUBI SP 1\n"
     variable_identifier = "LOAD ACC var_identifier\n"
-    constant = "LOAD ACC encode(w)\n"
-    constant_identifier = "LOAD ACC {encode(c)}\n"
+    constant = "LOADI ACC encode(w)\n"
+    constant_identifier = "LOADI ACC encode(c)\n"
     end = "STOREIN SP ACC 1\n"
 
     all_loc = 1
 
     def visit(self, ):
+        self.code_generator.add_code("# Variable / Constant start\n", 0)
+
         self.code_generator.add_code(
             strip_multiline_string(self.start), self.all_loc)
 
         if self.token.type == TT.IDENTIFIER:
-            var_value = self.symbol_table.resolve(self.token.value)
-            self.variable_identifier = self.code_generator.replace_code_directly_(
-                self.variable_identifier, "var_identifier", var_value)
+            var = self.symbol_table.resolve(self.token.value)
+            self.variable_identifier = self.code_generator.replace_code_directly(
+                self.variable_identifier, "var_identifier", str(var.address))
             self.code_generator.add_code(
-                strip_multiline_string(self.identifier), self.all_loc)
+                strip_multiline_string(self.variable_identifier), self.all_loc)
         elif self.token.type == TT.NUMBER:
             self.constant = self.code_generator.replace_code_directly(
                 self.constant, "encode(w)", str(self.token.value))
@@ -335,13 +355,14 @@ class ArithmeticVariableConstantNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.all_loc)
 
+        self.code_generator.add_code("# Variable / Constant end\n", 0)
+
 
 class ArithmeticBinaryOperationNode(ASTNode):
 
     """Abstract Syntax Tree Node for for arithmetic binary operations"""
 
-    end = """
-        # codeaa(e1)
+    end = """# codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2; # Wert von e 1 in ACC laden
         LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
@@ -357,18 +378,22 @@ class ArithmeticBinaryOperationNode(ASTNode):
             self.children[0].visit()
             return
 
+        self.code_generator.add_code(
+            "# Arithmetic Binary Operation start\n", 0)
+
         self.children[0].visit()
         self.children[1].visit()
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
+
+        self.code_generator.add_code("# Arithmetic Binary Operation end\n", 0)
 
 
 class ArithmeticUnaryOperationNode(ASTNode):
 
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
-    start = """
-        # codeaa(e1)
+    start = """# codeaa(e1)
         LOADI ACC 0; # 0 in ACC laden
         LOADIN SP IN2 1; # Wert von e1 in IN2 laden
         SUB ACC IN2; # (0 - e1) in ACC laden
@@ -385,6 +410,8 @@ class ArithmeticUnaryOperationNode(ASTNode):
     end_loc = 1
 
     def visit(self, ):
+        self.code_generator.add_code("# Arithmetic Unary Operation start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code(
@@ -397,13 +424,14 @@ class ArithmeticUnaryOperationNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# Arithmetic Unary Operation end\n", 0)
+
 
 class LogicAndOrNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic 'and' and 'or'"""
 
-    end = """
-        # codela(l1)
+    end = """# codela(l1)
         # codela(l2)
         LOADIN SP ACC 2;  # Wert von l1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l2 in IN2 laden
@@ -415,19 +443,26 @@ class LogicAndOrNode(ASTNode):
     end_loc = 5
 
     def visit(self, ):
+        if len(self.children) == 1:
+            self.children[0].visit()
+            return
+
+        self.code_generator.add_code("# Logic Binary Operation start\n", 0)
+
         self.children[0].visit()
         self.children[1].visit()
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# Logic Binary Operation end\n", 0)
+
 
 class LogicNotNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic not"""
 
-    end = """
-        # codela(l1)
+    end = """# codela(l1)
         LOADI ACC 1;  # 1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l1 in IN2 laden
         OPLUS ACC IN2;  # !(l1) in ACC laden
@@ -437,18 +472,21 @@ class LogicNotNode(ASTNode):
     end_loc = 4
 
     def visit(self, ):
+        self.code_generator.add_code("# Logic Unary Operation start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
+
+        self.code_generator.add_code("# Logic Unary Operation end\n", 0)
 
 
 class LogicAtomNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic atom"""
 
-    end = """
-        # codeaa(e1)
+    end = """# codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2;  # Wert von e1 in ACC laden
         LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
@@ -464,19 +502,22 @@ class LogicAtomNode(ASTNode):
     end_loc = 9
 
     def visit(self, ):
+        self.code_generator.add_code("# Logic Atom start\n", 0)
+
         self.children[0].visit()
         self.children[1].visit()
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# Logic Atom end\n", 0)
+
 
 class LogicTopBottomNode(ASTNode):
 
     """Abstract Syntax Tree Node for logic top bottom"""
 
-    end = """
-        # codeaa(e)
+    end = """# codeaa(e)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
@@ -486,10 +527,14 @@ class LogicTopBottomNode(ASTNode):
     end_loc = 4
 
     def visit(self, ):
+        self.code_generator.add_code("# Logic Top Bottom start\n", 0)
+
         self.children[0].visit()
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
+
+        self.code_generator.add_code("# Logic Top Bottom end\n", 0)
 
 
 class AssignmentNode(ASTNode):
@@ -498,8 +543,7 @@ class AssignmentNode(ASTNode):
 
     # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
 
-    end = """
-        # codeaa(e) (oder codela(e), falls logischer Ausdruck)
+    end = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         STORE ACC var_identifier;  # Wert von e in Adresse a speichern
@@ -507,19 +551,28 @@ class AssignmentNode(ASTNode):
 
     end_loc = 3
 
+    def get_value(self, idx):
+        # AllocationNode needs a special treatment, because it it's token only
+        # tells the type but not the value
+        if isinstance(self.children[idx], AllocationNode):
+            return self.children[idx].children[idx].token.value
+        else:
+            return self.children[idx].token.value
+
     def visit(self, ):
         # if it's just a throw-away node that had to be taken
         if len(self.children) == 1:
             self.children[0].visit()
             return
 
+        self.code_generator.add_code("# Assignment start\n", 0)
+
         self.children[0].visit()
         self.children[1].visit()
 
-        var_value = self.symbol_table.resolve(
-            self.children[0].children[0].token.value).get_address()
-        self.end = self.code_generator.replace_code_directly(self.end, "var_identifier",
-                                                             var_value)
+        self.end = self.code_generator.replace_code_directly(
+            self.end, "var_identifier",
+            self.symbol_table.resolve(self.get_value(0)).address)
 
         # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
         # SymbolTable speichern sollte oder ob der SRAM ausreicht
@@ -527,18 +580,26 @@ class AssignmentNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
+        self.code_generator.add_code("# Assignment end\n", 0)
+
 
 class AllocationNode(ASTNode):
 
     """Abstract Syntax Tree Node for allocation"""
 
     def visit(self, ):
+        self.code_generator.add_code("# Allocation start\n", 0)
+
         var = VariableSymbol(
-            self.children[0].token.value,
+            self.get_value(0),
             self.symbol_table.resolve(self.token.value))
 
         self.symbol_table.define(var)
         self.symbol_table.allocate(var)
+
+        self.code_generator.add_code(
+            "# successfully allocated " + str(self.get_value(0)) + "\n", 0)
+        self.code_generator.add_code("# Allocation end\n", 0)
 
 
 def strip_multiline_string(mutline_string):

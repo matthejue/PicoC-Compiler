@@ -24,8 +24,6 @@ class TT(Enum):
 
     ROOT = "ROOT"
     EOF = "EOF"
-    NUMBER = "number"
-    IDENTIFIER = "word"
     UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
@@ -46,6 +44,10 @@ class TT(Enum):
     OR = "or as part of logical expression grammar"
     COMP_OP = "comparison operator"
     BITSHIFT = "bitshift"
+    NUMBER = "number"
+    IDENTIFIER = "word"
+    CONST = "constant qualifier"
+    VAR = "variable qualifier"
     PRIM_DT = "primitive datatype"
     IF = "if"
     ELSE = "else"
@@ -209,35 +211,39 @@ class Lexer:
         :returns: Identifier Token
         """
         # check for special keywords
-        token = self._check_word("if", TT.IF)
+        token = self._check_word(TT.IF, "if")
         if token:
             return token
-        token = self._check_word("else", TT.ELSE)
+        token = self._check_word(TT.ELSE, "else")
         if token:
             return token
-        token = self._check_word("while", TT.WHILE)
+        token = self._check_word(TT.WHILE, "while")
         if token:
             return token
-        token = self._check_word("do", TT.DO_WHILE)
+        token = self._check_word(TT.DO_WHILE, "do")
         if token:
             return token
-        token = self._check_word("int", TT.PRIM_DT)
+        token = self._check_word(TT.PRIM_DT, "int")
         if token:
             return token
-        token = self._check_word("char", TT.PRIM_DT)
+        token = self._check_word(TT.PRIM_DT, "char")
         if token:
             return token
-        token = self._check_word("void", TT.PRIM_DT)
+        token = self._check_word(TT.CONST, "const")
         if token:
             return token
-        token = self._check_word("main", TT.MAIN)
+        token = self._check_word(TT.PRIM_DT, "void")
+        if token:
+            return token
+        token = self._check_word(TT.MAIN, "main")
         if token:
             return token
 
         # nothing more left then being a identifier
         return self._identifier()
 
-    def _check_word(self, word, tokentype):
+    def _check_word(self, tokentype, word):
+        # TODO: word und tokentype umdrehe, damit es zu Token passt
         """if
 
         :grammar: <word>

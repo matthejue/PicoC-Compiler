@@ -13,9 +13,6 @@ class Symbol:
     def set_address(self, address):
         self.address = address
 
-    def get_address(self,):
-        return self.address
-
     def __repr__(self, ):
         if self.type:
             return '<' + self.get_name() + ':' + self.type + '>'
@@ -49,7 +46,7 @@ class Scope:
         :fa_pointer: free address pointer
         :returns: None
         """
-        self.symbols = dict()
+        self.symbols = dict()  # {}
 
     def get_scope_name(self, ):
         """
@@ -98,11 +95,6 @@ class _SymbolTable(Scope):
         if not self.symbols[sym.name].address:
             self.symbols[sym.name].set_address(self.fa_pointer)
             self.fa_pointer += 1
-
-    def new(self, address=100):
-        self.symbols = {}
-        self.fa_pointer = address
-        self.initTypeSystem()
 
     def __repr__(self, ):
         return self.get_scope_name() + ":" + self.symbols

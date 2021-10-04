@@ -1,1 +1,76 @@
-('fun' ('=' 'm' '12') ('=' 'n' '7') ('while' ('>' 'n' '0') ('=' 'h' ('%' 'm' 'n')) ('=' 'm' 'n') ('=' 'n' 'h')))
+# Main start
+LOADI SP eds
+# Assignment start
+# Allocation start
+# successfully allocated i
+# Allocation end
+# Variable / Constant start
+SUBI SP 1
+LOADI ACC 0
+STOREIN SP ACC 1
+# Variable / Constant end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end
+# While start
+# Logic Atom start
+# Variable / Constant start
+SUBI SP 1
+LOAD ACC 100
+STOREIN SP ACC 1
+# Variable / Constant end
+# Variable / Constant start
+SUBI SP 1
+LOADI ACC 10
+STOREIN SP ACC 1
+# Variable / Constant end
+# codeaa(e1)
+# codeaa(e2)
+LOADIN SP ACC 2;  # Wert von e1 in ACC laden
+LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
+SUB ACC IN2;  # e1 - e2 in ACC laden
+JUMPvglop 3;  # Ergebnis 1, wenn e1 vglop e2 wahr
+LOADI ACC 0;  # Ergebnis 0, wenn e1 vglop e2 falsch
+JUMP 2;
+LOADI ACC 1;  # Ergebnis 1, wenn e1 vglop e2 wahr
+STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+# Logic Atom end
+# codela(l)
+LOADIN SP ACC 1; # Wert von l in ACC laden
+ADDI SP 1; # Stack um eine Zelle verkürzen
+JUMP= codelength(af) + 2; # af überspringen, wenn l unerfüllt
+# code(af)
+# Assignment start
+# Arithmetic Binary Operation start
+# Variable / Constant start
+SUBI SP 1
+LOAD ACC 100
+STOREIN SP ACC 1
+# Variable / Constant end
+# Variable / Constant start
+SUBI SP 1
+LOADI ACC 1
+STOREIN SP ACC 1
+# Variable / Constant end
+# codeaa(e1)
+# codeaa(e2)
+LOADIN SP ACC 2; # Wert von e 1 in ACC laden
+LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+OP ACC IN2; # e1 binop e2 in ACC laden
+STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1; # Stack um eine Zelle verkürzen
+# Arithmetic Binary Operation end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end
+# zurück zur Auswertung von l
+JUMP -(codelength(af) + codelength(l) + 3);
+# While end
+# code(af)
+JUMP 0
+# Main end

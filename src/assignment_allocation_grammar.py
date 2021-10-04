@@ -1,6 +1,6 @@
 from logic_expression_grammar import LogicExpressionGrammar
-from abstract_syntax_tree import AssignmentNode, AllocationNode
-from lexer import TT
+from abstract_syntax_tree import AssignmentNode, AllocationNode, TokenNode
+from lexer import TT, Token
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):
@@ -33,7 +33,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         if self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER])
         # elif self.LTT(3) == TT.ASSIGNMENT:
-        elif self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER:
+        elif self.LTT(1) in [TT.PRIM_DT, TT.CONST]:
+            # and self.LTT(2) == TT.IDENTIFIER:
             self._alloc()
         else:
             raise SyntaxError(
@@ -57,12 +58,19 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _alloc(self):
         """allocation of a variable
 
-        :grammar: #2 <prim_dt> <identifier>
+        :grammar: #2 <const>? <prim_dt> <identifier>
         :returns: None
 
         """
         savestate_node = self.ast_builder.down(
             AllocationNode, [TT.ALLOC, TT.PRIM_DT])
+
+        if self.LLT(1) == TT.CONST:
+            self.match_and_add([TT.CONST])
+        else:
+            self.ast_builder.addChild(TokenNode(Token(TT.VAR, "")))
+            # the first child should always identify whether the node is a
+            # constant or variable
 
         self.match_and_add([TT.PRIM_DT])
         self.match_and_add([TT.IDENTIFIER])
