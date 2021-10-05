@@ -2,17 +2,14 @@
 LOADI SP eds
 # Assignment start
 # Allocation start
-# successfully allocated i
+# successfully allocated 
 # Allocation end
 # Variable / Constant start
 SUBI SP 1
 LOADI ACC 0
 STOREIN SP ACC 1
 # Variable / Constant end
-# codeaa(e) (oder codela(e), falls logischer Ausdruck)
-LOADIN SP ACC 1;  # Wert von e in ACC laden
-ADDI SP 1;  # Stack um eine Zelle verkürzen
-STORE ACC 100;  # Wert von e in Adresse a speichern
+STORE ACC var_address;  # Wert von e in Adresse a speichern
 # Assignment end
 # While start
 # Logic Atom start
@@ -63,10 +60,7 @@ OP ACC IN2; # e1 binop e2 in ACC laden
 STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1; # Stack um eine Zelle verkürzen
 # Arithmetic Binary Operation end
-# codeaa(e) (oder codela(e), falls logischer Ausdruck)
-LOADIN SP ACC 1;  # Wert von e in ACC laden
-ADDI SP 1;  # Stack um eine Zelle verkürzen
-STORE ACC 100;  # Wert von e in Adresse a speichern
+STORE ACC var_address;  # Wert von e in Adresse a speichern
 # Assignment end
 # zurück zur Auswertung von l
 JUMP -(codelength(af) + codelength(l) + 3);

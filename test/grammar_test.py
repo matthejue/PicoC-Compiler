@@ -73,6 +73,14 @@ class TestLexer(unittest.TestCase, UsefullTools):
         self.assertEqual(str(tokens), str(['var', '=', '10', ';']))
 
 
+class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
+
+    def test_const_allocation(self, ):
+        self.set_everything_up_for_ast("void main() { const int var = 12; }")
+        self.assertEqual(str(self.grammar.reveal_ast()),
+                         "('main' ('=' ('const' 'int' 'var') '12'))")
+
+
 class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
 
     def test_basic_arithmetic_expression(self):
@@ -281,7 +289,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         code_generator.add_code(strip_multiline_string(self.code), 3)
 
         code_generator.replace_code(
-            'encode(w)', symbol_table.resolve('car').address)
+            'encode(w)', symbol_table.resolve('car').value)
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
@@ -297,6 +305,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                      "    i = i + 1;",
                      "  }",
                      "}"]
+
         globals.args = Args()
         self.lexer = Lexer("<while_generation>", test_code)
 

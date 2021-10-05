@@ -229,10 +229,10 @@ class Lexer:
         token = self._check_word(TT.PRIM_DT, "char")
         if token:
             return token
-        token = self._check_word(TT.CONST, "const")
+        token = self._check_word(TT.PRIM_DT, "void")
         if token:
             return token
-        token = self._check_word(TT.PRIM_DT, "void")
+        token = self._check_word(TT.CONST, "const")
         if token:
             return token
         token = self._check_word(TT.MAIN, "main")

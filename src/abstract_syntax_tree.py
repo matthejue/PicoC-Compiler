@@ -570,9 +570,9 @@ class AssignmentNode(ASTNode):
         else:
             return self.children[idx].token.value
 
-    def _is_constant_identifier(self, idx):
+    def _is_constant_identifier(self, ):
         return isinstance(self.symbol_table.resolve(
-            self._get_identifier_name(idx)), ConstantSymbol)
+            self._get_identifier_name(0)), ConstantSymbol)
 
     def _is_single_value_on_right_side(self, ):
         return len(self.children[1].children[0].children) == 1
@@ -595,28 +595,28 @@ class AssignmentNode(ASTNode):
             self.children[0].visit()
             return
 
+        self.code_generator.add_code("# Assignment start\n", 0)
+
+        self.children[0].visit()
+        self.children[1].visit()
+
         # # look at the next node if it's a also a constant
         # if _is_constant_identifier(1):
         #     self.children[1].visit()
         #     _assign_to_constant_identifier()
         # in case of a ConstantSymbol and a assignment with a number on the
         # right side of the =, the value gets assigned immediately
-        if self._is_constant_identifier(0) and self._is_single_value_on_right_side():
-            _assign_number_to_constant_identifier()
+        if self._is_constant_identifier() and self._is_single_value_on_right_side():
+            self._assign_number_to_constant_identifier()
 
         # case of a VariableSymbol
         else:
-            self.code_generator.add_code("# Assignment start\n", 0)
-
-            self.children[0].visit()
-            self.children[1].visit()
-
             if self._is_last_assignment():
                 self.code_generator.add_code(strip_multiline_string(self.end),
                                              self.end_loc)
 
             self._store_more = self.code_generator.replace_code_directly(
-                self._store_more, "var_address",
+                self.store_more, "var_address",
                 self.symbol_table.resolve(self._get_identifier_name(0)).value)
 
             # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
@@ -625,7 +625,7 @@ class AssignmentNode(ASTNode):
             self.code_generator.add_code(
                 strip_multiline_string(self.store_more), self.store_more_loc)
 
-            self.code_generator.add_code("# Assignment end\n", 0)
+        self.code_generator.add_code("# Assignment end\n", 0)
 
 
 class AllocationNode(ASTNode):
@@ -655,8 +655,9 @@ class AllocationNode(ASTNode):
         self.code_generator.add_code("# Allocation end\n", 0)
 
     def __repr__(self, ):
-        acc = f"({self.get_childvalue(0)} {self.token} {self.get_childtoken(1)})"
+        acc = f"({self.get_childtoken(0)} {self.token} {self.get_childtoken(1)})"
         return acc
+
 
 def strip_multiline_string(mutline_string):
     """helper function to make mutlineline string usable on different

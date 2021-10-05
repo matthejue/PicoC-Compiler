@@ -43,7 +43,7 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         :returns: None
 
         """
-        if self._is_assignment():
+        if self._is_assignment_allocation():
             self.code_aa()
         elif self.LTT(1) == TT.IF:
             self.code_ie()
@@ -52,17 +52,20 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         else:
             raise SyntaxError("statement", self.LT(1))
 
-    def _is_assignment(self):
+    def _is_assignment_allocation(self):
         """Test whether the next statement is a assignment.
 
         :returns: boolean
 
         """
-        return self.LTT(2) == TT.ASSIGNMENT or\
-            (self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER)
+        return (self.LTT(1) == TT.IDENTIFIER and self.LTT(2) == TT.ASSIGNMENT) or\
+            (self.LTT(1) == TT.PRIM_DT and self.LTT(2) == TT.IDENTIFIER) or\
+            (self.LTT(1) == TT.CONST and self.LTT(2) == TT.PRIM_DT and
+             self.LTT(3) == TT.IDENTIFIER)
 
     def _is_statement(self):
-        return self._is_assignment() or self.LTT(1) == TT.IF or self._is_loop()
+        return self._is_assignment_allocation() or self.LTT(1) == TT.IF or\
+            self._is_loop()
 
     def _is_loop(self, ):
         return self.LTT(1) == TT.WHILE or self.LTT(1) == TT.DO_WHILE
