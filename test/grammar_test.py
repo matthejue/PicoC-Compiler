@@ -298,7 +298,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         CodeGenerator().__init__()
         globals.test_name = "while_generation"
 
-        test_code = ["int main()",
+        test_code = ["void main()",
                      "{",
                      "  int i = 0;",
                      "  while (i < 10) {",
@@ -311,6 +311,28 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()
+        abstract_syntax_tree = self.grammar.reveal_ast()
+        abstract_syntax_tree.visit()
+
+        # with open("./output.reti", 'w', encoding="utf-8") as fout:
+        #     fout.writelines(abstract_syntax_tree.code_generator.show_code())
+
+    def test_constant_initialisation(self, ):
+        SymbolTable().__init__(100)
+        CodeGenerator().__init__()
+        globals.test_name = "constant_initialisation"
+
+        test_code = ["void main()",
+                     "{",
+                     "  const int var = 42;",
+                     "}"]
+
+        globals.args = Args()
+        self.lexer = Lexer("<constant_initialisation>", test_code)
+
+        self.grammar = Grammar(self.lexer)
+        self.grammar.start_parse()
+
         abstract_syntax_tree = self.grammar.reveal_ast()
         abstract_syntax_tree.visit()
 

@@ -598,7 +598,6 @@ class AssignmentNode(ASTNode):
         self.code_generator.add_code("# Assignment start\n", 0)
 
         self.children[0].visit()
-        self.children[1].visit()
 
         # # look at the next node if it's a also a constant
         # if _is_constant_identifier(1):
@@ -611,6 +610,8 @@ class AssignmentNode(ASTNode):
 
         # case of a VariableSymbol
         else:
+            self.children[1].visit()
+
             if self._is_last_assignment():
                 self.code_generator.add_code(strip_multiline_string(self.end),
                                              self.end_loc)
@@ -651,7 +652,7 @@ class AllocationNode(ASTNode):
             self.symbol_table.allocate(var)
 
         self.code_generator.add_code(
-            "# successfully allocated " + str(self.get_childvalue(0)) + "\n", 0)
+            "# successfully allocated " + str(self.get_childvalue(1)) + "\n", 0)
         self.code_generator.add_code("# Allocation end\n", 0)
 
     def __repr__(self, ):
