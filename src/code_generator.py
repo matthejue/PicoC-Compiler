@@ -11,18 +11,24 @@ class _CodeGenerator:
 
     def __init__(self):
         self.generated_code = []
-        self.ucp_stock = [0]
-        self.loc_stock = [0]
-        self.loc_layer = 0
-        self.loc_idx = 0
+        # self.loc_stock = [0]
+        # self.ucp_stock = [0]
+        # self.loc_layer = 0
 
-    def add_code(self, code, lines_of_code):
+        self.idx = -1
+        self.loc = 0
+
+    def add_code(self, code, loc):
         self.generated_code += [code]
 
-        self.loc_stock += [self.loc_stock[-1] + lines_of_code]
+        self.idx += 1
+        self.loc += loc
 
-    def set_marker(self, ):
-        self.marker = self.loc_idx
+    def add_marker(self, ):
+        self.metadata += [(self.idx, self.loc)]
+
+    def remove_marker(self, ):
+        self.metadata.pop()
 
     def replace_code_after(self, pattern, word):
         """Depending on the Token sometimes different reti code commands have
@@ -32,9 +38,8 @@ class _CodeGenerator:
         :word: by what the pattern should be replaced
         :returns: None
         """
-        idx = -self.loc_idx + self.ucp_stock[-1]
-        self.generated_code[idx] = self.generated_code[idx].replace(pattern,
-                                                                    str(word))
+        self.generated_code[self.metadata[0]] =\
+            self.generated_code[self.metadata[0]].replace(pattern, str(word))
 
     def replace_code_pre(self, code_as_ref, pattern, word):
         """Jumps backwards are e.g. needed for while loops.
@@ -53,7 +58,6 @@ class _CodeGenerator:
         for code_piece in self.generated_code:
             code_acc += code_piece
         return code_acc
-
 
 #     def add_code_open(self, code, lines_of_code):
 #         """Add raw reti code to the generated code.

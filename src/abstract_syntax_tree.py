@@ -306,14 +306,15 @@ class MainFunctionNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# Main start\n", 0)
 
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "while_generation":
-            if globals.test_name == "while_generation":
-                pass
-
         self.code_generator.add_code(
             strip_multiline_string(self.start), self.start_loc)
+
+        self.code_generator.add_marker()
+
+        self.code_generator.replace_code_after(
+            'eds', self.symbol_table().fa_pointer)
+
+        self.code_generator.remove_marker()
 
         for child in self.children:
             child.visit()
@@ -345,17 +346,17 @@ class ArithmeticVariableConstantNode(ASTNode):
         if self.token.type == TT.IDENTIFIER:
             var_or_const = self.symbol_table.resolve(self.token.value)
             if isinstance(var_or_const, VariableSymbol):
-                self.variable_identifier = self.code_generator.replace_code_directly(
+                self.variable_identifier = self.code_generator.replace_code_pre(
                     self.variable_identifier, "var_identifier", str(var_or_const.value))
                 self.code_generator.add_code(
                     strip_multiline_string(self.variable_identifier), self.all_loc)
             elif isinstance(var_or_const, ConstantSymbol):
-                self.constant_identifier = self.code_generator.replace_code_directly(
+                self.constant_identifier = self.code_generator.replace_code_pre(
                     self.constant_identifier, "encode(c)", str(var_or_const.value))
                 self.code_generator.add_code(
                     strip_multiline_string(self.constant_identifier), self.all_loc)
         elif self.token.type == TT.NUMBER:
-            self.constant = self.code_generator.replace_code_directly(
+            self.constant = self.code_generator.replace_code_pre(
                 self.constant, "encode(w)", str(self.token.value))
             self.code_generator.add_code(
                 strip_multiline_string(self.constant), self.all_loc)
