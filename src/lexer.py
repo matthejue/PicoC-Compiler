@@ -54,7 +54,7 @@ class TT(Enum):
     WHILE = "while"
     DO_WHILE = "do while"
     MAIN = "main"
-    LOGICAL = "convert arithmetic expression to logical expression"
+    TO_BOOL = "convert arithmetic expression to logical expression"
 
 
 class Lexer:
@@ -100,13 +100,13 @@ class Lexer:
             elif self.lc == ';':
                 self.next_char()
                 return Token(TT.SEMICOLON, self.c)
+            elif self.lc in '*%^':
+                self.next_char()
+                return Token(TT.BINOP_PREC_1, self.c)
             elif self.lc == '/':
                 token = self._division_sign_or_comment()
                 if token:
                     return token
-            elif self.lc in '*%':
-                self.next_char()
-                return Token(TT.BINOP_PREC_1, self.c)
             elif self.lc == '+':
                 self.next_char()
                 return Token(TT.BINOP_PREC_2, self.c)
@@ -139,11 +139,11 @@ class Lexer:
                 return Token(TT.NUMBER, self.c)
             elif self.lc in self.LETTER:
                 return self._identifier_special_keyword()
-            elif self.lc == "!":
+            elif self.lc == '!':
                 return self._not()
-            elif self.lc == "&":
+            elif self.lc == '&':
                 return self._and()
-            elif self.lc == "|":
+            elif self.lc == '|':
                 return self._or()
             elif self.lc in self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
                 return self._comp_operator_assignment_bitshift()
@@ -303,7 +303,7 @@ class Lexer:
         if self.lc == '&':
             self.next_char()
             return Token(TT.AND, "&&")
-        return Token(TT.AND_OP, self.c)
+        return Token(TT.BINOP_PREC_1, self.c)
 
     def _or(self):
         """
@@ -316,7 +316,7 @@ class Lexer:
         if self.lc == '|':
             self.next_char()
             return Token(TT.OR, "||")
-        return Token(TT.OR_OP, self.c)
+        return Token(TT.BINOP_PREC_1, self.c)
 
     def _comp_operator_assignment_bitshift(self):
         """

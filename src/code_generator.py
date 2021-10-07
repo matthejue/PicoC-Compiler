@@ -23,12 +23,16 @@ class _CodeGenerator:
 
         self.idx += 1
         self.loc += loc
+        self.metadata = []
 
     def add_marker(self, ):
         self.metadata += [(self.idx, self.loc)]
 
     def remove_marker(self, ):
         self.metadata.pop()
+
+    def get_marker_loc(self, ):
+        return self.metadata[-1][1]
 
     def replace_code_after(self, pattern, word):
         """Depending on the Token sometimes different reti code commands have
@@ -38,8 +42,9 @@ class _CodeGenerator:
         :word: by what the pattern should be replaced
         :returns: None
         """
-        self.generated_code[self.metadata[0]] =\
-            self.generated_code[self.metadata[0]].replace(pattern, str(word))
+        self.generated_code[self.metadata[-1][0]] =\
+            self.generated_code[self.metadata[-1]
+                                [0]].replace(pattern, str(word))
 
     def replace_code_pre(self, code_as_ref, pattern, word):
         """Jumps backwards are e.g. needed for while loops.

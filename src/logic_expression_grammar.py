@@ -1,8 +1,9 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-from lexer import TT
+from lexer import TT, Token
 from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
-    LogicTopBottomNode
+    LogicTopBottomNode, TokenNode
 from errors import SyntaxError, NoApplicableRuleError
+import globals
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -123,11 +124,19 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(
-            LogicTopBottomNode, [TT.LOGICAL])
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "to bool":
+            if globals.test_name == "to bool":
+                pass
 
-        # little hack to get
-        self.match_and_add([TT.LOGICAL])
+        savestate_node = self.ast_builder.down(
+            LogicTopBottomNode, [TT.TO_BOOL])
+
+        # TODO: little hack to get
+        if not globals.is_tasting:
+            self.ast_builder.current_node.addChild(
+                TokenNode(Token(TT.TO_BOOL, "to bool")))
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
@@ -172,6 +181,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
             self.ast_builder.down(LogicNotNode, [TT.NOT])
 
-        self._code_le()
+        self._lo()
 
         self.ast_builder.up(savestate_node)

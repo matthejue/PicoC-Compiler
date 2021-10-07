@@ -39,9 +39,6 @@ class ASTNode(TokenNode):
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
 
-    lines_of_code = 0
-    reti_code = ""
-
     def __init__(self, tokentypes):
         # at the time of creation the tokenvalue is unknown
         self.children = []
@@ -73,6 +70,7 @@ class ASTNode(TokenNode):
 
         self.children += [node]
 
+    # TODO: rly necessary?
     def _is_tokennode(self, node):
         """checks if something is a TokenNode
 
@@ -82,9 +80,11 @@ class ASTNode(TokenNode):
         # being not instance of ASTNode means being instance of TokenNode
         return not isinstance(node, ASTNode)
 
+    # TODO: rly necessary?
     def get_childvalue(self, idx):
         return self.children[idx].token.value
 
+    # TODO: rly necessary?
     def get_childtoken(self, idx):
         return self.children[idx].token
 
@@ -130,23 +130,32 @@ class WhileNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# While start\n", 0)
 
+        self.code_generator.add_marker()
+
         self.children[0].visit()
 
-        self.code_generator.add_code_open(
+        self.code_generator.add_code(
             strip_multiline_string(self.condition_check),
             self.condition_check_loc)
+
+        self.code_generator.add_marker()
 
         for child in self.children[1:]:
             child.visit()
 
-        self.code_generator.replace_jump("codelength(af) + 2", 2)
+        self.code_generator.replace_code_after(
+            "codelength(af) + 2", self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
 
-        self.code_generator.replace_jump_back([self.end],
-                                              "(codelength(af) +"
-                                              " codelength(l) + 3)")
+        self.code_generator.remove_marker()
+
+        self.end = self.code_generator.replace_code_pre(self.end,
+                                                        "(codelength(af) + codelength(l) + 3)", self.code_generator.loc -
+                                                        self.code_generator.get_marker_loc())
         # + 3 sind schon mit drin
 
-        self.code_generator.add_code_close(
+        self.code_generator.remove_marker()
+
+        self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
         self.code_generator.add_code("# While end\n", 0)
@@ -170,20 +179,22 @@ class DoWhileNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# Do While start\n", 0)
 
-        # little hack to get a artificial ucp_stock entry
-        self.code_generator.add_code_open("", 0)
+        self.code_generator.add_marker()
 
         for child in self.children[1:]:
             child.visit()
 
         self.children[0].visit()
 
-        self.code_generator.replace_jump_back([self.condition_check],
-                                              "(codelength(af) + "
-                                              "codelength(l) + 2), 2")
+        self.condition_check = self.code_generator.replace_code_pre(self.condition_check,
+                                                                    "(codelength(af) + "
+                                                                    "codelength(l) + 2) + 2",
+                                                                    self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
 
-        self.code_generator.add_code_close(strip_multiline_string(self.condition_check),
-                                           self.condition_check_loc)
+        self.code_generator.remove_marker()
+
+        self.code_generator.add_code(strip_multiline_string(self.condition_check),
+                                     self.condition_check_loc)
 
         self.code_generator.add_code("# Do While end\n", 0)
 
@@ -209,8 +220,6 @@ class IfNode(ASTNode):
 
     """Abstract Syntax Tree Node for If"""
 
-    # TODO
-
     start = """# codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -225,15 +234,18 @@ class IfNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.add_code_open(
+        self.code_generator.add_code(
             strip_multiline_string(self.start), self.start_loc)
+
+        self.code_generator.add_marker()
 
         for child in self.children[1:]:
             child.visit()
 
-        self.code_generator.replace_jump("codelength(af) + 1", 1)
+        self.code_generator.replace_code_after(
+            "codelength(af) + 1", self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
 
-        self.code_generator.add_code_close("", 0)
+        self.code_generator.remove_marker()
 
         self.code_generator.add_code("# If end\n", 0)
 
@@ -241,8 +253,6 @@ class IfNode(ASTNode):
 class IfElseNode(ASTNode):
 
     """Abstract Syntax Tree Node for Else"""
-
-    # TODO
 
     start = """# codela(l)
         LOADIN SP ACC 1; # Wert von l in ACC laden
@@ -253,7 +263,7 @@ class IfElseNode(ASTNode):
 
     start_loc = 3
 
-    middle = """JUMP {codelength(af2) + 1};
+    middle = """JUMP codelength(af2) + 1;
         # code(af2)
         """
 
@@ -264,24 +274,31 @@ class IfElseNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.add_code_open(
+        self.code_generator.add_code(
             strip_multiline_string(self.start), self.start_loc)
+
+        self.code_generator.add_marker()
 
         for child in self.children[1:]:
             child.visit()
 
-        self.code_generator.replace_jump("codelength(af1) + 2", 2)
+        self.code_generator.replace_code_after(
+            "codelength(af1) + 2", self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
+
+        self.code_generator.remove_marker()
 
         self.code_generator.add_code(
             strip_multiline_string(self.middle), self.middle_loc)
 
-        self.code_generator.set_marker()
+        self.code_generator.add_marker()
 
         for child in self.children[1:]:
             child.visit()
 
-        self.code_generator.replace_jump_marker(
-            self.end, "codelength(af2) + 1", 1)
+        self.code_generator.replace_code_after(
+            self.end, "codelength(af2) + 1", self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
+
+        self.code_generator.remove_marker()
 
         self.code_generator.add_code_close("", 0)
 
@@ -301,7 +318,7 @@ class MainFunctionNode(ASTNode):
         JUMP 0
         """
 
-    end_loc = 2
+    end_loc = 1
 
     def visit(self, ):
         self.code_generator.add_code("# Main start\n", 0)
@@ -312,7 +329,7 @@ class MainFunctionNode(ASTNode):
         self.code_generator.add_marker()
 
         self.code_generator.replace_code_after(
-            'eds', self.symbol_table().fa_pointer)
+            'eds', self.symbol_table.fa_pointer)
 
         self.code_generator.remove_marker()
 
@@ -392,6 +409,32 @@ class ArithmeticBinaryOperationNode(ASTNode):
 
         self.children[0].visit()
         self.children[1].visit()
+
+        if self.token.value == '+':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'ADD')
+        elif self.token.value == '-':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'SUB')
+        elif self.token.value == '*':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'MUL')
+        elif self.token.value == '/':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'DIV')
+        elif self.token.value == '%':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'MOD')
+        elif self.token.value == '^':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'OPLUS')
+        elif self.token.value == '|':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'OR')
+        elif self.token.value == '&':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'OP', 'AND')
+
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
@@ -426,7 +469,7 @@ class ArithmeticUnaryOperationNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.start), self.start_loc)
 
-        if self.token.value == "~":
+        if self.token.value == '~':
             self.code_generator.add_code(strip_multiline_string(self.bitwise_negation),
                                          self.bitwise_negation_loc)
 
@@ -460,6 +503,13 @@ class LogicAndOrNode(ASTNode):
 
         self.children[0].visit()
         self.children[1].visit()
+
+        if self.token.value == '&&':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'LOP', 'AND')
+        elif self.token.value == '||':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'LOP', 'OR')
 
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
@@ -516,6 +566,25 @@ class LogicAtomNode(ASTNode):
         self.children[0].visit()
         self.children[1].visit()
 
+        if self.token.value == '>':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '>')
+        elif self.token.value == '=':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '=')
+        elif self.token.value == '>=':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '>=')
+        elif self.token.value == '<':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '<')
+        elif self.token.value == '!=':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '!=')
+        elif self.token.value == '<=':
+            self.end = self.code_generator.replace_code_pre(
+                self.end, 'vglop', '<=')
+
         self.code_generator.add_code(
             strip_multiline_string(self.end), self.end_loc)
 
@@ -528,7 +597,7 @@ class LogicTopBottomNode(ASTNode):
 
     end = """# codeaa(e)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
-        JUMP = 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
+        JUMP= 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
         LOADI ACC 1;
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """
@@ -579,8 +648,8 @@ class AssignmentNode(ASTNode):
         return len(self.children[1].children[0].children) == 1
 
     def _assign_number_to_constant_identifier(self):
-        self.symbol_table.resolve(self._get_identifier_name(0)).value =\
-            self.children[1].children[0].children[0].children[0].token.value
+        self.symbol_table.resolve(self._get_identifier_name(
+            0)).value = self.children[1].children[0].children[0].children[0].token.value
 
     # def _assign_constant_to_constant_identifier(self):
     #     self.symbol_table.resolve(

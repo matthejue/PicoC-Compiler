@@ -200,6 +200,13 @@ class TestIfElseGrammar(unittest.TestCase, UsefullTools):
             "('if' ('==' 'cars' '10') ('=' 'var' '42')))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
+    def test_if_arithmetic_expression_as_logical_expression(self, ):
+        globals.test_name = "to bool"
+        self.set_everything_up_for_ast(
+            "void main() { if (123 * var) { var = 123; } }")
+        expected_res = "('main' ('if' ('to bool' ('*' '123' 'var')) ('=' 'var' '123')))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+
 
 class TestLoopGrammar(unittest.TestCase, UsefullTools):
 
@@ -273,7 +280,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
     STOREIN SP ACC 1
     """
 
-    def test_code_replacment(self, ):
+    def test_code_replacment_after(self, ):
         code_generator = CodeGenerator()
         symbol_table = SymbolTable()
 
@@ -288,8 +295,13 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
         code_generator.add_code(strip_multiline_string(self.code), 3)
 
-        code_generator.replace_code(
+        code_generator.add_marker()
+
+        code_generator.replace_code_after(
             'encode(w)', symbol_table.resolve('car').value)
+
+        code_generator.remove_marker()
+
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
