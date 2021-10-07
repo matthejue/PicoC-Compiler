@@ -621,24 +621,32 @@ class AssignmentNode(ASTNode):
 
     # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
 
-    end = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+    assignment = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von e in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
 
-    end_loc = 2
+    assignment_loc = 2
 
-    store_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\n"
+    assign_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\n"
 
-    store_more_loc = 1
+    assign_more_loc = 1
 
-    def _get_identifier_name(self, idx=0):
+    def _get_identifier_name(self):
         # AllocationNode needs a special treatment, because it it's token only
         # tells the type but not the value
-        if isinstance(self.children[idx], AllocationNode):
-            return self.children[idx].children[1].token.value
+        if isinstance(self.children[0], AllocationNode):
+            # AssignmentNode(AllocationNode(TokenNode(TT.CONST, 'const'),
+            #   TokenNode(TT.IDENTIFIER, x)), AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
+            return self.children[0].children[1].token.value
         else:
-            return self.children[idx].token.value
+            # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
+            #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
+            return self.children[0].token.value
+
+    def _is_last_assignment(self, ):
+        # AssignmentNode(..., AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
+        return isinstance(self.children[1].children[0], LogicAndOrNode) or isinstance(self.children[1].children[0], ArithmeticBinaryOperationNode)
 
     def _is_constant_identifier(self, ):
         return isinstance(self.symbol_table.resolve(
@@ -655,48 +663,41 @@ class AssignmentNode(ASTNode):
     #     self.symbol_table.resolve(
     #         self._get_identifier_name(0)).value = self.symbol_table.resolve(self._get_identifier_name(1)).value
 
-    def _is_last_assignment(self, ):
-        return not (isinstance(self.children[1], AllocationNode) or
-                    isinstance(self.children[1], TokenNode))
-
     def visit(self, ):
         # if it's just a throw-away node that had to be taken
         if len(self.children) == 1:
             self.children[0].visit()
             return
 
-        self.code_generator.add_code("# Assignment start\n", 0)
+        self.code_generator.add_code(
+            "# Assignment start or new sub-assignment\n", 0)
 
         self.children[0].visit()
 
-        # # look at the next node if it's a also a constant
-        # if _is_constant_identifier(1):
-        #     self.children[1].visit()
-        #     _assign_to_constant_identifier()
         # in case of a ConstantSymbol and a assignment with a number on the
         # right side of the =, the value gets assigned immediately
         if self._is_constant_identifier() and self._is_single_value_on_right_side():
             self._assign_number_to_constant_identifier()
-
         # case of a VariableSymbol
         else:
             self.children[1].visit()
 
             if self._is_last_assignment():
-                self.code_generator.add_code(strip_multiline_string(self.end),
-                                             self.end_loc)
+                self.code_generator.add_code(strip_multiline_string(self.assignment),
+                                             self.assignment_loc)
 
-            self._store_more = self.code_generator.replace_code_directly(
-                self.store_more, "var_address",
-                self.symbol_table.resolve(self._get_identifier_name(0)).value)
+            self.assign_more = self.code_generator.replace_code_pre(
+                self.assign_more, "var_address",
+                self.symbol_table.resolve(self._get_identifier_name()).value)
 
             # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
             # SymbolTable speichern sollte oder ob der SRAM ausreicht
 
             self.code_generator.add_code(
-                strip_multiline_string(self.store_more), self.store_more_loc)
+                strip_multiline_string(self.assign_more), self.assign_more_loc)
 
-        self.code_generator.add_code("# Assignment end\n", 0)
+        if self._is_last_assignment():
+            self.code_generator.add_code("# Assignment end\n", 0)
 
 
 class AllocationNode(ASTNode):

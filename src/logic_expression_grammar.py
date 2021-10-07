@@ -2,7 +2,7 @@ from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
 from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
     LogicTopBottomNode, TokenNode
-from errors import SyntaxError, NoApplicableRuleError
+from errors import SyntaxError, NoApplicableRuleError, MismatchedTokenError
 import globals
 
 
@@ -124,22 +124,19 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae>
         :returns: None
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "to bool":
-            if globals.test_name == "to bool":
-                pass
-
         savestate_node = self.ast_builder.down(
             LogicTopBottomNode, [TT.TO_BOOL])
 
-        # TODO: little hack to get
+        # TODO: little hack to to also have a token for bottomnode
         if not globals.is_tasting:
-            self.ast_builder.current_node.addChild(
-                TokenNode(Token(TT.TO_BOOL, "to bool")))
+            self.ast_builder.addChild(TokenNode(Token(TT.TO_BOOL, "to bool")))
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
+
+        # don't allow it to be a atom
+        if self.LTT(1) == TT.COMP_OP:
+            raise MismatchedTokenError("arithmetic expression", self.LT(1))
 
     def _atom(self, ):
         """atomic formula
