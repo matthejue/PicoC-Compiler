@@ -22,6 +22,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
+        # it's important that arithmetic grammar is before logic grammar,
+        # because else a number > 0 would automatically be converted to 1 in
+        # logic grammar
         if self.taste(self.taste_consume_ae):
             self.taste_consume_ae()
         elif self.taste(self.taste_consume_le):

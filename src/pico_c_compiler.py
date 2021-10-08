@@ -15,14 +15,24 @@ def main():
     cli_args_parser.add_argument("outfile", nargs='?',
                                  help="Output file with RETI Code")
     cli_args_parser.add_argument('-p', '--print', action='store_true',
-                                 help="Also output the file output to \
-                                 the terminal")
+                                 help="Also output the file output to "
+                                 "the terminal")
     cli_args_parser.add_argument('-a', '--ast', action='store_true',
-                                 help="Output the Abstract Syntax Tree \
-                                 instead of RETI Code")
+                                 help="Output the Abstract Syntax Tree "
+                                 "instead of RETI Code")
     cli_args_parser.add_argument('-t', '--tokens', action='store_true',
-                                 help="Output the Tokenlist instead of \
-                                 RETI Code")
+                                 help="Output the Tokenlist instead of "
+                                 "RETI Code")
+    cli_args_parser.add_argument('-s', '--start_data_segment',
+                                 help="Where the allocation of variables
+                                 starts", type=int, default=100)
+    cli_args_parser.add_argument('-e', '--end_data_segment', help="Where the "
+                                 "stackpointer starts", type=int, default=200)
+    cli_args_parser.add_argument('-c', '--comments', action='store_true',
+                                 help="Add comments to the RETI Code")
+    cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
+                                 action='store_true', help="Show python error"
+                                 "messages with stacktrace")
     cli_args_parser.add_argument('-v', '--verbose', action='store_true',
                                  help="Create verbose output for the ast")
 

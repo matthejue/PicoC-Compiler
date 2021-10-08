@@ -16,6 +16,10 @@ class Args(object):
         self.tokens = False
         self.ast = True
         self.verbose = False
+        self.start_data_segment = 100
+        self.end_data_segment = 200
+        self.comments = True
+        self.python_stracktrace_error_message = True
 
 
 class UsefullTools():
@@ -41,19 +45,42 @@ class UsefullTools():
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()
 
-    def set_everything_up_for_ast_multiline(self, testname, code_without_cr):
+    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):
         globals.args = Args()
-        self.lexer = Lexer(testname, code_without_cr)
+        self.lexer = Lexer(test_name, code_without_cr)
 
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()
 
-    def set_everything_up_for_testing_programs(self, programname, programpath):
+    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
+        globals.test_name = test_name
+        SymbolTable().__init__()
+        CodeGenerator().__init__()
+
+        globals.args = Args()
+        self.lexer = Lexer('<' + test_name + '>', code_without_cr)
+
+        self.grammar = Grammar(self.lexer)
+        self.grammar.start_parse()
+
+        abstract_syntax_tree = self.grammar.reveal_ast()
+        abstract_syntax_tree.visit()
+
+        with open("./output.reti", 'w', encoding="utf-8") as fout:
+            fout.writelines(abstract_syntax_tree.show_generated_code())
+
+    def set_everything_up_for_multiline_program(self, program_name, input_string):
+        multiline_string = [i.lstrip() for i in input_string.split('\n')]
+        multiline_string.pop()
+        self.set_everything_up_for_visit_multiline(
+            program_name, multiline_string)
+
+    def set_everything_up_for_testing_program_file(self, program_name, programpath):
         with open(programpath) as input:
             code_without_cr = list(
                 map(lambda line: line.strip(), input.readlines()))
             self.set_everything_up_for_ast_multiline(
-                programname, code_without_cr)
+                program_name, code_without_cr)
 
 
 class TestLexer(unittest.TestCase, UsefullTools):
@@ -306,57 +333,39 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     def test_while_generation(self, ):
         # create new Singleton SymbolTable and CodeGenerator and remove old
-        SymbolTable().__init__(100)
-        CodeGenerator().__init__()
-        globals.test_name = "while_generation"
+        test_code = """void main()
+                     {
+                       int i = 0;
+                       int x = 1;
+                       while (i < 10) {
+                         if (i == 5 ) {
+                           x = 2;
+                         }
+                         i = i + x;
+                       }
+                       const int y = x % 10;
+                     }
+                     """
 
-        test_code = ["void main()",
-                     "{",
-                     "  int i = 0;",
-                     "  while (i < 10) {",
-                     "    i = i + 1;",
-                     "  }",
-                     "}"]
-
-        globals.args = Args()
-        self.lexer = Lexer("<while_generation>", test_code)
-
-        self.grammar = Grammar(self.lexer)
-        self.grammar.start_parse()
-        abstract_syntax_tree = self.grammar.reveal_ast()
-        abstract_syntax_tree.visit()
-
-        # with open("./output.reti", 'w', encoding="utf-8") as fout:
-        #     fout.writelines(abstract_syntax_tree.code_generator.show_code())
+        self.set_everything_up_for_multiline_program(
+            "while_generation", test_code)
 
     def test_constant_initialisation(self, ):
-        SymbolTable().__init__(100)
-        CodeGenerator().__init__()
-        globals.test_name = "constant_initialisation"
+        test_code = """void main()
+                    {
+                        const int var = 42;
+                    }
+                    """
 
-        test_code = ["void main()",
-                     "{",
-                     "  const int var = 42;",
-                     "}"]
-
-        globals.args = Args()
-        self.lexer = Lexer("<constant_initialisation>", test_code)
-
-        self.grammar = Grammar(self.lexer)
-        self.grammar.start_parse()
-
-        abstract_syntax_tree = self.grammar.reveal_ast()
-        abstract_syntax_tree.visit()
-
-        with open("./output.reti", 'w', encoding="utf-8") as fout:
-            fout.writelines(abstract_syntax_tree.code_generator.show_code())
+        self.set_everything_up_for_multiline_program(
+            "constant_initialisation", test_code)
 
 
 class TestPrograms(unittest.TestCase, UsefullTools):
 
     def test_gcd(self, ):
-        self.set_everything_up_for_testing_programs("gcd",
-                                                    "./test/gcd.picoc")
+        self.set_everything_up_for_testing_program_file("gcd",
+                                                        "./test/gcd.picoc")
 
 
 if __name__ == '__main__':

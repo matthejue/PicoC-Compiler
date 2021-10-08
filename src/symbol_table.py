@@ -1,3 +1,6 @@
+import globals
+
+
 class Symbol:
 
     """Name for a program entity like a variable or function"""
@@ -87,10 +90,10 @@ class _SymbolTable(Scope):
 
     _instance = None
 
-    def __init__(self, address_start):
+    def __init__(self):
         super().__init__()
         self.initTypeSystem()
-        self.fa_pointer = address_start
+        self.fa_pointer = globals.args.start_data_segment
 
     def initTypeSystem(self, ):
         self.define(BuiltInTypeSymbol('int'))
@@ -105,7 +108,7 @@ class _SymbolTable(Scope):
         return self.get_scope_name() + ":" + self.symbols
 
 
-def SymbolTable(address_start=100):
+def SymbolTable():
     """Factory Function as possible way to implement Singleton Pattern.
     Taken from here:
     https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
@@ -113,5 +116,5 @@ def SymbolTable(address_start=100):
     :returns: None
     """
     if _SymbolTable._instance is None:
-        _SymbolTable._instance = _SymbolTable(address_start)
+        _SymbolTable._instance = _SymbolTable()
     return _SymbolTable._instance

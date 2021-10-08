@@ -2,6 +2,7 @@
 from lexer import Token, TT
 from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
+import globals
 
 
 class TokenNode:
@@ -27,6 +28,9 @@ class TokenNode:
         return f"{self.token}"
 
     def visit(self, ):
+        # in case the AssignmentNode doesn't have a AllocationNode as first
+        # child there'll be a TokenNode which needs a dummy visit() function as
+        # there's polymorphic visit() call
         pass
 
 
@@ -51,7 +55,16 @@ class ASTNode(TokenNode):
         # he has any
         self.ignore = True
         self.code_generator = CodeGenerator()
-        self.symbol_table = SymbolTable(100)
+        self.symbol_table = SymbolTable()
+
+    def _is_tokennode(self, node):
+        """checks if something is a TokenNode
+
+        :returns: boolean
+
+        """
+        # being not instance of ASTNode means being instance of TokenNode
+        return not isinstance(node, ASTNode)
 
     def addChild(self, node):
         """
@@ -70,23 +83,8 @@ class ASTNode(TokenNode):
 
         self.children += [node]
 
-    # TODO: rly necessary?
-    def _is_tokennode(self, node):
-        """checks if something is a TokenNode
-
-        :returns: boolean
-
-        """
-        # being not instance of ASTNode means being instance of TokenNode
-        return not isinstance(node, ASTNode)
-
-    # TODO: rly necessary?
-    def get_childvalue(self, idx):
-        return self.children[idx].token.value
-
-    # TODO: rly necessary?
-    def get_childtoken(self, idx):
-        return self.children[idx].token
+    def show_generated_code(self, ):
+        return self.code_generator.show_code()
 
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
@@ -329,7 +327,7 @@ class MainFunctionNode(ASTNode):
         self.code_generator.add_marker()
 
         self.code_generator.replace_code_after(
-            'eds', self.symbol_table.fa_pointer)
+            'eds', globals.args.end_data_segment)
 
         self.code_generator.remove_marker()
 
@@ -403,6 +401,12 @@ class ArithmeticBinaryOperationNode(ASTNode):
         if len(self.children) == 1:
             self.children[0].visit()
             return
+
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "while_generation":
+            if globals.test_name == "while_generation":
+                pass
 
         self.code_generator.add_code(
             "# Arithmetic Binary Operation start\n", 0)
@@ -648,20 +652,24 @@ class AssignmentNode(ASTNode):
         # AssignmentNode(..., AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
         return isinstance(self.children[1].children[0], LogicAndOrNode) or isinstance(self.children[1].children[0], ArithmeticBinaryOperationNode)
 
-    def _is_constant_identifier(self, ):
+    def _is_constant_identifier_on_left_side(self, ):
+        # can only be found out by analysing what type of Symbol there is,
+        # because a TokenNode doesn't tell whether a symbol is a constant or
+        # not. Only a AllocationNode would have information whether a symbol
+        # is a constant by by his first childnode
         return isinstance(self.symbol_table.resolve(
-            self._get_identifier_name(0)), ConstantSymbol)
+            self._get_identifier_name()), ConstantSymbol)
 
     def _is_single_value_on_right_side(self, ):
-        return len(self.children[1].children[0].children) == 1
+        # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
+        #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
+        return len(self.children[1].children[0].children[0].children) == 1
 
     def _assign_number_to_constant_identifier(self):
+        # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
+        #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
         self.symbol_table.resolve(self._get_identifier_name(
-            0)).value = self.children[1].children[0].children[0].children[0].token.value
-
-    # def _assign_constant_to_constant_identifier(self):
-    #     self.symbol_table.resolve(
-    #         self._get_identifier_name(0)).value = self.symbol_table.resolve(self._get_identifier_name(1)).value
+            )).value = self.children[1].children[0].children[0].children[0].token.value
 
     def visit(self, ):
         # if it's just a throw-away node that had to be taken
@@ -676,7 +684,7 @@ class AssignmentNode(ASTNode):
 
         # in case of a ConstantSymbol and a assignment with a number on the
         # right side of the =, the value gets assigned immediately
-        if self._is_constant_identifier() and self._is_single_value_on_right_side():
+        if self._is_constant_identifier_on_left_side() and self._is_single_value_on_right_side():
             self._assign_number_to_constant_identifier()
         # case of a VariableSymbol
         else:
@@ -696,38 +704,43 @@ class AssignmentNode(ASTNode):
             self.code_generator.add_code(
                 strip_multiline_string(self.assign_more), self.assign_more_loc)
 
-        if self._is_last_assignment():
-            self.code_generator.add_code("# Assignment end\n", 0)
+        self.code_generator.add_code("# Assignment end or sub-assignment end\n", 0)
 
 
 class AllocationNode(ASTNode):
 
     """Abstract Syntax Tree Node for allocation"""
 
+    def _get_childvalue(self, idx):
+        return self.children[idx].token.value
+
+    def _get_childtoken(self, idx):
+        return self.children[idx].token
+
     def visit(self, ):
         self.code_generator.add_code("# Allocation start\n", 0)
 
-        if self.get_childvalue(0) == 'const':
+        if self._get_childvalue(0) == 'const':
             # the value of a ConstantNode is the name of the Constantnode if
             # there wasn't assigned a value directly to the constant which has
             # to be resolved internally in the RETI or by a RETI Code Interpreter
             const = ConstantSymbol(
-                self.get_childvalue(1),
-                self.symbol_table.resolve(self.token.value), self.get_childvalue(1))
+                self._get_childvalue(1),
+                self.symbol_table.resolve(self.token.value), self._get_childvalue(1))
             self.symbol_table.define(const)
-        else:  # self.get_childvalue(0) == 'var'
+        else:  # self._get_childvalue(0) == 'var'
             var = VariableSymbol(
-                self.get_childvalue(1),
+                self._get_childvalue(1),
                 self.symbol_table.resolve(self.token.value))
             self.symbol_table.define(var)
             self.symbol_table.allocate(var)
 
         self.code_generator.add_code(
-            "# successfully allocated " + str(self.get_childvalue(1)) + "\n", 0)
+            "# successfully allocated " + str(self._get_childvalue(1)) + "\n", 0)
         self.code_generator.add_code("# Allocation end\n", 0)
 
     def __repr__(self, ):
-        acc = f"({self.get_childtoken(0)} {self.token} {self.get_childtoken(1)})"
+        acc = f"({self._get_childtoken(0)} {self.token} {self._get_childtoken(1)})"
         return acc
 
 
@@ -740,7 +753,7 @@ def strip_multiline_string(mutline_string):
     """
     mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
     mutline_string.pop()
-    mutline_string_acc = ''
+    mutline_string_acc = ""
     for line in mutline_string:
         mutline_string_acc += line + '\n'
     return mutline_string_acc
