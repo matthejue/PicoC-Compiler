@@ -18,7 +18,7 @@ class Args(object):
         self.verbose = False
         self.start_data_segment = 100
         self.end_data_segment = 200
-        self.comments = True
+        self.comments = False
         self.python_stracktrace_error_message = True
 
 

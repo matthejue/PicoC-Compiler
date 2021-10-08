@@ -1,3 +1,6 @@
+import globals
+
+
 class _CodeGenerator:
 
     """Encapsulates all tree-walking code associated with a particular
@@ -61,6 +64,24 @@ class _CodeGenerator:
         """
         code_acc = ""
         for code_piece in self.generated_code:
+            if not globals.args.comments:
+                cleaned_code = ""
+                include = True
+                for c1, c2 in list((code_piece[i], code_piece[i+1]) for
+                                   i in range(len(code_piece)-1)):
+                    if c1 == '#':
+                        include = False
+                    elif c1 + c2 == '\n#':
+                        include = False
+                    elif c1 == '\n':
+                        include = True
+
+                    if include:
+                        cleaned_code += c1
+                if include:
+                    cleaned_code += c2
+                code_piece = cleaned_code
+
             code_acc += code_piece
         return code_acc
 
