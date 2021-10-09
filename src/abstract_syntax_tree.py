@@ -669,7 +669,7 @@ class AssignmentNode(ASTNode):
         # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
         #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
         self.symbol_table.resolve(self._get_identifier_name(
-            )).value = self.children[1].children[0].children[0].children[0].token.value
+        )).value = self.children[1].children[0].children[0].children[0].token.value
 
     def visit(self, ):
         # if it's just a throw-away node that had to be taken
@@ -704,7 +704,8 @@ class AssignmentNode(ASTNode):
             self.code_generator.add_code(
                 strip_multiline_string(self.assign_more), self.assign_more_loc)
 
-        self.code_generator.add_code("# Assignment end or sub-assignment end\n", 0)
+        self.code_generator.add_code(
+            "# Assignment end or sub-assignment end\n", 0)
 
 
 class AllocationNode(ASTNode):

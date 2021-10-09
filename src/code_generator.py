@@ -67,19 +67,22 @@ class _CodeGenerator:
             if not globals.args.comments:
                 cleaned_code = ""
                 include = True
-                for c1, c2 in list((code_piece[i], code_piece[i+1]) for
-                                   i in range(len(code_piece)-1)):
-                    if c1 == '#':
+                single_line_comment = True
+                for c in code_piece:
+                    if c == '#':
                         include = False
-                    elif c1 + c2 == '\n#':
-                        include = False
-                    elif c1 == '\n':
+                    elif c == '\n':
                         include = True
+                    elif include:
+                        # wenn vor dem '#' noch was ist gdw. include hat
+                        # Gelegenheit true zu werdn
+                        single_line_comment = False
 
-                    if include:
-                        cleaned_code += c1
-                if include:
-                    cleaned_code += c2
+                    if include and c != '\n':
+                        cleaned_code += c
+                    elif not single_line_comment and c == '\n':
+                        cleaned_code += c
+                        single_line_comment = True
                 code_piece = cleaned_code
 
             code_acc += code_piece
