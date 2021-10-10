@@ -1,12 +1,15 @@
-int main()
-{
-  m = 12;
-  n = 7;
-  // important comment
-  while (n > 0) {
-    h = m % n;
-    m = /* important **!** comment within line */ n;
-    n = h; // important comment end of line
+void main() {
+  int i = 0;
+  int x = 1;
+  while (i < 10) {
+    if (i == 5) {
+      x = 2;
+    }
+    i = i + x;
   }
-  // test
+  int y = i % 10; // Problem mit Konstantenzuweisung
+  // const int y = i % 10; Problem mit Konstantenzuweisung
+  // Problem mit const: int y = (i + x) % 10;
+  // bessere Bezeichnung für Variable / Constant finden usw.
 }
+

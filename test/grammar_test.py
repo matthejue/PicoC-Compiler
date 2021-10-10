@@ -18,7 +18,6 @@ class Args(object):
         self.verbose = False
         self.start_data_segment = 100
         self.end_data_segment = 200
-        self.comments = Tru
         self.python_stracktrace_error_message = True
 
 
@@ -54,6 +53,7 @@ class UsefullTools():
 
     def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
         globals.test_name = test_name
+        # create new Singleton SymbolTable and CodeGenerator and remove old
         SymbolTable().__init__()
         CodeGenerator().__init__()
 
@@ -302,9 +302,9 @@ class TestComments(unittest.TestCase, UsefullTools):
 
 class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
-    code = """SUBI SP 1
-    LOAD ACC encode(w)
-    STOREIN SP ACC 1
+    code = """SUBI SP 1;
+    LOAD ACC encode(w);
+    STOREIN SP ACC 1;
     """
 
     def test_code_replacment_after(self, ):
@@ -315,9 +315,9 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         symbol_table.define(var)
         symbol_table.allocate(var)
 
-        expected_res = strip_multiline_string("""SUBI SP 1
-        LOAD ACC 100
-        STOREIN SP ACC 1
+        expected_res = strip_multiline_string("""SUBI SP 1;
+        LOAD ACC 100;
+        STOREIN SP ACC 1;
         """)
 
         code_generator.add_code(strip_multiline_string(self.code), 3)
@@ -332,18 +332,16 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.assertEqual(code_generator.show_code(), expected_res)
 
     def test_while_generation(self, ):
-        # create new Singleton SymbolTable and CodeGenerator and remove old
-        test_code = """void main()
-                     {
+        test_code = """void main() {
                        int i = 0;
                        int x = 1;
                        while (i < 10) {
-                         if (i == 5 ) {
+                         if (i == 5) {
                            x = 2;
                          }
                          i = i + x;
                        }
-                       const int y = x % 10;
+                       const int y = i % 10;
                      }
                      """
 
@@ -351,8 +349,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
             "while_generation", test_code)
 
     def test_constant_initialisation(self, ):
-        test_code = """void main()
-                    {
+        test_code = """void main() {
                         const int var = 42;
                     }
                     """

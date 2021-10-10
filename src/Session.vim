@@ -8,33 +8,27 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +144 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-badd +119 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
-badd +54 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +100 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
+badd +37 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
 badd +5 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
 badd +1 ~/Documents/Studium/pico_c_compiler/src/errors.py
 badd +1 ~/Documents/Studium/pico_c_compiler/src/function_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/globals.py
-badd +26 ~/Documents/Studium/pico_c_compiler/src/grammar.py
-badd +17 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
+badd +3 ~/Documents/Studium/pico_c_compiler/src/globals.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/grammar.py
+badd +14 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
 badd +3 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-badd +18 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
+badd +25 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
 badd +1 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
 badd +1 ~/Documents/Studium/pico_c_compiler/src/parser_.py
 badd +104 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
 badd +3 ~/Documents/Studium/pico_c_compiler/src/statement_sequence_grammar.py
-badd +3 ~/Documents/Studium/pico_c_compiler/test/grammar_test.py
+badd +307 ~/Documents/Studium/pico_c_compiler/test/grammar_test.py
 badd +1 ~/Documents/Studium/pico_c_compiler/input.picoc
 badd +1 ~/Documents/Studium/pico_c_compiler/test/gcd.picoc
-badd +45 ~/Documents/Studium/pico_c_compiler/src/code_generator.py
+badd +12 ~/Documents/Studium/pico_c_compiler/src/code_generator.py
 badd +117 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
-badd +8 ~/Documents/Studium/pico_c_compiler/output.reti
-badd +0 term://~/Documents/Studium/pico_c_compiler//155051:/usr/bin/python
-badd +1 term://~/Documents/Studium/pico_c_compiler//171935:/usr/bin/python
-badd +1 term://~/Documents/Studium/pico_c_compiler//192566:/usr/bin/python
-badd +0 term://~/Documents/Studium/pico_c_compiler//198396:/usr/bin/python
-badd +0 term://~/Documents/Studium/pico_c_compiler//205889:/usr/bin/python
-badd +0 term://~/Documents/Studium/pico_c_compiler//207108:/usr/bin/python
+badd +1 ~/Documents/Studium/pico_c_compiler/output.reti
 argglobal
 %argdel
 $argadd abstract_syntax_tree.py
@@ -53,15 +47,6 @@ $argadd parser_.py
 $argadd pico_c_compiler.py
 $argadd statement_sequence_grammar.py
 edit ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-let s:save_splitbelow = &splitbelow
-let s:save_splitright = &splitright
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
-let &splitbelow = s:save_splitbelow
-let &splitright = s:save_splitright
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -69,10 +54,9 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 95 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 94 + 95) / 190)
+exe '2resize ' . ((&lines * 3 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
 argglobal
-balt ~/Documents/Studium/pico_c_compiler/src/code_generator.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -81,54 +65,47 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-38
+526
 normal! zo
-69
+538
 normal! zo
-69
+550
 normal! zo
-69
+552
 normal! zo
-79
+568
 normal! zo
-91
+574
 normal! zo
-747
+589
 normal! zo
-747
+600
 normal! zo
-747
+602
 normal! zo
-let s:l = 144 - ((21 * winheight(0) + 20) / 41)
+612
+normal! zo
+let s:l = 1 - ((0 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 144
-normal! 081|
-wincmd w
-argglobal
-if bufexists("~/Documents/Studium/pico_c_compiler/test/grammar_test.py") | buffer ~/Documents/Studium/pico_c_compiler/test/grammar_test.py | else | edit ~/Documents/Studium/pico_c_compiler/test/grammar_test.py | endif
-if &buftype ==# 'terminal'
-  silent file ~/Documents/Studium/pico_c_compiler/test/grammar_test.py
-endif
-balt ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=4
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-let s:l = 304 - ((10 * winheight(0) + 20) / 41)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 304
+keepjumps 1
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 95 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 94 + 95) / 190)
+argglobal
+enew
+balt ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+exe '2resize ' . ((&lines * 3 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

@@ -64,29 +64,46 @@ class _CodeGenerator:
         """
         code_acc = ""
         for code_piece in self.generated_code:
-            if not globals.args.comments:
-                cleaned_code = ""
-                include = True
-                single_line_comment = True
-                for c in code_piece:
-                    if c == '#':
-                        include = False
-                    elif c == '\n':
-                        include = True
-                    elif include:
-                        # wenn vor dem '#' noch was ist gdw. include hat
-                        # Gelegenheit true zu werdn
-                        single_line_comment = False
-
-                    if include and c != '\n':
-                        cleaned_code += c
-                    elif not single_line_comment and c == '\n':
-                        cleaned_code += c
-                        single_line_comment = True
-                code_piece = cleaned_code
-
+            if not globals.args.verbose:
+                code_piece = self._clean_up_code_piece(code_piece)
             code_acc += code_piece
+            # code_acc += "\n"
         return code_acc
+
+    def _clean_up_code_piece(self, code_piece):
+        cleaned_code = ""
+        stop_include_next_c = False
+        include = True
+        has_seen_semicolon = False
+        reset = False
+        for c in code_piece:
+            if c == '#' and not reset:
+                include = False
+            elif c == '#' and reset:
+                # in case there're two single line comments after
+                # another in one code_piece
+                include = False
+                has_seen_semicolon = False
+                reset = False
+            elif c == ';':
+                stop_include_next_c = True
+                has_seen_semicolon = True
+            elif c == '\n':
+                reset = True
+            elif reset:
+                stop_include_next_c = False
+                include = True
+                has_seen_semicolon = False
+                reset = False
+            elif stop_include_next_c:
+                include = False
+                stop_include_next_c = False
+
+            if include and c != '\n':
+                cleaned_code += c
+            elif has_seen_semicolon and c == '\n':
+                cleaned_code += c
+        return cleaned_code
 
 
 def CodeGenerator():

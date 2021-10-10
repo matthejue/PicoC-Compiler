@@ -1,13 +1,13 @@
 # Main start
-LOADI SP 200
+LOADI SP 200;
 # Assignment start or new sub-assignment
 # Allocation start
 # successfully allocated i
 # Allocation end
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 0
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 0;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e) (oder codela(e), falls logischer Ausdruck)
 LOADIN SP ACC 1;  # Wert von e in ACC laden
@@ -19,9 +19,9 @@ STORE ACC 100;  # Wert von e in Adresse a speichern
 # successfully allocated x
 # Allocation end
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 1
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 1;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e) (oder codela(e), falls logischer Ausdruck)
 LOADIN SP ACC 1;  # Wert von e in ACC laden
@@ -31,14 +31,14 @@ STORE ACC 101;  # Wert von e in Adresse a speichern
 # While start
 # Logic Atom start
 # Variable / Constant start
-SUBI SP 1
-LOAD ACC 100
-STOREIN SP ACC 1
+SUBI SP 1;
+LOAD ACC 100;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 10
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 10;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e1)
 # codeaa(e2)
@@ -60,24 +60,24 @@ JUMP= 40; # af überspringen, wenn l unerfüllt
 # If start
 # Logic Atom start
 # Variable / Constant start
-SUBI SP 1
-LOAD ACC 100
-STOREIN SP ACC 1
+SUBI SP 1;
+LOAD ACC 100;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 5
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 5;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e1)
 # codeaa(e2)
 LOADIN SP ACC 2;  # Wert von e1 in ACC laden
 LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
 SUB ACC IN2;  # e1 - e2 in ACC laden
-JUMPvglop 3;  # Ergebnis 1, wenn e1 vglop e2 wahr
-LOADI ACC 0;  # Ergebnis 0, wenn e1 vglop e2 falsch
+JUMP== 3;  # Ergebnis 1, wenn e1 == e2 wahr
+LOADI ACC 0;  # Ergebnis 0, wenn e1 == e2 falsch
 JUMP 2;
-LOADI ACC 1;  # Ergebnis 1, wenn e1 vglop e2 wahr
+LOADI ACC 1;  # Ergebnis 1, wenn e1 == e2 wahr
 STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;  # Stack um eine Zelle verkürzen
 # Logic Atom end
@@ -88,9 +88,9 @@ JUMP= 7; # af überspringen
 # code(af)
 # Assignment start or new sub-assignment
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 2
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 2;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e) (oder codela(e), falls logischer Ausdruck)
 LOADIN SP ACC 1;  # Wert von e in ACC laden
@@ -101,14 +101,14 @@ STORE ACC 101;  # Wert von e in Adresse a speichern
 # Assignment start or new sub-assignment
 # Arithmetic Binary Operation start
 # Variable / Constant start
-SUBI SP 1
-LOAD ACC 100
-STOREIN SP ACC 1
+SUBI SP 1;
+LOAD ACC 100;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # Variable / Constant start
-SUBI SP 1
-LOAD ACC 101
-STOREIN SP ACC 1
+SUBI SP 1;
+LOAD ACC 101;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e1)
 # codeaa(e2)
@@ -132,14 +132,14 @@ JUMP -56;
 # Allocation end
 # Arithmetic Binary Operation start
 # Variable / Constant start
-SUBI SP 1
-LOAD ACC 101
-STOREIN SP ACC 1
+SUBI SP 1;
+LOAD ACC 100;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # Variable / Constant start
-SUBI SP 1
-LOADI ACC 10
-STOREIN SP ACC 1
+SUBI SP 1;
+LOADI ACC 10;
+STOREIN SP ACC 1;
 # Variable / Constant end
 # codeaa(e1)
 # codeaa(e2)
@@ -152,8 +152,8 @@ ADDI SP 1; # Stack um eine Zelle verkürzen
 # codeaa(e) (oder codela(e), falls logischer Ausdruck)
 LOADIN SP ACC 1;  # Wert von e in ACC laden
 ADDI SP 1;  # Stack um eine Zelle verkürzen
-STORE ACC y;  # Wert von e in Adresse a speichern
+STORE ACC 102;  # Wert von e in Adresse a speichern
 # Assignment end or sub-assignment end
 # code(af)
-JUMP 0
+JUMP 0;
 # Main end

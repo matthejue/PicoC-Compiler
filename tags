@@ -83,7 +83,7 @@ SessionLoad	src/Session.vim	/^let SessionLoad = 1$/;"	v
 SessionLoad	test/Session.vim	/^let SessionLoad = 1$/;"	v
 StatementSequenceGrammar	src/statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
 Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
-SymbolTable	src/symbol_table.py	/^def SymbolTable(address_start=100):$/;"	f
+SymbolTable	src/symbol_table.py	/^def SymbolTable():$/;"	f
 SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARY_BASENAMES	Makefile	/^TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard .\/test\/*_test.py))$/;"	m
 TEST_BINARY_PATHS	Makefile	/^TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test\/$(test_binary))$/;"	m
@@ -130,8 +130,8 @@ __init__	src/lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
 __init__	src/logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:LogicExpressionGrammar
 __init__	src/parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
 __init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
+__init__	src/symbol_table.py	/^    def __init__(self):$/;"	m	class:_SymbolTable
 __init__	src/symbol_table.py	/^    def __init__(self, ):$/;"	m	class:Scope
-__init__	src/symbol_table.py	/^    def __init__(self, address_start):$/;"	m	class:_SymbolTable
 __init__	src/symbol_table.py	/^    def __init__(self, name):$/;"	m	class:BuiltInTypeSymbol
 __init__	src/symbol_table.py	/^    def __init__(self, name, type):$/;"	m	class:VariableSymbol
 __init__	src/symbol_table.py	/^    def __init__(self, name, type, value):$/;"	m	class:ConstantSymbol
@@ -151,11 +151,9 @@ _ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:Arithm
 _assign_number_to_constant_identifier	src/abstract_syntax_tree.py	/^    def _assign_number_to_constant_identifier(self):$/;"	m	class:AssignmentNode
 _atom	src/logic_expression_grammar.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
 _atom_or_top_bottom	src/logic_expression_grammar.py	/^    def _atom_or_top_bottom(self):$/;"	m	class:LogicExpressionGrammar
-_basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
 _check_word	src/lexer.py	/^    def _check_word(self, tokentype, word):$/;"	m	class:Lexer
 _comment	.vimspector.json	/^        "_comment": "args: [.\/input.picoc, .\/output.reti, -p, -v, -a]"$/;"	s	object:configurations.Debug.configuration
 _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
-_compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
 _division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
 _do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
@@ -192,10 +190,8 @@ _paren_arith	src/arithmetic_expression_grammar.py	/^    def _paren_arith(self):$
 _paren_logic	src/logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
 _prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
 _prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
-_read_file	src/pico_c_compiler.py	/^def _read_file(infile, outfile):$/;"	f
 _release	src/parser_.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
 _s	src/statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSequenceGrammar
-_shell	src/pico_c_compiler.py	/^def _shell():$/;"	f
 _ss	src/statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
 _sync	src/parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
 _taste_consume_if_without_else	src/if_else_grammar.py	/^def _taste_consume_if_without_else(self):$/;"	f
@@ -240,8 +236,8 @@ condition_check_loc	src/abstract_syntax_tree.py	/^    condition_check_loc = 3$/;
 configuration	.vimspector.json	/^      "configuration": {$/;"	o	object:configurations.Debug
 configurations	.vimspector.json	/^  "configurations": {$/;"	o
 console	.vimspector.json	/^        "console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
-constant	src/abstract_syntax_tree.py	/^    constant = "LOADI ACC encode(w)\\n"$/;"	v	class:ArithmeticVariableConstantNode
-constant_identifier	src/abstract_syntax_tree.py	/^    constant_identifier = "LOADI ACC encode(c)\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant	src/abstract_syntax_tree.py	/^    constant = "LOADI ACC encode(w);\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant_identifier	src/abstract_syntax_tree.py	/^    constant_identifier = "LOADI ACC encode(c);\\n"$/;"	v	class:ArithmeticVariableConstantNode
 cwd	.vimspector.json	/^        "cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
 debugOptions	.vimspector.json	/^        "debugOptions": [],$/;"	a	object:configurations.Debug.configuration
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
@@ -254,7 +250,7 @@ end	src/abstract_syntax_tree.py	/^    end = """# codela(l1)$/;"	v	class:LogicAnd
 end	src/abstract_syntax_tree.py	/^    end = """# codela(l1)$/;"	v	class:LogicNotNode
 end	src/abstract_syntax_tree.py	/^    end = """# zurück zur Auswertung von l$/;"	v	class:WhileNode
 end	src/abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"$/;"	v	class:ArithmeticUnaryOperationNode
-end	src/abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
+end	src/abstract_syntax_tree.py	/^    end = "STOREIN SP ACC 1;\\n"$/;"	v	class:ArithmeticVariableConstantNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:ArithmeticUnaryOperationNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:MainFunctionNode
 end_loc	src/abstract_syntax_tree.py	/^    end_loc = 1$/;"	v	class:WhileNode
@@ -309,17 +305,16 @@ run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 610 - ((17 * winheight(0) + 17) \/ 35)$/;"	v
-s:l	src/Session.vim	/^let s:l = 144 - ((21 * winheight(0) + 20) \/ 41)$/;"	v
-s:l	src/Session.vim	/^let s:l = 304 - ((10 * winheight(0) + 20) \/ 41)$/;"	v
+s:l	Session.vim	/^let s:l = 611 - ((42 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	src/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
 s:l	test/Session.vim	/^let s:l = 50 - ((19 * winheight(0) + 20) \/ 41)$/;"	v
 s:l	test/Session.vim	/^let s:l = 58 - ((39 * winheight(0) + 20) \/ 41)$/;"	v
-s:save_splitbelow	src/Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
 s:save_splitbelow	test/Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
-s:save_splitright	src/Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_splitright	test/Session.vim	/^let s:save_splitright = &splitright$/;"	v
+s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminheight	test/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
+s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:save_winminwidth	src/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:save_winminwidth	test/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
@@ -344,8 +339,8 @@ show_generated_code	src/abstract_syntax_tree.py	/^    def show_generated_code(se
 start	src/abstract_syntax_tree.py	/^    start = """# codeaa(e1)$/;"	v	class:ArithmeticUnaryOperationNode
 start	src/abstract_syntax_tree.py	/^    start = """# codela(l)$/;"	v	class:IfElseNode
 start	src/abstract_syntax_tree.py	/^    start = """# codela(l)$/;"	v	class:IfNode
-start	src/abstract_syntax_tree.py	/^    start = """LOADI SP eds$/;"	v	class:MainFunctionNode
-start	src/abstract_syntax_tree.py	/^    start = "SUBI SP 1\\n"$/;"	v	class:ArithmeticVariableConstantNode
+start	src/abstract_syntax_tree.py	/^    start = """LOADI SP eds;$/;"	v	class:MainFunctionNode
+start	src/abstract_syntax_tree.py	/^    start = "SUBI SP 1;\\n"$/;"	v	class:ArithmeticVariableConstantNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 1$/;"	v	class:MainFunctionNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:ArithmeticUnaryOperationNode
 start_loc	src/abstract_syntax_tree.py	/^    start_loc = 3$/;"	v	class:IfElseNode
@@ -400,7 +395,7 @@ test_while_loop	test/grammar_test.py	/^    def test_while_loop(self, ):$/;"	m	cl
 tokens	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
 type	.vimspector.json	/^        "type": "python",$/;"	s	object:configurations.Debug.configuration
 up	src/ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
-variable_identifier	src/abstract_syntax_tree.py	/^    variable_identifier = "LOAD ACC var_identifier\\n"$/;"	v	class:ArithmeticVariableConstantNode
+variable_identifier	src/abstract_syntax_tree.py	/^    variable_identifier = "LOAD ACC var_identifier;\\n"$/;"	v	class:ArithmeticVariableConstantNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:AllocationNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:ArithmeticBinaryOperationNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:ArithmeticUnaryOperationNode

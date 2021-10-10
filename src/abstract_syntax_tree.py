@@ -307,13 +307,13 @@ class MainFunctionNode(ASTNode):
 
     """Abstract Syntax Tree Node for main method"""
 
-    start = """LOADI SP eds
+    start = """LOADI SP eds;
         """
 
     start_loc = 1
 
     end = """# code(af)
-        JUMP 0
+        JUMP 0;
         """
 
     end_loc = 1
@@ -344,11 +344,11 @@ class ArithmeticVariableConstantNode(ASTNode):
 
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
-    start = "SUBI SP 1\n"
-    constant = "LOADI ACC encode(w)\n"
-    constant_identifier = "LOADI ACC encode(c)\n"
-    variable_identifier = "LOAD ACC var_identifier\n"
-    end = "STOREIN SP ACC 1\n"
+    start = "SUBI SP 1;\n"
+    constant = "LOADI ACC encode(w);\n"
+    constant_identifier = "LOADI ACC encode(c);\n"
+    variable_identifier = "LOAD ACC var_identifier;\n"
+    end = "STOREIN SP ACC 1;\n"
 
     all_loc = 1
 
@@ -573,9 +573,9 @@ class LogicAtomNode(ASTNode):
         if self.token.value == '>':
             self.end = self.code_generator.replace_code_pre(
                 self.end, 'vglop', '>')
-        elif self.token.value == '=':
+        elif self.token.value == '==':
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'vglop', '=')
+                self.end, 'vglop', '==')
         elif self.token.value == '>=':
             self.end = self.code_generator.replace_code_pre(
                 self.end, 'vglop', '>=')

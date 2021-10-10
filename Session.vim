@@ -8,7 +8,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +610 src/abstract_syntax_tree.py
+badd +1 src/abstract_syntax_tree.py
 badd +100 src/arithmetic_expression_grammar.py
 badd +37 src/assignment_allocation_grammar.py
 badd +5 src/ast_builder.py
@@ -23,12 +23,14 @@ badd +1 src/loop_grammar.py
 badd +1 src/parser_.py
 badd +104 src/pico_c_compiler.py
 badd +3 src/statement_sequence_grammar.py
-badd +307 test/grammar_test.py
+badd +21 test/grammar_test.py
 badd +1 input.picoc
 badd +1 test/gcd.picoc
-badd +12 src/code_generator.py
-badd +117 src/symbol_table.py
+badd +1 src/code_generator.py
+badd +1 src/symbol_table.py
 badd +1 output.reti
+badd +1 __Tagbar__.1
+badd +1 Makefile
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -46,9 +48,37 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit src/abstract_syntax_tree.py
+edit Makefile
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+2wincmd h
+wincmd w
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 113 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 37 + 95) / 190)
+exe 'vert 3resize ' . ((&columns * 38 + 95) / 190)
+exe '4resize ' . ((&lines * 22 + 23) / 47)
+exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
 argglobal
-balt src/arithmetic_expression_grammar.py
+if bufexists("Makefile") | buffer Makefile | else | edit Makefile | endif
+if &buftype ==# 'terminal'
+  silent file Makefile
+endif
+balt test/grammar_test.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -56,39 +86,64 @@ setlocal fdi=#
 setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
-setlocal fen
-542
-normal! zo
-546
-normal! zo
-559
-normal! zo
-565
-normal! zo
-570
-normal! zo
-575
-normal! zo
-576
-normal! zo
-589
-normal! zo
-596
-normal! zo
-604
-normal! zo
-607
-normal! zo
-613
-normal! zo
-618
-normal! zo
-let s:l = 610 - ((17 * winheight(0) + 17) / 35)
+setlocal nofen
+let s:l = 1 - ((0 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 610
-normal! 034|
+keepjumps 1
+normal! 0
+wincmd w
+argglobal
+if bufexists("output.reti") | buffer output.reti | else | edit output.reti | endif
+if &buftype ==# 'terminal'
+  silent file output.reti
+endif
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+let s:l = 1 - ((0 * winheight(0) + 21) / 43)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 013|
+wincmd w
+argglobal
+enew
+file __Tagbar__.1
+balt src/abstract_syntax_tree.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+argglobal
+enew
+balt src/code_generator.py
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+exe 'vert 1resize ' . ((&columns * 113 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 37 + 95) / 190)
+exe 'vert 3resize ' . ((&columns * 38 + 95) / 190)
+exe '4resize ' . ((&lines * 22 + 23) / 47)
+exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
@@ -96,6 +151,8 @@ if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxIAoOaFTt
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

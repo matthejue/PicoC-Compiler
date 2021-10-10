@@ -24,18 +24,16 @@ def main():
                                  help="Output the Tokenlist instead of "
                                  "RETI Code")
     cli_args_parser.add_argument('-s', '--start_data_segment',
-                                 help="Where the allocation of variables
-                                 starts", type=int, default=100)
+                                 help="Where the allocation of variables"
+                                 "starts", type=int, default=100)
     cli_args_parser.add_argument('-e', '--end_data_segment', help="Where the "
                                  "stackpointer starts", type=int, default=200)
-    cli_args_parser.add_argument('-c', '--comments', action='store_true',
-                                 help="Add comments to the RETI Code")
     cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
-                                 action='store_true', help="Show python error"
+                                 action='store_true', help="Show python error "
                                  "messages with stacktrace")
     cli_args_parser.add_argument('-v', '--verbose', action='store_true',
-                                 help="Create verbose output for the ast")
-
+                                 help="Add tokentype to the ast and add "
+                                 "comments to the RETI Code")
     globals.args = cli_args_parser.parse_args()
 
     if not globals.args.infile:
@@ -105,7 +103,6 @@ def _read_file(infile, outfile):
 def _compile(fname, code):
     # remove all \n from the code
     code_without_cr = list(map(lambda line: line.strip(), code))
-    # TODO: remove temporary solution to only read first line
 
     lexer = Lexer(fname, code_without_cr)
 
@@ -133,13 +130,14 @@ def _compile(fname, code):
             print(grammar.reveal_ast())
         return grammar.reveal_ast()
 
-    # TODO: CodeGenerator belongs here
+    abstract_syntax_tree = grammar.reveal_ast()
+    abstract_syntax_tree.visit()
 
     # Deal with print option
     if globals.args.print:
-        print("Placeholder for RETI Code")
+        print(abstract_syntax_tree.show_generated_code())
 
-    return "Placeholder for RETI Code", None
+    return abstract_syntax_tree.show_generated_code()
 
 
 if __name__ == '__main__':
