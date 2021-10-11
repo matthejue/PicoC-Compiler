@@ -49,7 +49,7 @@ class ASTNode(TokenNode):
         # the first tokentype is always the actual tokentype and the others are
         # for symbols like e.g. '-' which had to get a seperate tokentype
         # because they overlap with e.g. unary and binary operations
-        super().__init__(Token(tokentypes[0], None))
+        super().__init__(Token(tokentypes[0], None, None, None))
         self.tokentypes = tokentypes
         # decide whether a node should be ignored and just show his children if
         # he has any
@@ -78,6 +78,8 @@ class ASTNode(TokenNode):
         if self._is_tokennode(node) and node.token.type in\
                 self.tokentypes:
             self.token.value = node.token.value
+            self.token.start = node.token.start
+            self.token.end = node.token.end
             self.ignore = False
             return
 
@@ -474,7 +476,8 @@ class ArithmeticUnaryOperationNode(ASTNode):
             strip_multiline_string(self.start), self.start_loc)
 
         if self.token.value == '~':
-            self.code_generator.add_code(strip_multiline_string(self.bitwise_negation),
+            self.code_generator.add_code(strip_multiline_string
+                                         (self.bitwise_negation),
                                          self.bitwise_negation_loc)
 
         self.code_generator.add_code(
@@ -575,7 +578,7 @@ class LogicAtomNode(ASTNode):
                 self.end, 'vglop', '>')
         elif self.token.value == '==':
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'vglop', '==')
+                self.end, 'vglop', '=')
         elif self.token.value == '>=':
             self.end = self.code_generator.replace_code_pre(
                 self.end, 'vglop', '>=')
@@ -584,7 +587,7 @@ class LogicAtomNode(ASTNode):
                 self.end, 'vglop', '<')
         elif self.token.value == '!=':
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'vglop', '!=')
+                self.end, 'vglop', '<>')
         elif self.token.value == '<=':
             self.end = self.code_generator.replace_code_pre(
                 self.end, 'vglop', '<=')

@@ -10,6 +10,8 @@ class SyntaxError(Exception):
         self.description = f"SyntaxError: Expected {expected}"\
             f", found {found.value}"
         super().__init__(self.description)
+        self.expected = expected
+        self.found = found
 
 
 class InvalidCharacterError(Exception):
@@ -21,6 +23,7 @@ class InvalidCharacterError(Exception):
         self.description = f"InvalidCharacterError: "\
             f"{found} is not a permitted character"
         super().__init__(self.description)
+        self.found = found
 
 
 class NoApplicableRuleError(Exception):
@@ -32,6 +35,8 @@ class NoApplicableRuleError(Exception):
         self.description = f"NoApplicableRuleError: Expected {expected}"\
             f", found {found.value}"
         super().__init__(self.description)
+        self.expected = expected
+        self.found = found
 
 
 class MismatchedTokenError(Exception):
@@ -42,6 +47,8 @@ class MismatchedTokenError(Exception):
         self.description = f"MismatchedTokenError: Expected {expected}"\
             f", found {found.value}"
         super().__init__(self.description)
+        self.expected = expected
+        self.found = found
 
 
 class ErrorHandler:

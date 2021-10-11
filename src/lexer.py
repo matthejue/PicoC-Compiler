@@ -8,13 +8,19 @@ class Token():
 
     """Identifies what a certiain string slice is"""
 
-    def __init__(self, type, value):
+    def __init__(self, type, value, start, end):
+        """
+        :start: (row, column) in the file where it starts
+        :end: (row, column) in the file where it ends
+        """
         self.type = type
         self.value = value
+        self.start = start
+        self.end = end
 
     def __repr__(self):
         if globals.args.verbose:
-            return f"<{self.type},'{self.value}'>"
+            return f"<{self.type},'{self.value}',{self.start},{self.end}>"
         return f"'{self.value}'"
 
 
@@ -22,26 +28,25 @@ class TT(Enum):
 
     """Tokentypes that are part of the grammar"""
 
-    ROOT = "ROOT"
-    EOF = "EOF"
+    EOF = "end of file"
     UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
-    ASSIGNMENT = "="
-    L_PAREN = "("
-    R_PAREN = ")"
-    L_BRACE = "{"
-    R_BRACE = "}"
-    SEMICOLON = ";"
-    MINUS = "-"
+    ASSIGNMENT = "assignment operator"
+    L_PAREN = "left parenthesis"
+    R_PAREN = "right parenthesis"
+    L_BRACE = "left brace"
+    R_BRACE = "right brace"
+    SEMICOLON = "semicolon"
+    MINUS = "minus unary or binary operator"
     ALLOC = "allocation"
     STATEMENT = "statement"
     FUNCTION = "function"
-    NOT = "not operator or not as part of logical expression grammar"
-    AND_OP = "and operator"
-    OR_OP = "or operator"
-    AND = "and as part of logical expression grammar"
-    OR = "or as part of logical expression grammar"
+    NOT = "not logical expression grammar"
+    AND_OP = "and arithmetic operator"
+    OR_OP = "or arithmetic operator"
+    AND = "and logical expression grammar"
+    OR = "or logical expression grammar"
     COMP_OP = "comparison operator"
     BITSHIFT = "bitshift"
     NUMBER = "number"
@@ -49,12 +54,12 @@ class TT(Enum):
     CONST = "constant qualifier"
     VAR = "variable qualifier"
     PRIM_DT = "primitive datatype"
-    IF = "if"
-    ELSE = "else"
-    WHILE = "while"
-    DO_WHILE = "do while"
-    MAIN = "main"
-    TO_BOOL = "convert arithmetic expression to logical expression"
+    IF = "if statement"
+    ELSE = "else statement"
+    WHILE = "while statement"
+    DO_WHILE = "do while statement"
+    MAIN = "main function"
+    TO_BOOL = "convert to boolean value"
 
 
 class Lexer:
@@ -98,45 +103,55 @@ class Lexer:
             if self.lc in ' \t':
                 self.next_char()
             elif self.lc == ';':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.SEMICOLON, self.c)
+                return Token(TT.SEMICOLON, self.c, start, end)
             elif self.lc in '*%^':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.BINOP_PREC_1, self.c)
+                return Token(TT.BINOP_PREC_1, self.c, start, end)
             elif self.lc == '/':
                 token = self._division_sign_or_comment()
                 if token:
                     return token
             elif self.lc == '+':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.BINOP_PREC_2, self.c)
+                return Token(TT.BINOP_PREC_2, self.c, start, end)
             elif self.lc == '-':
                 # minus has a special role because it can be both a unary and
                 # binary operator
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.MINUS, self.c)
+                return Token(TT.MINUS, self.c, start, end)
             elif self.lc == '~':
                 # minus has a special role because it can be both a unary and
                 # binary operator
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.UNARY_OP, self.c)
+                return Token(TT.UNARY_OP, self.c, start, end)
             elif self.lc == '(':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.L_PAREN, self.c)
+                return Token(TT.L_PAREN, self.c, start, end)
             elif self.lc == ')':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.R_PAREN, self.c)
+                return Token(TT.R_PAREN, self.c, start, end)
             elif self.lc == '{':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.L_BRACE, self.c)
+                return Token(TT.L_BRACE, self.c, start, end)
             elif self.lc == '}':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.R_BRACE, self.c)
+                return Token(TT.R_BRACE, self.c, start, end)
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
             elif self.lc == '0':
+                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.NUMBER, self.c)
+                return Token(TT.NUMBER, self.c, start, end)
             elif self.lc in self.LETTER:
                 return self._identifier_special_keyword()
             elif self.lc == '!':
@@ -149,7 +164,13 @@ class Lexer:
                 return self._comp_operator_assignment_bitshift()
             else:
                 raise InvalidCharacterError(self.lc)
-        return Token(TT.EOF, self.lc)
+        return Token(TT.EOF, self.lc, start, end)
+
+    def _measure_pos(self, method):
+        start = (self.lc_row, self.lc_col)
+        method()
+        end = (self.lc_row, self.lc_col)
+        return (start, end)
 
     def next_char(self):
         """go to the next character, detect if "end of file" is reached
@@ -195,13 +216,16 @@ class Lexer:
         :grammar: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
         """
+        start = (self.lc_row, self.lc_col)
+
         self.next_char()
         number = self.c
         while self.lc in self.DIGIT_WITH_ZERO:
             self.next_char()
             number += self.c
 
-        return Token(TT.NUMBER, int(number))
+        end = (self.lc_row, self.lc_col)
+        return Token(TT.NUMBER, int(number), start, end)
 
     def _identifier_special_keyword(self):
         """
@@ -240,6 +264,7 @@ class Lexer:
             return token
 
         # nothing more left then being a identifier
+        # TOOD: that could be programmed more efficient by keeping the old word
         return self._identifier()
 
     def _check_word(self, tokentype, word):
@@ -250,18 +275,21 @@ class Lexer:
         :returns: None
 
         """
-        lc_row_copy, lc_col_copy, c_copy, lc_copy = self.lc_row, self.lc_col, \
+        lc_row_copy, lc_col_copy, c_copy, lc_copy = self.lc_row, self.lc_col,\
             self.c, self.lc
+
+        start = (self.lc_row, self.lc_col)
 
         for match_char in word:
             if self.lc != match_char:
                 break
+            end = (self.lc_row, self.lc_col)
             self.next_char()
         else:
             if self.lc not in self.LETTER_DIGIT:
-                return Token(tokentype, word)
+                return Token(tokentype, word, start, end)
 
-        self.lc_row, self.lc_col, self.c, self.lc = lc_row_copy, lc_col_copy, \
+        self.lc_row, self.lc_col, self.c, self.lc = lc_row_copy, lc_col_copy,\
             c_copy, lc_copy
 
     def _identifier(self):
@@ -271,13 +299,15 @@ class Lexer:
         :returns: None
 
         """
-        self.next_char()
-        word = self.c
-        while self.lc in self.LETTER_DIGIT:
-            self.next_char()
-            word += self.c
+        start = (self.lc_row, self.lc_col)
 
-        return Token(TT.IDENTIFIER, word)
+        word = ""
+        while self.lc in self.LETTER_DIGIT:
+            word += self.lc
+            self.next_char()
+
+        end = (self.lc_row, self.lc_col)
+        return Token(TT.IDENTIFIER, word, start, end)
 
     def _not(self, ):
         """
@@ -286,11 +316,13 @@ class Lexer:
         :returns: None
 
         """
+        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '=':
+            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.COMP_OP, '!=')
-        return Token(TT.NOT, self.c)
+            return Token(TT.COMP_OP, '!=', start, end)
+        return Token(TT.NOT, self.c, start, end)
 
     def _and(self):
         """
@@ -299,11 +331,13 @@ class Lexer:
         :returns: None
 
         """
+        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '&':
+            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.AND, "&&")
-        return Token(TT.BINOP_PREC_1, self.c)
+            return Token(TT.AND, "&&", start, end)
+        return Token(TT.BINOP_PREC_1, self.c, start, end)
 
     def _or(self):
         """
@@ -312,11 +346,13 @@ class Lexer:
         :returns: None
 
         """
+        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '|':
+            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.OR, "||")
-        return Token(TT.BINOP_PREC_1, self.c)
+            return Token(TT.OR, "||", start, end)
+        return Token(TT.BINOP_PREC_1, self.c, start, end)
 
     def _comp_operator_assignment_bitshift(self):
         """
@@ -324,30 +360,36 @@ class Lexer:
         :grammar: ((==?)|(<(<|=)?)|(>(>|=)?))
         :returns: None
         """
+        start, end = ((self.lc_row, self.lc_col) * 2)
         if self.lc == '=':
             self.next_char()
             if self.lc == '=':
+                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, "==")
-            return Token(TT.ASSIGNMENT, '=')
+                return Token(TT.COMP_OP, "==", start, end)
+            return Token(TT.ASSIGNMENT, '=', start, end)
         elif self.lc == '<':
             self.next_char()
             if self.lc == '=':
+                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, "<=")
+                return Token(TT.COMP_OP, "<=", start, end)
             elif self.lc == '<':
+                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.BITSHIFT, "<<")
-            return Token(TT.COMP_OP, self.c)
+                return Token(TT.BITSHIFT, "<<", start, end)
+            return Token(TT.COMP_OP, self.c, start, end)
         elif self.lc == '>':
             self.next_char()
             if self.lc == '=':
+                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, ">=")
+                return Token(TT.COMP_OP, ">=", start, end)
             elif self.lc == '>':
+                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.BITSHIFT, ">>")
-            return Token(TT.COMP_OP, self.c)
+                return Token(TT.BITSHIFT, ">>", start, end)
+            return Token(TT.COMP_OP, self.c, start, end)
 
     def _division_sign_or_comment(self, ):
         """
@@ -355,6 +397,7 @@ class Lexer:
         :grammar: /(/|('*'.*'*'/))?
         :returns: None
         """
+        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
 
         if self.lc == '/':
@@ -369,4 +412,4 @@ class Lexer:
                 self.next_char()
             self.next_char()
         else:
-            return Token(TT.BINOP_PREC_1, self.c)
+            return Token(TT.BINOP_PREC_1, self.c, start, end)

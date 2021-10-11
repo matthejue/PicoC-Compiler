@@ -13,6 +13,6 @@
 //   // bessere Bezeichnung für Variable / Constant finden usw.
 // }
 void main() {
-	int var = 32
+	int var = 32;
 	var = 10;
 }
