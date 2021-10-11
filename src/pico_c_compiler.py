@@ -4,6 +4,7 @@
 import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
+from errors import ErrorHandler
 import globals
 
 
@@ -121,8 +122,10 @@ def _compile(fname, code):
 
     # Generate ast
     grammar = Grammar(lexer)
+    # Handle errors
+    error_handler = ErrorHandler(grammar)
     # Assignment grammar needs 2 num_lts for <va>
-    grammar.start_parse()
+    error_handler.handle(grammar.start_parse)
 
     # Deal with --ast option
     if globals.args.ast:
@@ -131,9 +134,10 @@ def _compile(fname, code):
         return grammar.reveal_ast()
 
     abstract_syntax_tree = grammar.reveal_ast()
+    error_handler.handle(abstract_syntax_tree.visit)
     abstract_syntax_tree.visit()
 
-    # Deal with print option
+    # Deal with --print option
     if globals.args.print:
         print(abstract_syntax_tree.show_generated_code())
 

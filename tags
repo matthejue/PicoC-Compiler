@@ -41,6 +41,7 @@ DoWhileNode	src/abstract_syntax_tree.py	/^class DoWhileNode(ASTNode):$/;"	c
 ELSE	src/lexer.py	/^    ELSE = "else"$/;"	v	class:TT
 EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
+ErrorHandler	src/errors.py	/^class ErrorHandler:$/;"	c
 FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
 Grammar	src/grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
@@ -151,9 +152,12 @@ _ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:Arithm
 _assign_number_to_constant_identifier	src/abstract_syntax_tree.py	/^    def _assign_number_to_constant_identifier(self):$/;"	m	class:AssignmentNode
 _atom	src/logic_expression_grammar.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
 _atom_or_top_bottom	src/logic_expression_grammar.py	/^    def _atom_or_top_bottom(self):$/;"	m	class:LogicExpressionGrammar
+_basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
 _check_word	src/lexer.py	/^    def _check_word(self, tokentype, word):$/;"	m	class:Lexer
+_clean_up_code_piece	src/code_generator.py	/^    def _clean_up_code_piece(self, code_piece):$/;"	m	class:_CodeGenerator
 _comment	.vimspector.json	/^        "_comment": "args: [.\/input.picoc, .\/output.reti, -p, -v, -a]"$/;"	s	object:configurations.Debug.configuration
 _comp_operator_assignment_bitshift	src/lexer.py	/^    def _comp_operator_assignment_bitshift(self):$/;"	m	class:Lexer
+_compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
 _division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
 _do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
@@ -190,8 +194,10 @@ _paren_arith	src/arithmetic_expression_grammar.py	/^    def _paren_arith(self):$
 _paren_logic	src/logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
 _prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
 _prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_read_file	src/pico_c_compiler.py	/^def _read_file(infile, outfile):$/;"	f
 _release	src/parser_.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
 _s	src/statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSequenceGrammar
+_shell	src/pico_c_compiler.py	/^def _shell():$/;"	f
 _ss	src/statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
 _sync	src/parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
 _taste_consume_if_without_else	src/if_else_grammar.py	/^def _taste_consume_if_without_else(self):$/;"	f
@@ -204,7 +210,7 @@ addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class
 addChild	src/ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
 add_code	src/code_generator.py	/^    def add_code(self, code, loc):$/;"	m	class:_CodeGenerator
 add_marker	src/code_generator.py	/^    def add_marker(self, ):$/;"	m	class:_CodeGenerator
-all	Makefile	/^all: run-shell-ast clean$/;"	t
+all	Makefile	/^all: run-shell-compile clean$/;"	t
 all_loc	src/abstract_syntax_tree.py	/^    all_loc = 1$/;"	v	class:ArithmeticVariableConstantNode
 allocate	src/symbol_table.py	/^    def allocate(self, sym):$/;"	m	class:_SymbolTable
 args	.misc/pico_c_compiler	/^args = None$/;"	v
@@ -217,7 +223,7 @@ basename	.misc/pico_c_compiler	/^def basename(fname):$/;"	f
 bitwise_negation	src/abstract_syntax_tree.py	/^    bitwise_negation = "SUBI ACC 1; # transform negation to complement\\n"$/;"	v	class:ArithmeticUnaryOperationNode
 bitwise_negation_loc	src/abstract_syntax_tree.py	/^    bitwise_negation_loc = 1$/;"	v	class:ArithmeticUnaryOperationNode
 clean	Makefile	/^clean:$/;"	t
-code	test/grammar_test.py	/^    code = """SUBI SP 1$/;"	v	class:TestCodeGenerator
+code	test/grammar_test.py	/^    code = """SUBI SP 1;$/;"	v	class:TestCodeGenerator
 code_aa	src/assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
 code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
 code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
@@ -268,6 +274,7 @@ get_marker_loc	src/code_generator.py	/^    def get_marker_loc(self, ):$/;"	m	cla
 get_name	src/symbol_table.py	/^    def get_name(self, ):$/;"	m	class:Symbol
 get_scope_name	src/symbol_table.py	/^    def get_scope_name(self, ):$/;"	m	class:Scope
 grammar	test/grammar_test.py	/^    grammar = None$/;"	v	class:UsefullTools
+handle	src/errors.py	/^    def handle(self, function):$/;"	m	class:ErrorHandler
 initTypeSystem	src/symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:_SymbolTable
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
 is_tasting	src/globals.py	/^is_tasting = 0$/;"	v
@@ -301,15 +308,21 @@ resolve	src/symbol_table.py	/^    def resolve(self, name):$/;"	m	class:Scope
 reveal_ast	src/grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
 run-read-ast	Makefile	/^run-read-ast:$/;"	t
 run-read-ast-verbose	Makefile	/^run-read-ast-verbose:$/;"	t
+run-read-compile	Makefile	/^run-read-compile:$/;"	t
+run-read-compile-comments	Makefile	/^run-read-compile-comments:$/;"	t
 run-read-tokens	Makefile	/^run-read-tokens:$/;"	t
 run-shell-ast	Makefile	/^run-shell-ast:$/;"	t
 run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
+run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
+run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 611 - ((42 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
 s:l	src/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
 s:l	test/Session.vim	/^let s:l = 50 - ((19 * winheight(0) + 20) \/ 41)$/;"	v
 s:l	test/Session.vim	/^let s:l = 58 - ((39 * winheight(0) + 20) \/ 41)$/;"	v
+s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
 s:save_splitbelow	test/Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
+s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_splitright	test/Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v

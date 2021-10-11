@@ -25,15 +25,15 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # it's important that arithmetic grammar is before logic grammar,
         # because else a number > 0 would automatically be converted to 1 in
         # logic grammar
-        if self.taste(self.taste_consume_ae):
-            self.taste_consume_ae()
-        elif self.taste(self.taste_consume_le):
-            self.taste_consume_le()
+        if self.taste(self._taste_consume_ae):
+            self._taste_consume_ae()
+        elif self.taste(self._taste_consume_le):
+            self._taste_consume_le()
         else:
             raise NoApplicableRuleError("arithmetic expression or logic "
                                         "expression", self.LT(1))
 
-    def taste_consume_ae(self):
+    def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
 
         :function: <code_ae> ;
@@ -42,7 +42,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self.code_ae()
         self.match([TT.SEMICOLON])
 
-    def taste_consume_le(self):
+    def _taste_consume_le(self):
         """taste whether the next expression is a logic expression
 
         :grammar: <code_le> ;
@@ -133,6 +133,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # TODO: little hack to to also have a token for bottomnode
         if not globals.is_tasting:
             self.ast_builder.addChild(TokenNode(Token(TT.TO_BOOL, "to bool")))
+
         self.code_ae()
 
         self.ast_builder.up(savestate_node)

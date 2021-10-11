@@ -2,9 +2,6 @@
 
 import unittest
 import sys
-# from src.lexer import Lexer
-# from src.grammar import Grammar
-# from src import globals
 
 
 class Args(object):
@@ -61,10 +58,11 @@ class UsefullTools():
         self.lexer = Lexer('<' + test_name + '>', code_without_cr)
 
         self.grammar = Grammar(self.lexer)
-        self.grammar.start_parse()
+        error_handler = ErrorHandler(self.grammar)
+        error_handler.handle(self.grammar.start_parse)
 
         abstract_syntax_tree = self.grammar.reveal_ast()
-        abstract_syntax_tree.visit()
+        error_handler.handle(abstract_syntax_tree.visit)
 
         with open("./output.reti", 'w', encoding="utf-8") as fout:
             fout.writelines(abstract_syntax_tree.show_generated_code())
@@ -365,6 +363,17 @@ class TestPrograms(unittest.TestCase, UsefullTools):
                                                         "./test/gcd.picoc")
 
 
+class TestError(unittest.TestCase, UsefullTools):
+
+    def test_no_semicolon(self, ):
+        test_code = """void main() {
+                      int var = 32
+                      var = 10;
+                    }
+                    """
+        self.set_everything_up_for_multiline_program("no_semicolon", test_code)
+
+
 if __name__ == '__main__':
     sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
     from lexer import Lexer, TT
@@ -378,4 +387,5 @@ if __name__ == '__main__':
                                       LogicAtomNode, AssignmentNode,
                                       AllocationNode)
     from abstract_syntax_tree import strip_multiline_string
+    from errors import ErrorHandler
     unittest.main()

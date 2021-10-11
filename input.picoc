@@ -1,15 +1,18 @@
+// void main() {
+//   int i = 0;
+//   int x = 1;
+//   while (i - 1) {
+//     if (i == 5) {
+//       x = 2;
+//     }
+//     i = i + x;
+//   }
+//   const int y = i % 10; // Problem mit Konstantenzuweisung
+//   // const int y = i % 10; Problem mit Konstantenzuweisung
+//   // Problem mit const: int y = (i + x) % 10;
+//   // bessere Bezeichnung für Variable / Constant finden usw.
+// }
 void main() {
-  int i = 0;
-  int x = 1;
-  while (i < 10) {
-    if (i == 5) {
-      x = 2;
-    }
-    i = i + x;
-  }
-  int y = i % 10; // Problem mit Konstantenzuweisung
-  // const int y = i % 10; Problem mit Konstantenzuweisung
-  // Problem mit const: int y = (i + x) % 10;
-  // bessere Bezeichnung für Variable / Constant finden usw.
+	int var = 32
+	var = 10;
 }
-
