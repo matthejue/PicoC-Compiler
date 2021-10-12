@@ -64,24 +64,26 @@ class ErrorHandler:
             function()
         except InvalidCharacterError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_error() + '\n'
+            error_message += self._point_at_error(e) + '\n'
             print(error_message)
             exit(0)
         except NoApplicableRuleError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_error() + '\n'
+            error_message += self._point_at_error(e) + '\n'
             print(error_message)
             exit(0)
         except MismatchedTokenError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_error() + '\n'
+            error_message += self._point_at_error(e) + '\n'
             print(error_message)
             exit(0)
 
     def _error_message_header(self, error):
-        return self.grammar.lexer.fname + ':' + str(self.grammar.lexer.lc_row)\
-            + ':' + str(self.grammar.lexer.lc_col) + ': ' + error.description
+        return self.grammar.lexer.fname + ':' + str(error.found.start[0])\
+            + ':' + str(error.found.start[1]) + ': ' + error.description
 
-    def _point_at_error(self, ):
-        line = self.grammar.lexer.input[self.grammar.lexer.lc_row]
-        return line + '\n' + ' ' * self.grammar.lexer.lc_col + '^'
+    def _point_at_error(self, error):
+        # TODO: Was ist wenn sich ein Token über mehrere Zeilen erstreck mit ^~
+        line = self.grammar.lexer.input[error.found.start[0]]
+        return line + '\n' + ' ' * (error.found.start[1]-1) + '^' +\
+            '~' * (error.found.end[1]-error.found.start[1])

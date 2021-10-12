@@ -209,7 +209,9 @@ class DoWhileNode(ASTNode):
         # first TokenNode matching the possible representative tokens
         if self._is_tokennode(node) and node.token.type in\
                 self.tokentypes:
-            self.token = Token(TT.DO_WHILE, "do while")
+            self.token.value = "do while"
+            self.token.start = node.token.start
+            self.token.end = node.token.end
             self.ignore = False
             return
 

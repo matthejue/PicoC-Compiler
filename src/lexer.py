@@ -14,7 +14,7 @@ class Token():
         :end: (row, column) in the file where it ends
         """
         self.type = type
-        self.value = value
+        self.value = type
         self.start = start
         self.end = end
 
@@ -166,12 +166,6 @@ class Lexer:
                 raise InvalidCharacterError(self.lc)
         return Token(TT.EOF, self.lc, start, end)
 
-    def _measure_pos(self, method):
-        start = (self.lc_row, self.lc_col)
-        method()
-        end = (self.lc_row, self.lc_col)
-        return (start, end)
-
     def next_char(self):
         """go to the next character, detect if "end of file" is reached
 
@@ -216,15 +210,15 @@ class Lexer:
         :grammar: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
         """
-        start = (self.lc_row, self.lc_col)
+        start, end = ((self.lc_row, self.lc_col) * 2)
 
         self.next_char()
         number = self.c
         while self.lc in self.DIGIT_WITH_ZERO:
+            end = (self.lc_row, self.lc_col)
             self.next_char()
             number += self.c
 
-        end = (self.lc_row, self.lc_col)
         return Token(TT.NUMBER, int(number), start, end)
 
     def _identifier_special_keyword(self):
@@ -278,7 +272,7 @@ class Lexer:
         lc_row_copy, lc_col_copy, c_copy, lc_copy = self.lc_row, self.lc_col,\
             self.c, self.lc
 
-        start = (self.lc_row, self.lc_col)
+        start, end = ((self.lc_row, self.lc_col) * 2)
 
         for match_char in word:
             if self.lc != match_char:
@@ -299,14 +293,14 @@ class Lexer:
         :returns: None
 
         """
-        start = (self.lc_row, self.lc_col)
-
-        word = ""
+        start, end = ((self.lc_row, self.lc_col) * 2)
+        self.next_char()
+        word = self.c
         while self.lc in self.LETTER_DIGIT:
-            word += self.lc
+            end = (self.lc_row, self.lc_col)
             self.next_char()
+            word += self.c
 
-        end = (self.lc_row, self.lc_col)
         return Token(TT.IDENTIFIER, word, start, end)
 
     def _not(self, ):
@@ -399,7 +393,6 @@ class Lexer:
         """
         start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
-
         if self.lc == '/':
             # don't go one position over last character else one gets stuck at
             # this line forever because a character > line end can only be
