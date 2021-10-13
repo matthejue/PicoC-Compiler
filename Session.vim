@@ -8,28 +8,26 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +1 src/abstract_syntax_tree.py
+badd +93 src/abstract_syntax_tree.py
 badd +100 src/arithmetic_expression_grammar.py
-badd +37 src/assignment_allocation_grammar.py
-badd +5 src/ast_builder.py
-badd +1 src/errors.py
-badd +1 src/function_grammar.py
+badd +54 src/assignment_allocation_grammar.py
+badd +30 src/ast_builder.py
+badd +89 src/errors.py
+badd +44 src/function_grammar.py
 badd +3 src/globals.py
-badd +1 src/grammar.py
-badd +14 src/if_else_grammar.py
-badd +3 src/lexer.py
-badd +25 src/logic_expression_grammar.py
+badd +18 src/grammar.py
+badd +79 src/if_else_grammar.py
+badd +1 src/lexer.py
 badd +1 src/loop_grammar.py
-badd +1 src/parser_.py
+badd +70 src/parser_.py
 badd +104 src/pico_c_compiler.py
-badd +3 src/statement_sequence_grammar.py
-badd +21 test/grammar_test.py
-badd +1 input.picoc
+badd +47 src/statement_sequence_grammar.py
+badd +88 test/grammar_test.py
+badd +16 input.picoc
 badd +1 test/gcd.picoc
 badd +1 src/code_generator.py
 badd +1 src/symbol_table.py
 badd +1 output.reti
-badd +1 __Tagbar__.1
 badd +1 Makefile
 argglobal
 %argdel
@@ -48,7 +46,7 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit Makefile
+edit src/errors.py
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -68,17 +66,40 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 113 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 37 + 95) / 190)
-exe 'vert 3resize ' . ((&columns * 38 + 95) / 190)
+exe 'vert 1resize ' . ((&columns * 125 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 27 + 95) / 190)
+exe 'vert 3resize ' . ((&columns * 36 + 95) / 190)
 exe '4resize ' . ((&lines * 22 + 23) / 47)
 exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
+exe '5resize ' . ((&lines * 21 + 23) / 47)
+exe 'vert 5resize ' . ((&columns * 1 + 95) / 190)
 argglobal
-if bufexists("Makefile") | buffer Makefile | else | edit Makefile | endif
+if bufexists("src/errors.py") | buffer src/errors.py | else | edit src/errors.py | endif
 if &buftype ==# 'terminal'
-  silent file Makefile
+  silent file src/errors.py
 endif
-balt test/grammar_test.py
+balt src/lexer.py
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+let s:l = 89 - ((42 * winheight(0) + 21) / 43)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 89
+normal! 03|
+wincmd w
+argglobal
+if bufexists("output.reti") | buffer output.reti | else | edit output.reti | endif
+if &buftype ==# 'terminal'
+  silent file output.reti
+endif
+balt input.picoc
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -95,29 +116,9 @@ keepjumps 1
 normal! 0
 wincmd w
 argglobal
-if bufexists("output.reti") | buffer output.reti | else | edit output.reti | endif
-if &buftype ==# 'terminal'
-  silent file output.reti
-endif
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-let s:l = 1 - ((0 * winheight(0) + 21) / 43)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 1
-normal! 013|
-wincmd w
-argglobal
 enew
-file __Tagbar__.1
-balt src/abstract_syntax_tree.py
+file __Tagbar__.3
+balt input.picoc
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -129,7 +130,7 @@ setlocal nofen
 wincmd w
 argglobal
 enew
-balt src/code_generator.py
+balt output.reti
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -139,11 +140,25 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 wincmd w
-exe 'vert 1resize ' . ((&columns * 113 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 37 + 95) / 190)
-exe 'vert 3resize ' . ((&columns * 38 + 95) / 190)
+argglobal
+enew
+balt src/if_else_grammar.py
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+exe 'vert 1resize ' . ((&columns * 125 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 27 + 95) / 190)
+exe 'vert 3resize ' . ((&columns * 36 + 95) / 190)
 exe '4resize ' . ((&lines * 22 + 23) / 47)
 exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
+exe '5resize ' . ((&lines * 21 + 23) / 47)
+exe 'vert 5resize ' . ((&columns * 1 + 95) / 190)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

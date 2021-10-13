@@ -22,16 +22,27 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "no semicolon":
+            if globals.test_name == "no semicolon":
+                pass
         # it's important that arithmetic grammar is before logic grammar,
-        # because else a number > 0 would automatically be converted to 1 in
-        # logic grammar
+        # because both arithmetic and logic grammar have single numbers. In
+        # arithmetic grammar they're just numbers and in logic grammar
+        # there're 0 and numbers greater 0
         if self.taste(self._taste_consume_ae):
             self._taste_consume_ae()
         elif self.taste(self._taste_consume_le):
             self._taste_consume_le()
         else:
-            raise NoApplicableRuleError("arithmetic expression or logic "
-                                        "expression", self.LT(1))
+            if self.errors[0] == self.errors[1]:
+                error = self.errors[0]
+                self.errors = []
+                raise error
+            else:
+                raise NoApplicableRuleError("arithmetic expression or logic "
+                                            "expression", self.LT(1))
 
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
@@ -116,10 +127,10 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         :returns: None
         """
-        if self.taste(self._top_bottom):
-            self._top_bottom()
-        elif self.taste(self._atom):
+        if self.taste(self._atom):
             self._atom()
+        elif self.taste(self._top_bottom):
+            self._top_bottom()
 
     def _top_bottom(self, ):
         """top / bottom
@@ -132,7 +143,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         # TODO: little hack to to also have a token for bottomnode
         if not globals.is_tasting:
-            self.ast_builder.addChild(TokenNode(Token(TT.TO_BOOL, "to bool")))
+            self.ast_builder.addChild(
+                TokenNode(Token(TT.TO_BOOL, "to bool", None)))
 
         self.code_ae()
 

@@ -17,13 +17,17 @@ class BacktrackingParser():
         :lts: lookahead tokens
         :num_lts: number of lookahead tokens
         :lt_idx: lookahead token index
-
+        :errors: errors that accurred in the last diverging tasting processes
+        :max_errors: number of errors that should be collected before
+        resetting. Should prevent a list that gets longer and longer
         """
         self.lexer = lexer
         self.markers = []
         self.lts = []
         self.lt_idx = 0
         self.ast_builder = ASTBuilder()
+        self.errors = []
+        self.max_errors = 2
 
     def LT(self, i):
         """Lookahead Token
@@ -142,8 +146,12 @@ class BacktrackingParser():
         self._mark()
         try:
             rule()
-        except Exception:
+        except Exception as e:
+            self.errors += [e]
             tastes_good = False
+        else:
+            # reset if this rule can be taken without error
+            self.errors = []
         self._release()
         return tastes_good
 

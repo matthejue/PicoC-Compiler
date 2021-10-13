@@ -79,11 +79,11 @@ class ErrorHandler:
             exit(0)
 
     def _error_message_header(self, error):
-        return self.grammar.lexer.fname + ':' + str(error.found.start[0])\
-            + ':' + str(error.found.start[1]) + ': ' + error.description
+        return self.grammar.lexer.fname + ':' + str(error.found.position[0])\
+            + ':' + str(error.found.position[1]) + ': ' + error.description
 
     def _point_at_error(self, error):
         # TODO: Was ist wenn sich ein Token über mehrere Zeilen erstreck mit ^~
-        line = self.grammar.lexer.input[error.found.start[0]]
-        return line + '\n' + ' ' * (error.found.start[1]-1) + '^' +\
-            '~' * (error.found.end[1]-error.found.start[1])
+        line = self.grammar.lexer.input[error.found.position[0]]
+        return line + '\n' + ' ' * (error.found.position[1]-1) + '^' +\
+            '~' * (len(error.found.value) - 1)

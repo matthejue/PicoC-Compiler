@@ -10,9 +10,9 @@
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
 ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
-AND	src/lexer.py	/^    AND = "and as part of logical expression grammar"$/;"	v	class:TT
-AND_OP	src/lexer.py	/^    AND_OP = "and operator"$/;"	v	class:TT
-ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
+AND	src/lexer.py	/^    AND = "and logical expression grammar"$/;"	v	class:TT
+AND_OP	src/lexer.py	/^    AND_OP = "and arithmetic operator"$/;"	v	class:TT
+ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "assignment operator"$/;"	v	class:TT
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
 ASTNode	src/abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
 AllocationNode	src/abstract_syntax_tree.py	/^class AllocationNode(ASTNode):$/;"	c
@@ -35,18 +35,18 @@ CodeGenerator	src/code_generator.py	/^def CodeGenerator():$/;"	f
 ConstantSymbol	src/symbol_table.py	/^class ConstantSymbol(Symbol):$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
 DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
-DO_WHILE	src/lexer.py	/^    DO_WHILE = "do while"$/;"	v	class:TT
+DO_WHILE	src/lexer.py	/^    DO_WHILE = "do while statement"$/;"	v	class:TT
 Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
 DoWhileNode	src/abstract_syntax_tree.py	/^class DoWhileNode(ASTNode):$/;"	c
-ELSE	src/lexer.py	/^    ELSE = "else"$/;"	v	class:TT
-EOF	src/lexer.py	/^    EOF = "EOF"$/;"	v	class:TT
+ELSE	src/lexer.py	/^    ELSE = "else statement"$/;"	v	class:TT
+EOF	src/lexer.py	/^    EOF = "end of file"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
 ErrorHandler	src/errors.py	/^class ErrorHandler:$/;"	c
 FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementSequenceGrammar):$/;"	c
 Grammar	src/grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
 IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
-IF	src/lexer.py	/^    IF = "if"$/;"	v	class:TT
+IF	src/lexer.py	/^    IF = "if statement"$/;"	v	class:TT
 IfElseNode	src/abstract_syntax_tree.py	/^class IfElseNode(ASTNode):$/;"	c
 IfNode	src/abstract_syntax_tree.py	/^class IfNode(ASTNode):$/;"	c
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
@@ -54,33 +54,31 @@ LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
 LETTER_DIGIT	src/lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
 LT	src/parser_.py	/^    def LT(self, i):$/;"	m	class:BacktrackingParser
 LTT	src/parser_.py	/^    def LTT(self, i):$/;"	m	class:BacktrackingParser
-L_BRACE	src/lexer.py	/^    L_BRACE = "{"$/;"	v	class:TT
-L_PAREN	src/lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
+L_BRACE	src/lexer.py	/^    L_BRACE = "left brace"$/;"	v	class:TT
+L_PAREN	src/lexer.py	/^    L_PAREN = "left parenthesis"$/;"	v	class:TT
 Lexer	src/lexer.py	/^class Lexer:$/;"	c
 LogicAndOrNode	src/abstract_syntax_tree.py	/^class LogicAndOrNode(ASTNode):$/;"	c
 LogicAtomNode	src/abstract_syntax_tree.py	/^class LogicAtomNode(ASTNode):$/;"	c
 LogicExpressionGrammar	src/logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
 LogicNotNode	src/abstract_syntax_tree.py	/^class LogicNotNode(ASTNode):$/;"	c
 LogicTopBottomNode	src/abstract_syntax_tree.py	/^class LogicTopBottomNode(ASTNode):$/;"	c
-MAIN	src/lexer.py	/^    MAIN = "main"$/;"	v	class:TT
-MINUS	src/lexer.py	/^    MINUS = "-"$/;"	v	class:TT
+MAIN	src/lexer.py	/^    MAIN = "main function"$/;"	v	class:TT
+MINUS	src/lexer.py	/^    MINUS = "minus unary or binary operator"$/;"	v	class:TT
 MainFunctionNode	src/abstract_syntax_tree.py	/^class MainFunctionNode(ASTNode):$/;"	c
 MismatchedTokenError	src/errors.py	/^class MismatchedTokenError(Exception):$/;"	c
-NOT	src/lexer.py	/^    NOT = "not operator or not as part of logical expression grammar"$/;"	v	class:TT
+NOT	src/lexer.py	/^    NOT = "not logical expression grammar"$/;"	v	class:TT
 NUMBER	src/lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
 NoApplicableRuleError	src/errors.py	/^class NoApplicableRuleError(Exception):$/;"	c
-OR	src/lexer.py	/^    OR = "or as part of logical expression grammar"$/;"	v	class:TT
-OR_OP	src/lexer.py	/^    OR_OP = "or operator"$/;"	v	class:TT
+OR	src/lexer.py	/^    OR = "or logical expression grammar"$/;"	v	class:TT
+OR_OP	src/lexer.py	/^    OR_OP = "or arithmetic operator"$/;"	v	class:TT
 PRIM_DT	src/lexer.py	/^    PRIM_DT = "primitive datatype"$/;"	v	class:TT
 Pico-C Compiler	README.md	/^# Pico-C Compiler$/;"	c
-ROOT	src/lexer.py	/^    ROOT = "ROOT"$/;"	v	class:TT
-R_BRACE	src/lexer.py	/^    R_BRACE = "}"$/;"	v	class:TT
-R_PAREN	src/lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
-SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
+R_BRACE	src/lexer.py	/^    R_BRACE = "right brace"$/;"	v	class:TT
+R_PAREN	src/lexer.py	/^    R_PAREN = "right parenthesis"$/;"	v	class:TT
+SEMICOLON	src/lexer.py	/^    SEMICOLON = "semicolon"$/;"	v	class:TT
 STATEMENT	src/lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
 Scope	src/symbol_table.py	/^class Scope:$/;"	c
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
-SessionLoad	src/Session.vim	/^let SessionLoad = 1$/;"	v
 SessionLoad	test/Session.vim	/^let SessionLoad = 1$/;"	v
 StatementSequenceGrammar	src/statement_sequence_grammar.py	/^class StatementSequenceGrammar(AssignmentAllocationGrammar):$/;"	c
 Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
@@ -89,13 +87,14 @@ SyntaxError	src/errors.py	/^class SyntaxError(Exception):$/;"	c
 TEST_BINARY_BASENAMES	Makefile	/^TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard .\/test\/*_test.py))$/;"	m
 TEST_BINARY_PATHS	Makefile	/^TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test\/$(test_binary))$/;"	m
 TODO	README.md	/^## TODO$/;"	s	chapter:Pico-C Compiler
-TO_BOOL	src/lexer.py	/^    TO_BOOL = "convert arithmetic expression to logical expression"$/;"	v	class:TT
+TO_BOOL	src/lexer.py	/^    TO_BOOL = "convert to boolean value"$/;"	v	class:TT
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
 TestArithmeticExpressionGrammar	test/grammar_test.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestAssignmentGrammar	test/grammar_test.py	/^class TestAssignmentGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestCodeGenerator	test/grammar_test.py	/^class TestCodeGenerator(unittest.TestCase, UsefullTools):$/;"	c
 TestComments	test/grammar_test.py	/^class TestComments(unittest.TestCase, UsefullTools):$/;"	c
+TestError	test/grammar_test.py	/^class TestError(unittest.TestCase, UsefullTools):$/;"	c
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
 TestIfElseGrammar	test/grammar_test.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestLexer	test/grammar_test.py	/^class TestLexer(unittest.TestCase, UsefullTools):$/;"	c
@@ -110,7 +109,7 @@ Used Resources	README.md	/^## Used Resources$/;"	s	chapter:Pico-C Compiler
 UsefullTools	test/grammar_test.py	/^class UsefullTools():$/;"	c
 VAR	src/lexer.py	/^    VAR = "variable qualifier"$/;"	v	class:TT
 VariableSymbol	src/symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
-WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
+WHILE	src/lexer.py	/^    WHILE = "while statement"$/;"	v	class:TT
 WhileNode	src/abstract_syntax_tree.py	/^class WhileNode(ASTNode):$/;"	c
 _CodeGenerator	src/code_generator.py	/^class _CodeGenerator:$/;"	c
 _SymbolTable	src/symbol_table.py	/^class _SymbolTable(Scope):$/;"	c
@@ -124,10 +123,11 @@ __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:Mi
 __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:NoApplicableRuleError
 __init__	src/errors.py	/^    def __init__(self, expected, found):$/;"	m	class:SyntaxError
 __init__	src/errors.py	/^    def __init__(self, found):$/;"	m	class:InvalidCharacterError
+__init__	src/errors.py	/^    def __init__(self, grammar):$/;"	m	class:ErrorHandler
 __init__	src/function_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:FunctionGrammar
 __init__	src/grammar.py	/^    def __init__(self, lexer):$/;"	m	class:Grammar
 __init__	src/lexer.py	/^    def __init__(self, fname, input):$/;"	m	class:Lexer
-__init__	src/lexer.py	/^    def __init__(self, type, value):$/;"	m	class:Token
+__init__	src/lexer.py	/^    def __init__(self, type, value, position):$/;"	m	class:Token
 __init__	src/logic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:LogicExpressionGrammar
 __init__	src/parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
 __init__	src/statement_sequence_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:StatementSequenceGrammar
@@ -161,6 +161,7 @@ _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
 _division_sign_or_comment	src/lexer.py	/^    def _division_sign_or_comment(self, ):$/;"	m	class:Lexer
 _do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
+_error_message_header	src/errors.py	/^    def _error_message_header(self, error):$/;"	m	class:ErrorHandler
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
 _get_childtoken	src/abstract_syntax_tree.py	/^    def _get_childtoken(self, idx):$/;"	m	class:AllocationNode
 _get_childvalue	src/abstract_syntax_tree.py	/^    def _get_childvalue(self, idx):$/;"	m	class:AllocationNode
@@ -192,6 +193,7 @@ _or	src/lexer.py	/^    def _or(self):$/;"	m	class:Lexer
 _or_expr	src/logic_expression_grammar.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
 _paren_arith	src/arithmetic_expression_grammar.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
 _paren_logic	src/logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
+_point_at_error	src/errors.py	/^    def _point_at_error(self, error):$/;"	m	class:ErrorHandler
 _prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
 _prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
 _read_file	src/pico_c_compiler.py	/^def _read_file(infile, outfile):$/;"	f
@@ -200,7 +202,9 @@ _s	src/statement_sequence_grammar.py	/^    def _s(self):$/;"	m	class:StatementSe
 _shell	src/pico_c_compiler.py	/^def _shell():$/;"	f
 _ss	src/statement_sequence_grammar.py	/^    def _ss(self):$/;"	m	class:StatementSequenceGrammar
 _sync	src/parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
+_taste_consume_ae	src/logic_expression_grammar.py	/^    def _taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
 _taste_consume_if_without_else	src/if_else_grammar.py	/^def _taste_consume_if_without_else(self):$/;"	f
+_taste_consume_le	src/logic_expression_grammar.py	/^    def _taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
 _top_bottom	src/logic_expression_grammar.py	/^    def _top_bottom(self, ):$/;"	m	class:LogicExpressionGrammar
 _unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
 _while	src/loop_grammar.py	/^def _while(self):$/;"	f
@@ -284,7 +288,6 @@ lexer	test/grammar_test.py	/^    lexer = None$/;"	v	class:UsefullTools
 main	.misc/pico_c_compiler	/^def main():$/;"	f
 main	.misc/test.cpp	/^int main() {$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
-match	src/lexer.py	/^    def match(self, m):$/;"	m	class:Lexer
 match	src/parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
 match_and_add	src/parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
 middle	src/abstract_syntax_tree.py	/^    middle = """JUMP codelength(af2) + 1;$/;"	v	class:IfElseNode
@@ -317,7 +320,7 @@ run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
 run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
 s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
-s:l	src/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	Session.vim	/^let s:l = 89 - ((42 * winheight(0) + 21) \/ 43)$/;"	v
 s:l	test/Session.vim	/^let s:l = 50 - ((19 * winheight(0) + 20) \/ 41)$/;"	v
 s:l	test/Session.vim	/^let s:l = 58 - ((39 * winheight(0) + 20) \/ 41)$/;"	v
 s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
@@ -325,25 +328,20 @@ s:save_splitbelow	test/Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
 s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_splitright	test/Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
-s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminheight	test/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
-s:save_winminwidth	src/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:save_winminwidth	test/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
-s:so_save	src/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:so_save	test/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
-s:sx	src/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:sx	test/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
-s:wipebuf	src/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 s:wipebuf	test/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
-set_everything_up_for_ast	test/grammar_test.py	/^    def set_everything_up_for_ast(self, code):$/;"	m	class:UsefullTools
+set_everything_up_for_ast	test/grammar_test.py	/^    def set_everything_up_for_ast(self, test_name, code):$/;"	m	class:UsefullTools
 set_everything_up_for_ast_multiline	test/grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
-set_everything_up_for_lexer	test/grammar_test.py	/^    def set_everything_up_for_lexer(self, code):$/;"	m	class:UsefullTools
-set_everything_up_for_multiline_program	test/grammar_test.py	/^    def set_everything_up_for_multiline_program(self, program_name, input_string):$/;"	m	class:UsefullTools
-set_everything_up_for_testing_program_file	test/grammar_test.py	/^    def set_everything_up_for_testing_program_file(self, program_name, programpath):$/;"	m	class:UsefullTools
+set_everything_up_for_lexer	test/grammar_test.py	/^    def set_everything_up_for_lexer(self, test_name, code):$/;"	m	class:UsefullTools
+set_everything_up_for_multiline_program	test/grammar_test.py	/^    def set_everything_up_for_multiline_program(self, test_name, input_string):$/;"	m	class:UsefullTools
+set_everything_up_for_testing_program_file	test/grammar_test.py	/^    def set_everything_up_for_testing_program_file(self, test_name, programpath):$/;"	m	class:UsefullTools
 set_everything_up_for_visit_multiline	test/grammar_test.py	/^    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
 set_prefs	.vim/.ropeproject/config.py	/^def set_prefs(prefs):$/;"	f
 shell	.misc/pico_c_compiler	/^def shell():$/;"	f
@@ -363,8 +361,6 @@ stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configu
 strip_multiline_string	src/abstract_syntax_tree.py	/^def strip_multiline_string(mutline_string):$/;"	f
 syntax_tree_rootnode	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors
 taste	src/parser_.py	/^    def taste(self, rule):$/;"	m	class:BacktrackingParser
-taste_consume_ae	src/logic_expression_grammar.py	/^    def taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
-taste_consume_le	src/logic_expression_grammar.py	/^    def taste_consume_le(self):$/;"	m	class:LogicExpressionGrammar
 test	Makefile	/^test:$/;"	t
 test_basic_arithmetic_expression	test/grammar_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_code_replacment_after	test/grammar_test.py	/^    def test_code_replacment_after(self, ):$/;"	m	class:TestCodeGenerator
@@ -389,6 +385,7 @@ test_mixed_if_else_after_another	test/grammar_test.py	/^    def test_mixed_if_el
 test_name	src/globals.py	/^test_name = ""$/;"	v
 test_negative_parenthesis_and_variable	test/grammar_test.py	/^    def test_negative_parenthesis_and_variable(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_nested_loops	test/grammar_test.py	/^    def test_nested_loops(self, ):$/;"	m	class:TestLoopGrammar
+test_no_semicolon	test/grammar_test.py	/^    def test_no_semicolon(self, ):$/;"	m	class:TestError
 test_numbers	test/grammar_test.py	/^    def test_numbers(self, ):$/;"	m	class:TestLexer
 test_parenthesis	.misc/test_parser	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpreessions
 test_parenthesis	test/grammar_test.py	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpressionGrammar

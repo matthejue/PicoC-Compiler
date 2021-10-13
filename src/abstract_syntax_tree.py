@@ -49,7 +49,7 @@ class ASTNode(TokenNode):
         # the first tokentype is always the actual tokentype and the others are
         # for symbols like e.g. '-' which had to get a seperate tokentype
         # because they overlap with e.g. unary and binary operations
-        super().__init__(Token(tokentypes[0], None, None, None))
+        super().__init__(Token(tokentypes[0], None, None))
         self.tokentypes = tokentypes
         # decide whether a node should be ignored and just show his children if
         # he has any
@@ -78,8 +78,7 @@ class ASTNode(TokenNode):
         if self._is_tokennode(node) and node.token.type in\
                 self.tokentypes:
             self.token.value = node.token.value
-            self.token.start = node.token.start
-            self.token.end = node.token.end
+            self.token.position = node.token.position
             self.ignore = False
             return
 
@@ -210,8 +209,7 @@ class DoWhileNode(ASTNode):
         if self._is_tokennode(node) and node.token.type in\
                 self.tokentypes:
             self.token.value = "do while"
-            self.token.start = node.token.start
-            self.token.end = node.token.end
+            self.token.position = node.token.position
             self.ignore = False
             return
 

@@ -8,19 +8,17 @@ class Token():
 
     """Identifies what a certiain string slice is"""
 
-    def __init__(self, type, value, start, end):
+    def __init__(self, type, value, position):
         """
-        :start: (row, column) in the file where it starts
-        :end: (row, column) in the file where it ends
+        :position: (row, column) in the file where the token starts
         """
         self.type = type
-        self.value = type
-        self.start = start
-        self.end = end
+        self.value = value
+        self.position = position
 
     def __repr__(self):
         if globals.args.verbose:
-            return f"<{self.type},'{self.value}',{self.start},{self.end}>"
+            return f"<{self.type},'{self.value}',{self.position}>"
         return f"'{self.value}'"
 
 
@@ -92,6 +90,8 @@ class Lexer:
         self.lc_row = 0
         self.lc = input[self.lc_row][self.lc_col]
         self.c = None
+        # position variable to be available between methods
+        self.position = (0, 0)
 
     def next_token(self):
         """identifies the next Token in the picoC code
@@ -99,59 +99,50 @@ class Lexer:
         :returns: Token
         """
         while self.lc != self.EOF_CHAR:
+            self.position = (self.lc_row, self.lc_col)
             # TODO: remove \n again
             if self.lc in ' \t':
                 self.next_char()
             elif self.lc == ';':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.SEMICOLON, self.c, start, end)
+                return Token(TT.SEMICOLON, self.c, self.position)
             elif self.lc in '*%^':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.BINOP_PREC_1, self.c, start, end)
+                return Token(TT.BINOP_PREC_1, self.c, self.position)
             elif self.lc == '/':
                 token = self._division_sign_or_comment()
                 if token:
                     return token
             elif self.lc == '+':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.BINOP_PREC_2, self.c, start, end)
+                return Token(TT.BINOP_PREC_2, self.c, self.position)
             elif self.lc == '-':
                 # minus has a special role because it can be both a unary and
                 # binary operator
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.MINUS, self.c, start, end)
+                return Token(TT.MINUS, self.c, self.position)
             elif self.lc == '~':
                 # minus has a special role because it can be both a unary and
                 # binary operator
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.UNARY_OP, self.c, start, end)
+                return Token(TT.UNARY_OP, self.c, self.position)
             elif self.lc == '(':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.L_PAREN, self.c, start, end)
+                return Token(TT.L_PAREN, self.c, self.position)
             elif self.lc == ')':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.R_PAREN, self.c, start, end)
+                return Token(TT.R_PAREN, self.c, self.position)
             elif self.lc == '{':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.L_BRACE, self.c, start, end)
+                return Token(TT.L_BRACE, self.c, self.position)
             elif self.lc == '}':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.R_BRACE, self.c, start, end)
+                return Token(TT.R_BRACE, self.c, self.position)
             elif self.lc in self.DIGIT_WITHOUT_ZERO:
                 return self._number()
             elif self.lc == '0':
-                start, end = ((self.lc_row, self.lc_col) * 2)
                 self.next_char()
-                return Token(TT.NUMBER, self.c, start, end)
+                return Token(TT.NUMBER, self.c, self.position)
             elif self.lc in self.LETTER:
                 return self._identifier_special_keyword()
             elif self.lc == '!':
@@ -164,7 +155,7 @@ class Lexer:
                 return self._comp_operator_assignment_bitshift()
             else:
                 raise InvalidCharacterError(self.lc)
-        return Token(TT.EOF, self.lc, start, end)
+        return Token(TT.EOF, self.lc, self.position)
 
     def next_char(self):
         """go to the next character, detect if "end of file" is reached
@@ -193,33 +184,19 @@ class Lexer:
             self.c = self.lc
             self.lc = self.input[self.lc_row][self.lc_col]
 
-    def match(self, m):
-        """Check if m is the next character in the input to match
-
-        :m: possibly matching character
-        :returns: None
-        """
-        if self.lc == m:
-            self.next_char()
-        else:
-            raise SyntaxError(m, self.c)
-
     def _number(self):
         """
 
         :grammar: <digit_without_zero> <digit_with_zero>*
         :returns: Number Token
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
-
         self.next_char()
         number = self.c
         while self.lc in self.DIGIT_WITH_ZERO:
-            end = (self.lc_row, self.lc_col)
             self.next_char()
             number += self.c
 
-        return Token(TT.NUMBER, int(number), start, end)
+        return Token(TT.NUMBER, number, self.position)
 
     def _identifier_special_keyword(self):
         """
@@ -272,16 +249,13 @@ class Lexer:
         lc_row_copy, lc_col_copy, c_copy, lc_copy = self.lc_row, self.lc_col,\
             self.c, self.lc
 
-        start, end = ((self.lc_row, self.lc_col) * 2)
-
         for match_char in word:
             if self.lc != match_char:
                 break
-            end = (self.lc_row, self.lc_col)
             self.next_char()
         else:
             if self.lc not in self.LETTER_DIGIT:
-                return Token(tokentype, word, start, end)
+                return Token(tokentype, word, self.position)
 
         self.lc_row, self.lc_col, self.c, self.lc = lc_row_copy, lc_col_copy,\
             c_copy, lc_copy
@@ -293,15 +267,13 @@ class Lexer:
         :returns: None
 
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         word = self.c
         while self.lc in self.LETTER_DIGIT:
-            end = (self.lc_row, self.lc_col)
             self.next_char()
             word += self.c
 
-        return Token(TT.IDENTIFIER, word, start, end)
+        return Token(TT.IDENTIFIER, word, self.position)
 
     def _not(self, ):
         """
@@ -310,13 +282,11 @@ class Lexer:
         :returns: None
 
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '=':
-            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.COMP_OP, '!=', start, end)
-        return Token(TT.NOT, self.c, start, end)
+            return Token(TT.COMP_OP, '!=', self.position)
+        return Token(TT.NOT, self.c, self.position)
 
     def _and(self):
         """
@@ -325,13 +295,11 @@ class Lexer:
         :returns: None
 
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '&':
-            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.AND, "&&", start, end)
-        return Token(TT.BINOP_PREC_1, self.c, start, end)
+            return Token(TT.AND, "&&", self.position)
+        return Token(TT.BINOP_PREC_1, self.c, self.position)
 
     def _or(self):
         """
@@ -340,13 +308,11 @@ class Lexer:
         :returns: None
 
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '|':
-            end = (self.lc_row, self.lc_col)
             self.next_char()
-            return Token(TT.OR, "||", start, end)
-        return Token(TT.BINOP_PREC_1, self.c, start, end)
+            return Token(TT.OR, "||", self.position)
+        return Token(TT.BINOP_PREC_1, self.c, self.position)
 
     def _comp_operator_assignment_bitshift(self):
         """
@@ -354,36 +320,30 @@ class Lexer:
         :grammar: ((==?)|(<(<|=)?)|(>(>|=)?))
         :returns: None
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         if self.lc == '=':
             self.next_char()
             if self.lc == '=':
-                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, "==", start, end)
-            return Token(TT.ASSIGNMENT, '=', start, end)
+                return Token(TT.COMP_OP, "==", self.position)
+            return Token(TT.ASSIGNMENT, '=', self.position)
         elif self.lc == '<':
             self.next_char()
             if self.lc == '=':
-                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, "<=", start, end)
+                return Token(TT.COMP_OP, "<=", self.position)
             elif self.lc == '<':
-                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.BITSHIFT, "<<", start, end)
-            return Token(TT.COMP_OP, self.c, start, end)
+                return Token(TT.BITSHIFT, "<<", self.position)
+            return Token(TT.COMP_OP, self.c, self.position)
         elif self.lc == '>':
             self.next_char()
             if self.lc == '=':
-                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.COMP_OP, ">=", start, end)
+                return Token(TT.COMP_OP, ">=", self.position)
             elif self.lc == '>':
-                end = (self.lc_row, self.lc_col)
                 self.next_char()
-                return Token(TT.BITSHIFT, ">>", start, end)
-            return Token(TT.COMP_OP, self.c, start, end)
+                return Token(TT.BITSHIFT, ">>", self.position)
+            return Token(TT.COMP_OP, self.c, self.position)
 
     def _division_sign_or_comment(self, ):
         """
@@ -391,7 +351,6 @@ class Lexer:
         :grammar: /(/|('*'.*'*'/))?
         :returns: None
         """
-        start, end = ((self.lc_row, self.lc_col) * 2)
         self.next_char()
         if self.lc == '/':
             # don't go one position over last character else one gets stuck at
@@ -405,4 +364,4 @@ class Lexer:
                 self.next_char()
             self.next_char()
         else:
-            return Token(TT.BINOP_PREC_1, self.c, start, end)
+            return Token(TT.BINOP_PREC_1, self.c, self.position)

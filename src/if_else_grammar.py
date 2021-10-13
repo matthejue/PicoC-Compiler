@@ -14,10 +14,10 @@ def code_if_if_else(self):
     <code_ss> }|<s>))?
     :returns: None
     """
-    if self.taste(self._taste_consume_if_without_else):
-        self._taste_consume_if_without_else()
-    elif self.taste(self._if_else):
+    if self.taste(self._if_else):
         self._if_else()
+    elif self.taste(self._taste_consume_if_without_else):
+        self._taste_consume_if_without_else()
     else:
         raise NoApplicableRuleError("if or if else expression", self.LT(1))
 
