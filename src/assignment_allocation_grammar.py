@@ -1,6 +1,7 @@
 from logic_expression_grammar import LogicExpressionGrammar
 from abstract_syntax_tree import AssignmentNode, AllocationNode, TokenNode
 from lexer import TT, Token
+from errors import MismatchedTokenError
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):
@@ -37,7 +38,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             # and self.LTT(2) == TT.IDENTIFIER:
             self._alloc()
         else:
-            raise SyntaxError(
+            raise MismatchedTokenError(
                 "identifier or assignment expression", self.LT(2))
 
         self.match_and_add([TT.ASSIGNMENT])

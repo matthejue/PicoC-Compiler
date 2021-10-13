@@ -1,17 +1,6 @@
 from sys import exit
-
-
-class SyntaxError(Exception):
-
-    """If there're Token sequences generated from the input that are not
-    permitted by the grammar rules"""
-
-    def __init__(self, expected, found):
-        self.description = f"SyntaxError: Expected {expected}"\
-            f", found {found.value}"
-        super().__init__(self.description)
-        self.expected = expected
-        self.found = found
+# because of circular import
+import lexer
 
 
 class InvalidCharacterError(Exception):
@@ -23,7 +12,7 @@ class InvalidCharacterError(Exception):
         self.description = f"InvalidCharacterError: "\
             f"{found} is not a permitted character"
         super().__init__(self.description)
-        self.found = found
+        self.found = lexer.Token(None, value=found, position=None)
 
 
 class NoApplicableRuleError(Exception):
@@ -41,7 +30,7 @@ class NoApplicableRuleError(Exception):
 
 class MismatchedTokenError(Exception):
 
-    """If token shouldn't syntactically appear at this position"""
+    """If Token shouldn't syntactically appear at this position"""
 
     def __init__(self, expected, found):
         self.description = f"MismatchedTokenError: Expected {expected}"\
@@ -79,6 +68,8 @@ class ErrorHandler:
             exit(0)
 
     def _error_message_header(self, error):
+        if error.found.position[0]:
+            pass
         return self.grammar.lexer.fname + ':' + str(error.found.position[0])\
             + ':' + str(error.found.position[1]) + ': ' + error.description
 
@@ -86,4 +77,4 @@ class ErrorHandler:
         # TODO: Was ist wenn sich ein Token über mehrere Zeilen erstreck mit ^~
         line = self.grammar.lexer.input[error.found.position[0]]
         return line + '\n' + ' ' * (error.found.position[1]-1) + '^' +\
-            '~' * (len(error.found.value) - 1)
+            '~' * (len(error.found.value))

@@ -27,7 +27,7 @@ class BacktrackingParser():
         self.lt_idx = 0
         self.ast_builder = ASTBuilder()
         self.errors = []
-        self.max_errors = 2
+        self.num_tastes = 0
 
     def LT(self, i):
         """Lookahead Token
@@ -148,10 +148,12 @@ class BacktrackingParser():
             rule()
         except Exception as e:
             self.errors += [e]
+            self.num_tastes += 1
             tastes_good = False
         else:
             # reset if this rule can be taken without error
-            self.errors = []
+            for _ in range(self.num_tastes):
+                self.errors.pop()
         self._release()
         return tastes_good
 

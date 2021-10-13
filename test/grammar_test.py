@@ -401,11 +401,31 @@ class TestError(unittest.TestCase, UsefullTools):
 
     def test_no_semicolon(self, ):
         test_code = """void main() {
-                      int var = 32
-                      var = 10;
+                      if (1) {
+                        int var = 32
+                        var = 10;
+                      }
                     }
                     """
-        self.set_everything_up_for_multiline_program("no semicolon", test_code)
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no semicolon", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_closing_parenthesis(self, ):
+        test_code = """void main() {
+                      if (1) {
+                          int var = (32 * 2;
+                          var = 10;
+                      }
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no closing parenthesis", test_code)
+        except SystemExit:
+            pass
 
 
 if __name__ == '__main__':

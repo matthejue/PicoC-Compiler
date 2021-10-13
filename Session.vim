@@ -29,6 +29,7 @@ badd +1 src/code_generator.py
 badd +1 src/symbol_table.py
 badd +1 output.reti
 badd +1 Makefile
+badd +0 src/logic_expression_grammar.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -46,16 +47,12 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit src/errors.py
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
-wincmd _ | wincmd |
-vsplit
-2wincmd h
-wincmd w
+1wincmd h
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -66,68 +63,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 125 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 27 + 95) / 190)
-exe 'vert 3resize ' . ((&columns * 36 + 95) / 190)
-exe '4resize ' . ((&lines * 22 + 23) / 47)
-exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
-exe '5resize ' . ((&lines * 21 + 23) / 47)
-exe 'vert 5resize ' . ((&columns * 1 + 95) / 190)
-argglobal
-if bufexists("src/errors.py") | buffer src/errors.py | else | edit src/errors.py | endif
-if &buftype ==# 'terminal'
-  silent file src/errors.py
-endif
-balt src/lexer.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-let s:l = 89 - ((42 * winheight(0) + 21) / 43)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 89
-normal! 03|
-wincmd w
-argglobal
-if bufexists("output.reti") | buffer output.reti | else | edit output.reti | endif
-if &buftype ==# 'terminal'
-  silent file output.reti
-endif
-balt input.picoc
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-let s:l = 1 - ((0 * winheight(0) + 21) / 43)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 1
-normal! 0
-wincmd w
-argglobal
-enew
-file __Tagbar__.3
-balt input.picoc
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
+exe 'vert 1resize ' . ((&columns * 117 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 72 + 95) / 190)
 argglobal
 enew
 balt output.reti
@@ -152,13 +89,8 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 wincmd w
-exe 'vert 1resize ' . ((&columns * 125 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 27 + 95) / 190)
-exe 'vert 3resize ' . ((&columns * 36 + 95) / 190)
-exe '4resize ' . ((&lines * 22 + 23) / 47)
-exe 'vert 4resize ' . ((&columns * 1 + 95) / 190)
-exe '5resize ' . ((&lines * 21 + 23) / 47)
-exe 'vert 5resize ' . ((&columns * 1 + 95) / 190)
+exe 'vert 1resize ' . ((&columns * 117 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 72 + 95) / 190)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

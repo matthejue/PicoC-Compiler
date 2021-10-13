@@ -2,7 +2,7 @@ from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
 from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
     LogicTopBottomNode, TokenNode
-from errors import SyntaxError, NoApplicableRuleError, MismatchedTokenError
+from errors import MismatchedTokenError, NoApplicableRuleError, MismatchedTokenError
 import globals
 
 
@@ -31,18 +31,26 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # because both arithmetic and logic grammar have single numbers. In
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
+        self.num_tastes = 0
         if self.taste(self._taste_consume_ae):
             self._taste_consume_ae()
         elif self.taste(self._taste_consume_le):
             self._taste_consume_le()
         else:
-            if self.errors[0] == self.errors[1]:
-                error = self.errors[0]
-                self.errors = []
-                raise error
-            else:
-                raise NoApplicableRuleError("arithmetic expression or logic "
-                                            "expression", self.LT(1))
+            self._handle_all_tastes_unsuccessful()
+
+    def _handle_all_tastes_unsuccessful(self, ):
+        # if both threw the same error print that error out
+        if self.errors[-1].expected == self.errors[-2].expected:
+            error = self.errors[-1]
+            for _ in range(self.num_tastes):
+                self.errors.pop()
+            raise error
+        # if both threw different errors raise a undefinied
+        # NoApplicableRuleError
+        else:
+            raise NoApplicableRuleError("arithmetic expression or logic "
+                                        "expression", self.LT(1))
 
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
@@ -119,7 +127,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         elif self.LTT(1) in [TT.NUMBER, TT.IDENTIFIER]:
             self._atom_or_top_bottom()
         else:
-            raise SyntaxError("logic operand", self.LT(1))
+            raise MismatchedTokenError("logic operand", self.LT(1))
 
     def _atom_or_top_bottom(self):
         """atomic formula or top / bottom
@@ -127,10 +135,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         :returns: None
         """
+        self.num_tastes = 0
         if self.taste(self._atom):
             self._atom()
         elif self.taste(self._top_bottom):
             self._top_bottom()
+        else:
+            self._handle_all_tastes_unsuccessful()
 
     def _top_bottom(self, ):
         """top / bottom

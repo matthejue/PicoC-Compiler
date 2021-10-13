@@ -2,7 +2,7 @@ from parser_ import BacktrackingParser
 from abstract_syntax_tree import (ArithmeticUnaryOperationNode,
                                   ArithmeticBinaryOperationNode,
                                   ArithmeticVariableConstantNode)
-from errors import SyntaxError
+from errors import MismatchedTokenError
 from lexer import TT
 
 
@@ -86,7 +86,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             # TT.MINUS and TT.UNOP
             self._unop()
         else:
-            raise SyntaxError("aritmetic operand", self.LT(1))
+            raise MismatchedTokenError("aritmetic operand", self.LT(1))
 
     def _identifier(self, ):
         savestate_node = self.ast_builder.down(

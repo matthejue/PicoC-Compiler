@@ -1,4 +1,4 @@
-from errors import SyntaxError, InvalidCharacterError
+from errors import InvalidCharacterError
 from enum import Enum
 import string
 import globals
@@ -24,38 +24,39 @@ class Token():
 
 class TT(Enum):
 
-    """Tokentypes that are part of the grammar"""
+    """Tokentypes that are part of the grammar. Their strings are used for
+    differentiation and for error messages"""
 
     EOF = "end of file"
     UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
-    ASSIGNMENT = "assignment operator"
-    L_PAREN = "left parenthesis"
-    R_PAREN = "right parenthesis"
-    L_BRACE = "left brace"
-    R_BRACE = "right brace"
-    SEMICOLON = "semicolon"
-    MINUS = "minus unary or binary operator"
+    ASSIGNMENT = "="
+    L_PAREN = "("
+    R_PAREN = ")"
+    L_BRACE = "{"
+    R_BRACE = "}"
+    SEMICOLON = ";"
+    MINUS = "-"
     ALLOC = "allocation"
     STATEMENT = "statement"
     FUNCTION = "function"
-    NOT = "not logical expression grammar"
-    AND_OP = "and arithmetic operator"
-    OR_OP = "or arithmetic operator"
-    AND = "and logical expression grammar"
-    OR = "or logical expression grammar"
+    NOT = "!"
+    AND_OP = "&"
+    OR_OP = "|"
+    AND = "&&"
+    OR = "||"
     COMP_OP = "comparison operator"
-    BITSHIFT = "bitshift"
+    BITSHIFT = "<<"
     NUMBER = "number"
     IDENTIFIER = "identifier"
     CONST = "constant qualifier"
     VAR = "variable qualifier"
     PRIM_DT = "primitive datatype"
-    IF = "if statement"
-    ELSE = "else statement"
-    WHILE = "while statement"
-    DO_WHILE = "do while statement"
+    IF = "if"
+    ELSE = "else"
+    WHILE = "while"
+    DO_WHILE = "do while"
     MAIN = "main function"
     TO_BOOL = "convert to boolean value"
 

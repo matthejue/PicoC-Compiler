@@ -1,6 +1,7 @@
 from assignment_allocation_grammar import AssignmentAllocationGrammar
 # from abstract_syntax_tree import ASTNode
 from lexer import TT
+from errors import MismatchedTokenError
 
 
 class StatementSequenceGrammar(AssignmentAllocationGrammar):
@@ -50,7 +51,7 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         elif self._is_loop():
             self.code_lo()
         else:
-            raise SyntaxError("statement", self.LT(1))
+            raise MismatchedTokenError("statement", self.LT(1))
 
     def _is_assignment_allocation(self):
         """Test whether the next statement is a assignment.

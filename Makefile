@@ -11,6 +11,9 @@ run-read-compile:
 run-read-compile-comments:
 	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m ./input.picoc ./output.reti
 
+run-read-compile-arg:
+	./src/pico_c_compiler.py -p -s 100 -e 200 -m ./test/$(ARG) ./output.reti
+
 run-shell-compile:
 	./src/pico_c_compiler.py -p -s 100 -e 200 -m
 
