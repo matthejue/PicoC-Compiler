@@ -1,85 +1,126 @@
+# Main start
 LOADI SP 200;
+# Assignment start or new sub-assignment
+# Allocation start
+# successfully allocated var
+# Allocation end
+# Variable / Constant start
 SUBI SP 1;
-LOADI ACC 0;
+LOADI ACC 12;
 STOREIN SP ACC 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-STORE ACC 100;
+# Variable / Constant end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end or sub-assignment end
+# If start
+# Logic Top Bottom start
+# Variable / Constant start
 SUBI SP 1;
+LOADI ACC 12;
+STOREIN SP ACC 1;
+# Variable / Constant end
+# codeaa(e)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+JUMP= 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
 LOADI ACC 1;
+STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
+# Logic Top Bottom end
+# codela(l)
+LOADIN SP ACC 1; # Wert von l in ACC laden
+ADDI SP 1; # Stack um eine Zelle verkürzen
+JUMP= 15; # af überspringen
+# code(af)
+# Assignment start or new sub-assignment
+# Arithmetic Binary Operation start
+# Variable / Constant start
+SUBI SP 1;
+LOADI ACC 13;
 STOREIN SP ACC 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-STORE ACC 101;
+# Variable / Constant end
+# Variable / Constant start
 SUBI SP 1;
 LOAD ACC 100;
 STOREIN SP ACC 1;
-SUBI SP 1;
-LOADI ACC 10;
-STOREIN SP ACC 1;
-LOADIN SP ACC 2;
-LOADIN SP IN2 1;
-SUB ACC IN2;
-JUMP< 3;
-LOADI ACC 0;
-JUMP 2;
-LOADI ACC 1;
-STOREIN SP ACC 2;
-ADDI SP 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-JUMP= 40;
-SUBI SP 1;
-LOAD ACC 100;
-STOREIN SP ACC 1;
-SUBI SP 1;
-LOADI ACC 5;
-STOREIN SP ACC 1;
-LOADIN SP ACC 2;
-LOADIN SP IN2 1;
-SUB ACC IN2;
-JUMP= 3;
-LOADI ACC 0;
-JUMP 2;
-LOADI ACC 1;
-STOREIN SP ACC 2;
-ADDI SP 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-JUMP= 7;
-SUBI SP 1;
-LOADI ACC 2;
-STOREIN SP ACC 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-STORE ACC 101;
-SUBI SP 1;
-LOAD ACC 100;
-STOREIN SP ACC 1;
-SUBI SP 1;
-LOAD ACC 101;
-STOREIN SP ACC 1;
-LOADIN SP ACC 2;
-LOADIN SP IN2 1;
-ADD ACC IN2;
-STOREIN SP ACC 2;
-ADDI SP 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-STORE ACC 100;
-JUMP -56;
-SUBI SP 1;
-LOAD ACC 100;
-STOREIN SP ACC 1;
-SUBI SP 1;
-LOADI ACC 10;
-STOREIN SP ACC 1;
-LOADIN SP ACC 2;
-LOADIN SP IN2 1;
-MOD ACC IN2;
-STOREIN SP ACC 2;
-ADDI SP 1;
-LOADIN SP ACC 1;
-ADDI SP 1;
-STORE ACC y;
+# Variable / Constant end
+# codeaa(e1)
+# codeaa(e2)
+LOADIN SP ACC 2; # Wert von e 1 in ACC laden
+LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+ADD ACC IN2; # e1 binop e2 in ACC laden
+STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1; # Stack um eine Zelle verkürzen
+# Arithmetic Binary Operation end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end or sub-assignment end
+# If end
+# code(af)
 JUMP 0;
+# Main end
+# Main start
+LOADI SP 200;
+# Assignment start or new sub-assignment
+# Allocation start
+# successfully allocated var
+# Allocation end
+# Variable / Constant start
+SUBI SP 1;
+LOADI ACC 12;
+STOREIN SP ACC 1;
+# Variable / Constant end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end or sub-assignment end
+# If start
+# Logic Top Bottom start
+# Variable / Constant start
+SUBI SP 1;
+LOADI ACC 12;
+STOREIN SP ACC 1;
+# Variable / Constant end
+# codeaa(e)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+JUMP= 3;  # Überspringe 2 Befehle, wenn e den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
+# Logic Top Bottom end
+# codela(l)
+LOADIN SP ACC 1; # Wert von l in ACC laden
+ADDI SP 1; # Stack um eine Zelle verkürzen
+JUMP= 15; # af überspringen
+# code(af)
+# Assignment start or new sub-assignment
+# Arithmetic Binary Operation start
+# Variable / Constant start
+SUBI SP 1;
+LOADI ACC 13;
+STOREIN SP ACC 1;
+# Variable / Constant end
+# Variable / Constant start
+SUBI SP 1;
+LOAD ACC 100;
+STOREIN SP ACC 1;
+# Variable / Constant end
+# codeaa(e1)
+# codeaa(e2)
+LOADIN SP ACC 2; # Wert von e 1 in ACC laden
+LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+ADD ACC IN2; # e1 binop e2 in ACC laden
+STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1; # Stack um eine Zelle verkürzen
+# Arithmetic Binary Operation end
+# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+LOADIN SP ACC 1;  # Wert von e in ACC laden
+ADDI SP 1;  # Stack um eine Zelle verkürzen
+STORE ACC 100;  # Wert von e in Adresse a speichern
+# Assignment end or sub-assignment end
+# If end
+# code(af)
+JUMP 0;
+# Main end

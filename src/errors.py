@@ -9,12 +9,12 @@ class InvalidCharacterError(Exception):
     """If there're Token sequences generated from the input that are not
     permitted by the grammar rules"""
 
-    def __init__(self, found):
+    def __init__(self, found, position):
         self.description = f"InvalidCharacterError: "\
             f"'{found}' is not a permitted character"
         super().__init__(self.description)
         self.expected = None
-        self.found = lexer.Token(None, value=found, position=None)
+        self.found = lexer.Token(None, value=found, position=position)
 
 
 class NoApplicableRuleError(Exception):

@@ -29,7 +29,7 @@ badd +1 src/code_generator.py
 badd +1 src/symbol_table.py
 badd +1 output.reti
 badd +1 Makefile
-badd +0 src/logic_expression_grammar.py
+badd +1 src/logic_expression_grammar.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -47,15 +47,7 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-let s:save_splitbelow = &splitbelow
-let s:save_splitright = &splitright
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
-let &splitbelow = s:save_splitbelow
-let &splitright = s:save_splitright
+edit test/grammar_test.py
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -63,11 +55,31 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 117 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 72 + 95) / 190)
+exe '2resize ' . ((&lines * 4 + 22) / 45)
+exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
+argglobal
+if bufexists("test/grammar_test.py") | buffer test/grammar_test.py | else | edit test/grammar_test.py | endif
+if &buftype ==# 'terminal'
+  silent file test/grammar_test.py
+endif
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+let s:l = 88 - ((20 * winheight(0) + 20) / 41)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 88
+normal! 0
+wincmd w
 argglobal
 enew
-balt output.reti
+balt test/grammar_test.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -77,20 +89,8 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 wincmd w
-argglobal
-enew
-balt src/if_else_grammar.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-exe 'vert 1resize ' . ((&columns * 117 + 95) / 190)
-exe 'vert 2resize ' . ((&columns * 72 + 95) / 190)
+exe '2resize ' . ((&lines * 4 + 22) / 45)
+exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

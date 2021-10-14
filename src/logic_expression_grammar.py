@@ -22,31 +22,23 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
         :returns: None
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "no semicolon":
-            if globals.test_name == "no semicolon":
-                pass
         # it's important that arithmetic grammar is before logic grammar,
         # because both arithmetic and logic grammar have single numbers. In
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
-        self.num_tastes = 0
-        if self.taste(self._taste_consume_ae):
+        errors = []
+        if self.taste(self._taste_consume_ae, errors):
             self._taste_consume_ae()
-        elif self.taste(self._taste_consume_le):
+        elif self.taste(self._taste_consume_le, errors):
             self._taste_consume_le()
         else:
             self._handle_all_tastes_unsuccessful("arithmetic expression or "
-                                                 "logic expression")
+                                                 "logic expression", errors)
 
-    def _handle_all_tastes_unsuccessful(self, expected):
+    def _handle_all_tastes_unsuccessful(self, expected, errors):
         # if both threw the same error print that error out
-        if self.errors[-1].expected == self.errors[-2].expected:
-            error = self.errors[-1]
-            for _ in range(self.num_tastes):
-                self.errors.pop()
-            raise error
+        if errors[0].expected == errors[1].expected:
+            raise errors[0]
         # if both threw different errors raise a undefinied
         # NoApplicableRuleError
         else:
@@ -135,18 +127,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         :returns: None
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "no semicolon":
-            if globals.test_name == "no semicolon":
-                pass
-        self.num_tastes = 0
-        if self.taste(self._atom):
+        errors = []
+        if self.taste(self._atom, errors):
             self._atom()
-        elif self.taste(self._top_bottom):
+        elif self.taste(self._top_bottom, errors):
             self._top_bottom()
         else:
-            self._handle_all_tastes_unsuccessful("logic atom or term")
+            self._handle_all_tastes_unsuccessful("logic atom or term", errors)
 
     def _top_bottom(self, ):
         """top / bottom

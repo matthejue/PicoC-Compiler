@@ -26,8 +26,6 @@ class BacktrackingParser():
         self.lts = []
         self.lt_idx = 0
         self.ast_builder = ASTBuilder()
-        self.errors = []
-        self.num_tastes = 0
 
     def LT(self, i):
         """Lookahead Token
@@ -135,7 +133,7 @@ class BacktrackingParser():
 #         """
 #         return len(self.markers) > 0
 
-    def taste(self, rule):
+    def taste(self, rule, errors):
         """Tries ("tastes") out alternative and says whether it will raise a
         exception so one can go on and try out the next alternative. Is used in
         case of syntactically undistinguishable grammar rules.
@@ -147,13 +145,8 @@ class BacktrackingParser():
         try:
             rule()
         except Exception as e:
-            self.errors += [e]
-            self.num_tastes += 1
+            errors += [e]
             tastes_good = False
-        else:
-            # reset if this rule can be taken without error
-            for _ in range(self.num_tastes):
-                self.errors.pop()
         self._release()
         return tastes_good
 

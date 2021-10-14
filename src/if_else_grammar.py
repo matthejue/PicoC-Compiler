@@ -14,12 +14,19 @@ def code_if_if_else(self):
     <code_ss> }|<s>))?
     :returns: None
     """
-    if self.taste(self._if_else):
-        self._if_else()
-    elif self.taste(self._taste_consume_if_without_else):
+    # TODO: Don't forget to remove this improvised conditional breakpoint
+    import globals
+    if globals.test_name == "no closing parenthesis":
+        if globals.test_name == "no closing parenthesis":
+            pass
+    errors = []
+    if self.taste(self._taste_consume_if_without_else, errors):
         self._taste_consume_if_without_else()
+    elif self.taste(self._if_else, errors):
+        self._if_else()
     else:
-        self._handle_all_tastes_unsuccessful("if or if else expression")
+        self._handle_all_tastes_unsuccessful(
+            "if or if else expression", errors)
 
 
 def _taste_consume_if_without_else(self):
@@ -30,16 +37,7 @@ def _taste_consume_if_without_else(self):
     """
     self._if_without_else()
     if self.LTT(1) == TT.ELSE:
-        raise MismatchedTokenError("if", self.LT(1))
-
-
-# def taste_consume_if_else():
-#     """taste whether the next expression is a if else
-#
-#     :grammar: <if_else>
-#     :returns: None
-#     """
-#     self._if_else()
+        raise MismatchedTokenError("all besides else", self.LT(1))
 
 
 def _if_without_else(self, ):

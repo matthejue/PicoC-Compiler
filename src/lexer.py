@@ -47,7 +47,6 @@ class TT(Enum):
     AND = "&&"
     OR = "||"
     COMP_OP = "comparison operator"
-    BITSHIFT = "<<"
     NUMBER = "number"
     IDENTIFIER = "identifier"
     CONST = "constant qualifier"
@@ -155,7 +154,7 @@ class Lexer:
             elif self.lc in self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
                 return self._comp_operator_assignment_bitshift()
             else:
-                raise InvalidCharacterError(self.lc)
+                raise InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)
 
     def next_char(self):
@@ -343,7 +342,7 @@ class Lexer:
                 return Token(TT.COMP_OP, ">=", self.position)
             elif self.lc == '>':
                 self.next_char()
-                return Token(TT.BITSHIFT, ">>", self.position)
+                return Token(TT.BINOP_PREC_1, ">>", self.position)
             return Token(TT.COMP_OP, self.c, self.position)
 
     def _division_sign_or_comment(self, ):

@@ -1,4 +1,5 @@
 import globals
+from errors import UnkownIdentifierError
 
 
 class Symbol:
@@ -82,6 +83,11 @@ class Scope:
         :return: Symbol
         """
         return self.symbols[name]
+        # try:
+        #     value = self.symbols[name]
+        # expect KeyError:
+        #     raise UnkownIdentifierError()
+        # return value
 
 
 class _SymbolTable(Scope):

@@ -106,11 +106,17 @@ class TestLexer(unittest.TestCase, UsefullTools):
 
 class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
 
-    def test_const_allocation(self, ):
-        self.set_everything_up_for_ast("const allocation",
+    def test_constant_initialisation(self, ):
+        self.set_everything_up_for_ast("constant initialisation",
                                        "void main() { const int var = 12; }")
         self.assertEqual(str(self.grammar.reveal_ast()),
                          "('main' ('=' ('const' 'int' 'var') '12'))")
+
+    # def test_allocation(self, ):
+    #     self.set_everything_up_for_ast("allocation",
+    #                                    "void main() { int var; }")
+    #     self.assertEqual(str(self.grammar.reveal_ast()),
+    #                      "('main' ('=' ('const' 'int' 'var') '12'))")
 
 
 class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
@@ -397,22 +403,35 @@ class TestPrograms(unittest.TestCase, UsefullTools):
                                                         "./test/gcd.picoc")
 
 
-class TestError(unittest.TestCase, UsefullTools):
+class TestErrorMessages(unittest.TestCase, UsefullTools):
 
     def test_no_semicolon(self, ):
         test_code = """void main() {
-                        int var = 32
-                        var = 10;
+                      int var = 32
+                      if (var < 3) {
+                          var = 10;
+                      }
                     }
                     """
         try:
             self.set_everything_up_for_multiline_program(
-                "no semicolon_", test_code)
+                "no semicolon", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_assignment_operator(self, ):
+        test_code = """void main() {
+                      int var 42 % 7;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no assignment operator", test_code)
         except SystemExit:
             pass
 
     def test_one_liner(self, ):
-        test_code = """void main() { int var = 32 var = 10; }
+        test_code = """void main() { int var = 32  var = 10; }
         """
         try:
             self.set_everything_up_for_multiline_program(
@@ -422,8 +441,10 @@ class TestError(unittest.TestCase, UsefullTools):
 
     def test_no_closing_parenthesis(self, ):
         test_code = """void main() {
-                          int var = (32 * 2;
-                          var = 10;
+                      if (12) {
+                        int var = (32 * 2;
+                        var = 10;
+                      }
                     }
                     """
         try:
@@ -431,6 +452,136 @@ class TestError(unittest.TestCase, UsefullTools):
                 "no closing parenthesis", test_code)
         except SystemExit:
             pass
+
+    def test_several_parenthesis_nested(self, ):
+        test_code = """void main() {
+                      if (12) {
+                        int var = 1 + (2 * (31 + 42);
+                        var = 10;
+                      }
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no closing parenthesis", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_opening_brace_main(self, ):
+        test_code = """void main()
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no opening brace main", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_right_operand(self, ):
+        test_code = """void main() {
+                      int var = 42 % ;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no operand right", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_identifier(self, ):
+        test_code = """void main() {
+                      int = 42 % 7;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no assignment operator", test_code)
+        except SystemExit:
+            pass
+
+    def test_invalid_character(self, ):
+        test_code = """void main() {
+                      int var = 12 @ 3;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "invalid character", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_operator(self, ):
+        test_code = """void main() {
+                      int var = 12 3;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no operator", test_code)
+        except SystemExit:
+            pass
+
+    def test_no_left_operand(self, ):
+        test_code = """void main() {
+                      int var = % 7;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no operand left", test_code)
+        except SystemExit:
+            pass
+
+    # def test_compile_time_error(self, ):
+    #     test_code = """void main() {
+    #                   var = 31 >> 7;
+    #                 }
+    #                 """
+    #     try:
+    #         self.set_everything_up_for_multiline_program(
+    #             "compile time error", test_code)
+    #     except SystemExit:
+    #         pass
+
+#     def test_no_opening_brace_if(self, ):
+#         test_code = """void main() {
+#                       if (1) {
+#                         const int var = 12;
+#                       else
+#                         int car = 3
+#                     }
+#                     """
+#         try:
+#             self.set_everything_up_for_multiline_program(
+#                 "no opening brace if", test_code)
+#         except SystemExit:
+#             pass
+#
+#     def test_typo_in_const(self, ):
+#         test_code = """void main() {
+#                       csnt int var = 12;
+#                     }
+#                     """
+#         try:
+#             self.set_everything_up_for_multiline_program(
+#                 "typo in const", test_code)
+#         except SystemExit:
+#             pass
+#
+#     def test_single_line_comment(self, ):
+#         test_code = """void main() {
+#                       int var = 32
+#                       // i think there's an error somewhere close
+#                       if (var < 3) {
+#                           var = 10;
+#                       }
+#                     }
+#                     """
+#         try:
+#             self.set_everything_up_for_multiline_program(
+#                 "no semicolon", test_code)
+#         except SystemExit:
+#             pass
 
 
 if __name__ == '__main__':
