@@ -60,7 +60,7 @@ class BacktrackingParser():
             # TODO: (vielleicht) Funktion schreiben, die das aufdroesselt in
             # tts[0].value or # tts[1].value. Aber meistens ist der erste Typ
             # der richtige
-            raise MismatchedTokenError("'" + tts[0].value + "'", self.LT(1))
+            raise MismatchedTokenError(tts[0].value, self.LT(1))
 
     def match_and_add(self, tts):
         """Add the current token to the ast and check for match

@@ -37,9 +37,10 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         elif self.taste(self._taste_consume_le):
             self._taste_consume_le()
         else:
-            self._handle_all_tastes_unsuccessful()
+            self._handle_all_tastes_unsuccessful("arithmetic expression or "
+                                                 "logic expression")
 
-    def _handle_all_tastes_unsuccessful(self, ):
+    def _handle_all_tastes_unsuccessful(self, expected):
         # if both threw the same error print that error out
         if self.errors[-1].expected == self.errors[-2].expected:
             error = self.errors[-1]
@@ -49,8 +50,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # if both threw different errors raise a undefinied
         # NoApplicableRuleError
         else:
-            raise NoApplicableRuleError("arithmetic expression or logic "
-                                        "expression", self.LT(1))
+            raise NoApplicableRuleError(expected, self.LT(1))
 
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
@@ -135,13 +135,18 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         :returns: None
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "no semicolon":
+            if globals.test_name == "no semicolon":
+                pass
         self.num_tastes = 0
         if self.taste(self._atom):
             self._atom()
         elif self.taste(self._top_bottom):
             self._top_bottom()
         else:
-            self._handle_all_tastes_unsuccessful()
+            self._handle_all_tastes_unsuccessful("logic atom or term")
 
     def _top_bottom(self, ):
         """top / bottom

@@ -19,7 +19,7 @@ def code_if_if_else(self):
     elif self.taste(self._taste_consume_if_without_else):
         self._taste_consume_if_without_else()
     else:
-        raise NoApplicableRuleError("if or if else expression", self.LT(1))
+        self._handle_all_tastes_unsuccessful("if or if else expression")
 
 
 def _taste_consume_if_without_else(self):
