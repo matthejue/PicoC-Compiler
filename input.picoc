@@ -1,6 +1,8 @@
 void main() {
-  int var = 12;
-  if(12) {
-    var = 13 + var;
+  int i = 0;
+  while (i >= 0) {
+    while (i < 10 && i >= 0) {
+      i = i + 1;
+    }
   }
 }
