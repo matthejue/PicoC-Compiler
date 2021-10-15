@@ -1,14 +1,14 @@
 import globals
-from errors import UnkownIdentifierError
 
 
 class Symbol:
 
     """Name for a program entity like a variable or function"""
 
-    def __init__(self, name, type, value):
+    def __init__(self, name, type, position, value):
         self.name = name
         self.type = type
+        self.position = position
         self.value = value
 
     def get_name(self, ):
@@ -24,16 +24,16 @@ class VariableSymbol(Symbol):
 
     """Represents a variable definition (name, type) in symbol table"""
 
-    def __init__(self, name, type):
-        super().__init__(name, type, None)
+    def __init__(self, name, type, position):
+        super().__init__(name, type, position, None)
 
 
 class ConstantSymbol(Symbol):
 
     """Represents a variable definition (name, type) in symbol table"""
 
-    def __init__(self, name, type, value):
-        super().__init__(name, type, value)
+    def __init__(self, name, type, position, value):
+        super().__init__(name, type, position, value)
 
 
 class BuiltInTypeSymbol(Symbol):
@@ -41,7 +41,7 @@ class BuiltInTypeSymbol(Symbol):
     """Built in types such as int and char"""
 
     def __init__(self, name):
-        super().__init__(name, None, None)
+        super().__init__(name, None, None, None)
 
 
 class Scope:
@@ -83,11 +83,6 @@ class Scope:
         :return: Symbol
         """
         return self.symbols[name]
-        # try:
-        #     value = self.symbols[name]
-        # expect KeyError:
-        #     raise UnkownIdentifierError()
-        # return value
 
 
 class _SymbolTable(Scope):

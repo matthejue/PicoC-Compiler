@@ -9,12 +9,13 @@ class InvalidCharacterError(Exception):
     """If there're Token sequences generated from the input that are not
     permitted by the grammar rules"""
 
-    def __init__(self, found, position):
+    def __init__(self, value, position):
         self.description = f"InvalidCharacterError: "\
-            f"'{found}' is not a permitted character"
+            f"'{ffoundvalueound}' is not a permitted character"
         super().__init__(self.description)
         self.expected = None
-        self.found = lexer.Token(None, value=found, position=position)
+        self.found = lexer.Token(
+            lexer.TT.IDENTIFIER, value=value, position=position)
 
 
 class NoApplicableRuleError(Exception):
@@ -42,13 +43,13 @@ class MismatchedTokenError(Exception):
         self.found = found
 
 
-class UnkownIdentifierError(Exception):
+class UnknownIdentifierError(Exception):
 
     """If Token shouldn't syntactically appear at this position"""
 
-    def __init__(self, expected, found):
-        self.description = f"MismatchedTokenError: Expected '{expected}'"\
-            f", found '{found.value}'"
+    def __init__(self, found):
+        self.description = f"UnknownIdentifierError: Identifier "\
+            f"'{found.value}' wasn't declared yet."
         super().__init__(self.description)
         self.found = found
 

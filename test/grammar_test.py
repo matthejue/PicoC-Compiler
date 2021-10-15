@@ -532,16 +532,16 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
-    # def test_compile_time_error(self, ):
-    #     test_code = """void main() {
-    #                   var = 31 >> 7;
-    #                 }
-    #                 """
-    #     try:
-    #         self.set_everything_up_for_multiline_program(
-    #             "compile time error", test_code)
-    #     except SystemExit:
-    #         pass
+    def test_compile_time_error(self, ):
+        test_code = """void main() {
+                      var = 31 >> 7;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "compile time error", test_code)
+        except SystemExit:
+            pass
 
 #     def test_no_opening_brace_if(self, ):
 #         test_code = """void main() {

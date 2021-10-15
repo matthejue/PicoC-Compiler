@@ -1,8 +1,3 @@
 #include <stdio.h>
 
-int main()
-{
-  if() {
-
-  }
-}
+int main() { var = 10; }

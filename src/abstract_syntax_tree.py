@@ -2,6 +2,7 @@
 from lexer import Token, TT
 from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
+from errors import UnknownIdentifierError
 import globals
 
 
@@ -651,6 +652,18 @@ class AssignmentNode(ASTNode):
             #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
             return self.children[0].token.value
 
+    def _get_identifier_token(self):
+        # AllocationNode needs a special treatment, because it it's token only
+        # tells the type but not the value
+        if isinstance(self.children[0], AllocationNode):
+            # AssignmentNode(AllocationNode(TokenNode(TT.CONST, 'const'),
+            #   TokenNode(TT.IDENTIFIER, x)), AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
+            return self.children[0].children[1].token
+        else:
+            # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
+            #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
+            return self.children[0].token
+
     def _is_last_assignment(self, ):
         # AssignmentNode(..., AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
         return isinstance(self.children[1].children[0], LogicAndOrNode) or isinstance(self.children[1].children[0], ArithmeticBinaryOperationNode)
@@ -666,11 +679,15 @@ class AssignmentNode(ASTNode):
     def _is_single_value_on_right_side(self, ):
         # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
         #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
+        # TODO: diese Funktion wird später unnötig, es unmöglich ist, dass bei
+        # einer Konstante was anderes als ein einzelner Wert auf der anderen
+        # Seite steht
         return len(self.children[1].children[0].children[0].children) == 1
 
     def _assign_number_to_constant_identifier(self):
         # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
         #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
+        # TODO: das geht schöner
         self.symbol_table.resolve(self._get_identifier_name(
         )).value = self.children[1].children[0].children[0].children[0].token.value
 
@@ -687,6 +704,13 @@ class AssignmentNode(ASTNode):
 
         # in case of a ConstantSymbol and a assignment with a number on the
         # right side of the =, the value gets assigned immediately
+        try:
+            self._assign_to_identifier()
+        except KeyError:
+            # repackage the error
+            raise UnknownIdentifierError(self._get_identifier_token())
+
+    def _assign_to_identifier(self, ):
         if self._is_constant_identifier_on_left_side() and self._is_single_value_on_right_side():
             self._assign_number_to_constant_identifier()
         # case of a VariableSymbol
@@ -715,36 +739,44 @@ class AllocationNode(ASTNode):
 
     """Abstract Syntax Tree Node for allocation"""
 
-    def _get_childvalue(self, idx):
+    def _get_childtokenvalue(self, idx):
         return self.children[idx].token.value
 
     def _get_childtoken(self, idx):
         return self.children[idx].token
 
+    def _get_childtokenposition(self, idx):
+        return self.children[idx].token.position
+
     def visit(self, ):
         self.code_generator.add_code("# Allocation start\n", 0)
 
-        if self._get_childvalue(0) == 'const':
+        if self._get_childtokenvalue(0) == 'const':
             # the value of a ConstantNode is the name of the Constantnode if
             # there wasn't assigned a value directly to the constant which has
-            # to be resolved internally in the RETI or by a RETI Code Interpreter
+            # to be resolved internally in the RETI or by a RETI Code
+            # Interpreter
             const = ConstantSymbol(
-                self._get_childvalue(1),
-                self.symbol_table.resolve(self.token.value), self._get_childvalue(1))
+                self._get_childtokenvalue(1),
+                self.symbol_table.resolve(self.token.value),
+                self._get_childtokenposition(1), self._get_childtokenvalue(1))
             self.symbol_table.define(const)
-        else:  # self._get_childvalue(0) == 'var'
+        else:  # self._get_childtokenvalue(0) == 'var'
             var = VariableSymbol(
-                self._get_childvalue(1),
-                self.symbol_table.resolve(self.token.value))
+                self._get_childtokenvalue(1),
+                self.symbol_table.resolve(self.token.value),
+                self._get_childtokenposition(1))
             self.symbol_table.define(var)
             self.symbol_table.allocate(var)
 
         self.code_generator.add_code(
-            "# successfully allocated " + str(self._get_childvalue(1)) + "\n", 0)
+            "# successfully allocated " + str(self._get_childtokenvalue(1)) +
+            "\n", 0)
         self.code_generator.add_code("# Allocation end\n", 0)
 
     def __repr__(self, ):
-        acc = f"({self._get_childtoken(0)} {self.token} {self._get_childtoken(1)})"
+        acc = f"({self._get_childtoken(0)} {self.token} "
+        "{self._get_childtoken(1)})"
         return acc
 
 
