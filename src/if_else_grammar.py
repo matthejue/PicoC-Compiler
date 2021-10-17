@@ -14,11 +14,6 @@ def code_if_if_else(self):
     <code_ss> }|<s>))?
     :returns: None
     """
-    # TODO: Don't forget to remove this improvised conditional breakpoint
-    import globals
-    if globals.test_name == "if else grammar":
-        if globals.test_name == "if else grammar":
-            pass
     errors = []
     if self.taste(self._taste_consume_if_without_else, errors):
         self._taste_consume_if_without_else()

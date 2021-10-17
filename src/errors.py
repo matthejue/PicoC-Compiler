@@ -69,11 +69,6 @@ class ErrorHandler:
         self.grammar = grammar
 
     def handle(self, function):
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "constant initialisation":
-            if globals.test_name == "constant initialisation":
-                pass
         error_message = ""
         try:
             function()

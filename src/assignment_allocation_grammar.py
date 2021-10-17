@@ -28,11 +28,6 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "allocation":
-            if globals.test_name == "allocation":
-                pass
         savestate_node = self.ast_builder.down(
             AssignmentNode, [TT.STATEMENT, TT.ASSIGNMENT])
 

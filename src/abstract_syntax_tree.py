@@ -361,6 +361,18 @@ class ArithmeticVariableConstantNode(ASTNode):
         self.code_generator.add_code(
             strip_multiline_string(self.start), self.all_loc)
 
+        try:
+            self._insert_identifier()
+        except KeyError:
+            # repackage the error
+            raise UnknownIdentifierError(self.token)
+
+        self.code_generator.add_code(
+            strip_multiline_string(self.end), self.all_loc)
+
+        self.code_generator.add_code("# Variable / Constant end\n", 0)
+
+    def _insert_identifier(self, ):
         if self.token.type == TT.IDENTIFIER:
             var_or_const = self.symbol_table.resolve(self.token.value)
             if isinstance(var_or_const, VariableSymbol):
@@ -378,11 +390,6 @@ class ArithmeticVariableConstantNode(ASTNode):
                 self.constant, "encode(w)", str(self.token.value))
             self.code_generator.add_code(
                 strip_multiline_string(self.constant), self.all_loc)
-
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.all_loc)
-
-        self.code_generator.add_code("# Variable / Constant end\n", 0)
 
 
 class ArithmeticBinaryOperationNode(ASTNode):
@@ -404,12 +411,6 @@ class ArithmeticBinaryOperationNode(ASTNode):
         if len(self.children) == 1:
             self.children[0].visit()
             return
-
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "while_generation":
-            if globals.test_name == "while_generation":
-                pass
 
         self.code_generator.add_code(
             "# Arithmetic Binary Operation start\n", 0)
