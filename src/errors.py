@@ -11,7 +11,7 @@ class InvalidCharacterError(Exception):
 
     def __init__(self, value, position):
         self.description = f"InvalidCharacterError: "\
-            f"'{ffoundvalueound}' is not a permitted character"
+            f"'{value}' is not a permitted character"
         super().__init__(self.description)
         self.expected = None
         self.found = lexer.Token(
@@ -71,8 +71,8 @@ class ErrorHandler:
     def handle(self, function):
         # TODO: Don't forget to remove this improvised conditional breakpoint
         import globals
-        if globals.test_name == "no semicolon_":
-            if globals.test_name == "no semicolon_":
+        if globals.test_name == "constant initialisation":
+            if globals.test_name == "constant initialisation":
                 pass
         error_message = ""
         try:
@@ -101,6 +101,12 @@ class ErrorHandler:
                                                       e) + '\n'
             else:
                 error_message += self._point_at_found(column,  e) + '\n'
+            print(error_message)
+            exit(0)
+        except UnknownIdentifierError as e:
+            error_message += self._error_message_header(e) + '\n'
+            error_message += self._point_at_found(States.ONLY_FOUND.value, e)\
+                + '\n'
             print(error_message)
             exit(0)
 

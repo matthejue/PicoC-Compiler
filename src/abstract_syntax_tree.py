@@ -775,8 +775,8 @@ class AllocationNode(ASTNode):
         self.code_generator.add_code("# Allocation end\n", 0)
 
     def __repr__(self, ):
-        acc = f"({self._get_childtoken(0)} {self.token} "
-        "{self._get_childtoken(1)})"
+        acc = f"({self._get_childtoken(0)} {self.token} "\
+            f"{self._get_childtoken(1)})"
         return acc
 
 

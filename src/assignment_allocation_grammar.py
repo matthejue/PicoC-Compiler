@@ -24,10 +24,15 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _aa(self):
         """assignment and allocation
 
-        :grammar: #2 ((<identifier> | <alloc>) = #2 (<identifier> = #2)* <le>)
+        :grammar: #2 (<identifier> | <alloc>) (= #2 (<identifier> = #2) * <ae_le>)?
         :returns: None
 
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "allocation":
+            if globals.test_name == "allocation":
+                pass
         savestate_node = self.ast_builder.down(
             AssignmentNode, [TT.STATEMENT, TT.ASSIGNMENT])
 
@@ -41,18 +46,19 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             raise MismatchedTokenError(
                 "identifier or assignment expression", self.LT(2))
 
-        self.match_and_add([TT.ASSIGNMENT])
-
-        self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
-
-        while self.LTT(2) == TT.ASSIGNMENT:
-            self.match_and_add([TT.IDENTIFIER])
+        if self.LTT(1) == TT.ASSIGNMENT:
             self.match_and_add([TT.ASSIGNMENT])
 
             self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
 
-        # self.code_le()
-        self.code_ae_le()
+            while self.LTT(2) == TT.ASSIGNMENT:
+                self.match_and_add([TT.IDENTIFIER])
+                self.match_and_add([TT.ASSIGNMENT])
+
+                self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
+
+            # self.code_le()
+            self.code_ae_le()
 
         self.ast_builder.up(savestate_node)
 

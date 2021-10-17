@@ -1,8 +1,11 @@
+/* void main() { */
+/*   int i = 0; */
+/*   while (i >= 0) { */
+/*     while (i < 10 && i >= 0) { */
+/*       i = i + 1; */
+/*     } */
+/*   } */
+/* } */
 void main() {
-  int i = 0;
-  while (i >= 0) {
-    while (i < 10 && i >= 0) {
-      i = i + 1;
-    }
-  }
+  var = 31 >> 7;
 }

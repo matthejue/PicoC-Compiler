@@ -1,3 +1,9 @@
 #include <stdio.h>
 
-int main() { var = 10; }
+int main() {
+  int var = 10;
+  ;
+  if (var < 10) {
+    var++;
+  };
+}

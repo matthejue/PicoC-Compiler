@@ -104,6 +104,16 @@ class TestLexer(unittest.TestCase, UsefullTools):
         self.assertEqual(str(tokens), str(['var', '=', '10', ';']))
 
 
+class TestStatement(unittest.TestCase, UsefullTools):
+
+    def test_semicolon_after_another(self, ):
+        tokens = self.set_everything_up_for_ast("semicolon after another",
+                                                "void main() { ; int x = 12"
+                                                "; ; if (x < 10) { ; }; }")
+        self.assertEqual(str(self.grammar.reveal_ast(
+        )), "('main' ('=' ('var' 'int' 'x') '12') ('if' ('<' 'x' '10')))")
+
+
 class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
 
     def test_constant_initialisation(self, ):
@@ -112,11 +122,11 @@ class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()),
                          "('main' ('=' ('const' 'int' 'var') '12'))")
 
-    # def test_allocation(self, ):
-    #     self.set_everything_up_for_ast("allocation",
-    #                                    "void main() { int var; }")
-    #     self.assertEqual(str(self.grammar.reveal_ast()),
-    #                      "('main' ('=' ('const' 'int' 'var') '12'))")
+    def test_allocation(self, ):
+        self.set_everything_up_for_ast("allocation",
+                                       "void main() { int x; }")
+        self.assertEqual(str(self.grammar.reveal_ast()),
+                         "('main' ('var' 'int' 'x'))")
 
 
 class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
@@ -330,11 +340,11 @@ class TestComments(unittest.TestCase, UsefullTools):
         expected_res = "('main' ('=' 'var' '10') ('=' 'var' '0'))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
-#     def test_single_line_comment_end_of_line(self, ):
-#         self.set_everything_up_for_ast_multiline(
-#             [['int var;']['var = 0; // important comment']['var = var + 1;']])
-#         expected_res = "('fun' ('\t'))"
-#         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
+    # def test_single_line_comment_end_of_line(self, ):
+    #     self.set_everything_up_for_ast_multiline(
+    #         [['int var;']['var = 0; // important comment']['var = var + 1;']])
+    #     expected_res = "('fun' ('\t'))"
+    #     self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 #
 #     def test_multi_line_comments(self, ):
 #         pass
@@ -351,7 +361,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         code_generator = CodeGenerator()
         symbol_table = SymbolTable()
 
-        var = VariableSymbol('car', symbol_table.resolve('int'))
+        var = VariableSymbol('car', symbol_table.resolve('int'), (0, 0))
         symbol_table.define(var)
         symbol_table.allocate(var)
 
@@ -477,17 +487,6 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
-    def test_no_right_operand(self, ):
-        test_code = """void main() {
-                      int var = 42 % ;
-                    }
-                    """
-        try:
-            self.set_everything_up_for_multiline_program(
-                "no operand right", test_code)
-        except SystemExit:
-            pass
-
     def test_no_identifier(self, ):
         test_code = """void main() {
                       int = 42 % 7;
@@ -521,6 +520,17 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
+    def test_no_right_operand(self, ):
+        test_code = """void main() {
+                      int var = 42 % ;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no operand right", test_code)
+        except SystemExit:
+            pass
+
     def test_no_left_operand(self, ):
         test_code = """void main() {
                       int var = % 7;
@@ -532,14 +542,25 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
-    def test_compile_time_error(self, ):
+    def test_compile_time_error_assignment(self, ):
         test_code = """void main() {
                       var = 31 >> 7;
                     }
                     """
         try:
             self.set_everything_up_for_multiline_program(
-                "compile time error", test_code)
+                "compile time error assignment", test_code)
+        except SystemExit:
+            pass
+
+    def test_compile_time_error_not_initialised_variable(self, ):
+        test_code = """void main() {
+                      int x = 12 & var;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "compile time error not initialised variable", test_code)
         except SystemExit:
             pass
 

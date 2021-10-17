@@ -2,7 +2,7 @@ from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
 from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
     LogicTopBottomNode, TokenNode
-from errors import MismatchedTokenError, NoApplicableRuleError, MismatchedTokenError
+from errors import MismatchedTokenError, NoApplicableRuleError
 import globals
 
 
@@ -29,8 +29,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         errors = []
         if self.taste(self._taste_consume_ae, errors):
             self._taste_consume_ae()
-        elif self.taste(self._taste_consume_le, errors):
-            self._taste_consume_le()
+        elif self.taste(self.code_le, errors):
+            self.code_le()
         else:
             self._handle_all_tastes_unsuccessful("arithmetic expression or "
                                                  "logic expression", errors)
@@ -51,16 +51,22 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :returns: None
         """
         self.code_ae()
-        self.match([TT.SEMICOLON])
+        if self.LTT(1) == TT.COMP_OP or self._is_logical_connective():
+            raise MismatchedTokenError("all besides comparison operators and "
+                                       "logical connectives", self.LT(1))
 
-    def _taste_consume_le(self):
-        """taste whether the next expression is a logic expression
+    def _is_logical_connective(self, ):
+        return self.LTT(1) == TT.AND or self.LTT(1) == TT.OR or self.LTT(1)\
+            == TT.NOT
 
-        :grammar: <code_le> ;
-        :returns: None
-        """
-        self.code_le()
-        self.match([TT.SEMICOLON])
+#     def _taste_consume_le(self):
+#         """taste whether the next expression is a logic expression
+#
+#         :grammar: <code_le> ;
+#         :returns: None
+#         """
+#         self.code_le()
+#         self.match([TT.SEMICOLON])
 
     def code_le(self):
         """logic expression startpoint
@@ -128,12 +134,19 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :returns: None
         """
         errors = []
-        if self.taste(self._atom, errors):
+        if self.taste(self._taste_consume_top_bottom, errors):
+            self._taste_consume_top_bottom()
+        elif self.taste(self._atom, errors):
             self._atom()
-        elif self.taste(self._top_bottom, errors):
-            self._top_bottom()
         else:
             self._handle_all_tastes_unsuccessful("logic atom or term", errors)
+
+    def _taste_consume_top_bottom(self, ):
+        self._top_bottom()
+        # don't allow it to be a atom
+        if self.LTT(1) == TT.COMP_OP:
+            raise MismatchedTokenError("all besides comparison operators",
+                                       self.LT(1))
 
     def _top_bottom(self, ):
         """top / bottom
@@ -152,10 +165,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
-
-        # don't allow it to be a atom
-        if self.LTT(1) == TT.COMP_OP:
-            raise MismatchedTokenError("arithmetic expression", self.LT(1))
 
     def _atom(self, ):
         """atomic formula

@@ -24,17 +24,23 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
     def _ss(self):
         """statement sequence
 
-        :grammar: <s>+
+        :grammar: (<s> ;+)+
         :returns: None
 
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "allocation":
+            if globals.test_name == "allocation":
+                pass
         while True:
             # if self._is_statement():
             self._s()
 
             # TODO: add in other statement types by replacing the false
             # it's possibe to write var = 10;;
-            if not (self._is_statement() or self.LTT(1) == TT.SEMICOLON):
+
+            if self.LTT(1) == TT.R_BRACE:
                 break
 
     def _s(self):
@@ -46,10 +52,17 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         """
         if self._is_assignment_allocation():
             self.code_aa()
+
+            while True:
+                self.match([TT.SEMICOLON])
+                if self.LTT(1) != TT.SEMICOLON:
+                    break
         elif self.LTT(1) == TT.IF:
             self.code_ie()
         elif self._is_loop():
             self.code_lo()
+        elif self.LTT(1) == TT.SEMICOLON:
+            self.match([TT.SEMICOLON])
         else:
             raise MismatchedTokenError("statement", self.LT(1))
 
@@ -66,7 +79,7 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
 
     def _is_statement(self):
         return self._is_assignment_allocation() or self.LTT(1) == TT.IF or\
-            self._is_loop()
+            self._is_loop() or self.LTT(1) == TT.SEMICOLON
 
     def _is_loop(self, ):
         return self.LTT(1) == TT.WHILE or self.LTT(1) == TT.DO_WHILE
