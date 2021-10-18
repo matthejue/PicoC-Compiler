@@ -5,6 +5,8 @@ import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
 from errors import ErrorHandler
+from symbol_table import SymbolTable
+from tabulate import tabulate
 import globals
 
 
@@ -16,8 +18,9 @@ def main():
     cli_args_parser.add_argument("outfile", nargs='?',
                                  help="Output file with RETI Code")
     cli_args_parser.add_argument('-p', '--print', action='store_true',
-                                 help="Also output the file output to "
-                                 "the terminal")
+                                 help="Output the file output to the terminal"
+                                 " and if --symbol_table is active output the"
+                                 " symbol table beneath")
     cli_args_parser.add_argument('-a', '--ast', action='store_true',
                                  help="Output the Abstract Syntax Tree "
                                  "instead of RETI Code")
@@ -32,6 +35,10 @@ def main():
     cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
                                  action='store_true', help="Show python error "
                                  "messages with stacktrace")
+    cli_args_parser.add_argument('-S', '--symbol_table', action='store_true',
+                                 help="Output the final symbol table into "
+                                 "a CSV file after the whole Abstract Syntax "
+                                 "Tree was visited")
     cli_args_parser.add_argument('-v', '--verbose', action='store_true',
                                  help="Add tokentype to the ast and add "
                                  "comments to the RETI Code")
@@ -49,7 +56,7 @@ def main():
         outfile = _basename(infile) + ".reti"
 
     try:
-        _read_file(infile, outfile)
+        _read_and_write_file(infile, outfile)
     except FileNotFoundError:
         print("File does not exist")
     else:
@@ -62,7 +69,7 @@ def _basename(fname):
     :returns: basename of the file
 
     """
-    index_of_extension = fname.index(".")
+    index_of_extension = fname.rindex('.')
     return fname[0:index_of_extension]
 
 
@@ -86,7 +93,7 @@ def _shell():
         _compile('<stdin>', [pico_c_in])
 
 
-def _read_file(infile, outfile):
+def _read_and_write_file(infile, outfile):
     """reads a pico_c file and compiles it
     :returns: pico_c Code compiled in RETI Assembler
 
@@ -99,6 +106,22 @@ def _read_file(infile, outfile):
         output = _compile(infile, pico_c_in)
 
         fout.writelines(str(output))
+
+    if globals.args.symbol_table:
+        outfile = _basename(outfile) + '.csv'
+        output = "name,type,position,value\n"
+        symbols = SymbolTable().symbols
+        for name in symbols.keys():
+            if symbols[name].position:
+                output += f"{name},{symbols[name].type},"\
+                    f"{symbols[name].position[0]}:"\
+                    f"{symbols[name].position[1]},"\
+                    f"{symbols[name].value}\n"
+            else:  # if it is None
+                output += f"{name},{symbols[name].type},"\
+                    f"{symbols[name].position},{symbols[name].value}\n"
+        with open(outfile, 'w', encoding="utf-8") as csv_out:
+            csv_out.writelines(output)
 
 
 def _compile(fname, code):
@@ -135,11 +158,15 @@ def _compile(fname, code):
 
     abstract_syntax_tree = grammar.reveal_ast()
     error_handler.handle(abstract_syntax_tree.visit)
-    abstract_syntax_tree.visit()
 
-    # Deal with --print option
+    # Deal with --print and --symbol_table options
     if globals.args.print:
         print(abstract_syntax_tree.show_generated_code())
+    if globals.args.symbol_table:
+        header = ["name", "type", "position", "value"]
+        symbols = SymbolTable().symbols
+        print(tabulate([(k, str(v.type), str(v.position), str(v.value))
+              for k, v in symbols.items()], headers=header))
 
     return abstract_syntax_tree.show_generated_code()
 

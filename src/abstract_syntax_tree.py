@@ -62,7 +62,6 @@ class ASTNode(TokenNode):
         """checks if something is a TokenNode
 
         :returns: boolean
-
         """
         # being not instance of ASTNode means being instance of TokenNode
         return not isinstance(node, ASTNode)

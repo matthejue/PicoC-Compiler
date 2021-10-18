@@ -6,19 +6,19 @@ TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test/$(test_b
 all: run-shell-compile clean
 
 run-read-compile:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m ./input.picoc ./output.reti
+	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S ./input.picoc ./output.reti
 
 run-read-compile-comments:
-	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m ./input.picoc ./output.reti
+	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m -S ./input.picoc ./output.reti
 
 run-read-compile-arg:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m ./test/$(ARG) ./output.reti
+	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S ./test/$(ARG) ./output.reti
 
 run-shell-compile:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m
+	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S
 
 run-shell-compile-comments:
-	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m
+	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m -S
 
 run-read-ast:
 	./src/pico_c_compiler.py -a -p -m ./input.picoc ./output.reti
