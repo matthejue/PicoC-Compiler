@@ -254,11 +254,21 @@ class Lexer:
                 break
             self.next_char()
         else:
-            if self.lc not in self.LETTER_DIGIT:
+            if self.lc not in self.LETTER_DIGIT or self._reached_end_of_line():
                 return Token(tokentype, word, self.position)
 
         self.lc_row, self.lc_col, self.c, self.lc = lc_row_copy, lc_col_copy,\
             c_copy, lc_copy
+
+    def _reached_end_of_line(self, ):
+        """If one has e.g. 'if (...) ... else
+        int car = 10;' as one liner, so the two words 'else' and 'int' don't
+        get connected together to one word 'elseint'
+
+        :returns: boolean
+        """
+        # already in a new linw
+        return self.lc_col == 0
 
     def _identifier(self):
         """identifier

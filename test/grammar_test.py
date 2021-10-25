@@ -564,45 +564,45 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
-#     def test_no_opening_brace_if(self, ):
-#         test_code = """void main() {
-#                       if (1) {
-#                         const int var = 12;
-#                       else
-#                         int car = 3
-#                     }
-#                     """
-#         try:
-#             self.set_everything_up_for_multiline_program(
-#                 "no opening brace if", test_code)
-#         except SystemExit:
-#             pass
-#
-#     def test_typo_in_const(self, ):
-#         test_code = """void main() {
-#                       csnt int var = 12;
-#                     }
-#                     """
-#         try:
-#             self.set_everything_up_for_multiline_program(
-#                 "typo in const", test_code)
-#         except SystemExit:
-#             pass
-#
-#     def test_single_line_comment(self, ):
-#         test_code = """void main() {
-#                       int var = 32
-#                       // i think there's an error somewhere close
-#                       if (var < 3) {
-#                           var = 10;
-#                       }
-#                     }
-#                     """
-#         try:
-#             self.set_everything_up_for_multiline_program(
-#                 "no semicolon", test_code)
-#         except SystemExit:
-#             pass
+    def test_no_closing_brace_if(self, ):
+        test_code = """void main() {
+                      if (1) {
+                        const int var = 12;
+                      else
+                        int car = 3
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "no closing brace if", test_code)
+        except SystemExit:
+            pass
+
+    def test_typo_in_const(self, ):
+        test_code = """void main() {
+                      csnt int var = 12;
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "typo in const", test_code)
+        except SystemExit:
+            pass
+
+    # def test_single_line_comment(self, ):
+    #     test_code = """void main() {
+    #                   int var = 32
+    #                   // i think there's an error somewhere close
+    #                   if (var < 3) {
+    #                       var = 10;
+    #                   }
+    #                 }
+    #                 """
+    #     try:
+    #         self.set_everything_up_for_multiline_program(
+    #             "no semicolon", test_code)
+    #     except SystemExit:
+    #         pass
 
 
 if __name__ == '__main__':
