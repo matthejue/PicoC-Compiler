@@ -589,20 +589,20 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
-    # def test_single_line_comment(self, ):
-    #     test_code = """void main() {
-    #                   int var = 32
-    #                   // i think there's an error somewhere close
-    #                   if (var < 3) {
-    #                       var = 10;
-    #                   }
-    #                 }
-    #                 """
-    #     try:
-    #         self.set_everything_up_for_multiline_program(
-    #             "no semicolon", test_code)
-    #     except SystemExit:
-    #         pass
+    def test_single_line_comment(self, ):
+        test_code = """void main() {
+                      int var = 32
+                      // i think there's an error somewhere close
+                      if (var < 3) {
+                          var = 10;
+                      }
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "single line comment", test_code)
+        except SystemExit:
+            pass
 
 
 if __name__ == '__main__':

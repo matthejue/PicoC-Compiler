@@ -138,15 +138,47 @@ class ErrorHandler:
                 '~' * len(error.found.value) + '\n'
 
     def _find_white_space_before_last_token(self, e):
-        row = e.found.position[0]
-        column = e.found.position[1]
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import globals
+        if globals.test_name == "single line comment":
+            if globals.test_name == "single line comment":
+                pass
+        (row, column) = (e.found.position[0], e.found.position[1])
         while True:
-            (row, column) = self._calculate_next_row_column(row, column)
+            # comments should be overjumped
+            res = self._check_for_comment(row, column)
+            if res:
+                (row, column) = res
+            # TODO: make it more efficient by not chekcing a line several 'times'
+
+            (row, column) = self._calculate_previous_row_column(row, column)
             if self.grammar.lexer.input[row][column] not in " \t":
                 break
         return (row, column+1)
 
-    def _calculate_next_row_column(self, row, column):
+    def _check_for_comment(self, row, column):
+        """checks whether there comes a comment while going back and if yes
+        return the position where the comment starts
+        """
+        while True:
+            (row, column) = self._calculate_previous_row_column(row, column)
+            if self._check_words(["//", "/*"], row, column):
+                break
+        (row, column) = self._calculate_previous_row_column(row, column)
+        return (row, column)
+
+    def _check_words(self, patterns, row, column):
+        match_pattern_results = []
+        for pattern in patterns:
+            single_match_results = []
+            for char in reversed(pattern):
+                single_match_results += [self.grammar.lexer.input[row]
+                                         [column] == char]
+                column -= column
+            match_pattern_results += [all(single_match_results)]
+        return any(match_pattern_results)
+
+    def _calculate_previous_row_column(self, row, column):
         if column - 1 >= 0:
             column -= 1
         else:
