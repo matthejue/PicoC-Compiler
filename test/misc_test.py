@@ -34,15 +34,6 @@ class TestComments(unittest.TestCase, UsefullTools):
         expected_res = "('main' ('=' 'var' '10') ('=' 'var' '0'))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
-    # def test_single_line_comment_end_of_line(self, ):
-    #     self.set_everything_up_for_ast_multiline(
-    #         [['int var;']['var = 0; // important comment']['var = var + 1;']])
-    #     expected_res = "('fun' ('\t'))"
-    #     self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
-#
-#     def test_multi_line_comments(self, ):
-#         pass
-
 
 if __name__ == '__main__':
     unittest.main()

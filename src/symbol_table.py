@@ -32,8 +32,8 @@ class ConstantSymbol(Symbol):
 
     """Represents a variable definition (name, type) in symbol table"""
 
-    def __init__(self, name, type, position, value):
-        super().__init__(name, type, position, value)
+    def __init__(self, name, type, position):
+        super().__init__(name, type, position, None)
 
 
 class BuiltInTypeSymbol(Symbol):

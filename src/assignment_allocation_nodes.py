@@ -141,7 +141,7 @@ class AllocationNode(ASTNode):
             const = ConstantSymbol(
                 self._get_childtokenvalue(1),
                 self.symbol_table.resolve(self.token.value),
-                self._get_childtokenposition(1), self._get_childtokenvalue(1))
+                self._get_childtokenposition(1))
             self.symbol_table.define(const)
         else:  # self._get_childtokenvalue(0) == 'var'
             var = VariableSymbol(

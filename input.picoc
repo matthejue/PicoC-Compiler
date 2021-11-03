@@ -6,11 +6,14 @@
 /*     } */
 /*   } */
 /* } */
+/* void main() { */
+/*   int var = 31 >> 7; */
+/*   const int car = 31; */
+/*   while (var < 10) { */
+/*     var = var + 10; */
+/*   } */
+/*   int result; */
+/* } */
 void main() {
-  int var = 31 >> 7;
-  const int car = 31;
-  while (var < 10) {
-    var = var + 10;
-  }
-  int result;
+  char x = 'c' + 2;
 }

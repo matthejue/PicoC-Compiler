@@ -1,6 +1,4 @@
 name,type,position,value
 int,None,None,None
 char,None,None,None
-var,int,9:4,100
-car,int,10:10,31
-result,int,14:4,101
+x,char,17:5,100

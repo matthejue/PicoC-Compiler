@@ -64,9 +64,15 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.set_everything_up_for_multiline_program(
             "constant initialisation", test_code)
 
+    def test_initialising_with_character(self, ):
+        test_code = """void main() {
+                        const int var = 'c' + 2;
+                    }
+                    """
+        self.set_everything_up_for_multiline_program(
+            "test initialising with character", test_code)
+
     # TODO: Einen Test mit IfElseNode machen
-    # TODO: diese Datei in 2 Dateien splitten mit code_generator_test and
-    # parser_test
 
 
 if __name__ == '__main__':

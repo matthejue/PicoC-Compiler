@@ -22,7 +22,7 @@ class UnclosedCharacterError(Exception):
 
     def __init__(self, expected, value, position):
         self.description = f"UnclosedCharacterError: Expected {expected},"\
-            f" found '{value}'"
+            f" found {value}"
         super().__init__(self.description)
         self.expected = expected
         self.found = lexer.Token(

@@ -51,6 +51,11 @@ class ArithmeticVariableConstantNode(ASTNode):
                 self.constant, "encode(w)", str(self.token.value))
             self.code_generator.add_code(
                 strip_multiline_string(self.constant), self.all_loc)
+        elif self.token.type == TT.CHAR:
+            self.constant = self.code_generator.replace_code_pre(
+                self.constant, "encode(w)", str(ord(self.token.value)))
+            self.code_generator.add_code(
+                strip_multiline_string(self.constant), self.all_loc)
 
 
 class ArithmeticBinaryOperationNode(ASTNode):

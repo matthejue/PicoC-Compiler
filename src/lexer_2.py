@@ -31,7 +31,8 @@ def _character(self, ):
     if self.lc == "'":
         self.next_char()
     else:
-        raise UnclosedCharacterError("'", self.lc, self.position)
+        raise UnclosedCharacterError("'" + self.c + "'",
+                                     "'" + self.c, self.position)
 
     return Token(TT.CHAR, char, self.position)
 

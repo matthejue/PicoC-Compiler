@@ -1,7 +1,7 @@
 from ast_builder import ASTBuilder
 from abstract_syntax_tree import TokenNode
 import global_vars
-from errors import MismatchedTokenError
+from errors import MismatchedTokenError, UnknownIdentifierError, UnclosedCharacterError
 
 
 class BacktrackingParser():
@@ -144,6 +144,11 @@ class BacktrackingParser():
         self._mark()
         try:
             rule()
+        # Lexer errors should always be reported, else it can happen that only
+        # the first taste triggers the lexer error and the next taste can
+        # continue without error from the last lexer position
+        except (UnknownIdentifierError, UnclosedCharacterError) as e:
+            raise e
         except Exception as e:
             errors += [e]
             tastes_good = False
