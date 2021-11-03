@@ -30,7 +30,7 @@ def _character(self, ):
 
     self.next_char()
 
-    return Token(TT.IDENTIFIER, word, self.position)
+    return Token(TT.CHAR, word, self.position)
 
 
 def _identifier_special_keyword(self):

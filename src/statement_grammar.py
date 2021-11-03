@@ -4,7 +4,7 @@ from lexer import TT
 from errors import MismatchedTokenError
 
 
-class StatementSequenceGrammar(AssignmentAllocationGrammar):
+class StatementGrammar(AssignmentAllocationGrammar):
 
     """The statement sequence part of the context free grammar of the piocC
     language"""

@@ -1,6 +1,7 @@
-from abstract_syntax_tree import IfNode, IfElseNode
 from lexer import TT
 from errors import NoApplicableRuleError, MismatchedTokenError
+
+from if_else_nodes import IfNode, IfElseNode
 
 
 def code_ie(self, ):

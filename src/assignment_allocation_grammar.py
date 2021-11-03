@@ -1,5 +1,6 @@
 from logic_expression_grammar import LogicExpressionGrammar
-from abstract_syntax_tree import AssignmentNode, AllocationNode, TokenNode
+from abstract_syntax_tree import TokenNode
+from assignment_allocation_nodes import AssignmentNode, AllocationNode
 from lexer import TT, Token
 from errors import MismatchedTokenError
 

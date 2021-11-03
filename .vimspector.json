@@ -12,7 +12,7 @@
         "justMyCode": true,
         "console": "externalTerminal",
         "debugOptions": [],
-        "program": "${workspaceFolder}/test/grammar_test.py",
+        "program": "${workspaceFolder}/test/error_message_test.py",
         "_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]"
       }
     }

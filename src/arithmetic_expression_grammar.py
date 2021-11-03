@@ -1,7 +1,7 @@
 from parser_ import BacktrackingParser
-from abstract_syntax_tree import (ArithmeticUnaryOperationNode,
-                                  ArithmeticBinaryOperationNode,
-                                  ArithmeticVariableConstantNode)
+from arithmetic_nodes import (ArithmeticUnaryOperationNode,
+                              ArithmeticBinaryOperationNode,
+                              ArithmeticVariableConstantNode)
 from errors import MismatchedTokenError
 from lexer import TT
 
@@ -77,6 +77,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self._identifier()
         elif self.LTT(1) == TT.NUMBER:
             self._number()
+        elif self.LTT(1) == TT.CHAR:
+            self._char()
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
         elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
@@ -109,12 +111,18 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         self.ast_builder.up(savestate_node)
 
-    def char(self, ):
+    def _char(self, ):
         """character
 
         :grammar: <character>
         :returns: None
         """
+        savestate_node = self.ast_builder.down(
+            ArithmeticVariableConstantNode, [TT.CHAR])
+
+        self.match_and_add([TT.CHAR])
+
+        self.ast_builder.up(savestate_node)
 
     def _paren_arith(self):
         """arithmetic parenthesis

@@ -1,11 +1,11 @@
-from statement_sequence_grammar import StatementSequenceGrammar
-from abstract_syntax_tree import MainFunctionNode
+from statement_grammar import StatementGrammar
+from function_nodes import MainFunctionNode
 from lexer import TT
 
 # TODO: Grammar irgendwo als oberste Grammar noch einrichten
 
 
-class FunctionGrammar(StatementSequenceGrammar):
+class FunctionGrammar(StatementGrammar):
 
     """the function part of the context free grammar of the piocC
     language"""

@@ -1,4 +1,3 @@
-import unittest
 import sys
 
 
@@ -50,12 +49,13 @@ class UsefullTools():
         self.grammar.start_parse()
 
     def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
+        global_vars.args = Args()
         global_vars.test_name = test_name
+
         # create new Singleton SymbolTable and CodeGenerator and remove old
         SymbolTable().__init__()
         CodeGenerator().__init__()
 
-        global_vars.args = Args()
         self.lexer = Lexer(test_name, code_without_cr)
 
         self.grammar = Grammar(self.lexer)
@@ -82,7 +82,7 @@ class UsefullTools():
                 test_name, code_without_cr)
 
 
-if __name__ == '__main__':
+if __name__ == 'testing_helpers':
     sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
     from lexer import Lexer, TT
     from grammar import Grammar

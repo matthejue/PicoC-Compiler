@@ -101,7 +101,6 @@ def _read_and_write_file(infile, outfile):
     with open(infile, encoding="utf-8") as fin, \
             open(outfile, 'w', encoding="utf-8") as fout:
         pico_c_in = fin.readlines()
-        # TODO: remove temporary solution to only read first line
 
         output = _compile(infile, pico_c_in)
 

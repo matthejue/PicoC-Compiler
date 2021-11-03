@@ -1,7 +1,8 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
-from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
-    LogicTopBottomNode, TokenNode
+from logic_nodes import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
+    LogicTopBottomNode
+from abstract_syntax_tree import TokenNode
 from errors import MismatchedTokenError, NoApplicableRuleError
 import global_vars
 

@@ -2,109 +2,10 @@
 
 import unittest
 import sys
+from testing_helpers import UsefullTools
 
 
-class Args(object):
-
-    """For the purpose of testing constructed class which simulates the
-    intended bahaviour of the args variable in global_vars.py"""
-
-    def __init__(self):
-        self.tokens = False
-        self.ast = True
-        self.verbose = False
-        self.start_data_segment = 100
-        self.end_data_segment = 200
-        self.python_stracktrace_error_message = True
-
-
-class UsefullTools():
-    """Helper class for testing"""
-
-    lexer = None
-    grammar = None
-
-    def set_everything_up_for_lexer(self, test_name, code):
-        global_vars.test_name = test_name
-        global_vars.args = Args()
-        self.lexer = Lexer(test_name, [code])
-        tokens = []
-        t = self.lexer.next_token()
-        while t.type != TT.EOF:
-            tokens += [t]
-            t = self.lexer.next_token()
-        return tokens
-
-    def set_everything_up_for_ast(self, test_name, code):
-        global_vars.test_name = test_name
-        global_vars.args = Args()
-        self.lexer = Lexer(test_name, [code])
-
-        self.grammar = Grammar(self.lexer)
-        self.grammar.start_parse()
-
-    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):
-        global_vars.test_name = test_name
-        global_vars.args = Args()
-        self.lexer = Lexer(test_name, code_without_cr)
-
-        self.grammar = Grammar(self.lexer)
-        self.grammar.start_parse()
-
-    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
-        global_vars.test_name = test_name
-        # create new Singleton SymbolTable and CodeGenerator and remove old
-        SymbolTable().__init__()
-        CodeGenerator().__init__()
-
-        global_vars.args = Args()
-        self.lexer = Lexer(test_name, code_without_cr)
-
-        self.grammar = Grammar(self.lexer)
-        error_handler = ErrorHandler(self.grammar)
-        error_handler.handle(self.grammar.start_parse)
-
-        abstract_syntax_tree = self.grammar.reveal_ast()
-        error_handler.handle(abstract_syntax_tree.visit)
-
-        with open("./output.reti", 'w', encoding="utf-8") as fout:
-            fout.writelines(abstract_syntax_tree.show_generated_code())
-
-    def set_everything_up_for_multiline_program(self, test_name, input_string):
-        multiline_string = [i.lstrip() for i in input_string.split('\n')]
-        multiline_string.pop()
-        self.set_everything_up_for_visit_multiline(
-            test_name, multiline_string)
-
-    def set_everything_up_for_testing_program_file(self, test_name, programpath):
-        with open(programpath) as input:
-            code_without_cr = list(
-                map(lambda line: line.strip(), input.readlines()))
-            self.set_everything_up_for_ast_multiline(
-                test_name, code_without_cr)
-
-
-class TestLexer(unittest.TestCase, UsefullTools):
-
-    def test_space_and_word_seperation(self, ):
-        tokens = self.set_everything_up_for_lexer("space and word seperation",
-                                                  "  -12ab   --  (   var)")
-        self.assertEqual(str(tokens), str(
-            ['-', '12', 'ab', '-', '-', '(', 'var', ')']))
-
-    def test_numbers(self, ):
-        tokens = self.set_everything_up_for_lexer("numbers",
-                                                  "12 0 10 9876543021")
-        self.assertEqual(str(tokens), str(['12', '0', '10', '9876543021']))
-
-    def test_comments(self, ):
-        tokens = self.set_everything_up_for_lexer("comments",
-                                                  "var = /* comment */ 10; //"
-                                                  " important comment")
-        self.assertEqual(str(tokens), str(['var', '=', '10', ';']))
-
-
-class TestStatement(unittest.TestCase, UsefullTools):
+class TestStatementGrammar(unittest.TestCase, UsefullTools):
 
     def test_semicolon_after_another(self, ):
         tokens = self.set_everything_up_for_ast("semicolon after another",
@@ -267,7 +168,6 @@ class TestIfElseGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
     def test_if_arithmetic_expression_as_logical_expression(self, ):
-        global_vars.test_name = "to bool"
         self.set_everything_up_for_ast("if arithmetic expression as logical "
                                        "expression",
                                        "void main() { if (123 * var) { var = "
@@ -330,26 +230,6 @@ class TestLoopGrammar(unittest.TestCase, UsefullTools):
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
-class TestComments(unittest.TestCase, UsefullTools):
-
-    def test_single_line_comment(self, ):
-        self.set_everything_up_for_ast_multiline(
-            "commenttest", ["void main() {", "var = 10;",
-                            "// important comment",
-                            "var = 0;", "}"])
-        expected_res = "('main' ('=' 'var' '10') ('=' 'var' '0'))"
-        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
-
-    # def test_single_line_comment_end_of_line(self, ):
-    #     self.set_everything_up_for_ast_multiline(
-    #         [['int var;']['var = 0; // important comment']['var = var + 1;']])
-    #     expected_res = "('fun' ('\t'))"
-    #     self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
-#
-#     def test_multi_line_comments(self, ):
-#         pass
-
-
 class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     code = """SUBI SP 1;
@@ -405,21 +285,14 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.set_everything_up_for_multiline_program(
             "constant initialisation", test_code)
 
-
-class TestPrograms(unittest.TestCase, UsefullTools):
-
-    def test_gcd(self, ):
-        self.set_everything_up_for_testing_program_file("gcd",
-                                                        "./test/gcd.picoc")
+    # TODO: Einen Test mit IfElseNode machen
+    # TODO: diese Datei in 2 Dateien splitten mit code_generator_test and
+    # parser_test
 
 
 if __name__ == '__main__':
     sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
-    from lexer import Lexer, TT
-    from grammar import Grammar
-    import global_vars
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
     from abstract_syntax_tree import strip_multiline_string
-    from errors import ErrorHandler
     unittest.main()

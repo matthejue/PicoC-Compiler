@@ -1,4 +1,4 @@
-from abstract_syntax_tree import WhileNode, DoWhileNode
+from loop_nodes import WhileNode, DoWhileNode
 from lexer import TT
 # from errors import NoApplicableRuleError
 
