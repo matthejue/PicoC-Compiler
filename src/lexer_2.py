@@ -1,4 +1,5 @@
 from lexer import Token, TT
+from errors import UnclosedCharacterError
 
 
 def _number(self):
@@ -30,9 +31,9 @@ def _character(self, ):
     if self.lc == "'":
         self.next_char()
     else:
-        raise
+        raise UnclosedCharacterError("'", self.lc, self.position)
 
-    return Token(TT.CHAR, ord(char), self.position)
+    return Token(TT.CHAR, char, self.position)
 
 
 def _identifier_special_keyword(self):

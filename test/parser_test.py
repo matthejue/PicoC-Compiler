@@ -77,10 +77,11 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
 
     def test_character_as_operand(self, ):
         self.set_everything_up_for_ast("character as operand",
-                                       "void main() {"
-                                       ""
-                                       "}"
-                                       )
+                                       "void main() { int x = 'C' + 1; "
+                                       "var = var + ('a' - 'A'); }")
+        expected_res = "('main' ('=' ('var' 'int' 'x') ('+' 'C' '1')) ('=' 'var' "\
+            "('+' 'var' ('-' 'a' 'A'))))"
+        self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 
 class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):

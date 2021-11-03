@@ -177,6 +177,7 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         try:
             self.set_everything_up_for_multiline_program(
                 "typo in const", test_code)
+        # TODO: hier wird expected an der falschen Stelle angezeigt
         except SystemExit:
             pass
 
@@ -216,6 +217,23 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         try:
             self.set_everything_up_for_multiline_program(
                 "stupid inline comment", test_code)
+        except SystemExit:
+            pass
+
+    def test_unclosed_character_error(self, ):
+        test_code = """void main() {
+                      int x = 'C' + 1;
+                      var = var + ()
+                      var = 2;
+                    }
+                    """
+                                       "void main() { int x = 'C' + 1; "
+                                       "var = var + ('a' - 'A'); }")
+        expected_res="('main' ('=' ('var' 'int' 'x') ('+' 'C' '1')) ('=' 'var' "
+            "('+' 'var' ('-' 'a' 'A'))))"
+        try:
+            self.set_everything_up_for_multiline_program(
+                "unclosed character error", test_code)
         except SystemExit:
             pass
 
