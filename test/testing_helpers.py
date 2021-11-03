@@ -1,7 +1,7 @@
 import sys
 
 
-class Args(object):
+class Args():
 
     """For the purpose of testing constructed class which simulates the
     intended bahaviour of the args variable in global_vars.py"""
@@ -90,4 +90,4 @@ if __name__ == 'testing_helpers':
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
     from abstract_syntax_tree import strip_multiline_string
-    from errors import ErrorHandler
+    from error_handler import ErrorHandler

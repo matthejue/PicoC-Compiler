@@ -223,14 +223,9 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
     def test_unclosed_character_error(self, ):
         test_code = """void main() {
                       int x = 'C' + 1;
-                      var = var + ()
-                      var = 2;
+                      x = x + ('a - 'A');
                     }
                     """
-                                       "void main() { int x = 'C' + 1; "
-                                       "var = var + ('a' - 'A'); }")
-        expected_res="('main' ('=' ('var' 'int' 'x') ('+' 'C' '1')) ('=' 'var' "
-            "('+' 'var' ('-' 'a' 'A'))))"
         try:
             self.set_everything_up_for_multiline_program(
                 "unclosed character error", test_code)

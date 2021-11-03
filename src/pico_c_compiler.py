@@ -4,7 +4,7 @@
 import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
-from errors import ErrorHandler
+from error_handler import ErrorHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
 import global_vars
