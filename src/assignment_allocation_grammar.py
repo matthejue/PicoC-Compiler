@@ -29,6 +29,12 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import global_vars
+        if global_vars.test_name == "unclosed character error":
+            if global_vars.test_name == "unclosed character error":
+                pass
+
         savestate_node = self.ast_builder.down(
             AssignmentNode, [TT.STATEMENT, TT.ASSIGNMENT])
 

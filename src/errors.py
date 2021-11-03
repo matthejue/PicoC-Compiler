@@ -13,7 +13,7 @@ class InvalidCharacterError(Exception):
         super().__init__(self.description)
         self.expected = None
         self.found = lexer.Token(
-            lexer.TT.EOF, value=value, position=position)
+            None, value=value, position=position)
 
 
 class UnclosedCharacterError(Exception):
@@ -26,7 +26,7 @@ class UnclosedCharacterError(Exception):
         super().__init__(self.description)
         self.expected = expected
         self.found = lexer.Token(
-            lexer.TT.EOF, value=value, position=position)
+            None, value=value, position=position)
 
 
 class NoApplicableRuleError(Exception):

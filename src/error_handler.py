@@ -23,8 +23,8 @@ class ErrorHandler:
     def handle(self, function):
         # TODO: Don't forget to remove this improvised conditional breakpoint
         import global_vars
-        if global_vars.test_name == "single line comment":
-            if global_vars.test_name == "single line comment":
+        if global_vars.test_name == "unclosed character error":
+            if global_vars.test_name == "unclosed character error":
                 pass
         error_message = ""
         try:
