@@ -3,7 +3,7 @@ from lexer import Token, TT
 from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
-import globals
+import global_vars
 
 
 class TokenNode:
@@ -329,7 +329,7 @@ class MainFunctionNode(ASTNode):
         self.code_generator.add_marker()
 
         self.code_generator.replace_code_after(
-            'eds', globals.args.end_data_segment)
+            'eds', global_vars.args.end_data_segment)
 
         self.code_generator.remove_marker()
 

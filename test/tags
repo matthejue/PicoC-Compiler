@@ -1,0 +1,98 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/areo/Documents/Studium/pico_c_compiler/test/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
+Args	error_message_test.py	/^class Args(object):$/;"	c
+Args	grammar_test.py	/^class Args(object):$/;"	c
+TestArithmeticExpressionGrammar	grammar_test.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestAssignmentGrammar	grammar_test.py	/^class TestAssignmentGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestCodeGenerator	grammar_test.py	/^class TestCodeGenerator(unittest.TestCase, UsefullTools):$/;"	c
+TestComments	grammar_test.py	/^class TestComments(unittest.TestCase, UsefullTools):$/;"	c
+TestErrorMessages	error_message_test.py	/^class TestErrorMessages(unittest.TestCase, UsefullTools):$/;"	c
+TestIfElseGrammar	grammar_test.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestLexer	grammar_test.py	/^class TestLexer(unittest.TestCase, UsefullTools):$/;"	c
+TestLogicExpressionGrammar	grammar_test.py	/^class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestLoopGrammar	grammar_test.py	/^class TestLoopGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestPrograms	grammar_test.py	/^class TestPrograms(unittest.TestCase, UsefullTools):$/;"	c
+TestStatement	grammar_test.py	/^class TestStatement(unittest.TestCase, UsefullTools):$/;"	c
+UsefullTools	error_message_test.py	/^class UsefullTools():$/;"	c
+UsefullTools	grammar_test.py	/^class UsefullTools():$/;"	c
+__init__	error_message_test.py	/^    def __init__(self):$/;"	m	class:Args
+__init__	grammar_test.py	/^    def __init__(self):$/;"	m	class:Args
+code	grammar_test.py	/^    code = """SUBI SP 1;$/;"	v	class:TestCodeGenerator
+grammar	error_message_test.py	/^    grammar = None$/;"	v	class:UsefullTools
+grammar	grammar_test.py	/^    grammar = None$/;"	v	class:UsefullTools
+lexer	error_message_test.py	/^    lexer = None$/;"	v	class:UsefullTools
+lexer	grammar_test.py	/^    lexer = None$/;"	v	class:UsefullTools
+set_everything_up_for_ast	error_message_test.py	/^    def set_everything_up_for_ast(self, test_name, code):$/;"	m	class:UsefullTools
+set_everything_up_for_ast	grammar_test.py	/^    def set_everything_up_for_ast(self, test_name, code):$/;"	m	class:UsefullTools
+set_everything_up_for_ast_multiline	error_message_test.py	/^    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
+set_everything_up_for_ast_multiline	grammar_test.py	/^    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
+set_everything_up_for_lexer	error_message_test.py	/^    def set_everything_up_for_lexer(self, test_name, code):$/;"	m	class:UsefullTools
+set_everything_up_for_lexer	grammar_test.py	/^    def set_everything_up_for_lexer(self, test_name, code):$/;"	m	class:UsefullTools
+set_everything_up_for_multiline_program	error_message_test.py	/^    def set_everything_up_for_multiline_program(self, test_name, input_string):$/;"	m	class:UsefullTools
+set_everything_up_for_multiline_program	grammar_test.py	/^    def set_everything_up_for_multiline_program(self, test_name, input_string):$/;"	m	class:UsefullTools
+set_everything_up_for_testing_program_file	error_message_test.py	/^    def set_everything_up_for_testing_program_file(self, test_name, programpath):$/;"	m	class:UsefullTools
+set_everything_up_for_testing_program_file	grammar_test.py	/^    def set_everything_up_for_testing_program_file(self, test_name, programpath):$/;"	m	class:UsefullTools
+set_everything_up_for_visit_multiline	error_message_test.py	/^    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
+set_everything_up_for_visit_multiline	grammar_test.py	/^    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
+test_allocation	grammar_test.py	/^    def test_allocation(self, ):$/;"	m	class:TestAssignmentGrammar
+test_basic_arithmetic_expression	grammar_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_code_replacment_after	grammar_test.py	/^    def test_code_replacment_after(self, ):$/;"	m	class:TestCodeGenerator
+test_comments	grammar_test.py	/^    def test_comments(self, ):$/;"	m	class:TestLexer
+test_compile_time_error_assignment	error_message_test.py	/^    def test_compile_time_error_assignment(self, ):$/;"	m	class:TestErrorMessages
+test_compile_time_error_not_initialised_variable	error_message_test.py	/^    def test_compile_time_error_not_initialised_variable(self, ):$/;"	m	class:TestErrorMessages
+test_connected_logic_expression	grammar_test.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
+test_constant_initialisation	grammar_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestAssignmentGrammar
+test_constant_initialisation	grammar_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestCodeGenerator
+test_do_while_loop	grammar_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_else_if	grammar_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
+test_gcd	grammar_test.py	/^    def test_gcd(self, ):$/;"	m	class:TestPrograms
+test_if_arithmetic_expression_as_logical_expression	grammar_test.py	/^    def test_if_arithmetic_expression_as_logical_expression(self, ):$/;"	m	class:TestIfElseGrammar
+test_if_else_braces	grammar_test.py	/^    def test_if_else_braces(self):$/;"	m	class:TestIfElseGrammar
+test_if_else_grammar	grammar_test.py	/^    def test_if_else_grammar(self):$/;"	m	class:TestIfElseGrammar
+test_inline_comment	error_message_test.py	/^    def test_inline_comment(self, ):$/;"	m	class:TestErrorMessages
+test_invalid_character	error_message_test.py	/^    def test_invalid_character(self, ):$/;"	m	class:TestErrorMessages
+test_logic_and_arithmetic_parenthesis_mixed	grammar_test.py	/^    def test_logic_and_arithmetic_parenthesis_mixed(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_expression	grammar_test.py	/^    def test_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_precedence_1	grammar_test.py	/^    def test_logic_precedence_1(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_precedence_2	grammar_test.py	/^    def test_logic_precedence_2(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_loop_and_nested_if_else	grammar_test.py	/^    def test_loop_and_nested_if_else(self, ):$/;"	m	class:TestLoopGrammar
+test_loop_statements_after_another	grammar_test.py	/^    def test_loop_statements_after_another(self, ):$/;"	m	class:TestLoopGrammar
+test_mixed_if_else_after_another	grammar_test.py	/^    def test_mixed_if_else_after_another(self, ):$/;"	m	class:TestIfElseGrammar
+test_negative_parenthesis_and_variable	grammar_test.py	/^    def test_negative_parenthesis_and_variable(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_nested_loops	grammar_test.py	/^    def test_nested_loops(self, ):$/;"	m	class:TestLoopGrammar
+test_no_assignment_operator	error_message_test.py	/^    def test_no_assignment_operator(self, ):$/;"	m	class:TestErrorMessages
+test_no_closing_brace_if	error_message_test.py	/^    def test_no_closing_brace_if(self, ):$/;"	m	class:TestErrorMessages
+test_no_closing_parenthesis	error_message_test.py	/^    def test_no_closing_parenthesis(self, ):$/;"	m	class:TestErrorMessages
+test_no_identifier	error_message_test.py	/^    def test_no_identifier(self, ):$/;"	m	class:TestErrorMessages
+test_no_left_operand	error_message_test.py	/^    def test_no_left_operand(self, ):$/;"	m	class:TestErrorMessages
+test_no_opening_brace_main	error_message_test.py	/^    def test_no_opening_brace_main(self, ):$/;"	m	class:TestErrorMessages
+test_no_operator	error_message_test.py	/^    def test_no_operator(self, ):$/;"	m	class:TestErrorMessages
+test_no_right_operand	error_message_test.py	/^    def test_no_right_operand(self, ):$/;"	m	class:TestErrorMessages
+test_no_semicolon	error_message_test.py	/^    def test_no_semicolon(self, ):$/;"	m	class:TestErrorMessages
+test_numbers	grammar_test.py	/^    def test_numbers(self, ):$/;"	m	class:TestLexer
+test_one_liner	error_message_test.py	/^    def test_one_liner(self, ):$/;"	m	class:TestErrorMessages
+test_parenthesis	grammar_test.py	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_1	grammar_test.py	/^    def test_precedence_1(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_2	grammar_test.py	/^    def test_precedence_2(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_3	grammar_test.py	/^    def test_precedence_3(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_semicolon_after_another	grammar_test.py	/^    def test_semicolon_after_another(self, ):$/;"	m	class:TestStatement
+test_several_parenthesis_nested	error_message_test.py	/^    def test_several_parenthesis_nested(self, ):$/;"	m	class:TestErrorMessages
+test_several_statements_loop	grammar_test.py	/^    def test_several_statements_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_single_line_comment	error_message_test.py	/^    def test_single_line_comment(self, ):$/;"	m	class:TestErrorMessages
+test_single_line_comment	grammar_test.py	/^    def test_single_line_comment(self, ):$/;"	m	class:TestComments
+test_space_and_word_seperation	grammar_test.py	/^    def test_space_and_word_seperation(self, ):$/;"	m	class:TestLexer
+test_stupid_inline_comment	error_message_test.py	/^    def test_stupid_inline_comment(self, ):$/;"	m	class:TestErrorMessages
+test_two_if_after_another	grammar_test.py	/^    def test_two_if_after_another(self, ):$/;"	m	class:TestIfElseGrammar
+test_typo_in_const	error_message_test.py	/^    def test_typo_in_const(self, ):$/;"	m	class:TestErrorMessages
+test_unary_operators	grammar_test.py	/^    def test_unary_operators(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_while_generation	grammar_test.py	/^    def test_while_generation(self, ):$/;"	m	class:TestCodeGenerator
+test_while_loop	grammar_test.py	/^    def test_while_loop(self, ):$/;"	m	class:TestLoopGrammar

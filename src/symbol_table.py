@@ -1,4 +1,4 @@
-import globals
+import global_vars
 
 
 class Symbol:
@@ -94,7 +94,7 @@ class _SymbolTable(Scope):
     def __init__(self):
         super().__init__()
         self.initTypeSystem()
-        self.fa_pointer = globals.args.start_data_segment
+        self.fa_pointer = global_vars.args.start_data_segment
 
     def initTypeSystem(self, ):
         self.define(BuiltInTypeSymbol('int'))

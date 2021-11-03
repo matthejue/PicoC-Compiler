@@ -3,7 +3,7 @@ from lexer import TT, Token
 from abstract_syntax_tree import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
     LogicTopBottomNode, TokenNode
 from errors import MismatchedTokenError, NoApplicableRuleError
-import globals
+import global_vars
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -158,7 +158,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             LogicTopBottomNode, [TT.TO_BOOL])
 
         # TODO: little hack to to also have a token for bottomnode
-        if not globals.is_tasting:
+        if not global_vars.is_tasting:
             self.ast_builder.addChild(
                 TokenNode(Token(TT.TO_BOOL, "to bool", None)))
 

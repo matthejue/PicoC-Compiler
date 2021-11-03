@@ -5,8 +5,7 @@ int main()
   // important comment
   while (n > 0) {
     h = m % n;
-    m = /* important **!** comment within line */ n;
+    m =  /* important **!** comment within line */ n;
     n = h; // important comment end of line
   }
-  // test
 }

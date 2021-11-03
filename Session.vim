@@ -9,7 +9,7 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +93 src/abstract_syntax_tree.py
-badd +100 src/arithmetic_expression_grammar.py
+badd +151 src/arithmetic_expression_grammar.py
 badd +54 src/assignment_allocation_grammar.py
 badd +30 src/ast_builder.py
 badd +89 src/errors.py
@@ -17,7 +17,7 @@ badd +44 src/function_grammar.py
 badd +3 src/globals.py
 badd +18 src/grammar.py
 badd +79 src/if_else_grammar.py
-badd +1 src/lexer.py
+badd +190 src/lexer.py
 badd +1 src/loop_grammar.py
 badd +70 src/parser_.py
 badd +104 src/pico_c_compiler.py
@@ -30,6 +30,7 @@ badd +1 src/symbol_table.py
 badd +1 output.reti
 badd +1 Makefile
 badd +1 src/logic_expression_grammar.py
+badd +1 src/lexer_2.py
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -47,7 +48,7 @@ $argadd src/loop_grammar.py
 $argadd src/parser_.py
 $argadd src/pico_c_compiler.py
 $argadd src/statement_sequence_grammar.py
-edit test/grammar_test.py
+edit src/lexer_2.py
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -55,13 +56,14 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '2resize ' . ((&lines * 4 + 22) / 45)
+exe '2resize ' . ((&lines * 9 + 23) / 47)
 exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
 argglobal
-if bufexists("test/grammar_test.py") | buffer test/grammar_test.py | else | edit test/grammar_test.py | endif
+if bufexists("src/lexer_2.py") | buffer src/lexer_2.py | else | edit src/lexer_2.py | endif
 if &buftype ==# 'terminal'
-  silent file test/grammar_test.py
+  silent file src/lexer_2.py
 endif
+balt src/lexer.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -70,16 +72,16 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 88 - ((20 * winheight(0) + 20) / 41)
+let s:l = 1 - ((0 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 88
+keepjumps 1
 normal! 0
 wincmd w
 argglobal
 enew
-balt test/grammar_test.py
+balt src/lexer.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -89,7 +91,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 wincmd w
-exe '2resize ' . ((&lines * 4 + 22) / 45)
+exe '2resize ' . ((&lines * 9 + 23) / 47)
 exe 'vert 2resize ' . ((&columns * 1 + 95) / 190)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1

@@ -65,6 +65,8 @@ class ErrorHandler:
 
     """Output a detailed error message"""
 
+    LENGTH_COMMENT_TOKEN = 2
+
     def __init__(self, grammar):
         self.grammar = grammar
 
@@ -128,55 +130,53 @@ class ErrorHandler:
             line += ' ' * expected_column + '^' + '\n'
             return line + ' ' * expected_column +\
                 error.expected + '\n'
-        elif expected_column >= 0:
+        if expected_column >= 0:
             line += ' ' * (expected_column) + '^' + \
                 ' ' * (error.found.position[1]-expected_column-1) +\
                 '~' * len(error.found.value) + '\n'
             return line + ' ' * expected_column + error.expected + '\n'
-        elif expected_column == States.ONLY_FOUND.value:
-            return line + ' ' * error.found.position[1] +\
-                '~' * len(error.found.value) + '\n'
+        return line + ' ' * error.found.position[1] +\
+            '~' * len(error.found.value) + '\n'
 
     def _find_white_space_before_last_token(self, e):
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "single line comment":
-            if globals.test_name == "single line comment":
-                pass
-        (row, column) = (e.found.position[0], e.found.position[1])
+        (row, column) = self._calculate_previous_row_column(
+            e.found.position[0], e.found.position[1])
         while True:
             # comments should be overjumped
             res = self._check_for_comment(row, column)
             if res:
                 (row, column) = res
-            # TODO: make it more efficient by not chekcing a line several 'times'
 
             (row, column) = self._calculate_previous_row_column(row, column)
             if self.grammar.lexer.input[row][column] not in " \t":
                 break
-        return (row, column+1)
+        return (row, column + 1)
 
     def _check_for_comment(self, row, column):
         """checks whether there comes a comment while going back and if yes
         return the position where the comment starts
         """
-        while True:
-            (row, column) = self._calculate_previous_row_column(row, column)
+        while column >= self.LENGTH_COMMENT_TOKEN - 1:
             if self._check_words(["//", "/*"], row, column):
                 break
-        (row, column) = self._calculate_previous_row_column(row, column)
-        return (row, column)
+            column -= 1
+        else:
+            return None
+        return (row, column - self.LENGTH_COMMENT_TOKEN + 1)
 
     def _check_words(self, patterns, row, column):
-        match_pattern_results = []
+        # check all patterns
         for pattern in patterns:
             single_match_results = []
+            column_copy = column
+            # check every letter of single pattern
             for char in reversed(pattern):
                 single_match_results += [self.grammar.lexer.input[row]
-                                         [column] == char]
-                column -= column
-            match_pattern_results += [all(single_match_results)]
-        return any(match_pattern_results)
+                                         [column_copy] == char]
+                column_copy -= 1
+            if all(single_match_results):
+                return True
+        return False
 
     def _calculate_previous_row_column(self, row, column):
         if column - 1 >= 0:

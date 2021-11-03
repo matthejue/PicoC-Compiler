@@ -97,12 +97,24 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         self.ast_builder.up(savestate_node)
 
     def _number(self, ):
+        """number
+
+        :grammar: <number>
+        :returns: None
+        """
         savestate_node = self.ast_builder.down(
             ArithmeticVariableConstantNode, [TT.NUMBER])
 
         self.match_and_add([TT.NUMBER])
 
         self.ast_builder.up(savestate_node)
+
+    def char(self, ):
+        """character
+
+        :grammar: <character>
+        :returns: None
+        """
 
     def _paren_arith(self):
         """arithmetic parenthesis

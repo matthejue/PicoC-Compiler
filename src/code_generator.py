@@ -1,4 +1,4 @@
-import globals
+import global_vars
 
 
 class _CodeGenerator:
@@ -64,7 +64,7 @@ class _CodeGenerator:
         """
         code_acc = ""
         for code_piece in self.generated_code:
-            if not globals.args.verbose:
+            if not global_vars.args.verbose:
                 code_piece = self._clean_up_code_piece(code_piece)
             code_acc += code_piece
             # code_acc += "\n"

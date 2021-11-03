@@ -28,11 +28,6 @@ class StatementSequenceGrammar(AssignmentAllocationGrammar):
         :returns: None
 
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import globals
-        if globals.test_name == "test_name":
-                if globals.test_name == "test_name":
-                        pass
         while True:
             # if self._is_statement():
             self._s()

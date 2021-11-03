@@ -1,6 +1,6 @@
 from ast_builder import ASTBuilder
 from abstract_syntax_tree import TokenNode
-import globals
+import global_vars
 from errors import MismatchedTokenError
 
 
@@ -67,7 +67,7 @@ class BacktrackingParser():
         :returns: None, possibly an exception
         """
         # if (self.ast_builder.current_node.token not in tts):
-        if not globals.is_tasting:
+        if not global_vars.is_tasting:
             self.ast_builder.addChild(TokenNode(self.LT(1)))
         self.match(tts)
 
@@ -100,7 +100,7 @@ class BacktrackingParser():
         # if one is already one index over the length of self.lts and doesn't
         # need the lookahead tokens anymore because there's no self.taste going
         # on
-        if self.lt_idx == len(self.lts) and not globals.is_tasting:
+        if self.lt_idx == len(self.lts) and not global_vars.is_tasting:
             self.lt_idx = 0
             self.lts = []
         self._sync(1)
@@ -114,7 +114,7 @@ class BacktrackingParser():
         self.markers += [self.lt_idx]
         # only if all elements of the list are deleted, actions get executed
         # again
-        globals.is_tasting += 1
+        global_vars.is_tasting += 1
         # return self.lt_idx
 
     def _release(self):
@@ -123,7 +123,7 @@ class BacktrackingParser():
         :returns: None
         """
         self.lt_idx = self.markers.pop()
-        globals.is_tasting -= 1
+        global_vars.is_tasting -= 1
 
 #     def _is_tasting(self):
 #         """if in the taste method every mark() found his corresponding

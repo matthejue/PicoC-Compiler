@@ -13,5 +13,4 @@ void main() {
     var = var + 10;
   }
   int result;
-  result = var + car;
 }

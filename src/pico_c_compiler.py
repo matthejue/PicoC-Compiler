@@ -7,7 +7,7 @@ from grammar import Grammar
 from errors import ErrorHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
-import globals
+import global_vars
 
 
 def main():
@@ -42,16 +42,16 @@ def main():
     cli_args_parser.add_argument('-v', '--verbose', action='store_true',
                                  help="Add tokentype to the ast and add "
                                  "comments to the RETI Code")
-    globals.args = cli_args_parser.parse_args()
+    global_vars.args = cli_args_parser.parse_args()
 
-    if not globals.args.infile:
+    if not global_vars.args.infile:
         _shell()
 
-    if globals.args.infile:
-        infile = globals.args.infile
+    if global_vars.args.infile:
+        infile = global_vars.args.infile
 
-    if globals.args.outfile:
-        outfile = globals.args.outfile
+    if global_vars.args.outfile:
+        outfile = global_vars.args.outfile
     else:
         outfile = _basename(infile) + ".reti"
 
@@ -79,7 +79,7 @@ def _shell():
 
     """
     # shell is always executed with print
-    globals.args.print = True
+    global_vars.args.print = True
 
     while True:
         pico_c_in = input('pico_c > ')
@@ -107,7 +107,7 @@ def _read_and_write_file(infile, outfile):
 
         fout.writelines(str(output))
 
-    if globals.args.symbol_table:
+    if global_vars.args.symbol_table:
         outfile = _basename(outfile) + '.csv'
         output = "name,type,position,value\n"
         symbols = SymbolTable().symbols
@@ -131,14 +131,14 @@ def _compile(fname, code):
     lexer = Lexer(fname, code_without_cr)
 
     # Deal with --tokens option
-    if globals.args.tokens:
+    if global_vars.args.tokens:
         tokens = []
         t = lexer.next_token()
         while t.type != TT.EOF:
             tokens += [t]
             t = lexer.next_token()
 
-        if globals.args.print:
+        if global_vars.args.print:
             print(tokens)
 
         return tokens
@@ -151,8 +151,8 @@ def _compile(fname, code):
     error_handler.handle(grammar.start_parse)
 
     # Deal with --ast option
-    if globals.args.ast:
-        if globals.args.print:
+    if global_vars.args.ast:
+        if global_vars.args.print:
             print(grammar.reveal_ast())
         return grammar.reveal_ast()
 
@@ -160,9 +160,9 @@ def _compile(fname, code):
     error_handler.handle(abstract_syntax_tree.visit)
 
     # Deal with --print and --symbol_table options
-    if globals.args.print:
+    if global_vars.args.print:
         print(abstract_syntax_tree.show_generated_code())
-    if globals.args.symbol_table:
+    if global_vars.args.symbol_table:
         header = ["name", "type", "position", "value"]
         symbols = SymbolTable().symbols
         print(tabulate([(k, str(v.type), str(v.position), str(v.value))

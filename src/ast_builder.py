@@ -1,4 +1,4 @@
-import globals
+import global_vars
 
 
 class ASTBuilder:
@@ -24,7 +24,7 @@ class ASTBuilder:
         :returns: None
         """
         # during tasting actions are disallowed
-        if globals.is_tasting:
+        if global_vars.is_tasting:
             return
 
         new_node = classname(tokens)
@@ -45,7 +45,7 @@ class ASTBuilder:
         :returns: None
         """
         # during tasting actions are disallowed
-        if globals.is_tasting:
+        if global_vars.is_tasting:
             return
 
         # grammar rules called on the same layer have to be called with the
