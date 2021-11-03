@@ -23,14 +23,16 @@ def _character(self, ):
     :returns: None
     """
     self.next_char()
-    word = ""
-    while self.lc in self.LETTER_DIGIT:
-        self.next_char()
-        word += self.c
 
     self.next_char()
+    char = self.c
 
-    return Token(TT.CHAR, word, self.position)
+    if self.lc == "'":
+        self.next_char()
+    else:
+        raise
+
+    return Token(TT.CHAR, ord(char), self.position)
 
 
 def _identifier_special_keyword(self):

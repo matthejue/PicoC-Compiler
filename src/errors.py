@@ -15,7 +15,20 @@ class InvalidCharacterError(Exception):
         super().__init__(self.description)
         self.expected = None
         self.found = lexer.Token(
-            lexer.TT.IDENTIFIER, value=value, position=position)
+            lexer.TT.EOF, value=value, position=position)
+
+
+class UnclosedCharacterError(Exception):
+
+    """If a character has a opening apostrophe but not a closing one"""
+
+    def __init__(self, expected, value, position):
+        self.description = f"UnclosedCharacterError: Expected {expected},"\
+            f" found '{value}' "
+        super().__init__(self.description)
+        self.expected = expected
+        self.found = lexer.Token(
+            lexer.TT.EOF, value=value, position=position)
 
 
 class NoApplicableRuleError(Exception):
@@ -27,7 +40,7 @@ class NoApplicableRuleError(Exception):
         self.description = f"NoApplicableRuleError: Expected '{expected}'"\
             f", found '{found.value}'"
         super().__init__(self.description)
-        self.expected = None
+        self.expected = expected
         self.found = found
 
 
@@ -80,6 +93,8 @@ class ErrorHandler:
                 States.ONLY_FOUND.value, e) + '\n'
             print(error_message)
             exit(0)
+        except UnclosedCharacterError as e:
+            pass
         except NoApplicableRuleError as e:
             error_message += self._error_message_header(e) + '\n'
             error_message += self._point_at_found(

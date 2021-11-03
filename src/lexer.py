@@ -77,7 +77,7 @@ class Lexer:
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
-    LETTER_DIGIT_SPAEC = LETTER_DIGIT + ' '
+    LETTER_DIGIT_SPACE = LETTER_DIGIT + ' '
     COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']
 
     def __init__(self, fname, input):
