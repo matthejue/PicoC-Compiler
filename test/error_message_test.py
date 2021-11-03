@@ -64,7 +64,7 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
                     """
         try:
             self.set_everything_up_for_multiline_program(
-                "no closing parenthesis", test_code)
+                "several parenthesis nested", test_code)
         except SystemExit:
             pass
 

@@ -21,6 +21,11 @@ class ErrorHandler:
         self.grammar = grammar
 
     def handle(self, function):
+        # TODO: Don't forget to remove this improvised conditional breakpoint
+        import global_vars
+        if global_vars.test_name == "single line comment":
+            if global_vars.test_name == "single line comment":
+                pass
         error_message = ""
         try:
             function()
@@ -67,14 +72,14 @@ class ErrorHandler:
             str(error.found.position[0]) + ':' + str(error.found.position[1]) \
             + ': ' + error.description
 
-    def _point_at_exptected(self, exptected_pos, error):
+    def _point_at_exptected(self, expected_pos, error):
         # line with exptected symbol
-        line = self.grammar.lexer.input[exptected_pos[0]] + '\n'
+        line = self.grammar.lexer.input[expected_pos[0]] + '\n'
         # positionize exptected_pos symbol at the right position beneath with a
         # arrow pointing on it
-        line += ' ' * exptected_pos[1] + '^' + '\n'
-        line += ' ' * exptected_pos[1] + error.exptected + '\n'
-        for i in range(exptected_pos[0]+1, error.found.position[0]):
+        line += ' ' * expected_pos[1] + '^' + '\n'
+        line += ' ' * expected_pos[1] + error.expected + '\n'
+        for i in range(expected_pos[0]+1, error.found.position[0]):
             line += self.grammar.lexer.input[i]
         return line
 
@@ -94,15 +99,15 @@ class ErrorHandler:
             '~' * len(error.found.value) + '\n'
 
     def _find_white_space_before_last_token(self, e):
-        (row, column) = self._calculate_previous_row_column(
-            e.found.position[0], e.found.position[1])
+        row, column = e.found.position[0], e.found.position[1]
         while True:
+            (row, column) = self._calculate_previous_row_column(row, column)
+
             # comments should be overjumped
             res = self._check_for_comment(row, column)
             if res:
                 (row, column) = res
 
-            (row, column) = self._calculate_previous_row_column(row, column)
             if self.grammar.lexer.input[row][column] not in " \t":
                 break
         return (row, column + 1)
@@ -117,7 +122,7 @@ class ErrorHandler:
             column -= 1
         else:
             return None
-        return (row, column - self.LENGTH_COMMENT_TOKEN + 1)
+        return self._calculate_previous_row_column(row, column - self.LENGTH_COMMENT_TOKEN + 1)
 
     def _check_words(self, patterns, row, column):
         # check all patterns
