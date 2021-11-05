@@ -15,5 +15,8 @@
 /*   int result; */
 /* } */
 void main() {
+  if (1 < 'c') {
+    int var = 10;
+  }
   char x = 'c' + 2;
 }
