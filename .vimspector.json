@@ -1,21 +1,26 @@
 {
-  "configurations": {
-    "Debug": {
-      "adapter": "debugpy",
-      "configuration": {
-        "name": "Debug",
-        "type": "python",
-        "request": "launch",
-        "cwd": "${workspaceFolder}",
-        "python": "/usr/bin/python",
-        "stopOnEntry": true,
-        "justMyCode": true,
-        "console": "externalTerminal",
-        "debugOptions": [],
-        "program": "${workspaceFolder}/src/pico_c_compiler.py",
-        "args": ["./input.picoc", "./output.reti", "-p", "-S"],
-        "_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]"
-      }
-    }
-  }
+	"configurations": {
+		"Debug": {
+			"adapter": "debugpy",
+			"configuration": {
+				"name": "Debug",
+				"type": "python",
+				"request": "launch",
+				"cwd": "${workspaceFolder}",
+				"python": "/usr/bin/python",
+				"stopOnEntry": true,
+				"justMyCode": true,
+				"console": "externalTerminal",
+				"debugOptions": [],
+				"program": "${workspaceFolder}/src/pico_c_compiler.py",
+				"args": [
+					"./input.picoc",
+					"./output.reti",
+					"-p",
+					"-S"
+				],
+				"_comment": "args: [./input.picoc, ./output.reti, -p, -v, -a]"
+			}
+		}
+	}
 }

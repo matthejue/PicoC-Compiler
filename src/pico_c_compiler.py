@@ -14,34 +14,45 @@ def main():
     cli_args_parser = argparse.ArgumentParser(
         description="Compiles Pico-C Code into RETI Code.")
     cli_args_parser.add_argument("infile", nargs='?',
-                                 help="Input file with Pico-C Code")
+                                 help="input file with Pico-C Code")
     cli_args_parser.add_argument("outfile", nargs='?',
-                                 help="Output file with RETI Code")
+                                 help="output file with RETI Code")
     cli_args_parser.add_argument('-p', '--print', action='store_true',
-                                 help="Output the file output to the terminal"
+                                 help="output the file output to the terminal"
                                  " and if --symbol_table is active output the"
                                  " symbol table beneath")
     cli_args_parser.add_argument('-a', '--ast', action='store_true',
-                                 help="Output the Abstract Syntax Tree "
+                                 help="output the Abstract Syntax Tree "
                                  "instead of RETI Code")
     cli_args_parser.add_argument('-t', '--tokens', action='store_true',
-                                 help="Output the Tokenlist instead of "
+                                 help="output the Tokenlist instead of "
                                  "RETI Code")
     cli_args_parser.add_argument('-s', '--start_data_segment',
-                                 help="Where the allocation of variables"
-                                 "starts", type=int, default=100)
-    cli_args_parser.add_argument('-e', '--end_data_segment', help="Where the "
-                                 "stackpointer starts", type=int, default=200)
+                                 help="where the allocation of variables "
+                                 "starts (default 100)", type=int, default=100)
+    cli_args_parser.add_argument('-e', '--end_data_segment', help="where the "
+                                 "stackpointer starts (default 200)", type=int, default=200)
     cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
-                                 action='store_true', help="Show python error "
+                                 action='store_true', help="show python error "
                                  "messages with stacktrace")
     cli_args_parser.add_argument('-S', '--symbol_table', action='store_true',
-                                 help="Output the final symbol table into "
+                                 help="output the final symbol table into "
                                  "a CSV file after the whole Abstract Syntax "
                                  "Tree was visited")
+    cli_args_parser.add_argument('-O', '--optimization-level',
+                                 help="set the optimiziation level of the "
+                                 "compiler (0=save all variables on the "
+                                 "stack, 1=use graph coloring to find the "
+                                 "best assignment of variables to registers, "
+                                 "2=partially interpret expressions) [NOT IMPLEMENTED YET]", type=int, default=0)
+    cli_args_parser.add_argument('-b', '--binary', action='store_true',
+                                 help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
+    cli_args_parser.add_argument('-P', '--prefix-notation', action='store_true',
+                                 help="write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
     cli_args_parser.add_argument('-v', '--verbose', action='store_true',
-                                 help="Add tokentype to the ast and add "
-                                 "comments to the RETI Code")
+                                 help="also show tokentypes in the ast, add "
+                                 "comments to the RETI Code and show more "
+                                 "context around error messages [NOT IMPLEMENTED YET]")
     global_vars.args = cli_args_parser.parse_args()
 
     if not global_vars.args.infile:

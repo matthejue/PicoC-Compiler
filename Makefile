@@ -38,6 +38,9 @@ run-shell-ast-verbose:
 run-shell-tokens:
 	./src/pico_c_compiler.py -t -v -m
 
+run-help:
+	./src/pico_c_compiler.py -h
+
 test:
 	# for test_binary in $(TEST_BINARY_BASENAMES); do \
 	# 	python -m $$test_binary; \

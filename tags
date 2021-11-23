@@ -9,6 +9,10 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
+0	.vimspector.json	/^					".\/input.picoc",$/;"	s	array:configurations.Debug.configuration.args
+1	.vimspector.json	/^					".\/output.reti",$/;"	s	array:configurations.Debug.configuration.args
+2	.vimspector.json	/^					"-p",$/;"	s	array:configurations.Debug.configuration.args
+3	.vimspector.json	/^					"-S"$/;"	s	array:configurations.Debug.configuration.args
 ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
 AND	src/lexer.py	/^    AND = "&&"$/;"	v	class:TT
 AND_OP	src/lexer.py	/^    AND_OP = "&"$/;"	v	class:TT
@@ -36,7 +40,7 @@ ConstantSymbol	src/symbol_table.py	/^class ConstantSymbol(Symbol):$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
 DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
 DO_WHILE	src/lexer.py	/^    DO_WHILE = "do while"$/;"	v	class:TT
-Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
+Debug	.vimspector.json	/^		"Debug": {$/;"	o	object:configurations
 DoWhileNode	src/loop_nodes.py	/^class DoWhileNode(ASTNode):$/;"	c
 ELSE	src/lexer.py	/^    ELSE = "else"$/;"	v	class:TT
 EOF	src/lexer.py	/^    EOF = "end of file"$/;"	v	class:TT
@@ -140,8 +144,8 @@ __init__	src/statement_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:S
 __init__	src/symbol_table.py	/^    def __init__(self):$/;"	m	class:_SymbolTable
 __init__	src/symbol_table.py	/^    def __init__(self, ):$/;"	m	class:Scope
 __init__	src/symbol_table.py	/^    def __init__(self, name):$/;"	m	class:BuiltInTypeSymbol
+__init__	src/symbol_table.py	/^    def __init__(self, name, type, position):$/;"	m	class:ConstantSymbol
 __init__	src/symbol_table.py	/^    def __init__(self, name, type, position):$/;"	m	class:VariableSymbol
-__init__	src/symbol_table.py	/^    def __init__(self, name, type, position, value):$/;"	m	class:ConstantSymbol
 __init__	src/symbol_table.py	/^    def __init__(self, name, type, position, value):$/;"	m	class:Symbol
 __init__	test/testing_helpers.py	/^    def __init__(self):$/;"	m	class:Args
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
@@ -167,7 +171,7 @@ _check_for_comment	src/error_handler.py	/^    def _check_for_comment(self, row, 
 _check_word	src/lexer_2.py	/^def _check_word(self, tokentype, word):$/;"	f
 _check_words	src/error_handler.py	/^    def _check_words(self, patterns, row, column):$/;"	m	class:ErrorHandler
 _clean_up_code_piece	src/code_generator.py	/^    def _clean_up_code_piece(self, code_piece):$/;"	m	class:_CodeGenerator
-_comment	.vimspector.json	/^        "_comment": "args: [.\/input.picoc, .\/output.reti, -p, -v, -a]"$/;"	s	object:configurations.Debug.configuration
+_comment	.vimspector.json	/^				"_comment": "args: [.\/input.picoc, .\/output.reti, -p, -v, -a]"$/;"	s	object:configurations.Debug.configuration
 _comp_operator_assignment_bitshift	src/lexer_2.py	/^def _comp_operator_assignment_bitshift(self):$/;"	f
 _compile	src/pico_c_compiler.py	/^def _compile(fname, code):$/;"	f
 _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	class:BacktrackingParser
@@ -211,7 +215,7 @@ _or	src/lexer_2.py	/^def _or(self):$/;"	f
 _or_expr	src/logic_expression_grammar.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
 _paren_arith	src/arithmetic_expression_grammar.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
 _paren_logic	src/logic_expression_grammar.py	/^    def _paren_logic(self):$/;"	m	class:LogicExpressionGrammar
-_point_at_expected	src/error_handler.py	/^    def _point_at_expected(self, expected, error):$/;"	m	class:ErrorHandler
+_point_at_exptected	src/error_handler.py	/^    def _point_at_exptected(self, expected_pos, error):$/;"	m	class:ErrorHandler
 _point_at_found	src/error_handler.py	/^    def _point_at_found(self, expected_column, error):$/;"	m	class:ErrorHandler
 _prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
 _prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
@@ -228,16 +232,17 @@ _taste_consume_top_bottom	src/logic_expression_grammar.py	/^    def _taste_consu
 _top_bottom	src/logic_expression_grammar.py	/^    def _top_bottom(self, ):$/;"	m	class:LogicExpressionGrammar
 _unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
 _while	src/loop_grammar.py	/^def _while(self):$/;"	f
-adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configurations.Debug
+adapter	.vimspector.json	/^			"adapter": "debugpy",$/;"	s	object:configurations.Debug
 addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
 addChild	src/ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
 addChild	src/loop_nodes.py	/^    def addChild(self, node):$/;"	m	class:DoWhileNode
 add_code	src/code_generator.py	/^    def add_code(self, code, loc):$/;"	m	class:_CodeGenerator
 add_marker	src/code_generator.py	/^    def add_marker(self, ):$/;"	m	class:_CodeGenerator
-all	Makefile	/^all: run-shell-compile clean$/;"	t
+all	Makefile	/^all: run-read-compile clean$/;"	t
 all_loc	src/arithmetic_nodes.py	/^    all_loc = 1$/;"	v	class:ArithmeticVariableConstantNode
 allocate	src/symbol_table.py	/^    def allocate(self, sym):$/;"	m	class:_SymbolTable
 args	.misc/pico_c_compiler	/^args = None$/;"	v
+args	.vimspector.json	/^				"args": [$/;"	a	object:configurations.Debug.configuration
 args	src/global_vars.py	/^args = None$/;"	v
 assign_more	src/assignment_allocation_nodes.py	/^    assign_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\\n"$/;"	v	class:AssignmentNode
 assign_more_loc	src/assignment_allocation_nodes.py	/^    assign_more_loc = 1$/;"	v	class:AssignmentNode
@@ -263,13 +268,13 @@ condition_check	src/loop_nodes.py	/^    condition_check = """# code(af)$/;"	v	cl
 condition_check	src/loop_nodes.py	/^    condition_check = """# codela(l)$/;"	v	class:WhileNode
 condition_check_loc	src/loop_nodes.py	/^    condition_check_loc = 3$/;"	v	class:DoWhileNode
 condition_check_loc	src/loop_nodes.py	/^    condition_check_loc = 3$/;"	v	class:WhileNode
-configuration	.vimspector.json	/^      "configuration": {$/;"	o	object:configurations.Debug
-configurations	.vimspector.json	/^  "configurations": {$/;"	o
-console	.vimspector.json	/^        "console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
+configuration	.vimspector.json	/^			"configuration": {$/;"	o	object:configurations.Debug
+configurations	.vimspector.json	/^	"configurations": {$/;"	o
+console	.vimspector.json	/^				"console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
 constant	src/arithmetic_nodes.py	/^    constant = "LOADI ACC encode(w);\\n"$/;"	v	class:ArithmeticVariableConstantNode
 constant_identifier	src/arithmetic_nodes.py	/^    constant_identifier = "LOADI ACC encode(c);\\n"$/;"	v	class:ArithmeticVariableConstantNode
-cwd	.vimspector.json	/^        "cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
-debugOptions	.vimspector.json	/^        "debugOptions": [],$/;"	a	object:configurations.Debug.configuration
+cwd	.vimspector.json	/^				"cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
+debugOptions	.vimspector.json	/^				"debugOptions": [],$/;"	a	object:configurations.Debug.configuration
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
 down	src/ast_builder.py	/^    def down(self, classname, tokens):$/;"	m	class:ASTBuilder
 end	src/arithmetic_nodes.py	/^    end = """# codeaa(e1)$/;"	v	class:ArithmeticBinaryOperationNode
@@ -302,33 +307,34 @@ handle	src/error_handler.py	/^    def handle(self, function):$/;"	m	class:ErrorH
 initTypeSystem	src/symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:_SymbolTable
 isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
 is_tasting	src/global_vars.py	/^is_tasting = 0$/;"	v
-justMyCode	.vimspector.json	/^        "justMyCode": true,$/;"	b	object:configurations.Debug.configuration
+justMyCode	.vimspector.json	/^				"justMyCode": true,$/;"	b	object:configurations.Debug.configuration
 lexer	.misc/test_errors	/^    lexer = Lexer("<testin>", code_ae)$/;"	v	class:TestErrors
 lexer	test/testing_helpers.py	/^    lexer = None$/;"	v	class:UsefullTools
 main	.misc/pico_c_compiler	/^def main():$/;"	f
-main	.misc/test.cpp	/^int main() { int var = 'c' + 10; }$/;"	f	typeref:typename:int
+main	.misc/test.cpp	/^int main() {$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 match	src/parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
 match_and_add	src/parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
 middle	src/if_else_nodes.py	/^    middle = """JUMP codelength(af2) + 1;$/;"	v	class:IfElseNode
 middle_loc	src/if_else_nodes.py	/^    middle_loc = 1$/;"	v	class:IfElseNode
-name	.vimspector.json	/^        "name": "Debug",$/;"	s	object:configurations.Debug.configuration
+name	.vimspector.json	/^				"name": "Debug",$/;"	s	object:configurations.Debug.configuration
 next_char	src/lexer.py	/^    def next_char(self):$/;"	m	class:Lexer
 next_token	src/lexer.py	/^    def next_token(self):$/;"	m	class:Lexer
 parser	.misc/test_errors	/^    parser = Parser(tokens)$/;"	v	class:TestErrors
-program	.vimspector.json	/^        "program": "${workspaceFolder}\/test\/error_message_test.py",$/;"	s	object:configurations.Debug.configuration
+program	.vimspector.json	/^				"program": "${workspaceFolder}\/src\/pico_c_compiler.py",$/;"	s	object:configurations.Debug.configuration
 project_opened	.vim/.ropeproject/config.py	/^def project_opened(project):$/;"	f
-python	.vimspector.json	/^        "python": "\/usr\/bin\/python",$/;"	s	object:configurations.Debug.configuration
+python	.vimspector.json	/^				"python": "\/usr\/bin\/python",$/;"	s	object:configurations.Debug.configuration
 python.linting.enabled	.vim/coc-settings.json	/^  "python.linting.enabled": true,$/;"	b
 python.linting.flake8Enabled	.vim/coc-settings.json	/^  "python.linting.flake8Enabled": false$/;"	b
 python.linting.pylintEnabled	.vim/coc-settings.json	/^  "python.linting.pylintEnabled": true,$/;"	b
 read_file	.misc/pico_c_compiler	/^def read_file(infile, outfile):$/;"	f
 remove_marker	src/code_generator.py	/^    def remove_marker(self, ):$/;"	m	class:_CodeGenerator
 replace_code_after	src/code_generator.py	/^    def replace_code_after(self, pattern, word):$/;"	m	class:_CodeGenerator
-replace_code_pre	src/code_generator.py	/^    def replace_code_pre(self, code_as_ref, pattern, word):$/;"	m	class:_CodeGenerator
-request	.vimspector.json	/^        "request": "launch",$/;"	s	object:configurations.Debug.configuration
+replace_code_pre	src/code_generator.py	/^    def replace_code_pre(self, code, pattern, word):$/;"	m	class:_CodeGenerator
+request	.vimspector.json	/^				"request": "launch",$/;"	s	object:configurations.Debug.configuration
 resolve	src/symbol_table.py	/^    def resolve(self, name):$/;"	m	class:Scope
 reveal_ast	src/grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
+run-help	Makefile	/^run-help:$/;"	t
 run-read-ast	Makefile	/^run-read-ast:$/;"	t
 run-read-ast-verbose	Makefile	/^run-read-ast-verbose:$/;"	t
 run-read-compile	Makefile	/^run-read-compile:$/;"	t
@@ -340,7 +346,11 @@ run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
 run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 4 - ((3 * winheight(0) + 18) \/ 37)$/;"	v
+s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 0) \/ 1)$/;"	v
+s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	Session.vim	/^let s:l = 55 - ((33 * winheight(0) + 21) \/ 43)$/;"	v
+s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
+s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
 s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
 s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
@@ -366,13 +376,14 @@ start_loc	src/function_nodes.py	/^    start_loc = 1$/;"	v	class:MainFunctionNode
 start_loc	src/if_else_nodes.py	/^    start_loc = 3$/;"	v	class:IfElseNode
 start_loc	src/if_else_nodes.py	/^    start_loc = 3$/;"	v	class:IfNode
 start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
-stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
+stopOnEntry	.vimspector.json	/^				"stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
 strip_multiline_string	src/abstract_syntax_tree.py	/^def strip_multiline_string(mutline_string):$/;"	f
 syntax_tree_rootnode	.misc/test_errors	/^    syntax_tree_rootnode, error = parser.parse()$/;"	v	class:TestErrors
 taste	src/parser_.py	/^    def taste(self, rule, errors):$/;"	m	class:BacktrackingParser
 test	Makefile	/^test:$/;"	t
 test_allocation	test/parser_test.py	/^    def test_allocation(self, ):$/;"	m	class:TestAssignmentGrammar
 test_basic_arithmetic_expression	test/parser_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_char_as_datatype	test/code_generator_test.py	/^    def test_char_as_datatype(self, ):$/;"	m	class:TestCodeGenerator
 test_character_as_operand	test/parser_test.py	/^    def test_character_as_operand(self, ):$/;"	m	class:TestArithmeticExpressionGrammar
 test_code_replacment_after	test/code_generator_test.py	/^    def test_code_replacment_after(self, ):$/;"	m	class:TestCodeGenerator
 test_comments	test/misc_test.py	/^    def test_comments(self, ):$/;"	m	class:TestLexer
@@ -382,12 +393,15 @@ test_connected_logic_expression	test/parser_test.py	/^    def test_connected_log
 test_constant_initialisation	test/code_generator_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestCodeGenerator
 test_constant_initialisation	test/parser_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestAssignmentGrammar
 test_do_while_loop	test/parser_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_else_if	test/code_generator_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestCodeGenerator
 test_else_if	test/parser_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
 test_gcd	test/execution_test.py	/^    def test_gcd(self, ):$/;"	m	class:TestPrograms
 test_if_arithmetic_expression_as_logical_expression	test/parser_test.py	/^    def test_if_arithmetic_expression_as_logical_expression(self, ):$/;"	m	class:TestIfElseGrammar
 test_if_else_braces	test/parser_test.py	/^    def test_if_else_braces(self):$/;"	m	class:TestIfElseGrammar
 test_if_else_grammar	test/parser_test.py	/^    def test_if_else_grammar(self):$/;"	m	class:TestIfElseGrammar
+test_if_with_character	test/code_generator_test.py	/^    def test_if_with_character(self, ):$/;"	m	class:TestCodeGenerator
 test_illegal_char_error	.misc/test_errors	/^    def test_illegal_char_error()$/;"	m	class:TestErrors
+test_initialising_with_character	test/code_generator_test.py	/^    def test_initialising_with_character(self, ):$/;"	m	class:TestCodeGenerator
 test_inline_comment	test/error_message_test.py	/^    def test_inline_comment(self, ):$/;"	m	class:TestErrorMessages
 test_invalid_character	test/error_message_test.py	/^    def test_invalid_character(self, ):$/;"	m	class:TestErrorMessages
 test_logic_and_arithmetic_parenthesis_mixed	test/parser_test.py	/^    def test_logic_and_arithmetic_parenthesis_mixed(self, ):$/;"	m	class:TestLogicExpressionGrammar
@@ -433,7 +447,7 @@ test_varying_spacing	.misc/test_parser	/^    def test_varying_spacing(self):$/;"
 test_while_generation	test/code_generator_test.py	/^    def test_while_generation(self, ):$/;"	m	class:TestCodeGenerator
 test_while_loop	test/parser_test.py	/^    def test_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 tokens	.misc/test_errors	/^    tokens, error = lexer.create_tokens()$/;"	v	class:TestErrors
-type	.vimspector.json	/^        "type": "python",$/;"	s	object:configurations.Debug.configuration
+type	.vimspector.json	/^				"type": "python",$/;"	s	object:configurations.Debug.configuration
 up	src/ast_builder.py	/^    def up(self, savestate_node):$/;"	m	class:ASTBuilder
 variable_identifier	src/arithmetic_nodes.py	/^    variable_identifier = "LOAD ACC var_identifier;\\n"$/;"	v	class:ArithmeticVariableConstantNode
 visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:TokenNode

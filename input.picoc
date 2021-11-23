@@ -1,5 +1,12 @@
-int main() {
-	if ('c') {
-		const int var = 'c' + 2;
+void main() {
+	const char var = 'c' + 3;
+	char x = 3;
+	if (var || (0 - 1)) {
+		x = x + var;
+	} else if (1 && 0) {
+		x = x + var --12;
+	} else {
+		x = var + 'c';
 	}
 }
+

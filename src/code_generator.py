@@ -35,11 +35,13 @@ class _CodeGenerator:
         self.metadata.pop()
 
     def get_marker_loc(self, ):
+        """E.g. to get the previous loc for calculation of the difference
+        """
         return self.metadata[-1][1]
 
     def replace_code_after(self, pattern, word):
-        """Depending on the Token sometimes different reti code commands have
-        to be executed
+        """Replace code afterwards after adding it, e.g. for a if-statement to
+        jump over a codeblock of beforehand unknown size
 
         :pattern: pattern that should be replaced
         :word: by what the pattern should be replaced
@@ -49,12 +51,12 @@ class _CodeGenerator:
             self.generated_code[self.metadata[-1]
                                 [0]].replace(pattern, str(word))
 
-    def replace_code_pre(self, code_as_ref, pattern, word):
-        """Jumps backwards are e.g. needed for while loops.
+    def replace_code_pre(self, code, pattern, word):
+        """Jumps backwards, e.g. needed for while loops.
 
-        :returns: None
+        :returns: code
         """
-        return code_as_ref.replace(pattern, str(word))
+        return code.replace(pattern, str(word))
 
     def show_code(self, ):
         """Sets the generated / modified code pieces together to one unified

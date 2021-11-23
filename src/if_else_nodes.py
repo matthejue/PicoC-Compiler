@@ -1,4 +1,5 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
+from lexer import TT
 
 
 class IfNode(ASTNode):
@@ -55,7 +56,6 @@ class IfElseNode(ASTNode):
     middle_loc = 1
 
     def visit(self, ):
-        # TODO: hier ist auf jeden Fall noch ein Bug
         self.code_generator.add_code("# If Else start\n", 0)
 
         self.children[0].visit()
@@ -65,7 +65,8 @@ class IfElseNode(ASTNode):
 
         self.code_generator.add_marker()
 
-        for child in self.children[1:]:
+        else_idx = self._idx_of_else_node()
+        for child in self.children[1:else_idx]:
             child.visit()
 
         self.code_generator.replace_code_after(
@@ -78,7 +79,7 @@ class IfElseNode(ASTNode):
 
         self.code_generator.add_marker()
 
-        for child in self.children[1:]:
+        for child in self.children[else_idx + 1:]:
             child.visit()
 
         self.code_generator.replace_code_after(
@@ -86,6 +87,15 @@ class IfElseNode(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code_close("", 0)
-
         self.code_generator.add_code("# If Else end\n", 0)
+
+    def _idx_of_else_node(self):
+        """Finds out the index of the Else TokenNode whichs marks the border between
+        the If and Else Codeblocks
+
+
+        """
+        for (i, child) in enumerate(self.children):
+            if child.token.type == TT.ELSE:
+                return i
+        return -1
