@@ -42,23 +42,23 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     def test_while_generation(self, ):
         test_code = """void main() {
-                       int i = 0;
-                       int x = 1;
-                       while (i < 10) {
-                         if (i == 5) {
-                           x = 2;
-                         }
-                         i = i + x;
-                       }
-                       const int y = i % 10;
-                     }
-                     """
+                      int i = 0;
+                      int x = 1;
+                      while (i < 10) {
+                        if (i == 5) {
+                          x = 2;
+                        }
+                        i = i + x;
+                      }
+                      const int y = i % 10;
+                    }
+                    """
         self.set_everything_up_for_multiline_program(
             "while generation", test_code)
 
     def test_constant_initialisation(self, ):
         test_code = """void main() {
-                        const int var = 42;
+                      const int var = 42;
                     }
                     """
         self.set_everything_up_for_multiline_program(
@@ -66,13 +66,46 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     def test_initialising_with_character(self, ):
         test_code = """void main() {
-                        const int var = 'c' + 2;
+                      const int var = 'c' + 2;
                     }
                     """
         self.set_everything_up_for_multiline_program(
             "test initialising with character", test_code)
 
-    # TODO: Einen Test mit IfElseNode machen
+    def test_if_with_character(self, ):
+        test_code = """void main() {
+                      if ('c') {
+                        const int var = 'c' + 2;
+                      }
+                    }
+                    """
+        self.set_everything_up_for_multiline_program(
+            "test if else", test_code)
+
+    def test_char_as_datatype(self, ):
+        test_code = """void main() {
+                      const char var = 'c' + 2;
+                      char x = var - (5 - 'c');
+                    }
+                    """
+        self.set_everything_up_for_multiline_program(
+            "test if else", test_code)
+
+    def test_else_if(self, ):
+        test_code = """void main() {
+                      const int var = 'c' + 3;
+                      int x = 3;
+                      if (var || 0) {
+                        x = x + var;
+                      } else if (1 && 0) {
+                        x = x + var --12;
+                      } else {
+                        x = x + var;
+                      }
+                    }
+                    """
+        self.set_everything_up_for_multiline_program(
+            "test if else", test_code)
 
 
 if __name__ == '__main__':

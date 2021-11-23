@@ -86,6 +86,7 @@ class ASTNode(TokenNode):
     def show_generated_code(self, ):
         return self.code_generator.show_code()
 
+
     def __repr__(self):
         # if Node doesn't even reach it's own operation token it's unnecessary
         # and should be skipped

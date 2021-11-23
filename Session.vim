@@ -14,7 +14,7 @@ badd +1 src/arithmetic_nodes.py
 badd +1 src/assignment_allocation_grammar.py
 badd +1 src/assignment_allocation_nodes.py
 badd +1 src/ast_builder.py
-badd +1 src/code_generator.py
+badd +23 src/code_generator.py
 badd +1 src/errors.py
 badd +1 src/function_grammar.py
 badd +1 src/function_nodes.py
@@ -32,12 +32,14 @@ badd +1 src/parser_.py
 badd +1 src/pico_c_compiler.py
 badd +1 src/statement_grammar.py
 badd +1 src/symbol_table.py
-badd +70 test/grammar_test.py
-badd +3 test/parser_test.py
-badd +18 test/code_generator_test.py
+badd +1 test/parser_test.py
+badd +76 test/code_generator_test.py
 badd +1 ~/.config_stow/nvim/.config/nvim/plugin_settings.vim
 badd +47 test/testing_helpers.py
 badd +1 statement_nodes.py
+badd +3 test/execution_test.py
+badd +7 test/misc_test.py
+badd +43 Makefile
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -65,7 +67,16 @@ $argadd src/pico_c_compiler.py
 $argadd src/statement_grammar.py
 $argadd statement_nodes.py
 $argadd src/symbol_table.py
-edit src/abstract_syntax_tree.py
+edit Makefile
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
 wincmd t
 let s:save_winminheight = &winminheight
 let s:save_winminwidth = &winminwidth
@@ -73,13 +84,14 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '2resize ' . ((&lines * 5 + 19) / 39)
-exe 'vert 2resize ' . ((&columns * 1 + 79) / 158)
-exe '3resize ' . ((&lines * 5 + 19) / 39)
-exe 'vert 3resize ' . ((&columns * 49 + 79) / 158)
-exe '4resize ' . ((&lines * 12 + 19) / 39)
-exe 'vert 4resize ' . ((&columns * 1 + 79) / 158)
+exe 'vert 1resize ' . ((&columns * 149 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 40 + 95) / 190)
 argglobal
+if bufexists("Makefile") | buffer Makefile | else | edit Makefile | endif
+if &buftype ==# 'terminal'
+  silent file Makefile
+endif
+balt test/code_generator_test.py
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -88,18 +100,18 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 4 - ((3 * winheight(0) + 18) / 37)
+let s:l = 43 - ((33 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 4
+keepjumps 43
 normal! 0
 wincmd w
 argglobal
 enew
-balt src/abstract_syntax_tree.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
+file __Tagbar__.1
+setlocal fdm=manual
+setlocal fde=0
 setlocal fmr={{{,}}}
 setlocal fdi=#
 setlocal fdl=1
@@ -107,36 +119,8 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 wincmd w
-argglobal
-enew
-balt src/abstract_syntax_tree.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-argglobal
-enew
-balt src/abstract_syntax_tree.py
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-exe '2resize ' . ((&lines * 5 + 19) / 39)
-exe 'vert 2resize ' . ((&columns * 1 + 79) / 158)
-exe '3resize ' . ((&lines * 5 + 19) / 39)
-exe 'vert 3resize ' . ((&columns * 49 + 79) / 158)
-exe '4resize ' . ((&lines * 12 + 19) / 39)
-exe 'vert 4resize ' . ((&columns * 1 + 79) / 158)
+exe 'vert 1resize ' . ((&columns * 149 + 95) / 190)
+exe 'vert 2resize ' . ((&columns * 40 + 95) / 190)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
