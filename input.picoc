@@ -1,19 +1,5 @@
-/* void main() { */
-/*   int i = 0; */
-/*   while (i >= 0) { */
-/*     while (i < 10 && i >= 0) { */
-/*       i = i + 1; */
-/*     } */
-/*   } */
-/* } */
-/* void main() { */
-/*   int var = 31 >> 7; */
-/*   const int car = 31; */
-/*   while (var < 10) { */
-/*     var = var + 10; */
-/*   } */
-/*   int result; */
-/* } */
-void main() {
-  char x = 'c' + 2;
+int main() {
+	if ('c') {
+		const int var = 'c' + 2;
+	}
 }

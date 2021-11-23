@@ -3,7 +3,7 @@ TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard ./test/*_test.py))
 TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test/$(test_binary))
 .PHONY: all run test clean
 
-all: run-shell-compile clean
+all: run-read-compile clean
 
 run-read-compile:
 	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S ./input.picoc ./output.reti

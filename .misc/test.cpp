@@ -1,3 +1,7 @@
 #include <stdio.h>
 
-int main() { int var = 'c' + 10; }
+int main() {
+  if ('c') {
+    int var = 'c' + 10;
+  }
+}
