@@ -4,3 +4,4 @@ build/
 output.reti
 output.csv
 pico_c_compiler.spec
+README.txt
