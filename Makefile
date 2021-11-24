@@ -51,6 +51,7 @@ test:
 	done
 
 setup_pyinstaller_linux:
+	python -m pip install --upgrade pip
 	pip install pyinstaller
 	pip install staticx
 	pip install patchelf-wrapper
