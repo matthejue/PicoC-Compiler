@@ -1,0 +1,11 @@
+void main() {
+	const char var = 'c';
+	char x = 3;
+	if (var || (0 - 1)) {
+		int y = x + var;
+	} else if (1 && 0) {
+		x = var --12;
+	} else {
+		x = var + 'c';
+	}
+}
