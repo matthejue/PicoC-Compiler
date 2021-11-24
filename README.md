@@ -63,3 +63,7 @@ optional arguments:
 
 [1] Parr, Terence. Language implementation patterns: create your own
 domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
+
+## Useful sites
+- https://github.com/pyinstaller/pyinstaller/wiki/FAQ
+- https://github.com/JonathonReinhart/staticx/

@@ -50,17 +50,29 @@ test:
 		./$$test_binary; \
 	done
 
+setup_pyinstaller_linux:
+	pip install pyinstaller
+	pip install staticx
+	pip install patchelf-wrapper
+
+setup_pyinstaller_wine:
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 winecfg
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/python.exe -m pip install --upgrade pip
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/python.exe -m pip install pyinstaller
+
 create_bin_linux:
 	pyinstaller ./src/pico_c_compiler.py --onefile --hidden-import=tabulate --distpath=./dist
+	staticx ./dist/pico_c_compiler ./dist/pico_c_compiler_linux
 
-create_bin_win:
+create_bin_wine:
 	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/Scripts/pyinstaller.exe ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py  --onefile --hidden-import=tabulate --distpath=~/Documents/Studium/pico_c_compiler/dist
+	mv ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler_wine.exe
 
 exec_bin_linux:
-	./dist/pico_c_compiler -S
+	./dist/pico_c_compiler_linux -S
 
-exec_bin_win:
-	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe -S
+exec_bin_wine:
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/dist/pico_c_compiler_wine.exe -S
 
 help:
 	./src/pico_c_compiler.py -h
