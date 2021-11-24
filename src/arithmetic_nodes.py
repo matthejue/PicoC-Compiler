@@ -64,8 +64,8 @@ class ArithmeticBinaryOperationNode(ASTNode):
 
     end = """# codeaa(e1)
         # codeaa(e2)
-        LOADIN SP ACC 2; # Wert von e 1 in ACC laden
-        LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+        LOADIN SP ACC 2; # Wert von e1 in ACC laden
+        LOADIN SP IN2 1; # Wert von e2 in IN2 laden
         OP ACC IN2; # e1 binop e2 in ACC laden
         STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -131,7 +131,7 @@ class ArithmeticUnaryOperationNode(ASTNode):
 
     bitwise_negation_loc = 1
 
-    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"
+    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle\n"
 
     end_loc = 1
 
@@ -144,11 +144,9 @@ class ArithmeticUnaryOperationNode(ASTNode):
             strip_multiline_string(self.start), self.start_loc)
 
         if self.token.value == '~':
-            self.code_generator.add_code(strip_multiline_string
-                                         (self.bitwise_negation),
+            self.code_generator.add_code(self.bitwise_negation,
                                          self.bitwise_negation_loc)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.end_loc)
+        self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code("# Arithmetic Unary Operation end\n", 0)

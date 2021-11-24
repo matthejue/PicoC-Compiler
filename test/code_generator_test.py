@@ -93,10 +93,10 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
     def test_else_if(self, ):
         test_code = """void main() {
-                      const int var = 'c' + 3;
-                      int x = 3;
+                      const char var = 'c' + 3;
+                      char x = 3;
                       if (var || 0) {
-                        x = x + var;
+                        int y = x + var;
                       } else if (1 && 0) {
                         x = x + var --12;
                       } else {

@@ -6,6 +6,12 @@ class Symbol:
     """Name for a program entity like a variable or function"""
 
     def __init__(self, name, type, position, value):
+        """
+        :name: string
+        :type: Symbol
+        :position: tuple(int, int)
+        :value: int
+        """
         self.name = name
         self.type = type
         self.position = position
@@ -80,6 +86,7 @@ class Scope:
     def resolve(self, name):
         """look up name in scope
 
+        :name: string
         :return: Symbol
         """
         return self.symbols[name]
