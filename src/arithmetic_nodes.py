@@ -44,13 +44,9 @@ class ArithmeticVariableConstantNode(ASTNode):
                     self.constant_identifier, "encode(c)", str(var_or_const.value))
                 self.code_generator.add_code(
                     self.constant_identifier, self.all_loc)
-        elif self.token.type == TT.NUMBER:
+        elif self.token.type in [TT.NUMBER, TT.CHAR]:
             self.constant = self.code_generator.replace_code_pre(
                 self.constant, "encode(w)", str(self.token.value))
-            self.code_generator.add_code(self.constant, self.all_loc)
-        elif self.token.type == TT.CHAR:
-            self.constant = self.code_generator.replace_code_pre(
-                self.constant, "encode(w)", self.token.value)
             self.code_generator.add_code(self.constant, self.all_loc)
 
 

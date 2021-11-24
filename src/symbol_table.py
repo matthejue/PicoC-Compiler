@@ -5,15 +5,15 @@ class Symbol:
 
     """Name for a program entity like a variable or function"""
 
-    def __init__(self, name, type, position, value):
+    def __init__(self, name, datatype, position, value):
         """
         :name: string
-        :type: Symbol
+        :datatype: Symbol
         :position: tuple(int, int)
         :value: int
         """
         self.name = name
-        self.type = type
+        self.datatype = datatype
         self.position = position
         self.value = value
 
@@ -21,33 +21,42 @@ class Symbol:
         return self.name
 
     def __repr__(self, ):
-        if self.type:
-            return '<' + self.name + ':' + self.type + '>'
+        if self.datatype:
+            return '<' + self.name + ':' + self.datatype + '>'
         return self.name
 
 
 class VariableSymbol(Symbol):
 
-    """Represents a variable definition (name, type) in symbol table"""
+    """Represents a variable definition (name, datatype) in symbol table"""
 
-    def __init__(self, name, type, position):
-        super().__init__(name, type, position, None)
+    def __init__(self, name, datatype, position):
+        super().__init__(name, datatype, position, None)
+
+    def get_type(self, ):
+        return "variable"
 
 
 class ConstantSymbol(Symbol):
 
-    """Represents a variable definition (name, type) in symbol table"""
+    """Represents a variable definition (name, datatype) in symbol table"""
 
-    def __init__(self, name, type, position):
-        super().__init__(name, type, position, None)
+    def __init__(self, name, datatype, position):
+        super().__init__(name, datatype, position, None)
+
+    def get_type(self, ):
+        return "named constant"
 
 
 class BuiltInTypeSymbol(Symbol):
 
-    """Built in types such as int and char"""
+    """Built in datatypes such as int and char"""
 
     def __init__(self, name):
         super().__init__(name, None, None, None)
+
+    def get_type(self, ):
+        return "built in"
 
 
 class Scope:

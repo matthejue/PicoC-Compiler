@@ -119,17 +119,19 @@ def _read_and_write_file(infile, outfile):
 
     if global_vars.args.symbol_table:
         outfile = _basename(outfile) + '.csv'
-        output = "name,type,position,value\n"
+        output = "name,type,datatype,position,value\n"
         symbols = SymbolTable().symbols
         for name in symbols.keys():
             if symbols[name].position:
-                output += f"{name},{symbols[name].type},"\
+                output += f"{name},"\
+                    f"{symbols[name].get_type()},"\
+                    f"{symbols[name].datatype},"\
                     f"{symbols[name].position[0]}:"\
                     f"{symbols[name].position[1]},"\
                     f"{symbols[name].value}\n"
             else:  # if it is None
-                output += f"{name},{symbols[name].type},"\
-                    f"{symbols[name].position},{symbols[name].value}\n"
+                output += f"{name},{symbols[name].get_type()},"\
+                    f"{symbols[name].datatype},{symbols[name].position}, {symbols[name].value}\n"
         with open(outfile, 'w', encoding="utf-8") as csv_out:
             csv_out.writelines(output)
 
@@ -173,9 +175,9 @@ def _compile(fname, code):
     if global_vars.args.print:
         print(abstract_syntax_tree.show_generated_code())
     if global_vars.args.symbol_table:
-        header = ["name", "type", "position", "value"]
+        header = ["name", "type", "datatype", "position", "value"]
         symbols = SymbolTable().symbols
-        print(tabulate([(k, str(v.type), str(v.position), str(v.value))
+        print(tabulate([(k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
               for k, v in symbols.items()], headers=header))
 
     return abstract_syntax_tree.show_generated_code()

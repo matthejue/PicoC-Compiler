@@ -23,6 +23,7 @@ class UsefullTools():
 
     def set_everything_up_for_lexer(self, test_name, code):
         global_vars.test_name = test_name
+        global_vars.is_tasting = 0
         global_vars.args = Args()
         self.lexer = Lexer(test_name, [code])
         tokens = []
@@ -34,6 +35,7 @@ class UsefullTools():
 
     def set_everything_up_for_ast(self, test_name, code):
         global_vars.test_name = test_name
+        global_vars.is_tasting = 0
         global_vars.args = Args()
         self.lexer = Lexer(test_name, [code])
 
@@ -42,6 +44,7 @@ class UsefullTools():
 
     def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):
         global_vars.test_name = test_name
+        global_vars.is_tasting = 0
         global_vars.args = Args()
         self.lexer = Lexer(test_name, code_without_cr)
 
@@ -49,8 +52,9 @@ class UsefullTools():
         self.grammar.start_parse()
 
     def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
-        global_vars.args = Args()
         global_vars.test_name = test_name
+        global_vars.is_tasting = 0
+        global_vars.args = Args()
 
         # create new Singleton SymbolTable and CodeGenerator and remove old
         SymbolTable().__init__()
