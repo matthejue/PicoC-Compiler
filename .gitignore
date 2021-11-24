@@ -1,3 +1,5 @@
 __pycache__/
 dist/
 build/
+output.reti
+output.csv
