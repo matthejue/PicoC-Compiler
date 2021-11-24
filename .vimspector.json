@@ -12,7 +12,7 @@
         "justMyCode": true,
         "console": "externalTerminal",
         "debugOptions": [],
-        "program": "${workspaceFolder}/test/parser_test.py",
+        "program": "${workspaceFolder}/src/pico_c_compiler.py",
         "args": [
           "./input.picoc",
           "./output.reti",

@@ -62,6 +62,9 @@ exec_bin_linux:
 exec_bin_win:
 	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe -S
 
+help:
+	./src/pico_c_compiler.py -h
+
 clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete

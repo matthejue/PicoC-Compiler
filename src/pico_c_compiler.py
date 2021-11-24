@@ -8,11 +8,26 @@ from error_handler import ErrorHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
 import global_vars
+from abstract_syntax_tree import strip_multiline_string
 
 
 def main():
+    description = """
+    Compiles Pico-C Code into RETI Code.
+    PicoC is a subset of C including while loops, if and else statements,
+    assignments, arithmetic and logic expressions.
+    All Code has to be written into a
+
+    void main() { /* your program */ }
+
+    main function.
+
+    If you discover any bugs I would be very grateful if you could report it
+    via email to juergmatth@gmail.com, attaching the malicious code to the
+    email ^_^
+    """
     cli_args_parser = argparse.ArgumentParser(
-        description="Compiles Pico-C Code into RETI Code.")
+        description=description)
     cli_args_parser.add_argument("infile", nargs='?',
                                  help="input file with Pico-C Code")
     cli_args_parser.add_argument("outfile", nargs='?',

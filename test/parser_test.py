@@ -30,7 +30,7 @@ class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
                          "('main' ('var' 'int' 'x'))")
 
 
-class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
+class TestArithmeticExpressionGrammar(unittest.TestCase, UsefulTools):
 
     def test_basic_arithmetic_expression(self):
         self.set_everything_up_for_ast("basic arithmetic expression",
@@ -79,9 +79,9 @@ class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
     def test_character_as_operand(self, ):
         self.set_everything_up_for_ast("character as operand",
                                        "void main() { int x = 'C' + 1; "
-                                       "x = x + ('97' - '65'); }")
-        expected_res = "('main' ('=' ('var' 'int' 'x') ('+' '99' '1')) ('=' 'x' "\
-            "('+' 'x' ('-' 'a' 'A'))))"
+                                       "x = x + ('a' - 'A'); }")
+        expected_res = "('main' ('=' ('var' 'int' 'x') ('+' '67' '1')) ('=' 'x' "\
+            "('+' 'x' ('-' '97' '65'))))"
         self.assertEqual(str(self.grammar.reveal_ast()), expected_res)
 
 

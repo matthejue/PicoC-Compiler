@@ -9,15 +9,16 @@ usage: pico_c_compiler.py [-h] [-p] [-a] [-t] [-s START_DATA_SEGMENT]
 
 Compiles Pico-C Code into RETI Code.
 PicoC is a subset of C including while loops, if and else statements,
-assignments, arithmetic and logic expressions etc.
+assignments, arithmetic and logic expressions.
 All Code has to be written into a
 
 void main() { /* your program */ }
 
 main function.
 
-If you discover any bugs I would be very grateful if you could report it over
-an email to juergmatth@gmail.com, attaching the malicious code to the email.
+If you discover any bugs I would be very grateful if you could report it
+via email to juergmatth@gmail.com, attaching the malicious code to the
+email ^_^
 
 positional arguments:
   infile                input file with Pico-C Code

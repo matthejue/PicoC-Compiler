@@ -232,6 +232,17 @@ class TestErrorMessages(unittest.TestCase, UsefullTools):
         except SystemExit:
             pass
 
+    def test_more_than_one_character_error(self, ):
+        test_code = """void main() {
+                        int x = x + ('97' - '65');
+                    }
+                    """
+        try:
+            self.set_everything_up_for_multiline_program(
+                "more than one character error", test_code)
+        except SystemExit:
+            pass
+
 
 if __name__ == '__main__':
     unittest.main()

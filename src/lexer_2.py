@@ -32,7 +32,7 @@ def _character(self, ):
         self.next_char()
     else:
         raise UnclosedCharacterError("'" + self.c + "'",
-                                     "'" + self.c, self.position)
+                                     "'" + self.c + self.lc, self.position)
 
     return Token(TT.CHAR, str(ord(char)), self.position)
 
