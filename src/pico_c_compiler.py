@@ -8,7 +8,6 @@ from error_handler import ErrorHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
 import global_vars
-from abstract_syntax_tree import strip_multiline_string
 
 
 def main():
