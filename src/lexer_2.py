@@ -34,7 +34,7 @@ def _character(self, ):
         raise UnclosedCharacterError("'" + self.c + "'",
                                      "'" + self.c, self.position)
 
-    return Token(TT.CHAR, char, self.position)
+    return Token(TT.CHAR, str(ord(char)), self.position)
 
 
 def _identifier_special_keyword(self):

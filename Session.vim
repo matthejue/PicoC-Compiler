@@ -10,7 +10,7 @@ endif
 set shortmess=aoO
 badd +100 src/abstract_syntax_tree.py
 badd +1 src/arithmetic_expression_grammar.py
-badd +1 src/arithmetic_nodes.py
+badd +73 src/arithmetic_nodes.py
 badd +1 src/assignment_allocation_grammar.py
 badd +1 src/assignment_allocation_nodes.py
 badd +1 src/ast_builder.py
@@ -33,17 +33,17 @@ badd +1 src/pico_c_compiler.py
 badd +1 src/statement_grammar.py
 badd +1 src/symbol_table.py
 badd +1 test/parser_test.py
-badd +95 test/code_generator_test.py
+badd +99 test/code_generator_test.py
 badd +1 ~/.config_stow/nvim/.config/nvim/plugin_settings.vim
 badd +47 test/testing_helpers.py
 badd +1 statement_nodes.py
 badd +3 test/execution_test.py
 badd +7 test/misc_test.py
 badd +6 Makefile
-badd +4 input.picoc
+badd +1 input.picoc
 badd +1 output.reti
 badd +15 .vimspector.json
-badd +1 /tmp/context
+badd +1 /tmp/crap
 argglobal
 %argdel
 $argadd src/abstract_syntax_tree.py
@@ -71,38 +71,13 @@ $argadd src/pico_c_compiler.py
 $argadd src/statement_grammar.py
 $argadd statement_nodes.py
 $argadd src/symbol_table.py
-edit src/abstract_syntax_tree.py
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-exe '2resize ' . ((&lines * 1 + 23) / 47)
-exe 'vert 2resize ' . ((&columns * 184 + 95) / 190)
+edit src/arithmetic_nodes.py
 argglobal
-setlocal fdm=expr
-setlocal fde=nvim_treesitter#foldexpr()
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-let s:l = 100 - ((20 * winheight(0) + 21) / 42)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 100
-normal! 0
-wincmd w
-argglobal
-if bufexists("/tmp/crap") | buffer /tmp/crap | else | edit /tmp/crap | endif
+if bufexists("src/arithmetic_nodes.py") | buffer src/arithmetic_nodes.py | else | edit src/arithmetic_nodes.py | endif
 if &buftype ==# 'terminal'
-  silent file /tmp/crap
+  silent file src/arithmetic_nodes.py
 endif
-balt src/abstract_syntax_tree.py
+balt input.picoc
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
 setlocal fmr={{{,}}}
@@ -111,23 +86,18 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 1 - ((0 * winheight(0) + 0) / 1)
+let s:l = 73 - ((21 * winheight(0) + 21) / 43)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
+keepjumps 73
 normal! 0
-wincmd w
-exe '2resize ' . ((&lines * 1 + 23) / 47)
-exe 'vert 2resize ' . ((&columns * 184 + 95) / 190)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxAoOaFTtI
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

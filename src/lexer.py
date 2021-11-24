@@ -10,6 +10,8 @@ class Token():
 
     def __init__(self, type, value, position):
         """
+        :type: TT
+        :value: string
         :position: (row, column) in the file where the token starts
         """
         self.type = type

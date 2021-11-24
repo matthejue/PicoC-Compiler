@@ -1,0 +1,6 @@
+name,type,position,value
+int,None,None,None
+char,None,None,None
+var,char,1:11,99
+x,char,2:5,100
+y,int,4:4,101

@@ -111,7 +111,7 @@ class AssignmentNode(ASTNode):
             # SymbolTable speichern sollte oder ob der SRAM ausreicht
 
             self.code_generator.add_code(
-                strip_multiline_string(self.assign_more), self.assign_more_loc)
+                self.assign_more, self.assign_more_loc)
 
         self.code_generator.add_code(
             "# Assignment end or sub-assignment end\n", 0)

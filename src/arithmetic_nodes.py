@@ -19,8 +19,7 @@ class ArithmeticVariableConstantNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# Variable / Constant start\n", 0)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.start), self.all_loc)
+        self.code_generator.add_code(self.start, self.all_loc)
 
         try:
             self._insert_identifier()
@@ -28,8 +27,7 @@ class ArithmeticVariableConstantNode(ASTNode):
             # repackage the error
             raise UnknownIdentifierError(self.token)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.all_loc)
+        self.code_generator.add_code(self.end, self.all_loc)
 
         self.code_generator.add_code("# Variable / Constant end\n", 0)
 
@@ -40,22 +38,20 @@ class ArithmeticVariableConstantNode(ASTNode):
                 self.variable_identifier = self.code_generator.replace_code_pre(
                     self.variable_identifier, "var_identifier", str(var_or_const.value))
                 self.code_generator.add_code(
-                    strip_multiline_string(self.variable_identifier), self.all_loc)
+                    self.variable_identifier, self.all_loc)
             elif isinstance(var_or_const, ConstantSymbol):
                 self.constant_identifier = self.code_generator.replace_code_pre(
                     self.constant_identifier, "encode(c)", str(var_or_const.value))
                 self.code_generator.add_code(
-                    strip_multiline_string(self.constant_identifier), self.all_loc)
+                    self.constant_identifier, self.all_loc)
         elif self.token.type == TT.NUMBER:
             self.constant = self.code_generator.replace_code_pre(
                 self.constant, "encode(w)", str(self.token.value))
-            self.code_generator.add_code(
-                strip_multiline_string(self.constant), self.all_loc)
+            self.code_generator.add_code(self.constant, self.all_loc)
         elif self.token.type == TT.CHAR:
             self.constant = self.code_generator.replace_code_pre(
-                self.constant, "encode(w)", str(ord(self.token.value)))
-            self.code_generator.add_code(
-                strip_multiline_string(self.constant), self.all_loc)
+                self.constant, "encode(w)", self.token.value)
+            self.code_generator.add_code(self.constant, self.all_loc)
 
 
 class ArithmeticBinaryOperationNode(ASTNode):
@@ -64,8 +60,8 @@ class ArithmeticBinaryOperationNode(ASTNode):
 
     end = """# codeaa(e1)
         # codeaa(e2)
-        LOADIN SP ACC 2; # Wert von e 1 in ACC laden
-        LOADIN SP IN2 1; # Wert von e 2 in IN2 laden
+        LOADIN SP ACC 2; # Wert von e1 in ACC laden
+        LOADIN SP IN2 1; # Wert von e2 in IN2 laden
         OP ACC IN2; # e1 binop e2 in ACC laden
         STOREIN SP ACC 2; # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1; # Stack um eine Zelle verkürzen
@@ -131,7 +127,7 @@ class ArithmeticUnaryOperationNode(ASTNode):
 
     bitwise_negation_loc = 1
 
-    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"
+    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle\n"
 
     end_loc = 1
 
@@ -144,11 +140,9 @@ class ArithmeticUnaryOperationNode(ASTNode):
             strip_multiline_string(self.start), self.start_loc)
 
         if self.token.value == '~':
-            self.code_generator.add_code(strip_multiline_string
-                                         (self.bitwise_negation),
+            self.code_generator.add_code(self.bitwise_negation,
                                          self.bitwise_negation_loc)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.end_loc)
+        self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code("# Arithmetic Unary Operation end\n", 0)

@@ -50,6 +50,18 @@ test:
 		./$$test_binary; \
 	done
 
+create_bin_linux:
+	pyinstaller ./src/pico_c_compiler.py --onefile --hidden-import=tabulate --distpath=./dist
+
+create_bin_win:
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/Scripts/pyinstaller.exe ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py  --onefile --hidden-import=tabulate --distpath=~/Documents/Studium/pico_c_compiler/dist
+
+exec_bin_linux:
+	./dist/pico_c_compiler -S
+
+exec_bin_win:
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe -S
+
 clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete

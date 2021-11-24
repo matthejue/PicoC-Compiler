@@ -10,7 +10,9 @@ class TokenNode:
     """Abstract Syntax Tree Node for Leaves"""
 
     def __init__(self, token):
-
+        """
+        :token: Token
+        """
         self.token = token
 
     def getNodeType(self):

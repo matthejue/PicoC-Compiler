@@ -2,20 +2,56 @@
 
 ## Usage
 ```
-usage: pico_c_compiler.py [-h] [-p] [-a] [-t] [-v] [infile] [outfile]
+usage: pico_c_compiler.py [-h] [-p] [-a] [-t] [-s START_DATA_SEGMENT]
+                          [-e END_DATA_SEGMENT] [-m] [-S]
+                          [-O OPTIMIZATION_LEVEL] [-b] [-P] [-v]
+                          [infile] [outfile]
 
 Compiles Pico-C Code into RETI Code.
+PicoC is a subset of C including while loops, if and else statements,
+assignments, arithmetic and logic expressions etc.
+All Code has to be written into a
+
+void main() { /* your program */ }
+
+main function.
+
+If you discover any bugs I would be very grateful if you could report it over
+an email to juergmatth@gmail.com, attaching the malicious code to the email.
 
 positional arguments:
-  infile         Input file with Pico-C Code
-  outfile        Output file with RETI Code
+  infile                input file with Pico-C Code
+  outfile               output file with RETI Code
 
 optional arguments:
-  -h, --help     show this help message and exit
-  -p, --print    Also output the file output to the terminal
-  -a, --ast      Output the Abstract Syntax Tree instead of RETI Code
-  -t, --tokens   Output the Tokenlist instead of RETI Code
-  -v, --verbose  Create verbose output for the ast
+  -h, --help            show this help message and exit
+  -p, --print           output the file output to the terminal and if
+                        --symbol_table is active output the symbol table
+                        beneath
+  -a, --ast             output the Abstract Syntax Tree instead of RETI Code
+  -t, --tokens          output the Tokenlist instead of RETI Code
+  -s START_DATA_SEGMENT, --start_data_segment START_DATA_SEGMENT
+                        where the allocation of variables starts (default 100)
+  -e END_DATA_SEGMENT, --end_data_segment END_DATA_SEGMENT
+                        where the stackpointer starts (default 200)
+  -m, --python_stracktrace_error_message
+                        show python error messages with stacktrace
+  -S, --symbol_table    output the final symbol table into a CSV file after
+                        the whole Abstract Syntax Tree was visited
+  -O OPTIMIZATION_LEVEL, --optimization-level OPTIMIZATION_LEVEL
+                        set the optimiziation level of the compiler (0=save
+                        all variables on the stack, 1=use graph coloring to
+                        find the best assignment of variables to registers,
+                        2=partially interpret expressions) [NOT IMPLEMENTED
+                        YET]
+  -b, --binary          produce binary encoded RETI code [NOT IMPLEMENTED YET]
+  -P, --prefix-notation
+                        write Abstract Syntax Tree in prefix notation [NOT
+                        IMPLEMENTED YET]
+  -v, --verbose         also show tokentypes in the ast, add comments to the
+                        RETI Code and show more context around error messages
+                        [NOT IMPLEMENTED YET]
+
 ```
 
 ## Used Resources
@@ -26,10 +62,3 @@ optional arguments:
 
 [1] Parr, Terence. Language implementation patterns: create your own
 domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
-
-## TODO
-- if, else, while, Funktionen
-- mehrzeilge Programme
-- Symboltablle korrekt implemtieren
-- const nicht vergessen
-- bessere Anzeige von Fehlern

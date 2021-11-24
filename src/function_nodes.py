@@ -6,8 +6,7 @@ class MainFunctionNode(ASTNode):
 
     """Abstract Syntax Tree Node for main method"""
 
-    start = """LOADI SP eds;
-        """
+    start = "LOADI SP eds;\n"
 
     start_loc = 1
 
@@ -20,8 +19,7 @@ class MainFunctionNode(ASTNode):
     def visit(self, ):
         self.code_generator.add_code("# Main start\n", 0)
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.start), self.start_loc)
+        self.code_generator.add_code(self.start, self.start_loc)
 
         self.code_generator.add_marker()
 

@@ -86,6 +86,7 @@ SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
 STATEMENT	src/lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
 Scope	src/symbol_table.py	/^class Scope:$/;"	c
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	src/Session.vim	/^let SessionLoad = 1$/;"	v
 StatementGrammar	src/statement_grammar.py	/^class StatementGrammar(AssignmentAllocationGrammar):$/;"	c
 States	src/error_handler.py	/^class States(Enum):$/;"	c
 Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
@@ -189,6 +190,7 @@ _handle_all_tastes_unsuccessful	src/logic_expression_grammar.py	/^    def _handl
 _identifier	src/arithmetic_expression_grammar.py	/^    def _identifier(self, ):$/;"	m	class:ArithmeticExpressionGrammar
 _identifier	src/lexer_2.py	/^def _identifier(self):$/;"	f
 _identifier_special_keyword	src/lexer_2.py	/^def _identifier_special_keyword(self):$/;"	f
+_idx_of_else_node	src/if_else_nodes.py	/^    def _idx_of_else_node(self):$/;"	m	class:IfElseNode
 _if	src/if_else_grammar.py	/^def _if(self):$/;"	f
 _if_else	src/if_else_grammar.py	/^def _if_else(self, ):$/;"	f
 _if_without_else	src/if_else_grammar.py	/^def _if_without_else(self, ):$/;"	f
@@ -278,7 +280,7 @@ debugOptions	.vimspector.json	/^				"debugOptions": [],$/;"	a	object:configurati
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
 down	src/ast_builder.py	/^    def down(self, classname, tokens):$/;"	m	class:ASTBuilder
 end	src/arithmetic_nodes.py	/^    end = """# codeaa(e1)$/;"	v	class:ArithmeticBinaryOperationNode
-end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle"$/;"	v	class:ArithmeticUnaryOperationNode
+end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle\\n"$/;"	v	class:ArithmeticUnaryOperationNode
 end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1;\\n"$/;"	v	class:ArithmeticVariableConstantNode
 end	src/function_nodes.py	/^    end = """# code(af)$/;"	v	class:MainFunctionNode
 end	src/logic_nodes.py	/^    end = """# codeaa(e)$/;"	v	class:LogicTopBottomNode
@@ -346,16 +348,19 @@ run-shell-ast-verbose	Makefile	/^run-shell-ast-verbose:$/;"	t
 run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
 run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
-s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 0) \/ 1)$/;"	v
-s:l	Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
-s:l	Session.vim	/^let s:l = 55 - ((33 * winheight(0) + 21) \/ 43)$/;"	v
-s:save_splitbelow	Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
-s:save_splitright	Session.vim	/^let s:save_splitright = &splitright$/;"	v
-s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
-s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
+s:l	Session.vim	/^let s:l = 73 - ((21 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	src/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 21) \/ 43)$/;"	v
+s:l	src/Session.vim	/^let s:l = 98 - ((39 * winheight(0) + 21) \/ 43)$/;"	v
+s:save_splitbelow	src/Session.vim	/^let s:save_splitbelow = &splitbelow$/;"	v
+s:save_splitright	src/Session.vim	/^let s:save_splitright = &splitright$/;"	v
+s:save_winminheight	src/Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
+s:save_winminwidth	src/Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
+s:so_save	src/Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	src/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	src/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 set_everything_up_for_ast	test/testing_helpers.py	/^    def set_everything_up_for_ast(self, test_name, code):$/;"	m	class:UsefullTools
 set_everything_up_for_ast_multiline	test/testing_helpers.py	/^    def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):$/;"	m	class:UsefullTools
 set_everything_up_for_lexer	test/testing_helpers.py	/^    def set_everything_up_for_lexer(self, test_name, code):$/;"	m	class:UsefullTools
