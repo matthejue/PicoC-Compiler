@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# from sys import exit
+from sys import exit
 import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
