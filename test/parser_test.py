@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.10
 
 import unittest
 from sys import argv  # TODO: remove later, temporaly so debugger stops complaining
@@ -30,7 +30,7 @@ class TestAssignmentGrammar(unittest.TestCase, UsefullTools):
                          "('main' ('var' 'int' 'x'))")
 
 
-class TestArithmeticExpressionGrammar(unittest.TestCase, UsefulTools):
+class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):
 
     def test_basic_arithmetic_expression(self):
         self.set_everything_up_for_ast("basic arithmetic expression",

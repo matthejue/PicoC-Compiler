@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.10
 
 import unittest
 import sys
@@ -19,6 +19,8 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         # create new Singleton SymbolTable and CodeGenerator and remove old
         code_generator = CodeGenerator()
         symbol_table = SymbolTable()
+        CodeGenerator().__init__()
+        SymbolTable().__init__()
 
         var = VariableSymbol('car', symbol_table.resolve('int'), (0, 0))
         symbol_table.define(var)
@@ -110,6 +112,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
 if __name__ == '__main__':
     sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
+    del sys.argv[1:]
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
     from abstract_syntax_tree import strip_multiline_string

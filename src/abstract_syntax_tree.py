@@ -46,6 +46,9 @@ class ASTNode(TokenNode):
     and all childs normalized in a list"""
 
     def __init__(self, tokentypes):
+        """
+        :tokentypes: list of TT's, first entry will be the TT of the Node
+        """
         # at the time of creation the tokenvalue is unknown
         self.children = []
         # the first tokentype is always the actual tokentype and the others are

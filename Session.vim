@@ -29,12 +29,11 @@ badd +1 src/logic_nodes.py
 badd +1 src/loop_grammar.py
 badd +1 src/loop_nodes.py
 badd +56 src/parser_.py
-badd +26 src/pico_c_compiler.py
+badd +27 src/pico_c_compiler.py
 badd +49 src/statement_grammar.py
 badd +1 src/symbol_table.py
 badd +43 test/parser_test.py
 badd +43 test/code_generator_test.py
-badd +1 ~/.config_stow/nvim/.config/nvim/plugin_settings.vim
 badd +43 test/testing_helpers.py
 badd +1 statement_nodes.py
 badd +3 test/execution_test.py
@@ -73,11 +72,20 @@ $argadd src/pico_c_compiler.py
 $argadd src/statement_grammar.py
 $argadd statement_nodes.py
 $argadd src/symbol_table.py
-edit src/pico_c_compiler.py
+edit src/statement_grammar.py
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe '2resize ' . ((&lines * 1 + 19) / 39)
+exe 'vert 2resize ' . ((&columns * 154 + 79) / 158)
 argglobal
-if bufexists("src/pico_c_compiler.py") | buffer src/pico_c_compiler.py | else | edit src/pico_c_compiler.py | endif
+if bufexists("src/statement_grammar.py") | buffer src/statement_grammar.py | else | edit src/statement_grammar.py | endif
 if &buftype ==# 'terminal'
-  silent file src/pico_c_compiler.py
+  silent file src/statement_grammar.py
 endif
 setlocal fdm=expr
 setlocal fde=nvim_treesitter#foldexpr()
@@ -87,18 +95,35 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 26 - ((25 * winheight(0) + 21) / 43)
+let s:l = 49 - ((18 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 26
-normal! 05|
+keepjumps 49
+normal! 03|
+wincmd w
+argglobal
+enew
+balt src/statement_grammar.py
+setlocal fdm=expr
+setlocal fde=nvim_treesitter#foldexpr()
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=1
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+exe '2resize ' . ((&lines * 1 + 19) / 39)
+exe 'vert 2resize ' . ((&columns * 154 + 79) / 158)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxAoOaFTtI
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

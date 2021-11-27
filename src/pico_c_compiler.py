@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.10
 
 from sys import exit
 import argparse
@@ -42,10 +42,11 @@ def main():
                                  help="output the Tokenlist instead of "
                                  "RETI Code")
     cli_args_parser.add_argument('-s', '--start_data_segment',
-                                 help="where the allocation of variables "
-                                 "starts (default 100)", type=int, default=100)
+                                 help="where the datasegment starts (default 100)",
+                                 type=int, default=100)
     cli_args_parser.add_argument('-e', '--end_data_segment', help="where the "
-                                 "stackpointer starts (default 200)", type=int, default=200)
+                                 "datasegment ends and where the stackpointer "
+                                 "starts (default 200)", type=int, default=200)
     cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
                                  action='store_true', help="show python error "
                                  "messages with stacktrace")

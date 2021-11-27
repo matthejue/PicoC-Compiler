@@ -14,10 +14,6 @@ class _CodeGenerator:
 
     def __init__(self):
         self.generated_code = []
-        # self.loc_stock = [0]
-        # self.ucp_stock = [0]
-        # self.loc_layer = 0
-
         self.idx = -1
         self.loc = 0
         self.metadata = []

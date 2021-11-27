@@ -3,6 +3,7 @@ from logic_nodes import LogicAndOrNode
 from arithmetic_nodes import ArithmeticBinaryOperationNode, ArithmeticVariableConstantNode
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
+import global_vars
 
 
 class AssignmentNode(ASTNode):
@@ -11,14 +12,22 @@ class AssignmentNode(ASTNode):
 
     # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
 
+    __match_args__ = ("variable", "expression")
+
+    def __init__(self, tokentypes, variable=None, expression=None):
+        super().__init__(tokentypes)
+        if (variable and expression):
+            self.children[0] = variable
+            self.children[1] = expression
+
     assignment = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
-        LOADIN SP ACC 1;  # Wert von e in ACC laden
+        LOADIN SP ACC 1;  # Wert von expression in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
 
     assignment_loc = 2
 
-    assign_more = "STORE ACC var_address;  # Wert von e in Adresse a speichern\n"
+    assign_more = "STORE ACC var_address;  # Wert von e in Variable xyz speichern\n"
 
     assign_more_loc = 1
 
@@ -45,6 +54,9 @@ class AssignmentNode(ASTNode):
             # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
             #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
             return self.children[0].token
+
+    def _get_expression(self, ):
+        return self.children[1]
 
     def _is_last_assignment(self, ):
         # AssignmentNode(..., AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
@@ -93,6 +105,10 @@ class AssignmentNode(ASTNode):
             raise UnknownIdentifierError(self._get_identifier_token())
 
     def _assign_to_identifier(self, ):
+        #         match self:
+        #             case AssignmentNode([tokentype], AllocationNode(), ArithmeticBinaryOperationNode()):
+        #                 pass
+        #
         if self._is_constant_identifier_on_left_side() and self._is_single_value_on_right_side():
             self._assign_number_to_constant_identifier()
         # case of a VariableSymbol
@@ -100,15 +116,19 @@ class AssignmentNode(ASTNode):
             self.children[1].visit()
 
             if self._is_last_assignment():
+
+                if global_vars.args.verbose:
+                    global_vars.args.verbose = False
+                    self.assign_more = self.code_generator.replace_code_pre(
+                        strip_multiline_string(self.assignment), "expression", str(self._get_expression()))
+                    global_vars.args.verbose = True
+
                 self.code_generator.add_code(strip_multiline_string(self.assignment),
                                              self.assignment_loc)
 
             self.assign_more = self.code_generator.replace_code_pre(
                 self.assign_more, "var_address",
                 self.symbol_table.resolve(self._get_identifier_name()).value)
-
-            # TODO: Überlegen, ob man den neuen Wert der Variable auch in der
-            # SymbolTable speichern sollte oder ob der SRAM ausreicht
 
             self.code_generator.add_code(
                 self.assign_more, self.assign_more_loc)

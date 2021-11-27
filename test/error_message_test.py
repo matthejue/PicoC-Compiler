@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3.10
 
 import unittest
 from testing_helpers import UsefullTools
