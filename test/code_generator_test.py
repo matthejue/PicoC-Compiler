@@ -1,4 +1,4 @@
-#!/usr/bin/python3.10
+#!/usr/bin/python
 
 import unittest
 import sys
@@ -35,8 +35,8 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
 
         code_generator.add_marker()
 
-        code_generator.replace_code_after(
-            'encode(w)', symbol_table.resolve('car').value)
+        code_generator.replace_code_after('encode(w)',
+                                          symbol_table.resolve('car').value)
 
         code_generator.remove_marker()
 
@@ -55,16 +55,16 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                       const int y = i % 10;
                     }
                     """
-        self.set_everything_up_for_multiline_program(
-            "while generation", test_code)
+        self.set_everything_up_for_multiline_program("while generation",
+                                                     test_code)
 
     def test_constant_initialisation(self, ):
         test_code = """void main() {
                       const int var = 42;
                     }
                     """
-        self.set_everything_up_for_multiline_program(
-            "constant initialisation", test_code)
+        self.set_everything_up_for_multiline_program("constant initialisation",
+                                                     test_code)
 
     def test_initialising_with_character(self, ):
         test_code = """void main() {
@@ -81,8 +81,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                       }
                     }
                     """
-        self.set_everything_up_for_multiline_program(
-            "test if else", test_code)
+        self.set_everything_up_for_multiline_program("test if else", test_code)
 
     def test_char_as_datatype(self, ):
         test_code = """void main() {
@@ -90,8 +89,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                       char x = var - (5 - 'c');
                     }
                     """
-        self.set_everything_up_for_multiline_program(
-            "test if else", test_code)
+        self.set_everything_up_for_multiline_program("test if else", test_code)
 
     def test_else_if(self, ):
         test_code = """void main() {
@@ -106,8 +104,7 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                       }
                     }
                     """
-        self.set_everything_up_for_multiline_program(
-            "test if else", test_code)
+        self.set_everything_up_for_multiline_program("test if else", test_code)
 
 
 if __name__ == '__main__':
