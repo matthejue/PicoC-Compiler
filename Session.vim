@@ -8,51 +8,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +31 pico_c_compiler/src/assignment_allocation_nodes.py
-badd +45 pico_c_compiler/src/abstract_syntax_tree.py
-badd +40 pico_c_compiler/src/assignment_allocation_grammar.py
-badd +50 pico_c_compiler/src/ast_builder.py
+badd +40 pico_c_compiler/src/assignment_allocation_nodes.py
+badd +68 pico_c_compiler/src/abstract_syntax_tree.py
+badd +46 pico_c_compiler/src/assignment_allocation_grammar.py
+badd +31 pico_c_compiler/src/ast_builder.py
 badd +66 pico_c_compiler/src/parser_.py
 argglobal
 %argdel
 edit pico_c_compiler/src/ast_builder.py
-let s:save_splitbelow = &splitbelow
-let s:save_splitright = &splitright
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-wincmd _ | wincmd |
-vsplit
-2wincmd h
-wincmd w
-wincmd w
-let &splitbelow = s:save_splitbelow
-let &splitright = s:save_splitright
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-exe 'vert 1resize ' . ((&columns * 30 + 86) / 173)
-exe 'vert 2resize ' . ((&columns * 111 + 86) / 173)
-exe 'vert 3resize ' . ((&columns * 30 + 86) / 173)
 argglobal
-enew
-file __Tagbar__.1
-balt pico_c_compiler/src/abstract_syntax_tree.py
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-argglobal
-balt pico_c_compiler/src/assignment_allocation_nodes.py
+balt pico_c_compiler/src/assignment_allocation_grammar.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -63,30 +28,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 12 - ((11 * winheight(0) + 19) / 38)
+let s:l = 31 - ((18 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 12
-normal! 0
-wincmd w
-argglobal
-enew
-file NERD_tree_2
-balt pico_c_compiler/src/parser_.py
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 30 + 86) / 173)
-exe 'vert 2resize ' . ((&columns * 111 + 86) / 173)
-exe 'vert 3resize ' . ((&columns * 30 + 86) / 173)
+keepjumps 31
+normal! 029|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
@@ -94,8 +41,6 @@ if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxcsAoOaFTt
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
