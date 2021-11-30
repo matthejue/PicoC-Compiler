@@ -2,23 +2,20 @@ import global_vars
 
 
 class ASTBuilder:
-
     """Provides methods for ast construction"""
-
     def __init__(self):
         # TODO: root in ast umbenennen
         self.root = None
         self.current_node = None
 
-    def addChild(self, node):
+    def CN(self):
+        """Current node
+
+        :returns: Node
         """
+        return self.current_node
 
-        :returns: None
-
-        """
-        self.current_node.addChild(node)
-
-    def down(self, classname, tokens):
+    def down(self, classname, token):
         """go one layer down in the abstract syntax tree
 
         :returns: None
@@ -27,11 +24,11 @@ class ASTBuilder:
         if global_vars.is_tasting:
             return
 
-        new_node = classname(tokens)
+        new_node = classname(token)
         if not self.root:
             self.root = new_node
         else:
-            self.addChild(new_node)
+            self.current_node.add_child(new_node)
         savestate_node = self.current_node
 
         # deeper grammar rules have to be called with a new current_node

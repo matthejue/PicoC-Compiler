@@ -1,6 +1,13 @@
 #!/usr/bin/python3.10
 #  from pudb import set_trace
 
+class Apple:
+
+    __match_args__ = ("x",)
+
+    def __init__(self, *args):
+        self.x = args[0]
+
 
 class Test:
 
@@ -13,10 +20,10 @@ class Test:
 
 
 #  set_trace()
-test = Test(13, 12, 4)
+test = Test(Apple(3), 12, 4)
 
 match test:
-    case Test(13, 12):
+    case Test(Apple(3), 12):
         print("that's it")
     case _:
         print("that's not it")

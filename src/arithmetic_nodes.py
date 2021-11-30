@@ -4,7 +4,7 @@ from errors import UnknownIdentifierError
 from lexer import TT
 
 
-class ArithmeticVariableConstantNode(ASTNode):
+class ArithmeticVariableConstant(ASTNode):
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
     start = "SUBI SP 1;\n"
@@ -15,7 +15,13 @@ class ArithmeticVariableConstantNode(ASTNode):
 
     all_loc = 1
 
+    __match_args__ = ("variable_constant", )
+
+    def _update_match_args(self):
+        self.variable_constant = self.token
+
     def visit(self, ):
+        self._update_match_args()
         self.code_generator.add_code("# Variable / Constant start\n", 0)
 
         self.code_generator.add_code(self.start, self.all_loc)
@@ -56,12 +62,10 @@ class ArithmeticBinaryOperationNode(ASTNode):
 
     __match_args__ = ("left_operand", "operation", "right_operand")
 
-    def __init__(self, tokentypes, left_operand=None, operation=None, right_operand=None):
-        super().__init__(tokentypes)
-        if (left_operand and right_operand):
-            self.children[0] = left_operand
-            self.children[1] = right_operand
-            self.token.value = operation
+    def _update_match_args(self):
+        self.left_operand = self.children[0]
+        self.operation = self.children[1]
+        self.right_operand = self.children[2]
 
     end = """# codeaa(e1)
         # codeaa(e2)
@@ -81,6 +85,7 @@ class ArithmeticBinaryOperationNode(ASTNode):
     #  self.children[1].children[]
 
     def visit(self, ):
+        self._update_match_args()
         if len(self.children) == 1:
             self.children[0].visit()
             return

@@ -6,10 +6,8 @@ from errors import MismatchedTokenError
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):
-
     """The assignment expression part of the context free grammar of the piocC
     language"""
-
     def __init__(self, lexer):
         super().__init__(lexer)
 
@@ -29,35 +27,26 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import global_vars
-        if global_vars.test_name == "unclosed character error":
-            if global_vars.test_name == "unclosed character error":
-                pass
-
-        savestate_node = self.ast_builder.down(
-            AssignmentNode, [TT.STATEMENT, TT.ASSIGNMENT])
+        savestate_node = self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
 
         if self.LTT(2) == TT.ASSIGNMENT:
-            self.match_and_add([TT.IDENTIFIER])
-        # elif self.LTT(3) == TT.ASSIGNMENT:
+            self.match_and_determine(TT.IDENTIFIER)
         elif self.LTT(1) in [TT.PRIM_DT, TT.CONST]:
-            # and self.LTT(2) == TT.IDENTIFIER:
             self._alloc()
         else:
-            raise MismatchedTokenError(
-                "identifier or assignment expression", self.LT(2))
+            raise MismatchedTokenError("identifier or assignment expression",
+                                       self.LT(2))
 
         if self.LTT(1) == TT.ASSIGNMENT:
-            self.match_and_add([TT.ASSIGNMENT])
+            self.match_and_determine(TT.ASSIGNMENT)
 
-            self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
+            self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
 
             while self.LTT(2) == TT.ASSIGNMENT:
-                self.match_and_add([TT.IDENTIFIER])
-                self.match_and_add([TT.ASSIGNMENT])
+                self.match_and_add(TT.IDENTIFIER)
+                self.match_and_add(TT.ASSIGNMENT)
 
-                self.ast_builder.down(AssignmentNode, [TT.ASSIGNMENT])
+                self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
 
             # self.code_le()
             self.code_ae_le()
@@ -71,8 +60,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(
-            AllocationNode, [TT.ALLOC, TT.PRIM_DT])
+        savestate_node = self.ast_builder.down(AllocationNode,
+                                               [TT.ALLOC, TT.PRIM_DT])
 
         if self.LTT(1) == TT.CONST:
             self.match_and_add([TT.CONST])
