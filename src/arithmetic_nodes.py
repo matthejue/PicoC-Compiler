@@ -5,7 +5,6 @@ from lexer import TT
 
 
 class ArithmeticVariableConstantNode(ASTNode):
-
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
     start = "SUBI SP 1;\n"
@@ -36,14 +35,16 @@ class ArithmeticVariableConstantNode(ASTNode):
             var_or_const = self.symbol_table.resolve(self.token.value)
             if isinstance(var_or_const, VariableSymbol):
                 self.variable_identifier = self.code_generator.replace_code_pre(
-                    self.variable_identifier, "var_identifier", str(var_or_const.value))
-                self.code_generator.add_code(
-                    self.variable_identifier, self.all_loc)
+                    self.variable_identifier, "var_identifier",
+                    str(var_or_const.value))
+                self.code_generator.add_code(self.variable_identifier,
+                                             self.all_loc)
             elif isinstance(var_or_const, ConstantSymbol):
                 self.constant_identifier = self.code_generator.replace_code_pre(
-                    self.constant_identifier, "encode(c)", str(var_or_const.value))
-                self.code_generator.add_code(
-                    self.constant_identifier, self.all_loc)
+                    self.constant_identifier, "encode(c)",
+                    str(var_or_const.value))
+                self.code_generator.add_code(self.constant_identifier,
+                                             self.all_loc)
         elif self.token.type in [TT.NUMBER, TT.CHAR]:
             self.constant = self.code_generator.replace_code_pre(
                 self.constant, "encode(w)", str(self.token.value))
@@ -51,8 +52,16 @@ class ArithmeticVariableConstantNode(ASTNode):
 
 
 class ArithmeticBinaryOperationNode(ASTNode):
-
     """Abstract Syntax Tree Node for for arithmetic binary operations"""
+
+    __match_args__ = ("left_operand", "operation", "right_operand")
+
+    def __init__(self, tokentypes, left_operand=None, operation=None, right_operand=None):
+        super().__init__(tokentypes)
+        if (left_operand and right_operand):
+            self.children[0] = left_operand
+            self.children[1] = right_operand
+            self.token.value = operation
 
     end = """# codeaa(e1)
         # codeaa(e2)
@@ -65,50 +74,63 @@ class ArithmeticBinaryOperationNode(ASTNode):
 
     end_loc = 5
 
+    #  def _get_operand_left(self):
+    #  self.children[0].children[]
+#
+    #  def _get_operand_left(self):
+    #  self.children[1].children[]
+
     def visit(self, ):
         if len(self.children) == 1:
             self.children[0].visit()
             return
 
-        self.code_generator.add_code(
-            "# Arithmetic Binary Operation start\n", 0)
+        self.code_generator.add_code("# Arithmetic Binary Operation start\n",
+                                     0)
 
         self.children[0].visit()
         self.children[1].visit()
 
-        if self.token.value == '+':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'ADD')
-        elif self.token.value == '-':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'SUB')
-        elif self.token.value == '*':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'MUL')
-        elif self.token.value == '/':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'DIV')
-        elif self.token.value == '%':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'MOD')
-        elif self.token.value == '^':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'OPLUS')
-        elif self.token.value == '|':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'OR')
-        elif self.token.value == '&':
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'OP', 'AND')
+        match self:
+            case ArithmeticBinaryOperationNode(left_operand, operation, right_operand):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'e1', str(left_operand))
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'e2', str(right_operand))
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.end), self.end_loc)
+        match self.token.value:
+            case '+':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'ADD')
+            case '-':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'SUB')
+            case '*':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'MUL')
+            case '/':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'DIV')
+            case '%':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'MOD')
+            case '^':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'OPLUS')
+            case '|':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'OR')
+            case '&':
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'AND')
+
+        self.code_generator.add_code(strip_multiline_string(self.end),
+                                     self.end_loc)
 
         self.code_generator.add_code("# Arithmetic Binary Operation end\n", 0)
 
 
 class ArithmeticUnaryOperationNode(ASTNode):
-
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
     start = """# codeaa(e1)
@@ -132,8 +154,8 @@ class ArithmeticUnaryOperationNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.start), self.start_loc)
+        self.code_generator.add_code(strip_multiline_string(self.start),
+                                     self.start_loc)
 
         if self.token.value == '~':
             self.code_generator.add_code(self.bitwise_negation,

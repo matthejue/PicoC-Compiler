@@ -2,6 +2,7 @@ from ast_builder import ASTBuilder
 from abstract_syntax_tree import TokenNode
 import global_vars
 from errors import MismatchedTokenError, UnknownIdentifierError, UnclosedCharacterError
+from lexer import TT
 
 
 class BacktrackingParser():
@@ -70,6 +71,11 @@ class BacktrackingParser():
         if not global_vars.is_tasting:
             self.ast_builder.addChild(TokenNode(self.LT(1)))
         self.match(tts)
+
+    def _node_chooser(self, token):
+        match token:
+            case TT.CONST:
+                return Const(token)
 
     def _sync(self, i):
         """ensures that one can look ahead i tokens. If one has looked ahead i
