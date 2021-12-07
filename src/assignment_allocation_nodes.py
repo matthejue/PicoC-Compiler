@@ -120,7 +120,7 @@ class AssignmentNode(ASTNode):
                 if global_vars.args.verbose:
                     global_vars.args.verbose = False
                     self.assign_more = self.code_generator.replace_code_pre(
-                        strip_multiline_string(self.assignment), "expression", str(self._get_expression()))
+                        strip_multiline_string(self.assign_more), "expression", str(self._get_expression()))
                     global_vars.args.verbose = True
 
                 self.code_generator.add_code(strip_multiline_string(self.assignment),

@@ -1,7 +1,9 @@
 int main()
 {
-  m = 12;
-  n = 7;
+  int m = 12;
+  int n = 7;
+  int h;
+
   // important comment
   while (n > 0) {
     h = m % n;

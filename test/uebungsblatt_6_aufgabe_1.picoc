@@ -1,0 +1,15 @@
+// TODO: Add to master
+void main() {
+  //Deklarationsteil
+  int x;
+  int y;
+  const int z = 2;
+
+  //Anweisungsteil
+  y = 3;
+  x = 15;
+  while(x >= z * y)
+  {
+    x = x - 3;
+  }
+}

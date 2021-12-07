@@ -80,8 +80,11 @@ class UsefullTools():
 
     def set_everything_up_for_testing_program_file(self, test_name, programpath):
         with open(programpath) as input:
-            code_without_cr = list(
-                map(lambda line: line.strip(), input.readlines()))
+            # TODO: Add to master
+            code_without_cr = [line for line in map(
+                lambda line: line.strip(), input.readlines()) if line]
+            #  code_without_cr = list(
+            #  map(lambda line: line.strip(), input.readlines()))
             self.set_everything_up_for_ast_multiline(
                 test_name, code_without_cr)
 
