@@ -15,15 +15,18 @@ def main():
     Compiles Pico-C Code into RETI Code.
     PicoC is a subset of C including while loops, if and else statements,
     assignments, arithmetic and logic expressions.
-    All Code has to be written into a
+    Please keep in mind that all statements have to be enclosed in a
 
     void main() { /* your program */ }
 
     main function.
 
+    If called without arguments, a shell is going to open up where you can type
+    PicoC-Code in. The shell can be exited again by typing in exit() or quit().
+
     If you discover any bugs I would be very grateful if you could report it
     via email to juergmatth@gmail.com, attaching the malicious code to the
-    email ^_^
+    email. ^_^
     """
     cli_args_parser = argparse.ArgumentParser(
         description=description)
