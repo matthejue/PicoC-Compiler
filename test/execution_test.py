@@ -17,6 +17,10 @@ class TestPrograms(unittest.TestCase, UsefullTools):
         self.set_everything_up_for_testing_program_file(
             "uebungsblatt_6_aufgabe_1", "./test/uebungsblatt_6_aufgabe_1.picoc")
 
+    def uebungsblatt_6_aufgabe_2(self, ):
+        self.set_everything_up_for_testing_program_file(
+            "uebungsblatt_6_aufgabe_2", "./test/uebungsblatt_6_aufgabe_2.picoc")
+
 
 if __name__ == '__main__':
     unittest.main()
