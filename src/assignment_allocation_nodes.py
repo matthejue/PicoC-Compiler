@@ -1,6 +1,6 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from logic_nodes import LogicAndOrNode
-from arithmetic_nodes import ArithmeticBinaryOperationNode, ArithmeticVariableConstantNode
+from arithmetic_nodes import ArithmeticBinaryOperationNode, ArithmeticVariableConstan
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
 import global_vars
@@ -13,9 +13,11 @@ class AssignmentNode(ASTNode):
 
     __match_args__ = ("variable", "expression")
 
+    variable = None
+    expression = None
+
     def _update_match_args(self):
-        variable = self.children[0]
-        expression = self.children[1]
+        pass
 
     assignment = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von expression in ACC laden
@@ -27,6 +29,15 @@ class AssignmentNode(ASTNode):
     assign_more = "STORE ACC var_address;  # Wert von e in Variable xyz speichern\n"
 
     assign_more_loc = 1
+
+    def determine(self, token):
+        if not self.variable:
+            self.variable = token
+            return
+        if not self.token:
+            self.token = token
+            return
+        self.expression = token
 
     def _get_identifier_name(self):
         # AllocationNode needs a special treatment, because it it's token only
@@ -146,9 +157,9 @@ class AllocationNode(ASTNode):
     __match_args__ = ("const_or_var", "prim_datatype", "identifier")
 
     def _update_match_args(self):
-        const_or_var = self.children[0]
-        prim_datatype = self.children[1]
-        identifier = self.children[2]
+        self.const_or_var = self.children[0]
+        self.prim_datatype = self.children[1]
+        self.identifier = self.children[2]
 
     def _get_childtokenvalue(self, idx):
         return self.children[idx].token.value

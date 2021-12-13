@@ -1,7 +1,7 @@
 from parser_ import BacktrackingParser
 from arithmetic_nodes import (ArithmeticUnaryOperationNode,
                               ArithmeticBinaryOperationNode,
-                              ArithmeticVariableConstantNode)
+                              ArithmeticVariableConstant)
 from errors import MismatchedTokenError
 from lexer import TT
 
@@ -9,7 +9,6 @@ from lexer import TT
 class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
-
     def __init__(self, lexer):
         super().__init__(lexer)
 
@@ -29,16 +28,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(
-            ArithmeticBinaryOperationNode, [TT.BINOP_PREC_2, TT.MINUS])
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode,
+                                               [TT.BINOP_PREC_2, TT.MINUS])
 
         self._prec1()
 
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
             self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
 
-            self.ast_builder.down(ArithmeticBinaryOperationNode, [
-                                  TT.BINOP_PREC_2, TT.MINUS])
+            self.ast_builder.down(ArithmeticBinaryOperationNode,
+                                  [TT.BINOP_PREC_2, TT.MINUS])
 
             self._prec1()
 
@@ -51,16 +50,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(
-            ArithmeticBinaryOperationNode, [TT.BINOP_PREC_1])
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode,
+                                               [TT.BINOP_PREC_1])
 
         self._ao()
 
         while self.LTT(1) == TT.BINOP_PREC_1:
             self.match_and_add([TT.BINOP_PREC_1])
 
-            self.ast_builder.down(
-                ArithmeticBinaryOperationNode, [TT.BINOP_PREC_1])
+            self.ast_builder.down(ArithmeticBinaryOperationNode,
+                                  [TT.BINOP_PREC_1])
 
             self._ao()
 
@@ -91,8 +90,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             raise MismatchedTokenError("aritmetic operand", self.LT(1))
 
     def _identifier(self, ):
-        savestate_node = self.ast_builder.down(
-            ArithmeticVariableConstantNode, [TT.IDENTIFIER])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
+                                               [TT.IDENTIFIER])
 
         self.match_and_add([TT.IDENTIFIER])
 
@@ -104,8 +103,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammar: <number>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(
-            ArithmeticVariableConstantNode, [TT.NUMBER])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
+                                               [TT.NUMBER])
 
         self.match_and_add([TT.NUMBER])
 
@@ -117,8 +116,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammar: <character>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(
-            ArithmeticVariableConstantNode, [TT.CHAR])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
+                                               [TT.CHAR])
 
         self.match_and_add([TT.CHAR])
 
@@ -142,16 +141,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(
-            ArithmeticUnaryOperationNode, [TT.UNARY_OP, TT.MINUS])
+        savestate_node = self.ast_builder.down(ArithmeticUnaryOperationNode,
+                                               [TT.UNARY_OP, TT.MINUS])
 
         while True:  # do while loop
             self.match_and_add([TT.UNARY_OP, TT.MINUS])
             if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ArithmeticUnaryOperationNode, [
-                                  TT.UNARY_OP, TT.MINUS])
+            self.ast_builder.down(ArithmeticUnaryOperationNode,
+                                  [TT.UNARY_OP, TT.MINUS])
 
         # self.match_and_add([TT.NUMBER])
         self._ao()

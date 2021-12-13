@@ -5,8 +5,9 @@ import global_vars
 
 
 class Token():
-
     """Identifies what a certiain string slice is"""
+
+    __match_args__ = ("value")
 
     def __init__(self, type, value, position):
         """
@@ -25,7 +26,6 @@ class Token():
 
 
 class TT(Enum):
-
     """Tokentypes that are part of the grammar. Their strings are used for
     differentiation and for error messages"""
 
@@ -64,7 +64,6 @@ class TT(Enum):
 
 
 class Lexer:
-
     """Identifies tokens in the picoC code
 
     :Info: The Lexer doesn't check if the token is also at the right position
@@ -171,19 +170,19 @@ class Lexer:
         # next column or next row
         if self.lc_col + 1 < len(self.input[self.lc_row]):
             self.lc_col += 1
-        elif (self.lc_col + 1 == len(self.input[self.lc_row]) and
-              self.lc_row + 1 < len(self.input)):
+        elif (self.lc_col + 1 == len(self.input[self.lc_row])
+              and self.lc_row + 1 < len(self.input)):
             self.lc_row += 1
             self.lc_col = 0
-        elif (self.lc_col + 1 == len(self.input[self.lc_row]) and
-              self.lc_row + 1 == len(self.input)):
+        elif (self.lc_col + 1 == len(self.input[self.lc_row])
+              and self.lc_row + 1 == len(self.input)):
             self.lc_col += 1
         else:
             pass
 
         # next character
-        if (self.lc_row + 1 == len(self.input) and
-                self.lc_col == len(self.input[self.lc_row])):
+        if (self.lc_row + 1 == len(self.input)
+                and self.lc_col == len(self.input[self.lc_row])):
             self.c = self.lc
             self.lc = self.EOF_CHAR
         else:
