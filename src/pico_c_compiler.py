@@ -91,7 +91,8 @@ def main():
         '-P',
         '--prefix-notation',
         action='store_true',
-        help="write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
+        help=
+        "write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
     cli_args_parser.add_argument(
         '-v',
         '--verbose',
@@ -185,8 +186,9 @@ def _read_and_write_file(infile, outfile):
 def _compile(fname, code):
     # TODO: Add to master
     # remove all \n  and empty lines from the code
-    code_without_cr = [line for line in map(
-        lambda line: line.strip(), code) if line]
+    code_without_cr = [
+        line for line in map(lambda line: line.strip(), code) if line
+    ]
 
     lexer = Lexer(fname, code_without_cr)
 
@@ -228,7 +230,7 @@ def _compile(fname, code):
         print(
             tabulate([(k, v.get_type(), str(v.datatype), str(
                 v.position), str(v.value)) for k, v in symbols.items()],
-                headers=header))
+                     headers=header))
 
     return abstract_syntax_tree.show_generated_code()
 
