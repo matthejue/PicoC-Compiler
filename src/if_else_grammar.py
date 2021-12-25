@@ -21,8 +21,8 @@ def code_if_if_else(self):
     elif self.taste(self._if_else, errors):
         self._if_else()
     else:
-        self._handle_all_tastes_unsuccessful(
-            "if or if else expression", errors)
+        self._handle_all_tastes_unsuccessful("if or if else expression",
+                                             errors)
 
 
 def _taste_consume_if_without_else(self):
@@ -72,8 +72,8 @@ def _if_else(self, ):
     elif self._is_statement():
         self._s()
     else:
-        raise NoApplicableRuleError(
-            "statement in braces or single statement", self.LT(1))
+        raise NoApplicableRuleError("statement in braces or single statement",
+                                    self.LT(1))
 
     self.ast_builder.up(savestate_node)
 
@@ -101,5 +101,5 @@ def _if(self):
     elif self._is_statement():
         self._s()
     else:
-        raise NoApplicableRuleError(
-            "statement in braces or single statement", self.LT(1))
+        raise NoApplicableRuleError("statement in braces or single statement",
+                                    self.LT(1))

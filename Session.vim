@@ -3,21 +3,16 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium
+cd ~/Documents/Studium/pico_c_compiler
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +40 pico_c_compiler/src/assignment_allocation_nodes.py
-badd +68 pico_c_compiler/src/abstract_syntax_tree.py
-badd +46 pico_c_compiler/src/assignment_allocation_grammar.py
-badd +31 pico_c_compiler/src/ast_builder.py
-badd +66 pico_c_compiler/src/parser_.py
 argglobal
 %argdel
-edit pico_c_compiler/src/ast_builder.py
+edit src/if_else_grammar.py
 argglobal
-balt pico_c_compiler/src/assignment_allocation_grammar.py
+balt pico_c_compiler/src/pico_c_compiler.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -28,15 +23,18 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 31 - ((18 * winheight(0) + 19) / 38)
+let s:l = 23 - ((5 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 31
-normal! 029|
-if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
+keepjumps 23
+normal! 0
 tabnext 1
-if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+badd +19 src/if_else_grammar.py
+badd +1 pico_c_compiler/src/pico_c_compiler.py
+badd +71 src/pico_c_compiler.py
+badd +1 NERD_tree_3
+if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
