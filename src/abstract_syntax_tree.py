@@ -4,34 +4,6 @@ from code_generator import CodeGenerator
 from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
 
-#  class TokenNode:
-#      """Abstract Syntax Tree Node for Leaves"""
-#      def __init__(self, token):
-#          """
-#          :token: Token
-#          """
-#          self.token = token
-#
-#      def getNodeType(self):
-#          """
-#
-#          :returns: None
-#
-#          """
-#          return self.token.type
-#
-#      def isEmpty(self):
-#          return not self.token
-#
-#      def __repr__(self):
-#          return f"{self.token}"
-#
-#      def visit(self, ):
-#          # in case the AssignmentNode doesn't have a AllocationNode as first
-#          # child there'll be a TokenNode which needs a dummy visit() function as
-#          # there's polymorphic visit() call
-#          pass
-
 
 class ASTNode:
     """Node of a Normalized Heterogeneous Abstract Syntax Tree (AST), partially
@@ -40,54 +12,37 @@ class ASTNode:
     across.  Homogeneous AST means having only one node type and all childs
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
-    def __init__(self, tokentype):
+    def __init__(self, token=None):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
         self.children = []
-        # at the time of creation the tokenvalue is unknown
-        self.token = Token(tokentype, None, None)
-        # decide whether a node should be ignored and just show his children if
-        # he has any
-        self.ignore = True
+        self.token = token
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
-
-    #  def _is_tokennode(self, node):
-    #      """checks if something is a TokenNode
-    #
-    #      :returns: boolean
-    #      """
-    #      # being not instance of ASTNode means being instance of TokenNode
-    #      return not isinstance(node, ASTNode)
 
     def add_child(self, node):
         """
 
         :returns: None
         """
-        # in case the representative tokens of self appear as attribute of a
-        # TokenNode, the token of self can finally register the right value
-        # Because of e.g. <alloc>: <word> <word> ... one should only take the
-        # first TokenNode matching the possible representative tokens
         self.children += [node]
 
     def determine(self, token):
         self.token = token
-        self.ignore = False
 
     def show_generated_code(self, ):
         return self.code_generator.show_code()
 
+    def ignore(self, ):
+        return not self.token
+
     def __repr__(self):
-        # if Node doesn't even reach it's own operation token it's unnecessary
-        # and should be skipped
         if not self.children:
             return f"{self.token}"
-        # TODO: swap the order of this conditional statements when finishing
-        # the project because if a node isn't activated it should never be
-        # seen, it's just useful for debugging to have it the other way round
-        elif self.ignore:
+        # if Node doesn't even reach it's own operation token it's unnecessary
+        # and should be skipped
+        elif self.ignore():
             return f"{self.children[0]}"
 
         acc = f"({self.token}"

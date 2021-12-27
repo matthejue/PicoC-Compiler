@@ -7,7 +7,7 @@ import global_vars
 class Token():
     """Identifies what a certiain string slice is"""
 
-    __match_args__ = ("value")
+    __match_args__ = ("type")
 
     def __init__(self, type, value, position):
         """

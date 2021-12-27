@@ -43,7 +43,7 @@ class BacktrackingParser():
         """
         return self.LT(i).type
 
-    def match(self, token):
+    def match(self, tokentypes):
         """Check if one of the token are the next token in the lexer to match. In
         general checks if non-terminal symbols are at the right syntactial
         sition
@@ -51,12 +51,12 @@ class BacktrackingParser():
         :token: possibly matching tokentypes (because of symbols like e.g. '-')
         :returns: None, possibly an exception
         """
-        if (self.LTT(1) == token):
+        if (self.LTT(1) in tokentypes):
             self._consume_next_token()
         else:
-            raise MismatchedTokenError(token.value, self.LT(1))
+            raise MismatchedTokenError(tokentypes, self.LT(1))
 
-    def match_and_add(self, tokentype, classname):
+    def match_and_add(self, tokentypes, classname):
         """Add the current token to the ast and check for match
 
         :tokentype: possibly matching tokentype
@@ -64,12 +64,14 @@ class BacktrackingParser():
         """
         if not global_vars.is_tasting:
             self.ast_builder.CN().add_child(classname(self.LT(1)))
-        self.match(tokentype)
+        self.match(tokentypes)
 
-    def match_and_determine(self, tokentype):
+    def match_and_determine(self, tokentypes):
+        """Determines the tokentype of the cur
+        """
         if not global_vars.is_tasting:
             self.ast_builder.CN().determine(self.LT(1))
-        self.match(tokentype)
+        self.match(tokentypes)
 
     def _sync(self, i):
         """ensures that one can look ahead i tokens. If one has looked ahead i

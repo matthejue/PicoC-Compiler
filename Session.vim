@@ -3,16 +3,16 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium/pico_c_compiler
+cd ~/Documents/Studium/pico_c_compiler/src
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
 argglobal
 %argdel
-edit src/if_else_grammar.py
+edit lexer.py
 argglobal
-balt pico_c_compiler/src/pico_c_compiler.py
+balt lexer_2.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -20,20 +20,25 @@ setlocal fdi=#
 setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
-setlocal fen
+setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 23 - ((5 * winheight(0) + 19) / 38)
+let s:l = 12 - ((11 * winheight(0) + 19) / 38)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 23
-normal! 0
+keepjumps 12
+normal! 027|
+if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +19 src/if_else_grammar.py
-badd +1 pico_c_compiler/src/pico_c_compiler.py
-badd +71 src/pico_c_compiler.py
-badd +1 NERD_tree_3
+badd +69 ~/Documents/Studium/pico_c_compiler/src/parser_.py
+badd +28 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
+badd +31 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +18 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
+badd +12 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +11 ~/Documents/Studium/pico_c_compiler/src/lexer_2.py
+badd +136 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
+badd +3 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
