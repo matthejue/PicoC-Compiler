@@ -7,7 +7,7 @@ import global_vars
 class Token():
     """Identifies what a certiain string slice is"""
 
-    __match_args__ = ("value")
+    __match_args__ = ("type")
 
     def __init__(self, type, value, position):
         """
@@ -33,6 +33,12 @@ class TT(Enum):
     UNARY_OP = "unary operator"
     BINOP_PREC_1 = "binary operator with precedence 1"
     BINOP_PREC_2 = "binary operator with precedence 2"
+    PLUS_OP = "+"
+    MINUS_OP = "-"
+    MUL_OP = "-"
+    DIV_OP = "/"
+    MOD_OP = "%"
+    OPLUS_OP = "^"
     ASSIGNMENT = "="
     L_PAREN = "("
     R_PAREN = ")"

@@ -17,7 +17,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: <prec2>
         :returns: None
-
         """
         self._prec2()
 
@@ -26,18 +25,15 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         :returns: None
-
         """
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode,
-                                               [TT.BINOP_PREC_2, TT.MINUS])
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode)
 
         self._prec1()
 
         while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
-            self.match_and_add([TT.BINOP_PREC_2, TT.MINUS])
+            self.match_and_determine([TT.BINOP_PREC_2, TT.MINUS])
 
-            self.ast_builder.down(ArithmeticBinaryOperationNode,
-                                  [TT.BINOP_PREC_2, TT.MINUS])
+            self.ast_builder.down(ArithmeticBinaryOperationNode)
 
             self._prec1()
 
@@ -48,18 +44,15 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer:  #2 <ao> (<binop_prec1> #2 <ao>)*
         :returns: None
-
         """
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode,
-                                               [TT.BINOP_PREC_1])
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode)
 
         self._ao()
 
         while self.LTT(1) == TT.BINOP_PREC_1:
-            self.match_and_add([TT.BINOP_PREC_1])
+            self.match_and_determine([TT.BINOP_PREC_1])
 
-            self.ast_builder.down(ArithmeticBinaryOperationNode,
-                                  [TT.BINOP_PREC_1])
+            self.ast_builder.down(ArithmeticBinaryOperationNode)
 
             self._ao()
 
@@ -70,7 +63,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: <word> | <number> | <paren> | <unop>
         :returns: None
-
         """
         if self.LTT(1) == TT.IDENTIFIER:
             self._identifier()
@@ -81,19 +73,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
         elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
-            # for overlapping symbols liks e.g. '-' which overlap both with
-            # e.g. binary and unary operators, a seperate type (here: TT.MINUS)
-            # had  to be made and for unary opeartions one has to check both
-            # TT.MINUS and TT.UNOP
             self._unop()
         else:
             raise MismatchedTokenError("aritmetic operand", self.LT(1))
 
     def _identifier(self, ):
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
-                                               [TT.IDENTIFIER])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
 
-        self.match_and_add([TT.IDENTIFIER])
+        self.match_and_determine([TT.IDENTIFIER])
 
         self.ast_builder.up(savestate_node)
 
@@ -103,10 +90,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammar: <number>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
-                                               [TT.NUMBER])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
 
-        self.match_and_add([TT.NUMBER])
+        self.match_and_determine([TT.NUMBER])
 
         self.ast_builder.up(savestate_node)
 
@@ -116,10 +102,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammar: <character>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant,
-                                               [TT.CHAR])
+        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
 
-        self.match_and_add([TT.CHAR])
+        self.match_and_determine([TT.CHAR])
 
         self.ast_builder.up(savestate_node)
 
@@ -128,7 +113,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: ( <code_ae> )
         :returns: None
-
         """
         self.match([TT.L_PAREN])
         self.code_ae()
@@ -139,20 +123,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         :returns: None
-
         """
-        savestate_node = self.ast_builder.down(ArithmeticUnaryOperationNode,
-                                               [TT.UNARY_OP, TT.MINUS])
+        savestate_node = self.ast_builder.down(ArithmeticUnaryOperationNode)
 
-        while True:  # do while loop
-            self.match_and_add([TT.UNARY_OP, TT.MINUS])
+        while True:
+            self.match_and_determine([TT.UNARY_OP, TT.MINUS])
             if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
                 break
 
-            self.ast_builder.down(ArithmeticUnaryOperationNode,
-                                  [TT.UNARY_OP, TT.MINUS])
+            self.ast_builder.down(ArithmeticUnaryOperationNode)
 
-        # self.match_and_add([TT.NUMBER])
         self._ao()
 
         self.ast_builder.up(savestate_node)

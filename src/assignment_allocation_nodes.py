@@ -16,9 +16,6 @@ class AssignmentNode(ASTNode):
     variable = None
     expression = None
 
-    def _update_match_args(self):
-        pass
-
     assignment = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
         LOADIN SP ACC 1;  # Wert von expression in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen

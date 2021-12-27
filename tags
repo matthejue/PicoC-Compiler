@@ -10,6 +10,8 @@
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
 'java.lang'	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="'java.lang'"><\/a>$/;"	a
+'nose.plugins'	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="'nose.plugins'"><\/a>$/;"	a
+'nose.util'	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="'nose.util'"><\/a>$/;"	a
 'org.python'	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="'org.python'"><\/a>$/;"	a
 'typing.io'	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="'typing.io'"><\/a>$/;"	a
 0	.vimspector.json	/^          ".\/input.picoc",$/;"	s	array:configurations.Debug.configuration.args
@@ -21,13 +23,14 @@ AND	src/lexer.py	/^    AND = "&&"$/;"	v	class:TT
 AND_OP	src/lexer.py	/^    AND_OP = "&"$/;"	v	class:TT
 ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
-ASTNode	src/abstract_syntax_tree.py	/^class ASTNode(TokenNode):$/;"	c
+ASTNode	src/abstract_syntax_tree.py	/^class ASTNode:$/;"	c
 AllocationNode	src/assignment_allocation_nodes.py	/^class AllocationNode(ASTNode):$/;"	c
+Apple	.misc/python_match_args_example.py	/^class Apple:$/;"	c
 Args	test/testing_helpers.py	/^class Args():$/;"	c
 ArithmeticBinaryOperationNode	src/arithmetic_nodes.py	/^class ArithmeticBinaryOperationNode(ASTNode):$/;"	c
 ArithmeticExpressionGrammar	src/arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
 ArithmeticUnaryOperationNode	src/arithmetic_nodes.py	/^class ArithmeticUnaryOperationNode(ASTNode):$/;"	c
-ArithmeticVariableConstantNode	src/arithmetic_nodes.py	/^class ArithmeticVariableConstantNode(ASTNode):$/;"	c
+ArithmeticVariableConstant	src/arithmetic_nodes.py	/^class ArithmeticVariableConstant(ASTNode):$/;"	c
 AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
 AssignmentNode	src/assignment_allocation_nodes.py	/^class AssignmentNode(ASTNode):$/;"	c
 BINOP_PREC_1	src/lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
@@ -35,6 +38,7 @@ BINOP_PREC_2	src/lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 
 BacktrackingParser	src/parser_.py	/^class BacktrackingParser():$/;"	c
 BuiltInTypeSymbol	src/symbol_table.py	/^class BuiltInTypeSymbol(Symbol):$/;"	c
 CHAR	src/lexer.py	/^    CHAR = "character"$/;"	v	class:TT
+CN	src/ast_builder.py	/^    def CN(self):$/;"	m	class:ASTBuilder
 COMP_OP	src/lexer.py	/^    COMP_OP = "comparison operator"$/;"	v	class:TT
 COMP_OPERATOR_ASSIGNMENT_BITSHIFT	src/lexer.py	/^    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']$/;"	v	class:Lexer
 CONST	src/lexer.py	/^    CONST = "constant qualifier"$/;"	v	class:TT
@@ -112,7 +116,6 @@ TestLoopGrammar	test/parser_test.py	/^class TestLoopGrammar(unittest.TestCase, U
 TestPrograms	test/execution_test.py	/^class TestPrograms(unittest.TestCase, UsefullTools):$/;"	c
 TestStatementGrammar	test/parser_test.py	/^class TestStatementGrammar(unittest.TestCase, UsefullTools):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
-TokenNode	src/abstract_syntax_tree.py	/^class TokenNode:$/;"	c
 UNARY_OP	src/lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
 UnclosedCharacterError	src/errors.py	/^class UnclosedCharacterError(Exception):$/;"	c
 UnknownIdentifierError	src/errors.py	/^class UnknownIdentifierError(Exception):$/;"	c
@@ -127,12 +130,11 @@ WhileNode	src/loop_nodes.py	/^class WhileNode(ASTNode):$/;"	c
 _CodeGenerator	src/code_generator.py	/^class _CodeGenerator:$/;"	c
 _SymbolTable	src/symbol_table.py	/^class _SymbolTable(Scope):$/;"	c
 __future__	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="__future__"><\/a>$/;"	a
-__init__	.misc/python_match_args_example.py	/^    def __init__(self, x, y, z):$/;"	m	class:Test
-__init__	src/abstract_syntax_tree.py	/^    def __init__(self, token):$/;"	m	class:TokenNode
-__init__	src/abstract_syntax_tree.py	/^    def __init__(self, tokentypes):$/;"	m	class:ASTNode
+__init__	.misc/python_match_args_example.py	/^    def __init__(self, *args):$/;"	m	class:Apple
+__init__	.misc/python_match_args_example.py	/^    def __init__(self, *args):$/;"	m	class:Test
+__init__	src/abstract_syntax_tree.py	/^    def __init__(self, tokentype):$/;"	m	class:ASTNode
 __init__	src/arithmetic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ArithmeticExpressionGrammar
 __init__	src/assignment_allocation_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:AssignmentAllocationGrammar
-__init__	src/assignment_allocation_nodes.py	/^    def __init__(self, tokentypes, variable=None, expression=None):$/;"	m	class:AssignmentNode
 __init__	src/ast_builder.py	/^    def __init__(self):$/;"	m	class:ASTBuilder
 __init__	src/code_generator.py	/^    def __init__(self):$/;"	m	class:_CodeGenerator
 __init__	src/error_handler.py	/^    def __init__(self, grammar):$/;"	m	class:ErrorHandler
@@ -156,9 +158,13 @@ __init__	src/symbol_table.py	/^    def __init__(self, name, datatype, position):
 __init__	src/symbol_table.py	/^    def __init__(self, name, datatype, position, value):$/;"	m	class:Symbol
 __init__	test/testing_helpers.py	/^    def __init__(self):$/;"	m	class:Args
 __match_args__	.misc/python_match_args_example.py	/^    __match_args__ = ("x", "y")$/;"	v	class:Test	file:
+__match_args__	.misc/python_match_args_example.py	/^    __match_args__ = ("x",)$/;"	v	class:Apple	file:
+__match_args__	src/arithmetic_nodes.py	/^    __match_args__ = ("left_operand", "operation", "right_operand")$/;"	v	class:ArithmeticBinaryOperationNode	file:
+__match_args__	src/arithmetic_nodes.py	/^    __match_args__ = ("variable_constant", )$/;"	v	class:ArithmeticVariableConstant	file:
+__match_args__	src/assignment_allocation_nodes.py	/^    __match_args__ = ("const_or_var", "prim_datatype", "identifier")$/;"	v	class:AllocationNode	file:
 __match_args__	src/assignment_allocation_nodes.py	/^    __match_args__ = ("variable", "expression")$/;"	v	class:AssignmentNode	file:
+__match_args__	src/lexer.py	/^    __match_args__ = ("value")$/;"	v	class:Token	file:
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
-__repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:TokenNode
 __repr__	src/assignment_allocation_nodes.py	/^    def __repr__(self, ):$/;"	m	class:AllocationNode
 __repr__	src/lexer.py	/^    def __repr__(self):$/;"	m	class:Token
 __repr__	src/symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:Symbol
@@ -207,10 +213,13 @@ _consume_next_token	src/parser_.py	/^    def _consume_next_token(self):$/;"	m	cl
 _contextvars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_contextvars"><\/a>$/;"	a
 _csv	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_csv"><\/a>$/;"	a
 _ctypes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_ctypes"><\/a>$/;"	a
+_curses	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_curses"><\/a>$/;"	a
 _datetime	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_datetime"><\/a>$/;"	a
 _decimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_decimal"><\/a>$/;"	a
 _division_sign_or_comment	src/lexer_2.py	/^def _division_sign_or_comment(self, ):$/;"	f
 _do_while	src/loop_grammar.py	/^def _do_while(self):$/;"	f
+_dummy_thread	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_dummy_thread"><\/a>$/;"	a
+_elementtree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_elementtree"><\/a>$/;"	a
 _error_message_header	src/error_handler.py	/^    def _error_message_header(self, error):$/;"	m	class:ErrorHandler
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
 _find_white_space_before_last_token	src/error_handler.py	/^    def _find_white_space_before_last_token(self, e):$/;"	m	class:ErrorHandler
@@ -234,7 +243,7 @@ _if	src/if_else_grammar.py	/^def _if(self):$/;"	f
 _if_else	src/if_else_grammar.py	/^def _if_else(self, ):$/;"	f
 _if_without_else	src/if_else_grammar.py	/^def _if_without_else(self, ):$/;"	f
 _imp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_imp"><\/a>$/;"	a
-_insert_identifier	src/arithmetic_nodes.py	/^    def _insert_identifier(self, ):$/;"	m	class:ArithmeticVariableConstantNode
+_insert_identifier	src/arithmetic_nodes.py	/^    def _insert_identifier(self, ):$/;"	m	class:ArithmeticVariableConstant
 _instance	src/code_generator.py	/^    _instance = None$/;"	v	class:_CodeGenerator
 _instance	src/symbol_table.py	/^    _instance = None$/;"	v	class:_SymbolTable
 _io	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_io"><\/a>$/;"	a
@@ -245,7 +254,6 @@ _is_logical_connective	src/logic_expression_grammar.py	/^    def _is_logical_con
 _is_loop	src/statement_grammar.py	/^    def _is_loop(self, ):$/;"	m	class:StatementGrammar
 _is_single_value_on_right_side	src/assignment_allocation_nodes.py	/^    def _is_single_value_on_right_side(self, ):$/;"	m	class:AssignmentNode
 _is_statement	src/statement_grammar.py	/^    def _is_statement(self):$/;"	m	class:StatementGrammar
-_is_tokennode	src/abstract_syntax_tree.py	/^    def _is_tokennode(self, node):$/;"	m	class:ASTNode
 _json	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_json"><\/a>$/;"	a
 _lo	src/logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
 _locale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_locale"><\/a>$/;"	a
@@ -275,6 +283,7 @@ _posixshmem	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixs
 _posixsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixsubprocess"><\/a>$/;"	a
 _prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
 _prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_psutil_windows	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_psutil_windows"><\/a>$/;"	a
 _py_abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_py_abc"><\/a>$/;"	a
 _pydecimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_pydecimal"><\/a>$/;"	a
 _queue	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_queue"><\/a>$/;"	a
@@ -309,6 +318,10 @@ _threading_local	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_t
 _top_bottom	src/logic_expression_grammar.py	/^    def _top_bottom(self, ):$/;"	m	class:LogicExpressionGrammar
 _tracemalloc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_tracemalloc"><\/a>$/;"	a
 _unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
+_update_match_args	src/arithmetic_nodes.py	/^    def _update_match_args(self):$/;"	m	class:ArithmeticBinaryOperationNode
+_update_match_args	src/arithmetic_nodes.py	/^    def _update_match_args(self):$/;"	m	class:ArithmeticVariableConstant
+_update_match_args	src/assignment_allocation_nodes.py	/^    def _update_match_args(self):$/;"	m	class:AllocationNode
+_update_match_args	src/assignment_allocation_nodes.py	/^    def _update_match_args(self):$/;"	m	class:AssignmentNode
 _warnings	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_warnings"><\/a>$/;"	a
 _weakref	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakref"><\/a>$/;"	a
 _weakrefset	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakrefset"><\/a>$/;"	a
@@ -318,13 +331,12 @@ _winreg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_winreg"><\
 abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abc"><\/a>$/;"	a
 abstract_syntax_tree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abstract_syntax_tree"><\/a>$/;"	a
 adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configurations.Debug
-addChild	src/abstract_syntax_tree.py	/^    def addChild(self, node):$/;"	m	class:ASTNode
-addChild	src/ast_builder.py	/^    def addChild(self, node):$/;"	m	class:ASTBuilder
 addChild	src/loop_nodes.py	/^    def addChild(self, node):$/;"	m	class:DoWhileNode
+add_child	src/abstract_syntax_tree.py	/^    def add_child(self, node):$/;"	m	class:ASTNode
 add_code	src/code_generator.py	/^    def add_code(self, code, loc):$/;"	m	class:_CodeGenerator
 add_marker	src/code_generator.py	/^    def add_marker(self, ):$/;"	m	class:_CodeGenerator
 all	Makefile	/^all: run-read-compile clean$/;"	t
-all_loc	src/arithmetic_nodes.py	/^    all_loc = 1$/;"	v	class:ArithmeticVariableConstantNode
+all_loc	src/arithmetic_nodes.py	/^    all_loc = 1$/;"	v	class:ArithmeticVariableConstant
 allocate	src/symbol_table.py	/^    def allocate(self, sym):$/;"	m	class:_SymbolTable
 argparse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="argparse"><\/a>$/;"	a
 args	.misc/pico_c_compiler	/^args = None$/;"	v
@@ -403,6 +415,8 @@ codecs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="codecs"><\/a
 codeop	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="codeop"><\/a>$/;"	a
 collections	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections"><\/a>$/;"	a
 collections.Iterable	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections.Iterable"><\/a>$/;"	a
+collections.Mapping	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections.Mapping"><\/a>$/;"	a
+collections.MutableMapping	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections.MutableMapping"><\/a>$/;"	a
 collections.abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections.abc"><\/a>$/;"	a
 compile	.misc/pico_c_compiler	/^def compile(fname, code):$/;"	f
 concurrent	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="concurrent"><\/a>$/;"	a
@@ -418,8 +432,8 @@ configparser	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="config
 configuration	.vimspector.json	/^      "configuration": {$/;"	o	object:configurations.Debug
 configurations	.vimspector.json	/^  "configurations": {$/;"	o
 console	.vimspector.json	/^        "console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
-constant	src/arithmetic_nodes.py	/^    constant = "LOADI ACC encode(w);\\n"$/;"	v	class:ArithmeticVariableConstantNode
-constant_identifier	src/arithmetic_nodes.py	/^    constant_identifier = "LOADI ACC encode(c);\\n"$/;"	v	class:ArithmeticVariableConstantNode
+constant	src/arithmetic_nodes.py	/^    constant = "LOADI ACC encode(w);\\n"$/;"	v	class:ArithmeticVariableConstant
+constant_identifier	src/arithmetic_nodes.py	/^    constant_identifier = "LOADI ACC encode(c);\\n"$/;"	v	class:ArithmeticVariableConstant
 contextlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextlib"><\/a>$/;"	a
 contextvars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextvars"><\/a>$/;"	a
 copy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="copy"><\/a>$/;"	a
@@ -430,17 +444,35 @@ create_bin_wine	Makefile	/^create_bin_wine:$/;"	t
 csv	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="csv"><\/a>$/;"	a
 ctypes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ctypes"><\/a>$/;"	a
 ctypes._endian	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ctypes._endian"><\/a>$/;"	a
+curses	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="curses"><\/a>$/;"	a
+curses.has_key	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="curses.has_key"><\/a>$/;"	a
 cwd	.vimspector.json	/^        "cwd": "${workspaceFolder}",$/;"	s	object:configurations.Debug.configuration
 datetime	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="datetime"><\/a>$/;"	a
 debugOptions	.vimspector.json	/^        "debugOptions": [],$/;"	a	object:configurations.Debug.configuration
 decimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="decimal"><\/a>$/;"	a
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
+determine	src/abstract_syntax_tree.py	/^    def determine(self, token):$/;"	m	class:ASTNode
+determine	src/assignment_allocation_nodes.py	/^    def determine(self, token):$/;"	m	class:AssignmentNode
 difflib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="difflib"><\/a>$/;"	a
 dis	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="dis"><\/a>$/;"	a
 distutils	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils"><\/a>$/;"	a
+distutils.archive_util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.archive_util"><\/a>$/;"	a
+distutils.ccompiler	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.ccompiler"><\/a>$/;"	a
+distutils.debug	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.debug"><\/a>$/;"	a
+distutils.dep_util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.dep_util"><\/a>$/;"	a
+distutils.dir_util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.dir_util"><\/a>$/;"	a
+distutils.errors	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.errors"><\/a>$/;"	a
+distutils.fancy_getopt	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.fancy_getopt"><\/a>$/;"	a
+distutils.file_util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.file_util"><\/a>$/;"	a
+distutils.filelist	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.filelist"><\/a>$/;"	a
 distutils.log	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.log"><\/a>$/;"	a
+distutils.spawn	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.spawn"><\/a>$/;"	a
+distutils.sysconfig	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.sysconfig"><\/a>$/;"	a
+distutils.text_file	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.text_file"><\/a>$/;"	a
+distutils.util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.util"><\/a>$/;"	a
 doctest	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="doctest"><\/a>$/;"	a
-down	src/ast_builder.py	/^    def down(self, classname, tokens):$/;"	m	class:ASTBuilder
+down	src/ast_builder.py	/^    def down(self, classname, token):$/;"	m	class:ASTBuilder
+dummy_threading	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="dummy_threading"><\/a>$/;"	a
 email	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="email"><\/a>$/;"	a
 email._encoded_words	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="email._encoded_words"><\/a>$/;"	a
 email._header_value_parser	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="email._header_value_parser"><\/a>$/;"	a
@@ -585,7 +617,7 @@ encodings.uu_codec	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="
 encodings.zlib_codec	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="encodings.zlib_codec"><\/a>$/;"	a
 end	src/arithmetic_nodes.py	/^    end = """# codeaa(e1)$/;"	v	class:ArithmeticBinaryOperationNode
 end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1; # Ergebnis in oberste Stack-Zelle\\n"$/;"	v	class:ArithmeticUnaryOperationNode
-end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1;\\n"$/;"	v	class:ArithmeticVariableConstantNode
+end	src/arithmetic_nodes.py	/^    end = "STOREIN SP ACC 1;\\n"$/;"	v	class:ArithmeticVariableConstant
 end	src/function_nodes.py	/^    end = """# code(af)$/;"	v	class:MainFunctionNode
 end	src/logic_nodes.py	/^    end = """# codeaa(e)$/;"	v	class:LogicTopBottomNode
 end	src/logic_nodes.py	/^    end = """# codeaa(e1)$/;"	v	class:LogicAtomNode
@@ -610,6 +642,8 @@ exec_bin_linux	Makefile	/^exec_bin_linux:$/;"	t
 exec_bin_windows	Makefile	/^exec_bin_windows:$/;"	t
 exec_bin_wine	Makefile	/^exec_bin_wine:$/;"	t
 expected_output	.misc/test_errors	/^    expected_output = "(CONSTANT:12, ['BINOP', 'PRECEDENCE_1']:*, (CONSTANT:165, ['BINOP', 'PREC/;"	v	class:TestErrors
+expression	src/assignment_allocation_nodes.py	/^    expression = None$/;"	v	class:AssignmentNode
+fcntl	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="fcntl"><\/a>$/;"	a
 fnmatch	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="fnmatch"><\/a>$/;"	a
 fractions	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="fractions"><\/a>$/;"	a
 ftplib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ftplib"><\/a>$/;"	a
@@ -618,7 +652,6 @@ function_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="func
 functools	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="functools"><\/a>$/;"	a
 gc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="gc"><\/a>$/;"	a
 genericpath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="genericpath"><\/a>$/;"	a
-getNodeType	src/abstract_syntax_tree.py	/^    def getNodeType(self):$/;"	m	class:TokenNode
 get_enclosing_scope	src/symbol_table.py	/^    def get_enclosing_scope(self, ):$/;"	m	class:Scope
 get_marker_loc	src/code_generator.py	/^    def get_marker_loc(self, ):$/;"	m	class:_CodeGenerator
 get_name	src/symbol_table.py	/^    def get_name(self, ):$/;"	m	class:Symbol
@@ -668,7 +701,6 @@ importlib_metadata._text	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a 
 initTypeSystem	src/symbol_table.py	/^    def initTypeSystem(self, ):$/;"	m	class:_SymbolTable
 inspect	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="inspect"><\/a>$/;"	a
 io	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="io"><\/a>$/;"	a
-isEmpty	src/abstract_syntax_tree.py	/^    def isEmpty(self):$/;"	m	class:TokenNode
 is_tasting	src/global_vars.py	/^is_tasting = 0$/;"	v
 itertools	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="itertools"><\/a>$/;"	a
 java	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="java"><\/a>$/;"	a
@@ -694,8 +726,9 @@ main	.misc/pico_c_compiler	/^def main():$/;"	f
 main	.misc/test.cpp	/^int main() {$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 marshal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="marshal"><\/a>$/;"	a
-match	src/parser_.py	/^    def match(self, tts):$/;"	m	class:BacktrackingParser
-match_and_add	src/parser_.py	/^    def match_and_add(self, tts):$/;"	m	class:BacktrackingParser
+match	src/parser_.py	/^    def match(self, token):$/;"	m	class:BacktrackingParser
+match_and_add	src/parser_.py	/^    def match_and_add(self, tokentype, classname):$/;"	m	class:BacktrackingParser
+match_and_determine	src/parser_.py	/^    def match_and_determine(self, tokentype):$/;"	m	class:BacktrackingParser
 math	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="math"><\/a>$/;"	a
 middle	src/if_else_nodes.py	/^    middle = """JUMP codelength(af2) + 1;$/;"	v	class:IfElseNode
 middle_loc	src/if_else_nodes.py	/^    middle_loc = 1$/;"	v	class:IfElseNode
@@ -741,6 +774,185 @@ ntpath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ntpath"><\/a
 nturl2path	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="nturl2path"><\/a>$/;"	a
 numbers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numbers"><\/a>$/;"	a
 numpy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy"><\/a>$/;"	a
+numpy.__config__	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.__config__"><\/a>$/;"	a
+numpy._distributor_init	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy._distributor_init"><\/a>$/;"	a
+numpy._globals	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy._globals"><\/a>$/;"	a
+numpy._pytesttester	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy._pytesttester"><\/a>$/;"	a
+numpy._version	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy._version"><\/a>$/;"	a
+numpy.amax	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.amax"><\/a>$/;"	a
+numpy.amin	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.amin"><\/a>$/;"	a
+numpy.array	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.array"><\/a>$/;"	a
+numpy.bool_	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.bool_"><\/a>$/;"	a
+numpy.compat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.compat"><\/a>$/;"	a
+numpy.compat._inspect	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.compat._inspect"><\/a>$/;"	a
+numpy.compat.py3k	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.compat.py3k"><\/a>$/;"	a
+numpy.core	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core"><\/a>$/;"	a
+numpy.core.Inf	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.Inf"><\/a>$/;"	a
+numpy.core._add_newdocs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._add_newdocs"><\/a>$/;"	a
+numpy.core._add_newdocs_scalars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._add_newdocs_scalars"><\/a>$/;"	a
+numpy.core._asarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._asarray"><\/a>$/;"	a
+numpy.core._dtype	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._dtype"><\/a>$/;"	a
+numpy.core._dtype_ctypes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._dtype_ctypes"><\/a>$/;"	a
+numpy.core._exceptions	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._exceptions"><\/a>$/;"	a
+numpy.core._internal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._internal"><\/a>$/;"	a
+numpy.core._methods	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._methods"><\/a>$/;"	a
+numpy.core._multiarray_tests	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._multiarray_tests"><\/a>$/;"	a
+numpy.core._multiarray_umath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._multiarray_umath"><\/a>$/;"	a
+numpy.core._string_helpers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._string_helpers"><\/a>$/;"	a
+numpy.core._type_aliases	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._type_aliases"><\/a>$/;"	a
+numpy.core._ufunc_config	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core._ufunc_config"><\/a>$/;"	a
+numpy.core.add	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.add"><\/a>$/;"	a
+numpy.core.all	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.all"><\/a>$/;"	a
+numpy.core.amax	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.amax"><\/a>$/;"	a
+numpy.core.amin	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.amin"><\/a>$/;"	a
+numpy.core.arange	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.arange"><\/a>$/;"	a
+numpy.core.argsort	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.argsort"><\/a>$/;"	a
+numpy.core.array	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.array"><\/a>$/;"	a
+numpy.core.array2string	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.array2string"><\/a>$/;"	a
+numpy.core.array_repr	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.array_repr"><\/a>$/;"	a
+numpy.core.arrayprint	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.arrayprint"><\/a>$/;"	a
+numpy.core.asanyarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.asanyarray"><\/a>$/;"	a
+numpy.core.asarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.asarray"><\/a>$/;"	a
+numpy.core.atleast_1d	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.atleast_1d"><\/a>$/;"	a
+numpy.core.atleast_2d	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.atleast_2d"><\/a>$/;"	a
+numpy.core.atleast_3d	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.atleast_3d"><\/a>$/;"	a
+numpy.core.bool_	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.bool_"><\/a>$/;"	a
+numpy.core.cdouble	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.cdouble"><\/a>$/;"	a
+numpy.core.complexfloating	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.complexfloating"><\/a>$/;"	a
+numpy.core.conjugate	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.conjugate"><\/a>$/;"	a
+numpy.core.count_nonzero	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.count_nonzero"><\/a>$/;"	a
+numpy.core.csingle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.csingle"><\/a>$/;"	a
+numpy.core.defchararray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.defchararray"><\/a>$/;"	a
+numpy.core.divide	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.divide"><\/a>$/;"	a
+numpy.core.dot	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.dot"><\/a>$/;"	a
+numpy.core.double	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.double"><\/a>$/;"	a
+numpy.core.einsumfunc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.einsumfunc"><\/a>$/;"	a
+numpy.core.empty	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.empty"><\/a>$/;"	a
+numpy.core.empty_like	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.empty_like"><\/a>$/;"	a
+numpy.core.errstate	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.errstate"><\/a>$/;"	a
+numpy.core.fastCopyAndTranspose	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.fastCopyAndTranspose"><\/a>$/;"	a
+numpy.core.finfo	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.finfo"><\/a>$/;"	a
+numpy.core.float32	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.float32"><\/a>$/;"	a
+numpy.core.float_	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.float_"><\/a>$/;"	a
+numpy.core.fromnumeric	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.fromnumeric"><\/a>$/;"	a
+numpy.core.function_base	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.function_base"><\/a>$/;"	a
+numpy.core.geterrobj	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.geterrobj"><\/a>$/;"	a
+numpy.core.getlimits	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.getlimits"><\/a>$/;"	a
+numpy.core.hstack	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.hstack"><\/a>$/;"	a
+numpy.core.iinfo	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.iinfo"><\/a>$/;"	a
+numpy.core.inexact	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.inexact"><\/a>$/;"	a
+numpy.core.inf	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.inf"><\/a>$/;"	a
+numpy.core.intc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.intc"><\/a>$/;"	a
+numpy.core.integer	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.integer"><\/a>$/;"	a
+numpy.core.intp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.intp"><\/a>$/;"	a
+numpy.core.isfinite	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.isfinite"><\/a>$/;"	a
+numpy.core.isinf	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.isinf"><\/a>$/;"	a
+numpy.core.isnan	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.isnan"><\/a>$/;"	a
+numpy.core.isnat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.isnat"><\/a>$/;"	a
+numpy.core.isscalar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.isscalar"><\/a>$/;"	a
+numpy.core.linspace	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.linspace"><\/a>$/;"	a
+numpy.core.machar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.machar"><\/a>$/;"	a
+numpy.core.matmul	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.matmul"><\/a>$/;"	a
+numpy.core.memmap	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.memmap"><\/a>$/;"	a
+numpy.core.moveaxis	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.moveaxis"><\/a>$/;"	a
+numpy.core.multiarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.multiarray"><\/a>$/;"	a
+numpy.core.multiply	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.multiply"><\/a>$/;"	a
+numpy.core.ndarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.ndarray"><\/a>$/;"	a
+numpy.core.newaxis	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.newaxis"><\/a>$/;"	a
+numpy.core.number	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.number"><\/a>$/;"	a
+numpy.core.numeric	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.numeric"><\/a>$/;"	a
+numpy.core.numerictypes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.numerictypes"><\/a>$/;"	a
+numpy.core.object_	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.object_"><\/a>$/;"	a
+numpy.core.ones	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.ones"><\/a>$/;"	a
+numpy.core.overrides	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.overrides"><\/a>$/;"	a
+numpy.core.product	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.product"><\/a>$/;"	a
+numpy.core.records	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.records"><\/a>$/;"	a
+numpy.core.result_type	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.result_type"><\/a>$/;"	a
+numpy.core.shape_base	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.shape_base"><\/a>$/;"	a
+numpy.core.sign	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.sign"><\/a>$/;"	a
+numpy.core.signbit	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.signbit"><\/a>$/;"	a
+numpy.core.single	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.single"><\/a>$/;"	a
+numpy.core.sort	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.sort"><\/a>$/;"	a
+numpy.core.sqrt	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.sqrt"><\/a>$/;"	a
+numpy.core.sum	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.sum"><\/a>$/;"	a
+numpy.core.swapaxes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.swapaxes"><\/a>$/;"	a
+numpy.core.transpose	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.transpose"><\/a>$/;"	a
+numpy.core.ufunc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.ufunc"><\/a>$/;"	a
+numpy.core.umath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.umath"><\/a>$/;"	a
+numpy.core.vstack	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.vstack"><\/a>$/;"	a
+numpy.core.zeros	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.core.zeros"><\/a>$/;"	a
+numpy.ctypeslib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ctypeslib"><\/a>$/;"	a
+numpy.dtype	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.dtype"><\/a>$/;"	a
+numpy.expand_dims	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.expand_dims"><\/a>$/;"	a
+numpy.eye	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.eye"><\/a>$/;"	a
+numpy.fft	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.fft"><\/a>$/;"	a
+numpy.fft._pocketfft	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.fft._pocketfft"><\/a>$/;"	a
+numpy.fft._pocketfft_internal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.fft._pocketfft_internal"><\/a>$/;"	a
+numpy.fft.helper	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.fft.helper"><\/a>$/;"	a
+numpy.histogramdd	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.histogramdd"><\/a>$/;"	a
+numpy.iscomplexobj	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.iscomplexobj"><\/a>$/;"	a
+numpy.lib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib"><\/a>$/;"	a
+numpy.lib._datasource	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib._datasource"><\/a>$/;"	a
+numpy.lib._iotools	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib._iotools"><\/a>$/;"	a
+numpy.lib._version	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib._version"><\/a>$/;"	a
+numpy.lib.arraypad	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.arraypad"><\/a>$/;"	a
+numpy.lib.arraysetops	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.arraysetops"><\/a>$/;"	a
+numpy.lib.arrayterator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.arrayterator"><\/a>$/;"	a
+numpy.lib.format	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.format"><\/a>$/;"	a
+numpy.lib.function_base	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.function_base"><\/a>$/;"	a
+numpy.lib.histograms	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.histograms"><\/a>$/;"	a
+numpy.lib.index_tricks	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.index_tricks"><\/a>$/;"	a
+numpy.lib.mixins	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.mixins"><\/a>$/;"	a
+numpy.lib.nanfunctions	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.nanfunctions"><\/a>$/;"	a
+numpy.lib.npyio	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.npyio"><\/a>$/;"	a
+numpy.lib.polynomial	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.polynomial"><\/a>$/;"	a
+numpy.lib.scimath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.scimath"><\/a>$/;"	a
+numpy.lib.shape_base	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.shape_base"><\/a>$/;"	a
+numpy.lib.stride_tricks	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.stride_tricks"><\/a>$/;"	a
+numpy.lib.twodim_base	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.twodim_base"><\/a>$/;"	a
+numpy.lib.type_check	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.type_check"><\/a>$/;"	a
+numpy.lib.ufunclike	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.ufunclike"><\/a>$/;"	a
+numpy.lib.utils	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.lib.utils"><\/a>$/;"	a
+numpy.linalg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.linalg"><\/a>$/;"	a
+numpy.linalg._umath_linalg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.linalg._umath_linalg"><\/a>$/;"	a
+numpy.linalg.lapack_lite	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.linalg.lapack_lite"><\/a>$/;"	a
+numpy.linalg.linalg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.linalg.linalg"><\/a>$/;"	a
+numpy.ma	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ma"><\/a>$/;"	a
+numpy.ma.core	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ma.core"><\/a>$/;"	a
+numpy.ma.extras	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ma.extras"><\/a>$/;"	a
+numpy.ma.mrecords	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ma.mrecords"><\/a>$/;"	a
+numpy.matrixlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.matrixlib"><\/a>$/;"	a
+numpy.matrixlib.defmatrix	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.matrixlib.defmatrix"><\/a>$/;"	a
+numpy.ndarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.ndarray"><\/a>$/;"	a
+numpy.polynomial	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial"><\/a>$/;"	a
+numpy.polynomial._polybase	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial._polybase"><\/a>$/;"	a
+numpy.polynomial.chebyshev	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.chebyshev"><\/a>$/;"	a
+numpy.polynomial.hermite	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.hermite"><\/a>$/;"	a
+numpy.polynomial.hermite_e	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.hermite_e"><\/a>$/;"	a
+numpy.polynomial.laguerre	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.laguerre"><\/a>$/;"	a
+numpy.polynomial.legendre	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.legendre"><\/a>$/;"	a
+numpy.polynomial.polynomial	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.polynomial"><\/a>$/;"	a
+numpy.polynomial.polyutils	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.polynomial.polyutils"><\/a>$/;"	a
+numpy.random	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random"><\/a>$/;"	a
+numpy.random._bounded_integers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._bounded_integers"><\/a>$/;"	a
+numpy.random._common	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._common"><\/a>$/;"	a
+numpy.random._generator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._generator"><\/a>$/;"	a
+numpy.random._mt19937	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._mt19937"><\/a>$/;"	a
+numpy.random._pcg64	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._pcg64"><\/a>$/;"	a
+numpy.random._philox	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._philox"><\/a>$/;"	a
+numpy.random._pickle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._pickle"><\/a>$/;"	a
+numpy.random._sfc64	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random._sfc64"><\/a>$/;"	a
+numpy.random.bit_generator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random.bit_generator"><\/a>$/;"	a
+numpy.random.mtrand	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.random.mtrand"><\/a>$/;"	a
+numpy.recarray	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.recarray"><\/a>$/;"	a
+numpy.testing	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing"><\/a>$/;"	a
+numpy.testing._private	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private"><\/a>$/;"	a
+numpy.testing._private.decorators	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private.decorators"><\/a>$/;"	a
+numpy.testing._private.noseclasses	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private.noseclasses"><\/a>$/;"	a
+numpy.testing._private.nosetester	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private.nosetester"><\/a>$/;"	a
+numpy.testing._private.parameterized	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private.parameterized"><\/a>$/;"	a
+numpy.testing._private.utils	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.testing._private.utils"><\/a>$/;"	a
+numpy.version	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="numpy.version"><\/a>$/;"	a
 opcode	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="opcode"><\/a>$/;"	a
 operator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="operator"><\/a>$/;"	a
 optparse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="optparse"><\/a>$/;"	a
@@ -759,6 +971,7 @@ pep517.in_process	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="p
 pep517.meta	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pep517.meta"><\/a>$/;"	a
 pep517.wrappers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pep517.wrappers"><\/a>$/;"	a
 pickle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pickle"><\/a>$/;"	a
+pickle5	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pickle5"><\/a>$/;"	a
 pico_c_compiler.py	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pico_c_compiler.py"><\/a>$/;"	a
 pkgutil	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pkgutil"><\/a>$/;"	a
 platform	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="platform"><\/a>$/;"	a
@@ -768,6 +981,23 @@ posixpath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="posixpath
 pprint	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pprint"><\/a>$/;"	a
 program	.vimspector.json	/^        "program": "${workspaceFolder}\/test\/code_generator_test.py",$/;"	s	object:configurations.Debug.configuration
 project_opened	.vim/.ropeproject/config.py	/^def project_opened(project):$/;"	f
+psutil	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil"><\/a>$/;"	a
+psutil._common	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._common"><\/a>$/;"	a
+psutil._compat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._compat"><\/a>$/;"	a
+psutil._psaix	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psaix"><\/a>$/;"	a
+psutil._psbsd	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psbsd"><\/a>$/;"	a
+psutil._pslinux	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._pslinux"><\/a>$/;"	a
+psutil._psosx	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psosx"><\/a>$/;"	a
+psutil._psposix	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psposix"><\/a>$/;"	a
+psutil._pssunos	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._pssunos"><\/a>$/;"	a
+psutil._psutil_aix	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_aix"><\/a>$/;"	a
+psutil._psutil_bsd	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_bsd"><\/a>$/;"	a
+psutil._psutil_linux	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_linux"><\/a>$/;"	a
+psutil._psutil_osx	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_osx"><\/a>$/;"	a
+psutil._psutil_posix	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_posix"><\/a>$/;"	a
+psutil._psutil_sunos	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_sunos"><\/a>$/;"	a
+psutil._psutil_windows	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._psutil_windows"><\/a>$/;"	a
+psutil._pswindows	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="psutil._pswindows"><\/a>$/;"	a
 pwd	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pwd"><\/a>$/;"	a
 py_compile	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="py_compile"><\/a>$/;"	a
 pydoc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pydoc"><\/a>$/;"	a
@@ -809,9 +1039,7 @@ run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
 run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
 runpy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="runpy"><\/a>$/;"	a
-s:l	Session.vim	/^let s:l = 49 - ((18 * winheight(0) + 18) \/ 37)$/;"	v
-s:save_winminheight	Session.vim	/^let s:save_winminheight = &winminheight$/;"	v
-s:save_winminwidth	Session.vim	/^let s:save_winminwidth = &winminwidth$/;"	v
+s:l	Session.vim	/^let s:l = 3 - ((2 * winheight(0) + 19) \/ 38)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
@@ -841,7 +1069,7 @@ sre_constants	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="sre_c
 sre_parse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="sre_parse"><\/a>$/;"	a
 ssl	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ssl"><\/a>$/;"	a
 start	src/arithmetic_nodes.py	/^    start = """# codeaa(e1)$/;"	v	class:ArithmeticUnaryOperationNode
-start	src/arithmetic_nodes.py	/^    start = "SUBI SP 1;\\n"$/;"	v	class:ArithmeticVariableConstantNode
+start	src/arithmetic_nodes.py	/^    start = "SUBI SP 1;\\n"$/;"	v	class:ArithmeticVariableConstant
 start	src/function_nodes.py	/^    start = "LOADI SP eds;\\n"$/;"	v	class:MainFunctionNode
 start	src/if_else_nodes.py	/^    start = """# codela(l)$/;"	v	class:IfElseNode
 start	src/if_else_nodes.py	/^    start = """# codela(l)$/;"	v	class:IfNode
@@ -868,7 +1096,7 @@ tarfile	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tarfile"><\
 taste	src/parser_.py	/^    def taste(self, rule, errors):$/;"	m	class:BacktrackingParser
 tempfile	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tempfile"><\/a>$/;"	a
 termios	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="termios"><\/a>$/;"	a
-test	.misc/python_match_args_example.py	/^test = Test("asdf", 12, 3)$/;"	v
+test	.misc/python_match_args_example.py	/^test = Test(Apple(3), 12, 4)$/;"	v
 test	Makefile	/^test:$/;"	t
 test_allocation	test/parser_test.py	/^    def test_allocation(self, ):$/;"	m	class:TestAssignmentGrammar
 test_basic_arithmetic_expression	test/parser_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
@@ -949,6 +1177,7 @@ toml.tz	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="toml.tz"><\
 tomli	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tomli"><\/a>$/;"	a
 tomli._parser	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tomli._parser"><\/a>$/;"	a
 tomli._re	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tomli._re"><\/a>$/;"	a
+tomli._types	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tomli._types"><\/a>$/;"	a
 traceback	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="traceback"><\/a>$/;"	a
 tracemalloc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tracemalloc"><\/a>$/;"	a
 tty	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tty"><\/a>$/;"	a
@@ -975,11 +1204,11 @@ urllib.parse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib
 urllib.request	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib.request"><\/a>$/;"	a
 urllib.response	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib.response"><\/a>$/;"	a
 uu	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="uu"><\/a>$/;"	a
-variable_identifier	src/arithmetic_nodes.py	/^    variable_identifier = "LOAD ACC var_identifier;\\n"$/;"	v	class:ArithmeticVariableConstantNode
-visit	src/abstract_syntax_tree.py	/^    def visit(self, ):$/;"	m	class:TokenNode
+variable	src/assignment_allocation_nodes.py	/^    variable = None$/;"	v	class:AssignmentNode
+variable_identifier	src/arithmetic_nodes.py	/^    variable_identifier = "LOAD ACC var_identifier;\\n"$/;"	v	class:ArithmeticVariableConstant
 visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticBinaryOperationNode
 visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticUnaryOperationNode
-visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticVariableConstantNode
+visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticVariableConstant
 visit	src/assignment_allocation_nodes.py	/^    def visit(self, ):$/;"	m	class:AllocationNode
 visit	src/assignment_allocation_nodes.py	/^    def visit(self, ):$/;"	m	class:AssignmentNode
 visit	src/function_nodes.py	/^    def visit(self, ):$/;"	m	class:MainFunctionNode
@@ -1000,8 +1229,14 @@ wcwidth.unicode_versions	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a 
 wcwidth.wcwidth	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="wcwidth.wcwidth"><\/a>$/;"	a
 weakref	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="weakref"><\/a>$/;"	a
 webbrowser	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="webbrowser"><\/a>$/;"	a
+win32pdh	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="win32pdh"><\/a>$/;"	a
 winreg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="winreg"><\/a>$/;"	a
 xml	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml"><\/a>$/;"	a
+xml.etree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.etree"><\/a>$/;"	a
+xml.etree.ElementInclude	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.etree.ElementInclude"><\/a>$/;"	a
+xml.etree.ElementPath	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.etree.ElementPath"><\/a>$/;"	a
+xml.etree.ElementTree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.etree.ElementTree"><\/a>$/;"	a
+xml.etree.cElementTree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.etree.cElementTree"><\/a>$/;"	a
 xml.parsers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.parsers"><\/a>$/;"	a
 xml.parsers.expat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.parsers.expat"><\/a>$/;"	a
 xml.sax	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="xml.sax"><\/a>$/;"	a

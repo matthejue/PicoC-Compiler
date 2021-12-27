@@ -1,21 +1,22 @@
 import global_vars
+from lexer import Token
+from abstract_syntax_tree import ASTNode
 
 
 class ASTBuilder:
     """Provides methods for ast construction"""
     def __init__(self):
-        # TODO: root in ast umbenennen
         self.root = None
         self.current_node = None
 
-    def CN(self):
+    def CN(self) -> ASTNode:
         """Current node
 
         :returns: Node
         """
         return self.current_node
 
-    def down(self, classname, token):
+    def down(self, classname):
         """go one layer down in the abstract syntax tree
 
         :returns: None
@@ -24,7 +25,7 @@ class ASTBuilder:
         if global_vars.is_tasting:
             return
 
-        new_node = classname(token)
+        new_node = classname()
         if not self.root:
             self.root = new_node
         else:

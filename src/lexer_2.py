@@ -213,8 +213,8 @@ def _division_sign_or_comment(self, ):
         self.lc_col = len(self.input[self.lc_row]) - 1
         self.next_char()
     elif self.lc == '*':
-        while not (self.lc == '/' and self.c == '*' or
-                   self.lc == self.EOF_CHAR):
+        while not (self.lc == '/' and self.c == '*'
+                   or self.lc == self.EOF_CHAR):
             self.next_char()
         self.next_char()
     else:
