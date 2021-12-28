@@ -7,7 +7,7 @@
         "type": "python",
         "request": "launch",
         "cwd": "${workspaceFolder}",
-        "python": "/usr/bin/python3.10",
+        "python": "/usr/bin/python",
         "stopOnEntry": true,
         "justMyCode": true,
         "console": "externalTerminal",
