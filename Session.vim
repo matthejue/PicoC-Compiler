@@ -10,9 +10,9 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-$argadd ~/Documents/Studium/pico_c_compiler/.misc/lexer
 edit lexer.py
 argglobal
+balt lexer.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -31,7 +31,7 @@ keepjumps 137
 normal! 037|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +32 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +0 ~/Documents/Studium/pico_c_compiler/src/lexer.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

@@ -39,16 +39,18 @@ class TT(Enum):
     OR_OP = "|"
     OPLUS_OP = "^"
     NOT_OP = "~"
+    BITSHIFT_L = "<<"
+    BITSHIFT_R = ">>"
     EQ_COMP = "=="
     UEQ_COMP = "!="
     LT_COMP = "<"
     GT_COMP = ">"
     LE_COMP = "<="
     GE_COMP = ">="
+    ASSIGNMENT = "="
     NOT = "!"
     AND = "&&"
     OR = "||"
-    ASSIGNMENT = "="
     L_PAREN = "("
     R_PAREN = ")"
     L_BRACE = "{"
@@ -68,6 +70,9 @@ class TT(Enum):
     EOF = "end of file"
 
 
+# STRING_TO_TT = filter(lambda tt: not tt.startswith('__'), dir(TT))
+
+
 class Lexer:
     """Identifies tokens in the picoC code
 
@@ -84,7 +89,7 @@ class Lexer:
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
     LETTER_DIGIT_SPACE = LETTER_DIGIT + ' '
-    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']
+    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>', '!']
 
     def __init__(self, fname, input):
         """
@@ -129,9 +134,17 @@ class Lexer:
                     token = self._division_sign_or_comment()
                     if token:
                         return token
+                case self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
+                    return self._comp_operator_assignment_bitshift()
+                case '!':
+                    return self._not()
                 case '%':
                     self.next_char()
                     return Token(TT.MOD_OP, self.c, self.position)
+                case '&':
+                    return self._and()
+                case '|':
+                    return self._or()
                 case '^':
                     self.next_char()
                     return Token(TT.OPLUS_OP, self.c, self.position)
@@ -161,14 +174,6 @@ class Lexer:
                     return Token(TT.NUMBER, self.c, self.position)
                 case self.LETTER:
                     return self._identifier_special_keyword()
-                case '!':
-                    return self._not()
-                case '&':
-                    return self._and()
-                case '|':
-                    return self._or()
-                case self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
-                    return self._comp_operator_assignment_bitshift()
                 case _:
                     raise InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)

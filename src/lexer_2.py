@@ -151,7 +151,7 @@ def _and(self):
     if self.lc == '&':
         self.next_char()
         return Token(TT.AND, "&&", self.position)
-    return Token(TT.BINOP_PREC_1, self.c, self.position)
+    return Token(TT.AND_OP, self.c, self.position)
 
 
 def _or(self):
@@ -164,7 +164,7 @@ def _or(self):
     if self.lc == '|':
         self.next_char()
         return Token(TT.OR, "||", self.position)
-    return Token(TT.BINOP_PREC_1, self.c, self.position)
+    return Token(TT.OR_OP, self.c, self.position)
 
 
 def _comp_operator_assignment_bitshift(self):
@@ -177,26 +177,26 @@ def _comp_operator_assignment_bitshift(self):
         self.next_char()
         if self.lc == '=':
             self.next_char()
-            return Token(TT.COMP_OP, "==", self.position)
+            return Token(TT.EQ_COMP, "==", self.position)
         return Token(TT.ASSIGNMENT, '=', self.position)
     elif self.lc == '<':
         self.next_char()
         if self.lc == '=':
             self.next_char()
-            return Token(TT.COMP_OP, "<=", self.position)
+            return Token(TT.LE_COMP, "<=", self.position)
         elif self.lc == '<':
             self.next_char()
-            return Token(TT.BITSHIFT, "<<", self.position)
-        return Token(TT.COMP_OP, self.c, self.position)
+            return Token(TT.BITSHIFT_L, "<<", self.position)
+        return Token(TT.LT_COMP, self.c, self.position)
     elif self.lc == '>':
         self.next_char()
         if self.lc == '=':
             self.next_char()
-            return Token(TT.COMP_OP, ">=", self.position)
+            return Token(TT.GE_COMP, ">=", self.position)
         elif self.lc == '>':
             self.next_char()
-            return Token(TT.BINOP_PREC_1, ">>", self.position)
-        return Token(TT.COMP_OP, self.c, self.position)
+            return Token(TT.BITSHIFT_R, ">>", self.position)
+        return Token(TT.GT_COMP, self.c, self.position)
 
 
 def _division_sign_or_comment(self, ):
@@ -218,4 +218,4 @@ def _division_sign_or_comment(self, ):
             self.next_char()
         self.next_char()
     else:
-        return Token(TT.BINOP_PREC_1, self.c, self.position)
+        return Token(TT.DIV_OP, self.c, self.position)
