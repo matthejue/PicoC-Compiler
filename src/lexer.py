@@ -29,44 +29,43 @@ class TT(Enum):
     """Tokentypes that are part of the grammar. Their strings are used for
     differentiation and for error messages"""
 
-    EOF = "end of file"
-    UNARY_OP = "unary operator"
-    BINOP_PREC_1 = "binary operator with precedence 1"
-    BINOP_PREC_2 = "binary operator with precedence 2"
+    SEMICOLON = ";"
     PLUS_OP = "+"
     MINUS_OP = "-"
-    MUL_OP = "-"
+    MUL_OP = "*"
     DIV_OP = "/"
     MOD_OP = "%"
+    AND_OP = "&"
+    OR_OP = "|"
     OPLUS_OP = "^"
+    NOT_OP = "~"
+    EQ_COMP = "=="
+    UEQ_COMP = "!="
+    LT_COMP = "<"
+    GT_COMP = ">"
+    LE_COMP = "<="
+    GE_COMP = ">="
+    NOT = "!"
+    AND = "&&"
+    OR = "||"
     ASSIGNMENT = "="
     L_PAREN = "("
     R_PAREN = ")"
     L_BRACE = "{"
     R_BRACE = "}"
-    SEMICOLON = ";"
-    MINUS = "-"
-    ALLOC = "allocation"
-    STATEMENT = "statement"
-    FUNCTION = "function"
-    NOT = "!"
-    AND_OP = "&"
-    OR_OP = "|"
-    AND = "&&"
-    OR = "||"
-    COMP_OP = "comparison operator"
+    CONST = "const"  # constant qualifier
+    VAR = "var"  # var qualifier
+    INT = "int"
+    CHAR = "char"
     NUMBER = "number"
-    CHAR = "character"
-    IDENTIFIER = "identifier"
-    CONST = "constant qualifier"
-    VAR = "variable qualifier"
-    PRIM_DT = "primitive datatype"
+    MAIN = "main"
     IF = "if"
-    ELSE = "else"
+    IF_ELSE = "if else"
     WHILE = "while"
     DO_WHILE = "do while"
-    MAIN = "main function"
-    TO_BOOL = "convert to boolean value"
+    IDENTIFIER = "identifier"
+    TO_BOOL = "to bool"
+    EOF = "end of file"
 
 
 class Lexer:
@@ -109,63 +108,69 @@ class Lexer:
         """
         while self.lc != self.EOF_CHAR:
             self.position = (self.lc_row, self.lc_col)
-            # TODO: remove \n again
-            if self.lc in ' \t':
-                self.next_char()
-            elif self.lc == ';':
-                self.next_char()
-                return Token(TT.SEMICOLON, self.c, self.position)
-            elif self.lc in '*%^':
-                self.next_char()
-                return Token(TT.BINOP_PREC_1, self.c, self.position)
-            elif self.lc == '/':
-                token = self._division_sign_or_comment()
-                if token:
-                    return token
-            elif self.lc == '+':
-                self.next_char()
-                return Token(TT.BINOP_PREC_2, self.c, self.position)
-            elif self.lc == '-':
-                # minus has a special role because it can be both a unary and
-                # binary operator
-                self.next_char()
-                return Token(TT.MINUS, self.c, self.position)
-            elif self.lc == '~':
-                # minus has a special role because it can be both a unary and
-                # binary operator
-                self.next_char()
-                return Token(TT.UNARY_OP, self.c, self.position)
-            elif self.lc == '(':
-                self.next_char()
-                return Token(TT.L_PAREN, self.c, self.position)
-            elif self.lc == ')':
-                self.next_char()
-                return Token(TT.R_PAREN, self.c, self.position)
-            elif self.lc == '{':
-                self.next_char()
-                return Token(TT.L_BRACE, self.c, self.position)
-            elif self.lc == '}':
-                self.next_char()
-                return Token(TT.R_BRACE, self.c, self.position)
-            elif self.lc in self.DIGIT_WITHOUT_ZERO:
-                return self._number()
-            elif self.lc == "'":
-                return self._character()
-            elif self.lc == '0':
-                self.next_char()
-                return Token(TT.NUMBER, self.c, self.position)
-            elif self.lc in self.LETTER:
-                return self._identifier_special_keyword()
-            elif self.lc == '!':
-                return self._not()
-            elif self.lc == '&':
-                return self._and()
-            elif self.lc == '|':
-                return self._or()
-            elif self.lc in self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
-                return self._comp_operator_assignment_bitshift()
-            else:
-                raise InvalidCharacterError(self.lc, self.position)
+            match self.lc:
+                case '\t':
+                    self.next_char()
+                case ';':
+                    self.next_char()
+                    return Token(TT.SEMICOLON, self.c, self.position)
+                case '+':
+                    self.next_char()
+                    return Token(TT.PLUS_OP, self.c, self.position)
+                case '-':
+                    # minus has a special role because it can be both a unary and
+                    # binary operator
+                    self.next_char()
+                    return Token(TT.MINUS_OP, self.c, self.position)
+                case '*':
+                    self.next_char()
+                    return Token(TT.MUL_OP, self.c, self.position)
+                case '/':
+                    token = self._division_sign_or_comment()
+                    if token:
+                        return token
+                case '%':
+                    self.next_char()
+                    return Token(TT.MOD_OP, self.c, self.position)
+                case '^':
+                    self.next_char()
+                    return Token(TT.OPLUS_OP, self.c, self.position)
+                case '~':
+                    # minus has a special role because it can be both a unary and
+                    # binary operator
+                    self.next_char()
+                    return Token(TT.UNARY_OP, self.c, self.position)
+                case '(':
+                    self.next_char()
+                    return Token(TT.L_PAREN, self.c, self.position)
+                case ')':
+                    self.next_char()
+                    return Token(TT.R_PAREN, self.c, self.position)
+                case '{':
+                    self.next_char()
+                    return Token(TT.L_BRACE, self.c, self.position)
+                case '}':
+                    self.next_char()
+                    return Token(TT.R_BRACE, self.c, self.position)
+                case self.DIGIT_WITHOUT_ZERO:
+                    return self._number()
+                case "'":
+                    return self._character()
+                case '0':
+                    self.next_char()
+                    return Token(TT.NUMBER, self.c, self.position)
+                case self.LETTER:
+                    return self._identifier_special_keyword()
+                case '!':
+                    return self._not()
+                case '&':
+                    return self._and()
+                case '|':
+                    return self._or()
+                case self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
+                    return self._comp_operator_assignment_bitshift()
+                case _:
+                    raise InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)
 
     def next_char(self):

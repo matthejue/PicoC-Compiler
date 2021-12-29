@@ -18,7 +18,6 @@
 1	.vimspector.json	/^          ".\/output.reti",$/;"	s	array:configurations.Debug.configuration.args
 2	.vimspector.json	/^          "-p",$/;"	s	array:configurations.Debug.configuration.args
 3	.vimspector.json	/^          "-S"$/;"	s	array:configurations.Debug.configuration.args
-ALLOC	src/lexer.py	/^    ALLOC = "allocation"$/;"	v	class:TT
 AND	src/lexer.py	/^    AND = "&&"$/;"	v	class:TT
 AND_OP	src/lexer.py	/^    AND_OP = "&"$/;"	v	class:TT
 ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
@@ -33,31 +32,32 @@ ArithmeticUnaryOperationNode	src/arithmetic_nodes.py	/^class ArithmeticUnaryOper
 ArithmeticVariableConstant	src/arithmetic_nodes.py	/^class ArithmeticVariableConstant(ASTNode):$/;"	c
 AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
 AssignmentNode	src/assignment_allocation_nodes.py	/^class AssignmentNode(ASTNode):$/;"	c
-BINOP_PREC_1	src/lexer.py	/^    BINOP_PREC_1 = "binary operator with precedence 1"$/;"	v	class:TT
-BINOP_PREC_2	src/lexer.py	/^    BINOP_PREC_2 = "binary operator with precedence 2"$/;"	v	class:TT
 BacktrackingParser	src/parser_.py	/^class BacktrackingParser():$/;"	c
 BuiltInTypeSymbol	src/symbol_table.py	/^class BuiltInTypeSymbol(Symbol):$/;"	c
-CHAR	src/lexer.py	/^    CHAR = "character"$/;"	v	class:TT
-CN	src/ast_builder.py	/^    def CN(self):$/;"	m	class:ASTBuilder
-COMP_OP	src/lexer.py	/^    COMP_OP = "comparison operator"$/;"	v	class:TT
+CHAR	src/lexer.py	/^    CHAR = "char"$/;"	v	class:TT
+CN	src/ast_builder.py	/^    def CN(self) -> ASTNode:$/;"	m	class:ASTBuilder	typeref:typename:ASTNode
 COMP_OPERATOR_ASSIGNMENT_BITSHIFT	src/lexer.py	/^    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>']$/;"	v	class:Lexer
-CONST	src/lexer.py	/^    CONST = "constant qualifier"$/;"	v	class:TT
+CONST	src/lexer.py	/^    CONST = "const"  # constant qualifier$/;"	v	class:TT
 CodeGenerator	src/code_generator.py	/^def CodeGenerator():$/;"	f
 ConstantSymbol	src/symbol_table.py	/^class ConstantSymbol(Symbol):$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
 DIGIT_WITH_ZERO	src/lexer.py	/^    DIGIT_WITH_ZERO = "0123456789"$/;"	v	class:Lexer
+DIV_OP	src/lexer.py	/^    DIV_OP = "\/"$/;"	v	class:TT
 DO_WHILE	src/lexer.py	/^    DO_WHILE = "do while"$/;"	v	class:TT
 Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
 DoWhileNode	src/loop_nodes.py	/^class DoWhileNode(ASTNode):$/;"	c
-ELSE	src/lexer.py	/^    ELSE = "else"$/;"	v	class:TT
 EOF	src/lexer.py	/^    EOF = "end of file"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = "EOF"$/;"	v	class:Lexer
+EQ_COMP	src/lexer.py	/^    EQ_COMP = "=="$/;"	v	class:TT
 ErrorHandler	src/error_handler.py	/^class ErrorHandler:$/;"	c
-FUNCTION	src/lexer.py	/^    FUNCTION = "function"$/;"	v	class:TT
 FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementGrammar):$/;"	c
+GE_COMP	src/lexer.py	/^    GE_COMP = ">="$/;"	v	class:TT
+GT_COMP	src/lexer.py	/^    GT_COMP = ">"$/;"	v	class:TT
 Grammar	src/grammar.py	/^class Grammar(FunctionGrammar):$/;"	c
 IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
 IF	src/lexer.py	/^    IF = "if"$/;"	v	class:TT
+IF_ELSE	src/lexer.py	/^    IF_ELSE = "if else"$/;"	v	class:TT
+INT	src/lexer.py	/^    INT = "int"$/;"	v	class:TT
 IfElseNode	src/if_else_nodes.py	/^class IfElseNode(ASTNode):$/;"	c
 IfNode	src/if_else_nodes.py	/^class IfNode(ASTNode):$/;"	c
 InvalidCharacterError	src/errors.py	/^class InvalidCharacterError(Exception):$/;"	c
@@ -65,8 +65,10 @@ LENGTH_COMMENT_TOKEN	src/error_handler.py	/^    LENGTH_COMMENT_TOKEN = 2$/;"	v	c
 LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
 LETTER_DIGIT	src/lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'$/;"	v	class:Lexer
 LETTER_DIGIT_SPACE	src/lexer.py	/^    LETTER_DIGIT_SPACE = LETTER_DIGIT + ' '$/;"	v	class:Lexer
+LE_COMP	src/lexer.py	/^    LE_COMP = "<="$/;"	v	class:TT
 LT	src/parser_.py	/^    def LT(self, i):$/;"	m	class:BacktrackingParser
 LTT	src/parser_.py	/^    def LTT(self, i):$/;"	m	class:BacktrackingParser
+LT_COMP	src/lexer.py	/^    LT_COMP = "<"$/;"	v	class:TT
 L_BRACE	src/lexer.py	/^    L_BRACE = "{"$/;"	v	class:TT
 L_PAREN	src/lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
 Lexer	src/lexer.py	/^class Lexer:$/;"	c
@@ -75,22 +77,25 @@ LogicAtomNode	src/logic_nodes.py	/^class LogicAtomNode(ASTNode):$/;"	c
 LogicExpressionGrammar	src/logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
 LogicNotNode	src/logic_nodes.py	/^class LogicNotNode(ASTNode):$/;"	c
 LogicTopBottomNode	src/logic_nodes.py	/^class LogicTopBottomNode(ASTNode):$/;"	c
-MAIN	src/lexer.py	/^    MAIN = "main function"$/;"	v	class:TT
-MINUS	src/lexer.py	/^    MINUS = "-"$/;"	v	class:TT
+MAIN	src/lexer.py	/^    MAIN = "main"$/;"	v	class:TT
+MINUS_OP	src/lexer.py	/^    MINUS_OP = "-"$/;"	v	class:TT
+MOD_OP	src/lexer.py	/^    MOD_OP = "%"$/;"	v	class:TT
+MUL_OP	src/lexer.py	/^    MUL_OP = "*"$/;"	v	class:TT
 MainFunctionNode	src/function_nodes.py	/^class MainFunctionNode(ASTNode):$/;"	c
 MismatchedTokenError	src/errors.py	/^class MismatchedTokenError(Exception):$/;"	c
 NOT	src/lexer.py	/^    NOT = "!"$/;"	v	class:TT
+NOT_OP	src/lexer.py	/^    NOT_OP = "~"$/;"	v	class:TT
 NUMBER	src/lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
 NoApplicableRuleError	src/errors.py	/^class NoApplicableRuleError(Exception):$/;"	c
 ONLY_FOUND	src/error_handler.py	/^    ONLY_FOUND = -1$/;"	v	class:States
+OPLUS_OP	src/lexer.py	/^    OPLUS_OP = "^"$/;"	v	class:TT
 OR	src/lexer.py	/^    OR = "||"$/;"	v	class:TT
 OR_OP	src/lexer.py	/^    OR_OP = "|"$/;"	v	class:TT
-PRIM_DT	src/lexer.py	/^    PRIM_DT = "primitive datatype"$/;"	v	class:TT
+PLUS_OP	src/lexer.py	/^    PLUS_OP = "+"$/;"	v	class:TT
 Pico-C Compiler	README.md	/^# Pico-C Compiler$/;"	c
 R_BRACE	src/lexer.py	/^    R_BRACE = "}"$/;"	v	class:TT
 R_PAREN	src/lexer.py	/^    R_PAREN = ")"$/;"	v	class:TT
 SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
-STATEMENT	src/lexer.py	/^    STATEMENT = "statement"$/;"	v	class:TT
 Scope	src/symbol_table.py	/^class Scope:$/;"	c
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
 StatementGrammar	src/statement_grammar.py	/^class StatementGrammar(AssignmentAllocationGrammar):$/;"	c
@@ -99,7 +104,7 @@ Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
 SymbolTable	src/symbol_table.py	/^def SymbolTable():$/;"	f
 TEST_BINARY_BASENAMES	Makefile	/^TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard .\/test\/*_test.py))$/;"	m
 TEST_BINARY_PATHS	Makefile	/^TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test\/$(test_binary))$/;"	m
-TO_BOOL	src/lexer.py	/^    TO_BOOL = "convert to boolean value"$/;"	v	class:TT
+TO_BOOL	src/lexer.py	/^    TO_BOOL = "to bool"$/;"	v	class:TT
 TT	src/lexer.py	/^class TT(Enum):$/;"	c
 Test	.misc/python_match_args_example.py	/^class Test:$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
@@ -116,14 +121,14 @@ TestLoopGrammar	test/parser_test.py	/^class TestLoopGrammar(unittest.TestCase, U
 TestPrograms	test/execution_test.py	/^class TestPrograms(unittest.TestCase, UsefullTools):$/;"	c
 TestStatementGrammar	test/parser_test.py	/^class TestStatementGrammar(unittest.TestCase, UsefullTools):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
-UNARY_OP	src/lexer.py	/^    UNARY_OP = "unary operator"$/;"	v	class:TT
+UEQ_COMP	src/lexer.py	/^    UEQ_COMP = "!="$/;"	v	class:TT
 UnclosedCharacterError	src/errors.py	/^class UnclosedCharacterError(Exception):$/;"	c
 UnknownIdentifierError	src/errors.py	/^class UnknownIdentifierError(Exception):$/;"	c
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
 Used Resources	README.md	/^## Used Resources$/;"	s	chapter:Pico-C Compiler
 Useful sites	README.md	/^## Useful sites$/;"	s	chapter:Pico-C Compiler
 UsefullTools	test/testing_helpers.py	/^class UsefullTools():$/;"	c
-VAR	src/lexer.py	/^    VAR = "variable qualifier"$/;"	v	class:TT
+VAR	src/lexer.py	/^    VAR = "var"  # var qualifier$/;"	v	class:TT
 VariableSymbol	src/symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
 WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
 WhileNode	src/loop_nodes.py	/^class WhileNode(ASTNode):$/;"	c
@@ -132,7 +137,7 @@ _SymbolTable	src/symbol_table.py	/^class _SymbolTable(Scope):$/;"	c
 __future__	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="__future__"><\/a>$/;"	a
 __init__	.misc/python_match_args_example.py	/^    def __init__(self, *args):$/;"	m	class:Apple
 __init__	.misc/python_match_args_example.py	/^    def __init__(self, *args):$/;"	m	class:Test
-__init__	src/abstract_syntax_tree.py	/^    def __init__(self, tokentype):$/;"	m	class:ASTNode
+__init__	src/abstract_syntax_tree.py	/^    def __init__(self, token=None):$/;"	m	class:ASTNode
 __init__	src/arithmetic_expression_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:ArithmeticExpressionGrammar
 __init__	src/assignment_allocation_grammar.py	/^    def __init__(self, lexer):$/;"	m	class:AssignmentAllocationGrammar
 __init__	src/ast_builder.py	/^    def __init__(self):$/;"	m	class:ASTBuilder
@@ -163,7 +168,7 @@ __match_args__	src/arithmetic_nodes.py	/^    __match_args__ = ("left_operand", "
 __match_args__	src/arithmetic_nodes.py	/^    __match_args__ = ("variable_constant", )$/;"	v	class:ArithmeticVariableConstant	file:
 __match_args__	src/assignment_allocation_nodes.py	/^    __match_args__ = ("const_or_var", "prim_datatype", "identifier")$/;"	v	class:AllocationNode	file:
 __match_args__	src/assignment_allocation_nodes.py	/^    __match_args__ = ("variable", "expression")$/;"	v	class:AssignmentNode	file:
-__match_args__	src/lexer.py	/^    __match_args__ = ("value")$/;"	v	class:Token	file:
+__match_args__	src/lexer.py	/^    __match_args__ = ("type")$/;"	v	class:Token	file:
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
 __repr__	src/assignment_allocation_nodes.py	/^    def __repr__(self, ):$/;"	m	class:AllocationNode
 __repr__	src/lexer.py	/^    def __repr__(self):$/;"	m	class:Token
@@ -321,7 +326,6 @@ _unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:Ar
 _update_match_args	src/arithmetic_nodes.py	/^    def _update_match_args(self):$/;"	m	class:ArithmeticBinaryOperationNode
 _update_match_args	src/arithmetic_nodes.py	/^    def _update_match_args(self):$/;"	m	class:ArithmeticVariableConstant
 _update_match_args	src/assignment_allocation_nodes.py	/^    def _update_match_args(self):$/;"	m	class:AllocationNode
-_update_match_args	src/assignment_allocation_nodes.py	/^    def _update_match_args(self):$/;"	m	class:AssignmentNode
 _warnings	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_warnings"><\/a>$/;"	a
 _weakref	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakref"><\/a>$/;"	a
 _weakrefset	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakrefset"><\/a>$/;"	a
@@ -331,7 +335,6 @@ _winreg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_winreg"><\
 abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abc"><\/a>$/;"	a
 abstract_syntax_tree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abstract_syntax_tree"><\/a>$/;"	a
 adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configurations.Debug
-addChild	src/loop_nodes.py	/^    def addChild(self, node):$/;"	m	class:DoWhileNode
 add_child	src/abstract_syntax_tree.py	/^    def add_child(self, node):$/;"	m	class:ASTNode
 add_code	src/code_generator.py	/^    def add_code(self, code, loc):$/;"	m	class:_CodeGenerator
 add_marker	src/code_generator.py	/^    def add_marker(self, ):$/;"	m	class:_CodeGenerator
@@ -453,6 +456,7 @@ decimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="decimal"><\
 define	src/symbol_table.py	/^    def define(self, sym):$/;"	m	class:Scope
 determine	src/abstract_syntax_tree.py	/^    def determine(self, token):$/;"	m	class:ASTNode
 determine	src/assignment_allocation_nodes.py	/^    def determine(self, token):$/;"	m	class:AssignmentNode
+determine	src/loop_nodes.py	/^    def determine(self, token):$/;"	m	class:DoWhileNode
 difflib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="difflib"><\/a>$/;"	a
 dis	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="dis"><\/a>$/;"	a
 distutils	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils"><\/a>$/;"	a
@@ -471,7 +475,7 @@ distutils.sysconfig	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name=
 distutils.text_file	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.text_file"><\/a>$/;"	a
 distutils.util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="distutils.util"><\/a>$/;"	a
 doctest	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="doctest"><\/a>$/;"	a
-down	src/ast_builder.py	/^    def down(self, classname, token):$/;"	m	class:ASTBuilder
+down	src/ast_builder.py	/^    def down(self, classname):$/;"	m	class:ASTBuilder
 dummy_threading	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="dummy_threading"><\/a>$/;"	a
 email	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="email"><\/a>$/;"	a
 email._encoded_words	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="email._encoded_words"><\/a>$/;"	a
@@ -681,6 +685,7 @@ http.cookiejar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http
 http.server	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http.server"><\/a>$/;"	a
 if_else_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="if_else_grammar"><\/a>$/;"	a
 if_else_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="if_else_nodes"><\/a>$/;"	a
+ignore	src/abstract_syntax_tree.py	/^    def ignore(self, ):$/;"	m	class:ASTNode
 importlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="importlib"><\/a>$/;"	a
 importlib._bootstrap	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="importlib._bootstrap"><\/a>$/;"	a
 importlib._bootstrap_external	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="importlib._bootstrap_external"><\/a>$/;"	a
@@ -726,9 +731,9 @@ main	.misc/pico_c_compiler	/^def main():$/;"	f
 main	.misc/test.cpp	/^int main() {$/;"	f	typeref:typename:int
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 marshal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="marshal"><\/a>$/;"	a
-match	src/parser_.py	/^    def match(self, token):$/;"	m	class:BacktrackingParser
-match_and_add	src/parser_.py	/^    def match_and_add(self, tokentype, classname):$/;"	m	class:BacktrackingParser
-match_and_determine	src/parser_.py	/^    def match_and_determine(self, tokentype):$/;"	m	class:BacktrackingParser
+match	src/parser_.py	/^    def match(self, tokentypes):$/;"	m	class:BacktrackingParser
+match_and_add	src/parser_.py	/^    def match_and_add(self, tokentypes, classname):$/;"	m	class:BacktrackingParser
+match_and_determine	src/parser_.py	/^    def match_and_determine(self, tokentypes):$/;"	m	class:BacktrackingParser
 math	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="math"><\/a>$/;"	a
 middle	src/if_else_nodes.py	/^    middle = """JUMP codelength(af2) + 1;$/;"	v	class:IfElseNode
 middle_loc	src/if_else_nodes.py	/^    middle_loc = 1$/;"	v	class:IfElseNode
@@ -1008,7 +1013,7 @@ pyi_rth_inspect.py	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="
 pyi_rth_multiprocessing.py	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pyi_rth_multiprocessing.py"><\/a>$/;"	a
 pyi_rth_pkgutil.py	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pyi_rth_pkgutil.py"><\/a>$/;"	a
 pyimod03_importers	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pyimod03_importers"><\/a>$/;"	a
-python	.vimspector.json	/^        "python": "\/usr\/bin\/python3.10",$/;"	s	object:configurations.Debug.configuration
+python	.vimspector.json	/^        "python": "\/usr\/bin\/python",$/;"	s	object:configurations.Debug.configuration
 python.linting.enabled	.vim/coc-settings.json	/^  "python.linting.enabled": true,$/;"	b
 python.linting.flake8Enabled	.vim/coc-settings.json	/^  "python.linting.flake8Enabled": false$/;"	b
 python.linting.pylintEnabled	.vim/coc-settings.json	/^  "python.linting.pylintEnabled": true,$/;"	b
@@ -1039,7 +1044,7 @@ run-shell-compile	Makefile	/^run-shell-compile:$/;"	t
 run-shell-compile-comments	Makefile	/^run-shell-compile-comments:$/;"	t
 run-shell-tokens	Makefile	/^run-shell-tokens:$/;"	t
 runpy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="runpy"><\/a>$/;"	a
-s:l	Session.vim	/^let s:l = 3 - ((2 * winheight(0) + 19) \/ 38)$/;"	v
+s:l	Session.vim	/^let s:l = 65 - ((32 * winheight(0) + 18) \/ 37)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
