@@ -12,7 +12,7 @@ argglobal
 %argdel
 edit lexer.py
 argglobal
-balt lexer_2.py
+balt ~/Documents/Studium/pico_c_compiler/lexer_2.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -23,19 +23,20 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 12 - ((11 * winheight(0) + 19) / 38)
+let s:l = 180 - ((33 * winheight(0) + 18) / 36)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 12
-normal! 027|
+keepjumps 180
+normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
+badd +0 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +1 ~/Documents/Studium/pico_c_compiler/lexer_2.py
 badd +69 ~/Documents/Studium/pico_c_compiler/src/parser_.py
 badd +28 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
 badd +31 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
 badd +18 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
-badd +12 ~/Documents/Studium/pico_c_compiler/src/lexer.py
 badd +11 ~/Documents/Studium/pico_c_compiler/src/lexer_2.py
 badd +136 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
 badd +3 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
