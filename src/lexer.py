@@ -70,7 +70,9 @@ class TT(Enum):
     EOF = "end of file"
 
 
-# STRING_TO_TT = filter(lambda tt: not tt.startswith('__'), dir(TT))
+SPECIAL_MAPPINGS = ("/", "&", "|", "=", "<", ">", "!")
+STRING_TO_TT = {value.value: value for value in (value for key, value in TT.__dict__.items(
+) if not key.startswith('_') and not callable(key))}
 
 
 class Lexer:
@@ -113,6 +115,13 @@ class Lexer:
         """
         while self.lc != self.EOF_CHAR:
             self.position = (self.lc_row, self.lc_col)
+
+            # match all single characters
+            for char in STRING_TO_TT.keys():
+                if self.lc == char:
+                    self.next_char()
+                    return Token(STRING_TO_TT[string], self.c, self.position)
+
             match self.lc:
                 case '\t':
                     self.next_char()
