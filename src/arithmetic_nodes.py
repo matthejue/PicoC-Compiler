@@ -1,10 +1,10 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
-from lexer import TT
+from lexer import TT, Token
 
 
-class ArithmeticVariableConstant(ASTNode):
+class ArithmeticOperand(ASTNode):
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
     start = "SUBI SP 1;\n"
@@ -22,7 +22,7 @@ class ArithmeticVariableConstant(ASTNode):
 
     def visit(self, ):
         self._update_match_args()
-        self.code_generator.add_code("# Variable / Constant start\n", 0)
+        self.code_generator.add_code("# ArithmeticOperand start\n", 0)
 
         self.code_generator.add_code(self.start, self.all_loc)
 
@@ -34,30 +34,31 @@ class ArithmeticVariableConstant(ASTNode):
 
         self.code_generator.add_code(self.end, self.all_loc)
 
-        self.code_generator.add_code("# Variable / Constant end\n", 0)
+        self.code_generator.add_code("# ArithmeticOperand end\n", 0)
 
     def _insert_identifier(self, ):
-        if self.token.type == TT.IDENTIFIER:
-            var_or_const = self.symbol_table.resolve(self.token.value)
-            if isinstance(var_or_const, VariableSymbol):
-                self.variable_identifier = self.code_generator.replace_code_pre(
-                    self.variable_identifier, "var_identifier",
-                    str(var_or_const.value))
-                self.code_generator.add_code(self.variable_identifier,
-                                             self.all_loc)
-            elif isinstance(var_or_const, ConstantSymbol):
-                self.constant_identifier = self.code_generator.replace_code_pre(
-                    self.constant_identifier, "encode(c)",
-                    str(var_or_const.value))
-                self.code_generator.add_code(self.constant_identifier,
-                                             self.all_loc)
-        elif self.token.type in [TT.NUMBER, TT.CHAR]:
-            self.constant = self.code_generator.replace_code_pre(
-                self.constant, "encode(w)", str(self.token.value))
-            self.code_generator.add_code(self.constant, self.all_loc)
+        match self.token:
+            case Token(TT.IDENTIFIER, value):
+                match self.symbol_table.resolve(value):
+                    case VariableSymbol:
+                        self.variable_identifier = self.code_generator.replace_code_pre(
+                            self.variable_identifier, "var_identifier",
+                            str(var_or_const.value))
+                        self.code_generator.add_code(self.variable_identifier,
+                                                     self.all_loc)
+                    case ConstantSymbol:
+                        self.constant_identifier = self.code_generator.replace_code_pre(
+                            self.constant_identifier, "encode(c)",
+                            str(var_or_const.value))
+                        self.code_generator.add_code(self.constant_identifier,
+                                                     self.all_loc)
+            case (Token(TT.NUMBER, _) | Token(TT.CHAR, _)):
+                self.constant = self.code_generator.replace_code_pre(
+                    self.constant, "encode(w)", str(self.token.value))
+                self.code_generator.add_code(self.constant, self.all_loc)
 
 
-class ArithmeticBinaryOperationNode(ASTNode):
+class ArithmeticBinaryOperation(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic binary operations"""
 
     __match_args__ = ("left_operand", "operation", "right_operand")
@@ -97,7 +98,7 @@ class ArithmeticBinaryOperationNode(ASTNode):
         self.children[1].visit()
 
         match self:
-            case ArithmeticBinaryOperationNode(left_operand, operation, right_operand):
+            case ArithmeticBinaryOperation(left_operand, operation, right_operand):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'e1', str(left_operand))
                 self.end = self.code_generator.replace_code_pre(
@@ -135,7 +136,7 @@ class ArithmeticBinaryOperationNode(ASTNode):
         self.code_generator.add_code("# Arithmetic Binary Operation end\n", 0)
 
 
-class ArithmeticUnaryOperationNode(ASTNode):
+class ArithmeticUnaryOperation(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
     start = """# codeaa(e1)

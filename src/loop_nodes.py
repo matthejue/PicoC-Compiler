@@ -96,9 +96,5 @@ class DoWhileNode(ASTNode):
 
         :returns: None
         """
-        # in case the representative tokens of self appear as attribute of a
-        # TokenNode, the token of self can finally register the right value
-        # Because of e.g. <alloc>: <word> <word> ... one should only take the
-        # first TokenNode matching the possible representative tokens
         self.token = token
         self.token.value = "do while"

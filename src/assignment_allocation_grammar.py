@@ -1,5 +1,4 @@
 from logic_expression_grammar import LogicExpressionGrammar
-from abstract_syntax_tree import TokenNode
 from assignment_allocation_nodes import AssignmentNode, AllocationNode
 from lexer import TT, Token
 from errors import MismatchedTokenError
@@ -66,7 +65,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         if self.LTT(1) == TT.CONST:
             self.match_and_add([TT.CONST])
         else:
-            self.ast_builder.addChild(TokenNode(Token(TT.VAR, "var", None)))
+            self.ast_builder.addChild(VaraibleNode(Token(TT.VAR, "var", None)))
             # the first child should always identify whether the node is a
             # constant or variable
 

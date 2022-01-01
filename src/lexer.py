@@ -8,7 +8,7 @@ from errors import UnclosedCharacterError
 class Token():
     """Identifies what a certiain string slice is"""
 
-    __match_args__ = ("type")
+    __match_args__ = ("type", "value")
 
     def __init__(self, type, value, position):
         """
@@ -76,6 +76,7 @@ class TT(Enum):
 SPECIAL_MAPPINGS = ("&", "|", "=", "<", ">", "!")
 NOT_TO_MAP = ("/", "number", "character", "identifier", "var", "to bool",
               "end of file")
+
 STRING_TO_TT_SIMPLE = {
     value.value: value
     for value in (
@@ -114,7 +115,6 @@ class Lexer:
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
-    LETTER_DIGIT_SPACE = LETTER_DIGIT + ' '
 
     def __init__(self, fname, input):
         """
@@ -199,7 +199,6 @@ class Lexer:
                     raise UnclosedCharacterError("'" + self.c + "'",
                                                  "'" + self.c + self.lc,
                                                  self.position)
-
                 return Token(TT.CHAR, str(ord(char)), self.position)
             elif self.lc == '/':
                 # division or comments

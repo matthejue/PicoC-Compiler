@@ -3,7 +3,6 @@ from lexer import TT
 
 
 class IfNode(ASTNode):
-
     """Abstract Syntax Tree Node for If"""
 
     start = """# codela(l)
@@ -20,8 +19,8 @@ class IfNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.start), self.start_loc)
+        self.code_generator.add_code(strip_multiline_string(self.start),
+                                     self.start_loc)
 
         self.code_generator.add_marker()
 
@@ -29,7 +28,8 @@ class IfNode(ASTNode):
             child.visit()
 
         self.code_generator.replace_code_after(
-            "codelength(af) + 1", self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
+            "codelength(af) + 1",
+            self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
 
         self.code_generator.remove_marker()
 
@@ -37,7 +37,6 @@ class IfNode(ASTNode):
 
 
 class IfElseNode(ASTNode):
-
     """Abstract Syntax Tree Node for Else"""
 
     start = """# codela(l)
@@ -60,8 +59,8 @@ class IfElseNode(ASTNode):
 
         self.children[0].visit()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.start), self.start_loc)
+        self.code_generator.add_code(strip_multiline_string(self.start),
+                                     self.start_loc)
 
         self.code_generator.add_marker()
 
@@ -70,12 +69,13 @@ class IfElseNode(ASTNode):
             child.visit()
 
         self.code_generator.replace_code_after(
-            "codelength(af1) + 2", self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
+            "codelength(af1) + 2",
+            self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.middle), self.middle_loc)
+        self.code_generator.add_code(strip_multiline_string(self.middle),
+                                     self.middle_loc)
 
         self.code_generator.add_marker()
 
@@ -83,14 +83,15 @@ class IfElseNode(ASTNode):
             child.visit()
 
         self.code_generator.replace_code_after(
-            "codelength(af2) + 1", self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
+            "codelength(af2) + 1",
+            self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
 
         self.code_generator.remove_marker()
 
         self.code_generator.add_code("# If Else end\n", 0)
 
     def _idx_of_else_node(self):
-        """Finds out the index of the Else TokenNode whichs marks the border between
+        """Finds out the index of the ElseNode whichs marks the border between
         the If and Else Codeblocks
 
 

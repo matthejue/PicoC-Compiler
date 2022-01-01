@@ -1,7 +1,7 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import (ArithmeticUnaryOperationNode,
-                              ArithmeticBinaryOperationNode,
-                              ArithmeticVariableConstant)
+from arithmetic_nodes import (ArithmeticUnaryOperation,
+                              ArithmeticBinaryOperation,
+                              ArithmeticOperand)
 from errors import MismatchedTokenError
 from lexer import TT
 
@@ -9,6 +9,14 @@ from lexer import TT
 class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
+
+    BINOP_PREC_1 = [TT.MUL_OP, TT.DIV_OP, TT.MOD_OP]
+    BINOP_PREC_2 = [
+        TT.PLUS_OP, TT.MINUS_OP, TT.BITSHIFT_L, TT.BITSHIFT_R, TT.OPLUS_OP,
+        TT.AND_OP, TT.OR_OP
+    ]
+    UNARY_OP = [TT.MINUS_OP, TT.NOT_OP]
+
     def __init__(self, lexer):
         super().__init__(lexer)
 
@@ -26,14 +34,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode)
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
 
         self._prec1()
 
-        while self.LTT(1) in [TT.BINOP_PREC_2, TT.MINUS]:
-            self.match_and_determine([TT.BINOP_PREC_2, TT.MINUS])
+        while self.LTT(1) in self.BINOP_PREC_2:
+            self.match_and_determine(self.BINOP_PREC_2)
 
-            self.ast_builder.down(ArithmeticBinaryOperationNode)
+            self.ast_builder.down(ArithmeticBinaryOperation)
 
             self._prec1()
 
@@ -45,14 +53,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer:  #2 <ao> (<binop_prec1> #2 <ao>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperationNode)
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
 
         self._ao()
 
-        while self.LTT(1) == TT.BINOP_PREC_1:
-            self.match_and_determine([TT.BINOP_PREC_1])
+        while self.LTT(1) in self.BINOP_PREC_1:
+            self.match_and_determine(self.BINOP_PREC_1)
 
-            self.ast_builder.down(ArithmeticBinaryOperationNode)
+            self.ast_builder.down(ArithmeticBinaryOperation)
 
             self._ao()
 
@@ -64,49 +72,19 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: <word> | <number> | <paren> | <unop>
         :returns: None
         """
-        if self.LTT(1) == TT.IDENTIFIER:
-            self._identifier()
-        elif self.LTT(1) == TT.NUMBER:
-            self._number()
-        elif self.LTT(1) == TT.CHAR:
-            self._char()
-        elif self.LTT(1) == TT.L_PAREN:
-            self._paren_arith()
-        elif self.LTT(1) in [TT.MINUS, TT.UNARY_OP]:
-            self._unop()
-        else:
-            raise MismatchedTokenError("aritmetic operand", self.LT(1))
-
-    def _identifier(self, ):
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
-
-        self.match_and_determine([TT.IDENTIFIER])
-
-        self.ast_builder.up(savestate_node)
-
-    def _number(self, ):
-        """number
-
-        :grammar: <number>
-        :returns: None
-        """
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
-
-        self.match_and_determine([TT.NUMBER])
-
-        self.ast_builder.up(savestate_node)
-
-    def _char(self, ):
-        """character
-
-        :grammar: <character>
-        :returns: None
-        """
-        savestate_node = self.ast_builder.down(ArithmeticVariableConstant)
-
-        self.match_and_determine([TT.CHAR])
-
-        self.ast_builder.up(savestate_node)
+        match self.LTT(1):
+            case TT.IDENTIFIER:
+                self.match_and_add([TT.IDENTIFIER], ArithmeticOperand)
+            case TT.NUMBER:
+                self.match_and_add([TT.NUMBER], ArithmeticOperand)
+            case TT.CHARACTER:
+                self.match_and_add([TT.CHARACTER], ArithmeticOperand)
+            case TT.L_PAREN:
+                self._paren_arith()
+            case self.UNARY_OP:
+                self._unop()
+            case _:
+                raise MismatchedTokenError("aritmetic operand", self.LT(1))
 
     def _paren_arith(self):
         """arithmetic parenthesis
@@ -124,14 +102,14 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(ArithmeticUnaryOperationNode)
+        savestate_node = self.ast_builder.down(ArithmeticUnaryOperation)
 
         while True:
-            self.match_and_determine([TT.UNARY_OP, TT.MINUS])
-            if self.LTT(1) not in [TT.UNARY_OP, TT.MINUS]:
+            self.match_and_determine(self.UNARY_OP)
+            if self.LTT(1) not in self.UNARY_OP:
                 break
 
-            self.ast_builder.down(ArithmeticUnaryOperationNode)
+            self.ast_builder.down(ArithmeticUnaryOperation)
 
         self._ao()
 

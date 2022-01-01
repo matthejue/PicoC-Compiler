@@ -2,16 +2,14 @@ from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
 from logic_nodes import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
     LogicTopBottomNode
-from abstract_syntax_tree import TokenNode
 from errors import MismatchedTokenError, NoApplicableRuleError
+from dummy_nodes import ToBoolNode
 import global_vars
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
-
     """The logic expression part of the context free grammar of the piocC
     language"""
-
     def __init__(self, lexer):
         # super().__init__(lexer, num_lts)
         super().__init__(lexer)
@@ -33,8 +31,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         elif self.taste(self.code_le, errors):
             self.code_le()
         else:
-            self._handle_all_tastes_unsuccessful("arithmetic expression or "
-                                                 "logic expression", errors)
+            self._handle_all_tastes_unsuccessful(
+                "arithmetic expression or "
+                "logic expression", errors)
 
     def _handle_all_tastes_unsuccessful(self, expected, errors):
         # if both threw the same error print that error out
@@ -53,12 +52,14 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """
         self.code_ae()
         if self.LTT(1) == TT.COMP_OP or self._is_logical_connective():
-            raise MismatchedTokenError("all besides comparison operators and "
-                                       "logical connectives", self.LT(1))
+            raise MismatchedTokenError(
+                "all besides comparison operators and "
+                "logical connectives", self.LT(1))
 
     def _is_logical_connective(self, ):
         return self.LTT(1) == TT.AND or self.LTT(1) == TT.OR or self.LTT(1)\
             == TT.NOT
+
 
 #     def _taste_consume_le(self):
 #         """taste whether the next expression is a logic expression
@@ -155,13 +156,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(
-            LogicTopBottomNode, [TT.TO_BOOL])
+        savestate_node = self.ast_builder.down(LogicTopBottomNode,
+                                               [TT.TO_BOOL])
 
         # TODO: little hack to to also have a token for bottomnode
         if not global_vars.is_tasting:
             self.ast_builder.addChild(
-                TokenNode(Token(TT.TO_BOOL, "to bool", None)))
+                ToBoolNode(Token(TT.TO_BOOL, "to bool", None)))
 
         self.code_ae()
 

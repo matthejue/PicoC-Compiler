@@ -2,9 +2,7 @@ import global_vars
 
 
 class Symbol:
-
     """Name for a program entity like a variable or function"""
-
     def __init__(self, name, datatype, position, value):
         """
         :name: string
@@ -27,9 +25,7 @@ class Symbol:
 
 
 class VariableSymbol(Symbol):
-
     """Represents a variable definition (name, datatype) in symbol table"""
-
     def __init__(self, name, datatype, position):
         super().__init__(name, datatype, position, None)
 
@@ -38,9 +34,7 @@ class VariableSymbol(Symbol):
 
 
 class ConstantSymbol(Symbol):
-
     """Represents a variable definition (name, datatype) in symbol table"""
-
     def __init__(self, name, datatype, position):
         super().__init__(name, datatype, position, None)
 
@@ -49,9 +43,7 @@ class ConstantSymbol(Symbol):
 
 
 class BuiltInTypeSymbol(Symbol):
-
     """Built in datatypes such as int and char"""
-
     def __init__(self, name):
         super().__init__(name, None, None, None)
 
@@ -60,10 +52,8 @@ class BuiltInTypeSymbol(Symbol):
 
 
 class Scope:
-
     """Code region with with a well-defined boundary which groups symbol
     definitions"""
-
     def __init__(self, ):
         """
 
@@ -102,7 +92,6 @@ class Scope:
 
 
 class _SymbolTable(Scope):
-
     """Datastructure that tracks language symbols"""
 
     _instance = None

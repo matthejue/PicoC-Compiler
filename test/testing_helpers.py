@@ -2,10 +2,8 @@ import sys
 
 
 class Args():
-
     """For the purpose of testing constructed class which simulates the
     intended bahaviour of the args variable in global_vars.py"""
-
     def __init__(self):
         self.tokens = False
         self.ast = True
@@ -51,7 +49,8 @@ class UsefullTools():
         self.grammar = Grammar(self.lexer)
         self.grammar.start_parse()
 
-    def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
+    def set_everything_up_for_visit_multiline(self, test_name,
+                                              code_without_cr):
         global_vars.test_name = test_name
         global_vars.is_tasting = 0
         global_vars.args = Args()
@@ -75,15 +74,15 @@ class UsefullTools():
     def set_everything_up_for_multiline_program(self, test_name, input_string):
         multiline_string = [i.lstrip() for i in input_string.split('\n')]
         multiline_string.pop()
-        self.set_everything_up_for_visit_multiline(
-            test_name, multiline_string)
+        self.set_everything_up_for_visit_multiline(test_name, multiline_string)
 
-    def set_everything_up_for_testing_program_file(self, test_name, programpath):
+    def set_everything_up_for_testing_program_file(self, test_name,
+                                                   programpath):
         with open(programpath) as input:
             code_without_cr = list(
                 map(lambda line: line.strip(), input.readlines()))
-            self.set_everything_up_for_ast_multiline(
-                test_name, code_without_cr)
+            self.set_everything_up_for_ast_multiline(test_name,
+                                                     code_without_cr)
 
 
 if __name__ == 'testing_helpers':
