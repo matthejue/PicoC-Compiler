@@ -10,9 +10,9 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-edit lexer.py
 argglobal
-balt lexer.py
+enew
+balt ~/Documents/Studium/pico_c_compiler/NERD_tree_2
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -20,18 +20,13 @@ setlocal fdi=#
 setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
-setlocal fen
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 137 - ((18 * winheight(0) + 18) / 37)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 137
-normal! 037|
+setlocal nofen
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +0 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +1 ~/Documents/Studium/pico_c_compiler/NERD_tree_2
+badd +75 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +1 ~/Documents/Studium/pico_c_compiler/lexer.py
+badd +41 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

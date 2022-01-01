@@ -2,6 +2,7 @@ from errors import InvalidCharacterError
 from enum import Enum
 import string
 import global_vars
+from errors import UnclosedCharacterError
 
 
 class Token():
@@ -59,20 +60,43 @@ class TT(Enum):
     VAR = "var"  # var qualifier
     INT = "int"
     CHAR = "char"
+    VOID = "void"
     NUMBER = "number"
-    MAIN = "main"
-    IF = "if"
-    IF_ELSE = "if else"
-    WHILE = "while"
-    DO_WHILE = "do while"
+    CHARACTER = "character"
     IDENTIFIER = "identifier"
+    IF = "if"
+    ELSE = "else"
+    WHILE = "while"
+    DO = "do"
+    MAIN = "main"
     TO_BOOL = "to bool"
     EOF = "end of file"
 
 
-SPECIAL_MAPPINGS = ("/", "&", "|", "=", "<", ">", "!")
-STRING_TO_TT = {value.value: value for value in (value for key, value in TT.__dict__.items(
-) if not key.startswith('_') and not callable(key))}
+SPECIAL_MAPPINGS = ("&", "|", "=", "<", ">", "!")
+NOT_TO_MAP = ("/", "number", "character", "identifier", "var", "to bool",
+              "end of file")
+STRING_TO_TT_SIMPLE = {
+    value.value: value
+    for value in (
+        value for key, value in TT.__dict__.items()
+        if not key.startswith('_') and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) < 2)
+}
+STRING_TO_TT_COMPLEX = {
+    value.value: value
+    for value in (
+        value for key, value in TT.__dict__.items()
+        if not key.startswith('_') and value.value not in NOT_TO_MAP
+        and value.value[0] in SPECIAL_MAPPINGS and len(value.value) <= 2)
+}
+STRING_TO_TT_WORDS = {
+    value.value: value
+    for value in (
+        value for key, value in TT.__dict__.items()
+        if not key.startswith('_') and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) >= 2)
+}
 
 
 class Lexer:
@@ -91,7 +115,6 @@ class Lexer:
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
     LETTER_DIGIT_SPACE = LETTER_DIGIT + ' '
-    COMP_OPERATOR_ASSIGNMENT_BITSHIFT = ['=', '<', '>', '!']
 
     def __init__(self, fname, input):
         """
@@ -104,7 +127,7 @@ class Lexer:
         self.lc_col = 0
         self.lc_row = 0
         self.lc = input[self.lc_row][self.lc_col]
-        self.c = None
+        self.c = ''
         # position variable to be available between methods
         self.position = (0, 0)
 
@@ -115,76 +138,85 @@ class Lexer:
         """
         while self.lc != self.EOF_CHAR:
             self.position = (self.lc_row, self.lc_col)
-
-            # match all single characters
-            for char in STRING_TO_TT.keys():
-                if self.lc == char:
+            if self.lc in ' \t':
+                self.next_char()
+            elif STRING_TO_TT_SIMPLE.get(self.lc):
+                # simple symbols
+                # :grammar: ;|+|-|*|%|^|~|(|)|{|}
+                self.next_char()
+                return Token(STRING_TO_TT_SIMPLE[self.lc], self.c,
+                             self.position)
+            elif STRING_TO_TT_COMPLEX.get(self.lc):
+                # complex symbols that are easily confusable
+                # :grammar: &|&&|<bar>|<bar><bar>|!|!=|<<|>>|=|==|<
+                # |>|<=|>=
+                self.next_char()
+                if STRING_TO_TT_COMPLEX.get(self.c + self.lc):
+                    symbol = self.c + self.lc
                     self.next_char()
-                    return Token(STRING_TO_TT[string], self.c, self.position)
-
-            match self.lc:
-                case '\t':
+                    return Token(STRING_TO_TT_COMPLEX[symbol], symbol,
+                                 self.position)
+                return Token(STRING_TO_TT_COMPLEX[self.lc], self.c,
+                             self.position)
+            elif self.lc in self.LETTER:
+                # identifier or special keyword symbol
+                # :grammar: <identifier>|if|else|while|do|int|char
+                # |void|const|main
+                # :identifier: <letter> <letter_digit>*
+                self.next_char()
+                symbol = self.c
+                while self.lc in self.LETTER_DIGIT:
                     self.next_char()
-                case ';':
-                    self.next_char()
-                    return Token(TT.SEMICOLON, self.c, self.position)
-                case '+':
-                    self.next_char()
-                    return Token(TT.PLUS_OP, self.c, self.position)
-                case '-':
-                    # minus has a special role because it can be both a unary and
-                    # binary operator
-                    self.next_char()
-                    return Token(TT.MINUS_OP, self.c, self.position)
-                case '*':
-                    self.next_char()
-                    return Token(TT.MUL_OP, self.c, self.position)
-                case '/':
-                    token = self._division_sign_or_comment()
-                    if token:
-                        return token
-                case self.COMP_OPERATOR_ASSIGNMENT_BITSHIFT:
-                    return self._comp_operator_assignment_bitshift()
-                case '!':
-                    return self._not()
-                case '%':
-                    self.next_char()
-                    return Token(TT.MOD_OP, self.c, self.position)
-                case '&':
-                    return self._and()
-                case '|':
-                    return self._or()
-                case '^':
-                    self.next_char()
-                    return Token(TT.OPLUS_OP, self.c, self.position)
-                case '~':
-                    # minus has a special role because it can be both a unary and
-                    # binary operator
-                    self.next_char()
-                    return Token(TT.UNARY_OP, self.c, self.position)
-                case '(':
-                    self.next_char()
-                    return Token(TT.L_PAREN, self.c, self.position)
-                case ')':
-                    self.next_char()
-                    return Token(TT.R_PAREN, self.c, self.position)
-                case '{':
-                    self.next_char()
-                    return Token(TT.L_BRACE, self.c, self.position)
-                case '}':
-                    self.next_char()
-                    return Token(TT.R_BRACE, self.c, self.position)
-                case self.DIGIT_WITHOUT_ZERO:
-                    return self._number()
-                case "'":
-                    return self._character()
-                case '0':
+                    symbol += self.c
+                if STRING_TO_TT_WORDS.get(symbol):
+                    return Token(STRING_TO_TT_WORDS[symbol], symbol,
+                                 self.position)
+                return Token(TT.IDENTIFIER, symbol, self.position)
+            elif self.lc in self.DIGIT_WITH_ZERO:
+                # number
+                # :grammar: 0|(<digit_without_zero><digit_with_zero>*)
+                if self.lc == 0:
                     self.next_char()
                     return Token(TT.NUMBER, self.c, self.position)
-                case self.LETTER:
-                    return self._identifier_special_keyword()
-                case _:
-                    raise InvalidCharacterError(self.lc, self.position)
+                # else: self.lc in self.DIGIT_WITHOUT_ZERO:
+                self.next_char()
+                symbol = self.c
+                while self.lc in self.DIGIT_WITH_ZERO:
+                    self.next_char()
+                    symbol += self.c
+                return Token(TT.NUMBER, symbol, self.position)
+            elif self.lc == "'":
+                # character
+                # :grammar: '<letter_digit>'
+                self.next_char()
+
+                self.next_char()
+                char = self.c
+
+                if self.lc == "'":
+                    self.next_char()
+                else:
+                    raise UnclosedCharacterError("'" + self.c + "'",
+                                                 "'" + self.c + self.lc,
+                                                 self.position)
+
+                return Token(TT.CHAR, str(ord(char)), self.position)
+            elif self.lc == '/':
+                # division or comments
+                # :grammar: /(/|(<star>.*<start>/))?
+                self.next_char()
+                if self.lc == '/':
+                    self.lc_col = len(self.input[self.lc_row]) - 1
+                    self.next_char()
+                elif self.lc == '*':
+                    while not (self.lc == '/' and self.c == '*'
+                               or self.lc == self.EOF_CHAR):
+                        self.next_char()
+                    self.next_char()
+                else:
+                    return Token(TT.DIV_OP, self.c, self.position)
+            else:
+                raise InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)
 
     def next_char(self):
@@ -193,27 +225,23 @@ class Lexer:
         :returns: None
         """
         # next column or next row
-        if self.lc_col + 1 < len(self.input[self.lc_row]):
+        if self.lc_col < len(self.input[self.lc_row]) - 1:
             self.lc_col += 1
-        elif (self.lc_col + 1 == len(self.input[self.lc_row])
-              and self.lc_row + 1 < len(self.input)):
+        elif (self.lc_col == len(self.input[self.lc_row]) - 1
+              and self.lc_row < len(self.input) - 1):
             self.lc_row += 1
             self.lc_col = 0
-        elif (self.lc_col + 1 == len(self.input[self.lc_row])
-              and self.lc_row + 1 == len(self.input)):
+        elif (self.lc_col == len(self.input[self.lc_row]) - 1
+              and self.lc_row == len(self.input)) - 1:
             self.lc_col += 1
         else:
             pass
 
         # next character
-        if (self.lc_row + 1 == len(self.input)
+        if (self.lc_row == len(self.input) - 1
                 and self.lc_col == len(self.input[self.lc_row])):
             self.c = self.lc
             self.lc = self.EOF_CHAR
         else:
             self.c = self.lc
             self.lc = self.input[self.lc_row][self.lc_col]
-
-    from lexer_2 import _number, _character, _identifier_special_keyword,\
-        _check_word, _reached_end_of_line, _identifier, _not, _and, _or,\
-        _comp_operator_assignment_bitshift, _division_sign_or_comment

@@ -79,7 +79,6 @@ def _identifier_special_keyword(self):
 
 
 def _check_word(self, tokentype, word):
-    # TODO: word und tokentype umdrehe, damit es zu Token passt
     """checks if a word matches one of the special keywords of the PicoC
     language
 
@@ -219,3 +218,9 @@ def _division_sign_or_comment(self, ):
         self.next_char()
     else:
         return Token(TT.DIV_OP, self.c, self.position)
+
+
+    # in lexer.py
+    #  from lexer_2 import _number, _character, _identifier_special_keyword,\
+    #  _check_word, _reached_end_of_line, _identifier, _not, _and, _or,\
+    #  _comp_operator_assignment_bitshift, _division_sign_or_comment
