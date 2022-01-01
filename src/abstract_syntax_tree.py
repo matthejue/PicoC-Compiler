@@ -50,8 +50,7 @@ class ASTNode:
         for child in self.children:
             acc += f" {child}"
 
-        acc += ")"
-        return acc
+        return acc + ")"
 
 
 def strip_multiline_string(mutline_string):

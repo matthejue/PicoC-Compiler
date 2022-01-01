@@ -11,5 +11,10 @@ class ToBoolNode(ASTNode):
 
 
 @dataclass
-class VariableNode(ASTNode):
+class Variable(ASTNode):
+    token: Token
+
+
+@dataclass
+class Indentifier(ASTNode):
     token: Token

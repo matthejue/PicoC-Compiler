@@ -3,6 +3,9 @@ import global_vars
 
 class Symbol:
     """Name for a program entity like a variable or function"""
+
+    __match_args__ = ("value")
+
     def __init__(self, name, datatype, position, value):
         """
         :name: string

@@ -2,7 +2,6 @@ import global_vars
 
 
 class _CodeGenerator:
-
     """Encapsulates all tree-walking code associated with a particular
     task into a single visitor class. Implenents the Singleton pattern
 

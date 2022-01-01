@@ -6,7 +6,7 @@ from errors import UnknownIdentifierError
 import global_vars
 
 
-class AssignmentNode(ASTNode):
+class Assignment(ASTNode):
     """Abstract Syntax Tree Node for assignement"""
 
     # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
@@ -148,7 +148,7 @@ class AssignmentNode(ASTNode):
             "# Assignment end or sub-assignment end\n", 0)
 
 
-class AllocationNode(ASTNode):
+class Allocation(ASTNode):
     """Abstract Syntax Tree Node for allocation"""
 
     __match_args__ = ("const_or_var", "prim_datatype", "identifier")

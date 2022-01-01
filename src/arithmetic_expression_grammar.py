@@ -11,11 +11,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
     language"""
 
     BINOP_PREC_1 = [TT.MUL_OP, TT.DIV_OP, TT.MOD_OP]
-    BINOP_PREC_2 = [
-        TT.PLUS_OP, TT.MINUS_OP, TT.BITSHIFT_L, TT.BITSHIFT_R, TT.OPLUS_OP,
-        TT.AND_OP, TT.OR_OP
-    ]
-    UNARY_OP = [TT.MINUS_OP, TT.NOT_OP]
+    BINOP_PREC_2 = [TT.PLUS_OP, TT.MINUS_OP, TT.OPLUS_OP, TT.AND_OP, TT.OR_OP]
+    #  UNARY_OP = [TT.MINUS_OP, TT.NOT_OP]
 
     def __init__(self, lexer):
         super().__init__(lexer)
@@ -72,7 +69,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: <word> | <number> | <paren> | <unop>
         :returns: None
         """
-        match self.LTT(1):
+        tt = self.LTT(1)
+        match tt:
             case TT.IDENTIFIER:
                 self.match_and_add([TT.IDENTIFIER], ArithmeticOperand)
             case TT.NUMBER:
@@ -81,7 +79,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
                 self.match_and_add([TT.CHARACTER], ArithmeticOperand)
             case TT.L_PAREN:
                 self._paren_arith()
-            case self.UNARY_OP:
+            #  case _ if tt in self.UNARY_OP:
+            case (TT.NOT_OP | TT.MINUS_OP):
                 self._unop()
             case _:
                 raise MismatchedTokenError("aritmetic operand", self.LT(1))

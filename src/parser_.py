@@ -48,7 +48,7 @@ class BacktrackingParser():
         general checks if non-terminal symbols are at the right syntactial
         sition
 
-        :token: possibly matching tokentypes (because of symbols like e.g. '-')
+        :tokentypes: list of tokentypes
         :returns: None, possibly an exception
         """
         if (self.LTT(1) in tokentypes):
@@ -59,7 +59,8 @@ class BacktrackingParser():
     def match_and_add(self, tokentypes, classname):
         """Add the current token to the ast and check for match
 
-        :tokentype: possibly matching tokentype
+        :tokentypes: list of tokentypes
+        :classname: nodetype
         :returns: None, possibly an exception
         """
         if not global_vars.is_tasting:
@@ -68,6 +69,9 @@ class BacktrackingParser():
 
     def match_and_determine(self, tokentypes):
         """Determines the tokentype of the cur
+
+        :tokentypes: list of tokentypes
+        :returns: None, possibly an exception
         """
         if not global_vars.is_tasting:
             self.ast_builder.CN().determine(self.LT(1))

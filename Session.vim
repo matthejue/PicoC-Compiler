@@ -12,7 +12,7 @@ argglobal
 %argdel
 argglobal
 enew
-balt ~/Documents/Studium/pico_c_compiler/NERD_tree_2
+file NERD_tree_6
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -23,10 +23,14 @@ setlocal fdn=20
 setlocal nofen
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +1 ~/Documents/Studium/pico_c_compiler/NERD_tree_2
-badd +75 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-badd +1 ~/Documents/Studium/pico_c_compiler/lexer.py
+badd +36 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+badd +4 ~/Documents/Studium/pico_c_compiler/lexer.py
 badd +41 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
+badd +34 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
+badd +29 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
+badd +18 ~/Documents/Studium/pico_c_compiler/.misc/python_match_args_example.py
+badd +37 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +59 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -38,7 +42,6 @@ if filereadable(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

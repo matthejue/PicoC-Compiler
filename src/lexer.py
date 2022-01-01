@@ -40,8 +40,6 @@ class TT(Enum):
     OR_OP = "|"
     OPLUS_OP = "^"
     NOT_OP = "~"
-    BITSHIFT_L = "<<"
-    BITSHIFT_R = ">>"
     EQ_COMP = "=="
     UEQ_COMP = "!="
     LT_COMP = "<"

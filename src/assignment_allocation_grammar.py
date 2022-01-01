@@ -2,11 +2,14 @@ from logic_expression_grammar import LogicExpressionGrammar
 from assignment_allocation_nodes import AssignmentNode, AllocationNode
 from lexer import TT, Token
 from errors import MismatchedTokenError
+from dummy_nodes import Identifier
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):
     """The assignment expression part of the context free grammar of the piocC
     language"""
+    #  PRIM_DT = [TT.INT, TT.CHAR, TT.VOID]
+
     def __init__(self, lexer):
         super().__init__(lexer)
 
@@ -26,15 +29,16 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         :returns: None
 
         """
-        savestate_node = self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
+        savestate_node = self.ast_builder.down(AssignmentNode)
 
-        if self.LTT(2) == TT.ASSIGNMENT:
-            self.match_and_determine(TT.IDENTIFIER)
-        elif self.LTT(1) in [TT.PRIM_DT, TT.CONST]:
-            self._alloc()
-        else:
-            raise MismatchedTokenError("identifier or assignment expression",
-                                       self.LT(2))
+        match (self.LTT(1), self.LTT(2)):
+            case ((TT.INT | TT.CHAR | TT.VOID | TT.CONST), _):
+                self._alloc()
+            case (_, TT.ASSIGNMENT):
+                self.match_and_determine(TT.IDENTIFIER)
+            case _:
+                raise MismatchedTokenError("identifier or assignment expression",
+                                           self.LT(2))
 
         if self.LTT(1) == TT.ASSIGNMENT:
             self.match_and_determine(TT.ASSIGNMENT)
@@ -42,8 +46,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
 
             while self.LTT(2) == TT.ASSIGNMENT:
-                self.match_and_add(TT.IDENTIFIER)
-                self.match_and_add(TT.ASSIGNMENT)
+                self.match_and_add(TT.IDENTIFIER, IDENTIFIER())
+                self.match_and_determine(TT.ASSIGNMENT)
 
                 self.ast_builder.down(AssignmentNode, TT.ASSIGNMENT)
 
