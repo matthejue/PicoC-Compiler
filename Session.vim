@@ -10,9 +10,10 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-$argadd assignment_allocation_grammar.py
-edit dummy_nodes.py
+$argadd dummy_nodes.py
+edit assignment_allocation_nodes.py
 argglobal
+balt dummy_nodes.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -20,27 +21,28 @@ setlocal fdi=#
 setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
-setlocal fen
+setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 10 - ((9 * winheight(0) + 19) / 39)
+let s:l = 134 - ((31 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 10
+keepjumps 134
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +68 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
-badd +10 ~/Documents/Studium/pico_c_compiler/src/dummy_nodes.py
-badd +22 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-badd +77 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
-badd +117 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
-badd +6 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
-badd +19 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
-badd +45 ~/Documents/Studium/pico_c_compiler/src/errors.py
-badd +197 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-badd +58 ~/Documents/Studium/pico_c_compiler/src/parser_.py
+badd +74 ~/Documents/Studium/pico_c_compiler/src/dummy_nodes.py
+badd +62 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +8 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
+badd +6 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
+badd +70 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
+badd +37 ~/Documents/Studium/pico_c_compiler/src/function_nodes.py
+badd +1 ~/Documents/Studium/pico_c_compiler/src/global_vars.py
+badd +102 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
+badd +68 ~/Documents/Studium/pico_c_compiler/src/parser_.py
+badd +69 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
+badd +9 ~/Documents/Studium/pico_c_compiler/NERD_tree_2
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
