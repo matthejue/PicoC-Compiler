@@ -46,10 +46,9 @@ class BacktrackingParser():
     def match(self, tokentypes):
         """Check if one of the token are the next token in the lexer to match. In
         general checks if non-terminal symbols are at the right syntactial
-        sition
+        position
 
         :tokentypes: list of tokentypes
-        :returns: None, possibly an exception
         """
         if (self.LTT(1) in tokentypes):
             self._consume_next_token()
@@ -57,28 +56,45 @@ class BacktrackingParser():
             raise MismatchedTokenError(tokentypes, self.LT(1))
 
     def match_and_add(self, tokentypes, classname):
-        """Add the current token to the ast and check for match
+        """Add the given node with the curernt tokenvalue to the ast and
+        check for match
 
         :tokentypes: list of tokentypes
         :classname: nodetype
-        :returns: None, possibly an exception
+        """
+        self.match(tokentypes)
+        if not global_vars.is_tasting:
+            self.ast_builder.CN().add_child(
+                classname(self.LT(1).value,
+                          self.LT(1).position))
+
+    def choose(self, tt_class_map):
+        """Add the node with the right nodetype matching the tokentype of the
+        current token and with the right tokenvalue to the ast
+
+        :tt_class_mapping: mapping of tokentypes to classes
         """
         if not global_vars.is_tasting:
-            self.ast_builder.CN().add_child(classname(self.LT(1)))
-        self.match(tokentypes)
+            self.ast_builder.CN().add_child(tt_class_map[self.LTT(1)](
+                self.LT(1).value, self.LT(1).position))
 
-    def match_and_determine(self, tokentypes):
-        """Determines the tokentype of the cur
+    def match_and_choose(self, tt_class_map):
+        """Same as choose, but also check for match
 
-        :tokentypes: list of tokentypes
-        :returns: None, possibly an exception
+        :tt_class_mapping: mapping of tokentypes to classes
         """
-        if not global_vars.is_tasting:
-            self.ast_builder.CN().determine(self.LT(1))
-        self.match(tokentypes)
+        self.match(list(tt_class_map.keys()))
+        self.choose(tt_class_map)
+
+    def no_ignore(self, ):
+        """Some Nodes have to taken and only serve as a pipe to the actually
+        important Nodes. As soon as a Token receives his determining Node, it
+        should no longer only be a pipe and be ignored
+        """
+        self.ast_builder.CN().ignore = False
 
     def _sync(self, i):
-        """ensures that one can look ahead i tokens. If one has looked ahead i
+        """Ensures that one can look ahead i tokens. If one has looked ahead i
         < j tokens previously and next one is going to look ahead j > i tokens
         one only has too load j-i tokens
 
@@ -89,7 +105,7 @@ class BacktrackingParser():
             self._fill(not_filled_up)
 
     def _fill(self, not_filled_up):
-        """add not_filled_up many tokens
+        """Add not_filled_up many tokens
 
         :grammar: grammar specification
         :returns: None

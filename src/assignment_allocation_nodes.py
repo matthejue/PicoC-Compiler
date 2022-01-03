@@ -1,162 +1,105 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from logic_nodes import LogicAndOrNode
-from arithmetic_nodes import ArithmeticBinaryOperationNode, ArithmeticVariableConstan
+from arithmetic_nodes import ArithBinOp, ArithUnOp
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
 import global_vars
+from dummy_nodes import Const, Int, Char, Void, Identifier, Number, Character
+
+# TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
 
 
-class Assignment(ASTNode):
+class Assign(ASTNode):
     """Abstract Syntax Tree Node for assignement"""
 
-    # TODO: genauer begutachten: "oder codela(e), falls logischer Ausdruck"
+    ASSIGN = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
+        LOADIN SP ACC 1;  # Wert von e1 in ACC laden
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
+        """
+    ASSIGN_LOC = 2
+
+    ASSIGN_MORE = "STORE ACC var_address;  # Wert von e1 in Variable v1 speichern\n"
+    ASSIGN_MORE_LOC = 1
+
+    def _update_match_args(self, ):
+        self.variable = self.children[0]
+        self.expression = self.children[1]
 
     __match_args__ = ("variable", "expression")
 
-    variable = None
-    expression = None
-
-    assignment = """# codeaa(e) (oder codela(e), falls logischer Ausdruck)
-        LOADIN SP ACC 1;  # Wert von expression in ACC laden
-        ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """
-
-    assignment_loc = 2
-
-    assign_more = "STORE ACC var_address;  # Wert von e in Variable xyz speichern\n"
-
-    assign_more_loc = 1
-
-    def determine(self, token):
-        if not self.variable:
-            self.variable = token
-            return
-        if not self.token:
-            self.token = token
-            return
-        self.expression = token
-
-    def _get_identifier_name(self):
-        # AllocationNode needs a special treatment, because it it's token only
-        # tells the type but not the value
-        if isinstance(self.children[0], AllocationNode):
-            # AssignmentNode(AllocationNode(TokenNode(TT.CONST, 'const'),
-            #   TokenNode(TT.IDENTIFIER, x)), AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
-            return self.children[0].children[1].token.value
-        else:
-            # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
-            #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
-            return self.children[0].token.value
-
-    def _get_identifier_token(self):
-        # AllocationNode needs a special treatment, because it it's token only
-        # tells the type but not the value
-        if isinstance(self.children[0], AllocationNode):
-            # AssignmentNode(AllocationNode(TokenNode(TT.CONST, 'const'),
-            #   TokenNode(TT.IDENTIFIER, x)), AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
-            return self.children[0].children[1].token
-        else:
-            # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
-            #   AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
-            return self.children[0].token
-
-    def _get_expression(self, ):
-        return self.children[1]
-
-    def _is_last_assignment(self, ):
-        # AssignmentNode(..., AssignmentNode(LogicAndOrNode(LogicAndOrNode(...))))
-        return isinstance(
-            self.children[1].children[0], LogicAndOrNode) or isinstance(
-                self.children[1].children[0], ArithmeticBinaryOperationNode)
-
-    def _is_constant_identifier_on_left_side(self, ):
-        # can only be found out by analysing what type of Symbol there is,
-        # because a TokenNode doesn't tell whether a symbol is a constant or
-        # not. Only a AllocationNode would have information whether a symbol
-        # is a constant by by his first childnode
-        return isinstance(
-            self.symbol_table.resolve(self._get_identifier_name()),
-            ConstantSymbol)
-
-    def _is_single_value_on_right_side(self, ):
-        # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
-        #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
-        # TODO: diese Funktion wird später unnötig, es unmöglich ist, dass bei
-        # einer Konstante was anderes als ein einzelner Wert auf der anderen
-        # Seite steht
-        return len(self.children[1].children[0].children[0].children) == 1
-
-    def _assign_number_to_constant_identifier(self):
-        # AssignmentNode(TokenNode(TT.IDENTIFIER, 'x'),
-        #   AssignmentNode(ArithmeticBinaryOperationNode(ArithmeticBinaryOperationNode(ArithmeticVariableConstantNode))))
-        # TODO: das geht schöner
-        self.symbol_table.resolve(
-            self._get_identifier_name()).value = self.children[1].children[
-                0].children[0].children[0].token.value
-
     def visit(self, ):
-        self._update_match_args()
-        # if it's just a throw-away node that had to be taken
-        if len(self.children) == 1:
-            self.children[0].visit()
+        if self.ignore:
+            self.variable.visit()
             return
+
+        self._update_match_args()
 
         self.code_generator.add_code(
             "# Assignment start or new sub-assignment\n", 0)
 
-        self.children[0].visit()
+        self._pretty_comments()
 
-        # in case of a ConstantSymbol and a assignment with a number on the
-        # right side of the =, the value gets assigned immediately
+        self.variable.visit()
+
         try:
-            self._assign_to_identifier()
+            self._assignment()
         except KeyError:
             # repackage the error
-            raise UnknownIdentifierError(self._get_identifier_token())
-
-    def _assign_to_identifier(self, ):
-        match self:
-            case AssignmentNode(AllocationNode(TokenNode(TokenNode()), TokenNode(), TokenNode()), ArithmeticBinaryOperationNode()):
-        if self._is_constant_identifier_on_left_side(
-        ) and self._is_single_value_on_right_side():
-            self._assign_number_to_constant_identifier()
-        # case of a VariableSymbol
-        else:
-            self.children[1].visit()
-
-            if self._is_last_assignment():
-
-                if global_vars.args.verbose:
-                    global_vars.args.verbose = False
-                    self.assign_more = self.code_generator.replace_code_pre(
-                        strip_multiline_string(self.assignment), "expression",
-                        str(self._get_expression()))
-                    global_vars.args.verbose = True
-
-                self.code_generator.add_code(
-                    strip_multiline_string(self.assignment),
-                    self.assignment_loc)
-
-            self.assign_more = self.code_generator.replace_code_pre(
-                self.assign_more, "var_address",
-                self.symbol_table.resolve(self._get_identifier_name()).value)
-
-            self.code_generator.add_code(self.assign_more,
-                                         self.assign_more_loc)
+            raise UnknownIdentifierError(self.variable)
 
         self.code_generator.add_code(
             "# Assignment end or sub-assignment end\n", 0)
 
+    def _pretty_comments(self, ):
+        if global_vars.args.verbose:
+            self.ASSIGN = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.ASSIGN), "e1",
+                str(self.expression))
+            self.ASSIGN_MORE = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.ASSIGN_MORE), "e1",
+                str(self.expression))
+            self.ASSIGN_MORE = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.ASSIGN_MORE), "v1",
+                str(self.variable))
 
-class Allocation(ASTNode):
+    def _assignment(self, ):
+        match self:
+            case Assign(Alloc(Const(), _, Identifier(name)), (Number(value) | Character(value))):
+                self.symbol_table.resolve(name).value = value
+            # nested assignment that is the assignment of another assignment
+            case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), Assign(_, _)):
+                self.expression.visit()
+
+                self._adapt_code(name)
+            # assigment that assigns a variable to a expression
+            case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), _):
+                self.expression.visit()
+
+                self.code_generator.add_code(
+                    strip_multiline_string(self.ASSIGN), self.ASSIGN_LOC)
+
+                self._adapt_code(name)
+
+    def _adapt_code(self, name):
+        self.ASSIGN_MORE = self.code_generator.replace_code_pre(
+            self.ASSIGN_MORE, "var_address", self.symbol_table.resolve(name).value)
+
+        self.code_generator.add_code(self.ASSIGN_MORE, self.ASSIGN_MORE_LOC)
+
+
+class Alloc(ASTNode):
     """Abstract Syntax Tree Node for allocation"""
 
-    __match_args__ = ("const_or_var", "prim_datatype", "identifier")
+    __match_args__ = ("const", "prim_datatype", "identifier")
 
     def _update_match_args(self):
-        self.const_or_var = self.children[0]
-        self.prim_datatype = self.children[1]
-        self.identifier = self.children[2]
+        if isinstance(self.children[0], Const):
+            self.const = self.children[0]
+            self.prim_dt = self.children[1]
+            self.identifier = self.children[2]
+        else:
+            self.prim_dt = self.children[0]
+            self.identifier = self.children[1]
 
     def _get_childtokenvalue(self, idx):
         return self.children[idx].token.value

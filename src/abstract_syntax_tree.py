@@ -1,8 +1,5 @@
-# from enum import Enum
-from lexer import Token, TT
 from code_generator import CodeGenerator
-from symbol_table import SymbolTable, VariableSymbol, ConstantSymbol
-from errors import UnknownIdentifierError
+from symbol_table import SymbolTable
 
 
 class ASTNode:
@@ -12,14 +9,17 @@ class ASTNode:
     across.  Homogeneous AST means having only one node type and all childs
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
-    def __init__(self, token=None):
+    def __init__(self, value=None, position=None):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
         self.children = []
-        self.token = token
+        self.value = value
+        self.position = position
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
+        # the ignore option is only relevant for Container Nodes
+        self.ignore = True
 
     def add_child(self, node):
         """
@@ -28,24 +28,18 @@ class ASTNode:
         """
         self.children += [node]
 
-    def determine(self, token):
-        self.token = token
-
     def show_generated_code(self, ):
         return self.code_generator.show_code()
 
-    def ignore(self, ):
-        return not self.token
-
     def __repr__(self):
         if not self.children:
-            return f"{self.token}"
+            return f"{self.value}"
         # if Node doesn't even reach it's own operation token it's unnecessary
         # and should be skipped
-        elif self.ignore():
+        elif self.ignore:
             return f"{self.children[0]}"
 
-        acc = f"({self.token}"
+        acc = "("
 
         for child in self.children:
             acc += f" {child}"
