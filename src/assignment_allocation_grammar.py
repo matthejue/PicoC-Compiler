@@ -3,14 +3,13 @@ from assignment_allocation_nodes import Assign, Alloc
 from lexer import TT
 from errors import MismatchedTokenError
 from dummy_nodes import Const, Int, Char, Void, Identifier
-from itertools import chain
 
 
 class AssignmentAllocationGrammar(LogicExpressionGrammar):
     """The assignment expression part of the context free grammar of the piocC
     language"""
 
-    PRIM_DT = {TT.INT: Int, TT.CHAR: Char, TT.VOID: Void}
+    PRIM_DT = [TT.INT, TT.CHAR, TT.VOID]
 
     def code_aa(self):
         """assignment and allocation startpoint
@@ -30,7 +29,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         """
         savestate_node = self.ast_builder.down(Assign)
 
-        if self.LTT(1) in chain(self.PRIM_DT.keys(), [TT.CONST]):
+        if self.LTT(1) in self.PRIM_DT + [TT.CONST]:
             self._alloc()
         elif self.LTT(2) == TT.ASSIGNMENT:
             self.match_and_add([TT.IDENTIFIER], Identifier)

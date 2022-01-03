@@ -35,7 +35,7 @@ class Assign(ASTNode):
         self._update_match_args()
 
         self.code_generator.add_code(
-            "# Assignment start or new sub-assignment\n", 0)
+            "# Assignment start or new sub-assignment start\n", 0)
 
         self._pretty_comments()
 

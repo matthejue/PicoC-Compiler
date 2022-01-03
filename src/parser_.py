@@ -1,8 +1,8 @@
 from ast_builder import ASTBuilder
-from abstract_syntax_tree import TokenNode
 import global_vars
 from errors import MismatchedTokenError, UnknownIdentifierError, UnclosedCharacterError
 from lexer import TT
+from dummy_nodes import NT
 
 
 class BacktrackingParser():
@@ -11,6 +11,20 @@ class BacktrackingParser():
     furthermore able to backtrack and thus able to also distinguish rules which
     have the same identical syntactical structure for their first finitely many
     tokens"""
+
+    TT_CLASS_MAP = {
+        TT.PLUS_OP: NT.Add,
+        TT.MINUS_OP: NT.Sub,
+        TT.MUL_OP: NT.Mul,
+        TT.DIV_OP: NT.Div,
+        TT.MOD_OP: NT.Mod,
+        TT.OPLUS_OP: NT.Oplus,
+        TT.AND_OP: NT.And,
+        TT.OR_OP: NT.Or,
+        TT.MINUS_OP: NT.Minus,
+        TT.NOT_OP: NT.Not
+    }
+
     def __init__(self, lexer):
         """
         :lts: lookahead tokens
@@ -55,36 +69,29 @@ class BacktrackingParser():
         else:
             raise MismatchedTokenError(tokentypes, self.LT(1))
 
-    def match_and_add(self, tokentypes, classname):
-        """Add the given node with the curernt tokenvalue to the ast and
-        check for match
+    def match_and_add(self, tokentypes, classname=None):
+        """Same as add, but also check for match
 
         :tokentypes: list of tokentypes
         :classname: nodetype
         """
         self.match(tokentypes)
+        self.add(classname)
+
+    def add(self, classname=None):
+        """Add the node with the given classname if given or else right
+        nodetype matching the tokentype of the current token and with the right
+        tokenvalue to the ast
+
+        :tokentypes: list of tokentypes
+        :classname: nodetype
+        """
         if not global_vars.is_tasting:
+            if not classname:
+                classname = self.TT_CLASS_MAP[self.LTT(1)]
             self.ast_builder.CN().add_child(
                 classname(self.LT(1).value,
                           self.LT(1).position))
-
-    def choose(self, tt_class_map):
-        """Add the node with the right nodetype matching the tokentype of the
-        current token and with the right tokenvalue to the ast
-
-        :tt_class_mapping: mapping of tokentypes to classes
-        """
-        if not global_vars.is_tasting:
-            self.ast_builder.CN().add_child(tt_class_map[self.LTT(1)](
-                self.LT(1).value, self.LT(1).position))
-
-    def match_and_choose(self, tt_class_map):
-        """Same as choose, but also check for match
-
-        :tt_class_mapping: mapping of tokentypes to classes
-        """
-        self.match(list(tt_class_map.keys()))
-        self.choose(tt_class_map)
 
     def no_ignore(self, ):
         """Some Nodes have to taken and only serve as a pipe to the actually

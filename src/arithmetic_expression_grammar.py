@@ -3,22 +3,15 @@ from arithmetic_nodes import (ArithUnOp, ArithBinOp, Identifier, Number,
                               Character)
 from errors import MismatchedTokenError
 from lexer import TT
-from dummy_nodes import Add, Sub, Mul, Div, Mod, Oplus, Or, And, Minus, Not
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
-    BINOP_PREC_1 = {TT.MUL_OP: Mul, TT.DIV_OP: Div, TT.MOD_OP: Mod}
-    BINOP_PREC_2 = {
-        TT.PLUS_OP: Add,
-        TT.MINUS_OP: Sub,
-        TT.OPLUS_OP: Oplus,
-        TT.AND_OP: And,
-        TT.OR_OP: Or
-    }
-    UNARY_OP = {TT.MINUS_OP: Minus, TT.NOT_OP: Not}
+    BINOP_PREC_1 = [TT.MUL_OP, TT.DIV_OP, TT.MOD_OP]
+    BINOP_PREC_2 = [TT.PLUS_OP, TT.MINUS_OP, TT.OPLUS_OP, TT.AND_OP, TT.OR_OP]
+    UNARY_OP = [TT.MINUS_OP, TT.NOT_OP]
 
     def code_ae(self):
         """arithmetic expression startpoint
@@ -38,7 +31,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         self._prec1()
 
-        while self.LTT(1) in self.BINOP_PREC_2.keys():
+        while self.LTT(1) in self.BINOP_PREC_2:
             self.choose(self.BINOP_PREC_2)
             self.no_ignore()
             self.ast_builder.down(ArithBinOp)
@@ -57,7 +50,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         self._ao()
 
-        while self.LTT(1) in self.BINOP_PREC_1.keys():
+        while self.LTT(1) in self.BINOP_PREC_1:
             self.choose(self.BINOP_PREC_1)
             self.no_ignore()
             self.ast_builder.down(ArithBinOp)
@@ -106,7 +99,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         while True:
             self.match_and_choose(self.UNARY_OP)
             self.no_ignore()
-            if self.LTT(1) not in self.UNARY_OP.keys():
+            if self.LTT(1) not in self.UNARY_OP:
                 break
 
             self.ast_builder.down(ArithUnOp)
