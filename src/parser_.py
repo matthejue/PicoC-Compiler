@@ -11,21 +11,7 @@ class BacktrackingParser():
     furthermore able to backtrack and thus able to also distinguish rules which
     have the same identical syntactical structure for their first finitely many
     tokens"""
-
-    TT_CLASS_MAP = {
-        TT.PLUS_OP: NT.Add,
-        TT.MINUS_OP: NT.Sub,
-        TT.MUL_OP: NT.Mul,
-        TT.DIV_OP: NT.Div,
-        TT.MOD_OP: NT.Mod,
-        TT.OPLUS_OP: NT.Oplus,
-        TT.AND_OP: NT.And,
-        TT.OR_OP: NT.Or,
-        TT.MINUS_OP: NT.Minus,
-        TT.NOT_OP: NT.Not
-    }
-
-    def __init__(self, lexer):
+    def __init__(self, lexer, fname):
         """
         :lts: lookahead tokens
         :num_lts: number of lookahead tokens
@@ -38,7 +24,7 @@ class BacktrackingParser():
         self.markers = []
         self.lts = []
         self.lt_idx = 0
-        self.ast_builder = ASTBuilder()
+        self.ast_builder = ASTBuilder(fname)
 
     def LT(self, i):
         """Lookahead Token
@@ -57,6 +43,20 @@ class BacktrackingParser():
         """
         return self.LT(i).type
 
+    def consume_next_token(self):
+        """fills next position in the lookahead tokenlist with token
+
+        :returns: None
+        """
+        self.lt_idx += 1
+        # if one is already one index over the length of self.lts and doesn't
+        # need the lookahead tokens anymore because there's no self.taste going
+        # on
+        if self.lt_idx == len(self.lts) and not global_vars.is_tasting:
+            self.lt_idx = 0
+            self.lts = []
+        self._sync(1)
+
     def match(self, tokentypes):
         """Check if one of the token are the next token in the lexer to match. In
         general checks if non-terminal symbols are at the right syntactial
@@ -65,40 +65,35 @@ class BacktrackingParser():
         :tokentypes: list of tokentypes
         """
         if (self.LTT(1) in tokentypes):
-            self._consume_next_token()
+            self.consume_next_token()
         else:
             raise MismatchedTokenError(tokentypes, self.LT(1))
 
-    def match_and_add(self, tokentypes, classname=None):
+    def match_and_add(self, tokentypes, classname=None, mapping=None):
         """Same as add, but also check for match
 
         :tokentypes: list of tokentypes
         :classname: nodetype
+        :sign: in case a symbol has two possible operator classes, the sign
+        tells which one to chooes
         """
         self.match(tokentypes)
-        self.add(classname)
+        self.add(classname, mapping)
 
-    def add(self, classname=None):
+    def add(self, classname=None, mapping=None):
         """Add the node with the given classname if given or else right
         nodetype matching the tokentype of the current token and with the right
         tokenvalue to the ast
 
-        :tokentypes: list of tokentypes
         :classname: nodetype
+        :sign: see docstring of match_and_add
         """
         if not global_vars.is_tasting:
             if not classname:
-                classname = self.TT_CLASS_MAP[self.LTT(1)]
+                classname = mapping[self.LTT(1)]
             self.ast_builder.CN().add_child(
                 classname(self.LT(1).value,
                           self.LT(1).position))
-
-    def no_ignore(self, ):
-        """Some Nodes have to taken and only serve as a pipe to the actually
-        important Nodes. As soon as a Token receives his determining Node, it
-        should no longer only be a pipe and be ignored
-        """
-        self.ast_builder.CN().ignore = False
 
     def _sync(self, i):
         """Ensures that one can look ahead i tokens. If one has looked ahead i
@@ -119,20 +114,6 @@ class BacktrackingParser():
         """
         for _ in range(0, not_filled_up):
             self.lts += [self.lexer.next_token()]
-
-    def _consume_next_token(self):
-        """fills next position in the lookahead tokenlist with token
-
-        :returns: None
-        """
-        self.lt_idx += 1
-        # if one is already one index over the length of self.lts and doesn't
-        # need the lookahead tokens anymore because there's no self.taste going
-        # on
-        if self.lt_idx == len(self.lts) and not global_vars.is_tasting:
-            self.lt_idx = 0
-            self.lts = []
-        self._sync(1)
 
     def _mark(self):
         """rememeber with a marker index where the last taste method call

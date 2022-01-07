@@ -1,23 +1,32 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import (ArithUnOp, ArithBinOp, Identifier, Number,
-                              Character)
+from arithmetic_nodes import (ArithUnOp, ArithBinOp)
 from errors import MismatchedTokenError
 from lexer import TT
+from dummy_nodes import NT
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
-    BINOP_PREC_1 = [TT.MUL_OP, TT.DIV_OP, TT.MOD_OP]
-    BINOP_PREC_2 = [TT.PLUS_OP, TT.MINUS_OP, TT.OPLUS_OP, TT.AND_OP, TT.OR_OP]
-    UNARY_OP = [TT.MINUS_OP, TT.NOT_OP]
+    BINOP_PREC_1 = {
+        TT.MUL_OP: NT.Mul,
+        TT.DIV_OP: NT.Div,
+        TT.MOD_OP: NT.Mod,
+    }
+    BINOP_PREC_2 = {
+        TT.PLUS_OP: NT.Add,
+        TT.MINUS_OP: NT.Sub,
+        TT.OPLUS_OP: NT.Oplus,
+        TT.AND_OP: NT.And,
+        TT.OR_OP: NT.Or,
+    }
+    UNARY = {TT.NOT_OP: NT.Not, TT.MINUS_OP: NT.Minus}
 
     def code_ae(self):
         """arithmetic expression startpoint
 
         :grammer: <prec2>
-        :returns: None
         """
         self._prec2()
 
@@ -25,15 +34,17 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """precedence 2
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
-        :returns: None
         """
+        if self.LTT(2) not in self.BINOP_PREC_2.keys():
+            self._prec1()
+            return
+
         savestate_node = self.ast_builder.down(ArithBinOp)
 
         self._prec1()
 
-        while self.LTT(1) in self.BINOP_PREC_2:
-            self.choose(self.BINOP_PREC_2)
-            self.no_ignore()
+        while self.LTT(1) in self.BINOP_PREC_2.keys():
+            self.add(mapping=self.BINOP_PREC_2)
             self.ast_builder.down(ArithBinOp)
 
             self._prec1()
@@ -44,15 +55,17 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """precedence 1
 
         :grammer:  #2 <ao> (<binop_prec1> #2 <ao>)*
-        :returns: None
         """
+        if self.LTT(2) not in self.BINOP_PREC_1.keys():
+            self._ao()
+            return
+
         savestate_node = self.ast_builder.down(ArithBinOp)
 
         self._ao()
 
-        while self.LTT(1) in self.BINOP_PREC_1:
-            self.choose(self.BINOP_PREC_1)
-            self.no_ignore()
+        while self.LTT(1) in self.BINOP_PREC_1.keys():
+            self.add(mapping=self.BINOP_PREC_1)
             self.ast_builder.down(ArithBinOp)
 
             self._ao()
@@ -63,17 +76,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """arithmetic operand
 
         :grammer: <word> | <number> | <paren> | <unop>
-        :returns: None
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.match_and_add([TT.IDENTIFIER], Identifier)
+            self.add(classname=NT.Identifier)
         elif self.LTT(1) == TT.NUMBER:
-            self.match_and_add([TT.NUMBER], Number)
+            self.add(classname=NT.Number)
         elif self.LTT(1) == TT.CHARACTER:
-            self.match_and_add([TT.CHARACTER], Character)
+            self.add(classname=NT.Character)
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
-        elif self.LTT(1) in self.UNARY_OP:
+        elif self.LTT(1) in self.UNARY.keys():
             self._unop()
         else:
             raise MismatchedTokenError("aritmetic operand", self.LT(1))
@@ -82,7 +94,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """arithmetic parenthesis
 
         :grammer: ( <code_ae> )
-        :returns: None
         """
         self.match([TT.L_PAREN])
         self.code_ae()
@@ -92,14 +103,12 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """unary operator
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
-        :returns: None
         """
         savestate_node = self.ast_builder.down(ArithUnOp)
 
         while True:
-            self.match_and_choose(self.UNARY_OP)
-            self.no_ignore()
-            if self.LTT(1) not in self.UNARY_OP:
+            self.add(mapping=self.UNARY)
+            if self.LTT(1) not in self.UNARY.keys():
                 break
 
             self.ast_builder.down(ArithUnOp)

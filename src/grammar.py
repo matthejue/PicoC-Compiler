@@ -3,13 +3,8 @@ from lexer import TT
 
 
 class Grammar(FunctionGrammar):
-
     """the function part of the context free grammar of the piocC
     language"""
-
-    def __init__(self, lexer):
-        super().__init__(lexer)
-
     def start_parse(self):
         """start parsing the grammar
 

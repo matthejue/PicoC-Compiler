@@ -28,49 +28,81 @@ def main():
     via email to juergmatth@gmail.com, attaching the malicious code to the
     email. ^_^
     """
-    cli_args_parser = argparse.ArgumentParser(
-        description=description)
-    cli_args_parser.add_argument("infile", nargs='?',
+    cli_args_parser = argparse.ArgumentParser(description=description)
+    cli_args_parser.add_argument("infile",
+                                 nargs='?',
                                  help="input file with Pico-C Code")
-    cli_args_parser.add_argument("outfile", nargs='?',
+    cli_args_parser.add_argument("outfile",
+                                 nargs='?',
                                  help="output file with RETI Code")
-    cli_args_parser.add_argument('-p', '--print', action='store_true',
+    cli_args_parser.add_argument('-p',
+                                 '--print',
+                                 action='store_true',
                                  help="output the file output to the terminal"
                                  " and if --symbol_table is active output the"
                                  " symbol table beneath")
-    cli_args_parser.add_argument('-a', '--ast', action='store_true',
+    cli_args_parser.add_argument('-a',
+                                 '--ast',
+                                 action='store_true',
                                  help="output the Abstract Syntax Tree "
                                  "instead of RETI Code")
-    cli_args_parser.add_argument('-t', '--tokens', action='store_true',
+    cli_args_parser.add_argument('-t',
+                                 '--tokens',
+                                 action='store_true',
                                  help="output the Tokenlist instead of "
                                  "RETI Code")
-    cli_args_parser.add_argument('-s', '--start_data_segment',
-                                 help="where the datasegment starts (default 100)",
-                                 type=int, default=100)
-    cli_args_parser.add_argument('-e', '--end_data_segment', help="where the "
+    cli_args_parser.add_argument(
+        '-s',
+        '--start_data_segment',
+        help="where the datasegment starts (default 100)",
+        type=int,
+        default=100)
+    cli_args_parser.add_argument('-e',
+                                 '--end_data_segment',
+                                 help="where the "
                                  "datasegment ends and where the stackpointer "
-                                 "starts (default 200)", type=int, default=200)
-    cli_args_parser.add_argument('-m', '--python_stracktrace_error_message',
-                                 action='store_true', help="show python error "
+                                 "starts (default 200)",
+                                 type=int,
+                                 default=200)
+    cli_args_parser.add_argument('-m',
+                                 '--python_stracktrace_error_message',
+                                 action='store_true',
+                                 help="show python error "
                                  "messages with stacktrace")
-    cli_args_parser.add_argument('-S', '--symbol_table', action='store_true',
+    cli_args_parser.add_argument('-S',
+                                 '--symbol_table',
+                                 action='store_true',
                                  help="output the final symbol table into "
                                  "a CSV file after the whole Abstract Syntax "
                                  "Tree was visited")
-    cli_args_parser.add_argument('-O', '--optimization-level',
-                                 help="set the optimiziation level of the "
-                                 "compiler (0=save all variables on the "
-                                 "stack, 1=use graph coloring to find the "
-                                 "best assignment of variables to registers, "
-                                 "2=partially interpret expressions) [NOT IMPLEMENTED YET]", type=int, default=0)
-    cli_args_parser.add_argument('-b', '--binary', action='store_true',
-                                 help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
-    cli_args_parser.add_argument('-P', '--prefix-notation', action='store_true',
-                                 help="write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
-    cli_args_parser.add_argument('-v', '--verbose', action='store_true',
-                                 help="also show tokentypes in the ast, add "
-                                 "comments to the RETI Code and show more "
-                                 "context around error messages [NOT IMPLEMENTED YET]")
+    cli_args_parser.add_argument(
+        '-O',
+        '--optimization-level',
+        help="set the optimiziation level of the "
+        "compiler (0=save all variables on the "
+        "stack, 1=use graph coloring to find the "
+        "best assignment of variables to registers, "
+        "2=partially interpret expressions) [NOT IMPLEMENTED YET]",
+        type=int,
+        default=0)
+    cli_args_parser.add_argument(
+        '-b',
+        '--binary',
+        action='store_true',
+        help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
+    cli_args_parser.add_argument(
+        '-P',
+        '--prefix-notation',
+        action='store_true',
+        help=
+        "write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
+    cli_args_parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help="also show tokentypes in the ast, add "
+        "comments to the RETI Code and show more "
+        "context around error messages [NOT IMPLEMENTED YET]")
     global_vars.args = cli_args_parser.parse_args()
 
     if not global_vars.args.infile:
@@ -158,7 +190,7 @@ def _compile(fname, code):
     # remove all \n from the code
     code_without_cr = list(map(lambda line: line.strip(), code))
 
-    lexer = Lexer(fname, code_without_cr)
+    lexer = Lexer(code_without_cr)
 
     # Deal with --tokens option
     if global_vars.args.tokens:
@@ -174,7 +206,7 @@ def _compile(fname, code):
         return tokens
 
     # Generate ast
-    grammar = Grammar(lexer)
+    grammar = Grammar(lexer, fname)
     # Handle errors
     error_handler = ErrorHandler(grammar)
     # Assignment grammar needs 2 num_lts for <va>
@@ -195,8 +227,10 @@ def _compile(fname, code):
     if global_vars.args.symbol_table:
         header = ["name", "type", "datatype", "position", "value"]
         symbols = SymbolTable().symbols
-        print(tabulate([(k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
-              for k, v in symbols.items()], headers=header))
+        print(
+            tabulate([(k, v.get_type(), str(v.datatype), str(
+                v.position), str(v.value)) for k, v in symbols.items()],
+                     headers=header))
 
     return abstract_syntax_tree.show_generated_code()
 

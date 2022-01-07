@@ -1,105 +1,91 @@
 from lexer import TT
 from errors import NoApplicableRuleError, MismatchedTokenError
-
-from if_else_nodes import IfNode, IfElseNode
-
-
-def code_ie(self, ):
-    self.code_if_if_else()
+from if_else_nodes import If, IfElse
+from dummy_nodes import NT
+from statement_grammar import StatementGrammar
 
 
-def code_if_if_else(self):
-    """if or if else
+class IfElseGrammar(StatementGrammar):
+    def code_ie(self, ):
+        self.code_if_if_else()
 
-    :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) (else ({
-    <code_ss> }|<s>))?
-    :returns: None
-    """
-    errors = []
-    if self.taste(self._taste_consume_if_without_else, errors):
-        self._taste_consume_if_without_else()
-    elif self.taste(self._if_else, errors):
-        self._if_else()
-    else:
-        self._handle_all_tastes_unsuccessful("if or if else expression",
-                                             errors)
+    def code_if_if_else(self):
+        """if or if else
 
+        :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) (else ({
+        <code_ss> }|<s>))?
+        """
+        errors = []
+        if self.taste(self._taste_consume_if_without_else, errors):
+            self._taste_consume_if_without_else()
+        elif self.taste(self._if_else, errors):
+            self._if_else()
+        else:
+            self._handle_all_tastes_unsuccessful("if or if else expression",
+                                                 errors)
 
-def _taste_consume_if_without_else(self):
-    """taste whether the next expression is a if without else
+    def _taste_consume_if_without_else(self):
+        """taste whether the next expression is a if without else
 
-    :grammar: <if_without_else>
-    :returns: None
-    """
-    self._if_without_else()
-    if self.LTT(1) == TT.ELSE:
-        raise MismatchedTokenError("all besides else", self.LT(1))
+        :grammar: <if_without_else>
+        """
+        self._if_without_else()
+        if self.LTT(1) == TT.ELSE:
+            raise MismatchedTokenError("all besides else", self.LT(1))
 
+    def _if_without_else(self, ):
+        """if
 
-def _if_without_else(self, ):
-    """if
+        :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
+        """
+        savestate_node = self.ast_builder.down(If)
 
-    :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
-    :returns: None
-    """
-    savestate_node = self.ast_builder.down(IfNode, [TT.IF])
+        self._if_condition()
+        self._branch()
 
-    self._if()
+        self.ast_builder.up(savestate_node)
 
-    self.ast_builder.up(savestate_node)
+    def _if_else(self, ):
+        """if else
 
+        :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) else ({ <code_ss> }|<s>)
+        """
+        savestate_node = self.ast_builder.down(IfElse)
 
-def _if_else(self, ):
-    """if else
+        self._if_condition()
+        self._branch()
 
-    :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) else ({ <code_ss> }|<s>)
-    :returns: None
-    """
-    savestate_node = self.ast_builder.down(IfElseNode, [TT.IF])
+        self.match_and_add([TT.ELSE], NT.Else)
+        self._branch()
 
-    self._if()
-    # savestate_node = self.ast_builder.down(IfElseNode, [TT.ELSE])
+        self.ast_builder.up(savestate_node)
 
-    # self.match_and_add([TT.ELSE])
-    self.match_and_add([TT.ELSE])
+    def _if_condition(self, ):
+        """if code piece
 
-    if self.LTT(1) == TT.L_BRACE:
-        self.match([TT.L_BRACE])
+        :grammar: if '('<code_le>')'
+        """
+        self.match([TT.IF])
 
-        self.code_ss()
+        self.match([TT.L_PAREN])
 
-        self.match([TT.R_BRACE])
-    elif self._is_statement():
-        self._s()
-    else:
-        raise NoApplicableRuleError("statement in braces or single statement",
-                                    self.LT(1))
+        self.code_le()
 
-    self.ast_builder.up(savestate_node)
+        self.match([TT.R_PAREN])
 
+    def _branch(self, ):
+        """if code piece
 
-def _if(self):
-    """if code piece
+        :grammar: ({ <code_ss> }|<s>)
+        """
+        if self.LTT(1) == TT.L_BRACE:
+            self.consume_next_token()  # [TT.L_BRACE]
 
-    :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
-    :returns: None
-    """
-    self.match_and_add([TT.IF])
+            self.code_ss()
 
-    self.match([TT.L_PAREN])
-
-    self.code_le()
-
-    self.match([TT.R_PAREN])
-
-    if self.LTT(1) == TT.L_BRACE:
-        self.match([TT.L_BRACE])
-
-        self.code_ss()
-
-        self.match([TT.R_BRACE])
-    elif self._is_statement():
-        self._s()
-    else:
-        raise NoApplicableRuleError("statement in braces or single statement",
-                                    self.LT(1))
+            self.match([TT.R_BRACE])
+        elif self._is_statement():
+            self._s()
+        else:
+            raise NoApplicableRuleError(
+                "statement in braces or single statement", self.LT(1))

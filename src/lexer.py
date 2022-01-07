@@ -67,7 +67,6 @@ class TT(Enum):
     WHILE = "while"
     DO = "do"
     MAIN = "main"
-    TO_BOOL = "to bool"
     EOF = "end of file"
 
 
@@ -114,13 +113,12 @@ class Lexer:
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
 
-    def __init__(self, fname, input):
+    def __init__(self, input):
         """
         :lc: lookahead character
         :c: character
 
         """
-        self.fname = fname
         self.input = input
         self.lc_col = 0
         self.lc_row = 0

@@ -44,14 +44,14 @@ class _CodeGenerator:
         """
         self.generated_code[self.metadata[-1][0]] =\
             self.generated_code[self.metadata[-1]
-                                [0]].replace(pattern, str(word))
+                                [0]].replace(pattern, word)
 
     def replace_code_pre(self, code, pattern, word):
         """Jumps backwards, e.g. needed for while loops.
 
         :returns: code
         """
-        return code.replace(pattern, str(word))
+        return code.replace(pattern, word)
 
     def show_code(self, ):
         """Sets the generated / modified code pieces together to one unified

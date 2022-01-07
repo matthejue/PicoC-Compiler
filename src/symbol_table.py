@@ -11,7 +11,7 @@ class Symbol:
         :name: string
         :datatype: Symbol
         :position: tuple(int, int)
-        :value: int
+        :value: string
         """
         self.name = name
         self.datatype = datatype

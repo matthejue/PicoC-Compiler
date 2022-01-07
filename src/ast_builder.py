@@ -1,13 +1,13 @@
 import global_vars
-from lexer import Token
 from abstract_syntax_tree import ASTNode
+from dummy_nodes import NT
 
 
 class ASTBuilder:
     """Provides methods for ast construction"""
-    def __init__(self):
-        self.root = None
-        self.current_node = None
+    def __init__(self, fname):
+        self.root = NT.File(fname)
+        self.current_node = NT.File(fname)
 
     def CN(self) -> ASTNode:
         """Current node
@@ -26,10 +26,11 @@ class ASTBuilder:
             return
 
         new_node = classname()
-        if not self.root:
-            self.root = new_node
-        else:
-            self.current_node.add_child(new_node)
+        # TODO: remove when it's sure this won't ever be needed anymore
+        #  if not self.root:
+        #  self.root = new_node
+        #  else:
+        self.current_node.add_child(new_node)
         savestate_node = self.current_node
 
         # deeper grammar rules have to be called with a new current_node

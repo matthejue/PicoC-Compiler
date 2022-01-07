@@ -1,27 +1,27 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
-from dummy_nodes import Identifier, Number, Character, Add, Sub, Mul, Div, Mod, Oplus, And, Or, Not, Minus
+from dummy_nodes import NT
 import global_vars
 
 
 class ArithOperand(ASTNode):
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
-    START = "SUBI SP 1;  # Stack um eine Zelle erweitern\n"
-    CONSTANT = "LOADI ACC encode(w);  # Wert von e1 in ACC laden\n"
-    CONSTANT_IDENTIFIER = "LOADI ACC encode(c);  # Wert von e1 in ACC laden\n"
-    VARIABLE_IDENTIFIER = "LOAD ACC var_identifier;  # Wert von e1 in ACC laden\n"
-    END = "STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle\n"
+    start = "SUBI SP 1;  # Stack um eine Zelle erweitern\n"
+    constant = "LOADI ACC encode(w);  # Wert von e1 in ACC laden\n"
+    constant_identifier = "LOADI ACC encode(c);  # Wert von e1 in ACC laden\n"
+    variable_identifier = "LOAD ACC var_identifier;  # Wert von e1 in ACC laden\n"
+    end = "STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle\n"
 
-    ALL_LOC = 1
+    all_loc = 1
 
-    __match_args__ = ("value")
+    __match_args__ = ("value", "position")
 
     def visit(self, ):
         self.code_generator.add_code("# Arithmetic Operand start\n", 0)
 
-        self.code_generator.add_code(self.START, self.ALL_LOC)
+        self.code_generator.add_code(self.start, self.all_loc)
 
         try:
             self._adapt_code()
@@ -29,40 +29,40 @@ class ArithOperand(ASTNode):
             # repackage the error
             raise UnknownIdentifierError(self.value)
 
-        self.code_generator.add_code(self.END, self.ALL_LOC)
+        self.code_generator.add_code(self.end, self.all_loc)
 
         self.code_generator.add_code("# Arithmetic Operand end\n", 0)
 
     def _adapt_code(self, ):
         match self:
-            case Identifier(value):
+            case NT.Identifier(value):
                 symbol = self.symbol_table.resolve(value)
                 match symbol:
                     case VariableSymbol(value):
-                        self.VARIABLE_IDENTIFIER = self._pretty_comments(
-                            self.VARIABLE_IDENTIFIER)
-                        self.VARIABLE_IDENTIFIER = self.code_generator.replace_code_pre(
-                            self.VARIABLE_IDENTIFIER, "var_identifier", value)
-                        self.code_generator.add_code(self.VARIABLE_IDENTIFIER,
-                                                     self.ALL_LOC)
+                        self.variable_identifier = self._pretty_comments(
+                            self.variable_identifier)
+                        self.variable_identifier = self.code_generator.replace_code_pre(
+                            self.variable_identifier, "var_identifier", value)
+                        self.code_generator.add_code(self.variable_identifier,
+                                                     self.all_loc)
                     case ConstantSymbol(value):
-                        self.CONSTANT_IDENTIFIER = self._pretty_comments(
-                            self.CONSTANT_IDENTIFIER)
-                        self.CONSTANT_IDENTIFIER = self.code_generator.replace_code_pre(
-                            self.CONSTANT_IDENTIFIER, "encode(c)", value)
-                        self.code_generator.add_code(self.CONSTANT_IDENTIFIER,
-                                                     self.ALL_LOC)
-            case (Number(value) | Character(value)):
-                self.CONSTANT = self._pretty_comments(self.CONSTANT)
-                self.CONSTANT = self.code_generator.replace_code_pre(
-                    self.CONSTANT, "encode(w)", value)
-                self.code_generator.add_code(self.CONSTANT, self.ALL_LOC)
+                        self.constant_identifier = self._pretty_comments(
+                            self.constant_identifier)
+                        self.constant_identifier = self.code_generator.replace_code_pre(
+                            self.constant_identifier, "encode(c)", value)
+                        self.code_generator.add_code(self.constant_identifier,
+                                                     self.all_loc)
+            case (NT.Number(value) | NT.Character(value)):
+                self.constant = self._pretty_comments(self.constant)
+                self.constant = self.code_generator.replace_code_pre(
+                    self.constant, "encode(w)", value)
+                self.code_generator.add_code(self.constant, self.all_loc)
 
     def _pretty_comments(self, code):
         if global_vars.args.verbose:
             code = self.code_generator.replace_code_pre(
-                code, "e1", str(self.value))
-            return code
+                code, "e1", self.value)
+        return code
 
 
 class ArithBinOp(ASTNode):
@@ -71,7 +71,7 @@ class ArithBinOp(ASTNode):
     spezifiert, als Addition oder Subtraktion, da erst später feststeht, ob die
     Binary Operation eine Addition oder Subtraktion ist etc."""
 
-    END = """# codeaa(e1)
+    end = """# codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2;  # Wert von e1 in ACC laden
         LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
@@ -79,7 +79,6 @@ class ArithBinOp(ASTNode):
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """
-
     end_loc = 5
 
     def _update_match_args(self):
@@ -90,10 +89,6 @@ class ArithBinOp(ASTNode):
     __match_args__ = ("left_operand", "operation", "right_operand")
 
     def visit(self, ):
-        if self.ignore:
-            self.children[0].visit()
-            return
-
         self._update_match_args()
 
         self.code_generator.add_code(
@@ -106,63 +101,63 @@ class ArithBinOp(ASTNode):
 
         self._adapt_code()
 
+        self.code_generator.add_code(strip_multiline_string(self.end),
+                                     self.end_loc)
+
         self.code_generator.add_code("# Arithmetic Binary Operation end\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
-            self.END = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.END), 'e1', str(self.left_operand))
-            self.END = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.END), 'e2', str(self.right_operand))
-            self.END = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.END), 'e1 binop e2', str(self))
+            self.end = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.end), 'e1', str(self.left_operand))
+            self.end = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.end), 'e2', str(self.right_operand))
+            self.end = self.code_generator.replace_code_pre(
+                strip_multiline_string(self.end), 'e1 binop e2', str(self))
 
     def _adapt_code(self, ):
-        match self.operation:
-            case Add():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'ADD')
-            case Sub():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'SUB')
-            case Mul():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'MUL')
-            case Div():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'DIV')
-            case Mod():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'MOD')
-            case Oplus():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'OPLUS')
-            case And():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'AND')
-            case Or():
-                self.END = self.code_generator.replace_code_pre(
-                    self.END, 'OP', 'OR')
-
-        self.code_generator.add_code(strip_multiline_string(self.END),
-                                     self.end_loc)
+        match self:
+            case ArithBinOp(_, NT.Add(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'ADD')
+            case ArithBinOp(_, NT.Sub(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'SUB')
+            case ArithBinOp(_, NT.Mul(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'MUL')
+            case ArithBinOp(_, NT.Div(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'DIV')
+            case ArithBinOp(_, NT.Mod(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'MOD')
+            case ArithBinOp(_, NT.Oplus, _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'OPLUS')
+            case ArithBinOp(_, NT.And(), _):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'AND')
+            case ArithBinOp(_, NT.Or(), ):
+                self.end = self.code_generator.replace_code_pre(
+                    self.end, 'OP', 'OR')
 
 
 class ArithUnOp(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
-    START = """# codeaa(e1)
+    start = """# codeaa(e1)
         LOADI ACC 0;  # 0 in ACC laden
         LOADIN SP IN2 1;  # Wert von e1 in IN2 laden
         SUB ACC IN2;  # (0 - e1) in ACC laden
         """
-    START_LOC = 3
+    start_loc = 3
 
-    BITWISE_NOT = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\n"
-    BITWISE_NEGATION_LOC = 1
+    bitwise_not = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\n"
+    bitwise_not_loc = 1
 
-    END = "STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle\n"
-    END_LOC = 1
+    end = "STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle\n"
+    end_loc = 1
 
     def _update_match_args(self, ):
         self.operation = self.children[0]
@@ -175,23 +170,24 @@ class ArithUnOp(ASTNode):
 
         self.operand.visit()
 
-        self.code_generator.add_code(strip_multiline_string(self.START),
-                                     self.START_LOC)
+        self.code_generator.add_code(strip_multiline_string(self.start),
+                                     self.start_loc)
 
         self._adapt_code()
 
-        self.code_generator.add_code(self.END, self.END_LOC)
+        self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code("# Arithmetic Unary Operation end\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
-            self.code_generator.replace_code_pre(self.START, "e1", self.value)
+            self.code_generator.replace_code_pre(
+                self.start, "e1", str(self.operand))
 
     def _adapt_code(self, ):
-        match self.operation:
-            case Not():
-                self.code_generator.add_code(self.BITWISE_NOT,
-                                             self.BITWISE_NEGATION_LOC)
-            case Minus():
+        match self:
+            case ArithUnOp(NT.Not(), _):
+                self.code_generator.add_code(self.bitwise_not,
+                                             self.bitwise_not_loc)
+            case ArithUnOp(NT.Minus(), _):
                 pass

@@ -18,12 +18,9 @@ class ASTNode:
         self.position = position
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
-        # the ignore option is only relevant for Container Nodes
-        self.ignore = True
 
     def add_child(self, node):
         """
-
         :returns: None
         """
         self.children += [node]
@@ -34,14 +31,10 @@ class ASTNode:
     def __repr__(self):
         if not self.children:
             return f"{self.value}"
-        # if Node doesn't even reach it's own operation token it's unnecessary
-        # and should be skipped
-        elif self.ignore:
-            return f"{self.children[0]}"
 
-        acc = "("
+        acc = "(" + f"{self.children[0]}"
 
-        for child in self.children:
+        for child in self.children[1:]:
             acc += f" {child}"
 
         return acc + ")"

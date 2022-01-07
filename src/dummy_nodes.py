@@ -6,6 +6,10 @@ from dataclasses import dataclass
 class NT:
     """Nodetypes"""
     @dataclass
+    class File(ASTNode):
+        name: str
+
+    @dataclass
     class Add(ASTNode):
         value: str
         position: tuple[int, int]
@@ -87,5 +91,60 @@ class NT:
 
     @dataclass
     class Void(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Main(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Else(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Eq(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class UEq(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Lt(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Gt(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Le(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class Ge(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class LAnd(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class LOr(ASTNode):
+        value: str
+        position: tuple[int, int]
+
+    @dataclass
+    class LNot(ASTNode):
         value: str
         position: tuple[int, int]

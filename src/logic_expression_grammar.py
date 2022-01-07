@@ -1,18 +1,25 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT, Token
-from logic_nodes import LogicAndOrNode, LogicNotNode, LogicAtomNode,\
-    LogicTopBottomNode
+from logic_nodes import LogicAndOr, LogicNot, LogicAtom, LogicTopBottom
 from errors import MismatchedTokenError, NoApplicableRuleError
-from dummy_nodes import ToBoolNode
+from dummy_nodes import NT
 import global_vars
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
     """The logic expression part of the context free grammar of the piocC
     language"""
-    def __init__(self, lexer):
-        # super().__init__(lexer, num_lts)
-        super().__init__(lexer)
+
+    COMP_REL = {
+        TT.EQ_COMP: NT.Eq,
+        TT.UEQ_COMP: NT.UEq,
+        TT.LT_COMP: NT.Lt,
+        TT.GT_COMP: NT.Gt,
+        TT.LE_COMP: NT.Le,
+        TT.GE_COMP: NT.Ge
+    }
+    # TODO: da stimmt noch was nicht, später löschen
+    LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr, TT.NOT: NT.LNot}
 
     def code_ae_le(self):
         """point where it's decided if it's a arithmetic expression only or a
@@ -47,28 +54,15 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
 
-        :function: <code_ae> ;
+        :function: <code_ae>
         :returns: None
         """
         self.code_ae()
-        if self.LTT(1) == TT.COMP_OP or self._is_logical_connective():
+        if self.LTT(1) in self.COMP_REL.keys() or\
+                self.LTT(1) in self.LOG_CON.keys():
             raise MismatchedTokenError(
                 "all besides comparison operators and "
                 "logical connectives", self.LT(1))
-
-    def _is_logical_connective(self, ):
-        return self.LTT(1) == TT.AND or self.LTT(1) == TT.OR or self.LTT(1)\
-            == TT.NOT
-
-
-#     def _taste_consume_le(self):
-#         """taste whether the next expression is a logic expression
-#
-#         :grammar: <code_le> ;
-#         :returns: None
-#         """
-#         self.code_le()
-#         self.match([TT.SEMICOLON])
 
     def code_le(self):
         """logic expression startpoint
@@ -84,13 +78,17 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(LogicAndOrNode, [TT.OR])
+        if self.LTT(2) != TT.OR:
+            self._and_expr()
+            return
+
+        savestate_node = self.ast_builder.down(LogicAndOr)
 
         self._and_expr()
         while self.LTT(1) == TT.OR:
-            self.match_and_add([TT.OR])
+            self.add(classname=NT.LOr)
 
-            self.ast_builder.down(LogicAndOrNode, [TT.OR])
+            self.ast_builder.down(LogicAndOr)
 
             self._and_expr()
 
@@ -102,13 +100,17 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <lo> (and #2 <lo>)*
         :returns: None
         """
-        savestate_node = self.ast_builder.down(LogicAndOrNode, [TT.AND])
+        if self.LTT(2) != TT.AND:
+            self._lo()
+            return
+
+        savestate_node = self.ast_builder.down(LogicAndOr)
 
         self._lo()
         while self.LTT(1) == TT.AND:
-            self.match_and_add([TT.AND])
+            self.add(classname=NT.LAnd)
 
-            self.ast_builder.down(LogicAndOrNode, [TT.AND])
+            self.ast_builder.down(LogicAndOr)
 
             self._lo()
 
@@ -124,7 +126,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self._not_expr()
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_logic()
-        elif self.LTT(1) in [TT.NUMBER, TT.IDENTIFIER]:
+        elif self.LTT(1) in [TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER]:
             self._atom_or_top_bottom()
         else:
             raise MismatchedTokenError("logic operand", self.LT(1))
@@ -146,8 +148,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
     def _taste_consume_top_bottom(self, ):
         self._top_bottom()
         # don't allow it to be a atom
-        if self.LTT(1) == TT.COMP_OP:
-            raise MismatchedTokenError("all besides comparison operators",
+        if self.LTT(1) in self.COMP_REL.keys():
+            raise MismatchedTokenError("all besides comparison relations",
                                        self.LT(1))
 
     def _top_bottom(self, ):
@@ -156,13 +158,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(LogicTopBottomNode,
-                                               [TT.TO_BOOL])
-
-        # TODO: little hack to to also have a token for bottomnode
-        if not global_vars.is_tasting:
-            self.ast_builder.addChild(
-                ToBoolNode(Token(TT.TO_BOOL, "to bool", None)))
+        savestate_node = self.ast_builder.down(LogicTopBottom)
 
         self.code_ae()
 
@@ -174,10 +170,10 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <code_ae> <comp_op> <code_ae>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(LogicAtomNode, [TT.COMP_OP])
+        savestate_node = self.ast_builder.down(LogicAtom)
 
         self.code_ae()
-        self.match_and_add([TT.COMP_OP])
+        self.match_and_add(list(self.COMP_REL.keys()), mapping=self.COMP_REL)
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
@@ -188,7 +184,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: ( <code_le> )
         :returns: None
         """
-        self.match([TT.L_PAREN])
+        self.consume_next_token()  # [TT.L_PAREN]
         self.code_le()
         self.match([TT.R_PAREN])
 
@@ -198,15 +194,15 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: !+ <code_le>
         :returns: None
         """
-        savestate_node = self.ast_builder.down(LogicNotNode, [TT.NOT])
+        savestate_node = self.ast_builder.down(LogicNot)
 
         while True:
-            self.match_and_add(TT.NOT)
+            self.add(NT.LNot)
 
             if self.LTT(1) != TT.NOT:
                 break
 
-            self.ast_builder.down(LogicNotNode, [TT.NOT])
+            self.ast_builder.down(LogicNot)
 
         self._lo()
 
