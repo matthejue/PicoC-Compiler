@@ -36,8 +36,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         """
-        if not global_vars.is_tasting:
-            __import__('pudb').set_trace()
         self.ast_builder.save("_prec2")
 
         savestate_node = self.ast_builder.down(ArithBinOp)

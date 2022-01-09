@@ -2,7 +2,7 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 import global_vars
 
 
-class MainFunctionNode(ASTNode):
+class MainFunction(ASTNode):
     """Abstract Syntax Tree Node for main method"""
 
     start = "LOADI SP eds;\n"

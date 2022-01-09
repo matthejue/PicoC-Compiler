@@ -1,5 +1,5 @@
 from statement_grammar import StatementGrammar
-from function_nodes import MainFunctionNode
+from function_nodes import MainFunction
 from lexer import TT
 from dummy_nodes import NT
 
@@ -23,7 +23,7 @@ class FunctionGrammar(StatementGrammar):
         :returns: None
         """
         if self.LTT(2) == TT.MAIN:
-            savestate_node = self.ast_builder.down(MainFunctionNode)
+            savestate_node = self.ast_builder.down(MainFunction)
 
             self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
 
