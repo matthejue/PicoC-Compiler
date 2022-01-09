@@ -60,6 +60,12 @@ class ASTBuilder:
         return_node.children += self.current_node.children
         self.current_node = return_node
 
+    def discard(self, fname):
+        if global_vars.is_tasting:
+            return
+
+        self.return_nodes[fname].pop()
+
     def up(self, savestate_node):
         """go one layer up in the abstract syntax tree
 

@@ -31,6 +31,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # because both arithmetic and logic grammar have single numbers. In
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
+        __import__('pudb').set_trace()
         errors = []
         if self.taste(self._taste_consume_ae, errors):
             self._taste_consume_ae()
@@ -86,6 +87,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         if self.LTT(1) != TT.OR:
             self.ast_builder.go_back("_or_expr")
             return
+        else:
+            self.ast_builder.discard("_or_expr")
 
         while self.LTT(1) == TT.OR:
             self.add_and_consume(classname=NT.LOr)
@@ -111,6 +114,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         if self.LTT(1) != TT.AND:
             self.ast_builder.go_back("_and_expr")
             return
+        else:
+            self.ast_builder.discard("_and_expr")
 
         while self.LTT(1) == TT.AND:
             self.add_and_consume(classname=NT.LAnd)

@@ -32,6 +32,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         if self.LTT(1) in chain(self.PRIM_DT.keys(), [TT.CONST]):
             self._alloc()
         elif self.LTT(1) == TT.IDENTIFIER:
+            self.ast_builder.discard("_aa")
             self.add_and_consume(classname=Identifier)
             self._assign()
         else:
@@ -69,6 +70,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         if self.LTT(1) != TT.ASSIGNMENT:
             self.ast_builder.go_back("_aa")
+        else:
+            self.ast_builder.discard("_aa")
 
         if self.LTT(1) == TT.ASSIGNMENT:
             self.consume_next_token()  # [TT.ASSIGNMENT]

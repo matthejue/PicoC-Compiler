@@ -35,9 +35,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         """
-        import global_vars
-        if not global_vars.is_tasting:
-            __import__('pudb').set_trace()
+        #  import global_vars
+        #  if not global_vars.is_tasting:
+        #  __import__('pudb').set_trace()
         self.ast_builder.save("_prec2")
 
         savestate_node = self.ast_builder.down(ArithBinOp)
@@ -47,6 +47,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         if self.LTT(1) not in self.BINOP_PREC_2.keys():
             self.ast_builder.go_back("_prec2")
             return
+        else:
+            self.ast_builder.discard("_prec2")
 
         while self.LTT(1) in self.BINOP_PREC_2.keys():
             self.add_and_consume(mapping=self.BINOP_PREC_2)
@@ -70,6 +72,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         if self.LTT(1) not in self.BINOP_PREC_1.keys():
             self.ast_builder.go_back("_prec1")
             return
+        else:
+            self.ast_builder.discard("_prec1")
 
         while self.LTT(1) in self.BINOP_PREC_1.keys():
             self.add_and_consume(mapping=self.BINOP_PREC_1)
