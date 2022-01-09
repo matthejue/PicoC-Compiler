@@ -3,6 +3,7 @@ from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Characte
 from errors import MismatchedTokenError
 from lexer import TT
 from dummy_nodes import NT
+import global_vars
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
@@ -35,9 +36,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         """
-        #  import global_vars
-        #  if not global_vars.is_tasting:
-        #  __import__('pudb').set_trace()
+        if not global_vars.is_tasting:
+            __import__('pudb').set_trace()
         self.ast_builder.save("_prec2")
 
         savestate_node = self.ast_builder.down(ArithBinOp)
@@ -52,9 +52,17 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         while self.LTT(1) in self.BINOP_PREC_2.keys():
             self.add_and_consume(mapping=self.BINOP_PREC_2)
+
+            self.ast_builder.save("_prec2_loop")
+
             self.ast_builder.down(ArithBinOp)
 
             self._prec1()
+
+            if self.LTT(1) not in self.BINOP_PREC_2.keys():
+                self.ast_builder.go_back("_prec2_loop")
+            else:
+                self.ast_builder.discard("_prec2_loop")
 
         self.ast_builder.up(savestate_node)
 
@@ -77,9 +85,16 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         while self.LTT(1) in self.BINOP_PREC_1.keys():
             self.add_and_consume(mapping=self.BINOP_PREC_1)
-            self.ast_builder.down(ArithBinOp)
 
+            self.ast_builder.save("_prec1_loop")
+
+            self.ast_builder.down(ArithBinOp)
             self._ao()
+
+            if self.LTT(1) not in self.BINOP_PREC_1.keys():
+                self.ast_builder.go_back("_prec1_loop")
+            else:
+                self.ast_builder.discard("_prec1_loop")
 
         self.ast_builder.up(savestate_node)
 

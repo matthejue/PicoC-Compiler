@@ -31,7 +31,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # because both arithmetic and logic grammar have single numbers. In
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
-        __import__('pudb').set_trace()
         errors = []
         if self.taste(self._taste_consume_ae, errors):
             self._taste_consume_ae()
