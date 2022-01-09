@@ -25,9 +25,9 @@ class FunctionGrammar(StatementGrammar):
         if self.LTT(2) == TT.MAIN:
             savestate_node = self.ast_builder.down(MainFunctionNode)
 
-            self.match_and_add(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
+            self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
 
-            self.match_and_add([TT.MAIN], NT.Main)
+            self.add_and_match([TT.MAIN], NT.Main)
 
             self.match([TT.L_PAREN])
 

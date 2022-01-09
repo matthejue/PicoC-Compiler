@@ -19,3 +19,6 @@ class Grammar(FunctionGrammar):
         :returns: rootnode of the abstract syntax tree
         """
         return self.ast_builder.root
+
+    def __repr__(self, ):
+        return str(self.ast_builder)

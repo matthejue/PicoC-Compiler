@@ -3,7 +3,6 @@ from lexer import TT, Token
 from logic_nodes import LogicAndOr, LogicNot, LogicAtom, LogicTopBottom
 from errors import MismatchedTokenError, NoApplicableRuleError
 from dummy_nodes import NT
-import global_vars
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -78,15 +77,18 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
         :returns: None
         """
-        if self.LTT(2) != TT.OR:
-            self._and_expr()
-            return
+        self.ast_builder.save("_or_expr")
 
         savestate_node = self.ast_builder.down(LogicAndOr)
 
         self._and_expr()
+
+        if self.LTT(1) != TT.OR:
+            self.ast_builder.go_back("_or_expr")
+            return
+
         while self.LTT(1) == TT.OR:
-            self.add(classname=NT.LOr)
+            self.add_and_consume(classname=NT.LOr)
 
             self.ast_builder.down(LogicAndOr)
 
@@ -100,15 +102,18 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #2 <lo> (and #2 <lo>)*
         :returns: None
         """
-        if self.LTT(2) != TT.AND:
-            self._lo()
-            return
+        self.ast_builder.save("_and_expr")
 
         savestate_node = self.ast_builder.down(LogicAndOr)
 
         self._lo()
+
+        if self.LTT(1) != TT.AND:
+            self.ast_builder.go_back("_and_expr")
+            return
+
         while self.LTT(1) == TT.AND:
-            self.add(classname=NT.LAnd)
+            self.add_and_consume(classname=NT.LAnd)
 
             self.ast_builder.down(LogicAndOr)
 
@@ -173,7 +178,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         savestate_node = self.ast_builder.down(LogicAtom)
 
         self.code_ae()
-        self.match_and_add(list(self.COMP_REL.keys()), mapping=self.COMP_REL)
+        self.add_and_match(list(self.COMP_REL.keys()), mapping=self.COMP_REL)
         self.code_ae()
 
         self.ast_builder.up(savestate_node)
@@ -197,7 +202,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         savestate_node = self.ast_builder.down(LogicNot)
 
         while True:
-            self.add(NT.LNot)
+            self.add_and_consume(NT.LNot)
 
             if self.LTT(1) != TT.NOT:
                 break

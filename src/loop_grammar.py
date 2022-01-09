@@ -1,10 +1,11 @@
-from loop_nodes import WhileNode, DoWhileNode
+from loop_nodes import While, DoWhile
 from lexer import TT
 # from errors import NoApplicableRuleError
-from statement_grammar import StatementGrammar
+from errors import NoApplicableRuleError
+#  from statement_grammar import StatementGrammar
 
 
-class LoopGrammar(StatementGrammar):
+class LoopGrammar:
     def code_lo(self):
         """loop grammar startpoint
 
@@ -21,12 +22,10 @@ class LoopGrammar(StatementGrammar):
         """
         if self.LTT(1) == TT.WHILE:
             self._while()
-        elif self.LTT(1) == TT.DO_WHILE:
+        elif self.LTT(1) == TT.DO:
             self._do_while()
-        # eigentlich ergibt hier der Error keinen Sinnn, weil er nie
-        # aufgerufen werden kann
-        # else:
-        #     raise NoApplicableRuleError('while or do while', self.LT(1))
+        else:
+            raise NoApplicableRuleError('while or do while', self.LT(1))
 
     def _while(self):
         """while loop
@@ -34,9 +33,9 @@ class LoopGrammar(StatementGrammar):
         :grammar: <while> ( <code_le> ) { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(WhileNode, [TT.WHILE])
+        savestate_node = self.ast_builder.down(While)
 
-        self.match_and_add([TT.WHILE])
+        self.consume_next_token()  # [TT.WHILE]
 
         self.match([TT.L_PAREN])
 
@@ -58,9 +57,9 @@ class LoopGrammar(StatementGrammar):
         :grammar: do { <code_ss> } while ( <code_le> ) ;
         :returns: None
         """
-        savestate_node = self.ast_builder.down(DoWhileNode, [TT.DO_WHILE])
+        savestate_node = self.ast_builder.down(DoWhile)
 
-        self.match_and_add([TT.DO_WHILE])
+        self.consume_next_token()  # [TT.DO]
 
         self.match([TT.L_BRACE])
 

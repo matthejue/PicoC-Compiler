@@ -1,13 +1,15 @@
 import global_vars
 from abstract_syntax_tree import ASTNode
-from dummy_nodes import NT
+from file_nodes import File
 
 
 class ASTBuilder:
     """Provides methods for ast construction"""
     def __init__(self, fname):
-        self.root = NT.File(fname)
-        self.current_node = NT.File(fname)
+        file = File(fname)
+        self.root = file
+        self.current_node = file
+        self.return_nodes = {}
 
     def CN(self) -> ASTNode:
         """Current node
@@ -38,6 +40,26 @@ class ASTBuilder:
 
         return savestate_node
 
+    def save(self, fname):
+        """Save a node
+        """
+        if global_vars.is_tasting:
+            return
+
+        if not self.return_nodes.get(fname):
+            self.return_nodes[fname] = [self.current_node]
+        else:
+            self.return_nodes[fname] += [self.current_node]
+
+    def go_back(self, fname):
+        if global_vars.is_tasting:
+            return
+
+        return_node = self.return_nodes[fname].pop()
+        return_node.children.pop()
+        return_node.children += self.current_node.children
+        self.current_node = return_node
+
     def up(self, savestate_node):
         """go one layer up in the abstract syntax tree
 
@@ -50,3 +72,6 @@ class ASTBuilder:
         # grammar rules called on the same layer have to be called with the
         # same old current_node again
         self.current_node = savestate_node
+
+    def __repr__(self, ):
+        return str(self.root)

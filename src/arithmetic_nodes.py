@@ -2,6 +2,7 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
 from dummy_nodes import NT
+from dataclasses import dataclass
 import global_vars
 
 
@@ -19,7 +20,7 @@ class ArithOperand(ASTNode):
     __match_args__ = ("value", "position")
 
     def visit(self, ):
-        self.code_generator.add_code("# Arithmetic Operand start\n", 0)
+        self.code_generator.add_code("# Arithmetischer Operand Start\n", 0)
 
         self.code_generator.add_code(self.start, self.all_loc)
 
@@ -31,11 +32,11 @@ class ArithOperand(ASTNode):
 
         self.code_generator.add_code(self.end, self.all_loc)
 
-        self.code_generator.add_code("# Arithmetic Operand end\n", 0)
+        self.code_generator.add_code("# Arithmetischer Operand Ende\n", 0)
 
     def _adapt_code(self, ):
         match self:
-            case NT.Identifier(value):
+            case Identifier(value):
                 symbol = self.symbol_table.resolve(value)
                 match symbol:
                     case VariableSymbol(value):
@@ -52,7 +53,7 @@ class ArithOperand(ASTNode):
                             self.constant_identifier, "encode(c)", value)
                         self.code_generator.add_code(self.constant_identifier,
                                                      self.all_loc)
-            case (NT.Number(value) | NT.Character(value)):
+            case (Number(value) | Character(value)):
                 self.constant = self._pretty_comments(self.constant)
                 self.constant = self.code_generator.replace_code_pre(
                     self.constant, "encode(w)", value)
@@ -65,20 +66,47 @@ class ArithOperand(ASTNode):
         return code
 
 
+@dataclass
+class Identifier(ArithOperand):
+    value: str
+    position: tuple[int, int]
+
+    def __repr__(self, ):
+        return f"{self.value}"
+
+
+@dataclass
+class Number(ArithOperand):
+    value: str
+    position: tuple[int, int]
+
+    def __repr__(self, ):
+        return f"{self.value}"
+
+
+@dataclass
+class Character(ArithOperand):
+    value: str
+    position: tuple[int, int]
+
+    def __repr__(self, ):
+        return f"{self.value}"
+
+
 class ArithBinOp(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic binary operations.
     Dient als Container für andere Nodes, daher ist es nicht genauer
     spezifiert, als Addition oder Subtraktion, da erst später feststeht, ob die
     Binary Operation eine Addition oder Subtraktion ist etc."""
 
-    end = """# codeaa(e1)
+    end = strip_multiline_string("""# codeaa(e1)
         # codeaa(e2)
         LOADIN SP ACC 2;  # Wert von e1 in ACC laden
         LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
         OP ACC IN2;  # Wert von e1 binop e2 in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """
+        """)
     end_loc = 5
 
     def _update_match_args(self):
@@ -92,7 +120,7 @@ class ArithBinOp(ASTNode):
         self._update_match_args()
 
         self.code_generator.add_code(
-            "# Arithmetic Binary Operation start\n", 0)
+            "# Arithmetische binäre Operation Start\n", 0)
 
         self.left_operand.visit()
         self.right_operand.visit()
@@ -101,19 +129,19 @@ class ArithBinOp(ASTNode):
 
         self._adapt_code()
 
-        self.code_generator.add_code(strip_multiline_string(self.end),
-                                     self.end_loc)
+        self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Arithmetic Binary Operation end\n", 0)
+        self.code_generator.add_code(
+            "# Arithmetische binäre Operation Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.end = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.end), 'e1', str(self.left_operand))
+                self.end, 'e1', str(self.left_operand))
             self.end = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.end), 'e2', str(self.right_operand))
+                self.end, 'e2', str(self.right_operand))
             self.end = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.end), 'e1 binop e2', str(self))
+                self.end, 'e1 binop e2', str(self))
 
     def _adapt_code(self, ):
         match self:
@@ -146,11 +174,11 @@ class ArithBinOp(ASTNode):
 class ArithUnOp(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
-    start = """# codeaa(e1)
+    start = strip_multiline_string("""# codeaa(e1)
         LOADI ACC 0;  # 0 in ACC laden
         LOADIN SP IN2 1;  # Wert von e1 in IN2 laden
         SUB ACC IN2;  # (0 - e1) in ACC laden
-        """
+        """)
     start_loc = 3
 
     bitwise_not = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\n"
@@ -166,18 +194,19 @@ class ArithUnOp(ASTNode):
     __match_args__ = ("operation", "operand")
 
     def visit(self, ):
-        self.code_generator.add_code("# Arithmetic Unary Operation start\n", 0)
+        self.code_generator.add_code(
+            "# Arithmetische unäre Operation Start\n", 0)
 
         self.operand.visit()
 
-        self.code_generator.add_code(strip_multiline_string(self.start),
-                                     self.start_loc)
+        self.code_generator.add_code(self.start, self.start_loc)
 
         self._adapt_code()
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Arithmetic Unary Operation end\n", 0)
+        self.code_generator.add_code(
+            "# Arithmetische unäre Operation Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:

@@ -1,5 +1,5 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import (ArithUnOp, ArithBinOp)
+from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Character
 from errors import MismatchedTokenError
 from lexer import TT
 from dummy_nodes import NT
@@ -35,16 +35,21 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #2 <prec1> ((<binop_prec2>|<minus>) #2 <prec1>)*
         """
-        if self.LTT(2) not in self.BINOP_PREC_2.keys():
-            self._prec1()
-            return
+        import global_vars
+        if not global_vars.is_tasting:
+            __import__('pudb').set_trace()
+        self.ast_builder.save("_prec2")
 
         savestate_node = self.ast_builder.down(ArithBinOp)
 
         self._prec1()
 
+        if self.LTT(1) not in self.BINOP_PREC_2.keys():
+            self.ast_builder.go_back("_prec2")
+            return
+
         while self.LTT(1) in self.BINOP_PREC_2.keys():
-            self.add(mapping=self.BINOP_PREC_2)
+            self.add_and_consume(mapping=self.BINOP_PREC_2)
             self.ast_builder.down(ArithBinOp)
 
             self._prec1()
@@ -54,18 +59,20 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
     def _prec1(self):
         """precedence 1
 
-        :grammer:  #2 <ao> (<binop_prec1> #2 <ao>)*
+        :grammer: #2 <ao> (<binop_prec1> #2 <ao>)*
         """
-        if self.LTT(2) not in self.BINOP_PREC_1.keys():
-            self._ao()
-            return
+        self.ast_builder.save("_prec1")
 
         savestate_node = self.ast_builder.down(ArithBinOp)
 
         self._ao()
 
+        if self.LTT(1) not in self.BINOP_PREC_1.keys():
+            self.ast_builder.go_back("_prec1")
+            return
+
         while self.LTT(1) in self.BINOP_PREC_1.keys():
-            self.add(mapping=self.BINOP_PREC_1)
+            self.add_and_consume(mapping=self.BINOP_PREC_1)
             self.ast_builder.down(ArithBinOp)
 
             self._ao()
@@ -78,11 +85,11 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: <word> | <number> | <paren> | <unop>
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.add(classname=NT.Identifier)
+            self.add_and_consume(classname=Identifier)
         elif self.LTT(1) == TT.NUMBER:
-            self.add(classname=NT.Number)
+            self.add_and_consume(classname=Number)
         elif self.LTT(1) == TT.CHARACTER:
-            self.add(classname=NT.Character)
+            self.add_and_consume(classname=Character)
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
         elif self.LTT(1) in self.UNARY.keys():
@@ -107,7 +114,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         savestate_node = self.ast_builder.down(ArithUnOp)
 
         while True:
-            self.add(mapping=self.UNARY)
+            self.add_and_consume(mapping=self.UNARY)
             if self.LTT(1) not in self.UNARY.keys():
                 break
 

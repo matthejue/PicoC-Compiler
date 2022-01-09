@@ -140,7 +140,7 @@ class Lexer:
                 # simple symbols
                 # :grammar: ;|+|-|*|%|^|~|(|)|{|}
                 self.next_char()
-                return Token(STRING_TO_TT_SIMPLE[self.lc], self.c,
+                return Token(STRING_TO_TT_SIMPLE[self.c], self.c,
                              self.position)
             elif STRING_TO_TT_COMPLEX.get(self.lc):
                 # complex symbols that are easily confusable
@@ -152,7 +152,7 @@ class Lexer:
                     self.next_char()
                     return Token(STRING_TO_TT_COMPLEX[symbol], symbol,
                                  self.position)
-                return Token(STRING_TO_TT_COMPLEX[self.lc], self.c,
+                return Token(STRING_TO_TT_COMPLEX[self.c], self.c,
                              self.position)
             elif self.lc in self.LETTER:
                 # identifier or special keyword symbol
@@ -240,3 +240,6 @@ class Lexer:
         else:
             self.c = self.lc
             self.lc = self.input[self.lc_row][self.lc_col]
+
+    def __repr__(self, ):
+        return str(self.input)

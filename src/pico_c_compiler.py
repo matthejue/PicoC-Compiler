@@ -1,4 +1,4 @@
-#!/usr/bin/python3.10
+#!/usr/bin/env python
 
 from sys import exit
 import argparse

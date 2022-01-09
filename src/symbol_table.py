@@ -63,7 +63,7 @@ class Scope:
         :fa_pointer: free address pointer
         :returns: None
         """
-        self.symbols = dict()  # {}
+        self.symbols = dict()
 
     def get_scope_name(self, ):
         """
@@ -114,7 +114,7 @@ class _SymbolTable(Scope):
             self.fa_pointer += 1
 
     def __repr__(self, ):
-        return self.get_scope_name() + ":" + self.symbols
+        return self.get_scope_name() + ":" + str(self.symbols)
 
 
 def SymbolTable():
@@ -124,6 +124,6 @@ def SymbolTable():
 
     :returns: None
     """
-    if _SymbolTable._instance is None:
+    if not _SymbolTable._instance:
         _SymbolTable._instance = _SymbolTable()
     return _SymbolTable._instance

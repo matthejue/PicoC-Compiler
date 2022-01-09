@@ -1,100 +1,135 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 
 
-class WhileNode(ASTNode):
+class While(ASTNode):
     """Abstract Syntax Tree Node for while loop"""
 
-    condition_check = """# codela(l)
-        LOADIN SP ACC 1; # Wert von l in ACC laden
-        ADDI SP 1; # Stack um eine Zelle verkürzen
-        JUMP= codelength(af) + 2; # af überspringen, wenn l unerfüllt
-        # code(af)
-        """
-
+    condition_check = strip_multiline_string("""# codela(l1)
+        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
+        JUMP== codelength(af) + 2;  # Statements überspringen, wenn l1 nicht erfüllt
+        # code(statements)
+        """)
     condition_check_loc = 3
 
-    end = """# zurück zur Auswertung von l
-        JUMP -(codelength(af) + codelength(l) + 3);
-        """
-
+    end = "JUMP -(codelength(af) + codelength(l) + 3);  # Zurück zur Auswertung von l1\n"
     end_loc = 1
 
+    def _update_match_args(self, ):
+        self.condition = self.children[0]
+        self.statements = self.children[1:]
+
+    __match_args__ = ("condition", "statements")
+
     def visit(self, ):
-        self.code_generator.add_code("# While start\n", 0)
+        self._update_match_args()
+
+        self.code_generator.add_code("# While Statement Start\n", 0)
+
+        self._pretty_comments()
 
         self.code_generator.add_marker()
 
-        self.children[0].visit()
+        self.condition.visit()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.condition_check),
-            self.condition_check_loc)
+        self.code_generator.add_code(self.condition_check,
+                                     self.condition_check_loc)
 
         self.code_generator.add_marker()
 
-        for child in self.children[1:]:
-            child.visit()
+        for statement in self.statements:
+            statement.visit()
 
+        self._adapt_code_1()
+
+        self.code_generator.remove_marker()
+
+        self._adapt_code_2()
+
+        self.code_generator.remove_marker()
+
+        self.code_generator.add_code(self.end, self.end_loc)
+
+        self.code_generator.add_code("# While Statement Ende\n", 0)
+
+    def _pretty_comments(self, ):
+        self.condition_check = self.code_generator.replace_code_pre(
+            self.condition_check, "l1", str(self.condition))
+        self.condition_check = self.code_generator.replace_code_pre(
+            self.condition_check, "statements",
+            str(self.statements[0]) + " ... ")
+        self.end = self.code_generator.replace_code_pre(
+            self.end, "l1", str(self.condition))
+
+    def _adapt_code_1(self, ):
         self.code_generator.replace_code_after(
             "codelength(af) + 2",
-            self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
+            str(self.code_generator.loc -
+                self.code_generator.get_marker_loc() + 2))
 
-        self.code_generator.remove_marker()
-
+    def _adapt_code_2(self, ):
         self.end = self.code_generator.replace_code_pre(
             self.end, "(codelength(af) + codelength(l) + 3)",
-            self.code_generator.loc - self.code_generator.get_marker_loc())
+            str(self.code_generator.loc -
+                self.code_generator.get_marker_loc()))
         # + 3 sind schon mit drin
 
-        self.code_generator.remove_marker()
 
-        self.code_generator.add_code(strip_multiline_string(self.end),
-                                     self.end_loc)
-
-        self.code_generator.add_code("# While end\n", 0)
-
-
-class DoWhileNode(ASTNode):
+class DoWhile(ASTNode):
     """Abstract Syntax Tree Node for do while Grammar"""
 
-    # Problem mit code(af)
-    condition_check = """# code(af)
-        # codela(l)
-        LOADIN SP ACC 1; # Wert von l in ACC laden
-        ADDI SP 1; # Stack um eine Zelle verkürzen
-        # zurück zur Ausführung von af
-        JUMP<> -(codelength(af) + codelength(l) + 2);
-        """
-
+    condition_check = strip_multiline_string("""# code(statements)
+        # codela(l1)
+        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        ADDI SP 1;  # Stack um eine Zelle verkürzen
+        JUMP!= -(codelength(af) + codelength(l) + 2);  # zurück zur Ausführung der Statements
+        """)
     condition_check_loc = 3
 
+    def _update_match_args(self, ):
+        self.statements = self.children[:-1]
+        self.condition = self.children[-1]
+
+    __match_args__ = ("statements", "condition")
+
     def visit(self, ):
-        self.code_generator.add_code("# Do While start\n", 0)
+        self.code_generator.add_code("# Do While Start\n", 0)
 
         self.code_generator.add_marker()
 
-        for child in self.children[1:]:
-            child.visit()
+        for statement in self.statements:
+            statement.visit()
 
-        self.children[0].visit()
+        self.condition.visit()
 
-        self.condition_check = self.code_generator.replace_code_pre(
-            self.condition_check, "(codelength(af) + "
-            "codelength(l) + 2) + 2",
-            self.code_generator.loc - self.code_generator.get_marker_loc() + 2)
+        self._adapt_code()
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code(
-            strip_multiline_string(self.condition_check),
-            self.condition_check_loc)
+        self.code_generator.add_code(self.condition_check,
+                                     self.condition_check_loc)
 
-        self.code_generator.add_code("# Do While end\n", 0)
+        self.code_generator.add_code("# Do While Ende\n", 0)
 
-    def determine(self, token):
+    def _pretty_comments(self, ):
+        self.condition_check = self.code_generator.replace_code_pre(
+            self.condition_check, "l1", str(self.condition))
+        self.condition_check = self.code_generator.replace_code_pre(
+            self.condition_check, "statements",
+            str(self.statements[0]) + " ... ")
+
+    def _adapt_code(self, ):
+        self.condition_check = self.code_generator.replace_code_pre(
+            self.condition_check, "(codelength(af) + codelength(l) + 2) + 2",
+            str(self.code_generator.loc -
+                self.code_generator.get_marker_loc() + 2))
+
+    def __repr__(self):
         """do while loops should be called 'do while' and not 'do'
-
-        :returns: None
         """
-        self.token = token
-        self.token.value = "do while"
+        acc = "(do"
+
+        for child in self.children[:-1]:
+            acc += f" {child}"
+
+        return acc + f" while {self.children[-1]}" + ")"

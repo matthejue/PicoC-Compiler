@@ -3,12 +3,12 @@ from assignment_allocation_grammar import AssignmentAllocationGrammar
 from lexer import TT
 from errors import MismatchedTokenError
 from itertools import chain
+from if_else_grammar import IfElseGrammar
+from loop_grammar import LoopGrammar
 
-#  from if_else_grammar import IfElseGrammar
-#  from loop_grammar import LoopGrammar
 
-
-class StatementGrammar(AssignmentAllocationGrammar):
+class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,
+                       LoopGrammar):
     """The statement sequence part of the context free grammar of the piocC
     language"""
     def code_ss(self):
@@ -28,11 +28,7 @@ class StatementGrammar(AssignmentAllocationGrammar):
 
         """
         while True:
-            # if self._is_statement():
             self._s()
-
-            # TODO: add in other statement types by replacing the false
-            # it's possibe to write var = 10;;
 
             if self.LTT(1) == TT.R_BRACE:
                 break
@@ -40,25 +36,33 @@ class StatementGrammar(AssignmentAllocationGrammar):
     def _s(self):
         """statement
 
-        :grammar: <code_aa> | ...
+        :grammar: <code_aa>;+ | <code_ie>;* | <code_lo>;* | ;+
         :returns: None
 
         """
         if self._is_assignment_allocation():
             self.code_aa()
-
-            while True:
-                self.match([TT.SEMICOLON])
-                if self.LTT(1) != TT.SEMICOLON:
-                    break
+            self._semicolons()
         elif self.LTT(1) == TT.IF:
             self.code_ie()
+            self._semicolons_or_none()
         elif self._is_loop():
             self.code_lo()
+            self._semicolons_or_none()
         elif self.LTT(1) == TT.SEMICOLON:
-            self.match([TT.SEMICOLON])
+            self.consume_next_token()
         else:
             raise MismatchedTokenError("statement", self.LT(1))
+
+    def _semicolons(self, ):
+        while True:
+            self.match([TT.SEMICOLON])
+            if self.LTT(1) != TT.SEMICOLON:
+                break
+
+    def _semicolons_or_none(self, ):
+        while self.LTT(1) == TT.SEMICOLON:
+            self.consume_next_token()  # [TT.SEMICOLON]
 
     def _is_statement(self):
         return self._is_assignment_allocation() or self.LTT(1) == TT.IF or\

@@ -1,11 +1,10 @@
-#!/usr/bin/python3.10
+#!/usr/bin/env python
 
 import unittest
 from testing_helpers import UsefullTools
 
 
 class TestErrorMessages(unittest.TestCase, UsefullTools):
-
     def test_no_semicolon(self, ):
         test_code = """void main() {
                       int var = 32

@@ -2,10 +2,10 @@ from lexer import TT
 from errors import NoApplicableRuleError, MismatchedTokenError
 from if_else_nodes import If, IfElse
 from dummy_nodes import NT
-from statement_grammar import StatementGrammar
+#  from statement_grammar import StatementGrammar
 
 
-class IfElseGrammar(StatementGrammar):
+class IfElseGrammar:
     def code_ie(self, ):
         self.code_if_if_else()
 
@@ -55,7 +55,7 @@ class IfElseGrammar(StatementGrammar):
         self._if_condition()
         self._branch()
 
-        self.match_and_add([TT.ELSE], NT.Else)
+        self.add_and_match([TT.ELSE], NT.Else)
         self._branch()
 
         self.ast_builder.up(savestate_node)

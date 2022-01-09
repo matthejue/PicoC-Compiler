@@ -6,12 +6,12 @@ from dummy_nodes import NT
 class If(ASTNode):
     """Abstract Syntax Tree Node for If"""
 
-    start = """# codela(l1)
+    start = strip_multiline_string("""# codela(l1)
         LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        JUMP= codelength(af) + 1;  # Branch überspringen
+        JUMP== codelength(af) + 1;  # Branch überspringen
         # code(statements)
-        """
+        """)
     start_loc = 3
 
     def _update_match_args(self, ):
@@ -22,14 +22,13 @@ class If(ASTNode):
 
     def visit(self, ):
         self._update_match_args()
-        self.code_generator.add_code("# If start\n", 0)
+        self.code_generator.add_code("# If Statement Start\n", 0)
 
         self._pretty_comments()
 
         self.condition.visit()
 
-        self.code_generator.add_code(strip_multiline_string(self.start),
-                                     self.start_loc)
+        self.code_generator.add_code(self.start, self.start_loc)
 
         self.code_generator.add_marker()
 
@@ -40,14 +39,14 @@ class If(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code("# If end\n", 0)
+        self.code_generator.add_code("# If Statement Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.start), 'l1', str(self.condition))
+                self.start, 'l1', str(self.condition))
             self.start = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.start), 'statements',
+                self.start, 'statements',
                 str(self.branch[0]) + " ... ")
 
     def _adapt_code(self, ):
@@ -60,17 +59,18 @@ class If(ASTNode):
 class IfElse(ASTNode):
     """Abstract Syntax Tree Node for Else"""
 
-    start = """# codela(l1)
+    start = strip_multiline_string("""# codela(l1)
         LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        JUMP= codelength(af1) + 2;  # Zu Else-Branch springen, wenn l1 nicht erfüllt
+        JUMP== codelength(af1) + 2;  # Zu Else-Branch springen, wenn l1 nicht erfüllt
         # code(statements1)
-        """
+        """)
     start_loc = 3
 
-    middle = """JUMP codelength(af2) + 1;  # Else-Branch überspringen
+    middle = strip_multiline_string(
+        """JUMP codelength(af2) + 1;  # Else-Branch überspringen
         # code(statements2)
-        """
+        """)
     middle_loc = 1
 
     def _idx_of_else_node(self):
@@ -92,14 +92,13 @@ class IfElse(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# If Else start\n", 0)
+        self.code_generator.add_code("# If und Else Statement Start\n", 0)
 
         self._pretty_comments()
 
         self.condition.visit()
 
-        self.code_generator.add_code(strip_multiline_string(self.start),
-                                     self.start_loc)
+        self.code_generator.add_code(self.start, self.start_loc)
 
         self.code_generator.add_marker()
 
@@ -110,8 +109,7 @@ class IfElse(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code(strip_multiline_string(self.middle),
-                                     self.middle_loc)
+        self.code_generator.add_code(self.middle, self.middle_loc)
 
         self.code_generator.add_marker()
 
@@ -122,17 +120,17 @@ class IfElse(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code("# If Else end\n", 0)
+        self.code_generator.add_code("# If und Else Statement Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.start), "l1", str(self.condition))
+                self.start, "l1", str(self.condition))
             self.start = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.start), "statements1",
+                self.start, "statements1",
                 str(self.branch1[0]) + " ... ")
             self.middle = self.code_generator.replace_code_pre(
-                strip_multiline_string(self.middle), "statements2",
+                self.middle, "statements2",
                 str(self.branch2[0]) + " ... ")
 
     def _adapt_code_1(self, ):

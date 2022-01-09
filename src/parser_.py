@@ -1,8 +1,6 @@
 from ast_builder import ASTBuilder
 import global_vars
 from errors import MismatchedTokenError, UnknownIdentifierError, UnclosedCharacterError
-from lexer import TT
-from dummy_nodes import NT
 
 
 class BacktrackingParser():
@@ -69,24 +67,28 @@ class BacktrackingParser():
         else:
             raise MismatchedTokenError(tokentypes, self.LT(1))
 
-    def match_and_add(self, tokentypes, classname=None, mapping=None):
+    def add_and_match(self, tokentypes, classname=None, mapping=None):
         """Same as add, but also check for match
 
         :tokentypes: list of tokentypes
-        :classname: nodetype
-        :sign: in case a symbol has two possible operator classes, the sign
-        tells which one to chooes
+        :classname: what kind of nodetype should be added
+        :mapping: dictionray from which the right nodetype gets determined by
+        the LTT
         """
+        self._add(classname, mapping)
         self.match(tokentypes)
-        self.add(classname, mapping)
 
-    def add(self, classname=None, mapping=None):
+    def add_and_consume(self, classname=None, mapping=None):
+        self._add(classname, mapping)
+        self.consume_next_token()
+
+    def _add(self, classname=None, mapping=None):
         """Add the node with the given classname if given or else right
         nodetype matching the tokentype of the current token and with the right
         tokenvalue to the ast
 
         :classname: nodetype
-        :sign: see docstring of match_and_add
+        :mapping: see docstring of add_and_match
         """
         if not global_vars.is_tasting:
             if not classname:
@@ -125,7 +127,6 @@ class BacktrackingParser():
         # only if all elements of the list are deleted, actions get executed
         # again
         global_vars.is_tasting += 1
-        # return self.lt_idx
 
     def _release(self):
         """go the the last remembered marker and forget about it
@@ -134,14 +135,6 @@ class BacktrackingParser():
         """
         self.lt_idx = self.markers.pop()
         global_vars.is_tasting -= 1
-
-#     def _is_tasting(self):
-#         """if in the taste method every mark() found his corresponding
-#         release()
-#
-#         :returns: boolean
-#         """
-#         return len(self.markers) > 0
 
     def taste(self, rule, errors):
         """Tries ("tastes") out alternative and says whether it will raise a
@@ -165,6 +158,14 @@ class BacktrackingParser():
         self._release()
         return tastes_good
 
+
+#     def _is_tasting(self):
+#         """if in the taste method every mark() found his corresponding
+#         release()
+#
+#         :returns: boolean
+#         """
+#         return len(self.markers) > 0
 
 # class LL_Recursive_Decent_Parser:
 
