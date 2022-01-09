@@ -19,6 +19,8 @@ class ASTNode:
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
 
+    __match_args__ = ("value", "position")
+
     def add_child(self, node):
         """
         :returns: None

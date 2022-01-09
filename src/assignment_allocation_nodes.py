@@ -110,9 +110,13 @@ class Alloc(ASTNode):
 
         self.code_generator.add_code("# Allokation Ende\n", 0)
 
-    def _pretty_comments(self, const_var, name, dtype):
+    def _pretty_comments(self, const_var, name, dtype, value=None):
+        suppl = ""
+        if value:
+            suppl += " mit Adresse " + value
+
         self.code_generator.add_code("# " + const_var + " " + name + " vom Typ "
-                                     + dtype + " zur Symboltabelle"
+                                     + dtype + suppl + " zur Symboltabelle "
                                      "hinzugefügt\n", 0)
 
     def _adapt_code(self, ):
@@ -121,10 +125,9 @@ class Alloc(ASTNode):
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
-                self._pretty_comments("Konstante", name, dtype)
             case Alloc(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(variable)
-                self.symbol_table.allocate(variable)
-                self._pretty_comments("Variable", name, dtype)
+                address = self.symbol_table.allocate(variable)
+                self._pretty_comments("Variable", name, dtype, address)

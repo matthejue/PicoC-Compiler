@@ -3,10 +3,6 @@ from function_nodes import MainFunction
 
 
 class File(ASTNode):
-    def __init__(self, name):
-        self.value = name
-        self.children = []
-
     def __repr__(self, ):
         acc = f"({self.value}"
         for child in self.children:

@@ -2,7 +2,6 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import UnknownIdentifierError
 from dummy_nodes import NT
-from dataclasses import dataclass
 import global_vars
 
 
@@ -66,31 +65,16 @@ class ArithOperand(ASTNode):
         return code
 
 
-@dataclass
 class Identifier(ArithOperand):
-    value: str
-    position: tuple[int, int]
-
-    def __repr__(self, ):
-        return f"{self.value}"
+    pass
 
 
-@dataclass
 class Number(ArithOperand):
-    value: str
-    position: tuple[int, int]
-
-    def __repr__(self, ):
-        return f"{self.value}"
+    pass
 
 
-@dataclass
 class Character(ArithOperand):
-    value: str
-    position: tuple[int, int]
-
-    def __repr__(self, ):
-        return f"{self.value}"
+    pass
 
 
 class ArithBinOp(ASTNode):
@@ -137,11 +121,11 @@ class ArithBinOp(ASTNode):
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.end = self.code_generator.replace_code_pre(
+                self.end, 'e1 binop e2', str(self))
+            self.end = self.code_generator.replace_code_pre(
                 self.end, 'e1', str(self.left_operand))
             self.end = self.code_generator.replace_code_pre(
                 self.end, 'e2', str(self.right_operand))
-            self.end = self.code_generator.replace_code_pre(
-                self.end, 'e1 binop e2', str(self))
 
     def _adapt_code(self, ):
         match self:

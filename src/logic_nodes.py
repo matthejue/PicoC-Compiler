@@ -41,11 +41,11 @@ class LogicAndOr(ASTNode):
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
+            self.end, "l1 lop l2", str(self))
+        self.end = self.code_generator.replace_code_pre(
             self.end, "l1", str(self.left_atom))
         self.end = self.code_generator.replace_code_pre(
             self.end, "l2", str(self.right_atom))
-        self.end = self.code_generator.replace_code_pre(
-            self.end, "l1 lop l2", str(self))
 
     def _adapt_code(self, ):
         match self:
@@ -134,11 +134,11 @@ class LogicAtom(ASTNode):
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
+            self.end, "e1 rel e2", str(self))
+        self.end = self.code_generator.replace_code_pre(
             self.end, "e1", str(self.left_element))
         self.end = self.code_generator.replace_code_pre(
             self.end, "e2", str(self.right_element))
-        self.end = self.code_generator.replace_code_pre(
-            self.end, "e1 rel e2", str(self))
 
     def _adapt_code(self, ):
         match self:

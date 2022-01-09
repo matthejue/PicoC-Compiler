@@ -4,7 +4,7 @@ import global_vars
 class Symbol:
     """Name for a program entity like a variable or function"""
 
-    __match_args__ = ("value")
+    __match_args__ = ("value", )
 
     def __init__(self, name, datatype, position, value):
         """
@@ -23,7 +23,8 @@ class Symbol:
 
     def __repr__(self, ):
         if self.datatype:
-            return '<' + self.name + ':' + self.datatype + '>'
+            return '<' + self.name + ':' + str(
+                self.datatype) + ':' + self.value + '>'
         return self.name
 
 
@@ -109,9 +110,14 @@ class _SymbolTable(Scope):
         self.define(BuiltInTypeSymbol('char'))
 
     def allocate(self, sym):
+        """Determine address of variable
+
+        :returns: string of adress
+        """
         if not self.symbols[sym.name].value:
-            self.symbols[sym.name].value = self.fa_pointer
+            self.symbols[sym.name].value = str(self.fa_pointer)
             self.fa_pointer += 1
+        return str(self.fa_pointer - 1)
 
     def __repr__(self, ):
         return self.get_scope_name() + ":" + str(self.symbols)
