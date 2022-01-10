@@ -3,7 +3,7 @@ from function_nodes import MainFunction
 
 
 class File(ASTNode):
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         for (i, child) in enumerate(self.children):
             if isinstance(child, MainFunction):
                 break
@@ -17,7 +17,7 @@ class File(ASTNode):
     __match_args__ = ("filename", "main_function", "functions")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(f"# File {self.filename} Start\n", 0)
 

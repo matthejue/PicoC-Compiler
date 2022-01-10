@@ -18,21 +18,24 @@ class Assign(ASTNode):
     assign_more = "STORE ACC var_address;  # Wert von e1 in Variable v1 speichern\n"
     assign_more_loc = 1
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.location = self.children[0]
         self.expression = self.children[1]
 
     __match_args__ = ("location", "expression")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# Zuweisung {self} Start\n", 0)
 
         self._pretty_comments()
 
-        self.location.visit()
+        self.location.update_match_args()
+        match self.location:
+            case Alloc(_, _, _):
+                self.location.visit()
 
         try:
             self._assignment()
@@ -59,6 +62,7 @@ class Assign(ASTNode):
     def _assignment(self, ):
         match self:
             case Assign(Alloc(NT.Const(), _, Identifier(name)), (Number(value) | Character(value))):
+                # TODO was wenn auf rechter Seite einfach nur eine Variable ist?
                 self.symbol_table.resolve(name).value = value
                 self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
@@ -94,7 +98,7 @@ class Assign(ASTNode):
 class Alloc(ASTNode):
     """Abstract Syntax Tree Node for allocation"""
 
-    def _update_match_args(self):
+    def update_match_args(self):
         if isinstance(self.children[0], NT.Const):
             self.const = self.children[0]
             self.prim_dt = self.children[1]
@@ -107,7 +111,7 @@ class Alloc(ASTNode):
     __match_args__ = ("const", "prim_dt", "identifier")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(f"# Allokation {self} Start\n", 0)
 

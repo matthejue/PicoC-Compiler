@@ -14,14 +14,14 @@ class While(ASTNode):
     end = "JUMP -(codelength(af) + codelength(l) + 3);  # Zurück zur Auswertung von l1\n"
     end_loc = 1
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.condition = self.children[0]
         self.statements = self.children[1:]
 
     __match_args__ = ("condition", "statements")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# While Statement while({self.condition})"
@@ -85,13 +85,15 @@ class DoWhile(ASTNode):
         """)
     condition_check_loc = 3
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.statements = self.children[:-1]
         self.condition = self.children[-1]
 
     __match_args__ = ("statements", "condition")
 
     def visit(self, ):
+        self.update_match_args()
+
         self.code_generator.add_code(
             f"# Do While do {self.statements[0]} ... "
             "while({self.condition}) Start\n", 0)

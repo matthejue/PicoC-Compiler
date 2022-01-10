@@ -94,7 +94,7 @@ class ArithBinOp(ASTNode):
         """)
     end_loc = 5
 
-    def _update_match_args(self):
+    def update_match_args(self):
         self.left_operand = self.children[0]
         self.operation = self.children[1]
         self.right_operand = self.children[2]
@@ -102,15 +102,15 @@ class ArithBinOp(ASTNode):
     __match_args__ = ("left_operand", "operation", "right_operand")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# Arithmetische binäre Operation {self} Start\n", 0)
 
+        self._pretty_comments()
+
         self.left_operand.visit()
         self.right_operand.visit()
-
-        self._pretty_comments()
 
         self._adapt_code()
 
@@ -175,15 +175,19 @@ class ArithUnOp(ASTNode):
     end = "STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle\n"
     end_loc = 1
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.operation = self.children[0]
         self.operand = self.children[1]
 
     __match_args__ = ("operation", "operand")
 
     def visit(self, ):
+        self.update_match_args()
+
         self.code_generator.add_code(
             f"# Arithmetische unäre Operation {self} Start\n", 0)
+
+        self._pretty_comments()
 
         self.operand.visit()
 

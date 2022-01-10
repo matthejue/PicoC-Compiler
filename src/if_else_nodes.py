@@ -14,14 +14,15 @@ class If(ASTNode):
         """)
     start_loc = 3
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.condition = self.children[0]
         self.branch = self.children[1:]
 
     __match_args__ = ("condition", "branch")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
+
         self.code_generator.add_code(
             f"# If Statement if({self.condition}) {self.branch[0]} ... "
             "Start\n", 0)
@@ -83,7 +84,7 @@ class IfElse(ASTNode):
                 return i
         return -1
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.condition = self.children[0]
         self.branch1 = self.children[1:self._idx_of_else_node()]
         self.branch2 = self.children[self._idx_of_else_node() + 1:]
@@ -91,7 +92,7 @@ class IfElse(ASTNode):
     __match_args__ = ("condition", "branch1", "branch2")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# If und Else Statement if({self.condition}) {self.branch1[0]} "

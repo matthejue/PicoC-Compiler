@@ -14,7 +14,7 @@ class LogicAndOr(ASTNode):
         """)
     end_loc = 5
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.left_atom = self.children[0]
         self.binary_connective = self.children[1]
         self.right_atom = self.children[2]
@@ -22,7 +22,7 @@ class LogicAndOr(ASTNode):
     __match_args__ = ("left_atom", "binary_connective", "right_atom")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# Logische binäre Verknüpfung {self} Start\n", 0)
@@ -68,14 +68,14 @@ class LogicNot(ASTNode):
         """)
     end_loc = 4
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.unary_connective = self.children[0]
         self.atom = self.children[1]
 
     __match_args__ = ("unary_connective", "atom")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# Logische unäre Verknüpfung {self} Start\n", 0)
@@ -110,7 +110,7 @@ class LogicAtom(ASTNode):
         """)
     end_loc = 9
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.left_element = self.children[0]
         self.relation = self.children[1]
         self.right_element = self.children[2]
@@ -118,7 +118,7 @@ class LogicAtom(ASTNode):
     __match_args__ = ("left_element", "relation", "right_element")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(f"# Logisches Atom {self} Start\n", 0)
 
@@ -174,13 +174,13 @@ class LogicTopBottom(ASTNode):
         """)
     end_loc = 4
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.arithmetic_expression = self.children[0]
 
     __match_args__ = ("arithmetic_expression")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code(
             f"# Logischer Wahrheitswert aus arithmetischem Ausdruck {self} Start\n", 0)

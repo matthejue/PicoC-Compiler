@@ -30,6 +30,9 @@ class ASTNode:
     def show_generated_code(self, ):
         return self.code_generator.show_code()
 
+    def update_match_args(self, ):
+        pass
+
     def __repr__(self):
         if not self.children:
             return f"{self.value}"

@@ -11,7 +11,7 @@ class MainFunction(ASTNode):
     end = "JUMP 0;\n"
     end_loc = 1
 
-    def _update_match_args(self, ):
+    def update_match_args(self, ):
         self.prim_dt = self.children[0]
         self.main = self.children[1]
         self.statements = self.children[2:]
@@ -19,7 +19,7 @@ class MainFunction(ASTNode):
     __match_args__ = ("prim_dt", "main", "statements")
 
     def visit(self, ):
-        self._update_match_args()
+        self.update_match_args()
 
         self.code_generator.add_code("# Main Funktion Start\n", 0)
 

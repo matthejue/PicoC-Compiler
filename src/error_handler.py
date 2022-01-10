@@ -5,14 +5,12 @@ from errors import InvalidCharacterError, UnclosedCharacterError,\
 
 
 class States(Enum):
-
     """Special States for the ErrorHandler"""
 
     ONLY_FOUND = -1
 
 
 class ErrorHandler:
-
     """Output a detailed error message"""
 
     LENGTH_COMMENT_TOKEN = 2
@@ -31,20 +29,20 @@ class ErrorHandler:
             function()
         except InvalidCharacterError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(
-                States.ONLY_FOUND.value, e) + '\n'
+            error_message += self._point_at_found(States.ONLY_FOUND.value,
+                                                  e) + '\n'
             print(error_message)
             exit(0)
         except UnclosedCharacterError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(
-                e.found.position[1], e) + '\n'
+            error_message += self._point_at_found(e.found.position[1],
+                                                  e) + '\n'
             print(error_message)
             exit(0)
         except NoApplicableRuleError as e:
             error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(
-                States.ONLY_FOUND.value, e) + '\n'
+            error_message += self._point_at_found(States.ONLY_FOUND.value,
+                                                  e) + '\n'
             print(error_message)
             exit(0)
         except MismatchedTokenError as e:
@@ -57,7 +55,7 @@ class ErrorHandler:
                 error_message += self._point_at_found(States.ONLY_FOUND.value,
                                                       e) + '\n'
             else:
-                error_message += self._point_at_found(column,  e) + '\n'
+                error_message += self._point_at_found(column, e) + '\n'
             print(error_message)
             exit(0)
         except UnknownIdentifierError as e:
@@ -79,7 +77,7 @@ class ErrorHandler:
         # arrow pointing on it
         line += ' ' * expected_pos[1] + '^' + '\n'
         line += ' ' * expected_pos[1] + error.expected + '\n'
-        for i in range(expected_pos[0]+1, error.found.position[0]):
+        for i in range(expected_pos[0] + 1, error.found.position[0]):
             line += self.grammar.lexer.input[i]
         return line
 
@@ -122,7 +120,8 @@ class ErrorHandler:
             column -= 1
         else:
             return None
-        return self._calculate_previous_row_column(row, column - self.LENGTH_COMMENT_TOKEN + 1)
+        return self._calculate_previous_row_column(
+            row, column - self.LENGTH_COMMENT_TOKEN + 1)
 
     def _check_words(self, patterns, row, column):
         # check all patterns
@@ -131,8 +130,9 @@ class ErrorHandler:
             column_copy = column
             # check every letter of single pattern
             for char in reversed(pattern):
-                single_match_results += [self.grammar.lexer.input[row]
-                                         [column_copy] == char]
+                single_match_results += [
+                    self.grammar.lexer.input[row][column_copy] == char
+                ]
                 column_copy -= 1
             if all(single_match_results):
                 return True
