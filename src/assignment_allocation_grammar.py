@@ -31,7 +31,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         if self.LTT(1) in chain(self.PRIM_DT.keys(), [TT.CONST]):
             self._alloc()
-        elif self.LTT(1) == TT.IDENTIFIER:
+        elif self.LTT(1) == TT.NAME:
             self.ast_builder.discard("_aa")
             self.add_and_consume(classname=Identifier)
             self._assign()
@@ -46,7 +46,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
             while self.LTT(2) == TT.ASSIGNMENT:
                 self.ast_builder.down(Assign)
-                self.add_and_match([TT.IDENTIFIER], classname=Identifier)
+                self.add_and_match([TT.NAME], classname=Identifier)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
             self.code_ae_le()
@@ -64,7 +64,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.add_and_consume(classname=NT.Const)
 
         self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
-        self.add_and_match([TT.IDENTIFIER], classname=Identifier)
+        self.add_and_match([TT.NAME], classname=Identifier)
 
         self.ast_builder.up(savestate_node)
 
@@ -78,7 +78,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
             while self.LTT(2) == TT.ASSIGNMENT:
                 self.ast_builder.down(Assign)
-                self.add_and_match([TT.IDENTIFIER], classname=Identifier)
+                self.add_and_match([TT.NAME], classname=Identifier)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
             self.code_ae_le()

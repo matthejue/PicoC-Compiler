@@ -61,7 +61,7 @@ class TT(Enum):
     VOID = "void"
     NUMBER = "number"
     CHARACTER = "character"
-    IDENTIFIER = "identifier"
+    NAME = "name"
     IF = "if"
     ELSE = "else"
     WHILE = "while"
@@ -111,13 +111,12 @@ class Lexer:
     DIGIT_WITHOUT_ZERO = "123456789"
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
-    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO + '_'
+    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO
 
     def __init__(self, input):
         """
         :lc: lookahead character
         :c: character
-
         """
         self.input = input
         self.lc_col = 0
@@ -154,20 +153,20 @@ class Lexer:
                                  self.position)
                 return Token(STRING_TO_TT_COMPLEX[self.c], self.c,
                              self.position)
-            elif self.lc in self.LETTER:
+            elif self.lc in self.LETTER + '_.':
                 # identifier or special keyword symbol
                 # :grammar: <identifier>|if|else|while|do|int|char
                 # |void|const|main
                 # :identifier: <letter> <letter_digit>*
                 self.next_char()
                 symbol = self.c
-                while self.lc in self.LETTER_DIGIT:
+                while self.lc in self.LETTER_DIGIT + "_./":
                     self.next_char()
                     symbol += self.c
                 if STRING_TO_TT_WORDS.get(symbol):
                     return Token(STRING_TO_TT_WORDS[symbol], symbol,
                                  self.position)
-                return Token(TT.IDENTIFIER, symbol, self.position)
+                return Token(TT.NAME, symbol, self.position)
             elif self.lc in self.DIGIT_WITH_ZERO:
                 # number
                 # :grammar: 0|(<digit_without_zero><digit_with_zero>*)

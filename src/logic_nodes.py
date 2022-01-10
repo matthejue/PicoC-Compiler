@@ -5,9 +5,8 @@ from dummy_nodes import NT
 class LogicAndOr(ASTNode):
     """Abstract Syntax Tree Node for logic 'and' and 'or'"""
 
-    end = strip_multiline_string("""# codela(l1)
-        # codela(l2)
-        LOADIN SP ACC 2;  # Wert von l1 in ACC laden
+    end = strip_multiline_string(
+        """ LOADIN SP ACC 2;  # Wert von l1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l2 in IN2 laden
         LOP ACC IN2;  # l1 lop l2 in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
@@ -26,7 +25,7 @@ class LogicAndOr(ASTNode):
         self._update_match_args()
 
         self.code_generator.add_code(
-            "# Logische binäre Verknüpfung Start\n", 0)
+            f"# Logische binäre Verknüpfung {self} Start\n", 0)
 
         self._pretty_comments()
 
@@ -37,7 +36,8 @@ class LogicAndOr(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Logische binäre Verknüpfung Ende\n", 0)
+        self.code_generator.add_code(
+            f"# Logische binäre Verknüpfung {self} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -60,8 +60,8 @@ class LogicAndOr(ASTNode):
 class LogicNot(ASTNode):
     """Abstract Syntax Tree Node for logic not"""
 
-    end = strip_multiline_string("""# codela(l1)
-        LOADI ACC 1;  # 1 in ACC laden
+    end = strip_multiline_string(
+        """LOADI ACC 1;  # 1 in ACC laden
         LOADIN SP IN2 1;  # Wert von l1 in IN2 laden
         OPLUS ACC IN2;  # !(l1) in ACC laden
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
@@ -77,7 +77,8 @@ class LogicNot(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# Logische unäre Verknüpfung Start\n", 0)
+        self.code_generator.add_code(
+            f"# Logische unäre Verknüpfung {self} Start\n", 0)
 
         self._pretty_comments()
 
@@ -85,7 +86,8 @@ class LogicNot(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Logische unäre Verknüpfung Ende\n", 0)
+        self.code_generator.add_code(
+            f"# Logische unäre Verknüpfung {self} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -95,9 +97,8 @@ class LogicNot(ASTNode):
 class LogicAtom(ASTNode):
     """Abstract Syntax Tree Node for logic atom"""
 
-    end = strip_multiline_string("""# codeaa(e1)
-        # codeaa(e2)
-        LOADIN SP ACC 2;  # Wert von e1 in ACC laden
+    end = strip_multiline_string(
+        """LOADIN SP ACC 2;  # Wert von e1 in ACC laden
         LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
         SUB ACC IN2;  # e1 - e2 in ACC laden
         JUMPvglop 3;  # Ergebnis 1, wenn e1 rel e2 erfüllt
@@ -119,7 +120,7 @@ class LogicAtom(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# Logisches Atom Start\n", 0)
+        self.code_generator.add_code(f"# Logisches Atom {self} Start\n", 0)
 
         self._pretty_comments()
 
@@ -130,7 +131,7 @@ class LogicAtom(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Logisches Atom Ende\n", 0)
+        self.code_generator.add_code(f"# Logisches Atom {self} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -165,8 +166,8 @@ class LogicAtom(ASTNode):
 class LogicTopBottom(ASTNode):
     """Abstract Syntax Tree Node for logic top bottom"""
 
-    end = strip_multiline_string("""# codeaa(e1)
-        LOADIN SP ACC 1;  # Wert von e1 in ACC laden
+    end = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von e1 in ACC laden
         JUMP== 3;  # Überspringe 2 Befehle, wenn e1 den Wert 0 hat
         LOADI ACC 1;
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
@@ -182,7 +183,7 @@ class LogicTopBottom(ASTNode):
         self._update_match_args()
 
         self.code_generator.add_code(
-            "# Logischer Wahrheitswert aus arithmetischem Ausdruck Start\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck {self} Start\n", 0)
 
         self._pretty_comments()
 
@@ -191,7 +192,7 @@ class LogicTopBottom(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            "# Logischer Wahrheitswert aus arithmetischem Ausdruck Ende\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck {self} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(

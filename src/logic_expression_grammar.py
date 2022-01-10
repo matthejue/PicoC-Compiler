@@ -135,7 +135,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self._not_expr()
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_logic()
-        elif self.LTT(1) in [TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER]:
+        elif self.LTT(1) in [TT.NUMBER, TT.CHARACTER, TT.NAME]:
             self._atom_or_top_bottom()
         else:
             raise MismatchedTokenError("logic operand", self.LT(1))

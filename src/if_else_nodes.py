@@ -6,11 +6,11 @@ from dummy_nodes import NT
 class If(ASTNode):
     """Abstract Syntax Tree Node for If"""
 
-    start = strip_multiline_string("""# codela(l1)
-        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+    start = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af) + 1;  # Branch überspringen
-        # code(statements)
+        # If-Branch
         """)
     start_loc = 3
 
@@ -22,7 +22,9 @@ class If(ASTNode):
 
     def visit(self, ):
         self._update_match_args()
-        self.code_generator.add_code("# If Statement Start\n", 0)
+        self.code_generator.add_code(
+            f"# If Statement if({self.condition}) {self.branch[0]} ... "
+            "Start\n", 0)
 
         self._pretty_comments()
 
@@ -39,15 +41,14 @@ class If(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code("# If Statement Ende\n", 0)
+        self.code_generator.add_code(
+            f"# If Statement if({self.condition}) {self.branch[0]} ... "
+            "Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
                 self.start, 'l1', str(self.condition))
-            self.start = self.code_generator.replace_code_pre(
-                self.start, 'statements',
-                str(self.branch[0]) + " ... ")
 
     def _adapt_code(self, ):
         self.code_generator.replace_code_after(
@@ -59,17 +60,17 @@ class If(ASTNode):
 class IfElse(ASTNode):
     """Abstract Syntax Tree Node for Else"""
 
-    start = strip_multiline_string("""# codela(l1)
-        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+    start = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af1) + 2;  # Zu Else-Branch springen, wenn l1 nicht erfüllt
-        # code(statements1)
+        # If-Branch
         """)
     start_loc = 3
 
     middle = strip_multiline_string(
         """JUMP codelength(af2) + 1;  # Else-Branch überspringen
-        # code(statements2)
+        # Else-Branch
         """)
     middle_loc = 1
 
@@ -92,7 +93,9 @@ class IfElse(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# If und Else Statement Start\n", 0)
+        self.code_generator.add_code(
+            f"# If und Else Statement if({self.condition}) {self.branch1[0]} "
+            "... else {self.branch2[0]} ... Start\n", 0)
 
         self._pretty_comments()
 
@@ -120,18 +123,14 @@ class IfElse(ASTNode):
 
         self.code_generator.remove_marker()
 
-        self.code_generator.add_code("# If und Else Statement Ende\n", 0)
+        self.code_generator.add_code(
+            f"# If und Else Statement if({self.condition}) {self.branch1[0]} "
+            "... else {self.branch2[0]} ... Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
                 self.start, "l1", str(self.condition))
-            self.start = self.code_generator.replace_code_pre(
-                self.start, "statements1",
-                str(self.branch1[0]) + " ... ")
-            self.middle = self.code_generator.replace_code_pre(
-                self.middle, "statements2",
-                str(self.branch2[0]) + " ... ")
 
     def _adapt_code_1(self, ):
         self.code_generator.replace_code_after(

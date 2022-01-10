@@ -49,9 +49,7 @@ def strip_multiline_string(mutline_string):
     :grammar: grammar specification
     :returns: None
     """
-    mutline_string = [i.lstrip() for i in mutline_string.split('\n')]
-    mutline_string.pop()
-    mutline_string_acc = ""
-    for line in mutline_string:
-        mutline_string_acc += line + '\n'
-    return mutline_string_acc
+    mutline_string = ''.join(
+        [i.lstrip() + '\n' for i in mutline_string.split('\n')[:-1]])
+    # every code piece ends with \n, so the last element can always be poped
+    return mutline_string

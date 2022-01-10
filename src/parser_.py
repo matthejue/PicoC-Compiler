@@ -9,7 +9,7 @@ class BacktrackingParser():
     furthermore able to backtrack and thus able to also distinguish rules which
     have the same identical syntactical structure for their first finitely many
     tokens"""
-    def __init__(self, lexer, fname):
+    def __init__(self, lexer):
         """
         :lts: lookahead tokens
         :num_lts: number of lookahead tokens
@@ -22,7 +22,7 @@ class BacktrackingParser():
         self.markers = []
         self.lts = []
         self.lt_idx = 0
-        self.ast_builder = ASTBuilder(fname)
+        self.ast_builder = ASTBuilder()
 
     def LT(self, i):
         """Lookahead Token

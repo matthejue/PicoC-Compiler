@@ -1,14 +1,14 @@
 import global_vars
 from abstract_syntax_tree import ASTNode
-from file_nodes import File
+from root_node import Root
 
 
 class ASTBuilder:
     """Provides methods for ast construction"""
-    def __init__(self, fname):
-        file = File(fname)
-        self.root = file
-        self.current_node = file
+    def __init__(self):
+        root = Root()
+        self.root = root
+        self.current_node = root
         self.return_nodes = {}
 
     def CN(self) -> ASTNode:
@@ -28,12 +28,11 @@ class ASTBuilder:
             return
 
         new_node = classname()
-        # TODO: remove when it's sure this won't ever be needed anymore
-        #  if not self.root:
-        #  self.root = new_node
-        #  else:
-        self.current_node.add_child(new_node)
-        savestate_node = self.current_node
+        if not self.root:
+            self.root = new_node
+        else:
+            self.current_node.add_child(new_node)
+            savestate_node = self.current_node
 
         # deeper grammar rules have to be called with a new current_node
         self.current_node = new_node

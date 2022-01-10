@@ -4,11 +4,10 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 class While(ASTNode):
     """Abstract Syntax Tree Node for while loop"""
 
-    condition_check = strip_multiline_string("""# codela(l1)
-        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+    condition_check = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af) + 2;  # Statements überspringen, wenn l1 nicht erfüllt
-        # code(statements)
         """)
     condition_check_loc = 3
 
@@ -24,7 +23,9 @@ class While(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# While Statement Start\n", 0)
+        self.code_generator.add_code(
+            f"# While Statement while({self.condition})"
+            " {self.statements[0]} ... Start\n", 0)
 
         self._pretty_comments()
 
@@ -50,14 +51,13 @@ class While(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# While Statement Ende\n", 0)
+        self.code_generator.add_code(
+            f"# While Statement while({self.condition})"
+            " {self.statements[0]} ... Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
             self.condition_check, "l1", str(self.condition))
-        self.condition_check = self.code_generator.replace_code_pre(
-            self.condition_check, "statements",
-            str(self.statements[0]) + " ... ")
         self.end = self.code_generator.replace_code_pre(
             self.end, "l1", str(self.condition))
 
@@ -78,9 +78,8 @@ class While(ASTNode):
 class DoWhile(ASTNode):
     """Abstract Syntax Tree Node for do while Grammar"""
 
-    condition_check = strip_multiline_string("""# code(statements)
-        # codela(l1)
-        LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+    condition_check = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP!= -(codelength(af) + codelength(l) + 2);  # zurück zur Ausführung der Statements
         """)
@@ -93,7 +92,9 @@ class DoWhile(ASTNode):
     __match_args__ = ("statements", "condition")
 
     def visit(self, ):
-        self.code_generator.add_code("# Do While Start\n", 0)
+        self.code_generator.add_code(
+            f"# Do While do {self.statements[0]} ... "
+            "while({self.condition}) Start\n", 0)
 
         self.code_generator.add_marker()
 
@@ -109,14 +110,13 @@ class DoWhile(ASTNode):
         self.code_generator.add_code(self.condition_check,
                                      self.condition_check_loc)
 
-        self.code_generator.add_code("# Do While Ende\n", 0)
+        self.code_generator.add_code(
+            f"# Do While do {self.statements[0]} ... "
+            "while({self.condition}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
             self.condition_check, "l1", str(self.condition))
-        self.condition_check = self.code_generator.replace_code_pre(
-            self.condition_check, "statements",
-            str(self.statements[0]) + " ... ")
 
     def _adapt_code(self, ):
         self.condition_check = self.code_generator.replace_code_pre(

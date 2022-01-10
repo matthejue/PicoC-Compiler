@@ -12,18 +12,23 @@ class _CodeGenerator:
     _instance = None
 
     def __init__(self):
-        self.generated_code = []
+        self.code_arranger = CodeArranger()
         self.idx = -1
         self.loc = 0
         self.metadata = []
 
     def add_code(self, code, loc):
-        self.generated_code += [code]
+        self.code_arranger.add_code(code)
 
         self.idx += 1
         self.loc += loc
 
     def add_marker(self, ):
+        """save information about a code piece one does e.g. later want to jump
+        back to
+        :idx: index of the code piece
+        :loc: lines of code up to this code piece's end
+        """
         self.metadata += [(self.idx, self.loc)]
 
     def remove_marker(self, ):
@@ -42,9 +47,7 @@ class _CodeGenerator:
         :word: by what the pattern should be replaced
         :returns: None
         """
-        self.generated_code[self.metadata[-1][0]] =\
-            self.generated_code[self.metadata[-1]
-                                [0]].replace(pattern, word)
+        self.code_arranger.replace_code(self.metadata[-1][0], pattern, word)
 
     def replace_code_pre(self, code, pattern, word):
         """Jumps backwards, e.g. needed for while loops.
@@ -59,48 +62,55 @@ class _CodeGenerator:
 
         :returns: unified generated code
         """
-        code_acc = ""
-        for code_piece in self.generated_code:
-            if not global_vars.args.verbose:
-                code_piece = self._clean_up_code_piece(code_piece)
-            code_acc += code_piece
-            # code_acc += "\n"
-        return code_acc
+        return self.code_arranger.align_comments() if global_vars.args.verbose\
+            else self.code_arranger.remove_comments()
 
-    def _clean_up_code_piece(self, code_piece):
-        cleaned_code = ""
-        stop_include_next_c = False
-        include = True
-        has_seen_semicolon = False
-        reset = False
-        for c in code_piece:
-            if c == '#' and not reset:
-                include = False
-            elif c == '#' and reset:
-                # in case there're two single line comments after
-                # another in one code_piece
-                include = False
-                has_seen_semicolon = False
-                reset = False
-            elif c == ';':
-                stop_include_next_c = True
-                has_seen_semicolon = True
-            elif c == '\n':
-                reset = True
-            elif reset:
-                stop_include_next_c = False
-                include = True
-                has_seen_semicolon = False
-                reset = False
-            elif stop_include_next_c:
-                include = False
-                stop_include_next_c = False
 
-            if include and c != '\n':
-                cleaned_code += c
-            elif has_seen_semicolon and c == '\n':
-                cleaned_code += c
-        return cleaned_code
+class CodeArranger:
+    def __init__(self):
+        self.generated_code = []
+        # only single line strings
+        # imortant for having comments aligned
+        self.amax_comment_distance = 0
+
+    def add_code(self, code):
+        self.generated_code += [code]
+
+    def replace_code(self, idx, pattern, word):
+        self.generated_code[idx] = self.generated_code[idx].replace(
+            pattern, word)
+
+    def remove_comments(self, ):
+        clean_code = ""
+        for code_line in self._convert_to_lines():
+            comment_start = code_line.find('#')
+            if comment_start > 0:
+                clean_code += code_line[:comment_start - 2] + '\n'
+        return clean_code
+
+    def align_comments(self, ):
+        aligned_code = ""
+        for code_line in self._convert_to_lines():
+            if code_line[0] != '#':
+                num_spaces = self.amax_comment_distance -\
+                    (code_line.index(';') + 1)
+                code_line = code_line.replace('  ', ' ' * num_spaces)
+
+            aligned_code += code_line + '\n'
+        return aligned_code
+
+    def _convert_to_lines(self, ):
+        code_lines = []
+        for code in self.generated_code:
+            code_lines += code.split('\n')[:-1]
+
+            # find out longest distance from start of line to to a comment
+            for code_line in code_lines:
+                # no +1 to compensate find() starting with 0 because # +1 index
+                # too much for the distance from the start
+                self.amax_comment_distance = max(self.amax_comment_distance,
+                                                 code_line.find('#'))
+        return code_lines
 
 
 def CodeGenerator():

@@ -8,9 +8,7 @@ class MainFunction(ASTNode):
     start = "LOADI SP eds;\n"
     start_loc = 1
 
-    end = strip_multiline_string("""# code(af)
-        JUMP 0;
-        """)
+    end = "JUMP 0;\n"
     end_loc = 1
 
     def _update_match_args(self, ):

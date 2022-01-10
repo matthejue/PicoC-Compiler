@@ -1,8 +1,8 @@
-from function_grammar import FunctionGrammar
+from file_grammar import FileGrammar
 from lexer import TT
 
 
-class Grammar(FunctionGrammar):
+class Grammar(FileGrammar):
     """the function part of the context free grammar of the piocC
     language"""
     def start_parse(self):
@@ -10,7 +10,7 @@ class Grammar(FunctionGrammar):
 
         :returns: None
         """
-        self.code_f()
+        self.code_fi()
         self.match([TT.EOF])
 
     def reveal_ast(self):

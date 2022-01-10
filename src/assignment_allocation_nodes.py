@@ -9,8 +9,8 @@ from arithmetic_nodes import Identifier, Number, Character
 class Assign(ASTNode):
     """Abstract Syntax Tree Node for assignement"""
 
-    assign = strip_multiline_string("""# codeaa(e1) (oder codela(e1), falls logischer Ausdruck)
-        LOADIN SP ACC 1;  # Wert von e1 in ACC laden
+    assign = strip_multiline_string(
+        """LOADIN SP ACC 1;  # Wert von e1 in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
     assign_loc = 2
@@ -19,29 +19,29 @@ class Assign(ASTNode):
     assign_more_loc = 1
 
     def _update_match_args(self, ):
-        self.variable = self.children[0]
+        self.location = self.children[0]
         self.expression = self.children[1]
 
-    __match_args__ = ("variable", "expression")
+    __match_args__ = ("location", "expression")
 
     def visit(self, ):
         self._update_match_args()
 
         self.code_generator.add_code(
-            "# Zuweisung oder new Sub-Zuweisung Start\n", 0)
+            f"# Zuweisung {self} Start\n", 0)
 
         self._pretty_comments()
 
-        self.variable.visit()
+        self.location.visit()
 
         try:
             self._assignment()
         except KeyError:
             # repackage the error
-            raise UnknownIdentifierError(self.variable)
+            raise UnknownIdentifierError(self.location)
 
         self.code_generator.add_code(
-            "# Zuweisung oder Sub-Zuweisung Ende\n", 0)
+            f"# Zuweisung {self} Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
@@ -50,12 +50,17 @@ class Assign(ASTNode):
             self.assign_more = self.code_generator.replace_code_pre(
                 self.assign_more, "e1", str(self.expression))
             self.assign_more = self.code_generator.replace_code_pre(
-                self.assign_more, "v1", str(self.variable))
+                self.assign_more, "v1", str(self.location))
+
+    def _comment_for_constant(self, name, value):
+        self.code_generator.add_code("# Konstante " + name + " in Symboltabelle "
+                                     "den Wert " + value + " zugewiesen\n", 0)
 
     def _assignment(self, ):
         match self:
             case Assign(Alloc(NT.Const(), _, Identifier(name)), (Number(value) | Character(value))):
                 self.symbol_table.resolve(name).value = value
+                self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
             case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), Assign(_, _)):
                 self.expression.visit()
@@ -104,11 +109,11 @@ class Alloc(ASTNode):
     def visit(self, ):
         self._update_match_args()
 
-        self.code_generator.add_code("# Allokation Start\n", 0)
+        self.code_generator.add_code(f"# Allokation {self} Start\n", 0)
 
         self._adapt_code()
 
-        self.code_generator.add_code("# Allokation Ende\n", 0)
+        self.code_generator.add_code(f"# Allokation {self} Ende\n", 0)
 
     def _pretty_comments(self, const_var, name, dtype, value=None):
         suppl = ""
@@ -125,6 +130,7 @@ class Alloc(ASTNode):
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
+                self._pretty_comments("Konstante", name, dtype)
             case Alloc(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)

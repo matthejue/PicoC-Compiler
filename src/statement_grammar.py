@@ -75,7 +75,7 @@ class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,
 
         """
         return self.LTT(1) in chain(self.PRIM_DT.keys(), [TT.CONST]) or\
-            self.LTT(1) == TT.IDENTIFIER
+            self.LTT(1) == TT.NAME
         # return (self.LTT(1) == TT.IDENTIFIER and self.LTT(2) == TT.ASSIGNMENT) or\
         # (self.LTT(1) in self.PRIM_DT.keys() and self.LTT(2) == TT.IDENTIFIER) or\
         # (self.LTT(1) == TT.CONST and self.LTT(2) in self.PRIM_DT.keys() and

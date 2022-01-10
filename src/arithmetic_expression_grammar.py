@@ -101,7 +101,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: <word> | <number> | <paren> | <unop>
         """
-        if self.LTT(1) == TT.IDENTIFIER:
+        if self.LTT(1) == TT.NAME:
             self.add_and_consume(classname=Identifier)
         elif self.LTT(1) == TT.NUMBER:
             self.add_and_consume(classname=Number)

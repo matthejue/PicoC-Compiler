@@ -45,9 +45,6 @@ class NT:
     class Void(ASTNode):
         pass
 
-    class Main(ASTNode):
-        pass
-
     class Else(ASTNode):
         pass
 
@@ -76,4 +73,10 @@ class NT:
         pass
 
     class LNot(ASTNode):
+        pass
+
+    class Main(ASTNode):
+        pass
+
+    class Filename(ASTNode):
         pass

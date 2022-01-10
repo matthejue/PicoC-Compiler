@@ -7,36 +7,39 @@ from dummy_nodes import NT
 class FunctionGrammar(StatementGrammar):
     """the function part of the context free grammar of the piocC
     language"""
-    def code_f(self):
+    def code_fu(self):
         """function grammar startpoint
 
         :grammar: <main_function>
         :returns: None
 
         """
-        self._main_function()
+        self._function()
 
-    def _main_function(self, ):
+    def _function(self, ):
         """main function
 
         :grammar: void main () { <code_ss> }
         :returns: None
         """
         if self.LTT(2) == TT.MAIN:
-            savestate_node = self.ast_builder.down(MainFunction)
+            self._main_function()
 
-            self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
+    def _main_function(self, ):
+        savestate_node = self.ast_builder.down(MainFunction)
 
-            self.add_and_match([TT.MAIN], NT.Main)
+        self.add_and_consume(mapping=self.PRIM_DT)
 
-            self.match([TT.L_PAREN])
+        self.add_and_match([TT.MAIN], NT.Main)
 
-            self.match([TT.R_PAREN])
+        self.match([TT.L_PAREN])
 
-            self.match([TT.L_BRACE])
+        self.match([TT.R_PAREN])
 
-            self.code_ss()
+        self.match([TT.L_BRACE])
 
-            self.match([TT.R_BRACE])
+        self.code_ss()
 
-            self.ast_builder.up(savestate_node)
+        self.match([TT.R_BRACE])
+
+        self.ast_builder.up(savestate_node)

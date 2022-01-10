@@ -187,8 +187,9 @@ def _read_and_write_file(infile, outfile):
 
 
 def _compile(fname, code):
-    # remove all \n from the code
-    code_without_cr = list(map(lambda line: line.strip(), code))
+    # remove all \n from the code lines in the list
+    code_without_cr = [fname + " "] + list(map(lambda line: line.strip(),
+                                               code))
 
     lexer = Lexer(code_without_cr)
 
@@ -206,7 +207,7 @@ def _compile(fname, code):
         return tokens
 
     # Generate ast
-    grammar = Grammar(lexer, fname)
+    grammar = Grammar(lexer)
     # Handle errors
     error_handler = ErrorHandler(grammar)
     # Assignment grammar needs 2 num_lts for <va>
