@@ -1,8 +1,5 @@
 from loop_nodes import While, DoWhile
 from lexer import TT
-# from errors import NoApplicableRuleError
-from errors import NoApplicableRuleError
-#  from statement_grammar import StatementGrammar
 
 
 class LoopGrammar:
@@ -24,8 +21,7 @@ class LoopGrammar:
             self._while()
         elif self.LTT(1) == TT.DO:
             self._do_while()
-        else:
-            raise NoApplicableRuleError('while or do while', self.LT(1))
+        #  else: Error can't happen
 
     def _while(self):
         """while loop

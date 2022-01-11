@@ -1,8 +1,9 @@
 from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-from lexer import TT, Token
+from lexer import TT
 from logic_nodes import LogicAndOr, LogicNot, LogicAtom, LogicTopBottom
-from errors import MismatchedTokenError, NoApplicableRuleError
+from errors import Errors
 from dummy_nodes import NT
+from itertools import chain
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -38,30 +39,26 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self.code_le()
         else:
             self._handle_all_tastes_unsuccessful(
-                "arithmetic expression or "
-                "logic expression", errors)
+                "arithmetic or logic expression", errors)
 
     def _handle_all_tastes_unsuccessful(self, expected, errors):
         # if both threw the same error print that error out
         if errors[0].expected == errors[1].expected:
             raise errors[0]
-        # if both threw different errors raise a undefinied
-        # NoApplicableRuleError
         else:
-            raise NoApplicableRuleError(expected, self.LT(1))
+            token = self.LT(1)
+            raise Errors.NoApplicableRuleError(expected, token.value,
+                                               token.position)
 
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
 
-        :function: <code_ae>
+        :grammar: <code_ae>
         :returns: None
         """
         self.code_ae()
-        if self.LTT(1) in self.COMP_REL.keys() or\
-                self.LTT(1) in self.LOG_CON.keys():
-            raise MismatchedTokenError(
-                "all besides comparison operators and "
-                "logical connectives", self.LT(1))
+        if self.LTT(1) in chain(self.COMP_REL.keys(), self.LOG_CON.keys()):
+            raise Errors.TastingError()
 
     def code_le(self):
         """logic expression startpoint
@@ -138,7 +135,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         elif self.LTT(1) in [TT.NUMBER, TT.CHARACTER, TT.NAME]:
             self._atom_or_top_bottom()
         else:
-            raise MismatchedTokenError("logic operand", self.LT(1))
+            token = self.LT(1)
+            raise Errors.MismatchedTokenError("logic operand", token.value,
+                                              token.position)
 
     def _atom_or_top_bottom(self):
         """atomic formula or top / bottom
@@ -158,8 +157,10 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self._top_bottom()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():
-            raise MismatchedTokenError("all besides comparison relations",
-                                       self.LT(1))
+            token = self.LT(1)
+            raise Errors.MismatchedTokenError(
+                "all besides comparison relations", token.value,
+                token.position)
 
     def _top_bottom(self, ):
         """top / bottom

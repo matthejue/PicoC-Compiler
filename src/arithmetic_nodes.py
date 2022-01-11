@@ -1,6 +1,6 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
-from errors import UnknownIdentifierError
+from errors import Errors
 from dummy_nodes import NT
 import global_vars
 
@@ -28,7 +28,9 @@ class ArithOperand(ASTNode):
             self._adapt_code()
         except KeyError:
             # repackage the error
-            raise UnknownIdentifierError(self.value)
+            match self:
+                case Identifier(value, position):
+                    raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(self.end, self.all_loc)
 
@@ -210,5 +212,3 @@ class ArithUnOp(ASTNode):
             case ArithUnOp(NT.Not(), _):
                 self.code_generator.add_code(self.bitwise_not,
                                              self.bitwise_not_loc)
-            case ArithUnOp(NT.Minus(), _):
-                pass

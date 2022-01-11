@@ -1,8 +1,7 @@
-from errors import InvalidCharacterError
+from errors import Errors
 from enum import Enum
 import string
 import global_vars
-from errors import UnclosedCharacterError
 
 
 class Token():
@@ -10,13 +9,13 @@ class Token():
 
     __match_args__ = ("type", "value")
 
-    def __init__(self, type, value, position):
+    def __init__(self, tokentype, value, position):
         """
         :type: TT
         :value: string
         :position: (row, column) in the file where the token starts
         """
-        self.type = type
+        self.type = tokentype
         self.value = value
         self.position = position
 
@@ -191,9 +190,9 @@ class Lexer:
                 if self.lc == "'":
                     self.next_char()
                 else:
-                    raise UnclosedCharacterError("'" + self.c + "'",
-                                                 "'" + self.c + self.lc,
-                                                 self.position)
+                    raise Errors.UnclosedCharacterError(
+                        "'" + self.c + "'", "'" + self.c + self.lc,
+                        self.position)
                 return Token(TT.CHAR, str(ord(char)), self.position)
             elif self.lc == '/':
                 # division or comments
@@ -210,7 +209,7 @@ class Lexer:
                 else:
                     return Token(TT.DIV_OP, self.c, self.position)
             else:
-                raise InvalidCharacterError(self.lc, self.position)
+                raise Errors.InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)
 
     def next_char(self):

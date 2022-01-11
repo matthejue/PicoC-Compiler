@@ -1,6 +1,6 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
-from errors import UnknownIdentifierError
+from errors import Errors
 import global_vars
 from dummy_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
@@ -41,7 +41,9 @@ class Assign(ASTNode):
             self._assignment()
         except KeyError:
             # repackage the error
-            raise UnknownIdentifierError(self.location)
+            match self.location:
+                case Identifier(value, position):
+                    raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(
             f"# Zuweisung {self} Ende\n", 0)
@@ -61,10 +63,15 @@ class Assign(ASTNode):
 
     def _assignment(self, ):
         match self:
-            case Assign(Alloc(NT.Const(), _, Identifier(name)), (Number(value) | Character(value))):
-                # TODO was wenn auf rechter Seite einfach nur eine Variable ist?
-                self.symbol_table.resolve(name).value = value
-                self._comment_for_constant(name, value)
+            case Assign(Alloc(NT.Const(), _, Identifier(name)), assignment):
+                match assignment:
+                    case (Number(value) | Character(value)):
+                        self.symbol_table.resolve(name).value = value
+                        self._comment_for_constant(name, value)
+                    case Identifier(value):
+                        self.symbol_table.resolve(
+                            name).value = self.symbol_table.resolve(value).value
+                        self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
             case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), Assign(_, _)):
                 self.expression.visit()
@@ -77,10 +84,6 @@ class Assign(ASTNode):
                 self.code_generator.add_code(self.assign, self.assign_loc)
 
                 self._adapt_code(name)
-            case _:
-                # raise InvalidConstantAssignment(self.variable)
-                # TODO
-                pass
 
     def _adapt_code(self, name):
         self.assign_more = self.code_generator.replace_code_pre(

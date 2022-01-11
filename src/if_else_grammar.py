@@ -1,5 +1,5 @@
 from lexer import TT
-from errors import NoApplicableRuleError, MismatchedTokenError
+from errors import Errors
 from if_else_nodes import If, IfElse
 from dummy_nodes import NT
 #  from statement_grammar import StatementGrammar
@@ -21,7 +21,7 @@ class IfElseGrammar:
         elif self.taste(self._if_else, errors):
             self._if_else()
         else:
-            self._handle_all_tastes_unsuccessful("if or if else expression",
+            self._handle_all_tastes_unsuccessful("if or if else statement",
                                                  errors)
 
     def _taste_consume_if_without_else(self):
@@ -31,7 +31,7 @@ class IfElseGrammar:
         """
         self._if_without_else()
         if self.LTT(1) == TT.ELSE:
-            raise MismatchedTokenError("all besides else", self.LT(1))
+            raise Errors.TastingError()
 
     def _if_without_else(self, ):
         """if
@@ -84,8 +84,10 @@ class IfElseGrammar:
             self.code_ss()
 
             self.match([TT.R_BRACE])
-        elif self._is_statement():
+        elif self.LTT(1) in self.STATEMENT:
             self._s()
         else:
-            raise NoApplicableRuleError(
-                "statement in braces or single statement", self.LT(1))
+            token = self.LT(1)
+            raise Errors.NoApplicableRuleError(
+                TT.L_BRACE.value + " or single statement", token.value,
+                token.position)

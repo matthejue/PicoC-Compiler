@@ -1,16 +1,18 @@
 from abstract_syntax_tree import ASTNode
 from function_nodes import MainFunction
+from errors import Errors
 
 
 class File(ASTNode):
     def update_match_args(self, ):
+        self.filename = self.children[0]
+
+        # determine the main function
         for (i, child) in enumerate(self.children):
             if isinstance(child, MainFunction):
                 break
         else:
-            i = 1
-            # raise NoMainFunctionError()
-        self.filename = self.children[0]
+            raise Errors.NoMainFunctionError(str(self.filename))
         self.main_function = self.children[i]
         self.functions = self.children[1:i] + self.children[i + 1:]
 

@@ -1,6 +1,6 @@
 from parser_ import BacktrackingParser
 from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Character
-from errors import MismatchedTokenError
+from errors import Errors
 from lexer import TT
 from dummy_nodes import NT
 import global_vars
@@ -112,7 +112,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         elif self.LTT(1) in self.UNARY.keys():
             self._unop()
         else:
-            raise MismatchedTokenError("aritmetic operand", self.LT(1))
+            token = self.LT(1)
+            raise Errors.MismatchedTokenError("aritmetic operand", token.value,
+                                              token.position)
 
     def _paren_arith(self):
         """arithmetic parenthesis

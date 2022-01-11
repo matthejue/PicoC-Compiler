@@ -1,6 +1,7 @@
 from ast_builder import ASTBuilder
 import global_vars
-from errors import MismatchedTokenError, UnknownIdentifierError, UnclosedCharacterError
+from errors import Errors
+from lexer import Token, TT
 
 
 class BacktrackingParser():
@@ -24,7 +25,7 @@ class BacktrackingParser():
         self.lt_idx = 0
         self.ast_builder = ASTBuilder()
 
-    def LT(self, i):
+    def LT(self, i) -> Token:
         """Lookahead Token
 
         :returns: find out token looking ahead i tokens
@@ -34,7 +35,7 @@ class BacktrackingParser():
         # token because all tokens in self.lts are lookahead tokens
         return self.lts[self.lt_idx + i - 1]
 
-    def LTT(self, i):
+    def LTT(self, i) -> TT:
         """Lookahead tokentype
 
         :returns: find out type locking ahead i tokens
@@ -65,7 +66,11 @@ class BacktrackingParser():
         if (self.LTT(1) in tokentypes):
             self.consume_next_token()
         else:
-            raise MismatchedTokenError(tokentypes, self.LT(1))
+            token = self.LT(1)
+            raise Errors.MismatchedTokenError(
+                " or ".join("'" + tokentype.value + "'"
+                            for tokentype in tokentypes), token.value,
+                token.position)
 
     def add_and_match(self, tokentypes, classname=None, mapping=None):
         """Same as add, but also check for match
@@ -150,7 +155,8 @@ class BacktrackingParser():
         # Lexer errors should always be reported, else it can happen that only
         # the first taste triggers the lexer error and the next taste can
         # continue without error from the last lexer position
-        except (UnknownIdentifierError, UnclosedCharacterError) as e:
+        except (Errors.UnknownIdentifierError,
+                Errors.UnclosedCharacterError) as e:
             raise e
         except Exception as e:
             errors += [e]

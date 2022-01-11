@@ -86,7 +86,7 @@ class Scope:
         """
         self.symbols[sym.name] = sym
 
-    def resolve(self, name):
+    def resolve(self, name) -> Symbol:
         """look up name in scope
 
         :name: string

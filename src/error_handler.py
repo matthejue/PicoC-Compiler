@@ -1,7 +1,6 @@
 from sys import exit
 from enum import Enum
-from errors import InvalidCharacterError, UnclosedCharacterError,\
-    MismatchedTokenError, NoApplicableRuleError, UnknownIdentifierError
+from errors import Errors
 
 
 class States(Enum):
@@ -19,33 +18,28 @@ class ErrorHandler:
         self.grammar = grammar
 
     def handle(self, function):
-        # TODO: Don't forget to remove this improvised conditional breakpoint
-        import global_vars
-        if global_vars.test_name == "unclosed character error":
-            if global_vars.test_name == "unclosed character error":
-                pass
         error_message = ""
         try:
             function()
-        except InvalidCharacterError as e:
+        except Errors.InvalidCharacterError as e:
             error_message += self._error_message_header(e) + '\n'
             error_message += self._point_at_found(States.ONLY_FOUND.value,
                                                   e) + '\n'
             print(error_message)
             exit(0)
-        except UnclosedCharacterError as e:
+        except Errors.UnclosedCharacterError as e:
             error_message += self._error_message_header(e) + '\n'
             error_message += self._point_at_found(e.found.position[1],
                                                   e) + '\n'
             print(error_message)
             exit(0)
-        except NoApplicableRuleError as e:
+        except Errors.NoApplicableRuleError as e:
             error_message += self._error_message_header(e) + '\n'
             error_message += self._point_at_found(States.ONLY_FOUND.value,
                                                   e) + '\n'
             print(error_message)
             exit(0)
-        except MismatchedTokenError as e:
+        except Errors.MismatchedTokenError as e:
             error_message += self._error_message_header(e) + '\n'
 
             (row, column) = self._find_white_space_before_last_token(e)
@@ -58,7 +52,7 @@ class ErrorHandler:
                 error_message += self._point_at_found(column, e) + '\n'
             print(error_message)
             exit(0)
-        except UnknownIdentifierError as e:
+        except Errors.UnknownIdentifierError as e:
             error_message += self._error_message_header(e) + '\n'
             error_message += self._point_at_found(States.ONLY_FOUND.value, e)\
                 + '\n'
