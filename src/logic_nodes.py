@@ -199,4 +199,4 @@ class LogicTopBottom(ASTNode):
             self.end, "e1", str(self.arithmetic_expression))
 
     def __repr__(self, ):
-        return "to_bool(" + str(self.children[0]) + ")"
+        return f"(to_bool {self.children[0]})"

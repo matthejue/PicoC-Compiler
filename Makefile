@@ -3,43 +3,22 @@ TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard ./test/*_test.py))
 TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test/$(test_binary))
 .PHONY: all run test clean
 
-all: run-read-compile clean
+all: run-read-all-verbose clean
 
-run-read-compile:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S ./input.picoc ./output.reti
+run-read-all:
+	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -m ./code.picoc
 
-run-read-compile-comments:
-	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m -S ./input.picoc ./output.reti
+run-read-all-verbose:
+	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./code.picoc
 
-run-read-compile-arg:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S ./test/$(ARG) ./output.reti
+run-read-all-arg:
+	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./test/$(ARG)
 
-run-shell-compile:
-	./src/pico_c_compiler.py -p -s 100 -e 200 -m -S
+run-shell-all:
+	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -m
 
-run-shell-compile-comments:
-	./src/pico_c_compiler.py -p -v -s 100 -e 200 -m -S
-
-run-read-ast:
-	./src/pico_c_compiler.py -a -p -m ./input.picoc ./output.reti
-
-run-read-ast-verbose:
-	./src/pico_c_compiler.py -a -p -v -m ./input.picoc ./output.reti
-
-run-read-tokens:
-	./src/pico_c_compiler.py -t -p -v -m ./input.picoc ./output.reti
-
-run-shell-ast:
-	./src/pico_c_compiler.py -a -m
-
-run-shell-ast-verbose:
-	./src/pico_c_compiler.py -a -v -m
-
-run-shell-tokens:
-	./src/pico_c_compiler.py -t -v -m
-
-run-help:
-	./src/pico_c_compiler.py -h
+run-shell-all-verbose:
+	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m
 
 test:
 	# for test_binary in $(TEST_BINARY_BASENAMES); do \

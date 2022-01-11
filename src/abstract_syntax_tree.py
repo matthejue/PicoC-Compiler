@@ -35,7 +35,7 @@ class ASTNode:
 
     def __repr__(self):
         if not self.children:
-            return f"{self.value}"
+            return self.value
 
         acc = "(" + f"{self.children[0]}"
 

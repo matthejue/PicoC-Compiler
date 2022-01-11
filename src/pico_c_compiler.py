@@ -31,50 +31,48 @@ def main():
     cli_args_parser = argparse.ArgumentParser(description=description)
     cli_args_parser.add_argument("infile",
                                  nargs='?',
-                                 help="input file with Pico-C Code")
-    cli_args_parser.add_argument("outfile",
-                                 nargs='?',
-                                 help="output file with RETI Code")
+                                 help="input file with pico-c code")
     cli_args_parser.add_argument('-p',
                                  '--print',
                                  action='store_true',
-                                 help="output the file output to the terminal"
-                                 " and if --symbol_table is active output the"
-                                 " symbol table beneath")
-    cli_args_parser.add_argument('-a',
-                                 '--ast',
-                                 action='store_true',
-                                 help="output the Abstract Syntax Tree "
-                                 "instead of RETI Code")
+                                 help="print all file outputs to the terminal")
+    cli_args_parser.add_argument(
+        '-c',
+        '--concrete-syntax',
+        action='store_true',
+        help="also print the concrete syntax(=content of input file)."
+        "The --print option must be active")
     cli_args_parser.add_argument('-t',
                                  '--tokens',
                                  action='store_true',
-                                 help="output the Tokenlist instead of "
-                                 "RETI Code")
+                                 help="also write the tokenlist")
+    cli_args_parser.add_argument('-a',
+                                 '--abstract-syntax',
+                                 action='store_true',
+                                 help="also write the abstract syntax")
+    cli_args_parser.add_argument(
+        '-S',
+        '--symbol_table',
+        action='store_true',
+        help="also write the final symbol table into a CSV file")
     cli_args_parser.add_argument(
         '-s',
         '--start_data_segment',
         help="where the datasegment starts (default 100)",
         type=int,
         default=100)
-    cli_args_parser.add_argument('-e',
-                                 '--end_data_segment',
-                                 help="where the "
-                                 "datasegment ends and where the stackpointer "
-                                 "starts (default 200)",
-                                 type=int,
-                                 default=200)
-    cli_args_parser.add_argument('-m',
-                                 '--python_stracktrace_error_message',
-                                 action='store_true',
-                                 help="show python error "
-                                 "messages with stacktrace")
-    cli_args_parser.add_argument('-S',
-                                 '--symbol_table',
-                                 action='store_true',
-                                 help="output the final symbol table into "
-                                 "a CSV file after the whole Abstract Syntax "
-                                 "Tree was visited")
+    cli_args_parser.add_argument(
+        '-e',
+        '--end_data_segment',
+        help="where the "
+        "datasegment ends and where the stackpointer starts (default 200)",
+        type=int,
+        default=200)
+    cli_args_parser.add_argument(
+        '-m',
+        '--python_stracktrace_error_message',
+        action='store_true',
+        help="show python error messages with stacktrace")
     cli_args_parser.add_argument(
         '-O',
         '--optimization-level',
@@ -91,47 +89,27 @@ def main():
         action='store_true',
         help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
     cli_args_parser.add_argument(
-        '-P',
-        '--prefix-notation',
-        action='store_true',
-        help=
-        "write Abstract Syntax Tree in prefix notation [NOT IMPLEMENTED YET]")
-    cli_args_parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
-        help="also show tokentypes in the ast, add "
-        "comments to the RETI Code and show more "
-        "context around error messages [NOT IMPLEMENTED YET]")
+        help="also show tokentype and position for tokens, write the nodetype "
+        "in front of parenthesis in the abstract syntax tree [NOT IMPLEMENTED YET], add comments to "
+        "the RETI Code and show more context around error messages "
+        "[NOT IMPLEMENTED YET]")
     global_vars.args = cli_args_parser.parse_args()
 
     if not global_vars.args.infile:
         _shell()
-
-    if global_vars.args.infile:
-        infile = global_vars.args.infile
-
-    if global_vars.args.outfile:
-        outfile = global_vars.args.outfile
     else:
-        outfile = _basename(infile) + ".reti"
+        infile = global_vars.args.infile
+        outbase = _basename(infile)
 
     try:
-        _read_and_write_file(infile, outfile)
+        _read_and_write_file(infile, outbase)
     except FileNotFoundError:
         print("File does not exist")
     else:
         print("Compiled successfully")
-
-
-def _basename(fname):
-    """stips of the file extension
-    :fname: filename
-    :returns: basename of the file
-
-    """
-    index_of_extension = fname.rindex('.')
-    return fname[0:index_of_extension]
 
 
 def _shell():
@@ -150,89 +128,122 @@ def _shell():
         elif pico_c_in == '':
             continue
 
-        _compile('stdin', [pico_c_in])
+        _compile([pico_c_in], "stdin")
 
 
-def _read_and_write_file(infile, outfile):
+def _read_and_write_file(infile, outbase):
     """reads a pico_c file and compiles it
     :returns: pico_c Code compiled in RETI Assembler
 
     """
-    with open(infile, encoding="utf-8") as fin, \
-            open(outfile, 'w', encoding="utf-8") as fout:
+    with open(infile, encoding="utf-8") as fin:
         pico_c_in = fin.readlines()
 
-        output = _compile(infile, pico_c_in)
-
-        fout.writelines(str(output))
-
-    if global_vars.args.symbol_table:
-        outfile = _basename(outfile) + '.csv'
-        output = "name,type,datatype,position,value\n"
-        symbols = SymbolTable().symbols
-        for name in symbols.keys():
-            if symbols[name].position:
-                output += f"{name},"\
-                    f"{symbols[name].get_type()},"\
-                    f"{symbols[name].datatype},"\
-                    f"{symbols[name].position[0]}:"\
-                    f"{symbols[name].position[1]},"\
-                    f"{symbols[name].value}\n"
-            else:  # if it is None
-                output += f"{name},{symbols[name].get_type()},"\
-                    f"{symbols[name].datatype},{symbols[name].position}, {symbols[name].value}\n"
-        with open(outfile, 'w', encoding="utf-8") as csv_out:
-            csv_out.writelines(output)
+    _compile(pico_c_in, infile, outbase)
 
 
-def _compile(fname, code):
+def _compile(code, infile, outbase=None):
     # remove all \n from the code lines in the list
-    code_without_cr = [fname + " "] + list(map(lambda line: line.strip(),
-                                               code))
+    code_without_cr = [infile + " "] + list(
+        map(lambda line: line.strip(), code))
+
+    if global_vars.args.concrete_syntax and global_vars.args.print:
+        print(code_without_cr)
 
     lexer = Lexer(code_without_cr)
 
-    # Deal with --tokens option
     if global_vars.args.tokens:
-        tokens = []
-        t = lexer.next_token()
-        while t.type != TT.EOF:
-            tokens += [t]
-            t = lexer.next_token()
-
-        if global_vars.args.print:
-            print(tokens)
-
-        return tokens
+        _tokens_option(lexer, outbase)
+        lexer.__init__(code_without_cr)
 
     # Generate ast
     grammar = Grammar(lexer)
     # Handle errors
     error_handler = ErrorHandler(grammar)
-    # Assignment grammar needs 2 num_lts for <va>
     error_handler.handle(grammar.start_parse)
 
-    # Deal with --ast option
-    if global_vars.args.ast:
-        if global_vars.args.print:
-            print(grammar.reveal_ast())
-        return grammar.reveal_ast()
+    if global_vars.args.abstract_syntax:
+        _abstract_syntax_option(grammar, outbase)
 
     abstract_syntax_tree = grammar.reveal_ast()
     error_handler.handle(abstract_syntax_tree.visit)
 
-    # Deal with --print and --symbol_table options
-    if global_vars.args.print:
-        print(abstract_syntax_tree.show_generated_code())
     if global_vars.args.symbol_table:
-        header = ["name", "type", "datatype", "position", "value"]
-        symbols = SymbolTable().symbols
-        print(
-            tabulate([(k, v.get_type(), str(v.datatype), str(
-                v.position), str(v.value)) for k, v in symbols.items()],
-                     headers=header))
+        _symbol_table_option(outbase)
 
-    return abstract_syntax_tree.show_generated_code()
+    _reti_code(abstract_syntax_tree, outbase)
+
+
+def _tokens_option(lexer, outbase):
+    tokens = []
+    t = lexer.next_token()
+    while t.type != TT.EOF:
+        tokens += [t]
+        t = lexer.next_token()
+
+    if global_vars.args.print:
+        print('\n' + str(tokens))
+
+    if outbase:
+        with open(outbase + ".tokens", 'w', encoding="utf-8") as fout:
+            fout.write(str(tokens))
+
+
+def _abstract_syntax_option(grammar, outbase):
+    if global_vars.args.print:
+        print('\n' + str(grammar.reveal_ast()))
+
+    if outbase:
+        with open(outbase + ".ast", 'w', encoding="utf-8") as fout:
+            fout.write(str(grammar.reveal_ast()))
+
+
+def _symbol_table_option(outbase):
+    header = ["name", "type", "datatype", "position", "value"]
+    symbols = SymbolTable().symbols
+    print('\n' + str(
+        tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
+                   str(v.value)) for k, v in symbols.items()],
+                 headers=header)))
+
+    if outbase:
+        _write_symbol_table(outbase)
+
+
+def _write_symbol_table(outbase):
+    output = "name,type,datatype,position,value\n"
+    symbols = SymbolTable().symbols
+    for name in symbols.keys():
+        if symbols[name].position:
+            output += f"{name},"\
+                f"{symbols[name].get_type()},"\
+                f"{symbols[name].datatype},"\
+                f"{symbols[name].position[0]}:"\
+                f"{symbols[name].position[1]},"\
+                f"{symbols[name].value}\n"
+        else:  # if it is None
+            output += f"{name},{symbols[name].get_type()},"\
+                f"{symbols[name].datatype},{symbols[name].position}, {symbols[name].value}\n"
+    with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
+        fout.write(output)
+
+
+def _reti_code(abstract_syntax_tree, outbase):
+    if global_vars.args.print:
+        print('\n' + str(abstract_syntax_tree.show_generated_code()))
+    if outbase:
+        with open(outbase + ".reti", 'w', encoding="utf-8") as fout:
+            fout.write(str(abstract_syntax_tree.show_generated_code()))
+
+
+def _basename(fname):
+    """stips of the file extension
+    :fname: filename
+    :returns: basename of the file
+
+    """
+    index_of_extension = fname.rindex('.')
+    return fname[0:index_of_extension]
 
 
 if __name__ == '__main__':

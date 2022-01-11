@@ -156,9 +156,6 @@ class ArithBinOp(ASTNode):
             case ArithBinOp(_, NT.Or(), ):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'OR')
-            case _:
-                ...
-                # TODO
 
 
 class ArithUnOp(ASTNode):

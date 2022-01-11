@@ -13,15 +13,17 @@ class MainFunction(ASTNode):
 
     def update_match_args(self, ):
         self.prim_dt = self.children[0]
-        self.main = self.children[1]
+        self.function_name = self.children[1]
         self.statements = self.children[2:]
 
-    __match_args__ = ("prim_dt", "main", "statements")
+    __match_args__ = ("prim_dt", "function_name", "statements")
 
     def visit(self, ):
         self.update_match_args()
 
-        self.code_generator.add_code("# Main Funktion Start\n", 0)
+        self.code_generator.add_code(
+            f"# Main Funktion {self.prim_dt} {self.function_name}(){{ "
+            f"{self.statements[0]} ... }} Start\n", 0)
 
         self._pretty_comments()
 
@@ -34,7 +36,9 @@ class MainFunction(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code("# Main Funktion Ende\n", 0)
+        self.code_generator.add_code(
+            f"# Main Funktion {self.prim_dt} {self.function_name}(){{ "
+            f"{self.statements[0]} ... }} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(

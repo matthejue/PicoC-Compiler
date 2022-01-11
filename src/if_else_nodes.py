@@ -24,7 +24,7 @@ class If(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# If Statement if({self.condition}) {self.branch[0]} ... "
+            f"# If Statement if({self.condition}){{ {self.branch[0]} ... }} "
             "Start\n", 0)
 
         self._pretty_comments()
@@ -41,9 +41,8 @@ class If(ASTNode):
         self._adapt_code()
 
         self.code_generator.remove_marker()
-
         self.code_generator.add_code(
-            f"# If Statement if({self.condition}) {self.branch[0]} ... "
+            f"# If Statement if({self.condition}){{ {self.branch[0]} ... }} "
             "Ende\n", 0)
 
     def _pretty_comments(self, ):
@@ -57,8 +56,14 @@ class If(ASTNode):
             str(self.code_generator.loc -
                 self.code_generator.get_marker_loc() + 1))
 
+    def __repr__(self, ):
+        acc = f"(if"
+        for statement in self.children:
+            acc += f" {statement}"
+        return acc + ")"
 
-class IfElse(ASTNode):
+
+class IfElse(If):
     """Abstract Syntax Tree Node for Else"""
 
     start = strip_multiline_string(
@@ -95,8 +100,8 @@ class IfElse(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# If und Else Statement if({self.condition}) {self.branch1[0]} "
-            "... else {self.branch2[0]} ... Start\n", 0)
+            f"# If und Else Statement if({self.condition}){{ {self.branch1[0]} "
+            "... }} else {{ {self.branch2[0]} ... }} Start\n", 0)
 
         self._pretty_comments()
 
@@ -125,8 +130,8 @@ class IfElse(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If und Else Statement if({self.condition}) {self.branch1[0]} "
-            "... else {self.branch2[0]} ... Ende\n", 0)
+            f"# If und Else Statement if({self.condition}){{ {self.branch1[0]} "
+            "... }} else {{ {self.branch2[0]} ... }} Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
