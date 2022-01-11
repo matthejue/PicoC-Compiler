@@ -1,0 +1,6 @@
+name,type,datatype,position,value
+int,built in,None,None, None
+char,built in,None,None, None
+m,variable,int,3:4,100
+n,variable,int,4:4,101
+h,variable,int,5:4,102

@@ -1,5 +1,4 @@
-void main()
-{
+void main() {
   //Deklarationsteil
   int x;
   int y;

@@ -1,0 +1,1 @@
+(./tests/gcd.picoc (int main ((int m) = 12) ((int n) = 7) (int h) ((n > 0) (h = (m % n)) (m = n) (n = h))))

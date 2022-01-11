@@ -1,33 +1,37 @@
-TEST_BINARY_BASENAMES = $(shell basename -a $(wildcard ./test/*_test.py))
+TEST_FILENAMES = $(shell basename -a $(wildcard ./tests/*.picoc))
 # suffix=.py would have cut the .py away and implies -a
-TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_BINARY_BASENAMES),test/$(test_binary))
-.PHONY: all run test clean
+# TEST_BINARY_PATHS = $(foreach test_binary,$(TEST_FILENAMES),test/$(test_binary))
+.PHONY: all test clean
 
-all: run-read-all-verbose clean
+all: read-all-verbose clean
 
-run-read-all:
+read-all:
 	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -m ./code.picoc
 
-run-read-all-verbose:
+read-all-verbose:
 	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./code.picoc
 
-run-read-all-arg:
-	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./test/$(ARG)
-
-run-shell-all:
+shell-all:
 	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -m
 
-run-shell-all-verbose:
+shell-all-verbose:
 	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m
 
 test:
-	# for test_binary in $(TEST_BINARY_BASENAMES); do \
-	# 	python -m $$test_binary; \
-	# done
-	echo $(TEST_BINARY_PATHS)
-	for test_binary in $(TEST_BINARY_PATHS); do \
-		./$$test_binary; \
+	for testfile in $(TEST_FILENAMES); do \
+		echo -e \\n===============================================================================; \
+		echo $$testfile; \
+		echo ===============================================================================; \
+		./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./tests/$$testfile; \
 	done
+# echo $(TEST_BINARY_PATHS)
+# for test_binary in $(TEST_BINARY_PATHS); do \
+	# ./$$test_binary; \
+# done
+
+test-arg:
+	# start with 'make test-arg ARG=file_basename'
+	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -m ./tests/$(ARG).picoc
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

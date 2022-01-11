@@ -143,9 +143,9 @@ def _read_and_write_file(infile, outbase):
 
 
 def _compile(code, infile, outbase=None):
-    # remove all \n from the code lines in the list
+    # remove all empty lines and \n from the code lines in the list
     code_without_cr = [infile + " "] + list(
-        map(lambda line: line.strip(), code))
+        filter(lambda line: line, map(lambda line: line.strip(), code)))
 
     if global_vars.args.concrete_syntax and global_vars.args.print:
         print(code_without_cr)
@@ -199,12 +199,13 @@ def _abstract_syntax_option(grammar, outbase):
 
 
 def _symbol_table_option(outbase):
-    header = ["name", "type", "datatype", "position", "value"]
-    symbols = SymbolTable().symbols
-    print('\n' + str(
-        tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
-                   str(v.value)) for k, v in symbols.items()],
-                 headers=header)))
+    if global_vars.args.print:
+        header = ["name", "type", "datatype", "position", "value"]
+        symbols = SymbolTable().symbols
+        print('\n' + str(
+            tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
+                       str(v.value)) for k, v in symbols.items()],
+                     headers=header)))
 
     if outbase:
         _write_symbol_table(outbase)
