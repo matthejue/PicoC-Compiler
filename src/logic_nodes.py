@@ -197,3 +197,6 @@ class LogicTopBottom(ASTNode):
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
             self.end, "e1", str(self.arithmetic_expression))
+
+    def __repr__(self, ):
+        return "to_bool(" + str(self.children[0]) + ")"

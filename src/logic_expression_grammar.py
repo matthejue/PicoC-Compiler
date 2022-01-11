@@ -89,9 +89,16 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         while self.LTT(1) == TT.OR:
             self.add_and_consume(classname=NT.LOr)
 
-            self.ast_builder.down(LogicAndOr)
+            self.ast_builder.save("_or_expr")
 
+            self.ast_builder.down(LogicAndOr)
             self._and_expr()
+
+            if self.LTT(1) != TT.OR:
+                self.ast_builder.go_back("_or_expr")
+                return
+            else:
+                self.ast_builder.discard("_or_expr")
 
         self.ast_builder.up(savestate_node)
 
@@ -116,9 +123,16 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         while self.LTT(1) == TT.AND:
             self.add_and_consume(classname=NT.LAnd)
 
-            self.ast_builder.down(LogicAndOr)
+            self.ast_builder.save("_and_expr")
 
+            self.ast_builder.down(LogicAndOr)
             self._lo()
+
+            if self.LTT(1) != TT.AND:
+                self.ast_builder.go_back("_and_expr")
+                return
+            else:
+                self.ast_builder.discard("_and_expr")
 
         self.ast_builder.up(savestate_node)
 

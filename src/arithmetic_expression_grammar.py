@@ -122,7 +122,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: ( <code_ae> )
         """
         self.match([TT.L_PAREN])
-        self.code_ae()
+        self.code_ae_le()
         self.match([TT.R_PAREN])
 
     def _unop(self):

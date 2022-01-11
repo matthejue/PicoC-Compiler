@@ -150,8 +150,7 @@ def _shell():
         elif pico_c_in == '':
             continue
 
-        # compile('<stdin>', pico_c_in.split('\n'))
-        _compile('<stdin>', [pico_c_in])
+        _compile('stdin', [pico_c_in])
 
 
 def _read_and_write_file(infile, outfile):
