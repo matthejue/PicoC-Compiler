@@ -59,8 +59,8 @@ class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,
             self.consume_next_token()
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError("start of a statement",
-                                               token.value, token.position)
+            raise Errors.NoApplicableRuleError("statement", token.value,
+                                               token.position)
 
     def _semicolons(self, ):
         while True:

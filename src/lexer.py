@@ -193,7 +193,7 @@ class Lexer:
                     raise Errors.UnclosedCharacterError(
                         "'" + self.c + "'", "'" + self.c + self.lc,
                         self.position)
-                return Token(TT.CHAR, str(ord(char)), self.position)
+                return Token(TT.CHARACTER, str(ord(char)), self.position)
             elif self.lc == '/':
                 # division or comments
                 # :grammar: /(/|(<star>.*<start>/))?

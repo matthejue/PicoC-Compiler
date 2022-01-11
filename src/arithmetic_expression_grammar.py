@@ -3,7 +3,6 @@ from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Characte
 from errors import Errors
 from lexer import TT
 from dummy_nodes import NT
-import global_vars
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
@@ -113,8 +112,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self._unop()
         else:
             token = self.LT(1)
-            raise Errors.MismatchedTokenError("aritmetic operand", token.value,
-                                              token.position)
+            raise Errors.NoApplicableRuleError("arithmetic operand",
+                                               token.value, token.position)
 
     def _paren_arith(self):
         """arithmetic parenthesis

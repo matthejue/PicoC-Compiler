@@ -150,8 +150,8 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self._atom_or_top_bottom()
         else:
             token = self.LT(1)
-            raise Errors.MismatchedTokenError("logic operand", token.value,
-                                              token.position)
+            raise Errors.NoApplicableRuleError("logic operand", token.value,
+                                               token.position)
 
     def _atom_or_top_bottom(self):
         """atomic formula or top / bottom
@@ -171,10 +171,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self._top_bottom()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():
-            token = self.LT(1)
-            raise Errors.MismatchedTokenError(
-                "all besides comparison relations", token.value,
-                token.position)
+            raise Errors.TastingError()
 
     def _top_bottom(self, ):
         """top / bottom

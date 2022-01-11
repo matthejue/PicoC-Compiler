@@ -55,7 +55,7 @@ class Errors:
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, identifier, identifier_pos):
             self.description = "UnknownIdentifierError: Identifier "\
-                f"'{identifier}' wasn't declared yet."
+                f"'{identifier}' wasn't declared yet"
             super().__init__(self.description)
             self.expected = None
             self.expected_pos = None
