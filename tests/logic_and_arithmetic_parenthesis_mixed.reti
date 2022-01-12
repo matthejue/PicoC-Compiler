@@ -10,8 +10,10 @@ LOADI SP 200;
 # Allokation (char cars) Start
 # Variable cars vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
-# Zuweisung Assignment(var ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Start
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) Start
+# Zuweisung (var = ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0))) Start
+# Logische binäre Verknüpfung ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0)) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((12 <= ((dom - 1) * 2)) || (42 != cars))) Start
+# Logische binäre Verknüpfung ((12 <= ((dom - 1) * 2)) || (42 != cars)) Start
 # Logisches Atom (12 <= ((dom - 1) * 2)) Start
 # Arithmetischer Operand 12 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -57,15 +59,69 @@ LOADI ACC 1;                           # Ergebnis 1, wenn 12 <= ((dom - 1) * 2) 
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (12 <= ((dom - 1) * 2)) Ende
-LOADIN SP ACC 1;                       # Wert von (12 <= ((dom - 1) * 2)) in ACC laden
-JUMP== 3;                              # Überspringe 2 Befehle, wenn (12 <= ((dom - 1) * 2)) den Wert 0 hat
+# Logisches Atom (42 != cars) Start
+# Arithmetischer Operand 42 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 42;                          # Wert von 42 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 42 Ende
+# Arithmetischer Operand cars Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von cars in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand cars Ende
+LOADIN SP ACC 2;                       # Wert von 42 in ACC laden
+LOADIN SP IN2 1;                       # Wert von cars in IN2 laden
+SUB ACC IN2;                           # 42 - cars in ACC laden
+JUMP!= 3;                              # Ergebnis 1, wenn (42 != cars) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (42 != cars) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 42 != cars wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (42 != cars) Ende
+LOADIN SP ACC 2;                       # Wert von (12 <= ((dom - 1) * 2)) in ACC laden
+LOADIN SP IN2 1;                       # Wert von (42 != cars) in IN2 laden
+OR ACC IN2;                            # ((12 <= ((dom - 1) * 2)) || (42 != cars)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung ((12 <= ((dom - 1) * 2)) || (42 != cars)) Ende
+LOADIN SP ACC 1;                       # Wert von ((12 <= ((dom - 1) * 2)) || (42 != cars)) in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn ((12 <= ((dom - 1) * 2)) || (42 != cars)) den Wert 0 hat
 LOADI ACC 1;
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) Ende
-LOADIN SP ACC 1;                       # Wert von ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) in ACC laden
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((12 <= ((dom - 1) * 2)) || (42 != cars))) Ende
+# Logisches Atom (cars == 0) Start
+# Arithmetischer Operand cars Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von cars in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand cars Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 2;                       # Wert von cars in ACC laden
+LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
+SUB ACC IN2;                           # cars - 0 in ACC laden
+JUMP== 3;                              # Ergebnis 1, wenn (cars == 0) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (cars == 0) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn cars == 0 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) in Variable var speichern
-# Zuweisung Assignment(var ToBool((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Ende
+# Logisches Atom (cars == 0) Ende
+LOADIN SP ACC 2;                       # Wert von ToBool(((12 <= ((dom - 1) * 2)) || (42 != cars))) in ACC laden
+LOADIN SP IN2 1;                       # Wert von (cars == 0) in IN2 laden
+AND ACC IN2;                           # ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0)) Ende
+LOADIN SP ACC 1;                       # Wert von ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0)) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0)) in Variable var speichern
+# Zuweisung (var = ((((12 <= ((dom - 1) * 2)) || (42 != cars))) && (cars == 0))) Ende
 JUMP 0;
 # Main Funktion (void main (int var) ... ) Ende
 # File ./tests/logic_and_arithmetic_parenthesis_mixed.picoc Ende

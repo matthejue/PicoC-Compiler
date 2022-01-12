@@ -96,7 +96,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
             if self.LTT(1) != TT.OR:
                 self.ast_builder.go_back("_or_expr")
-                return
             else:
                 self.ast_builder.discard("_or_expr")
 
@@ -130,7 +129,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
             if self.LTT(1) != TT.AND:
                 self.ast_builder.go_back("_and_expr")
-                return
             else:
                 self.ast_builder.discard("_and_expr")
 

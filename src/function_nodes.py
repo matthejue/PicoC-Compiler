@@ -1,4 +1,4 @@
-from abstract_syntax_tree import ASTNode, strip_multiline_string
+from abstract_syntax_tree import ASTNode
 import global_vars
 
 
