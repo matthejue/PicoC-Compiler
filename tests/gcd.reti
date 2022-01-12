@@ -6,99 +6,99 @@ LOADI SP 200;
 # Variable m vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (int m) Ende
 # Arithmetischer Operand 12 Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOADI ACC 12;      # Wert von 12 in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 12 Ende
-LOADIN SP ACC 1;   # Wert von 12 in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-STORE ACC 100;     # Wert von 12 in Variable (int m) speichern
+LOADIN SP ACC 1;                       # Wert von 12 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 12 in Variable (int m) speichern
 # Zuweisung ((int m) = 12) Ende
 # Zuweisung ((int n) = 7) Start
 # Allokation (int n) Start
 # Variable n vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
 # Allokation (int n) Ende
 # Arithmetischer Operand 7 Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOADI ACC 7;       # Wert von 7 in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 7;                           # Wert von 7 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 7 Ende
-LOADIN SP ACC 1;   # Wert von 7 in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-STORE ACC 101;     # Wert von 7 in Variable (int n) speichern
+LOADIN SP ACC 1;                       # Wert von 7 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von 7 in Variable (int n) speichern
 # Zuweisung ((int n) = 7) Ende
 # Allokation (int h) Start
 # Variable h vom Typ int mit Adresse 102 zur Symboltabelle hinzugefügt
 # Allokation (int h) Ende
-# While Statement while((n > 0)) {self.statements[0]} ... Start
+# While Statement while((n > 0)){ (h = (m % n)) ... } Start
 # Logisches Atom (n > 0) Start
 # Arithmetischer Operand n Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOAD ACC 101;      # Wert von n in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von n in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand n Ende
 # Arithmetischer Operand 0 Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOADI ACC 0;       # Wert von 0 in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
-LOADIN SP ACC 2;   # Wert von n in ACC laden
-LOADIN SP IN2 1;   # Wert von 0 in IN2 laden
-SUB ACC IN2;       # n - 0 in ACC laden
-JUMP> 3;           # Ergebnis 1, wenn (n > 0) erfüllt
-LOADI ACC 0;       # Ergebnis 0, wenn (n > 0) nicht erfüllt
+LOADIN SP ACC 2;                       # Wert von n in ACC laden
+LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
+SUB ACC IN2;                           # n - 0 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (n > 0) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (n > 0) nicht erfüllt
 JUMP 2;
-LOADI ACC 1;       # Ergebnis 1, wenn n > 0 wahr
-STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
-ADDI SP 1;         # Stack um eine Zelle verkürzen
+LOADI ACC 1;                           # Ergebnis 1, wenn n > 0 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (n > 0) Ende
-LOADIN SP ACC 1;   # Wert von (n > 0) in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-JUMP== 28;         # Statements überspringen, wenn (n > 0) nicht erfüllt
+LOADIN SP ACC 1;                       # Wert von (n > 0) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 28;                             # Statements überspringen, wenn (n > 0) nicht erfüllt
 # Zuweisung (h = (m % n)) Start
 # Arithmetische binäre Operation (m % n) Start
 # Arithmetischer Operand m Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOAD ACC 100;      # Wert von m in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von m in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand m Ende
 # Arithmetischer Operand n Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOAD ACC 101;      # Wert von n in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von n in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand n Ende
-LOADIN SP ACC 2;   # Wert von m in ACC laden
-LOADIN SP IN2 1;   # Wert von n in IN2 laden
-MOD ACC IN2;       # Wert von (m % n) in ACC laden
-STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
-ADDI SP 1;         # Stack um eine Zelle verkürzen
+LOADIN SP ACC 2;                       # Wert von m in ACC laden
+LOADIN SP IN2 1;                       # Wert von n in IN2 laden
+MOD ACC IN2;                           # Wert von (m % n) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (m % n) Ende
-LOADIN SP ACC 1;   # Wert von (m % n) in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-STORE ACC 102;     # Wert von (m % n) in Variable h speichern
+LOADIN SP ACC 1;                       # Wert von (m % n) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von (m % n) in Variable h speichern
 # Zuweisung (h = (m % n)) Ende
 # Zuweisung (m = n) Start
 # Arithmetischer Operand n Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOAD ACC 101;      # Wert von n in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von n in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand n Ende
-LOADIN SP ACC 1;   # Wert von n in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-STORE ACC 100;     # Wert von n in Variable m speichern
+LOADIN SP ACC 1;                       # Wert von n in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von n in Variable m speichern
 # Zuweisung (m = n) Ende
 # Zuweisung (n = h) Start
 # Arithmetischer Operand h Start
-SUBI SP 1;         # Stack um eine Zelle erweitern
-LOAD ACC 102;      # Wert von h in ACC laden
-STOREIN SP ACC 1;  # Wert in oberste Stacke-Zelle
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von h in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand h Ende
-LOADIN SP ACC 1;   # Wert von h in ACC laden
-ADDI SP 1;         # Stack um eine Zelle verkürzen
-STORE ACC 101;     # Wert von h in Variable n speichern
+LOADIN SP ACC 1;                       # Wert von h in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von h in Variable n speichern
 # Zuweisung (n = h) Ende
-JUMP -44;          # Zurück zur Auswertung von (n > 0)
-# While Statement while((n > 0)) {self.statements[0]} ... Ende
+JUMP -44;                              # Zurück zur Auswertung von (n > 0)
+# While Statement while((n > 0)){ (h = (m % n)) ... } Ende
 JUMP 0;
 # Main Funktion int main(){ ((int m) = 12) ... } Ende
 # File ./tests/gcd.picoc Ende

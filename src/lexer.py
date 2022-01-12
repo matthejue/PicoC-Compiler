@@ -38,7 +38,7 @@ class TT(Enum):
     AND_OP = "&"
     OR_OP = "|"
     OPLUS_OP = "^"
-    NOT_OP = "~"
+    NEG_OP = "~"
     EQ_COMP = "=="
     UEQ_COMP = "!="
     LT_COMP = "<"

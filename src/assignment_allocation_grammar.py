@@ -1,5 +1,5 @@
 from logic_expression_grammar import LogicExpressionGrammar
-from assignment_allocation_nodes import Assign, Alloc
+from assignment_allocation_nodes import Assignment, Allocation
 from arithmetic_nodes import Identifier
 from lexer import TT
 from dummy_nodes import NT
@@ -26,7 +26,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         """
         self.ast_builder.save("_aa")
 
-        savestate_node = self.ast_builder.down(Assign)
+        savestate_node = self.ast_builder.down(Assignment)
 
         if self.LTT(1) in self.PRIM_DT.keys():
             self._alloc()
@@ -46,7 +46,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         :grammar: #2 <const>? <prim_dt> <identifier>
         """
-        savestate_node = self.ast_builder.down(Alloc)
+        savestate_node = self.ast_builder.down(Allocation)
 
         self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
         self.add_and_match([TT.NAME], classname=Identifier)
@@ -62,7 +62,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.consume_next_token()  # [TT.ASSIGNMENT]
 
             while self.LTT(2) == TT.ASSIGNMENT:
-                self.ast_builder.down(Assign)
+                self.ast_builder.down(Assignment)
                 self.add_and_match([TT.NAME], classname=Identifier)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
@@ -71,7 +71,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
     def _constant_assign(self, ):
         self.ast_builder.discard("_aa")
 
-        savestate_node = self.ast_builder.down(Alloc)
+        savestate_node = self.ast_builder.down(Allocation)
 
         self.add_and_consume(classname=NT.Const)
         self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
@@ -89,7 +89,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         self.match([TT.ASSIGNMENT])
 
         while self.LTT(2) == TT.ASSIGNMENT:
-            self.ast_builder.down(Assign)
+            self.ast_builder.down(Assignment)
             self.add_and_match([TT.NAME], classname=Identifier)
             self.consume_next_token()  # [TT.ASSIGNMENT]
 

@@ -2,7 +2,7 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 from dummy_nodes import NT
 
 
-class LogicAndOr(ASTNode):
+class LogicBinaryOperation(ASTNode):
     """Abstract Syntax Tree Node for logic 'and' and 'or'"""
 
     end = strip_multiline_string(
@@ -49,15 +49,18 @@ class LogicAndOr(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case LogicAndOr(_, NT.LAnd(), _):
+            case LogicBinaryOperation(_, NT.LAnd(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'LOP', 'AND')
-            case LogicAndOr(_, NT.LOr(), _):
+            case LogicBinaryOperation(_, NT.LOr(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'LOP', 'OR')
 
+    def __repr__(self, ):
+        self.alternative_to_string()
 
-class LogicNot(ASTNode):
+
+class Not(ASTNode):
     """Abstract Syntax Tree Node for logic not"""
 
     end = strip_multiline_string(
@@ -69,10 +72,9 @@ class LogicNot(ASTNode):
     end_loc = 4
 
     def update_match_args(self, ):
-        self.unary_connective = self.children[0]
-        self.atom = self.children[1]
+        self.atom = self.children[0]
 
-    __match_args__ = ("unary_connective", "atom")
+    __match_args__ = ("atom", )
 
     def visit(self, ):
         self.update_match_args()
@@ -93,8 +95,11 @@ class LogicNot(ASTNode):
         self.end = self.code_generator.replace_code_pre(
             self.end, "l1", str(self.atom))
 
+    def __repr__(self, ):
+        self.alternative_to_string()
 
-class LogicAtom(ASTNode):
+
+class Atom(ASTNode):
     """Abstract Syntax Tree Node for logic atom"""
 
     end = strip_multiline_string(
@@ -143,27 +148,30 @@ class LogicAtom(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case LogicAtom(_, NT.Eq(), _):
+            case Atom(_, NT.Eq(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '==')
-            case LogicAtom(_, NT.UEq(), _):
+            case Atom(_, NT.UEq(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '!=')
-            case LogicAtom(_, NT.Lt(), _):
+            case Atom(_, NT.Lt(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '<')
-            case LogicAtom(_, NT.Gt(), _):
+            case Atom(_, NT.Gt(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '>')
-            case LogicAtom(_, NT.Le(), _):
+            case Atom(_, NT.Le(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '<=')
-            case LogicAtom(_, NT.Ge(), _):
+            case Atom(_, NT.Ge(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'vglop', '>=')
 
+    def __repr__(self, ):
+        self.alternative_to_string()
 
-class LogicTopBottom(ASTNode):
+
+class ToBool(ASTNode):
     """Abstract Syntax Tree Node for logic top bottom"""
 
     end = strip_multiline_string(
@@ -198,5 +206,5 @@ class LogicTopBottom(ASTNode):
         self.end = self.code_generator.replace_code_pre(
             self.end, "e1", str(self.arithmetic_expression))
 
-    def __repr__(self, ):
-        return f"(to_bool {self.children[0]})"
+    #  def __repr__(self, ):
+    #      return f"(to_bool {self.children[0]})"

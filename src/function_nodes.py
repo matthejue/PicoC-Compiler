@@ -48,3 +48,6 @@ class MainFunction(ASTNode):
     def _adapt_code(self, ):
         self.start = self.code_generator.replace_code_pre(
             self.start, "eds", str(global_vars.args.end_data_segment))
+
+    def __repr__(self, ):
+        return self.alternative_to_string()

@@ -1,5 +1,6 @@
 from code_generator import CodeGenerator
 from symbol_table import SymbolTable
+import global_vars
 
 
 class ASTNode:
@@ -34,15 +35,31 @@ class ASTNode:
         pass
 
     def __repr__(self):
-        if not self.children:
-            return self.value
+        return self.to_string()
 
-        acc = "(" + f"{self.children[0]}"
+    def to_string(self, ):
+        if not self.children:
+            if not self.value and global_vars.args.verbose:
+                return self.__class__.__name__
+            return f"{self.value}"
+
+        acc = ""
+
+        if global_vars.args.verbose and global_vars.show_node:
+            acc += self.__class__.__name__
+
+        acc += f"({self.children[0]}"
 
         for child in self.children[1:]:
             acc += f" {child}"
 
         return acc + ")"
+
+    def alternative_to_string(self, ):
+        global_vars.show_node = False
+        tmp = self.to_string()
+        global_vars.show_node = True
+        return tmp
 
 
 def strip_multiline_string(mutline_string):

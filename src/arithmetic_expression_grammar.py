@@ -1,5 +1,5 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Character
+from arithmetic_nodes import ArithmeticUnaryOperation, ArithmeticBinaryOperation, Identifier, Number, Character
 from errors import Errors
 from lexer import TT
 from dummy_nodes import NT
@@ -21,7 +21,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         TT.AND_OP: NT.And,
         TT.OR_OP: NT.Or,
     }
-    UNARY = {TT.NOT_OP: NT.Not, TT.MINUS_OP: NT.Minus}
+    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}
 
     def code_ae(self):
         """arithmetic expression startpoint
@@ -37,7 +37,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """
         self.ast_builder.save("_prec2")
 
-        savestate_node = self.ast_builder.down(ArithBinOp)
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
 
         self._prec1()
 
@@ -52,7 +52,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
             self.ast_builder.save("_prec2_loop")
 
-            self.ast_builder.down(ArithBinOp)
+            self.ast_builder.down(ArithmeticBinaryOperation)
 
             self._prec1()
 
@@ -70,7 +70,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         """
         self.ast_builder.save("_prec1")
 
-        savestate_node = self.ast_builder.down(ArithBinOp)
+        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
 
         self._ao()
 
@@ -84,8 +84,8 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self.add_and_consume(mapping=self.BINOP_PREC_1)
 
             self.ast_builder.save("_prec1_loop")
+            self.ast_builder.down(ArithmeticBinaryOperation)
 
-            self.ast_builder.down(ArithBinOp)
             self._ao()
 
             if self.LTT(1) not in self.BINOP_PREC_1.keys():
@@ -129,14 +129,15 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         """
-        savestate_node = self.ast_builder.down(ArithUnOp)
+        savestate_node = self.ast_builder.down(ArithmeticUnaryOperation)
 
         while True:
             self.add_and_consume(mapping=self.UNARY)
+
             if self.LTT(1) not in self.UNARY.keys():
                 break
 
-            self.ast_builder.down(ArithUnOp)
+            self.ast_builder.down(ArithmeticUnaryOperation)
 
         self._ao()
 

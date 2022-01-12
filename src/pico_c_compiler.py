@@ -62,6 +62,13 @@ def main():
         type=int,
         default=100)
     cli_args_parser.add_argument(
+        '-d',
+        '--distance',
+        help="distance of the comments from the instructions for the --verbose"
+        "option. The passed value gets added to the minimum distance of 2 spaces",
+        type=int,
+        default=0)
+    cli_args_parser.add_argument(
         '-e',
         '--end_data_segment',
         help="where the "
@@ -69,10 +76,13 @@ def main():
         type=int,
         default=200)
     cli_args_parser.add_argument(
-        '-m',
-        '--python_stracktrace_error_message',
+        '-v',
+        '--verbose',
         action='store_true',
-        help="show python error messages with stacktrace")
+        help="also show tokentype and position for tokens, write the nodetype "
+        "in front of parenthesis in the abstract syntax tree, add comments to "
+        "the RETI Code and show more context around error messages "
+        "[NOT IMPLEMENTED YET]")
     cli_args_parser.add_argument(
         '-O',
         '--optimization-level',
@@ -89,13 +99,10 @@ def main():
         action='store_true',
         help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
     cli_args_parser.add_argument(
-        '-v',
-        '--verbose',
+        '-m',
+        '--python_stracktrace_error_message',
         action='store_true',
-        help="also show tokentype and position for tokens, write the nodetype "
-        "in front of parenthesis in the abstract syntax tree [NOT IMPLEMENTED YET], add comments to "
-        "the RETI Code and show more context around error messages "
-        "[NOT IMPLEMENTED YET]")
+        help="also show python error messages with stacktrace")
     global_vars.args = cli_args_parser.parse_args()
 
     if not global_vars.args.infile:

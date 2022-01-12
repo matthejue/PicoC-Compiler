@@ -108,8 +108,9 @@ class CodeArranger:
             for code_line in code_lines:
                 # no +1 to compensate find() starting with 0 because # +1 index
                 # too much for the distance from the start
-                self.amax_comment_distance = max(self.amax_comment_distance,
-                                                 code_line.find('#'))
+                self.amax_comment_distance = max(
+                    self.amax_comment_distance,
+                    code_line.find('#') + global_vars.args.distance)
         return code_lines
 
 

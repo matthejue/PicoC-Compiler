@@ -56,14 +56,8 @@ class If(ASTNode):
             str(self.code_generator.loc -
                 self.code_generator.get_marker_loc() + 1))
 
-    def __repr__(self, ):
-        acc = f"(if"
-        for statement in self.children:
-            acc += f" {statement}"
-        return acc + ")"
 
-
-class IfElse(If):
+class IfElse(ASTNode):
     """Abstract Syntax Tree Node for Else"""
 
     start = strip_multiline_string(

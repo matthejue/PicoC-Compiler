@@ -24,8 +24,8 @@ class While(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# While Statement while({self.condition})"
-            " {self.statements[0]} ... Start\n", 0)
+            f"# While Statement while({self.condition}){{ "
+            f"{self.statements[0]} ... }} Start\n", 0)
 
         self._pretty_comments()
 
@@ -52,8 +52,8 @@ class While(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# While Statement while({self.condition})"
-            " {self.statements[0]} ... Ende\n", 0)
+            f"# While Statement while({self.condition}){{ "
+            f"{self.statements[0]} ... }} Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
@@ -95,8 +95,8 @@ class DoWhile(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Do While do {self.statements[0]} ... "
-            "while({self.condition}) Start\n", 0)
+            f"# Do While do{{ {self.statements[0]} ... }} "
+            f"while({self.condition}) Start\n", 0)
 
         self.code_generator.add_marker()
 
@@ -113,8 +113,8 @@ class DoWhile(ASTNode):
                                      self.condition_check_loc)
 
         self.code_generator.add_code(
-            f"# Do While do {self.statements[0]} ... "
-            "while({self.condition}) Ende\n", 0)
+            f"# Do While do{{ {self.statements[0]} ... }} "
+            f"while({self.condition}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
@@ -126,12 +126,12 @@ class DoWhile(ASTNode):
             str(self.code_generator.loc -
                 self.code_generator.get_marker_loc() + 2))
 
-    def __repr__(self):
-        """do while loops should be called 'do while' and not 'do'
-        """
-        acc = "(do"
-
-        for child in self.children[:-1]:
-            acc += f" {child}"
-
-        return acc + f" while {self.children[-1]}" + ")"
+    #  def __repr__(self):
+    #      """do while loops should be called 'do while' and not 'do'
+    #      """
+    #      acc = "(do"
+    #
+    #      for child in self.children[:-1]:
+    #          acc += f" {child}"
+    #
+    #      return acc + f" while {self.children[-1]}" + ")"

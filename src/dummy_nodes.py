@@ -30,7 +30,7 @@ class NT:
     class Minus(ASTNode):
         pass
 
-    class Not(ASTNode):
+    class Negation(ASTNode):
         pass
 
     class Const(ASTNode):
@@ -72,8 +72,8 @@ class NT:
     class LOr(ASTNode):
         pass
 
-    class LNot(ASTNode):
-        pass
+    #  class LNot(ASTNode):
+    #  pass
 
     class Main(ASTNode):
         pass

@@ -1,12 +1,11 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
-import global_vars
 from dummy_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
 
 
-class Assign(ASTNode):
+class Assignment(ASTNode):
     """Abstract Syntax Tree Node for assignement"""
 
     assign = strip_multiline_string(
@@ -34,7 +33,7 @@ class Assign(ASTNode):
 
         self.location.update_match_args()
         match self.location:
-            case Alloc(_, _, _):
+            case Allocation(_, _, _):
                 self.location.visit()
 
         try:
@@ -63,7 +62,7 @@ class Assign(ASTNode):
 
     def _assignment(self, ):
         match self:
-            case Assign(Alloc(NT.Const(), _, Identifier(name)), assignment):
+            case Assignment(Allocation(NT.Const(), _, Identifier(name)), assignment):
                 match assignment:
                     case (Number(value) | Character(value)):
                         self.symbol_table.resolve(name).value = value
@@ -73,12 +72,12 @@ class Assign(ASTNode):
                             name).value = self.symbol_table.resolve(value).value
                         self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
-            case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), Assign(_, _)):
+            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
                 self.expression.visit()
 
                 self._adapt_code(name)
             # assigment that assigns a variable to a expression
-            case Assign((Identifier(name) | Alloc(_, _, Identifier(name))), _):
+            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), _):
                 self.expression.visit()
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
@@ -98,7 +97,7 @@ class Assign(ASTNode):
         return super().__repr__()
 
 
-class Alloc(ASTNode):
+class Allocation(ASTNode):
     """Abstract Syntax Tree Node for allocation"""
 
     def update_match_args(self):
@@ -133,14 +132,17 @@ class Alloc(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case Alloc(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
                 self._pretty_comments("Konstante", name, dtype)
-            case Alloc(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(variable)
                 address = self.symbol_table.allocate(variable)
                 self._pretty_comments("Variable", name, dtype, address)
+
+    def __repr__(self, ):
+        return self.alternative_to_string()

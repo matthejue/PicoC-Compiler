@@ -26,3 +26,6 @@ class File(ASTNode):
         self.main_function.visit()
 
         self.code_generator.add_code(f"# File {self.filename} Ende\n", 0)
+
+    def __repr__(self, ):
+        return self.alternative_to_string()

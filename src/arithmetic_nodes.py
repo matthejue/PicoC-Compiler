@@ -5,7 +5,7 @@ from dummy_nodes import NT
 import global_vars
 
 
-class ArithOperand(ASTNode):
+class ArithmeticOperand(ASTNode):
     """Abstract Syntax Tree Node for arithmetic variables and constants"""
 
     start = "SUBI SP 1;  # Stack um eine Zelle erweitern\n"
@@ -69,19 +69,19 @@ class ArithOperand(ASTNode):
         return code
 
 
-class Identifier(ArithOperand):
+class Identifier(ArithmeticOperand):
     pass
 
 
-class Number(ArithOperand):
+class Number(ArithmeticOperand):
     pass
 
 
-class Character(ArithOperand):
+class Character(ArithmeticOperand):
     pass
 
 
-class ArithBinOp(ASTNode):
+class ArithmeticBinaryOperation(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic binary operations.
     Dient als Container für andere Nodes, daher ist es nicht genauer
     spezifiert, als Addition oder Subtraktion, da erst später feststeht, ob die
@@ -132,33 +132,36 @@ class ArithBinOp(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case ArithBinOp(_, NT.Add(), _):
+            case ArithmeticBinaryOperation(_, NT.Add(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'ADD')
-            case ArithBinOp(_, NT.Sub(), _):
+            case ArithmeticBinaryOperation(_, NT.Sub(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'SUB')
-            case ArithBinOp(_, NT.Mul(), _):
+            case ArithmeticBinaryOperation(_, NT.Mul(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'MUL')
-            case ArithBinOp(_, NT.Div(), _):
+            case ArithmeticBinaryOperation(_, NT.Div(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'DIV')
-            case ArithBinOp(_, NT.Mod(), _):
+            case ArithmeticBinaryOperation(_, NT.Mod(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'MOD')
-            case ArithBinOp(_, NT.Oplus, _):
+            case ArithmeticBinaryOperation(_, NT.Oplus, _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'OPLUS')
-            case ArithBinOp(_, NT.And(), _):
+            case ArithmeticBinaryOperation(_, NT.And(), _):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'AND')
-            case ArithBinOp(_, NT.Or(), ):
+            case ArithmeticBinaryOperation(_, NT.Or(), ):
                 self.end = self.code_generator.replace_code_pre(
                     self.end, 'OP', 'OR')
 
+    def __repr__(self, ):
+        return self.alternative_to_string()
 
-class ArithUnOp(ASTNode):
+
+class ArithmeticUnaryOperation(ASTNode):
     """Abstract Syntax Tree Node for for arithmetic unary operations"""
 
     start = strip_multiline_string(
@@ -206,6 +209,9 @@ class ArithUnOp(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case ArithUnOp(NT.Not(), _):
+            case ArithmeticUnaryOperation(NT.Negation(), _):
                 self.code_generator.add_code(self.bitwise_not,
                                              self.bitwise_not_loc)
+
+    def __repr__(self, ):
+        return self.alternative_to_string()
