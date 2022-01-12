@@ -1,1 +1,1 @@
-(./tests/two_if_after_another.picoc (void main ((var == 0) (cars = 10)) If((cars == 10) (var = 42))))
+(./tests/two_if_after_another.picoc (void main ((char var) = 10) If((var == 0) ((int cars) = 10)) If((cars == 10) (var = 42))))

@@ -1,1 +1,1 @@
-(./tests/while_loop.picoc (void main ((x < 12) (x = (x + 1)))))
+(./tests/while_loop.picoc (void main ((char x) = 10) While((x < 12) (x = (x + 1)))))

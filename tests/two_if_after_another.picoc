@@ -1,1 +1,1 @@
-void main() { if (var == 0) cars = 10; if (cars == 10) { var = 42; } }
+void main() { char var = 10; if (var == 0) int cars = 10; if (cars == 10) { var = 42; } }

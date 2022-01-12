@@ -1,0 +1,79 @@
+# File ./tests/unary_operators.picoc Start
+# Main Funktion (void main ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189)))))) Start
+LOADI SP 200;
+# Zuweisung ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189))))) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Arithmetische binäre Operation ((- 12) % ((- (- (- 154))) - (- (- 189)))) Start
+# Arithmetische unäre Operation (- 12) Start
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 12) Ende
+# Arithmetische binäre Operation ((- (- (- 154))) - (- (- 189))) Start
+# Arithmetische unäre Operation (- (- (- 154))) Start
+# Arithmetische unäre Operation (- (- 154)) Start
+# Arithmetische unäre Operation (- 154) Start
+# Arithmetischer Operand 154 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 154;                         # Wert von 154 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 154 Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 154) Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- (- 154)) Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- (- (- 154))) Ende
+# Arithmetische unäre Operation (- (- 189)) Start
+# Arithmetische unäre Operation (- 189) Start
+# Arithmetischer Operand 189 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 189;                         # Wert von 189 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 189 Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 189) Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- (- 189)) Ende
+LOADIN SP ACC 2;                       # Wert von (- (- (- 154))) in ACC laden
+LOADIN SP IN2 1;                       # Wert von (- (- 189)) in IN2 laden
+SUB ACC IN2;                           # Wert von ((- (- (- 154))) - (- (- 189))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((- (- (- 154))) - (- (- 189))) Ende
+LOADIN SP ACC 2;                       # Wert von (- 12) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ((- (- (- 154))) - (- (- 189))) in IN2 laden
+MOD ACC IN2;                           # Wert von ((- 12) % ((- (- (- 154))) - (- (- 189)))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((- 12) % ((- (- (- 154))) - (- (- 189)))) Ende
+LOADIN SP ACC 1;                       # Wert von ((- 12) % ((- (- (- 154))) - (- (- 189)))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von ((- 12) % ((- (- (- 154))) - (- (- 189)))) in Variable (int var) speichern
+# Zuweisung ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189))))) Ende
+JUMP 0;
+# Main Funktion (void main ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189)))))) Ende
+# File ./tests/unary_operators.picoc Ende

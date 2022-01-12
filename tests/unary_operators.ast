@@ -1,1 +1,1 @@
-(./tests/unary_operators.picoc (void main (var = ((- 12) % ((- (- (- 154))) - (- (- 189)))))))
+(./tests/unary_operators.picoc (void main ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189)))))))

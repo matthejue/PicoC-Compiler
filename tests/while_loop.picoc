@@ -1,1 +1,1 @@
-void main() { while ( x < 12 ) { x = x + 1; } }
+void main() { char x = 10; while ( x < 12 ) { x = x + 1; } }
