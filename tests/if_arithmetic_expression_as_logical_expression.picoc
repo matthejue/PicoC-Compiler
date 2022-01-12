@@ -1,0 +1,1 @@
+void main() { if (123 * var) { var = 123; } }

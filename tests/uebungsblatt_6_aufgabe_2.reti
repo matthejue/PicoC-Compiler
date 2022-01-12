@@ -1,0 +1,179 @@
+# File ./tests/uebungsblatt_6_aufgabe_2.picoc Start
+# Main Funktion (void main ((int x) = 42) ... ) Start
+LOADI SP 200;
+# Zuweisung ((int x) = 42) Start
+# Allokation (int x) Start
+# Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int x) Ende
+# Arithmetischer Operand 42 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 42;                          # Wert von 42 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 42 Ende
+LOADIN SP ACC 1;                       # Wert von 42 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 42 in Variable (int x) speichern
+# Zuweisung ((int x) = 42) Ende
+# Zuweisung ((int y) = (- 24)) Start
+# Allokation (int y) Start
+# Variable y vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (int y) Ende
+# Arithmetische unäre Operation (- 24) Start
+# Arithmetischer Operand 24 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 24;                          # Wert von 24 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 24 Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 24) Ende
+LOADIN SP ACC 1;                       # Wert von (- 24) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von (- 24) in Variable (int y) speichern
+# Zuweisung ((int y) = (- 24)) Ende
+# Allokation (char is_less) Start
+# Variable is_less vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
+# Allokation (char is_less) Ende
+# If und Else Statement IfElse(ToBool(((x > 0) ^ (y > 0))) (is_less = (x <= y)) else IfElse((x > 0) (is_less = 0) else (is_less = 1))) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((x > 0) ^ (y > 0))) Start
+# Arithmetische binäre Operation ((x > 0) ^ (y > 0)) Start
+# Logisches Atom (x > 0) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 2;                       # Wert von x in ACC laden
+LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
+SUB ACC IN2;                           # x - 0 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (x > 0) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (x > 0) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn x > 0 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (x > 0) Ende
+# Logisches Atom (y > 0) Start
+# Arithmetischer Operand y Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von y in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand y Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 2;                       # Wert von y in ACC laden
+LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
+SUB ACC IN2;                           # y - 0 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (y > 0) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (y > 0) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn y > 0 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (y > 0) Ende
+LOADIN SP ACC 2;                       # Wert von (x > 0) in ACC laden
+LOADIN SP IN2 1;                       # Wert von (y > 0) in IN2 laden
+OP ACC IN2;                            # Wert von ((x > 0) ^ (y > 0)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((x > 0) ^ (y > 0)) Ende
+LOADIN SP ACC 1;                       # Wert von ((x > 0) ^ (y > 0)) in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn ((x > 0) ^ (y > 0)) den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((x > 0) ^ (y > 0))) Ende
+LOADIN SP ACC 1;                       # Wert von ToBool(((x > 0) ^ (y > 0))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 20;                             # Zu Else-Branch springen, wenn ToBool(((x > 0) ^ (y > 0))) nicht erfüllt
+# If-Branch
+# Zuweisung (is_less = (x <= y)) Start
+# Logisches Atom (x <= y) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
+# Arithmetischer Operand y Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von y in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand y Ende
+LOADIN SP ACC 2;                       # Wert von x in ACC laden
+LOADIN SP IN2 1;                       # Wert von y in IN2 laden
+SUB ACC IN2;                           # x - y in ACC laden
+JUMP<= 3;                              # Ergebnis 1, wenn (x <= y) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (x <= y) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn x <= y wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (x <= y) Ende
+LOADIN SP ACC 1;                       # Wert von (x <= y) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von (x <= y) in Variable is_less speichern
+# Zuweisung (is_less = (x <= y)) Ende
+JUMP 32;                               # Else-Branch überspringen
+# Else-Branch
+# If und Else Statement IfElse((x > 0) (is_less = 0) else (is_less = 1)) Start
+# Logisches Atom (x > 0) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 2;                       # Wert von x in ACC laden
+LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
+SUB ACC IN2;                           # x - 0 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (x > 0) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (x > 0) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn x > 0 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (x > 0) Ende
+LOADIN SP ACC 1;                       # Wert von (x > 0) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 8;                              # Zu Else-Branch springen, wenn (x > 0) nicht erfüllt
+# If-Branch
+# Zuweisung (is_less = 0) Start
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von 0 in Variable is_less speichern
+# Zuweisung (is_less = 0) Ende
+JUMP 7;                                # Else-Branch überspringen
+# Else-Branch
+# Zuweisung (is_less = 1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von 1 in Variable is_less speichern
+# Zuweisung (is_less = 1) Ende
+# If und Else Statement IfElse((x > 0) (is_less = 0) else (is_less = 1)) Ende
+# If und Else Statement IfElse(ToBool(((x > 0) ^ (y > 0))) (is_less = (x <= y)) else IfElse((x > 0) (is_less = 0) else (is_less = 1))) Ende
+JUMP 0;
+# Main Funktion (void main ((int x) = 42) ... ) Ende
+# File ./tests/uebungsblatt_6_aufgabe_2.picoc Ende

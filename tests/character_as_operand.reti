@@ -1,0 +1,65 @@
+# File ./tests/character_as_operand.picoc Start
+# Main Funktion (void main ((int x) = (67 + 1)) ... ) Start
+LOADI SP 200;
+# Zuweisung ((int x) = (67 + 1)) Start
+# Allokation (int x) Start
+# Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int x) Ende
+# Arithmetische binäre Operation (67 + 1) Start
+# Arithmetischer Operand 67 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 67;                          # Wert von 67 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 67 Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von 67 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+ADD ACC IN2;                           # Wert von (67 + 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (67 + 1) Ende
+LOADIN SP ACC 1;                       # Wert von (67 + 1) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von (67 + 1) in Variable (int x) speichern
+# Zuweisung ((int x) = (67 + 1)) Ende
+# Zuweisung (x = (x + (97 - 65))) Start
+# Arithmetische binäre Operation (x + (97 - 65)) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
+# Arithmetische binäre Operation (97 - 65) Start
+# Arithmetischer Operand 97 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 97;                          # Wert von 97 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 97 Ende
+# Arithmetischer Operand 65 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 65;                          # Wert von 65 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 65 Ende
+LOADIN SP ACC 2;                       # Wert von 97 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 65 in IN2 laden
+SUB ACC IN2;                           # Wert von (97 - 65) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (97 - 65) Ende
+LOADIN SP ACC 2;                       # Wert von x in ACC laden
+LOADIN SP IN2 1;                       # Wert von (97 - 65) in IN2 laden
+ADD ACC IN2;                           # Wert von (x + (97 - 65)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (x + (97 - 65)) Ende
+LOADIN SP ACC 1;                       # Wert von (x + (97 - 65)) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von (x + (97 - 65)) in Variable x speichern
+# Zuweisung (x = (x + (97 - 65))) Ende
+JUMP 0;
+# Main Funktion (void main ((int x) = (67 + 1)) ... ) Ende
+# File ./tests/character_as_operand.picoc Ende

@@ -57,7 +57,7 @@ class LogicBinaryOperation(ASTNode):
                     self.end, 'LOP', 'OR')
 
     def __repr__(self, ):
-        self.alternative_to_string()
+        return self.alternative_to_string()
 
 
 class Not(ASTNode):
@@ -96,7 +96,7 @@ class Not(ASTNode):
             self.end, "l1", str(self.atom))
 
     def __repr__(self, ):
-        self.alternative_to_string()
+        return self.alternative_to_string()
 
 
 class Atom(ASTNode):
@@ -168,7 +168,7 @@ class Atom(ASTNode):
                     self.end, 'vglop', '>=')
 
     def __repr__(self, ):
-        self.alternative_to_string()
+        return self.alternative_to_string()
 
 
 class ToBool(ASTNode):

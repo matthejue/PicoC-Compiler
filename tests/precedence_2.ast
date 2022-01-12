@@ -1,0 +1,1 @@
+(./tests/precedence_2.picoc (void main (var = (8 + (4 - 2)))))

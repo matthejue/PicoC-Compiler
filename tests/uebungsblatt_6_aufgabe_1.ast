@@ -1,1 +1,1 @@
-(./tests/uebungsblatt_6_aufgabe_1.picoc (void main (int x) (int y) ((const int z) = 2) (y = 3) (x = 15) ((x >= (z * y)) (x = (x - 3)))))
+(./tests/uebungsblatt_6_aufgabe_1.picoc (void main (int x) (int y) ((const int z) = 2) (y = 3) (x = 15) While((x >= (z * y)) (x = (x - 3)))))

@@ -1,0 +1,6 @@
+void main() {
+  int var = 32
+  if (var < 3) {
+      var = 10;
+  }
+}

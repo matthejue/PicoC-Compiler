@@ -1,0 +1,8 @@
+void main() {
+  int i = 0;
+  int x = 1;
+  while (i < 10) {
+    if (i == 5) {
+      x = 2;}
+    i = i + x;}
+  const int y = i % 10;}

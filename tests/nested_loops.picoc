@@ -1,0 +1,1 @@
+void main() { while (x <= 42) { while (y <= 42) { z = x * y; } } }

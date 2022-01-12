@@ -1,0 +1,1 @@
+(./tests/precedence_3.picoc (void main (var = (cars * (4 / 2)))))

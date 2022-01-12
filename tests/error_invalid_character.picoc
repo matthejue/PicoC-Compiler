@@ -1,0 +1,3 @@
+void main() {
+  int var = 12 @ 3;
+}

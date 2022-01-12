@@ -1,0 +1,1 @@
+(./tests/error_compile_time_error_not_initialised_variable.picoc (void main ((int x) = (12 & var))))

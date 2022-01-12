@@ -1,0 +1,1 @@
+void main() { while (x < 12) { x = x + 1; if (x == 42) { y = y + 1; } } }

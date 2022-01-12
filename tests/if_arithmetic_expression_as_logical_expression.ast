@@ -1,0 +1,1 @@
+(./tests/if_arithmetic_expression_as_logical_expression.picoc (void main (((123 * var)) (var = 123))))

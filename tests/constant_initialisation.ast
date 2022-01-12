@@ -1,0 +1,1 @@
+(./tests/constant_initialisation.picoc (void main ((const int var) = 12)))

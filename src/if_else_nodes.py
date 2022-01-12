@@ -23,8 +23,9 @@ class If(ASTNode):
     def visit(self, ):
         self.update_match_args()
 
+        dot_more = " ... " if len(self.branch) > 1 else ""
         self.code_generator.add_code(
-            f"# If Statement if({self.condition}){{ {self.branch[0]} ... }} "
+            f"# If Statement If({self.condition} {self.branch[0]}{dot_more}) "
             "Start\n", 0)
 
         self._pretty_comments()
@@ -41,8 +42,9 @@ class If(ASTNode):
         self._adapt_code()
 
         self.code_generator.remove_marker()
+
         self.code_generator.add_code(
-            f"# If Statement if({self.condition}){{ {self.branch[0]} ... }} "
+            f"# If Statement If({self.condition} {self.branch[0]}{dot_more}) "
             "Ende\n", 0)
 
     def _pretty_comments(self, ):
@@ -84,18 +86,21 @@ class IfElse(ASTNode):
         return -1
 
     def update_match_args(self, ):
+        idx_of_else_node = self._idx_of_else_node()
         self.condition = self.children[0]
-        self.branch1 = self.children[1:self._idx_of_else_node()]
-        self.branch2 = self.children[self._idx_of_else_node() + 1:]
+        self.branch1 = self.children[1:idx_of_else_node]
+        self.branch2 = self.children[idx_of_else_node + 1:]
 
     __match_args__ = ("condition", "branch1", "branch2")
 
     def visit(self, ):
         self.update_match_args()
 
+        if_dot_more = " ..." if len(self.branch1) > 1 else ""
+        else_dot_more = " ... " if len(self.branch2) > 1 else ""
         self.code_generator.add_code(
-            f"# If und Else Statement if({self.condition}){{ {self.branch1[0]} "
-            "... }} else {{ {self.branch2[0]} ... }} Start\n", 0)
+            f"# If und Else Statement IfElse({self.condition} {self.branch1[0]}"
+            f"{if_dot_more} else {self.branch2[0]}{else_dot_more}) Start\n", 0)
 
         self._pretty_comments()
 
@@ -124,8 +129,8 @@ class IfElse(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If und Else Statement if({self.condition}){{ {self.branch1[0]} "
-            "... }} else {{ {self.branch2[0]} ... }} Ende\n", 0)
+            f"# If und Else Statement IfElse({self.condition} {self.branch1[0]}"
+            f"{if_dot_more} else {self.branch2[0]}{else_dot_more}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
@@ -141,4 +146,5 @@ class IfElse(ASTNode):
     def _adapt_code_2(self, ):
         self.code_generator.replace_code_after(
             "codelength(af2) + 1",
-            self.code_generator.loc - self.code_generator.get_marker_loc() + 1)
+            str(self.code_generator.loc -
+                self.code_generator.get_marker_loc() + 1))

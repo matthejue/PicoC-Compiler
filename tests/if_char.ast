@@ -1,0 +1,1 @@
+(./tests/if_char.picoc (void main ((99) ((const int var) = (99 + 2)))))

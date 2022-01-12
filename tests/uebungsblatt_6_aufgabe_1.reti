@@ -1,5 +1,5 @@
 # File ./tests/uebungsblatt_6_aufgabe_1.picoc Start
-# Main Funktion void main(){ (int x) ... } Start
+# Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
 # Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
@@ -33,7 +33,7 @@ LOADIN SP ACC 1;                       # Wert von 15 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von 15 in Variable x speichern
 # Zuweisung (x = 15) Ende
-# While Statement while((x >= (z * y))){ (x = (x - 3)) ... } Start
+# While Statement While((x >= (z * y)) (x = (x - 3))) Start
 # Logisches Atom (x >= (z * y)) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -93,7 +93,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (x - 3) in Variable x speichern
 # Zuweisung (x = (x - 3)) Ende
 JUMP -40;                              # Zurück zur Auswertung von (x >= (z * y))
-# While Statement while((x >= (z * y))){ (x = (x - 3)) ... } Ende
+# While Statement While((x >= (z * y)) (x = (x - 3))) Ende
 JUMP 0;
-# Main Funktion void main(){ (int x) ... } Ende
+# Main Funktion (void main (int x) ... ) Ende
 # File ./tests/uebungsblatt_6_aufgabe_1.picoc Ende

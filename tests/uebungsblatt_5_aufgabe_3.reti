@@ -1,5 +1,5 @@
 # File ./tests/uebungsblatt_5_aufgabe_3.picoc Start
-# Main Funktion void main(){ (int x) ... } Start
+# Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
 # Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
@@ -80,5 +80,5 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (x + ((y * z) + 10)) in Variable x speichern
 # Zuweisung (x = (x + ((y * z) + 10))) Ende
 JUMP 0;
-# Main Funktion void main(){ (int x) ... } Ende
+# Main Funktion (void main (int x) ... ) Ende
 # File ./tests/uebungsblatt_5_aufgabe_3.picoc Ende

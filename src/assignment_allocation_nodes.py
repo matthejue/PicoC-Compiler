@@ -3,6 +3,7 @@ from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from dummy_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
+import global_vars
 
 
 class Assignment(ASTNode):

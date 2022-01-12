@@ -1,0 +1,1 @@
+void main() { if (var == 0) cars = 10; else cars = cars + 1; if (cars == 10) { var = 42; } }

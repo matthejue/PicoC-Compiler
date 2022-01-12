@@ -1,0 +1,1 @@
+[<TT.NAME,'./tests/error_no_opening_brace_main.picoc',(0, 0)>, <TT.VOID,'void',(1, 0)>, <TT.MAIN,'main',(1, 5)>, <TT.L_PAREN,'(',(1, 9)>, <TT.R_PAREN,')',(1, 10)>, <TT.R_BRACE,'}',(2, 0)>]

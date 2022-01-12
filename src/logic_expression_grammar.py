@@ -208,7 +208,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self.match([TT.R_PAREN])
 
     def _taste_consume_arithmetic_term(self, ):
-        __import__('pudb').set_trace()
         self._arithmetic_term()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():

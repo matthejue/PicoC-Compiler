@@ -1,0 +1,11 @@
+# File ./tests/initialising_with_character.picoc Start
+# Main Funktion (void main ((const int var) = (99 + 2))) Start
+LOADI SP 200;
+# Zuweisung ((const int var) = (99 + 2)) Start
+# Allokation (const int var) Start
+# Konstante var vom Typ int zur Symboltabelle hinzugefügt
+# Allokation (const int var) Ende
+# Zuweisung ((const int var) = (99 + 2)) Ende
+JUMP 0;
+# Main Funktion (void main ((const int var) = (99 + 2))) Ende
+# File ./tests/initialising_with_character.picoc Ende

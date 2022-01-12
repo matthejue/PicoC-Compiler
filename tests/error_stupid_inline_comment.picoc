@@ -1,0 +1,4 @@
+void main() {
+  int var = 32// that looks problematic
+  var = 2;
+}

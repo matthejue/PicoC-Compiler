@@ -16,16 +16,17 @@ class While(ASTNode):
 
     def update_match_args(self, ):
         self.condition = self.children[0]
-        self.statements = self.children[1:]
+        self.branch = self.children[1:]
 
-    __match_args__ = ("condition", "statements")
+    __match_args__ = ("condition", "branch")
 
     def visit(self, ):
         self.update_match_args()
 
+        dot_more = " ... " if len(self.branch) > 1 else ""
         self.code_generator.add_code(
-            f"# While Statement while({self.condition}){{ "
-            f"{self.statements[0]} ... }} Start\n", 0)
+            f"# While Statement While({self.condition} "
+            f"{self.branch[0]}{dot_more}) Start\n", 0)
 
         self._pretty_comments()
 
@@ -38,7 +39,7 @@ class While(ASTNode):
 
         self.code_generator.add_marker()
 
-        for statement in self.statements:
+        for statement in self.branch:
             statement.visit()
 
         self._adapt_code_1()
@@ -52,8 +53,8 @@ class While(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# While Statement while({self.condition}){{ "
-            f"{self.statements[0]} ... }} Ende\n", 0)
+            f"# While Statement While({self.condition} "
+            f"{self.branch[0]}{dot_more}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
@@ -86,21 +87,22 @@ class DoWhile(ASTNode):
     condition_check_loc = 3
 
     def update_match_args(self, ):
-        self.statements = self.children[:-1]
+        self.branch = self.children[:-1]
         self.condition = self.children[-1]
 
-    __match_args__ = ("statements", "condition")
+    __match_args__ = ("branch", "condition")
 
     def visit(self, ):
         self.update_match_args()
 
+        dot_more = " ..." if len(self.branch) > 1 else ""
         self.code_generator.add_code(
-            f"# Do While do{{ {self.statements[0]} ... }} "
-            f"while({self.condition}) Start\n", 0)
+            f"# Do While DoWhile({self.branch[0]}{dot_more} "
+            f"{self.condition}) Start\n", 0)
 
         self.code_generator.add_marker()
 
-        for statement in self.statements:
+        for statement in self.branch:
             statement.visit()
 
         self.condition.visit()
@@ -113,8 +115,8 @@ class DoWhile(ASTNode):
                                      self.condition_check_loc)
 
         self.code_generator.add_code(
-            f"# Do While do{{ {self.statements[0]} ... }} "
-            f"while({self.condition}) Ende\n", 0)
+            f"# Do While DoWhile({self.branch[0]}{dot_more} "
+            f"{self.condition}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(

@@ -1,0 +1,1 @@
+[<TT.NAME,'./tests/error_no_operator.picoc',(0, 0)>, <TT.VOID,'void',(1, 0)>, <TT.MAIN,'main',(1, 5)>, <TT.L_PAREN,'(',(1, 9)>, <TT.R_PAREN,')',(1, 10)>, <TT.L_BRACE,'{',(1, 12)>, <TT.INT,'int',(2, 0)>, <TT.NAME,'var',(2, 4)>, <TT.ASSIGNMENT,'=',(2, 8)>, <TT.NUMBER,'12',(2, 10)>, <TT.NUMBER,'3',(2, 13)>, <TT.SEMICOLON,';',(2, 14)>, <TT.R_BRACE,'}',(3, 0)>]

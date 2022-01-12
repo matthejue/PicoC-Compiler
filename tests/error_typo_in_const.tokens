@@ -1,0 +1,1 @@
+[<TT.NAME,'./tests/error_typo_in_const.picoc',(0, 0)>, <TT.VOID,'void',(2, 0)>, <TT.MAIN,'main',(2, 5)>, <TT.L_PAREN,'(',(2, 9)>, <TT.R_PAREN,')',(2, 10)>, <TT.L_BRACE,'{',(2, 12)>, <TT.NAME,'csnt',(3, 0)>, <TT.INT,'int',(3, 5)>, <TT.NAME,'var',(3, 9)>, <TT.ASSIGNMENT,'=',(3, 13)>, <TT.NUMBER,'12',(3, 15)>, <TT.SEMICOLON,';',(3, 17)>, <TT.R_BRACE,'}',(4, 0)>]

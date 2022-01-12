@@ -14,16 +14,17 @@ class MainFunction(ASTNode):
     def update_match_args(self, ):
         self.prim_dt = self.children[0]
         self.function_name = self.children[1]
-        self.statements = self.children[2:]
+        self.branch = self.children[2:]
 
-    __match_args__ = ("prim_dt", "function_name", "statements")
+    __match_args__ = ("prim_dt", "function_name", "branch")
 
     def visit(self, ):
         self.update_match_args()
 
+        dot_more = " ... " if len(self.branch) > 1 else ""
         self.code_generator.add_code(
-            f"# Main Funktion {self.prim_dt} {self.function_name}(){{ "
-            f"{self.statements[0]} ... }} Start\n", 0)
+            f"# Main Funktion ({self.prim_dt} {self.function_name} "
+            f"{self.branch[0]}{dot_more}) Start\n", 0)
 
         self._pretty_comments()
 
@@ -31,19 +32,19 @@ class MainFunction(ASTNode):
 
         self.code_generator.add_code(self.start, self.start_loc)
 
-        for statement in self.statements:
+        for statement in self.branch:
             statement.visit()
 
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Main Funktion {self.prim_dt} {self.function_name}(){{ "
-            f"{self.statements[0]} ... }} Ende\n", 0)
+            f"# Main Funktion ({self.prim_dt} {self.function_name} "
+            f"{self.branch[0]}{dot_more}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
             self.end, "af",
-            str(self.statements[0]) + " ... ")
+            str(self.branch[0]) + " ... ")
 
     def _adapt_code(self, ):
         self.start = self.code_generator.replace_code_pre(
