@@ -1,1 +1,1 @@
-void main() { var = -(-cars / 2); }
+void main() { char cars; int var = -(-cars % 2); }

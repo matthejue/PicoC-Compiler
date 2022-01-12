@@ -1,1 +1,1 @@
-(./tests/named_constant_number_character.picoc (void main ((const char var) = (99 + 2)) ((char x) = (var - (5 - 99)))))
+(./tests/named_constant_number_character.picoc (void main ((const char var) = 113) ((char x) = (var * (- (5 ^ (- 67)))))))

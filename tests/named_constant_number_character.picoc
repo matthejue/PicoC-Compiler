@@ -1,4 +1,4 @@
 void main() {
-  const char var = 'c' + 2;
-  char x = var - (5 - 'c');
+  const char var = 'q';
+  char x = var * -(5 ^ -'C');
 }

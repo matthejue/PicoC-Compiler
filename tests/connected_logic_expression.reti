@@ -1,0 +1,48 @@
+# File ./tests/connected_logic_expression.picoc Start
+# Main Funktion (void main ((char dom) = 99) ... ) Start
+LOADI SP 200;
+# Zuweisung ((char dom) = 99) Start
+# Allokation (char dom) Start
+# Variable dom vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char dom) Ende
+# Arithmetischer Operand 99 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 99;                          # Wert von 99 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 99 Ende
+LOADIN SP ACC 1;                       # Wert von 99 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 99 in Variable (char dom) speichern
+# Zuweisung ((char dom) = 99) Ende
+# Zuweisung Assignment((int var) (12 > 3) && (dom <= 4)) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Logisches Atom (12 > 3) Start
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+# Arithmetischer Operand 3 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von 3 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 3 Ende
+LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 3 in IN2 laden
+SUB ACC IN2;                           # 12 - 3 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (12 > 3) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (12 > 3) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 12 > 3 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (12 > 3) Ende
+LOADIN SP ACC 1;                       # Wert von (12 > 3) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von (12 > 3) in Variable (int var) speichern
+# Zuweisung Assignment((int var) (12 > 3) && (dom <= 4)) Ende
+JUMP 0;
+# Main Funktion (void main ((char dom) = 99) ... ) Ende
+# File ./tests/connected_logic_expression.picoc Ende

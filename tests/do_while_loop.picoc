@@ -1,1 +1,1 @@
-void main() { do { x = x + 1; } while ( y < 10 ); }
+void main() { int x=1;char y; do { y = x + 1; } while ( y < 10 ); }

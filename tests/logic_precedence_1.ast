@@ -1,1 +1,1 @@
-(./tests/logic_precedence_1.picoc (void main (var = (((12 >= dom) && (34 < 4) || (a == b))))))
+(./tests/logic_precedence_1.picoc (void main (char dom) ((int var) = (((12 >= dom) && (34 < 4) || (1 == 0))))))

@@ -22,9 +22,10 @@ class MainFunction(ASTNode):
         self.update_match_args()
 
         dot_more = " ... " if len(self.branch) > 1 else ""
+        branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
             f"# Main Funktion ({self.prim_dt} {self.function_name} "
-            f"{self.branch[0]}{dot_more}) Start\n", 0)
+            f"{branch}{dot_more}) Start\n", 0)
 
         self._pretty_comments()
 
@@ -39,7 +40,7 @@ class MainFunction(ASTNode):
 
         self.code_generator.add_code(
             f"# Main Funktion ({self.prim_dt} {self.function_name} "
-            f"{self.branch[0]}{dot_more}) Ende\n", 0)
+            f"{branch}{dot_more}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(

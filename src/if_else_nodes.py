@@ -24,8 +24,9 @@ class If(ASTNode):
         self.update_match_args()
 
         dot_more = " ... " if len(self.branch) > 1 else ""
+        branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# If Statement If({self.condition} {self.branch[0]}{dot_more}) "
+            f"# If Statement If({self.condition} {branch}{dot_more}) "
             "Start\n", 0)
 
         self._pretty_comments()
@@ -44,7 +45,7 @@ class If(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If Statement If({self.condition} {self.branch[0]}{dot_more}) "
+            f"# If Statement If({self.condition} {branch}{dot_more}) "
             "Ende\n", 0)
 
     def _pretty_comments(self, ):
@@ -96,11 +97,13 @@ class IfElse(ASTNode):
     def visit(self, ):
         self.update_match_args()
 
-        if_dot_more = " ..." if len(self.branch1) > 1 else ""
-        else_dot_more = " ... " if len(self.branch2) > 1 else ""
+        dot_more1 = " ..." if len(self.branch1) > 1 else ""
+        dot_more2 = " ... " if len(self.branch2) > 1 else ""
+        branch1 = self.branch1[0] if self.branch1 else ""
+        branch2 = self.branch2[0] if self.branch2 else ""
         self.code_generator.add_code(
-            f"# If und Else Statement IfElse({self.condition} {self.branch1[0]}"
-            f"{if_dot_more} else {self.branch2[0]}{else_dot_more}) Start\n", 0)
+            f"# If und Else Statement IfElse({self.condition} {branch1}"
+            f"{dot_more1} else {branch2}{dot_more2}) Start\n", 0)
 
         self._pretty_comments()
 
@@ -129,8 +132,8 @@ class IfElse(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If und Else Statement IfElse({self.condition} {self.branch1[0]}"
-            f"{if_dot_more} else {self.branch2[0]}{else_dot_more}) Ende\n", 0)
+            f"# If und Else Statement IfElse({self.condition} {branch1}"
+            f"{dot_more1} else {branch2}{dot_more2}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:

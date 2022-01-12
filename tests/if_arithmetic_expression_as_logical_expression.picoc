@@ -1,1 +1,1 @@
-void main() { if (123 * var) { var = 123; } }
+void main() { int var = 198123; if (123 * var) { var = 123; } }

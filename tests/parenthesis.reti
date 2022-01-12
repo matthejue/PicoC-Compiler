@@ -1,0 +1,46 @@
+# File ./tests/parenthesis.picoc Start
+# Main Funktion (void main (char cars) ... ) Start
+LOADI SP 200;
+# Allokation (char cars) Start
+# Variable cars vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char cars) Ende
+# Zuweisung ((int var) = ((4 + 7) | cars)) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Arithmetische binäre Operation ((4 + 7) | cars) Start
+# Arithmetische binäre Operation (4 + 7) Start
+# Arithmetischer Operand 4 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 4;                           # Wert von 4 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 4 Ende
+# Arithmetischer Operand 7 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 7;                           # Wert von 7 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 7 Ende
+LOADIN SP ACC 2;                       # Wert von 4 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 7 in IN2 laden
+ADD ACC IN2;                           # Wert von (4 + 7) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (4 + 7) Ende
+# Arithmetischer Operand cars Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von cars in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand cars Ende
+LOADIN SP ACC 2;                       # Wert von (4 + 7) in ACC laden
+LOADIN SP IN2 1;                       # Wert von cars in IN2 laden
+OR ACC IN2;                            # Wert von ((4 + 7) | cars) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((4 + 7) | cars) Ende
+LOADIN SP ACC 1;                       # Wert von ((4 + 7) | cars) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von ((4 + 7) | cars) in Variable (int var) speichern
+# Zuweisung ((int var) = ((4 + 7) | cars)) Ende
+JUMP 0;
+# Main Funktion (void main (char cars) ... ) Ende
+# File ./tests/parenthesis.picoc Ende

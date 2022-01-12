@@ -1,1 +1,1 @@
-(./tests/several_statements_loop.picoc (void main ((y = x) (x = (x + 1)) (y < 10))))
+(./tests/several_statements_loop.picoc (void main ((const int x) = 101) DoWhile(((int y) = x) (x = (x + 1)) (x < 10))))

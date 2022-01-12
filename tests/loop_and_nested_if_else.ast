@@ -1,1 +1,1 @@
-(./tests/loop_and_nested_if_else.picoc (void main ((x < 12) (x = (x + 1)) If((x == 42) (y = (y + 1))))))
+(./tests/loop_and_nested_if_else.picoc (void main ((const char x) = 97) ((int y) = x) While((x < 12) (y = (y + 1)) If((x == 42) (y = (y + 1))))))

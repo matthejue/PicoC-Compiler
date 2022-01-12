@@ -1,0 +1,6 @@
+name,type,datatype,position,value
+int,built in,None,None, None
+char,built in,None,None, None
+var,variable,char,1:19,100
+cars,variable,int,1:32,101
+b,variable,char,1:43,102

@@ -24,9 +24,10 @@ class While(ASTNode):
         self.update_match_args()
 
         dot_more = " ... " if len(self.branch) > 1 else ""
+        branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# While Statement While({self.condition} "
-            f"{self.branch[0]}{dot_more}) Start\n", 0)
+            f"# While Statement While({self.condition} {branch}{dot_more}) Start\n",
+            0)
 
         self._pretty_comments()
 
@@ -54,7 +55,7 @@ class While(ASTNode):
 
         self.code_generator.add_code(
             f"# While Statement While({self.condition} "
-            f"{self.branch[0]}{dot_more}) Ende\n", 0)
+            f"{branch}{dot_more}) Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
@@ -96,9 +97,10 @@ class DoWhile(ASTNode):
         self.update_match_args()
 
         dot_more = " ..." if len(self.branch) > 1 else ""
+        branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# Do While DoWhile({self.branch[0]}{dot_more} "
-            f"{self.condition}) Start\n", 0)
+            f"# Do While DoWhile({branch}{dot_more} {self.condition}) Start\n",
+            0)
 
         self.code_generator.add_marker()
 
@@ -115,8 +117,8 @@ class DoWhile(ASTNode):
                                      self.condition_check_loc)
 
         self.code_generator.add_code(
-            f"# Do While DoWhile({self.branch[0]}{dot_more} "
-            f"{self.condition}) Ende\n", 0)
+            f"# Do While DoWhile({branch}{dot_more} {self.condition}) Ende\n",
+            0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(

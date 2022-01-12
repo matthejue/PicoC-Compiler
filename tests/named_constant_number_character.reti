@@ -1,0 +1,61 @@
+# File ./tests/named_constant_number_character.picoc Start
+# Main Funktion (void main ((const char var) = 113) ... ) Start
+LOADI SP 200;
+# Zuweisung ((const char var) = 113) Start
+# Allokation (const char var) Start
+# Konstante var vom Typ char zur Symboltabelle hinzugefügt
+# Allokation (const char var) Ende
+# Konstante var in Symboltabelle den Wert 113 zugewiesen
+# Zuweisung ((const char var) = 113) Ende
+# Zuweisung ((char x) = (var * (- (5 ^ (- 67))))) Start
+# Allokation (char x) Start
+# Variable x vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char x) Ende
+# Arithmetische binäre Operation (var * (- (5 ^ (- 67)))) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 113;                         # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
+# Arithmetische unäre Operation (- (5 ^ (- 67))) Start
+# Arithmetische binäre Operation (5 ^ (- 67)) Start
+# Arithmetischer Operand 5 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 5;                           # Wert von 5 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 5 Ende
+# Arithmetische unäre Operation (- 67) Start
+# Arithmetischer Operand 67 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 67;                          # Wert von 67 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 67 Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 67) Ende
+LOADIN SP ACC 2;                       # Wert von 5 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (- 67) in IN2 laden
+OP ACC IN2;                            # Wert von (5 ^ (- 67)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (5 ^ (- 67)) Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- (5 ^ (- 67))) Ende
+LOADIN SP ACC 2;                       # Wert von var in ACC laden
+LOADIN SP IN2 1;                       # Wert von (- (5 ^ (- 67))) in IN2 laden
+MUL ACC IN2;                           # Wert von (var * (- (5 ^ (- 67)))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (var * (- (5 ^ (- 67)))) Ende
+LOADIN SP ACC 1;                       # Wert von (var * (- (5 ^ (- 67)))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von (var * (- (5 ^ (- 67)))) in Variable (char x) speichern
+# Zuweisung ((char x) = (var * (- (5 ^ (- 67))))) Ende
+JUMP 0;
+# Main Funktion (void main ((const char var) = 113) ... ) Ende
+# File ./tests/named_constant_number_character.picoc Ende

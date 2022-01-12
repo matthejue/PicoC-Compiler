@@ -1,1 +1,1 @@
-void main() { var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0; }
+void main() { int var; int dom; char cars; var = (12 <= (dom - 1) * 2 || 42 != cars) && cars == 0; }

@@ -2,11 +2,11 @@
 
 num_tests=0;
 not_passed=();
-for testfile in ./tests/*.picoc; do
+  for testfile in $(basename --suffix=.picoc ./tests/*.picoc); do
   echo -e \\n===============================================================================;
   echo $testfile;
   echo ===============================================================================;
-  ./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 -m $testfile;
+  ./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 ./tests/$testfile.picoc;
   if [[ $? != 0 ]]; then
     not_passed+=($testfile);
   fi;

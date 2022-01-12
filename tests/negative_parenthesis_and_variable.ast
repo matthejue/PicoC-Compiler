@@ -1,1 +1,1 @@
-(./tests/negative_parenthesis_and_variable.picoc (void main (var = (- ((- cars) / 2)))))
+(./tests/negative_parenthesis_and_variable.picoc (void main (char cars) ((int var) = (- ((- cars) % 2)))))

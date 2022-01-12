@@ -1,1 +1,1 @@
-(./tests/mixed_if_else_after_another.picoc (void main ((var == 0) (cars = 10) else (cars = (cars + 1))) If((cars == 10) (var = 42))))
+(./tests/mixed_if_else_after_another.picoc (void main (int var) (char cars) IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) If((cars == 10) (var = 42))))

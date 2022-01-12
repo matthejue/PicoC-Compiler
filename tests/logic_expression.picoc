@@ -1,1 +1,1 @@
-void main() { var = 12 > 3; }
+void main() { char var = 12 > 3; }

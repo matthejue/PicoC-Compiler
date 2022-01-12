@@ -2,6 +2,7 @@ from statement_grammar import StatementGrammar
 from function_nodes import MainFunction
 from lexer import TT
 from dummy_nodes import NT
+from errors import Errors
 
 
 class FunctionGrammar(StatementGrammar):
@@ -17,15 +18,19 @@ class FunctionGrammar(StatementGrammar):
         self._function()
 
     def _function(self, ):
+        if self.LTT(2) == TT.MAIN:
+            self._main_function()
+        else:
+            token = self.LT(1)
+            raise Errors.NoApplicableRuleError('main function', token.value,
+                                               token.position)
+
+    def _main_function(self, ):
         """main function
 
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        if self.LTT(2) == TT.MAIN:
-            self._main_function()
-
-    def _main_function(self, ):
         savestate_node = self.ast_builder.down(MainFunction)
 
         self.add_and_consume(mapping=self.PRIM_DT)

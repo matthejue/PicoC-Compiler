@@ -1,1 +1,1 @@
-(./tests/nested_loops.picoc (void main ((x <= 42) While((y <= 42) (z = (x * y))))))
+(./tests/nested_loops.picoc (void main (int x) ((const char y) = 71) ((int z) = y) While((x <= 42) While((y <= 42) (z = (x & y))))))
