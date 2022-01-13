@@ -1,0 +1,214 @@
+# File ./tests/logic_parenthesis.picoc Start
+# Main Funktion (int main ((int bool_var) = 0) ... ) Start
+LOADI SP 200;
+# Zuweisung ((int bool_var) = 0) Start
+# Allokation (int bool_var) Start
+# Variable bool_var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int bool_var) Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 0 in Variable (int bool_var) speichern
+# Zuweisung ((int bool_var) = 0) Ende
+# If Statement If(((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1))) Start
+# Logische binäre Verknüpfung ((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) Start
+# Logisches Atom (12 != 3) Start
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+# Arithmetischer Operand 3 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von 3 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 3 Ende
+LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 3 in IN2 laden
+SUB ACC IN2;                           # 12 - 3 in ACC laden
+JUMP!= 3;                              # Ergebnis 1, wenn (12 != 3) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (12 != 3) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 12 != 3 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (12 != 3) Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1)))) Start
+# Logische binäre Verknüpfung ((12 > bool_var) || (((bool_var + 1)) && ToBool(1))) Start
+# Logisches Atom (12 > bool_var) Start
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+# Arithmetischer Operand bool_var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von bool_var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand bool_var Ende
+LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
+LOADIN SP IN2 1;                       # Wert von bool_var in IN2 laden
+SUB ACC IN2;                           # 12 - bool_var in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (12 > bool_var) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (12 > bool_var) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 12 > bool_var wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (12 > bool_var) Ende
+# Logische binäre Verknüpfung (((bool_var + 1)) && ToBool(1)) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((bool_var + 1)) Start
+# Arithmetische binäre Operation (bool_var + 1) Start
+# Arithmetischer Operand bool_var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von bool_var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand bool_var Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von bool_var in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+ADD ACC IN2;                           # Wert von (bool_var + 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (bool_var + 1) Ende
+LOADIN SP ACC 1;                       # Wert von (bool_var + 1) in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn (bool_var + 1) den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((bool_var + 1)) Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn 1 den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(1) Ende
+LOADIN SP ACC 2;                       # Wert von ToBool((bool_var + 1)) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool(1) in IN2 laden
+AND ACC IN2;                           # (((bool_var + 1)) && ToBool(1)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung (((bool_var + 1)) && ToBool(1)) Ende
+LOADIN SP ACC 2;                       # Wert von (12 > bool_var) in ACC laden
+LOADIN SP IN2 1;                       # Wert von (((bool_var + 1)) && ToBool(1)) in IN2 laden
+OR ACC IN2;                            # ((12 > bool_var) || (((bool_var + 1)) && ToBool(1))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung ((12 > bool_var) || (((bool_var + 1)) && ToBool(1))) Ende
+LOADIN SP ACC 1;                       # Wert von ((12 > bool_var) || (((bool_var + 1)) && ToBool(1))) in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn ((12 > bool_var) || (((bool_var + 1)) && ToBool(1))) den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1)))) Ende
+LOADIN SP ACC 2;                       # Wert von (12 != 3) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1)))) in IN2 laden
+AND ACC IN2;                           # ((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung ((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) Ende
+LOADIN SP ACC 1;                       # Wert von ((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 59;                             # Branch überspringen
+# If-Branch
+# Zuweisung (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1)) Start
+# Arithmetische binäre Operation ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) Start
+# Logische binäre Verknüpfung (((123 * (- (12 - 3))) >= 12) || ToBool(0)) Start
+# Logisches Atom ((123 * (- (12 - 3))) >= 12) Start
+# Arithmetische binäre Operation (123 * (- (12 - 3))) Start
+# Arithmetischer Operand 123 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 123;                         # Wert von 123 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 123 Ende
+# Arithmetische unäre Operation (- (12 - 3)) Start
+# Arithmetische binäre Operation (12 - 3) Start
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+# Arithmetischer Operand 3 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von 3 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 3 Ende
+LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 3 in IN2 laden
+SUB ACC IN2;                           # Wert von (12 - 3) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (12 - 3) Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- (12 - 3)) Ende
+LOADIN SP ACC 2;                       # Wert von 123 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (- (12 - 3)) in IN2 laden
+MUL ACC IN2;                           # Wert von (123 * (- (12 - 3))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (123 * (- (12 - 3))) Ende
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+LOADIN SP ACC 2;                       # Wert von (123 * (- (12 - 3))) in ACC laden
+LOADIN SP IN2 1;                       # Wert von 12 in IN2 laden
+SUB ACC IN2;                           # (123 * (- (12 - 3))) - 12 in ACC laden
+JUMP>= 3;                              # Ergebnis 1, wenn ((123 * (- (12 - 3))) >= 12) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn ((123 * (- (12 - 3))) >= 12) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn (123 * (- (12 - 3))) >= 12 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom ((123 * (- (12 - 3))) >= 12) Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(0) Start
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn 0 den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(0) Ende
+LOADIN SP ACC 2;                       # Wert von ((123 * (- (12 - 3))) >= 12) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool(0) in IN2 laden
+OR ACC IN2;                            # (((123 * (- (12 - 3))) >= 12) || ToBool(0)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung (((123 * (- (12 - 3))) >= 12) || ToBool(0)) Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von (((123 * (- (12 - 3))) >= 12) || ToBool(0)) in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+SUB ACC IN2;                           # Wert von ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) Ende
+LOADIN SP ACC 1;                       # Wert von ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) in Variable bool_var speichern
+# Zuweisung (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1)) Ende
+# If Statement If(((12 != 3) && ToBool(((12 > bool_var) || (((bool_var + 1)) && ToBool(1))))) (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1))) Ende
+JUMP 0;
+# Main Funktion (int main ((int bool_var) = 0) ... ) Ende
+# File ./tests/logic_parenthesis.picoc Ende
