@@ -2,7 +2,7 @@
 
 num_tests=0;
 not_passed=();
-  for testfile in $(basename --suffix=.picoc ./tests/*.picoc); do
+  for testfile in $(basename --suffix=.picoc ./tests/$1*.picoc); do
   echo -e \\n===============================================================================;
   echo $testfile;
   echo ===============================================================================;

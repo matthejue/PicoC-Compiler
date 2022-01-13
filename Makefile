@@ -21,7 +21,7 @@ test:
 
 test-arg:
 	# start with 'make test-arg ARG=file_basename'
-	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 -m ./tests/$(ARG_BASE).picoc
+	./run_tests.sh $(ARG_BASE)
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

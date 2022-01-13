@@ -159,14 +159,16 @@ def _compile(code, infile, outbase=None):
 
     lexer = Lexer(code_without_cr)
 
+    # Handle errors
+    error_handler = ErrorHandler(infile, code_without_cr)
+
     if global_vars.args.tokens:
-        _tokens_option(lexer, outbase)
+        # TODO: stopped here
+        error_handler.handle(_tokens_option(lexer, outbase))
         lexer.__init__(code_without_cr)
 
     # Generate ast
     grammar = Grammar(lexer)
-    # Handle errors
-    error_handler = ErrorHandler(grammar)
     error_handler.handle(grammar.start_parse)
 
     if global_vars.args.abstract_syntax:

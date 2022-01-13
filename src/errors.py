@@ -58,7 +58,6 @@ class Errors:
                 f"'{identifier}' wasn't declared yet"
             super().__init__(self.description)
             self.expected = None
-            self.expected_pos = None
             self.found = identifier
             self.found_pos = identifier_pos
 
@@ -71,7 +70,6 @@ class Errors:
                 f"assigned to variable {identifier} of type {dtype} is too large"
             super().__init__(self.description)
             self.expected = None
-            self.expected_pos = None
             self.found = assignment
             self.found_pos = assignment_pos
 
@@ -82,6 +80,5 @@ class Errors:
                 f" in file {fname}"
             super().__init__(self.description)
             self.expected = None
-            self.expected_pos = None
             self.found = None
             self.found_pos = None

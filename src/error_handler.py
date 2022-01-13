@@ -1,6 +1,7 @@
 from sys import exit
 from enum import Enum
 from errors import Errors
+from lexer import Lexer
 
 
 class States(Enum):
@@ -14,81 +15,67 @@ class ErrorHandler:
 
     LENGTH_COMMENT_TOKEN = 2
 
-    def __init__(self, grammar):
-        self.grammar = grammar
+    def __init__(self, fname, finput):
+        self.fname = fname
+        self.finput = finput
 
     def handle(self, function):
-        error_message = ""
         try:
             function()
         except Errors.InvalidCharacterError as e:
-            error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(States.ONLY_FOUND.value,
-                                                  e) + '\n'
-            print(error_message)
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            print(error_header + error_screen)
             exit(0)
         except Errors.UnclosedCharacterError as e:
-            error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(e.found.position[1],
-                                                  e) + '\n'
-            print(error_message)
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.point_at(e.found_pos, e.expected)
+            print(error_header + error_screen)
             exit(0)
         except Errors.NoApplicableRuleError as e:
-            error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(States.ONLY_FOUND.value,
-                                                  e) + '\n'
-            print(error_message)
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.point_at(e.found_pos, e.expected)
+            print(error_header + error_screen)
             exit(0)
         except Errors.MismatchedTokenError as e:
-            error_message += self._error_message_header(e) + '\n'
-
-            (row, column) = self._find_white_space_before_last_token(e)
-            if row < e.found.position[0]:
-                error_message += self._point_at_exptected(
-                    (row, column), e) + '\n'
-                error_message += self._point_at_found(States.ONLY_FOUND.value,
-                                                      e) + '\n'
-            else:
-                error_message += self._point_at_found(column, e) + '\n'
-            print(error_message)
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.point_at(e.found_pos, e.expected)
+            print(error_header + error_screen)
+            exit(0)
+        except Errors.TastingError as e:
+            error_header = self._error_header(e) + '\n'
+            print(error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
-            error_message += self._error_message_header(e) + '\n'
-            error_message += self._point_at_found(States.ONLY_FOUND.value, e)\
-                + '\n'
-            print(error_message)
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            print(error_header + error_screen)
+            exit(0)
+        except Errors.TooLargeLiteralError as e:
+            error_header = self._error_header(e) + '\n'
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            print(error_header + error_screen)
+            exit(0)
+        except Errors.NoMainFunctionError as e:
+            error_header = self._error_header(e) + '\n'
+            print(error_header)
             exit(0)
 
-    def _error_message_header(self, error):
-        return self.grammar.lexer.fname + ':' +\
-            str(error.found.position[0]) + ':' + str(error.found.position[1]) \
-            + ': ' + error.description
-
-    def _point_at_exptected(self, expected_pos, error):
-        # line with exptected symbol
-        line = self.grammar.lexer.input[expected_pos[0]] + '\n'
-        # positionize exptected_pos symbol at the right position beneath with a
-        # arrow pointing on it
-        line += ' ' * expected_pos[1] + '^' + '\n'
-        line += ' ' * expected_pos[1] + error.expected + '\n'
-        for i in range(expected_pos[0] + 1, error.found.position[0]):
-            line += self.grammar.lexer.input[i]
-        return line
-
-    def _point_at_found(self, expected_column, error):
-        # TODO: Was ist wenn sich ein Token über mehrere Zeilen erstreck mit ^~
-        line = self.grammar.lexer.input[error.found.position[0]] + '\n'
-        if expected_column == error.found.position[1]:
-            line += ' ' * expected_column + '^' + '\n'
-            return line + ' ' * expected_column +\
-                error.expected + '\n'
-        if expected_column >= 0:
-            line += ' ' * (expected_column) + '^' + \
-                ' ' * (error.found.position[1]-expected_column-1) +\
-                '~' * len(error.found.value) + '\n'
-            return line + ' ' * expected_column + error.expected + '\n'
-        return line + ' ' * error.found.position[1] +\
-            '~' * len(error.found.value) + '\n'
+    def _error_header(self, error):
+        return self.fname + ':' + str(error.found_pos[0]) + ':' + str(
+            error.found_pos[1]) + ': ' + error.description
 
     def _find_white_space_before_last_token(self, e):
         row, column = e.found.position[0], e.found.position[1]
@@ -139,3 +126,34 @@ class ErrorHandler:
             row -= 1
             column = len(self.grammar.lexer.input[row]) - 1
         return (row, column)
+
+
+class ErrorScreen:
+    def __init__(self, finput, row_from, row_to):
+        self.screen = []
+        for line in finput[row_from:row_to + 1]:
+            self.screen += [line, ' ' * len(line), ' ' * len(line)]
+
+    def point_at(self, pos, word):
+        self.screen[3 * pos[0] + 1] = replace(self.screen[3 * pos[0] + 1], '^',
+                                              pos[1])
+        self.screen[3 * pos[0] + 2] = replace(self.screen[3 * pos[0] + 2],
+                                              word, pos[1])
+        self.screen[3 * pos[0] + 1] += "m"
+
+    def mark(self, pos, length):
+        self.screen[3 * pos[0] + 1] = replace(self.screen[3 * pos[0] + 1],
+                                              '~' * length, pos[1])
+        # mark line to
+        self.screen[3 * pos[0] + 1] += "m"
+
+    def __repr__(self, ):
+        for i in range(1, len(self.screen) - 1, -3):
+            if self.screen[i] != 'm':
+                del self.screen[i]
+                del self.screen[i + 1]
+        return self.screen
+
+
+def replace(old, replace_with, idx):
+    return old[:idx] + replace_with + old[idx + len(replace_with):]

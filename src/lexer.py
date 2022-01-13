@@ -112,15 +112,15 @@ class Lexer:
     LETTER = string.ascii_letters
     LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO
 
-    def __init__(self, input):
+    def __init__(self, finput):
         """
         :lc: lookahead character
         :c: character
         """
-        self.input = input
+        self.input = finput
         self.lc_col = 0
         self.lc_row = 0
-        self.lc = input[self.lc_row][self.lc_col]
+        self.lc = finput[self.lc_row][self.lc_col]
         self.c = ''
         # position variable to be available between methods
         self.position = (0, 0)
