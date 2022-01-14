@@ -184,6 +184,10 @@ class Lexer:
                 # :grammar: '<letter_digit>'
                 self.next_char()
 
+                if self.lc not in self.LETTER_DIGIT:
+                    raise Errors.InvalidCharacterError(
+                        self.lc, (self.lc_row, self.lc_col))
+
                 self.next_char()
                 char = self.c
 

@@ -5,16 +5,16 @@ ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 all: read-all-verbose clean
 
 read-all:
-	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -d 20 -m ./code.picoc
+	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
 read-all-verbose:
-	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 -m ./code.picoc
+	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
 shell-all:
-	./src/pico_c_compiler.py -c -t -a -S -p -s 100 -e 200 -d 20 -m
+	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
 
 shell-all-verbose:
-	./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 -m
+	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
 
 test:
 	./run_tests.sh

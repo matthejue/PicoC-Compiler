@@ -24,19 +24,19 @@ setlocal fdn=20
 setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 2 - ((1 * winheight(0) + 19) / 39)
+let s:l = 1 - ((0 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 2
+keepjumps 1
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +13 ~/Documents/Studium/pico_c_compiler/src/grammar.py
-badd +0 ~/Documents/Studium/pico_c_compiler/.misc/test.cpp
-badd +2 ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
-badd +0 ~/Documents/Studium/pico_c_compiler/file_grammar.py
+badd +0 ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
+badd +1 ~/Documents/Studium/pico_c_compiler/.misc/test.cpp
 badd +1 ~/Documents/Studium/pico_c_compiler/NERD_tree_8
+badd +13 ~/Documents/Studium/pico_c_compiler/src/grammar.py
+badd +1 ~/Documents/Studium/pico_c_compiler/file_grammar.py
 badd +1 ~/Documents/Studium/pico_c_compiler/assignment_allocation_grammar.py
 badd +6 ~/Documents/Studium/pico_c_compiler/src/dummy_nodes.py
 badd +1 ~/Documents/Studium/pico_c_compiler/file_nodes.py

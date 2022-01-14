@@ -6,7 +6,7 @@ not_passed=();
   echo -e \\n===============================================================================;
   echo $testfile;
   echo ===============================================================================;
-  ./src/pico_c_compiler.py -c -t -a -S -p -v -s 100 -e 200 -d 20 ./tests/$testfile.picoc;
+  ./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./tests/$testfile.picoc;
   if [[ $? != 0 ]]; then
     not_passed+=($testfile);
   fi;

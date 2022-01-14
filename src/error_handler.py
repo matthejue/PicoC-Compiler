@@ -1,13 +1,6 @@
 from sys import exit
-from enum import Enum
 from errors import Errors
-from lexer import Lexer
-
-
-class States(Enum):
-    """Special States for the ErrorHandler"""
-
-    ONLY_FOUND = -1
+import global_vars
 
 
 class ErrorHandler:
@@ -19,36 +12,40 @@ class ErrorHandler:
         self.fname = fname
         self.finput = finput
 
-    def handle(self, function):
+    def handle(self, function, *args):
         try:
-            function()
+            function(*args)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e) + '\n'
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
             error_header = self._error_header(e) + '\n'
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
             error_header = self._error_header(e) + '\n'
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
             error_header = self._error_header(e) + '\n'
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
             error_header = self._error_header(e) + '\n'
@@ -59,14 +56,16 @@ class ErrorHandler:
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
             error_header = self._error_header(e) + '\n'
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            print(error_header + error_screen)
+            error_screen.filter()
+            print(error_header + str(error_screen))
             exit(0)
         except Errors.NoMainFunctionError as e:
             error_header = self._error_header(e) + '\n'
@@ -130,29 +129,49 @@ class ErrorHandler:
 
 class ErrorScreen:
     def __init__(self, finput, row_from, row_to):
+
+        self.context_above = finput[row_from - global_vars.args.sight:row_from]
+
         self.screen = []
         for line in finput[row_from:row_to + 1]:
             self.screen += [line, ' ' * len(line), ' ' * len(line)]
 
+        self.context_below = finput[row_to + 1:row_to + 1 +
+                                    global_vars.args.sight]
+
+        self.not_emtpy_marked = []
+        self.row_from = row_from
+        self.row_to = row_to
+
     def point_at(self, pos, word):
-        self.screen[3 * pos[0] + 1] = replace(self.screen[3 * pos[0] + 1], '^',
-                                              pos[1])
-        self.screen[3 * pos[0] + 2] = replace(self.screen[3 * pos[0] + 2],
-                                              word, pos[1])
-        self.screen[3 * pos[0] + 1] += "m"
+        rel_row = pos[0] - self.row_from
+        self.screen[3 * rel_row + 1] = replace(self.screen[3 * rel_row + 1],
+                                               '^', pos[1])
+        self.screen[3 * rel_row + 2] = replace(self.screen[3 * rel_row + 2],
+                                               word, pos[1])
+        self.not_emtpy_marked += [3 * rel_row + 1]
 
     def mark(self, pos, length):
-        self.screen[3 * pos[0] + 1] = replace(self.screen[3 * pos[0] + 1],
-                                              '~' * length, pos[1])
+        rel_row = pos[0] - self.row_from
+        self.screen[3 * rel_row + 1] = replace(self.screen[3 * rel_row + 1],
+                                               '~' * length, pos[1])
         # mark line to
-        self.screen[3 * pos[0] + 1] += "m"
+        self.not_emtpy_marked += [3 * rel_row + 1]
+
+    def filter(self, ):
+        # -2 da man idx's bei 0 anfängen und man zwischen 0 und 2 usw. sein will
+        for i in range(len(self.screen) - 2, 0, -3):
+            if i not in self.not_emtpy_marked:
+                del self.screen[i + 1]
+                del self.screen[i]
 
     def __repr__(self, ):
-        for i in range(1, len(self.screen) - 1, -3):
-            if self.screen[i] != 'm':
-                del self.screen[i]
-                del self.screen[i + 1]
-        return self.screen
+        acc = ""
+
+        for line in self.context_above + self.screen + self.context_below:
+            acc += line + '\n'
+
+        return acc
 
 
 def replace(old, replace_with, idx):
