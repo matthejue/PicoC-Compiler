@@ -3,13 +3,14 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium/pico_c_compiler/src
+cd ~/Documents/Studium/pico_c_compiler
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
 argglobal
 %argdel
+<<<<<<< HEAD
 edit ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
@@ -35,6 +36,12 @@ exe 'vert 2resize ' . ((&columns * 111 + 86) / 173)
 exe 'vert 3resize ' . ((&columns * 30 + 86) / 173)
 argglobal
 balt ~/Documents/Studium/pico_c_compiler/error_handler.py
+=======
+$argadd src/pico_c_compiler.py
+argglobal
+enew
+file NERD_tree_1
+>>>>>>> 200dd1f8b57ccfae69bdd5439b9dae3d93800569
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -43,6 +50,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
+<<<<<<< HEAD
 silent! normal! zE
 let &fdl = &fdl
 let s:l = 14 - ((13 * winheight(0) + 18) / 37)
@@ -110,13 +118,29 @@ badd +0 ~/Documents/Studium/pico_c_compiler/error_handler.py
 badd +0 ~/Documents/Studium/pico_c_compiler/lexer.py
 badd +0 ~/Documents/Studium/pico_c_compiler/NERD_tree_10
 badd +63 ~/Documents/Studium/pico_c_compiler/src/lexer.py
+=======
+tabnext 1
+badd +55 src/pico_c_compiler.py
+badd +0 src/error_handler.py
+badd +1 errors.py
+badd +1 NERD_tree_2
+badd +9 ~/.SpaceVim.d/init.toml
+badd +616 ~/.config_stow/spacevim/.SpaceVim.d/autoload/myspacevim.vim
+badd +55 src/errors.py
+badd +12 src/file_grammar.py
+badd +1 src/file_node.py
+badd +23 src/function_grammar.py
+badd +26 src/function_nodes.py
+badd +44 src/statement_grammar.py
+badd +24 Makefile
+badd +6 run_tests.sh
+badd +19 ~/.SpaceVim/init.vim
+>>>>>>> 200dd1f8b57ccfae69bdd5439b9dae3d93800569
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxcsAoOaFTt
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

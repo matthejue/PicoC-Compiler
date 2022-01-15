@@ -1,6 +1,6 @@
-name,type,datatype,position,value
-int,built in,None,None, None
-char,built in,None,None, None
-var,variable,int,1:18,100
-dom,variable,int,1:27,101
-cars,variable,char,1:37,102
+name,type,datatype,position,value,range_from_to
+int,built in,None,None,None,(-128:127)
+char,built in,None,None,None,(-2147483648:2147483647)
+var,variable,int,(1:18),100,None
+dom,variable,int,(1:27),101,None
+cars,variable,char,(1:37),102,None

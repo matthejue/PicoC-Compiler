@@ -6,7 +6,7 @@ class Symbol:
 
     __match_args__ = ("value", )
 
-    def __init__(self, name, datatype, position, value):
+    def __init__(self, name, datatype, position, value, range_from_to):
         """
         :name: string
         :datatype: Symbol
@@ -17,6 +17,7 @@ class Symbol:
         self.datatype = datatype
         self.position = position
         self.value = value
+        self.range_from_to = range_from_to
 
     def get_name(self, ):
         return self.name
@@ -31,7 +32,7 @@ class Symbol:
 class VariableSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, None)
+        super().__init__(name, datatype, position, None, None)
 
     def get_type(self, ):
         return "variable"
@@ -40,7 +41,7 @@ class VariableSymbol(Symbol):
 class ConstantSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, None)
+        super().__init__(name, datatype, position, None, None)
 
     def get_type(self, ):
         return "named constant"
@@ -48,8 +49,8 @@ class ConstantSymbol(Symbol):
 
 class BuiltInTypeSymbol(Symbol):
     """Built in datatypes such as int and char"""
-    def __init__(self, name):
-        super().__init__(name, None, None, None)
+    def __init__(self, name, range):
+        super().__init__(name, None, None, None, range)
 
     def get_type(self, ):
         return "built in"
@@ -106,8 +107,8 @@ class _SymbolTable(Scope):
         self.fa_pointer = global_vars.args.begin_data_segment
 
     def initTypeSystem(self, ):
-        self.define(BuiltInTypeSymbol('int'))
-        self.define(BuiltInTypeSymbol('char'))
+        self.define(BuiltInTypeSymbol('int', (-128, 127)))
+        self.define(BuiltInTypeSymbol('char', (-2147483648, 2147483647)))
 
     def allocate(self, sym):
         """Determine address of variable

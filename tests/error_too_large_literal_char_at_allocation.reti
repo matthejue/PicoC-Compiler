@@ -1,0 +1,19 @@
+# File ./tests/error_too_large_literal_char_at_allocation.picoc Start
+# Main Funktion (void main ((char var) = 128)) Start
+LOADI SP 200;
+# Zuweisung ((char var) = 128) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Arithmetischer Operand 128 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 128;                         # Wert von 128 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 128 Ende
+LOADIN SP ACC 1;                       # Wert von 128 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 128 in Variable (char var) speichern
+# Zuweisung ((char var) = 128) Ende
+JUMP 0;
+# Main Funktion (void main ((char var) = 128)) Ende
+# File ./tests/error_too_large_literal_char_at_allocation.picoc Ende
