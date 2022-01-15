@@ -43,7 +43,6 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
-            #  __import__('pudb').set_trace()
             error_header = self._error_header(e) + '\n'
             expected_pos = self._find_space_after_previous_token(e.found_pos)
             error_screen = ErrorScreen(self.finput, expected_pos[0],
@@ -184,10 +183,8 @@ class ErrorScreen:
 
     def filter(self, ):
         # -2 da man idx's bei 0 anfängen und man zwischen 0 und 2 usw. sein will
-        for i in set(range(0,
-                           len(self.screen) - 1)) - set(
-                               range(0, len(self.screen), 3)) - set(
-                                   self.marked_lines):
+        for i in set(range(0, len(self.screen))) - set(
+                range(0, len(self.screen), 3)) - set(self.marked_lines):
             del self.screen[i]
 
     def undo(self, ):

@@ -1,4 +1,4 @@
-name,type,datatype,position,value
-int,built in,None,None, None
-char,built in,None,None, None
-x,variable,char,1:19,100
+name,type,datatype,position,value,range_from_to
+int,built in,None,None,None,(-128:127)
+char,built in,None,None,None,(-2147483648:2147483647)
+x,variable,char,(1:19),100,None

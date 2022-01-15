@@ -66,7 +66,9 @@ class Assignment(ASTNode):
             case Assignment(Allocation(NT.Const(), _, Variable_Constant_Identifier(name)), assignment):
                 match assignment:
                     case (Number(value) | Character(value)):
-                        self.symbol_table.resolve(name).value = value
+                        symbol = self.symbol_table.resolve(name)
+                        if symbol.datatype.range_from_to:
+                        symbol.value = value
                         self._comment_for_constant(name, value)
                     case Variable_Constant_Identifier(value):
                         self.symbol_table.resolve(

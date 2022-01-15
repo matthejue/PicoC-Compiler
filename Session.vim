@@ -13,7 +13,7 @@ argglobal
 $argadd src/pico_c_compiler.py
 argglobal
 enew
-file NERD_tree_3
+file NERD_tree_1
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -23,10 +23,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal nofen
 tabnext 1
-badd +234 src/pico_c_compiler.py
+badd +55 src/pico_c_compiler.py
+badd +0 src/error_handler.py
+badd +1 errors.py
+badd +1 NERD_tree_2
 badd +9 ~/.SpaceVim.d/init.toml
-badd +610 ~/.config_stow/spacevim/.SpaceVim.d/autoload/myspacevim.vim
-badd +46 src/error_handler.py
+badd +616 ~/.config_stow/spacevim/.SpaceVim.d/autoload/myspacevim.vim
 badd +55 src/errors.py
 badd +12 src/file_grammar.py
 badd +1 src/file_node.py
@@ -34,7 +36,8 @@ badd +23 src/function_grammar.py
 badd +26 src/function_nodes.py
 badd +44 src/statement_grammar.py
 badd +24 Makefile
-badd +6 ~/Documents/Studium/pico_c_compiler/./run_tests.sh
+badd +6 run_tests.sh
+badd +19 ~/.SpaceVim/init.vim
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

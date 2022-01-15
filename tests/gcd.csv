@@ -1,6 +1,6 @@
-name,type,datatype,position,value
-int,built in,None,None, None
-char,built in,None,None, None
-m,variable,int,3:6,100
-n,variable,int,4:6,101
-h,variable,int,5:6,102
+name,type,datatype,position,value,range_from_to
+int,built in,None,None,None,(-128:127)
+char,built in,None,None,None,(-2147483648:2147483647)
+m,variable,int,(3:6),100,None
+n,variable,int,(4:6),101,None
+h,variable,int,(5:6),102,None

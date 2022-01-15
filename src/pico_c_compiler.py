@@ -202,11 +202,14 @@ def _abstract_syntax_option(grammar: Grammar, outbase):
 
 def _symbol_table_option(outbase):
     if global_vars.args.print:
-        header = ["name", "type", "datatype", "position", "value"]
+        header = [
+            "name", "type", "datatype", "position", "value", "range_from_to"
+        ]
         symbols = SymbolTable().symbols
         print('\n' + str(
             tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
-                       str(v.value)) for k, v in symbols.items()],
+                       str(v.value), str(v.range_from_to))
+                      for k, v in symbols.items()],
                      headers=header)))
 
     if outbase:
@@ -214,19 +217,19 @@ def _symbol_table_option(outbase):
 
 
 def _write_symbol_table(outbase):
-    output = "name,type,datatype,position,value\n"
+    output = "name,type,datatype,position,value,range_from_to\n"
     symbols = SymbolTable().symbols
     for name in symbols.keys():
-        if symbols[name].position:
-            output += f"{name},"\
-                f"{symbols[name].get_type()},"\
-                f"{symbols[name].datatype},"\
-                f"{symbols[name].position[0]}:"\
-                f"{symbols[name].position[1]},"\
-                f"{symbols[name].value}\n"
-        else:  # if it is None
-            output += f"{name},{symbols[name].get_type()},"\
-                f"{symbols[name].datatype},{symbols[name].position}, {symbols[name].value}\n"
+        position = f"({symbols[name].position[0]}:{symbols[name].position[1]})"\
+            if symbols[name].position else None
+        range_from_to = f"({symbols[name].range_from_to[0]}:{symbols[name].range_from_to[1]})" if symbols[
+            name].range_from_to else None
+        output += f"{name},"\
+            f"{symbols[name].get_type()},"\
+            f"{symbols[name].datatype},"\
+            f"{position},"\
+            f"{symbols[name].value},"\
+            f"{range_from_to}\n"
     with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
         fout.write(output)
 
