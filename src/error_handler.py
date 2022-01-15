@@ -36,15 +36,14 @@ class ErrorHandler:
             exit(0)
         except Errors.NoApplicableRuleError as e:
             error_header = self._error_header(e) + '\n'
-            expected_pos = self._find_space_after_previous_token(e.found_pos)
-            error_screen = ErrorScreen(self.finput, expected_pos[0],
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
-            error_screen.mark(e.found_pos, len(e.found))
-            error_screen.point_at(expected_pos, e.expected)
+            error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
+            #  __import__('pudb').set_trace()
             error_header = self._error_header(e) + '\n'
             expected_pos = self._find_space_after_previous_token(e.found_pos)
             error_screen = ErrorScreen(self.finput, expected_pos[0],
@@ -112,14 +111,18 @@ class ErrorHandler:
                 line = overwrite(line, ' ' * (len(line) - col), col)
             elif line[col - 1] == '*' and line[col] == '/':
                 col_to = col
-                # TODO: what if col:-1?
                 col -= 2
                 while col > 0:
                     if line[col - 1] == '/' and line[col] == '*':
                         col -= 1
-                        line = overwrite(line, ' ' * (col_to - col - 1), col)
+                        line = overwrite(line, ' ' * (col_to - col + 1), col)
                         break
                     col -= 1
+                else:
+                    line = overwrite(line, ' ' * (col_to + 1), 0)
+            elif line[col - 1] == '/' and line[col] == '*':
+                col_from = col - 1
+                line = overwrite(line, ' ' * (len(line) - col_from), col_from)
             col -= 1
         return line
 
@@ -160,7 +163,7 @@ class ErrorScreen:
         self.context_below = finput[row_to + 1:row_to + 1 +
                                     global_vars.args.sight]
 
-        self.not_emtpy_marked = []
+        self.marked_lines = []
         self.row_from = row_from
         self.row_to = row_to
 
@@ -170,21 +173,25 @@ class ErrorScreen:
                                                  '^', pos[1])
         self.screen[3 * rel_row + 2] = overwrite(self.screen[3 * rel_row + 2],
                                                  word, pos[1])
-        self.not_emtpy_marked += [3 * rel_row + 1]
+        self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
     def mark(self, pos, length):
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
                                                  '~' * length, pos[1])
         # mark line to
-        self.not_emtpy_marked += [3 * rel_row + 1]
+        self.marked_lines += [3 * rel_row + 1]
 
     def filter(self, ):
         # -2 da man idx's bei 0 anfängen und man zwischen 0 und 2 usw. sein will
-        for i in range(len(self.screen) - 2, 0, -3):
-            if i not in self.not_emtpy_marked:
-                del self.screen[i + 1]
-                del self.screen[i]
+        for i in set(range(0,
+                           len(self.screen) - 1)) - set(
+                               range(0, len(self.screen), 3)) - set(
+                                   self.marked_lines):
+            del self.screen[i]
+
+    def undo(self, ):
+        ...
 
     def __repr__(self, ):
         acc = ""

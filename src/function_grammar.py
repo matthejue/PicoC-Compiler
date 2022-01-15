@@ -24,8 +24,8 @@ class FunctionGrammar(StatementGrammar):
             raise Errors.NotImplementedYetError('functions that are not main')
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError('function name', token.value,
-                                               token.position)
+            raise Errors.NoApplicableRuleError('function identifier',
+                                               token.value, token.position)
 
     def _main_function(self, ):
         """main function

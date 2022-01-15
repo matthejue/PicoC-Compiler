@@ -1,0 +1,1 @@
+(./tests/error_too_large_literal_int_at_allocation.picoc (void main ((int var) = 2147483648)))

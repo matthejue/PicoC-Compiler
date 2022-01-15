@@ -1,0 +1,10 @@
+void main() {
+  int char
+  // stupid comment
+  /* another unneccessary comment
+     that spreads over multiple
+     line */
+  // the last comment will be
+  // particularly annoying to debug
+  int var = 12;
+}
