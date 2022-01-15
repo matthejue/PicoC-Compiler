@@ -1,0 +1,6 @@
+# File ./tests/empty_main.picoc Start
+# Main Funktion (void main ) Start
+LOADI SP 200;
+JUMP 0;
+# Main Funktion (void main ) Ende
+# File ./tests/empty_main.picoc Ende

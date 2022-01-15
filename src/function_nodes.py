@@ -27,8 +27,6 @@ class MainFunction(ASTNode):
             f"# Main Funktion ({self.prim_dt} {self.function_name} "
             f"{branch}{dot_more}) Start\n", 0)
 
-        self._pretty_comments()
-
         self._adapt_code()
 
         self.code_generator.add_code(self.start, self.start_loc)
@@ -41,11 +39,6 @@ class MainFunction(ASTNode):
         self.code_generator.add_code(
             f"# Main Funktion ({self.prim_dt} {self.function_name} "
             f"{branch}{dot_more}) Ende\n", 0)
-
-    def _pretty_comments(self, ):
-        self.end = self.code_generator.replace_code_pre(
-            self.end, "af",
-            str(self.branch[0]) + " ... ")
 
     def _adapt_code(self, ):
         self.start = self.code_generator.replace_code_pre(

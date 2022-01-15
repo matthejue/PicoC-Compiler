@@ -129,13 +129,3 @@ class DoWhile(ASTNode):
             self.condition_check, "(codelength(af) + codelength(l) + 2) + 2",
             str(self.code_generator.loc -
                 self.code_generator.get_marker_loc() + 2))
-
-    #  def __repr__(self):
-    #      """do while loops should be called 'do while' and not 'do'
-    #      """
-    #      acc = "(do"
-    #
-    #      for child in self.children[:-1]:
-    #          acc += f" {child}"
-    #
-    #      return acc + f" while {self.children[-1]}" + ")"

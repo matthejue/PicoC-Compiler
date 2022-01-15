@@ -205,6 +205,3 @@ class ToBool(ASTNode):
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
             self.end, "e1", str(self.arithmetic_expression))
-
-    #  def __repr__(self, ):
-    #      return f"(to_bool {self.children[0]})"

@@ -32,16 +32,11 @@ def main():
     cli_args_parser.add_argument("infile",
                                  nargs='?',
                                  help="input file with pico-c code")
-    cli_args_parser.add_argument('-p',
-                                 '--print',
-                                 action='store_true',
-                                 help="print all file outputs to the terminal")
     cli_args_parser.add_argument(
         '-c',
-        '--concrete-syntax',
+        '--concrete_syntax',
         action='store_true',
-        help="also print the concrete syntax(=content of input file)."
-        "The --print option must be active")
+        help="also print the concrete syntax (= content of input file).")
     cli_args_parser.add_argument('-t',
                                  '--tokens',
                                  action='store_true',
@@ -51,23 +46,20 @@ def main():
                                  action='store_true',
                                  help="also write the abstract syntax")
     cli_args_parser.add_argument(
-        '-S',
+        '-s',
         '--symbol_table',
         action='store_true',
         help="also write the final symbol table into a CSV file")
+    cli_args_parser.add_argument('-p',
+                                 '--print',
+                                 action='store_true',
+                                 help="print all file outputs to the terminal")
     cli_args_parser.add_argument(
-        '-s',
-        '--start_data_segment',
+        '-b',
+        '--begin_data_segment',
         help="where the datasegment starts (default 100)",
         type=int,
         default=100)
-    cli_args_parser.add_argument(
-        '-d',
-        '--distance',
-        help="distance of the comments from the instructions for the --verbose"
-        "option. The passed value gets added to the minimum distance of 2 spaces",
-        type=int,
-        default=0)
     cli_args_parser.add_argument(
         '-e',
         '--end_data_segment',
@@ -76,13 +68,25 @@ def main():
         type=int,
         default=200)
     cli_args_parser.add_argument(
+        '-d',
+        '--distance',
+        help="distance of the comments from the instructions for the --verbose"
+        "option. The passed value gets added to the minimum distance of 2 spaces",
+        type=int,
+        default=0)
+    cli_args_parser.add_argument('-S',
+                                 '--sight',
+                                 help="sets the number of lines visible around"
+                                 " a error message",
+                                 type=int,
+                                 default=0)
+    cli_args_parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
         help="also show tokentype and position for tokens, write the nodetype "
         "in front of parenthesis in the abstract syntax tree, add comments to "
-        "the RETI Code and show more context around error messages "
-        "[NOT IMPLEMENTED YET]")
+        "the RETI Code")
     cli_args_parser.add_argument(
         '-O',
         '--optimization-level',
@@ -93,16 +97,6 @@ def main():
         "2=partially interpret expressions) [NOT IMPLEMENTED YET]",
         type=int,
         default=0)
-    cli_args_parser.add_argument(
-        '-b',
-        '--binary',
-        action='store_true',
-        help="produce binary encoded RETI code [NOT IMPLEMENTED YET]")
-    cli_args_parser.add_argument(
-        '-m',
-        '--python_stracktrace_error_message',
-        action='store_true',
-        help="also show python error messages with stacktrace")
     global_vars.args = cli_args_parser.parse_args()
 
     if not global_vars.args.infile:
@@ -114,9 +108,9 @@ def main():
     try:
         _read_and_write_file(infile, outbase)
     except FileNotFoundError:
-        print("File does not exist")
+        print("File does not exist\n")
     else:
-        print("Compiled successfully")
+        print("Compiled successfully\n")
 
 
 def _shell():
@@ -152,9 +146,9 @@ def _read_and_write_file(infile, outbase):
 def _compile(code, infile, outbase=None):
     # remove all empty lines and \n from the code lines in the list
     code_without_cr = [infile + " "] + list(
-        filter(lambda line: line, map(lambda line: line.strip(), code)))
+        filter(lambda line: line, map(lambda line: line.strip('\n'), code)))
 
-    if global_vars.args.concrete_syntax and global_vars.args.print:
+    if global_vars.args.concrete_syntax:
         print(code_without_cr)
 
     lexer = Lexer(code_without_cr)
@@ -163,8 +157,7 @@ def _compile(code, infile, outbase=None):
     error_handler = ErrorHandler(infile, code_without_cr)
 
     if global_vars.args.tokens:
-        # TODO: stopped here
-        error_handler.handle(_tokens_option(lexer, outbase))
+        error_handler.handle(_tokens_option, lexer, outbase)
         lexer.__init__(code_without_cr)
 
     # Generate ast
@@ -198,7 +191,7 @@ def _tokens_option(lexer, outbase):
             fout.write(str(tokens))
 
 
-def _abstract_syntax_option(grammar, outbase):
+def _abstract_syntax_option(grammar: Grammar, outbase):
     if global_vars.args.print:
         print('\n' + str(grammar.reveal_ast()))
 
