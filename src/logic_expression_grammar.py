@@ -142,7 +142,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """
         if self.LTT(1) == TT.NOT:
             self._not_expr()
-        elif self.LTT(1) in [TT.NUMBER, TT.CHARACTER, TT.NAME, TT.L_PAREN]:
+        elif self.LTT(1) in [
+                TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER, TT.L_PAREN
+        ]:
             self._parenthized_logic_expression_or_arithmetic_term_or_comparison(
             )
         else:
@@ -190,7 +192,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
                 errors)
 
     def _taste_consume_parenthesized_logic_expression(self, ):
-        self._taste_consume_parenthesized_logic_expression()
+        self._parenthesized_logic_expression()
         if self.LTT(1) in chain(self.BINOP_PREC_2, self.BINOP_PREC_1,
                                 self.COMP_REL.keys()):
             raise Errors.TastingError()

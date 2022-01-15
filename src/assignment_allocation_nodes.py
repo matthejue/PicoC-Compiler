@@ -2,7 +2,7 @@ from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from dummy_nodes import NT
-from arithmetic_nodes import Identifier, Number, Character
+from arithmetic_nodes import Variable_Constant_Identifier, Number, Character
 import global_vars
 
 
@@ -42,7 +42,7 @@ class Assignment(ASTNode):
         except KeyError:
             # repackage the error
             match self.location:
-                case Identifier(value, position):
+                case Variable_Constant_Identifier(value, position):
                     raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(
@@ -63,22 +63,22 @@ class Assignment(ASTNode):
 
     def _assignment(self, ):
         match self:
-            case Assignment(Allocation(NT.Const(), _, Identifier(name)), assignment):
+            case Assignment(Allocation(NT.Const(), _, Variable_Constant_Identifier(name)), assignment):
                 match assignment:
                     case (Number(value) | Character(value)):
                         self.symbol_table.resolve(name).value = value
                         self._comment_for_constant(name, value)
-                    case Identifier(value):
+                    case Variable_Constant_Identifier(value):
                         self.symbol_table.resolve(
                             name).value = self.symbol_table.resolve(value).value
                         self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
-            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
+            case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), Assignment(_, _)):
                 self.expression.visit()
 
                 self._adapt_code(name)
             # assigment that assigns a variable to a expression
-            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), _):
+            case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), _):
                 self.expression.visit()
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
@@ -133,12 +133,12 @@ class Allocation(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
                 self._pretty_comments("Konstante", name, dtype)
-            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(variable)

@@ -20,9 +20,11 @@ class FunctionGrammar(StatementGrammar):
     def _function(self, ):
         if self.LTT(2) == TT.MAIN:
             self._main_function()
+        elif self.LTT(2) == TT.IDENTIFIER:
+            raise Errors.NotImplementedYetError('functions that are not main')
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError('main function', token.value,
+            raise Errors.NoApplicableRuleError('function name', token.value,
                                                token.position)
 
     def _main_function(self, ):
@@ -35,7 +37,7 @@ class FunctionGrammar(StatementGrammar):
 
         self.add_and_consume(mapping=self.PRIM_DT)
 
-        self.add_and_match([TT.MAIN], NT.Main)
+        self.add_and_match([TT.MAIN], NT.FunctionIdentifier)
 
         self.match([TT.L_PAREN])
 

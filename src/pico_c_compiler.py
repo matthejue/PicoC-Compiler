@@ -108,9 +108,9 @@ def main():
     try:
         _read_and_write_file(infile, outbase)
     except FileNotFoundError:
-        print("File does not exist")
+        print("File does not exist\n")
     else:
-        print("Compiled successfully")
+        print("Compiled successfully\n")
 
 
 def _shell():
@@ -146,7 +146,7 @@ def _read_and_write_file(infile, outbase):
 def _compile(code, infile, outbase=None):
     # remove all empty lines and \n from the code lines in the list
     code_without_cr = [infile + " "] + list(
-        filter(lambda line: line, map(lambda line: line.strip(), code)))
+        filter(lambda line: line, map(lambda line: line.strip('\n'), code)))
 
     if global_vars.args.concrete_syntax:
         print(code_without_cr)

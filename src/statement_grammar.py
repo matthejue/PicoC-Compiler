@@ -12,8 +12,8 @@ class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,
     """The statement sequence part of the context free grammar of the piocC
     language"""
 
-    ASSIGNMENT_ALLOCATION = list(
-        AssignmentAllocationGrammar.PRIM_DT.keys()) + [TT.CONST, TT.NAME]
+    ASSIGNMENT_ALLOCATION = list(AssignmentAllocationGrammar.PRIM_DT.keys()
+                                 ) + [TT.CONST, TT.IDENTIFIER]
     LOOP = [TT.WHILE, TT.DO]
     STATEMENT = [TT.IF, TT.SEMICOLON] + ASSIGNMENT_ALLOCATION + LOOP
 
@@ -34,10 +34,9 @@ class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,
 
         """
         while True:
-            self._s()
-
             if self.LTT(1) == TT.R_BRACE:
                 break
+            self._s()
 
     def _s(self):
         """statement

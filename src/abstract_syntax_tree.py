@@ -45,6 +45,7 @@ class ASTNode:
 
         acc = ""
 
+        # TODO: warum hat do_while_empty keinen node?
         if global_vars.args.verbose and global_vars.show_node:
             acc += self.__class__.__name__
 

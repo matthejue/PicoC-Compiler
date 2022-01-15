@@ -1,0 +1,3 @@
+void main() {
+  do {} while('c');
+}

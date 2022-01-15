@@ -1,0 +1,22 @@
+# File ./tests/empty_do_while.picoc Start
+# Main Funktion (void main DoWhile(ToBool(99))) Start
+LOADI SP 200;
+# Do While DoWhile( ToBool(99)) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(99) Start
+# Arithmetischer Operand 99 Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOADI ACC 99;                                                      # Wert von 99 in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 99 Ende
+LOADIN SP ACC 1;                                                   # Wert von 99 in ACC laden
+JUMP== 3;                                                          # Überspringe 2 Befehle, wenn 99 den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                                                  # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(99) Ende
+LOADIN SP ACC 1;                                                   # Wert von l1 in ACC laden
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+JUMP!= -(codelength(af) + codelength(l) + 2);                      # zurück zur Ausführung der Statements
+# Do While DoWhile( ToBool(99)) Ende
+JUMP 0;
+# Main Funktion (void main DoWhile(ToBool(99))) Ende
+# File ./tests/empty_do_while.picoc Ende

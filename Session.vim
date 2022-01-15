@@ -10,10 +10,33 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-$argadd ~/Documents/Studium/pico_c_compiler/.misc/test.cpp
-edit ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
+edit error_handler.py
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+wincmd _ | wincmd |
+vsplit
+2wincmd h
+wincmd w
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 30 + 87) / 174)
+exe 'vert 2resize ' . ((&columns * 112 + 87) / 174)
+exe 'vert 3resize ' . ((&columns * 30 + 87) / 174)
 argglobal
-balt ~/Documents/Studium/pico_c_compiler/NERD_tree_8
+enew
+file __Tagbar__.1
+balt error_handler.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -22,66 +45,53 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
+wincmd w
+argglobal
+balt lexer.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 18) / 37)
+let s:l = 179 - ((26 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 0
+keepjumps 179
+normal! 022|
+wincmd w
+argglobal
+enew
+file NERD_tree_10
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+2wincmd w
+exe 'vert 1resize ' . ((&columns * 30 + 87) / 174)
+exe 'vert 2resize ' . ((&columns * 112 + 87) / 174)
+exe 'vert 3resize ' . ((&columns * 30 + 87) / 174)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +0 ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
-badd +1 ~/Documents/Studium/pico_c_compiler/.misc/test.cpp
-badd +1 ~/Documents/Studium/pico_c_compiler/NERD_tree_8
-badd +13 ~/Documents/Studium/pico_c_compiler/src/grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/file_grammar.py
-badd +1 ~/Documents/Studium/pico_c_compiler/assignment_allocation_grammar.py
-badd +6 ~/Documents/Studium/pico_c_compiler/src/dummy_nodes.py
-badd +1 ~/Documents/Studium/pico_c_compiler/file_nodes.py
-badd +153 ~/Documents/Studium/pico_c_compiler/src/parser_.py
-badd +7 ~/Documents/Studium/pico_c_compiler/src/statement_grammar.py
-badd +45 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-badd +128 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
-badd +22 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
-badd +43 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
-badd +4 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
-badd +64 ~/Documents/Studium/pico_c_compiler/src/ast_builder.py
-badd +105 ~/Documents/Studium/pico_c_compiler/src/code_generator.py
-badd +7 ~/Documents/Studium/pico_c_compiler/src/function_grammar.py
-badd +58 ~/Documents/Studium/pico_c_compiler/src/if_else_grammar.py
-badd +121 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
-badd +34 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
-badd +199 ~/Documents/Studium/pico_c_compiler/src/logic_nodes.py
-badd +9 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
-badd +121 ~/Documents/Studium/pico_c_compiler/src/loop_nodes.py
-badd +191 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
-badd +112 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
-badd +45 ~/Documents/Studium/pico_c_compiler/.misc/lexer_2
-badd +5 ~/Documents/Studium/pico_c_compiler/src/file_nodes.py
-badd +804 ~/Documents/Studium/pico_c_compiler/tags
-badd +1 ~/Documents/Studium/pico_c_compiler/.misc/python_match_args_example.py
-badd +46 ~/Documents/Studium/pico_c_compiler/src/function_nodes.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/global_vars.py
-badd +127 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-badd +2 ~/Documents/Studium/pico_c_compiler/test/code_generator_test.py
-badd +1 ~/Documents/Studium/pico_c_compiler/test/error_message_test.py
-badd +1 ~/Documents/Studium/pico_c_compiler/test/execution_test.py
-badd +1 ~/Documents/Studium/pico_c_compiler/test/lexer_test.py
-badd +4 ~/Documents/Studium/pico_c_compiler/test/parser_test.py
-badd +13 ~/Documents/Studium/pico_c_compiler/test/testing_helpers.py
-badd +39 ~/Documents/Studium/pico_c_compiler/README.md
-badd +1 ~/Documents/Studium/pico_c_compiler/.misc/pico_c_compiler
-badd +232 ~/.SpaceVim.d/init.toml
-badd +20 /tmp/tmp.YF6D7eD13D
-badd +8 ~/Documents/Studium/pico_c_compiler/input.picoc
-badd +11 ~/Documents/Studium/pico_c_compiler/src/file_grammar.py
+badd +116 ~/Documents/Studium/pico_c_compiler/src/error_handler.py
+badd +63 ~/Documents/Studium/pico_c_compiler/src/lexer.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20 shortmess=filnxcsAoOaFTt
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

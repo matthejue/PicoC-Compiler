@@ -38,7 +38,8 @@ class Errors:
     class MismatchedTokenError(Exception):
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, expected, found, found_pos):
-            self.description = f"MismatchedTokenError: Expected '{expected}'"\
+            # there can be several expected and these already have single quotes
+            self.description = f"MismatchedTokenError: Expected {expected}"\
                 f", found '{found}'"
             super().__init__(self.description)
             self.expected = expected
@@ -50,6 +51,9 @@ class Errors:
         Token appears that can only be part of the other tasting choice"""
         def __init__(self, ):
             super().__init__("This error should never be visible")
+            self.expected = None
+            self.found = None
+            self.found_pos = None
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
@@ -78,6 +82,16 @@ class Errors:
         def __init__(self, fname):
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file {fname}"
+            super().__init__(self.description)
+            self.expected = None
+            self.found = None
+            self.found_pos = None
+
+    class NotImplementedYetError(Exception):
+        """Feature that isn't implemented yet"""
+        def __init__(self, feature_description):
+            self.description = "NotImplementedYet: The feature of using "\
+                f"{feature_description} is not implemented yet"
             super().__init__(self.description)
             self.expected = None
             self.found = None

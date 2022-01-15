@@ -75,7 +75,10 @@ class NT:
     #  class LNot(ASTNode):
     #  pass
 
-    class Main(ASTNode):
+    #  class Main(ASTNode):
+    #      pass
+
+    class FunctionIdentifier(ASTNode):
         pass
 
     class Filename(ASTNode):

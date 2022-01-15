@@ -60,7 +60,7 @@ class TT(Enum):
     VOID = "void"
     NUMBER = "number"
     CHARACTER = "character"
-    NAME = "name"
+    IDENTIFIER = "identifier"
     IF = "if"
     ELSE = "else"
     WHILE = "while"
@@ -106,7 +106,7 @@ class Lexer:
     is used instead of self.match()
     """
 
-    EOF_CHAR = "EOF"
+    EOF_CHAR = 'EOF'
     DIGIT_WITHOUT_ZERO = "123456789"
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
@@ -117,7 +117,7 @@ class Lexer:
         :lc: lookahead character
         :c: character
         """
-        self.input = finput
+        self.finput = finput
         self.lc_col = 0
         self.lc_row = 0
         self.lc = finput[self.lc_row][self.lc_col]
@@ -165,7 +165,7 @@ class Lexer:
                 if STRING_TO_TT_WORDS.get(symbol):
                     return Token(STRING_TO_TT_WORDS[symbol], symbol,
                                  self.position)
-                return Token(TT.NAME, symbol, self.position)
+                return Token(TT.IDENTIFIER, symbol, self.position)
             elif self.lc in self.DIGIT_WITH_ZERO:
                 # number
                 # :grammar: 0|(<digit_without_zero><digit_with_zero>*)
@@ -203,7 +203,7 @@ class Lexer:
                 # :grammar: /(/|(<star>.*<start>/))?
                 self.next_char()
                 if self.lc == '/':
-                    self.lc_col = len(self.input[self.lc_row]) - 1
+                    self.lc_col = len(self.finput[self.lc_row]) - 1
                     self.next_char()
                 elif self.lc == '*':
                     while not (self.lc == '/' and self.c == '*'
@@ -222,26 +222,23 @@ class Lexer:
         :returns: None
         """
         # next column or next row
-        if self.lc_col < len(self.input[self.lc_row]) - 1:
+        if self.lc_col < len(self.finput[self.lc_row]) - 1:
             self.lc_col += 1
-        elif (self.lc_col == len(self.input[self.lc_row]) - 1
-              and self.lc_row < len(self.input) - 1):
+        elif (self.lc_col == len(self.finput[self.lc_row]) - 1
+              and self.lc_row < len(self.finput) - 1):
             self.lc_row += 1
             self.lc_col = 0
-        elif (self.lc_col == len(self.input[self.lc_row]) - 1
-              and self.lc_row == len(self.input)) - 1:
+        elif (self.lc_col == len(self.finput[self.lc_row]) - 1
+              and self.lc_row == len(self.finput)) - 1:
             self.lc_col += 1
-        else:
-            pass
 
         # next character
-        if (self.lc_row == len(self.input) - 1
-                and self.lc_col == len(self.input[self.lc_row])):
-            self.c = self.lc
+        self.c = self.lc
+        if (self.lc_col == len(self.finput[self.lc_row])
+                and self.lc_row == len(self.finput) - 1):
             self.lc = self.EOF_CHAR
         else:
-            self.c = self.lc
-            self.lc = self.input[self.lc_row][self.lc_col]
+            self.lc = self.finput[self.lc_row][self.lc_col]
 
     def __repr__(self, ):
-        return str(self.input)
+        return str(self.finput)

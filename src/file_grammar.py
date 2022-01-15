@@ -11,7 +11,7 @@ class FileGrammar(FunctionGrammar):
     def _file(self, ):
         savestate_node = self.ast_builder.down(File)
 
-        self.add_and_match([TT.NAME], NT.Filename)
+        self.add_and_match([TT.IDENTIFIER], NT.Filename)
 
         while self.LTT(1) in self.PRIM_DT.keys():
             self.code_fu()

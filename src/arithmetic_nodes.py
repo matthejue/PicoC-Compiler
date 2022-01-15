@@ -29,7 +29,7 @@ class ArithmeticOperand(ASTNode):
         except KeyError:
             # repackage the error
             match self:
-                case Identifier(value, position):
+                case Variable_Constant_Identifier(value, position):
                     raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(self.end, self.all_loc)
@@ -39,7 +39,7 @@ class ArithmeticOperand(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case Identifier(value):
+            case Variable_Constant_Identifier(value):
                 symbol = self.symbol_table.resolve(value)
                 match symbol:
                     case VariableSymbol(value):
@@ -69,7 +69,7 @@ class ArithmeticOperand(ASTNode):
         return code
 
 
-class Identifier(ArithmeticOperand):
+class Variable_Constant_Identifier(ArithmeticOperand):
     pass
 
 
