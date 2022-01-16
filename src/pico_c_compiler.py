@@ -14,6 +14,8 @@ def main():
     description = """
     Compiles Pico-C Code into RETI Code.
     PicoC is a subset of C including while loops, if and else statements,
+
+
     assignments, arithmetic and logic expressions.
     Please keep in mind that all statements have to be enclosed in a
 
@@ -221,9 +223,9 @@ def _write_symbol_table(outbase):
     symbols = SymbolTable().symbols
     for name in symbols.keys():
         position = f"({symbols[name].position[0]}:{symbols[name].position[1]})"\
-            if symbols[name].position else None
+            if symbols[name].position != 'None' else str(None)
         range_from_to = f"({symbols[name].range_from_to[0]}:{symbols[name].range_from_to[1]})" if symbols[
-            name].range_from_to else None
+            name].range_from_to != 'None' else str(None)
         output += f"{name},"\
             f"{symbols[name].get_type()},"\
             f"{symbols[name].datatype},"\

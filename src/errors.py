@@ -10,7 +10,6 @@ class Errors:
             self.description = f"InvalidCharacterError: '{found}' is not a "\
                 "permitted character"
             super().__init__(self.description)
-            self.expected = None
             self.found = found
             self.found_pos = found_pos
 
@@ -51,31 +50,38 @@ class Errors:
         Token appears that can only be part of the other tasting choice"""
         def __init__(self, ):
             super().__init__("This error should never be visible")
-            self.expected = None
-            self.found = None
-            self.found_pos = None
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
-        def __init__(self, identifier, identifier_pos):
+        def __init__(self, found, found_pos):
             self.description = "UnknownIdentifierError: Identifier "\
-                f"'{identifier}' wasn't declared yet"
+                f"'{found}' wasn't declared yet"
             super().__init__(self.description)
-            self.expected = None
-            self.found = identifier
-            self.found_pos = identifier_pos
+            self.found = found
+            self.found_pos = found_pos
 
     class TooLargeLiteralError(Exception):
         """If theu literal assigned to a variable is too large for the datatype of
         the variable"""
-        def __init__(self, identifier, assignment, assignment_pos):
-            dtype = SymbolTable().resolve(identifier).datatype
+        def __init__(self, variable, variable_pos, variable_type, assignment,
+                     assignment_pos):
             self.description = f"TooLargeLiteralError: Literal {assignment} "\
-                f"assigned to variable {identifier} of type {dtype} is too large"
+                f"assigned to variable {variable} of type {variable_type} is too large"
             super().__init__(self.description)
-            self.expected = None
+            self.variable = variable
+            self.variable_pos = variable_pos
+            self.variable_type = variable_type
             self.found = assignment
             self.found_pos = assignment_pos
+
+    class RedefinitionError(Exception):
+        def __init__(self, found, found_pos, first, first_pos):
+            self.description = f"RedefinitionError: Redefinition of {found}"
+            super().__init__(self.description)
+            self.found = found
+            self.found_pos = found_pos
+            self.first = first
+            self.first_pos = first_pos
 
     class NoMainFunctionError(Exception):
         """If there's no main function within the given file"""
@@ -83,9 +89,6 @@ class Errors:
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file {fname}"
             super().__init__(self.description)
-            self.expected = None
-            self.found = None
-            self.found_pos = None
 
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
@@ -93,6 +96,3 @@ class Errors:
             self.description = "NotImplementedYet: The feature of using "\
                 f"{feature_description} is not implemented yet"
             super().__init__(self.description)
-            self.expected = None
-            self.found = None
-            self.found_pos = None

@@ -2,13 +2,13 @@
 # Main Funktion (void main (int var) ... ) Start
 LOADI SP 200;
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Allokation (int dom) Start
-# Variable dom vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Variable dom vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int dom) Ende
 # Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
+# Variable cars vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
 # Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Start
 # Logische binäre Verknüpfung (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Start
@@ -23,7 +23,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetische binäre Operation (dom - 1) Start
 # Arithmetischer Operand dom Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von dom in ACC laden
+LOAD ACC None;                         # Wert von dom in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand dom Ende
 # Arithmetischer Operand 1 Start
@@ -66,7 +66,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 42 Ende
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von cars in ACC laden
+LOAD ACC None;                         # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 LOADIN SP ACC 2;                       # Wert von 42 in ACC laden
@@ -88,7 +88,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (cars == 0) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von cars in ACC laden
+LOAD ACC None;                         # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 # Arithmetischer Operand 0 Start
@@ -114,7 +114,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Ende
 LOADIN SP ACC 1;                       # Wert von (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) in Variable var speichern
+STORE ACC None;                        # Wert von (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) in Variable var speichern
 # Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Ende
 JUMP 0;
 # Main Funktion (void main (int var) ... ) Ende

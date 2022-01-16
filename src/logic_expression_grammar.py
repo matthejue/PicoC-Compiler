@@ -26,7 +26,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         logic expression
 
         :grammar: #2 <code_ae> (<comp_op> #2 <code_le>)?
-        :returns: None
         """
         # it's important that arithmetic grammar is before logic grammar,
         # because both arithmetic and logic grammar have single numbers. In
@@ -43,7 +42,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
     def _handle_all_tastes_unsuccessful(self, expected, errors):
         # if both threw the same error print that error out
-        if errors[0].expected == errors[1].expected:
+        if errors[0].found == errors[1].found:
             raise errors[0]
         else:
             token = self.LT(1)
@@ -54,7 +53,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """taste whether the next expression is a arithmetic expression
 
         :grammar: <code_ae>
-        :returns: None
         """
         self.code_ae()
         if self.LTT(1) in chain(self.COMP_REL.keys(), self.LOG_CON.keys()):
@@ -64,7 +62,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """logic expression startpoint
 
         :grammar: <or_expr>
-        :returns: None
         """
         self._or_expr()
 
@@ -72,7 +69,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """or expression
 
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
-        :returns: None
         """
         self.ast_builder.save("_or_expr")
 
@@ -105,7 +101,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """and expression
 
         :grammar: #2 <lo> (and #2 <lo>)*
-        :returns: None
         """
         self.ast_builder.save("_and_expr")
 
@@ -138,7 +133,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """logic operand
 
         :grammar: <not_expr>
-        :returns: None
         """
         if self.LTT(1) == TT.NOT:
             self._not_expr()
@@ -156,7 +150,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """not expression
 
         :grammar: !+ <code_le>
-        :returns: None
         """
         savestate_node = self.ast_builder.down(Not)
 
@@ -176,7 +169,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """atomic formula or top / bottom
 
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
-        :returns: None
         """
         errors = []
         if self.taste(self._taste_consume_parenthesized_logic_expression,
@@ -201,7 +193,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """logic parenthesis
 
         :grammar: ( <code_le> )
-        :returns: None
         """
         self.consume_next_token()  # [TT.L_PAREN]
         self.code_le()
@@ -217,7 +208,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """top / bottom
 
         :grammar: #1 <code_ae>
-        :returns: None
         """
         savestate_node = self.ast_builder.down(ToBool)
 
@@ -229,7 +219,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         """atomic formula
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>
-        :returns: None
         """
         savestate_node = self.ast_builder.down(Atom)
 

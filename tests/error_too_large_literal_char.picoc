@@ -1,4 +1,3 @@
 void main() {
-  char var = 127;
-  var = 128;
+  const char var = 128;
 }

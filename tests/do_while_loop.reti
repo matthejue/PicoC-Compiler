@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((int x) = 1) Start
 # Allokation (int x) Start
-# Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable x vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int x) Ende
 # Arithmetischer Operand 1 Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
@@ -12,17 +12,17 @@ STOREIN SP ACC 1;                                                  # Wert in obe
 # Arithmetischer Operand 1 Ende
 LOADIN SP ACC 1;                                                   # Wert von 1 in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 100;                                                     # Wert von 1 in Variable (int x) speichern
+STORE ACC None;                                                    # Wert von 1 in Variable (int x) speichern
 # Zuweisung ((int x) = 1) Ende
 # Allokation (char y) Start
-# Variable y vom Typ char mit Adresse 101 zur Symboltabelle hinzugefügt
+# Variable y vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (char y) Ende
 # Do While DoWhile((y = (x + 1)) (y < 10)) Start
 # Zuweisung (y = (x + 1)) Start
 # Arithmetische binäre Operation (x + 1) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von x in ACC laden
+LOAD ACC None;                                                     # Wert von x in ACC laden
 STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand x Ende
 # Arithmetischer Operand 1 Start
@@ -38,12 +38,12 @@ ADDI SP 1;                                                         # Stack um ei
 # Arithmetische binäre Operation (x + 1) Ende
 LOADIN SP ACC 1;                                                   # Wert von (x + 1) in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 101;                                                     # Wert von (x + 1) in Variable y speichern
+STORE ACC None;                                                    # Wert von (x + 1) in Variable y speichern
 # Zuweisung (y = (x + 1)) Ende
 # Logisches Atom (y < 10) Start
 # Arithmetischer Operand y Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 101;                                                      # Wert von y in ACC laden
+LOAD ACC None;                                                     # Wert von y in ACC laden
 STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand y Ende
 # Arithmetischer Operand 10 Start

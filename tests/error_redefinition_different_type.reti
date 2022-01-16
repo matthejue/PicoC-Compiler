@@ -1,0 +1,32 @@
+# File ./tests/error_redefinition_different_type.picoc Start
+# Main Funktion (void main ((char var) = 122) ... ) Start
+LOADI SP 200;
+# Zuweisung ((char var) = 122) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Arithmetischer Operand 122 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 122;                         # Wert von 122 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 122 Ende
+LOADIN SP ACC 1;                       # Wert von 122 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC None;                        # Wert von 122 in Variable (char var) speichern
+# Zuweisung ((char var) = 122) Ende
+# Zuweisung ((int var) = 10) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Arithmetischer Operand 10 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 10;                          # Wert von 10 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 10 Ende
+LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC None;                        # Wert von 10 in Variable (int var) speichern
+# Zuweisung ((int var) = 10) Ende
+JUMP 0;
+# Main Funktion (void main ((char var) = 122) ... ) Ende
+# File ./tests/error_redefinition_different_type.picoc Ende

@@ -35,6 +35,7 @@ class ASTNode:
         pass
 
     def __repr__(self):
+        global_vars.show_node = True
         return self.to_string()
 
     def to_string(self, ):
@@ -45,7 +46,6 @@ class ASTNode:
 
         acc = ""
 
-        # TODO: warum hat do_while_empty keinen node?
         if global_vars.args.verbose and global_vars.show_node:
             acc += self.__class__.__name__
 

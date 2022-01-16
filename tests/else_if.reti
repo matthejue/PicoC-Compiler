@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((int var) = 97) Start
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Arithmetischer Operand 97 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,13 +12,13 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 97 Ende
 LOADIN SP ACC 1;                       # Wert von 97 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 97 in Variable (int var) speichern
+STORE ACC None;                        # Wert von 97 in Variable (int var) speichern
 # Zuweisung ((int var) = 97) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Start
 # Logisches Atom (var == 0) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
+LOAD ACC None;                         # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 0 Start
@@ -48,7 +48,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 100 Ende
 LOADIN SP ACC 1;                       # Wert von 100 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 100 in Variable var speichern
+STORE ACC None;                        # Wert von 100 in Variable var speichern
 # Zuweisung (var = 100) Ende
 JUMP 40;                               # Else-Branch überspringen
 # Else-Branch
@@ -56,7 +56,7 @@ JUMP 40;                               # Else-Branch überspringen
 # Logisches Atom (var == 10) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
+LOAD ACC None;                         # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 10 Start
@@ -86,7 +86,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 5 Ende
 LOADIN SP ACC 1;                       # Wert von 5 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 5 in Variable var speichern
+STORE ACC None;                        # Wert von 5 in Variable var speichern
 # Zuweisung (var = 5) Ende
 JUMP 15;                               # Else-Branch überspringen
 # Else-Branch
@@ -94,7 +94,7 @@ JUMP 15;                               # Else-Branch überspringen
 # Arithmetische binäre Operation (var + 1) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
+LOAD ACC None;                         # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 1 Start
@@ -110,7 +110,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (var + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (var + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (var + 1) in Variable var speichern
+STORE ACC None;                        # Wert von (var + 1) in Variable var speichern
 # Zuweisung (var = (var + 1)) Ende
 # If und Else Statement IfElse((var == 10) (var = 5) else (var = (var + 1))) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Ende

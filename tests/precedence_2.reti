@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((int var) = (8 + (4 - 2))) Start
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Arithmetische binäre Operation (8 + (4 - 2)) Start
 # Arithmetischer Operand 8 Start
@@ -36,7 +36,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (8 + (4 - 2)) Ende
 LOADIN SP ACC 1;                       # Wert von (8 + (4 - 2)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (8 + (4 - 2)) in Variable (int var) speichern
+STORE ACC None;                        # Wert von (8 + (4 - 2)) in Variable (int var) speichern
 # Zuweisung ((int var) = (8 + (4 - 2))) Ende
 JUMP 0;
 # Main Funktion (void main ((int var) = (8 + (4 - 2)))) Ende

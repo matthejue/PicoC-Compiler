@@ -2,16 +2,16 @@
 # Main Funktion (void main (int var) ... ) Start
 LOADI SP 200;
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 101 zur Symboltabelle hinzugefügt
+# Variable cars vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
 # If und Else Statement IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) Start
 # Logisches Atom (var == 0) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
+LOAD ACC None;                         # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 0 Start
@@ -41,7 +41,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 10 Ende
 LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von 10 in Variable cars speichern
+STORE ACC None;                        # Wert von 10 in Variable cars speichern
 # Zuweisung (cars = 10) Ende
 JUMP 15;                               # Else-Branch überspringen
 # Else-Branch
@@ -49,7 +49,7 @@ JUMP 15;                               # Else-Branch überspringen
 # Arithmetische binäre Operation (cars + 1) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von cars in ACC laden
+LOAD ACC None;                         # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 # Arithmetischer Operand 1 Start
@@ -65,14 +65,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (cars + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (cars + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (cars + 1) in Variable cars speichern
+STORE ACC None;                        # Wert von (cars + 1) in Variable cars speichern
 # Zuweisung (cars = (cars + 1)) Ende
 # If und Else Statement IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) Ende
 # If Statement If((cars == 10) (var = 42)) Start
 # Logisches Atom (cars == 10) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von cars in ACC laden
+LOAD ACC None;                         # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 # Arithmetischer Operand 10 Start
@@ -102,7 +102,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 42 Ende
 LOADIN SP ACC 1;                       # Wert von 42 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 42 in Variable var speichern
+STORE ACC None;                        # Wert von 42 in Variable var speichern
 # Zuweisung (var = 42) Ende
 # If Statement If((cars == 10) (var = 42)) Ende
 JUMP 0;

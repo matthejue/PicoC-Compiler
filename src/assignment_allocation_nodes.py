@@ -65,14 +65,15 @@ class Assignment(ASTNode):
         match self:
             case Assignment(Allocation(NT.Const(), _, Variable_Constant_Identifier(name)), assignment):
                 match assignment:
-                    case (Number(value) | Character(value)):
+                    case (Number(value, position) | Character(value, position)):
                         symbol = self.symbol_table.resolve(name)
-                        if symbol.datatype.range_from_to:
+                        self._error_check(symbol, name, value, position)
                         symbol.value = value
                         self._comment_for_constant(name, value)
-                    case Variable_Constant_Identifier(value):
-                        self.symbol_table.resolve(
-                            name).value = self.symbol_table.resolve(value).value
+                    case Variable_Constant_Identifier(value, position):
+                        symbol = self.symbol_table.resolve(name)
+                        self._error_check(symbol, name, value, position)
+                        symbol.value = self.symbol_table.resolve(value).value
                         self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
             case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), Assignment(_, _)):
@@ -92,6 +93,11 @@ class Assignment(ASTNode):
             self.assign_more, "var_address", self.symbol_table.resolve(name).value)
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
+
+    def _error_check(self, symbol, name, value, position):
+        if not (symbol.datatype.range_from_to[0] < int(value) < symbol.datatype.range_from_to[1]):
+            raise Errors.TooLargeLiteralError(
+                name, symbol.position, symbol.datatype, value, position)
 
     def __repr__(self):
         if len(self.children) == 2:
@@ -136,16 +142,24 @@ class Allocation(ASTNode):
     def _adapt_code(self, ):
         match self:
             case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
+                self._error_check(name, position)
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
                 self._pretty_comments("Konstante", name, dtype)
             case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
+                self._error_check(name, position)
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(variable)
                 address = self.symbol_table.allocate(variable)
                 self._pretty_comments("Variable", name, dtype, address)
+
+    def _error_check(self, found_name, found_pos):
+        if self.symbol_table.symbols.get(found_name):
+            first = self.symbol_table.symbols[found_name]
+            raise Errors.RedefinitionError(
+                found_name, found_pos, first.name, first.position)
 
     def __repr__(self, ):
         return self.alternative_to_string()

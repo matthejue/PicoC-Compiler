@@ -1,0 +1,1 @@
+(./tests/error_redefinition_same_type.picoc (void main ((char var) = 122) ((char var) = 97)))

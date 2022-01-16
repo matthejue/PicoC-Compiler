@@ -2,11 +2,11 @@
 # Main Funktion (void main (char cars) ... ) Start
 LOADI SP 200;
 # Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable cars vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
 # Zuweisung ((int var) = ((8 * cars) + 2)) Start
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Arithmetische binäre Operation ((8 * cars) + 2) Start
 # Arithmetische binäre Operation (8 * cars) Start
@@ -17,7 +17,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 8 Ende
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von cars in ACC laden
+LOAD ACC None;                         # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 LOADIN SP ACC 2;                       # Wert von 8 in ACC laden
@@ -39,7 +39,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation ((8 * cars) + 2) Ende
 LOADIN SP ACC 1;                       # Wert von ((8 * cars) + 2) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von ((8 * cars) + 2) in Variable (int var) speichern
+STORE ACC None;                        # Wert von ((8 * cars) + 2) in Variable (int var) speichern
 # Zuweisung ((int var) = ((8 * cars) + 2)) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

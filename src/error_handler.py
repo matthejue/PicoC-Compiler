@@ -19,7 +19,7 @@ class ErrorHandler:
         try:
             function(*args)
         except Errors.InvalidCharacterError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
@@ -27,7 +27,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
@@ -35,7 +35,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
@@ -43,7 +43,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             expected_pos = self._find_space_after_previous_token(e.found_pos)
             error_screen = ErrorScreen(self.finput, expected_pos[0],
                                        e.found_pos[0])
@@ -53,11 +53,11 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             print('\n' + error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
@@ -65,12 +65,28 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
-            error_header = self._error_header(e) + '\n'
+            error_header = self._error_header(e.found_pos, e.description)
+            error_screen = ErrorScreen(self.finput, e.variable_pos[0],
+                                       e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            error_screen.mark(e.variable_pos, len(e.variable))
+            error_screen.filter()
+            print('\n' + error_header + str(error_screen))
+            exit(0)
+        except Errors.RedefinitionError as e:
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
+            note_header = self._error_header(e.first_pos,
+                                             "Note: Already defined here:")
+            error_screen_2 = ErrorScreen(self.finput, e.first_pos[0],
+                                         e.first_pos[0])
+            error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            error_screen_2.filter()
+            print('\n' + error_header + str(error_screen) + note_header +
+                  str(error_screen_2))
             exit(0)
         except Errors.NoMainFunctionError as e:
             error_header = e.description + '\n'
@@ -81,9 +97,9 @@ class ErrorHandler:
             print('\n' + error_header)
             exit(0)
 
-    def _error_header(self, error):
-        return self.fname + ':' + str(error.found_pos[0]) + ':' + str(
-            error.found_pos[1]) + ': ' + error.description
+    def _error_header(self, pos, descirption):
+        return self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
+            descirption + '\n'
 
     def _find_space_after_previous_token(self, pos):
         row, col = pos[0], pos[1]
@@ -150,7 +166,7 @@ class ErrorHandler:
 class ErrorScreen:
     def __init__(self, finput, row_from, row_to):
         # because the filename gets pasted in the first line of file content
-        context_from = row_from - global_vars.args.sight if row_from -\
+        context_from=row_from - global_vars.args.sight if row_from -\
             global_vars.args.sight > 0 else 1
         self.context_above = finput[context_from:row_from]
 
@@ -178,16 +194,15 @@ class ErrorScreen:
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
                                                  '~' * length, pos[1])
-        # mark line to
         self.marked_lines += [3 * rel_row + 1]
 
     def filter(self, ):
-        # -2 da man idx's bei 0 anfängen und man zwischen 0 und 2 usw. sein will
+        # -2 da man idx's bei 0 anfängt und man zwischen 0 und 2 usw. sein will
         for i in set(range(0, len(self.screen))) - set(
                 range(0, len(self.screen), 3)) - set(self.marked_lines):
             del self.screen[i]
 
-    def undo(self, ):
+    def undo_removing_commments(self, ):
         ...
 
     def __repr__(self, ):

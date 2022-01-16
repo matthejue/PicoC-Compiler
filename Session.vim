@@ -3,69 +3,17 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium/pico_c_compiler
+cd ~/Documents/Studium/pico_c_compiler/src
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
 argglobal
 %argdel
-<<<<<<< HEAD
-edit ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
-let s:save_splitbelow = &splitbelow
-let s:save_splitright = &splitright
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-wincmd _ | wincmd |
-vsplit
-2wincmd h
-wincmd w
-wincmd w
-let &splitbelow = s:save_splitbelow
-let &splitright = s:save_splitright
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-exe 'vert 1resize ' . ((&columns * 30 + 86) / 173)
-exe 'vert 2resize ' . ((&columns * 111 + 86) / 173)
-exe 'vert 3resize ' . ((&columns * 30 + 86) / 173)
+$argadd pico_c_compiler.py
+edit logic_expression_grammar.py
 argglobal
-balt ~/Documents/Studium/pico_c_compiler/error_handler.py
-=======
-$argadd src/pico_c_compiler.py
-argglobal
-enew
-file NERD_tree_1
->>>>>>> 200dd1f8b57ccfae69bdd5439b9dae3d93800569
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-<<<<<<< HEAD
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 14 - ((13 * winheight(0) + 18) / 37)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 14
-normal! 0
-wincmd w
-argglobal
-if bufexists("error_handler.py") | buffer error_handler.py | else | edit error_handler.py | endif
-if &buftype ==# 'terminal'
-  silent file error_handler.py
-endif
-balt ~/Documents/Studium/pico_c_compiler/lexer.py
+balt errors.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -76,66 +24,25 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 179 - ((24 * winheight(0) + 18) / 37)
+let s:l = 119 - ((4 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 179
-normal! 022|
-wincmd w
-argglobal
-if bufexists("~/Documents/Studium/pico_c_compiler/NERD_tree_10") | buffer ~/Documents/Studium/pico_c_compiler/NERD_tree_10 | else | edit ~/Documents/Studium/pico_c_compiler/NERD_tree_10 | endif
-if &buftype ==# 'terminal'
-  silent file ~/Documents/Studium/pico_c_compiler/NERD_tree_10
-endif
-balt error_handler.py
-setlocal fdm=manual
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 18) / 37)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 1
+keepjumps 119
 normal! 0
-wincmd w
-2wincmd w
-exe 'vert 1resize ' . ((&columns * 30 + 86) / 173)
-exe 'vert 2resize ' . ((&columns * 111 + 86) / 173)
-exe 'vert 3resize ' . ((&columns * 30 + 86) / 173)
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +179 ~/Documents/Studium/pico_c_compiler/src/error_handler.py
-badd +0 ~/Documents/Studium/pico_c_compiler/__Tagbar__.1
-badd +0 ~/Documents/Studium/pico_c_compiler/error_handler.py
-badd +0 ~/Documents/Studium/pico_c_compiler/lexer.py
-badd +0 ~/Documents/Studium/pico_c_compiler/NERD_tree_10
-badd +63 ~/Documents/Studium/pico_c_compiler/src/lexer.py
-=======
-tabnext 1
-badd +55 src/pico_c_compiler.py
-badd +0 src/error_handler.py
-badd +1 errors.py
-badd +1 NERD_tree_2
-badd +9 ~/.SpaceVim.d/init.toml
-badd +616 ~/.config_stow/spacevim/.SpaceVim.d/autoload/myspacevim.vim
-badd +55 src/errors.py
-badd +12 src/file_grammar.py
-badd +1 src/file_node.py
-badd +23 src/function_grammar.py
-badd +26 src/function_nodes.py
-badd +44 src/statement_grammar.py
-badd +24 Makefile
-badd +6 run_tests.sh
-badd +19 ~/.SpaceVim/init.vim
->>>>>>> 200dd1f8b57ccfae69bdd5439b9dae3d93800569
+badd +163 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
+badd +88 ~/Documents/Studium/pico_c_compiler/src/errors.py
+badd +160 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
+badd +38 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
+badd +41 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
+badd +140 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
+badd +44 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
+badd +206 ~/Documents/Studium/pico_c_compiler/src/logic_nodes.py
+badd +56 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
+badd +38 ~/Documents/Studium/pico_c_compiler/src/loop_nodes.py
+badd +3 ~/Documents/Studium/pico_c_compiler/tests/error_redefinition_same_type.picoc
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

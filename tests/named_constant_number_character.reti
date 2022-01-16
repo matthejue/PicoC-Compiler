@@ -9,7 +9,7 @@ LOADI SP 200;
 # Zuweisung ((const char var) = 113) Ende
 # Zuweisung ((char x) = (var * (- (5 ^ (- 67))))) Start
 # Allokation (char x) Start
-# Variable x vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable x vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (char x) Ende
 # Arithmetische binäre Operation (var * (- (5 ^ (- 67)))) Start
 # Arithmetischer Operand var Start
@@ -54,7 +54,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (var * (- (5 ^ (- 67)))) Ende
 LOADIN SP ACC 1;                       # Wert von (var * (- (5 ^ (- 67)))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (var * (- (5 ^ (- 67)))) in Variable (char x) speichern
+STORE ACC None;                        # Wert von (var * (- (5 ^ (- 67)))) in Variable (char x) speichern
 # Zuweisung ((char x) = (var * (- (5 ^ (- 67))))) Ende
 JUMP 0;
 # Main Funktion (void main ((const char var) = 113) ... ) Ende

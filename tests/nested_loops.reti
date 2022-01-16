@@ -2,7 +2,7 @@
 # Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
-# Variable x vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Variable x vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int x) Ende
 # Zuweisung ((const char y) = 71) Start
 # Allokation (const char y) Start
@@ -12,7 +12,7 @@ LOADI SP 200;
 # Zuweisung ((const char y) = 71) Ende
 # Zuweisung ((int z) = y) Start
 # Allokation (int z) Start
-# Variable z vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Variable z vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
 # Allokation (int z) Ende
 # Arithmetischer Operand y Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -21,13 +21,13 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand y Ende
 LOADIN SP ACC 1;                       # Wert von y in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von y in Variable (int z) speichern
+STORE ACC None;                        # Wert von y in Variable (int z) speichern
 # Zuweisung ((int z) = y) Ende
 # While Statement While((x <= 42) While((y <= 42) (z = (x & y)))) Start
 # Logisches Atom (x <= 42) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von x in ACC laden
+LOAD ACC None;                         # Wert von x in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand x Ende
 # Arithmetischer Operand 42 Start
@@ -77,7 +77,7 @@ JUMP== 16;                             # Statements überspringen, wenn (y <= 42
 # Arithmetische binäre Operation (x & y) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von x in ACC laden
+LOAD ACC None;                         # Wert von x in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand x Ende
 # Arithmetischer Operand y Start
@@ -93,7 +93,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (x & y) Ende
 LOADIN SP ACC 1;                       # Wert von (x & y) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (x & y) in Variable z speichern
+STORE ACC None;                        # Wert von (x & y) in Variable z speichern
 # Zuweisung (z = (x & y)) Ende
 JUMP -32;                              # Zurück zur Auswertung von (y <= 42)
 # While Statement While((y <= 42) (z = (x & y))) Ende
