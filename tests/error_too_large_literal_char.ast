@@ -1,1 +1,0 @@
-(./tests/error_too_large_literal_char.picoc (void main ((const char var) = 128)))

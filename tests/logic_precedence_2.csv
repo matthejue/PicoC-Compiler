@@ -1,8 +1,8 @@
 name,type,datatype,position,value,range_from_to
-int,built in,None,None,None,(-2147483648:2147483647)
-char,built in,None,None,None,(-128:127)
-dom,variable,int,(1:18),None,None
-a,variable,int,(1:27),None,None
-b,variable,char,(1:35),None,None
-c,variable,char,(1:43),None,None
-var,variable,int,(1:50),None,None
+int,built in,-,-,-,(-2147483648:2147483647)
+char,built in,-,-,-,(-128:127)
+dom,variable,int,(1:18),100,-
+a,variable,int,(1:27),101,-
+b,variable,char,(1:35),102,-
+c,variable,char,(1:43),103,-
+var,variable,int,(1:50),104,-

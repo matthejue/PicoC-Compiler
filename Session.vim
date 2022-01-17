@@ -11,9 +11,9 @@ set shortmess=aoO
 argglobal
 %argdel
 $argadd pico_c_compiler.py
-edit logic_expression_grammar.py
+edit assignment_allocation_nodes.py
 argglobal
-balt errors.py
+balt symbol_table.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -24,25 +24,22 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 119 - ((4 * winheight(0) + 19) / 39)
+let s:l = 112 - ((29 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 119
-normal! 0
+keepjumps 112
+normal! 023|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +163 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
-badd +88 ~/Documents/Studium/pico_c_compiler/src/errors.py
-badd +160 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
-badd +38 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
-badd +41 ~/Documents/Studium/pico_c_compiler/src/abstract_syntax_tree.py
-badd +140 ~/Documents/Studium/pico_c_compiler/src/if_else_nodes.py
-badd +44 ~/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py
-badd +206 ~/Documents/Studium/pico_c_compiler/src/logic_nodes.py
-badd +56 ~/Documents/Studium/pico_c_compiler/src/loop_grammar.py
-badd +38 ~/Documents/Studium/pico_c_compiler/src/loop_nodes.py
-badd +3 ~/Documents/Studium/pico_c_compiler/tests/error_redefinition_same_type.picoc
+badd +235 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
+badd +115 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
+badd +73 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
+badd +110 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
+badd +73 ~/Documents/Studium/pico_c_compiler/src/error_handler.py
+badd +58 ~/Documents/Studium/pico_c_compiler/src/errors.py
+badd +7 ~/Documents/Studium/pico_c_compiler/src/global_vars.py
+badd +7 ~/Documents/Studium/pico_c_compiler/src/symbol_table.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

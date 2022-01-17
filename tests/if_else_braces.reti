@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((char var) = 0) Start
 # Allokation (char var) Start
-# Variable var vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
 # Arithmetischer Operand 0 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,19 +12,19 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
 LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 0 in Variable (char var) speichern
+STORE ACC 100;                         # Wert von 0 in Variable (char var) speichern
 # Zuweisung ((char var) = 0) Ende
 # Allokation (int cars) Start
-# Variable cars vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable cars vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
 # Allokation (int cars) Ende
 # Allokation (char b) Start
-# Variable b vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable b vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
 # Allokation (char b) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) ... else (var = (var - 1)) ... ) Start
 # Logisches Atom (var == 0) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von var in ACC laden
+LOAD ACC 100;                          # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 0 Start
@@ -54,13 +54,13 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 100 Ende
 LOADIN SP ACC 1;                       # Wert von 100 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 100 in Variable var speichern
+STORE ACC 100;                         # Wert von 100 in Variable var speichern
 # Zuweisung (var = 100) Ende
 # Zuweisung (cars = (cars + 1)) Start
 # Arithmetische binäre Operation (cars + 1) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von cars in ACC laden
+LOAD ACC 101;                          # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 # Arithmetischer Operand 1 Start
@@ -76,7 +76,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (cars + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (cars + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von (cars + 1) in Variable cars speichern
+STORE ACC 101;                         # Wert von (cars + 1) in Variable cars speichern
 # Zuweisung (cars = (cars + 1)) Ende
 JUMP 21;                               # Else-Branch überspringen
 # Else-Branch
@@ -84,7 +84,7 @@ JUMP 21;                               # Else-Branch überspringen
 # Arithmetische binäre Operation (var - 1) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von var in ACC laden
+LOAD ACC 100;                          # Wert von var in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand var Ende
 # Arithmetischer Operand 1 Start
@@ -100,7 +100,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (var - 1) Ende
 LOADIN SP ACC 1;                       # Wert von (var - 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von (var - 1) in Variable var speichern
+STORE ACC 100;                         # Wert von (var - 1) in Variable var speichern
 # Zuweisung (var = (var - 1)) Ende
 # Zuweisung (b = 1) Start
 # Arithmetischer Operand 1 Start
@@ -110,7 +110,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 1 Ende
 LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 1 in Variable b speichern
+STORE ACC 102;                         # Wert von 1 in Variable b speichern
 # Zuweisung (b = 1) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) ... else (var = (var - 1)) ... ) Ende
 JUMP 0;

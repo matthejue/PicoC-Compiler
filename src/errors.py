@@ -1,8 +1,5 @@
-# because of circular import
-from symbol_table import SymbolTable
-
-
 class Errors:
+    """Every error needs a self.found variable because of the _handle_all_tasts_unsuccessful function"""
     class InvalidCharacterError(Exception):
         """If there're Token sequences generated from the input that are not
         permitted by the grammar rules"""
@@ -49,7 +46,9 @@ class Errors:
         """This error can only appear while tasting and should be raised if a
         Token appears that can only be part of the other tasting choice"""
         def __init__(self, ):
-            super().__init__("This error should never be visible")
+            self.description = "This error should never be visible"
+            super().__init__(self.description)
+            self.found = self.description
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
@@ -61,22 +60,25 @@ class Errors:
             self.found_pos = found_pos
 
     class TooLargeLiteralError(Exception):
-        """If theu literal assigned to a variable is too large for the datatype of
+        """If the literal assigned to a variable is too large for the datatype of
         the variable"""
-        def __init__(self, variable, variable_pos, variable_type, assignment,
-                     assignment_pos):
-            self.description = f"TooLargeLiteralError: Literal {assignment} "\
-                f"assigned to variable {variable} of type {variable_type} is too large"
+        def __init__(self, variable, variable_pos, variable_type,
+                     variable_from, variable_to, found, found_pos):
+            variable_description = f"assigned to variable {variable} of type {variable_type} " if variable else ""
+            self.description = f"TooLargeLiteralError: Literal {found} "\
+                 + variable_description +"is too large"
             super().__init__(self.description)
             self.variable = variable
             self.variable_pos = variable_pos
             self.variable_type = variable_type
-            self.found = assignment
-            self.found_pos = assignment_pos
+            self.variable_from = variable_from
+            self.variable_to = variable_to
+            self.found = found
+            self.found_pos = found_pos
 
     class RedefinitionError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
-            self.description = f"RedefinitionError: Redefinition of {found}"
+            self.description = f"RedefinitionError: Redefinition of '{found}'"
             super().__init__(self.description)
             self.found = found
             self.found_pos = found_pos
@@ -89,6 +91,7 @@ class Errors:
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file {fname}"
             super().__init__(self.description)
+            self.found = fname
 
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
@@ -96,3 +99,4 @@ class Errors:
             self.description = "NotImplementedYet: The feature of using "\
                 f"{feature_description} is not implemented yet"
             super().__init__(self.description)
+            self.found = feature_description

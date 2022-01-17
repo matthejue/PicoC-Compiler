@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((int i) = 0) Start
 # Allokation (int i) Start
-# Variable i vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable i vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (int i) Ende
 # Arithmetischer Operand 0 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,11 +12,11 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
 LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 0 in Variable (int i) speichern
+STORE ACC 100;                         # Wert von 0 in Variable (int i) speichern
 # Zuweisung ((int i) = 0) Ende
 # Zuweisung ((int x) = 1) Start
 # Allokation (int x) Start
-# Variable x vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable x vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
 # Allokation (int x) Ende
 # Arithmetischer Operand 1 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -25,13 +25,13 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 1 Ende
 LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 1 in Variable (int x) speichern
+STORE ACC 101;                         # Wert von 1 in Variable (int x) speichern
 # Zuweisung ((int x) = 1) Ende
 # While Statement While((i < 10) If((i == 5) (x = 2)) ... ) Start
 # Logisches Atom (i < 10) Start
 # Arithmetischer Operand i Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von i in ACC laden
+LOAD ACC 100;                          # Wert von i in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand i Ende
 # Arithmetischer Operand 10 Start
@@ -56,7 +56,7 @@ JUMP== 40;                             # Statements überspringen, wenn (i < 10)
 # Logisches Atom (i == 5) Start
 # Arithmetischer Operand i Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von i in ACC laden
+LOAD ACC 100;                          # Wert von i in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand i Ende
 # Arithmetischer Operand 5 Start
@@ -86,19 +86,19 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2 Ende
 LOADIN SP ACC 1;                       # Wert von 2 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von 2 in Variable x speichern
+STORE ACC 101;                         # Wert von 2 in Variable x speichern
 # Zuweisung (x = 2) Ende
 # If Statement If((i == 5) (x = 2)) Ende
 # Zuweisung (i = (i + x)) Start
 # Arithmetische binäre Operation (i + x) Start
 # Arithmetischer Operand i Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von i in ACC laden
+LOAD ACC 100;                          # Wert von i in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand i Ende
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von x in ACC laden
+LOAD ACC 101;                          # Wert von x in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand x Ende
 LOADIN SP ACC 2;                       # Wert von i in ACC laden
@@ -109,7 +109,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (i + x) Ende
 LOADIN SP ACC 1;                       # Wert von (i + x) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von (i + x) in Variable i speichern
+STORE ACC 100;                         # Wert von (i + x) in Variable i speichern
 # Zuweisung (i = (i + x)) Ende
 JUMP -56;                              # Zurück zur Auswertung von (i < 10)
 # While Statement While((i < 10) If((i == 5) (x = 2)) ... ) Ende

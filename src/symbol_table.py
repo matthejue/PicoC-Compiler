@@ -23,7 +23,7 @@ class Symbol:
         return self.name
 
     def __repr__(self, ):
-        if self.datatype != "None":
+        if self.datatype != '-':
             return '<' + self.name + ':' + str(
                 self.datatype) + ':' + self.value + '>'
         return self.name
@@ -32,7 +32,7 @@ class Symbol:
 class VariableSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, str(None), str(None))
+        super().__init__(name, datatype, position, '-', '-')
 
     def get_type(self, ):
         return "variable"
@@ -41,7 +41,7 @@ class VariableSymbol(Symbol):
 class ConstantSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, str(None), str(None))
+        super().__init__(name, datatype, position, '-', '-')
 
     def get_type(self, ):
         return "named constant"
@@ -50,7 +50,7 @@ class ConstantSymbol(Symbol):
 class BuiltInTypeSymbol(Symbol):
     """Built in datatypes such as int and char"""
     def __init__(self, name, range):
-        super().__init__(name, str(None), str(None), str(None), range)
+        super().__init__(name, '-', '-', '-', range)
 
     def get_type(self, ):
         return "built in"
@@ -115,7 +115,7 @@ class _SymbolTable(Scope):
 
         :returns: string of adress
         """
-        if not self.symbols[sym.name].value:
+        if self.symbols[sym.name].value == "-":
             self.symbols[sym.name].value = str(self.fa_pointer)
             self.fa_pointer += 1
         return str(self.fa_pointer - 1)

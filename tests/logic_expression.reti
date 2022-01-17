@@ -3,7 +3,7 @@
 LOADI SP 200;
 # Zuweisung ((char var) = (12 > 3)) Start
 # Allokation (char var) Start
-# Variable var vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
 # Logisches Atom (12 > 3) Start
 # Arithmetischer Operand 12 Start
@@ -28,7 +28,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (12 > 3) Ende
 LOADIN SP ACC 1;                       # Wert von (12 > 3) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von (12 > 3) in Variable (char var) speichern
+STORE ACC 100;                         # Wert von (12 > 3) in Variable (char var) speichern
 # Zuweisung ((char var) = (12 > 3)) Ende
 JUMP 0;
 # Main Funktion (void main ((char var) = (12 > 3))) Ende

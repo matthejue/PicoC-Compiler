@@ -1,0 +1,1 @@
+(./tests/error_redefinition_second_const.picoc (void main ((int var) = 122) ((const char var) = 97)))

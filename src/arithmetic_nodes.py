@@ -56,7 +56,8 @@ class ArithmeticOperand(ASTNode):
                             self.constant_identifier, "encode(c)", value)
                         self.code_generator.add_code(self.constant_identifier,
                                                      self.all_loc)
-            case (Number(value) | Character(value)):
+            case (Number(value, position) | Character(value, position)):
+                self._error_check(value, position)
                 self.constant = self._pretty_comments(self.constant)
                 self.constant = self.code_generator.replace_code_pre(
                     self.constant, "encode(w)", value)
@@ -67,6 +68,13 @@ class ArithmeticOperand(ASTNode):
             code = self.code_generator.replace_code_pre(
                 code, "e1", self.value)
         return code
+
+    def _error_check(self, value, position):
+        range_from = global_vars.range_from_to[0]
+        range_to = global_vars.range_from_to[1]
+        if not (range_from < int(value) < range_to):
+            raise Errors.TooLargeLiteralError(
+                None, None, None, range_from, range_to, value, position)
 
 
 class Variable_Constant_Identifier(ArithmeticOperand):

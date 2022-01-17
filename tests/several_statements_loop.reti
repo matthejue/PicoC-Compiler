@@ -10,7 +10,7 @@ LOADI SP 200;
 # Do While DoWhile(((int y) = x) ... (x < 10)) Start
 # Zuweisung ((int y) = x) Start
 # Allokation (int y) Start
-# Variable y vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable y vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (int y) Ende
 # Arithmetischer Operand x Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
@@ -19,7 +19,7 @@ STOREIN SP ACC 1;                                                  # Wert in obe
 # Arithmetischer Operand x Ende
 LOADIN SP ACC 1;                                                   # Wert von x in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC None;                                                    # Wert von x in Variable (int y) speichern
+STORE ACC 100;                                                     # Wert von x in Variable (int y) speichern
 # Zuweisung ((int y) = x) Ende
 # Zuweisung (x = (x + 1)) Start
 # Arithmetische binäre Operation (x + 1) Start

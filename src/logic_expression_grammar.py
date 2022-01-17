@@ -42,7 +42,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
     def _handle_all_tastes_unsuccessful(self, expected, errors):
         # if both threw the same error print that error out
-        if errors[0].found == errors[1].found:
+        if all(elem == errors[0] for elem in errors):
             raise errors[0]
         else:
             token = self.LT(1)

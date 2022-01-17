@@ -2,18 +2,18 @@
 # Main Funktion (void main (char cars) ... ) Start
 LOADI SP 200;
 # Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable cars vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
 # Zuweisung ((int var) = (- ((- cars) % 2))) Start
 # Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 99 zur Symboltabelle hinzugefügt
+# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
 # Allokation (int var) Ende
 # Arithmetische unäre Operation (- ((- cars) % 2)) Start
 # Arithmetische binäre Operation ((- cars) % 2) Start
 # Arithmetische unäre Operation (- cars) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC None;                         # Wert von cars in ACC laden
+LOAD ACC 100;                          # Wert von cars in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 LOADI ACC 0;                           # 0 in ACC laden
@@ -39,7 +39,7 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- ((- cars) % 2)) Ende
 LOADIN SP ACC 1;                       # Wert von (- ((- cars) % 2)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC None;                        # Wert von (- ((- cars) % 2)) in Variable (int var) speichern
+STORE ACC 101;                         # Wert von (- ((- cars) % 2)) in Variable (int var) speichern
 # Zuweisung ((int var) = (- ((- cars) % 2))) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

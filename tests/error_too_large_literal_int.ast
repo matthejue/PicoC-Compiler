@@ -1,1 +1,0 @@
-(./tests/error_too_large_literal_int.picoc (void main ((const int var) = 2147483648)))

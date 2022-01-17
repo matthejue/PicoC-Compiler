@@ -5,9 +5,6 @@ import global_vars
 
 class ErrorHandler:
     """Output a detailed error message"""
-
-    SOF_CHAR = 'SOF'
-
     def __init__(self, fname, finput):
         self.fname = fname
         self.finput = finput
@@ -53,7 +50,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
-            error_header = self._error_header(e.found_pos, e.description)
+            error_header = self._error_header(None, e.description)
             print('\n' + error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
@@ -69,9 +66,19 @@ class ErrorHandler:
             error_screen = ErrorScreen(self.finput, e.variable_pos[0],
                                        e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            error_screen.mark(e.variable_pos, len(e.variable))
+            if e.variable:
+                error_screen.mark(e.variable_pos, len(e.variable))
+                node_header = self._error_header(
+                    None,
+                    f"Note: Datatype {e.variable_type} has only range {e.variable_from} to {e.variable_to}"
+                )
+            else:
+                node_header = self._error_header(
+                    None,
+                    f"Note: The max literal size is that of an int (-2147483648 to 2147483647)"
+                )
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print('\n' + error_header + str(error_screen) + node_header)
             exit(0)
         except Errors.RedefinitionError as e:
             error_header = self._error_header(e.found_pos, e.description)
@@ -98,6 +105,8 @@ class ErrorHandler:
             exit(0)
 
     def _error_header(self, pos, descirption):
+        if not pos:
+            return descirption + '\n'
         return self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
             descirption + '\n'
 

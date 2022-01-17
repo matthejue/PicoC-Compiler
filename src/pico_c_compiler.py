@@ -223,9 +223,9 @@ def _write_symbol_table(outbase):
     symbols = SymbolTable().symbols
     for name in symbols.keys():
         position = f"({symbols[name].position[0]}:{symbols[name].position[1]})"\
-            if symbols[name].position != 'None' else str(None)
+            if symbols[name].position != '-' else '-'
         range_from_to = f"({symbols[name].range_from_to[0]}:{symbols[name].range_from_to[1]})" if symbols[
-            name].range_from_to != 'None' else str(None)
+            name].range_from_to != '-' else '-'
         output += f"{name},"\
             f"{symbols[name].get_type()},"\
             f"{symbols[name].datatype},"\

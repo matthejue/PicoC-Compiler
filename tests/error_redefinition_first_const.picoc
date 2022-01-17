@@ -1,4 +1,4 @@
 void main() {
-  char var = 'z';
+  const char var = 'z';
   char var = 'a';
 }

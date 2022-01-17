@@ -1,6 +1,6 @@
 name,type,datatype,position,value,range_from_to
-int,built in,None,None,None,(-2147483648:2147483647)
-char,built in,None,None,None,(-128:127)
-var,variable,char,(1:19),None,None
-cars,variable,int,(1:32),None,None
-b,variable,char,(1:43),None,None
+int,built in,-,-,-,(-2147483648:2147483647)
+char,built in,-,-,-,(-128:127)
+var,variable,char,(1:19),100,-
+cars,variable,int,(1:32),101,-
+b,variable,char,(1:43),102,-

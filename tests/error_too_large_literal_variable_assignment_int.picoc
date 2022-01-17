@@ -1,0 +1,4 @@
+void main() {
+  int var;
+  var = 2147483648;
+}

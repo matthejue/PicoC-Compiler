@@ -1,1 +1,0 @@
-(./tests/error_redefinition_different_type.picoc (void main ((char var) = 122) ((int var) = 10)))

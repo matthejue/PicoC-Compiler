@@ -82,7 +82,11 @@ class Assignment(ASTNode):
                 self._adapt_code(name)
             # assigment that assigns a variable to a expression
             case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), _):
+                self._adapt_code(name)
+
                 self.expression.visit()
+
+                global_vars.range_from_to = (-2147483648, 2147483647)
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
 
@@ -95,9 +99,19 @@ class Assignment(ASTNode):
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
     def _error_check(self, symbol, name, value, position):
-        if not (symbol.datatype.range_from_to[0] < int(value) < symbol.datatype.range_from_to[1]):
+        range_from = symbol.datatype.range_from_to[0]
+        range_to = symbol.datatype.range_from_to[1]
+        if not (range_from < int(value) < range_to):
             raise Errors.TooLargeLiteralError(
-                name, symbol.position, symbol.datatype, value, position)
+                name, symbol.position, symbol.datatype, range_from, range_to, value, position)
+
+    def _adapt_range(self, name):
+        symbol = self.symbol_table.resolve(name)
+        match symbol.datatype.name:
+            case "char":
+                global_vars.range_from_to = (-128, 127)
+            case "int":
+                global_vars.range_from_to = (-2147483648, 2147483647)
 
     def __repr__(self):
         if len(self.children) == 2:
