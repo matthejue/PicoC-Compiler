@@ -30,12 +30,10 @@ class Assignment(ASTNode):
         self.code_generator.add_code(
             f"# Zuweisung {self} Start\n", 0)
 
-        self._pretty_comments()
-
         self.location.update_match_args()
-        match self.location:
-            case Allocation(_, _, _):
-                self.location.visit()
+        self.location.visit()
+
+        self._pretty_comments()
 
         try:
             self._assignment()
@@ -54,8 +52,13 @@ class Assignment(ASTNode):
                 self.assign, "e1", str(self.expression))
             self.assign_more = self.code_generator.replace_code_pre(
                 self.assign_more, "e1", str(self.expression))
-            self.assign_more = self.code_generator.replace_code_pre(
-                self.assign_more, "v1", str(self.location))
+            match self.location:
+                case Allocation(_, _, _):
+                    self.assign_more = self.code_generator.replace_code_pre(
+                        self.assign_more, "v1", str(self.location.identifier))
+                case _:
+                    self.assign_more = self.code_generator.replace_code_pre(
+                        self.assign_more, "v1", str(self.location))
 
     def _comment_for_constant(self, name, value):
         self.code_generator.add_code("# Konstante " + name + " in Symboltabelle "
