@@ -1,4 +1,3 @@
-// TODO: hier wird expected an der falschen Stelle angezeigt
 void main() {
   csnt int var = 12;
 }

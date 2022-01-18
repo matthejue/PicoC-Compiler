@@ -12,7 +12,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 10 Ende
 LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 10 in Variable (char var) speichern
+STORE ACC 100;                         # Wert von 10 in Variable var speichern
 # Zuweisung ((char var) = 10) Ende
 # If Statement If((var == 0) ((int cars) = 10)) Start
 # Logisches Atom (var == 0) Start
@@ -51,7 +51,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 10 Ende
 LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von 10 in Variable (int cars) speichern
+STORE ACC 101;                         # Wert von 10 in Variable cars speichern
 # Zuweisung ((int cars) = 10) Ende
 # If Statement If((var == 0) ((int cars) = 10)) Ende
 # If Statement If((cars == 10) (var = 42)) Start
@@ -78,9 +78,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (cars == 10) Ende
 LOADIN SP ACC 1;                       # Wert von (cars == 10) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 7;                              # Branch überspringen
+JUMP== 10;                             # Branch überspringen
 # If-Branch
 # Zuweisung (var = 42) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetischer Operand 42 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 42;                          # Wert von 42 in ACC laden

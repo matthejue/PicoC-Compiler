@@ -24,9 +24,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (67 + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (67 + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (67 + 1) in Variable (int x) speichern
+STORE ACC 100;                         # Wert von (67 + 1) in Variable x speichern
 # Zuweisung ((int x) = (67 + 1)) Ende
 # Zuweisung (x = (x + (97 - 65))) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
 # Arithmetische binäre Operation (x + (97 - 65)) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern

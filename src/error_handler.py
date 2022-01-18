@@ -64,25 +64,33 @@ class ErrorHandler:
         except Errors.TooLargeLiteralError as e:
             error_header = self._error_header(e.found_pos, e.description)
             if e.variable:
-                error_screen = ErrorScreen(self.finput, e.variable_pos[0],
+                error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                            e.found_pos[0])
-                error_screen.mark(e.variable_pos, len(e.variable))
+                error_screen.mark(e.found_pos, len(e.found))
+                node_header = self._error_header(
+                    e.variable_pos,
+                    f"Note: Variable '{e.variable}' definied as type "
+                    f"'{e.variable_type}' here:")
+                error_screen_2 = ErrorScreen(self.finput, e.variable_pos[0],
+                                             e.variable_pos[0])
+                error_screen_2.mark(e.variable_pos, len(e.variable))
+                error_screen.filter()
+                error_screen_2.filter()
+                node_end = self._error_header(
+                    None, f"Note: Datatype '{e.variable_type}' has only range "
+                    f"{e.variable_from} to {e.variable_to}")
+                print('\n' + error_header + str(error_screen) + node_header +
+                      str(error_screen_2) + node_end)
             else:
                 error_screen = ErrorScreen(self.finput, e.found_pos[0],
                                            e.found_pos[0])
-            error_screen.mark(e.found_pos, len(e.found))
-            if e.variable:
-                node_header = self._error_header(
-                    None,
-                    f"Note: Datatype '{e.variable_type}' has only range {e.variable_from} to {e.variable_to}"
-                )
-            else:
+                error_screen.mark(e.found_pos, len(e.found))
                 node_header = self._error_header(
                     None,
                     f"Note: The max literal size is that of an int (-2147483648 to 2147483647)"
                 )
-            error_screen.filter()
-            print('\n' + error_header + str(error_screen) + node_header)
+                error_screen.filter()
+                print('\n' + error_header + str(error_screen) + node_header)
             exit(0)
         except Errors.RedefinitionError as e:
             error_header = self._error_header(e.found_pos, e.description)
@@ -115,7 +123,9 @@ class ErrorHandler:
             descirption + '\n'
 
     def _find_space_after_previous_token(self, pos):
+        #  __import__('pudb').set_trace()
         row, col = pos[0], pos[1]
+        self.finput[row] = self._remove_comments(self.finput[row])
         while True:
             old_row = row
             row, col = self._previous_char(row, col)

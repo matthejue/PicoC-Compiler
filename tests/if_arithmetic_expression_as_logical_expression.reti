@@ -12,7 +12,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 198123 Ende
 LOADIN SP ACC 1;                       # Wert von 198123 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 198123 in Variable (int var) speichern
+STORE ACC 100;                         # Wert von 198123 in Variable var speichern
 # Zuweisung ((int var) = 198123) Ende
 # If Statement If(ToBool((123 * var)) (var = 123)) Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((123 * var)) Start
@@ -40,9 +40,14 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((123 * var)) Ende
 LOADIN SP ACC 1;                       # Wert von ToBool((123 * var)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 7;                              # Branch überspringen
+JUMP== 10;                             # Branch überspringen
 # If-Branch
 # Zuweisung (var = 123) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetischer Operand 123 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 123;                         # Wert von 123 in ACC laden

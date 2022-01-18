@@ -12,7 +12,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 42 Ende
 LOADIN SP ACC 1;                       # Wert von 42 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 42 in Variable (int x) speichern
+STORE ACC 100;                         # Wert von 42 in Variable x speichern
 # Zuweisung ((int x) = 42) Ende
 # Zuweisung ((int y) = (- 24)) Start
 # Allokation (int y) Start
@@ -31,7 +31,7 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- 24) Ende
 LOADIN SP ACC 1;                       # Wert von (- 24) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (- 24) in Variable (int y) speichern
+STORE ACC 101;                         # Wert von (- 24) in Variable y speichern
 # Zuweisung ((int y) = (- 24)) Ende
 # Allokation (char is_less) Start
 # Variable is_less vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
@@ -94,9 +94,14 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(((x > 0) ^ (y > 0))) Ende
 LOADIN SP ACC 1;                       # Wert von ToBool(((x > 0) ^ (y > 0))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 20;                             # Zu Else-Branch springen, wenn ToBool(((x > 0) ^ (y > 0))) nicht erfüllt
+JUMP== 23;                             # Zu Else-Branch springen, wenn ToBool(((x > 0) ^ (y > 0))) nicht erfüllt
 # If-Branch
 # Zuweisung (is_less = (x <= y)) Start
+# Arithmetischer Operand is_less Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von is_less in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand is_less Ende
 # Logisches Atom (x <= y) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -122,7 +127,7 @@ LOADIN SP ACC 1;                       # Wert von (x <= y) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 102;                         # Wert von (x <= y) in Variable is_less speichern
 # Zuweisung (is_less = (x <= y)) Ende
-JUMP 32;                               # Else-Branch überspringen
+JUMP 38;                               # Else-Branch überspringen
 # Else-Branch
 # If und Else Statement IfElse((x > 0) (is_less = 0) else (is_less = 1)) Start
 # Logisches Atom (x > 0) Start
@@ -148,9 +153,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (x > 0) Ende
 LOADIN SP ACC 1;                       # Wert von (x > 0) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (x > 0) nicht erfüllt
+JUMP== 11;                             # Zu Else-Branch springen, wenn (x > 0) nicht erfüllt
 # If-Branch
 # Zuweisung (is_less = 0) Start
+# Arithmetischer Operand is_less Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von is_less in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand is_less Ende
 # Arithmetischer Operand 0 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 0;                           # Wert von 0 in ACC laden
@@ -160,9 +170,14 @@ LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 102;                         # Wert von 0 in Variable is_less speichern
 # Zuweisung (is_less = 0) Ende
-JUMP 7;                                # Else-Branch überspringen
+JUMP 10;                               # Else-Branch überspringen
 # Else-Branch
 # Zuweisung (is_less = 1) Start
+# Arithmetischer Operand is_less Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von is_less in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand is_less Ende
 # Arithmetischer Operand 1 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 1;                           # Wert von 1 in ACC laden

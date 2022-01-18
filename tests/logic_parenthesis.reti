@@ -12,7 +12,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
 LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 0 in Variable (int bool_var) speichern
+STORE ACC 100;                         # Wert von 0 in Variable bool_var speichern
 # Zuweisung ((int bool_var) = 0) Ende
 # If Statement If(((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1))) Start
 # Logische binäre Verknüpfung ((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) Start
@@ -114,9 +114,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung ((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) Ende
 LOADIN SP ACC 1;                       # Wert von ((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 59;                             # Branch überspringen
+JUMP== 62;                             # Branch überspringen
 # If-Branch
 # Zuweisung (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1)) Start
+# Arithmetischer Operand bool_var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von bool_var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand bool_var Ende
 # Arithmetische binäre Operation ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1) Start
 # Logische binäre Verknüpfung (((123 * (- (12 - 3))) >= 12) || ToBool(0)) Start
 # Logisches Atom ((123 * (- (12 - 3))) >= 12) Start

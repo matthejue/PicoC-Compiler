@@ -77,7 +77,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung (((12 >= dom) && (34 < 4)) || ToBool(0)) Ende
 LOADIN SP ACC 1;                       # Wert von (((12 >= dom) && (34 < 4)) || ToBool(0)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (((12 >= dom) && (34 < 4)) || ToBool(0)) in Variable (int var) speichern
+STORE ACC 101;                         # Wert von (((12 >= dom) && (34 < 4)) || ToBool(0)) in Variable var speichern
 # Zuweisung ((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0))) Ende
 JUMP 0;
 # Main Funktion (void main (char dom) ... ) Ende

@@ -199,6 +199,7 @@ class Lexer:
                         self.position)
                 return Token(TT.CHARACTER, str(ord(char)), self.position)
             elif self.lc == '/':
+                #  __import__('pudb').set_trace()
                 # division or comments
                 # :grammar: /(/|(<star>.*<start>/))?
                 self.next_char()

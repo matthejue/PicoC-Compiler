@@ -1,1 +1,0 @@
-(./tests/error_compile_time_assignment.picoc (void main (var = (31 > 7))))

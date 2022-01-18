@@ -12,7 +12,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 97 Ende
 LOADIN SP ACC 1;                       # Wert von 97 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 97 in Variable (int var) speichern
+STORE ACC 100;                         # Wert von 97 in Variable var speichern
 # Zuweisung ((int var) = 97) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Start
 # Logisches Atom (var == 0) Start
@@ -38,9 +38,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (var == 0) Ende
 LOADIN SP ACC 1;                       # Wert von (var == 0) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
+JUMP== 11;                             # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
 # If-Branch
 # Zuweisung (var = 100) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetischer Operand 100 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 100;                         # Wert von 100 in ACC laden
@@ -50,7 +55,7 @@ LOADIN SP ACC 1;                       # Wert von 100 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von 100 in Variable var speichern
 # Zuweisung (var = 100) Ende
-JUMP 40;                               # Else-Branch überspringen
+JUMP 46;                               # Else-Branch überspringen
 # Else-Branch
 # If und Else Statement IfElse((var == 10) (var = 5) else (var = (var + 1))) Start
 # Logisches Atom (var == 10) Start
@@ -76,9 +81,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (var == 10) Ende
 LOADIN SP ACC 1;                       # Wert von (var == 10) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (var == 10) nicht erfüllt
+JUMP== 11;                             # Zu Else-Branch springen, wenn (var == 10) nicht erfüllt
 # If-Branch
 # Zuweisung (var = 5) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetischer Operand 5 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 5;                           # Wert von 5 in ACC laden
@@ -88,9 +98,14 @@ LOADIN SP ACC 1;                       # Wert von 5 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von 5 in Variable var speichern
 # Zuweisung (var = 5) Ende
-JUMP 15;                               # Else-Branch überspringen
+JUMP 18;                               # Else-Branch überspringen
 # Else-Branch
 # Zuweisung (var = (var + 1)) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetische binäre Operation (var + 1) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern

@@ -10,9 +10,10 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-edit arithmetic_nodes.py
+$argadd pico_c_compiler.py
+edit error_handler.py
 argglobal
-balt assignment_allocation_nodes.py
+balt pico_c_compiler.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -23,22 +24,16 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 82 - ((5 * winheight(0) + 19) / 39)
+let s:l = 144 - ((19 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 82
-normal! 0
+keepjumps 144
+normal! 017|
 if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
 tabnext 1
-badd +17 ~/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py
-badd +0 ~/Documents/Studium/pico_c_compiler/assignment_allocation_nodes.py
-badd +0 ~/Documents/Studium/pico_c_compiler/parser_.py
-badd +0 ~/Documents/Studium/pico_c_compiler/arithmetic_nodes.py
-badd +1 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py
-badd +87 ~/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py
-badd +93 ~/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py
-badd +5 ~/Documents/Studium/pico_c_compiler/src/parser_.py
+badd +163 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
+badd +144 ~/Documents/Studium/pico_c_compiler/src/error_handler.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

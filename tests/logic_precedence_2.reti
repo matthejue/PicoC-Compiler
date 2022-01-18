@@ -96,7 +96,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung ((12 == dom) || ((c >= 4) || (a != b))) Ende
 LOADIN SP ACC 1;                       # Wert von ((12 == dom) || ((c >= 4) || (a != b))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 104;                         # Wert von ((12 == dom) || ((c >= 4) || (a != b))) in Variable (int var) speichern
+STORE ACC 104;                         # Wert von ((12 == dom) || ((c >= 4) || (a != b))) in Variable var speichern
 # Zuweisung ((int var) = ((12 == dom) || ((c >= 4) || (a != b)))) Ende
 JUMP 0;
 # Main Funktion (void main (int dom) ... ) Ende

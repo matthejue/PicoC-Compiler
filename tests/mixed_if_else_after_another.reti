@@ -31,9 +31,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (var == 0) Ende
 LOADIN SP ACC 1;                       # Wert von (var == 0) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
+JUMP== 11;                             # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
 # If-Branch
 # Zuweisung (cars = 10) Start
+# Arithmetischer Operand cars Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von cars in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand cars Ende
 # Arithmetischer Operand 10 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 10;                          # Wert von 10 in ACC laden
@@ -43,9 +48,14 @@ LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von 10 in Variable cars speichern
 # Zuweisung (cars = 10) Ende
-JUMP 15;                               # Else-Branch überspringen
+JUMP 18;                               # Else-Branch überspringen
 # Else-Branch
 # Zuweisung (cars = (cars + 1)) Start
+# Arithmetischer Operand cars Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von cars in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand cars Ende
 # Arithmetische binäre Operation (cars + 1) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -92,9 +102,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (cars == 10) Ende
 LOADIN SP ACC 1;                       # Wert von (cars == 10) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 7;                              # Branch überspringen
+JUMP== 10;                             # Branch überspringen
 # If-Branch
 # Zuweisung (var = 42) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
 # Arithmetischer Operand 42 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 42;                          # Wert von 42 in ACC laden

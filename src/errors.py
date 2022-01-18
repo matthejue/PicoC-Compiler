@@ -64,8 +64,8 @@ class Errors:
         the variable"""
         def __init__(self, variable, variable_pos, variable_type,
                      variable_from, variable_to, found, found_pos):
-            variable_description = f"assigned to variable {variable} of type {variable_type} " if variable else ""
-            self.description = f"TooLargeLiteralError: Literal {found} "\
+            variable_description = f"assigned to variable '{variable}' of type '{variable_type}' " if variable else ""
+            self.description = f"TooLargeLiteralError: Literal '{found}' "\
                  + variable_description +"is too large"
             super().__init__(self.description)
             self.variable = variable

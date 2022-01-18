@@ -78,9 +78,9 @@ class ArithmeticOperand(ASTNode):
                     higher_bits, lower_bits = self._split_huge_number(
                         int(value))
                     self.build_huge_number = self.code_generator.replace_code_pre(
-                        self.build_huge_number, "higher_bits", str(Bits(bin=higher_bits).int))
+                        self.build_huge_number, "higher_bits", str(Bits(bin='0'+higher_bits).int))
                     self.build_huge_number = self.code_generator.replace_code_pre(
-                        self.build_huge_number, "lower_bits", str(Bits(bin=lower_bits).int))
+                        self.build_huge_number, "lower_bits", str(Bits(bin='0'+lower_bits).int))
                     self.build_huge_number = self._pretty_comments_huge_number(self.build_huge_number,
                                                                                higher_bits, lower_bits)
                     self.code_generator.add_code(
@@ -100,9 +100,9 @@ class ArithmeticOperand(ASTNode):
     def _pretty_comments_huge_number(self, code, higher_bits, lower_bits):
         if global_vars.args.verbose:
             code = self.code_generator.replace_code_pre(
-                code, "HBITS", str(higher_bits))
+                code, "HBITS", '0'*6+'_'+higher_bits)
             code = self.code_generator.replace_code_pre(
-                code, "LBITS", str(lower_bits))
+                code, "LBITS", '0'*6+'_'+lower_bits)
         return code
 
     def _error_check(self, value, position):

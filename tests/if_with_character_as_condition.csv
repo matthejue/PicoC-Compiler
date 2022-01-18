@@ -1,0 +1,3 @@
+name,type,datatype,position,value,range_from_to
+char,built in,-,-,-,(-128:127)
+int,built in,-,-,-,(-2147483648:2147483647)

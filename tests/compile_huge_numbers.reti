@@ -14,18 +14,18 @@ LOADI SP 200;
 # Arithmetische binäre Operation (2147483647 & ((- 2147483647) | car)) Start
 # Arithmetischer Operand 2147483647 Start
 SUBI SP 1;                                 # Stack um eine Zelle erweitern
-LOADI ACC 32767;                           # Higher Bits '0111111111111111' in ACC laden
+LOADI ACC 32767;                           # Higher Bits '000000_0111111111111111' in ACC laden
 MULTI ACC 65536;                           # Higher Bits um 16 Bits shiften
-ORI ACC -1;                                # Lower Bits '1111111111111111' in ACC einfügen
+ORI ACC 65535;                             # Lower Bits '000000_1111111111111111' in ACC einfügen
 STOREIN SP ACC 1;                          # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2147483647 Ende
 # Arithmetische binäre Operation ((- 2147483647) | car) Start
 # Arithmetische unäre Operation (- 2147483647) Start
 # Arithmetischer Operand 2147483647 Start
 SUBI SP 1;                                 # Stack um eine Zelle erweitern
-LOADI ACC 32767;                           # Higher Bits '0111111111111111' in ACC laden
+LOADI ACC 32767;                           # Higher Bits '000000_0111111111111111' in ACC laden
 MULTI ACC 65536;                           # Higher Bits um 16 Bits shiften
-ORI ACC -1;                                # Lower Bits '1111111111111111' in ACC einfügen
+ORI ACC 65535;                             # Lower Bits '000000_1111111111111111' in ACC einfügen
 STOREIN SP ACC 1;                          # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2147483647 Ende
 LOADI ACC 0;                               # 0 in ACC laden
@@ -52,7 +52,7 @@ ADDI SP 1;                                 # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (2147483647 & ((- 2147483647) | car)) Ende
 LOADIN SP ACC 1;                           # Wert von (2147483647 & ((- 2147483647) | car)) in ACC laden
 ADDI SP 1;                                 # Stack um eine Zelle verkürzen
-STORE ACC 100;                             # Wert von (2147483647 & ((- 2147483647) | car)) in Variable (int var) speichern
+STORE ACC 100;                             # Wert von (2147483647 & ((- 2147483647) | car)) in Variable var speichern
 # Zuweisung ((int var) = (2147483647 & ((- 2147483647) | car))) Ende
 JUMP 0;
 # Main Funktion (void main ((const int car) = 2147483647) ... ) Ende

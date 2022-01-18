@@ -153,6 +153,7 @@ NOT_TO_MAP	.misc/tokentypes.py	/^NOT_TO_MAP = ("identifier", "to bool", "end of 
 NOT_TO_MAP	src/lexer.py	/^NOT_TO_MAP = ("\/", "number", "character", "identifier", "var", "to bool",$/;"	v
 NT	src/dummy_nodes.py	/^class NT:$/;"	c
 NUMBER	src/lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
+Needs tobe added	.misc/critical_tests.md	/^# Needs tobe added$/;"	c
 Negation	src/dummy_nodes.py	/^    class Negation(ASTNode):$/;"	c	class:NT
 NoApplicableRuleError	src/errors.py	/^    class NoApplicableRuleError(Exception):$/;"	c	class:Errors
 NoMainFunctionError	src/errors.py	/^    class NoMainFunctionError(Exception):$/;"	c	class:Errors
@@ -345,7 +346,6 @@ _bootlocale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootlo
 _bootsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootsubprocess"><\/a>$/;"	a
 _branch	src/if_else_grammar.py	/^    def _branch(self, ):$/;"	m	class:IfElseGrammar
 _bz2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bz2"><\/a>$/;"	a
-_check_huge_number	src/arithmetic_nodes.py	/^    def _check_huge_number(self, ):$/;"	m	class:ArithmeticOperand
 _codecs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs"><\/a>$/;"	a
 _codecs_cn	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs_cn"><\/a>$/;"	a
 _codecs_hk	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs_hk"><\/a>$/;"	a
@@ -430,6 +430,7 @@ _pretty_comments	src/logic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	cl
 _pretty_comments	src/logic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:ToBool
 _pretty_comments	src/loop_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:DoWhile
 _pretty_comments	src/loop_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:While
+_pretty_comments_huge_number	src/arithmetic_nodes.py	/^    def _pretty_comments_huge_number(self, code, higher_bits, lower_bits):$/;"	m	class:ArithmeticOperand
 _previous_char	src/error_handler.py	/^    def _previous_char(self, row, col):$/;"	m	class:ErrorHandler
 _psutil_windows	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_psutil_windows"><\/a>$/;"	a
 _py_abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_py_abc"><\/a>$/;"	a
@@ -451,6 +452,7 @@ _sha512	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sha512"><\
 _shell	src/pico_c_compiler.py	/^def _shell():$/;"	f
 _signal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_signal"><\/a>$/;"	a
 _socket	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_socket"><\/a>$/;"	a
+_split_huge_number	src/arithmetic_nodes.py	/^    def _split_huge_number(self, value):$/;"	m	class:ArithmeticOperand
 _sre	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sre"><\/a>$/;"	a
 _ss	src/statement_grammar.py	/^    def _ss(self):$/;"	m	class:StatementGrammar
 _ssl	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_ssl"><\/a>$/;"	a
@@ -553,6 +555,7 @@ bisect	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="bisect"><\/a
 bitwise_not	src/arithmetic_nodes.py	/^    bitwise_not = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\\n"$/;"	v	class:ArithmeticUnaryOperation
 bitwise_not_loc	src/arithmetic_nodes.py	/^    bitwise_not_loc = 1$/;"	v	class:ArithmeticUnaryOperation
 build_huge_number	src/arithmetic_nodes.py	/^    build_huge_number = strip_multiline_string($/;"	v	class:ArithmeticOperand
+build_huge_number_loc	src/arithmetic_nodes.py	/^    build_huge_number_loc = 3$/;"	v	class:ArithmeticOperand
 builtins	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="builtins"><\/a>$/;"	a
 bz2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="bz2"><\/a>$/;"	a
 c	.misc/python_match_args_update_args_function.py	/^c = C(D("g", 69))$/;"	v
@@ -602,6 +605,7 @@ contextlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextl
 contextvars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextvars"><\/a>$/;"	a
 copy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="copy"><\/a>$/;"	a
 copyreg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="copyreg"><\/a>$/;"	a
+could be improved	.misc/critical_tests.md	/^# could be improved$/;"	c
 create_bin_linux	Makefile	/^create_bin_linux:$/;"	t
 create_bin_windows	Makefile	/^create_bin_windows:$/;"	t
 create_bin_wine	Makefile	/^create_bin_wine:$/;"	t
@@ -932,6 +936,7 @@ multiprocessing.spawn	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a nam
 multiprocessing.synchronize	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="multiprocessing.synchronize"><\/a>$/;"	a
 multiprocessing.util	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="multiprocessing.util"><\/a>$/;"	a
 name	.vimspector.json	/^        "name": "Debug",$/;"	s	object:configurations.Debug.configuration
+need to be improved	.misc/critical_tests.md	/^# need to be improved$/;"	c
 netrc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="netrc"><\/a>$/;"	a
 next_char	src/lexer.py	/^    def next_char(self):$/;"	m	class:Lexer
 next_token	src/lexer.py	/^    def next_token(self):$/;"	m	class:Lexer
@@ -1200,7 +1205,7 @@ resolve	src/symbol_table.py	/^    def resolve(self, name) -> Symbol:$/;"	m	class
 resource	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="resource"><\/a>$/;"	a
 reveal_ast	src/grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
 runpy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="runpy"><\/a>$/;"	a
-s:l	Session.vim	/^let s:l = 82 - ((5 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	Session.vim	/^let s:l = 144 - ((19 * winheight(0) + 19) \/ 39)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v

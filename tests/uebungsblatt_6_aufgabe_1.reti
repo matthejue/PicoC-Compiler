@@ -14,6 +14,11 @@ LOADI SP 200;
 # Konstante z in Symboltabelle den Wert 2 zugewiesen
 # Zuweisung ((const int z) = 2) Ende
 # Zuweisung (y = 3) Start
+# Arithmetischer Operand y Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von y in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand y Ende
 # Arithmetischer Operand 3 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 3;                           # Wert von 3 in ACC laden
@@ -24,6 +29,11 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von 3 in Variable y speichern
 # Zuweisung (y = 3) Ende
 # Zuweisung (x = 15) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
 # Arithmetischer Operand 15 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 15;                          # Wert von 15 in ACC laden
@@ -69,8 +79,13 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (x >= (z * y)) Ende
 LOADIN SP ACC 1;                       # Wert von (x >= (z * y)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 16;                             # Statements überspringen, wenn (x >= (z * y)) nicht erfüllt
+JUMP== 19;                             # Statements überspringen, wenn (x >= (z * y)) nicht erfüllt
 # Zuweisung (x = (x - 3)) Start
+# Arithmetischer Operand x Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von x in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand x Ende
 # Arithmetische binäre Operation (x - 3) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -92,7 +107,7 @@ LOADIN SP ACC 1;                       # Wert von (x - 3) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (x - 3) in Variable x speichern
 # Zuweisung (x = (x - 3)) Ende
-JUMP -40;                              # Zurück zur Auswertung von (x >= (z * y))
+JUMP -43;                              # Zurück zur Auswertung von (x >= (z * y))
 # While Statement While((x >= (z * y)) (x = (x - 3))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende
