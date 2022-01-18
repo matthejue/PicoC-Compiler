@@ -1,5 +1,4 @@
 int main() {
-  char var = 20;
-  char var = 200000000000000000;
-  return 0;
+  char car;
+  char var = car = door = 10;
 }

@@ -22,7 +22,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand cars Ende
 LOADIN SP ACC 2;                       # Wert von 8 in ACC laden
 LOADIN SP IN2 1;                       # Wert von cars in IN2 laden
-MUL ACC IN2;                           # Wert von (8 * cars) in ACC laden
+MULT ACC IN2;                          # Wert von (8 * cars) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (8 * cars) Ende

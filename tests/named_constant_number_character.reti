@@ -48,7 +48,7 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- (5 ^ (- 67))) Ende
 LOADIN SP ACC 2;                       # Wert von var in ACC laden
 LOADIN SP IN2 1;                       # Wert von (- (5 ^ (- 67))) in IN2 laden
-MUL ACC IN2;                           # Wert von (var * (- (5 ^ (- 67)))) in ACC laden
+MULT ACC IN2;                          # Wert von (var * (- (5 ^ (- 67)))) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (var * (- (5 ^ (- 67)))) Ende

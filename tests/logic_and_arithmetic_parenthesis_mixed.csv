@@ -1,6 +1,6 @@
 name,type,datatype,position,value,range_from_to
-int,built in,-,-,-,(-2147483648:2147483647)
 char,built in,-,-,-,(-128:127)
+int,built in,-,-,-,(-2147483648:2147483647)
 var,variable,int,(1:18),100,-
 dom,variable,int,(1:27),101,-
 cars,variable,char,(1:37),102,-

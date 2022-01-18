@@ -1,4 +1,4 @@
 name,type,datatype,position,value,range_from_to
-int,built in,-,-,-,(-2147483648:2147483647)
 char,built in,-,-,-,(-128:127)
+int,built in,-,-,-,(-2147483648:2147483647)
 var,named constant,int,(1:24),12,-

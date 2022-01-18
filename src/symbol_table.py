@@ -4,7 +4,7 @@ import global_vars
 class Symbol:
     """Name for a program entity like a variable or function"""
 
-    __match_args__ = ("value", )
+    __match_args__ = ("value", "datatype")
 
     def __init__(self, name, datatype, position, value, range_from_to):
         """
@@ -49,6 +49,9 @@ class ConstantSymbol(Symbol):
 
 class BuiltInTypeSymbol(Symbol):
     """Built in datatypes such as int and char"""
+
+    __match_args__ = ("name", )
+
     def __init__(self, name, range):
         super().__init__(name, '-', '-', '-', range)
 
@@ -107,8 +110,8 @@ class _SymbolTable(Scope):
         self.fa_pointer = global_vars.args.begin_data_segment
 
     def initTypeSystem(self, ):
-        self.define(BuiltInTypeSymbol('int', (-2147483648, 2147483647)))
         self.define(BuiltInTypeSymbol('char', (-128, 127)))
+        self.define(BuiltInTypeSymbol('int', (-2147483648, 2147483647)))
 
     def allocate(self, sym):
         """Determine address of variable

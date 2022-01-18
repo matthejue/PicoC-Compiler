@@ -1,0 +1,59 @@
+# File ./tests/compile_huge_numbers.picoc Start
+# Main Funktion (void main ((const int car) = 2147483647) ... ) Start
+LOADI SP 200;
+# Zuweisung ((const int car) = 2147483647) Start
+# Allokation (const int car) Start
+# Konstante car vom Typ int zur Symboltabelle hinzugefügt
+# Allokation (const int car) Ende
+# Konstante car in Symboltabelle den Wert 2147483647 zugewiesen
+# Zuweisung ((const int car) = 2147483647) Ende
+# Zuweisung ((int var) = (2147483647 & ((- 2147483647) | car))) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Arithmetische binäre Operation (2147483647 & ((- 2147483647) | car)) Start
+# Arithmetischer Operand 2147483647 Start
+SUBI SP 1;                                 # Stack um eine Zelle erweitern
+LOADI ACC 32767;                           # Higher Bits '0111111111111111' in ACC laden
+MULTI ACC 65536;                           # Higher Bits um 16 Bits shiften
+ORI ACC -1;                                # Lower Bits '1111111111111111' in ACC einfügen
+STOREIN SP ACC 1;                          # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 2147483647 Ende
+# Arithmetische binäre Operation ((- 2147483647) | car) Start
+# Arithmetische unäre Operation (- 2147483647) Start
+# Arithmetischer Operand 2147483647 Start
+SUBI SP 1;                                 # Stack um eine Zelle erweitern
+LOADI ACC 32767;                           # Higher Bits '0111111111111111' in ACC laden
+MULTI ACC 65536;                           # Higher Bits um 16 Bits shiften
+ORI ACC -1;                                # Lower Bits '1111111111111111' in ACC einfügen
+STOREIN SP ACC 1;                          # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 2147483647 Ende
+LOADI ACC 0;                               # 0 in ACC laden
+LOADIN SP IN2 1;                           # Wert von e1 in IN2 laden
+SUB ACC IN2;                               # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                          # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- 2147483647) Ende
+# Arithmetischer Operand car Start
+SUBI SP 1;                                 # Stack um eine Zelle erweitern
+LOADI ACC 2147483647;                      # Wert von car in ACC laden
+STOREIN SP ACC 1;                          # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand car Ende
+LOADIN SP ACC 2;                           # Wert von (- 2147483647) in ACC laden
+LOADIN SP IN2 1;                           # Wert von car in IN2 laden
+OR ACC IN2;                                # Wert von ((- 2147483647) | car) in ACC laden
+STOREIN SP ACC 2;                          # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                                 # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation ((- 2147483647) | car) Ende
+LOADIN SP ACC 2;                           # Wert von 2147483647 in ACC laden
+LOADIN SP IN2 1;                           # Wert von ((- 2147483647) | car) in IN2 laden
+AND ACC IN2;                               # Wert von (2147483647 & ((- 2147483647) | car)) in ACC laden
+STOREIN SP ACC 2;                          # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                                 # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (2147483647 & ((- 2147483647) | car)) Ende
+LOADIN SP ACC 1;                           # Wert von (2147483647 & ((- 2147483647) | car)) in ACC laden
+ADDI SP 1;                                 # Stack um eine Zelle verkürzen
+STORE ACC 100;                             # Wert von (2147483647 & ((- 2147483647) | car)) in Variable (int var) speichern
+# Zuweisung ((int var) = (2147483647 & ((- 2147483647) | car))) Ende
+JUMP 0;
+# Main Funktion (void main ((const int car) = 2147483647) ... ) Ende
+# File ./tests/compile_huge_numbers.picoc Ende

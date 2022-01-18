@@ -1,6 +1,6 @@
 name,type,datatype,position,value,range_from_to
-int,built in,-,-,-,(-2147483648:2147483647)
 char,built in,-,-,-,(-128:127)
+int,built in,-,-,-,(-2147483648:2147483647)
 x,variable,int,(1:18),100,-
 y,named constant,char,(1:32),71,-
 z,variable,int,(1:45),101,-

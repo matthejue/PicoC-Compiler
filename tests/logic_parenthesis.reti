@@ -151,7 +151,7 @@ STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- (12 - 3)) Ende
 LOADIN SP ACC 2;                       # Wert von 123 in ACC laden
 LOADIN SP IN2 1;                       # Wert von (- (12 - 3)) in IN2 laden
-MUL ACC IN2;                           # Wert von (123 * (- (12 - 3))) in ACC laden
+MULT ACC IN2;                          # Wert von (123 * (- (12 - 3))) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (123 * (- (12 - 3))) Ende

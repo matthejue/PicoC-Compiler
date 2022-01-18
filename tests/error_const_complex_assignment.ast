@@ -1,0 +1,1 @@
+(./tests/error_const_complex_assignment.picoc (void main (int car) ((const char var) = (12 + car))))

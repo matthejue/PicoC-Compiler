@@ -63,14 +63,18 @@ class ErrorHandler:
             exit(0)
         except Errors.TooLargeLiteralError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.variable_pos[0],
-                                       e.found_pos[0])
+            if e.variable:
+                error_screen = ErrorScreen(self.finput, e.variable_pos[0],
+                                           e.found_pos[0])
+                error_screen.mark(e.variable_pos, len(e.variable))
+            else:
+                error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                           e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             if e.variable:
-                error_screen.mark(e.variable_pos, len(e.variable))
                 node_header = self._error_header(
                     None,
-                    f"Note: Datatype {e.variable_type} has only range {e.variable_from} to {e.variable_to}"
+                    f"Note: Datatype '{e.variable_type}' has only range {e.variable_from} to {e.variable_to}"
                 )
             else:
                 node_header = self._error_header(
@@ -207,8 +211,10 @@ class ErrorScreen:
 
     def filter(self, ):
         # -2 da man idx's bei 0 anfängt und man zwischen 0 und 2 usw. sein will
-        for i in set(range(0, len(self.screen))) - set(
-                range(0, len(self.screen), 3)) - set(self.marked_lines):
+        for i in sorted(set(range(0, len(self.screen))) -
+                        set(range(0, len(self.screen), 3)) -
+                        set(self.marked_lines),
+                        reverse=True):
             del self.screen[i]
 
     def undo_removing_commments(self, ):

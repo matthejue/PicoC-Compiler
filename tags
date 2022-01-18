@@ -103,6 +103,7 @@ IF	.misc/tokentypes.py	/^    IF = "if"$/;"	v	class:TT
 IF	src/lexer.py	/^    IF = "if"$/;"	v	class:TT
 INT	.misc/tokentypes.py	/^    INT = "int"$/;"	v	class:TT
 INT	src/lexer.py	/^    INT = "int"$/;"	v	class:TT
+Identifier	src/arithmetic_nodes.py	/^class Identifier(ArithmeticOperand):$/;"	c
 If	src/if_else_nodes.py	/^class If(ASTNode):$/;"	c
 IfElse	src/if_else_nodes.py	/^class IfElse(ASTNode):$/;"	c
 IfElseGrammar	src/if_else_grammar.py	/^class IfElseGrammar:$/;"	c
@@ -170,6 +171,8 @@ PLUS_OP	.misc/tokentypes.py	/^    PLUS_OP = "+"$/;"	v	class:TT
 PLUS_OP	src/lexer.py	/^    PLUS_OP = "+"$/;"	v	class:TT
 PRIM_DT	src/assignment_allocation_grammar.py	/^    PRIM_DT = {TT.INT: NT.Int, TT.CHAR: NT.Char, TT.VOID: NT.Void}$/;"	v	class:AssignmentAllocationGrammar
 Pico-C Compiler	README.md	/^# Pico-C Compiler$/;"	c
+RANGE_OF_INT	src/arithmetic_nodes.py	/^    RANGE_OF_INT = (-2147483648, 2147483647)$/;"	v	class:ArithmeticOperand
+RANGE_OF_PARAMETER	src/arithmetic_nodes.py	/^    RANGE_OF_PARAMETER = (-2097152, 2097151)$/;"	v	class:ArithmeticOperand
 R_BRACE	.misc/tokentypes.py	/^    R_BRACE = "}"$/;"	v	class:TT
 R_BRACE	src/lexer.py	/^    R_BRACE = "}"$/;"	v	class:TT
 R_PAREN	.misc/tokentypes.py	/^    R_PAREN = ")"$/;"	v	class:TT
@@ -228,7 +231,6 @@ VAR	.misc/tokentypes.py	/^    VAR = "var"  # var qualifier$/;"	v	class:TT
 VAR	src/lexer.py	/^    VAR = "var"  # var qualifier$/;"	v	class:TT
 VOID	src/lexer.py	/^    VOID = "void"$/;"	v	class:TT
 VariableSymbol	src/symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
-Variable_Constant_Identifier	src/arithmetic_nodes.py	/^class Variable_Constant_Identifier(ArithmeticOperand):$/;"	c
 Void	src/dummy_nodes.py	/^    class Void(ASTNode):$/;"	c	class:NT
 WHILE	.misc/tokentypes.py	/^    WHILE = "while"$/;"	v	class:TT
 WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
@@ -288,7 +290,8 @@ __match_args__	src/logic_nodes.py	/^    __match_args__ = ("left_atom", "binary_c
 __match_args__	src/logic_nodes.py	/^    __match_args__ = ("left_element", "relation", "right_element")$/;"	v	class:Atom	file:
 __match_args__	src/loop_nodes.py	/^    __match_args__ = ("branch", "condition")$/;"	v	class:DoWhile	file:
 __match_args__	src/loop_nodes.py	/^    __match_args__ = ("condition", "branch")$/;"	v	class:While	file:
-__match_args__	src/symbol_table.py	/^    __match_args__ = ("value", )$/;"	v	class:Symbol	file:
+__match_args__	src/symbol_table.py	/^    __match_args__ = ("name", )$/;"	v	class:BuiltInTypeSymbol	file:
+__match_args__	src/symbol_table.py	/^    __match_args__ = ("value", "datatype")$/;"	v	class:Symbol	file:
 __repr__	src/abstract_syntax_tree.py	/^    def __repr__(self):$/;"	m	class:ASTNode
 __repr__	src/arithmetic_nodes.py	/^    def __repr__(self, ):$/;"	m	class:ArithmeticBinaryOperation
 __repr__	src/arithmetic_nodes.py	/^    def __repr__(self, ):$/;"	m	class:ArithmeticUnaryOperation
@@ -324,7 +327,6 @@ _adapt_code_1	src/if_else_nodes.py	/^    def _adapt_code_1(self, ):$/;"	m	class:
 _adapt_code_1	src/loop_nodes.py	/^    def _adapt_code_1(self, ):$/;"	m	class:While
 _adapt_code_2	src/if_else_nodes.py	/^    def _adapt_code_2(self, ):$/;"	m	class:IfElse
 _adapt_code_2	src/loop_nodes.py	/^    def _adapt_code_2(self, ):$/;"	m	class:While
-_adapt_range	src/assignment_allocation_nodes.py	/^    def _adapt_range(self, name):$/;"	m	class:Assignment
 _add	src/parser_.py	/^    def _add(self, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
 _aix_support	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_aix_support"><\/a>$/;"	a
 _alloc	src/assignment_allocation_grammar.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
@@ -343,6 +345,7 @@ _bootlocale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootlo
 _bootsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootsubprocess"><\/a>$/;"	a
 _branch	src/if_else_grammar.py	/^    def _branch(self, ):$/;"	m	class:IfElseGrammar
 _bz2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bz2"><\/a>$/;"	a
+_check_huge_number	src/arithmetic_nodes.py	/^    def _check_huge_number(self, ):$/;"	m	class:ArithmeticOperand
 _codecs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs"><\/a>$/;"	a
 _codecs_cn	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs_cn"><\/a>$/;"	a
 _codecs_hk	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs_hk"><\/a>$/;"	a
@@ -370,7 +373,7 @@ _dummy_thread	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_dumm
 _elementtree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_elementtree"><\/a>$/;"	a
 _error_check	src/arithmetic_nodes.py	/^    def _error_check(self, value, position):$/;"	m	class:ArithmeticOperand
 _error_check	src/assignment_allocation_nodes.py	/^    def _error_check(self, found_name, found_pos):$/;"	m	class:Allocation
-_error_check	src/assignment_allocation_nodes.py	/^    def _error_check(self, symbol, name, value, position):$/;"	m	class:Assignment
+_error_check	src/assignment_allocation_nodes.py	/^    def _error_check(self, name, symbol, value, position):$/;"	m	class:Assignment
 _error_header	src/error_handler.py	/^    def _error_header(self, pos, descirption):$/;"	m	class:ErrorHandler
 _file	src/file_grammar.py	/^    def _file(self, ):$/;"	m	class:FileGrammar
 _fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
@@ -549,6 +552,7 @@ binascii	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="binascii">
 bisect	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="bisect"><\/a>$/;"	a
 bitwise_not	src/arithmetic_nodes.py	/^    bitwise_not = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\\n"$/;"	v	class:ArithmeticUnaryOperation
 bitwise_not_loc	src/arithmetic_nodes.py	/^    bitwise_not_loc = 1$/;"	v	class:ArithmeticUnaryOperation
+build_huge_number	src/arithmetic_nodes.py	/^    build_huge_number = strip_multiline_string($/;"	v	class:ArithmeticOperand
 builtins	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="builtins"><\/a>$/;"	a
 bz2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="bz2"><\/a>$/;"	a
 c	.misc/python_match_args_update_args_function.py	/^c = C(D("g", 69))$/;"	v
@@ -1180,7 +1184,6 @@ python.linting.pylintEnabled	.vim/coc-settings.json	/^  "python.linting.pylintEn
 queue	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="queue"><\/a>$/;"	a
 quopri	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="quopri"><\/a>$/;"	a
 random	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="random"><\/a>$/;"	a
-range_from_to	src/global_vars.py	/^range_from_to = (-2147483648, 2147483647)$/;"	v
 re	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="re"><\/a>$/;"	a
 read-all	Makefile	/^read-all:$/;"	t
 read-all-verbose	Makefile	/^read-all-verbose:$/;"	t
@@ -1197,7 +1200,7 @@ resolve	src/symbol_table.py	/^    def resolve(self, name) -> Symbol:$/;"	m	class
 resource	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="resource"><\/a>$/;"	a
 reveal_ast	src/grammar.py	/^    def reveal_ast(self):$/;"	m	class:Grammar
 runpy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="runpy"><\/a>$/;"	a
-s:l	Session.vim	/^let s:l = 112 - ((29 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	Session.vim	/^let s:l = 82 - ((5 * winheight(0) + 19) \/ 39)$/;"	v
 s:so_save	Session.vim	/^let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1$/;"	v
 s:sx	Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
@@ -1388,6 +1391,7 @@ urllib.parse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib
 urllib.request	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib.request"><\/a>$/;"	a
 urllib.response	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="urllib.response"><\/a>$/;"	a
 uu	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="uu"><\/a>$/;"	a
+variable_context	src/global_vars.py	/^variable_context: Symbol = None$/;"	v	typeref:typename:Symbol
 variable_identifier	src/arithmetic_nodes.py	/^    variable_identifier = "LOAD ACC var_identifier;  # Wert von e1 in ACC laden\\n"$/;"	v	class:ArithmeticOperand
 visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticBinaryOperation
 visit	src/arithmetic_nodes.py	/^    def visit(self, ):$/;"	m	class:ArithmeticOperand

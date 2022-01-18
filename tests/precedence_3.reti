@@ -33,7 +33,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (4 / 2) Ende
 LOADIN SP ACC 2;                       # Wert von cars in ACC laden
 LOADIN SP IN2 1;                       # Wert von (4 / 2) in IN2 laden
-MUL ACC IN2;                           # Wert von (cars * (4 / 2)) in ACC laden
+MULT ACC IN2;                          # Wert von (cars * (4 / 2)) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (cars * (4 / 2)) Ende

@@ -97,7 +97,9 @@ class BacktrackingParser():
         """
         if not global_vars.is_tasting:
             if not classname:
-                classname = mapping[self.LTT(1)]
+                classname = mapping.get(self.LTT(1))
+                # leave it to the match function to throw the error
+                if not classname: return
             self.ast_builder.CN().add_child(
                 classname(self.LT(1).value,
                           self.LT(1).position))

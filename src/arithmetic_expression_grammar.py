@@ -1,5 +1,5 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import ArithmeticUnaryOperation, ArithmeticBinaryOperation, Variable_Constant_Identifier, Number, Character
+from arithmetic_nodes import ArithmeticUnaryOperation, ArithmeticBinaryOperation, Identifier, Number, Character
 from errors import Errors
 from lexer import TT
 from dummy_nodes import NT
@@ -101,7 +101,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         :grammer: <word> | <number> | <paren> | <unop>
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.add_and_consume(classname=Variable_Constant_Identifier)
+            self.add_and_consume(classname=Identifier)
         elif self.LTT(1) == TT.NUMBER:
             self.add_and_consume(classname=Number)
         elif self.LTT(1) == TT.CHARACTER:

@@ -44,7 +44,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2 Ende
 LOADIN SP ACC 2;                       # Wert von (dom - 1) in ACC laden
 LOADIN SP IN2 1;                       # Wert von 2 in IN2 laden
-MUL ACC IN2;                           # Wert von ((dom - 1) * 2) in ACC laden
+MULT ACC IN2;                          # Wert von ((dom - 1) * 2) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation ((dom - 1) * 2) Ende

@@ -1,8 +1,8 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
-from symbol_table import VariableSymbol, ConstantSymbol
+from symbol_table import VariableSymbol, ConstantSymbol, BuiltInTypeSymbol
 from errors import Errors
 from dummy_nodes import NT
-from arithmetic_nodes import Variable_Constant_Identifier, Number, Character
+from arithmetic_nodes import Identifier, Number, Character
 import global_vars
 
 
@@ -42,7 +42,7 @@ class Assignment(ASTNode):
         except KeyError:
             # repackage the error
             match self.location:
-                case Variable_Constant_Identifier(value, position):
+                case Identifier(value, position):
                     raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(
@@ -63,30 +63,34 @@ class Assignment(ASTNode):
 
     def _assignment(self, ):
         match self:
-            case Assignment(Allocation(NT.Const(), _, Variable_Constant_Identifier(name)), assignment):
+            case Assignment(Allocation(NT.Const(), _, Identifier(name)), assignment):
                 match assignment:
                     case (Number(value, position) | Character(value, position)):
                         symbol = self.symbol_table.resolve(name)
-                        self._error_check(symbol, name, value, position)
+                        self._error_check(name, symbol, value, position)
                         symbol.value = value
                         self._comment_for_constant(name, value)
-                    case Variable_Constant_Identifier(value, position):
+                    case Identifier(value, position):
                         symbol = self.symbol_table.resolve(name)
-                        self._error_check(symbol, name, value, position)
+                        self._error_check(
+                            name, symbol, self.symbol_table.resolve(value).value, position)
                         symbol.value = self.symbol_table.resolve(value).value
                         self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
-            case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), Assignment(_, _)):
+            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
+                # TODO: sich hier überlegen wie das ausshen müsste
                 self.expression.visit()
 
                 self._adapt_code(name)
             # assigment that assigns a variable to a expression
-            case Assignment((Variable_Constant_Identifier(name) | Allocation(_, _, Variable_Constant_Identifier(name))), _):
-                self._adapt_code(name)
+            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), _):
+                # all literals in the assignent (context of the variable) must
+                # be in the range of the datatype of the variable
+                global_vars.variable_context = self.symbol_table.resolve(name)
 
                 self.expression.visit()
 
-                global_vars.range_from_to = (-2147483648, 2147483647)
+                global_vars.variable_context = None
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
 
@@ -98,20 +102,12 @@ class Assignment(ASTNode):
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
-    def _error_check(self, symbol, name, value, position):
+    def _error_check(self, name, symbol, value, position):
         range_from = symbol.datatype.range_from_to[0]
         range_to = symbol.datatype.range_from_to[1]
-        if not (range_from < int(value) < range_to):
+        if not (int(value) <= range_to):  # range_from <=
             raise Errors.TooLargeLiteralError(
                 name, symbol.position, symbol.datatype, range_from, range_to, value, position)
-
-    def _adapt_range(self, name):
-        symbol = self.symbol_table.resolve(name)
-        match symbol.datatype.name:
-            case "char":
-                global_vars.range_from_to = (-128, 127)
-            case "int":
-                global_vars.range_from_to = (-2147483648, 2147483647)
 
     def __repr__(self):
         if len(self.children) == 2:
@@ -155,13 +151,13 @@ class Allocation(ASTNode):
 
     def _adapt_code(self, ):
         match self:
-            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
+            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 self._error_check(name, position)
                 constant = ConstantSymbol(
                     name, self.symbol_table.resolve(dtype), position)
                 self.symbol_table.define(constant)
                 self._pretty_comments("Konstante", name, dtype)
-            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Variable_Constant_Identifier(name, position)):
+            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
                 self._error_check(name, position)
                 variable = VariableSymbol(
                     name, self.symbol_table.resolve(dtype), position)
