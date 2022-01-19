@@ -1,1 +1,1 @@
-(./tests/do_while_loop.picoc (void main ((int x) = 1) (char y) DoWhile((y = (x + 1)) (y < 10))))
+(do_while_loop (void main ((int x) = 1) (char y) DoWhile((y = (x + 1)) (y < 10))))

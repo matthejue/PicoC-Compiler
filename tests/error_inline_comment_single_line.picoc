@@ -1,0 +1,3 @@
+void main() {
+  int var = 32 /* inline comment */ var = 2;
+}

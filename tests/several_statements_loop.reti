@@ -1,4 +1,4 @@
-# File ./tests/several_statements_loop.picoc Start
+# File several_statements_loop Start
 # Main Funktion (void main ((const int x) = 101) ... ) Start
 LOADI SP 200;
 # Zuweisung ((const int x) = 101) Start
@@ -75,4 +75,4 @@ JUMP!= -(codelength(af) + codelength(l) + 2);                      # zurück zur
 # Do While DoWhile(((int y) = x) ... (x < 10)) Ende
 JUMP 0;
 # Main Funktion (void main ((const int x) = 101) ... ) Ende
-# File ./tests/several_statements_loop.picoc Ende
+# File several_statements_loop Ende

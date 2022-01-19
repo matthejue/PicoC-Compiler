@@ -1,0 +1,1 @@
+(logic_not_parenthesis (void main ((char bool) = 1) ((char var) = (((ToBool(1) || ToBool(bool)) && (12 < (4 + 1)))))))

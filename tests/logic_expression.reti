@@ -1,4 +1,4 @@
-# File ./tests/logic_expression.picoc Start
+# File logic_expression Start
 # Main Funktion (void main ((char var) = (12 > 3))) Start
 LOADI SP 200;
 # Zuweisung ((char var) = (12 > 3)) Start
@@ -32,4 +32,4 @@ STORE ACC 100;                         # Wert von (12 > 3) in Variable var speic
 # Zuweisung ((char var) = (12 > 3)) Ende
 JUMP 0;
 # Main Funktion (void main ((char var) = (12 > 3))) Ende
-# File ./tests/logic_expression.picoc Ende
+# File logic_expression Ende

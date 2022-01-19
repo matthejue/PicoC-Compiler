@@ -1,4 +1,4 @@
-# File ./tests/loop_statements_after_another.picoc Start
+# File loop_statements_after_another Start
 # Main Funktion (void main ((int x) = 90) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int x) = 90) Start
@@ -138,4 +138,4 @@ JUMP!= -(codelength(af) + codelength(l) + 2);                      # zurück zur
 # Do While DoWhile((x = (x + 1)) (x <= 100)) Ende
 JUMP 0;
 # Main Funktion (void main ((int x) = 90) ... ) Ende
-# File ./tests/loop_statements_after_another.picoc Ende
+# File loop_statements_after_another Ende

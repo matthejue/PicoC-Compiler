@@ -1,4 +1,4 @@
-# File ./tests/while_loop.picoc Start
+# File while_loop Start
 # Main Funktion (void main ((char x) = 10) ... ) Start
 LOADI SP 200;
 # Zuweisung ((char x) = 10) Start
@@ -70,4 +70,4 @@ JUMP -35;                              # Zurück zur Auswertung von (x < 12)
 # While Statement While((x < 12) (x = (x + 1))) Ende
 JUMP 0;
 # Main Funktion (void main ((char x) = 10) ... ) Ende
-# File ./tests/while_loop.picoc Ende
+# File while_loop Ende

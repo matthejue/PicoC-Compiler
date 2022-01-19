@@ -1,10 +1,10 @@
 void main() {
-  int char
+  int var
   // stupid comment
   /* another unneccessary comment
      that spreads over multiple
      line */
   // the last comment will be
   // particularly annoying to debug
-  int var = 12;
+  var = 12;
 }

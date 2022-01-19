@@ -1,4 +1,4 @@
-# File ./tests/uebungsblatt_6_aufgabe_1.picoc Start
+# File uebungsblatt_6_aufgabe_1 Start
 # Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
@@ -111,4 +111,4 @@ JUMP -43;                              # Zurück zur Auswertung von (x >= (z * y
 # While Statement While((x >= (z * y)) (x = (x - 3))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende
-# File ./tests/uebungsblatt_6_aufgabe_1.picoc Ende
+# File uebungsblatt_6_aufgabe_1 Ende

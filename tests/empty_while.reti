@@ -1,4 +1,4 @@
-# File ./tests/empty_while.picoc Start
+# File empty_while Start
 # Main Funktion (void main While(ToBool(99))) Start
 LOADI SP 200;
 # While Statement While(ToBool(99) ) Start
@@ -20,4 +20,4 @@ JUMP -10;                              # Zurück zur Auswertung von ToBool(99)
 # While Statement While(ToBool(99) ) Ende
 JUMP 0;
 # Main Funktion (void main While(ToBool(99))) Ende
-# File ./tests/empty_while.picoc Ende
+# File empty_while Ende

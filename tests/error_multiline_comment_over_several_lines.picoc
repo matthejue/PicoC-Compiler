@@ -1,4 +1,4 @@
 void main() {
-  char var/* unneccessary comment
-  that is just annyoing */int car = 12;
+  char var /* unneccessary comment
+  that is just annyoing */ int car = 12;
 }

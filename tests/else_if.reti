@@ -1,4 +1,4 @@
-# File ./tests/else_if.picoc Start
+# File else_if Start
 # Main Funktion (void main ((int var) = 97) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int var) = 97) Start
@@ -131,4 +131,4 @@ STORE ACC 100;                         # Wert von (var + 1) in Variable var spei
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Ende
 JUMP 0;
 # Main Funktion (void main ((int var) = 97) ... ) Ende
-# File ./tests/else_if.picoc Ende
+# File else_if Ende

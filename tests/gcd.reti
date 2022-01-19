@@ -1,4 +1,4 @@
-# File ./tests/gcd.picoc Start
+# File gcd Start
 # Main Funktion (int main ((int m) = 12) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int m) = 12) Start
@@ -116,4 +116,4 @@ JUMP -53;                              # Zurück zur Auswertung von (n > 0)
 # While Statement While((n > 0) (h = (m % n)) ... ) Ende
 JUMP 0;
 # Main Funktion (int main ((int m) = 12) ... ) Ende
-# File ./tests/gcd.picoc Ende
+# File gcd Ende

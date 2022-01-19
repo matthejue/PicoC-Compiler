@@ -1,4 +1,4 @@
-# File ./tests/constant_initialisation.picoc Start
+# File constant_initialisation Start
 # Main Funktion (void main ((const int var) = 12)) Start
 LOADI SP 200;
 # Zuweisung ((const int var) = 12) Start
@@ -9,4 +9,4 @@ LOADI SP 200;
 # Zuweisung ((const int var) = 12) Ende
 JUMP 0;
 # Main Funktion (void main ((const int var) = 12)) Ende
-# File ./tests/constant_initialisation.picoc Ende
+# File constant_initialisation Ende

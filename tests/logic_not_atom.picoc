@@ -1,0 +1,3 @@
+void main() {
+  char var = !10 < 34 + 1;
+}

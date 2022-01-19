@@ -18,7 +18,6 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         TT.LE_COMP: NT.Le,
         TT.GE_COMP: NT.Ge
     }
-    # TODO: da stimmt noch was nicht, später löschen
     LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot
 
     def code_ae_le(self):

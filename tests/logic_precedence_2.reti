@@ -1,4 +1,4 @@
-# File ./tests/logic_precedence_2.picoc Start
+# File logic_precedence_2 Start
 # Main Funktion (void main (int dom) ... ) Start
 LOADI SP 200;
 # Allokation (int dom) Start
@@ -100,4 +100,4 @@ STORE ACC 104;                         # Wert von ((12 == dom) || ((c >= 4) || (
 # Zuweisung ((int var) = ((12 == dom) || ((c >= 4) || (a != b)))) Ende
 JUMP 0;
 # Main Funktion (void main (int dom) ... ) Ende
-# File ./tests/logic_precedence_2.picoc Ende
+# File logic_precedence_2 Ende

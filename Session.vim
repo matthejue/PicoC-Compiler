@@ -3,15 +3,15 @@ let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-
 let v:this_session=expand("<sfile>:p")
 silent only
 silent tabonly
-cd ~/Documents/Studium/pico_c_compiler/src
+cd ~/Documents/Studium/pico_c_compiler
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
 argglobal
 %argdel
-$argadd pico_c_compiler.py
-edit error_handler.py
+$argadd src/pico_c_compiler.py
+edit __Tagbar__.1
 argglobal
 balt pico_c_compiler.py
 setlocal fdm=manual
@@ -21,19 +21,23 @@ setlocal fdi=#
 setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
-setlocal fen
+setlocal nofen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 144 - ((19 * winheight(0) + 19) / 39)
+let s:l = 47 - ((37 * winheight(0) + 19) / 39)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 144
-normal! 017|
-if exists(':tcd') == 2 | tcd ~/Documents/Studium/pico_c_compiler | endif
+keepjumps 47
+normal! 0
 tabnext 1
-badd +163 ~/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py
-badd +144 ~/Documents/Studium/pico_c_compiler/src/error_handler.py
+badd +162 src/lexer.py
+badd +163 src/pico_c_compiler.py
+badd +0 __Tagbar__.1
+badd +0 pico_c_compiler.py
+badd +0 error_handler.py
+badd +0 NERD_tree_2
+badd +125 src/error_handler.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

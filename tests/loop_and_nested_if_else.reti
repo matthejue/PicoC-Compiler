@@ -1,4 +1,4 @@
-# File ./tests/loop_and_nested_if_else.picoc Start
+# File loop_and_nested_if_else Start
 # Main Funktion (void main ((const char x) = 97) ... ) Start
 LOADI SP 200;
 # Zuweisung ((const char x) = 97) Start
@@ -130,4 +130,4 @@ JUMP -70;                              # Zurück zur Auswertung von (x < 12)
 # While Statement While((x < 12) (y = (y + 1)) ... ) Ende
 JUMP 0;
 # Main Funktion (void main ((const char x) = 97) ... ) Ende
-# File ./tests/loop_and_nested_if_else.picoc Ende
+# File loop_and_nested_if_else Ende

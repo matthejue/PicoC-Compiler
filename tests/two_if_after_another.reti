@@ -1,4 +1,4 @@
-# File ./tests/two_if_after_another.picoc Start
+# File two_if_after_another Start
 # Main Funktion (void main ((char var) = 10) ... ) Start
 LOADI SP 200;
 # Zuweisung ((char var) = 10) Start
@@ -98,4 +98,4 @@ STORE ACC 100;                         # Wert von 42 in Variable var speichern
 # If Statement If((cars == 10) (var = 42)) Ende
 JUMP 0;
 # Main Funktion (void main ((char var) = 10) ... ) Ende
-# File ./tests/two_if_after_another.picoc Ende
+# File two_if_after_another Ende

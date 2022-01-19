@@ -1,1 +1,1 @@
-(./tests/constant_initialisation.picoc (void main ((const int var) = 12)))
+(constant_initialisation (void main ((const int var) = 12)))

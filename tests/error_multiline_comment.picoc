@@ -1,0 +1,7 @@
+void main() {
+  int var
+  // stupid comment
+  /* another unneccessary comment
+     that spreads over multiple
+     line */ var = 12;
+}

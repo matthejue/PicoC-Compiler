@@ -1,1 +1,1 @@
-(./tests/empty_do_while.picoc (void main DoWhile(ToBool(99))))
+(empty_do_while (void main DoWhile(ToBool(99))))

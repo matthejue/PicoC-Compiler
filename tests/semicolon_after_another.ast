@@ -1,1 +1,1 @@
-(./tests/semicolon_after_another.picoc (void main ((int x) = 12) If((x < 10))))
+(semicolon_after_another (void main ((int x) = 12) If((x < 10))))

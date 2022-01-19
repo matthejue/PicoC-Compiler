@@ -1,4 +1,4 @@
-# File ./tests/if_else_braces.picoc Start
+# File if_else_braces Start
 # Main Funktion (void main ((char var) = 0) ... ) Start
 LOADI SP 200;
 # Zuweisung ((char var) = 0) Start
@@ -135,4 +135,4 @@ STORE ACC 102;                         # Wert von 1 in Variable b speichern
 # If und Else Statement IfElse((var == 0) (var = 100) ... else (var = (var - 1)) ... ) Ende
 JUMP 0;
 # Main Funktion (void main ((char var) = 0) ... ) Ende
-# File ./tests/if_else_braces.picoc Ende
+# File if_else_braces Ende

@@ -1,1 +1,1 @@
-(./tests/if_with_character_as_condition.picoc (void main If(ToBool(97))))
+(if_with_character_as_condition (void main If(ToBool(97))))

@@ -1,4 +1,4 @@
-# File ./tests/empty_else.picoc Start
+# File empty_else Start
 # Main Funktion (void main IfElse(ToBool(99) else)) Start
 LOADI SP 200;
 # If und Else Statement IfElse(ToBool(99)  else ) Start
@@ -22,4 +22,4 @@ JUMP 1;                                # Else-Branch überspringen
 # If und Else Statement IfElse(ToBool(99)  else ) Ende
 JUMP 0;
 # Main Funktion (void main IfElse(ToBool(99) else)) Ende
-# File ./tests/empty_else.picoc Ende
+# File empty_else Ende

@@ -1,4 +1,4 @@
-# File ./tests/empty_do_while.picoc Start
+# File empty_do_while Start
 # Main Funktion (void main DoWhile(ToBool(99))) Start
 LOADI SP 200;
 # Do While DoWhile( ToBool(99)) Start
@@ -19,4 +19,4 @@ JUMP!= -(codelength(af) + codelength(l) + 2);                      # zurück zur
 # Do While DoWhile( ToBool(99)) Ende
 JUMP 0;
 # Main Funktion (void main DoWhile(ToBool(99))) Ende
-# File ./tests/empty_do_while.picoc Ende
+# File empty_do_while Ende

@@ -1,1 +1,1 @@
-(./tests/loop_statements_after_another.picoc (void main ((int x) = 90) While((x <= 100) (x = (x + 1))) (x = 10) DoWhile((x = (x + 1)) (x <= 100))))
+(loop_statements_after_another (void main ((int x) = 90) While((x <= 100) (x = (x + 1))) (x = 10) DoWhile((x = (x + 1)) (x <= 100))))

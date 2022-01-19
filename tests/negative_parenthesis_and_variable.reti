@@ -1,4 +1,4 @@
-# File ./tests/negative_parenthesis_and_variable.picoc Start
+# File negative_parenthesis_and_variable Start
 # Main Funktion (void main (char cars) ... ) Start
 LOADI SP 200;
 # Allokation (char cars) Start
@@ -43,4 +43,4 @@ STORE ACC 101;                         # Wert von (- ((- cars) % 2)) in Variable
 # Zuweisung ((int var) = (- ((- cars) % 2))) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende
-# File ./tests/negative_parenthesis_and_variable.picoc Ende
+# File negative_parenthesis_and_variable Ende

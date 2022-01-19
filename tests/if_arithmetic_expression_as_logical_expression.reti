@@ -1,4 +1,4 @@
-# File ./tests/if_arithmetic_expression_as_logical_expression.picoc Start
+# File if_arithmetic_expression_as_logical_expression Start
 # Main Funktion (void main ((int var) = 198123) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int var) = 198123) Start
@@ -60,4 +60,4 @@ STORE ACC 100;                         # Wert von 123 in Variable var speichern
 # If Statement If(ToBool((123 * var)) (var = 123)) Ende
 JUMP 0;
 # Main Funktion (void main ((int var) = 198123) ... ) Ende
-# File ./tests/if_arithmetic_expression_as_logical_expression.picoc Ende
+# File if_arithmetic_expression_as_logical_expression Ende

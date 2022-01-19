@@ -1,1 +1,1 @@
-(./tests/character_as_operand.picoc (void main ((int x) = (67 + 1)) (x = (x + (97 - 65)))))
+(character_as_operand (void main ((int x) = (67 + 1)) (x = (x + (97 - 65)))))

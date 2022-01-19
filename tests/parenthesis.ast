@@ -1,1 +1,1 @@
-(./tests/parenthesis.picoc (void main (char cars) ((int var) = ((4 + 7) | cars))))
+(parenthesis (void main (char cars) ((int var) = ((4 + 7) | cars))))

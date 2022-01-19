@@ -1,4 +1,4 @@
-# File ./tests/nested_loops.picoc Start
+# File nested_loops Start
 # Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
@@ -106,4 +106,4 @@ JUMP -54;                              # Zurück zur Auswertung von (x <= 42)
 # While Statement While((x <= 42) While((y <= 42) (z = (x & y)))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende
-# File ./tests/nested_loops.picoc Ende
+# File nested_loops Ende

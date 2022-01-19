@@ -1,4 +1,4 @@
-# File ./tests/connected_logic_expression.picoc Start
+# File connected_logic_expression Start
 # Main Funktion (void main ((char dom) = 99) ... ) Start
 LOADI SP 200;
 # Zuweisung ((char dom) = 99) Start
@@ -73,4 +73,4 @@ STORE ACC 101;                         # Wert von ((12 > 3) && (dom <= 4)) in Va
 # Zuweisung ((int var) = ((12 > 3) && (dom <= 4))) Ende
 JUMP 0;
 # Main Funktion (void main ((char dom) = 99) ... ) Ende
-# File ./tests/connected_logic_expression.picoc Ende
+# File connected_logic_expression Ende

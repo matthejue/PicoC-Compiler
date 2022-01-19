@@ -1,4 +1,4 @@
-# File ./tests/logic_parenthesis.picoc Start
+# File logic_parenthesis Start
 # Main Funktion (int main ((int bool_var) = 0) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int bool_var) = 0) Start
@@ -210,4 +210,4 @@ STORE ACC 100;                         # Wert von ((((123 * (- (12 - 3))) >= 12)
 # If Statement If(((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1))) Ende
 JUMP 0;
 # Main Funktion (int main ((int bool_var) = 0) ... ) Ende
-# File ./tests/logic_parenthesis.picoc Ende
+# File logic_parenthesis Ende

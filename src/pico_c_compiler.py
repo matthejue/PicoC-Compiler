@@ -105,7 +105,7 @@ def main():
         _shell()
     else:
         infile = global_vars.args.infile
-        outbase = _basename(infile)
+        outbase = _remove_extension(infile)
 
     try:
         _read_and_write_file(infile, outbase)
@@ -147,7 +147,7 @@ def _read_and_write_file(infile, outbase):
 
 def _compile(code, infile, outbase=None):
     # remove all empty lines and \n from the code lines in the list
-    code_without_cr = [infile + " "] + list(
+    code_without_cr = [_basename(infile) + " "] + list(
         filter(lambda line: line, map(lambda line: line.strip('\n'), code)))
 
     if global_vars.args.concrete_syntax:
@@ -244,14 +244,24 @@ def _reti_code(abstract_syntax_tree, outbase):
             fout.write(str(abstract_syntax_tree.show_generated_code()))
 
 
-def _basename(fname):
+def _remove_extension(fname):
     """stips of the file extension
     :fname: filename
     :returns: basename of the file
 
     """
-    index_of_extension = fname.rindex('.')
-    return fname[0:index_of_extension]
+    index_of_extension_start = fname.rindex('.')
+    return fname[0:index_of_extension_start]
+
+
+def _remove_path(fname):
+    index_of_path_end = fname.rindex('/')
+    return fname[index_of_path_end + 1:]
+
+
+def _basename(fname):
+    fname = _remove_extension(fname)
+    return _remove_path(fname)
 
 
 if __name__ == '__main__':

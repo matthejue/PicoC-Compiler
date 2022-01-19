@@ -1,1 +1,1 @@
-(./tests/error_not_initialised_variable_assignment.picoc (void main (var = (31 > 7))))
+(error_not_initialised_variable_assignment (void main (var = (31 > 7))))

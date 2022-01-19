@@ -1,1 +1,1 @@
-(./tests/empty_if.picoc (void main If(ToBool(99))))
+(empty_if (void main If(ToBool(99))))

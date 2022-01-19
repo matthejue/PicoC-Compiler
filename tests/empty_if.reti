@@ -1,4 +1,4 @@
-# File ./tests/empty_if.picoc Start
+# File empty_if Start
 # Main Funktion (void main If(ToBool(99))) Start
 LOADI SP 200;
 # If Statement If(ToBool(99) ) Start
@@ -20,4 +20,4 @@ JUMP== 1;                              # Branch überspringen
 # If Statement If(ToBool(99) ) Ende
 JUMP 0;
 # Main Funktion (void main If(ToBool(99))) Ende
-# File ./tests/empty_if.picoc Ende
+# File empty_if Ende

@@ -1,1 +1,1 @@
-(./tests/if_arithmetic_expression_as_logical_expression.picoc (void main ((int var) = 198123) If(ToBool((123 * var)) (var = 123))))
+(if_arithmetic_expression_as_logical_expression (void main ((int var) = 198123) If(ToBool((123 * var)) (var = 123))))

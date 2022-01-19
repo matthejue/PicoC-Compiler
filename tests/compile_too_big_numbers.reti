@@ -1,4 +1,4 @@
-# File ./tests/compile_too_big_numbers.picoc Start
+# File compile_too_big_numbers Start
 # Main Funktion (void main ((int car) = 2097152) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int car) = 2097152) Start
@@ -63,4 +63,4 @@ STORE ACC 101;                          # Wert von (2097151 & ((- 2097160) | car
 # Zuweisung ((int var) = (2097151 & ((- 2097160) | car))) Ende
 JUMP 0;
 # Main Funktion (void main ((int car) = 2097152) ... ) Ende
-# File ./tests/compile_too_big_numbers.picoc Ende
+# File compile_too_big_numbers Ende

@@ -1,4 +1,4 @@
-# File ./tests/character_as_operand.picoc Start
+# File character_as_operand Start
 # Main Funktion (void main ((int x) = (67 + 1)) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int x) = (67 + 1)) Start
@@ -67,4 +67,4 @@ STORE ACC 100;                         # Wert von (x + (97 - 65)) in Variable x 
 # Zuweisung (x = (x + (97 - 65))) Ende
 JUMP 0;
 # Main Funktion (void main ((int x) = (67 + 1)) ... ) Ende
-# File ./tests/character_as_operand.picoc Ende
+# File character_as_operand Ende

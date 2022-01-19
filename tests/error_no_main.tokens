@@ -1,1 +1,1 @@
-[<TT.IDENTIFIER,'./tests/error_no_main.picoc',(0, 0)>, <TT.VOID,'void',(1, 0)>, <TT.IDENTIFIER,'fun',(1, 5)>, <TT.L_PAREN,'(',(1, 8)>, <TT.R_PAREN,')',(1, 9)>, <TT.L_BRACE,'{',(1, 11)>, <TT.SEMICOLON,';',(1, 13)>, <TT.R_BRACE,'}',(1, 15)>]
+[<TT.IDENTIFIER,'error_no_main',(0, 0)>, <TT.VOID,'void',(1, 0)>, <TT.IDENTIFIER,'fun',(1, 5)>, <TT.L_PAREN,'(',(1, 8)>, <TT.R_PAREN,')',(1, 9)>, <TT.L_BRACE,'{',(1, 11)>, <TT.SEMICOLON,';',(1, 13)>, <TT.R_BRACE,'}',(1, 15)>]

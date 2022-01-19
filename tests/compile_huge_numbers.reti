@@ -1,4 +1,4 @@
-# File ./tests/compile_huge_numbers.picoc Start
+# File compile_huge_numbers Start
 # Main Funktion (void main ((const int car) = 2147483647) ... ) Start
 LOADI SP 200;
 # Zuweisung ((const int car) = 2147483647) Start
@@ -56,4 +56,4 @@ STORE ACC 100;                             # Wert von (2147483647 & ((- 21474836
 # Zuweisung ((int var) = (2147483647 & ((- 2147483647) | car))) Ende
 JUMP 0;
 # Main Funktion (void main ((const int car) = 2147483647) ... ) Ende
-# File ./tests/compile_huge_numbers.picoc Ende
+# File compile_huge_numbers Ende

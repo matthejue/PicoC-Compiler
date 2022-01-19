@@ -1,0 +1,1 @@
+(logic_not_atom (void main ((char var) = ((10 < (34 + 1))))))

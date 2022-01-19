@@ -152,14 +152,14 @@ class Lexer:
                                  self.position)
                 return Token(STRING_TO_TT_COMPLEX[self.c], self.c,
                              self.position)
-            elif self.lc in self.LETTER + '_.':
+            elif self.lc in self.LETTER + '_':
                 # identifier or special keyword symbol
                 # :grammar: <identifier>|if|else|while|do|int|char
                 # |void|const|main
                 # :identifier: <letter> <letter_digit>*
                 self.next_char()
                 symbol = self.c
-                while self.lc in self.LETTER_DIGIT + "_./":
+                while self.lc in self.LETTER_DIGIT + "_":
                     self.next_char()
                     symbol += self.c
                 if STRING_TO_TT_WORDS.get(symbol):
@@ -199,7 +199,6 @@ class Lexer:
                         self.position)
                 return Token(TT.CHARACTER, str(ord(char)), self.position)
             elif self.lc == '/':
-                #  __import__('pudb').set_trace()
                 # division or comments
                 # :grammar: /(/|(<star>.*<start>/))?
                 self.next_char()

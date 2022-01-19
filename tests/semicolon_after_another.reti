@@ -1,4 +1,4 @@
-# File ./tests/semicolon_after_another.picoc Start
+# File semicolon_after_another Start
 # Main Funktion (void main ((int x) = 12) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int x) = 12) Start
@@ -43,4 +43,4 @@ JUMP== 1;                              # Branch überspringen
 # If Statement If((x < 10) ) Ende
 JUMP 0;
 # Main Funktion (void main ((int x) = 12) ... ) Ende
-# File ./tests/semicolon_after_another.picoc Ende
+# File semicolon_after_another Ende

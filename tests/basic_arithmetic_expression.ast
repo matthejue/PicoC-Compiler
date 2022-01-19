@@ -1,1 +1,1 @@
-(./tests/basic_arithmetic_expression.picoc (void main ((char var) = (12 - 374))))
+(basic_arithmetic_expression (void main ((char var) = (12 - 374))))

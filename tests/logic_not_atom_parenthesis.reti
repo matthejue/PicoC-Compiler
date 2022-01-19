@@ -1,0 +1,53 @@
+# File logic_not_atom_parenthesis Start
+# Main Funktion (void main ((char var) = ((1 < (34 + 10))))) Start
+LOADI SP 200;
+# Zuweisung ((char var) = ((1 < (34 + 10)))) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Logische unäre Verknüpfung ((1 < (34 + 10))) Start
+# Logisches Atom (1 < (34 + 10)) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+# Arithmetische binäre Operation (34 + 10) Start
+# Arithmetischer Operand 34 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 34;                          # Wert von 34 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 34 Ende
+# Arithmetischer Operand 10 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 10;                          # Wert von 10 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 10 Ende
+LOADIN SP ACC 2;                       # Wert von 34 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 10 in IN2 laden
+ADD ACC IN2;                           # Wert von (34 + 10) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (34 + 10) Ende
+LOADIN SP ACC 2;                       # Wert von 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (34 + 10) in IN2 laden
+SUB ACC IN2;                           # 1 - (34 + 10) in ACC laden
+JUMP< 3;                               # Ergebnis 1, wenn (1 < (34 + 10)) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (1 < (34 + 10)) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 1 < (34 + 10) wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (1 < (34 + 10)) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (1 < (34 + 10)) in IN2 laden
+OPLUS ACC IN2;                         # !((1 < (34 + 10))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung ((1 < (34 + 10))) Ende
+LOADIN SP ACC 1;                       # Wert von ((1 < (34 + 10))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von ((1 < (34 + 10))) in Variable var speichern
+# Zuweisung ((char var) = ((1 < (34 + 10)))) Ende
+JUMP 0;
+# Main Funktion (void main ((char var) = ((1 < (34 + 10))))) Ende
+# File logic_not_atom_parenthesis Ende

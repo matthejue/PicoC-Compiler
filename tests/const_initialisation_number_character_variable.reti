@@ -1,4 +1,4 @@
-# File ./tests/const_initialisation_number_character_variable.picoc Start
+# File const_initialisation_number_character_variable Start
 # Main Funktion (void main ((const char var1) = 99) ... ) Start
 LOADI SP 200;
 # Zuweisung ((const char var1) = 99) Start
@@ -21,4 +21,4 @@ LOADI SP 200;
 # Zuweisung ((const char var3) = var1) Ende
 JUMP 0;
 # Main Funktion (void main ((const char var1) = 99) ... ) Ende
-# File ./tests/const_initialisation_number_character_variable.picoc Ende
+# File const_initialisation_number_character_variable Ende

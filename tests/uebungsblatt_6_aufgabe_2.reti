@@ -1,4 +1,4 @@
-# File ./tests/uebungsblatt_6_aufgabe_2.picoc Start
+# File uebungsblatt_6_aufgabe_2 Start
 # Main Funktion (void main ((int x) = 42) ... ) Start
 LOADI SP 200;
 # Zuweisung ((int x) = 42) Start
@@ -191,4 +191,4 @@ STORE ACC 102;                         # Wert von 1 in Variable is_less speicher
 # If und Else Statement IfElse(ToBool(((x > 0) ^ (y > 0))) (is_less = (x <= y)) else IfElse((x > 0) (is_less = 0) else (is_less = 1))) Ende
 JUMP 0;
 # Main Funktion (void main ((int x) = 42) ... ) Ende
-# File ./tests/uebungsblatt_6_aufgabe_2.picoc Ende
+# File uebungsblatt_6_aufgabe_2 Ende

@@ -1,0 +1,5 @@
+void main() {
+  int var/*another unneccessary comment
+     that spreads over multiple
+     line*/var = 12;
+}

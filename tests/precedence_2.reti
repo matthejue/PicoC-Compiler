@@ -1,4 +1,4 @@
-# File ./tests/precedence_2.picoc Start
+# File precedence_2 Start
 # Main Funktion (void main ((int var) = (8 + (4 - 2)))) Start
 LOADI SP 200;
 # Zuweisung ((int var) = (8 + (4 - 2))) Start
@@ -40,4 +40,4 @@ STORE ACC 100;                         # Wert von (8 + (4 - 2)) in Variable var 
 # Zuweisung ((int var) = (8 + (4 - 2))) Ende
 JUMP 0;
 # Main Funktion (void main ((int var) = (8 + (4 - 2)))) Ende
-# File ./tests/precedence_2.picoc Ende
+# File precedence_2 Ende

@@ -1,0 +1,4 @@
+void main() {
+  char bool = 1;
+  char var = !((1 || bool) && 12 < 4 + 1);
+}

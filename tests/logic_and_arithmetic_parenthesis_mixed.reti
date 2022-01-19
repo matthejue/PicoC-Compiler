@@ -1,4 +1,4 @@
-# File ./tests/logic_and_arithmetic_parenthesis_mixed.picoc Start
+# File logic_and_arithmetic_parenthesis_mixed Start
 # Main Funktion (void main (int var) ... ) Start
 LOADI SP 200;
 # Allokation (int var) Start
@@ -123,4 +123,4 @@ STORE ACC 100;                         # Wert von (((12 <= ((dom - 1) * 2)) || (
 # Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Ende
 JUMP 0;
 # Main Funktion (void main (int var) ... ) Ende
-# File ./tests/logic_and_arithmetic_parenthesis_mixed.picoc Ende
+# File logic_and_arithmetic_parenthesis_mixed Ende

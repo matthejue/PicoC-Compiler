@@ -1,4 +1,4 @@
-# File ./tests/named_constant_number_character.picoc Start
+# File named_constant_number_character Start
 # Main Funktion (void main ((const char var) = 113) ... ) Start
 LOADI SP 200;
 # Zuweisung ((const char var) = 113) Start
@@ -58,4 +58,4 @@ STORE ACC 100;                         # Wert von (var * (- (5 ^ (- 67)))) in Va
 # Zuweisung ((char x) = (var * (- (5 ^ (- 67))))) Ende
 JUMP 0;
 # Main Funktion (void main ((const char var) = 113) ... ) Ende
-# File ./tests/named_constant_number_character.picoc Ende
+# File named_constant_number_character Ende

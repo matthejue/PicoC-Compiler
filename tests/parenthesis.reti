@@ -1,4 +1,4 @@
-# File ./tests/parenthesis.picoc Start
+# File parenthesis Start
 # Main Funktion (void main (char cars) ... ) Start
 LOADI SP 200;
 # Allokation (char cars) Start
@@ -43,4 +43,4 @@ STORE ACC 101;                         # Wert von ((4 + 7) | cars) in Variable v
 # Zuweisung ((int var) = ((4 + 7) | cars)) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende
-# File ./tests/parenthesis.picoc Ende
+# File parenthesis Ende

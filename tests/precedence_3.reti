@@ -1,4 +1,4 @@
-# File ./tests/precedence_3.picoc Start
+# File precedence_3 Start
 # Main Funktion (void main (char cars) ... ) Start
 LOADI SP 200;
 # Allokation (char cars) Start
@@ -43,4 +43,4 @@ STORE ACC 101;                         # Wert von (cars * (4 / 2)) in Variable v
 # Zuweisung ((int var) = (cars * (4 / 2))) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende
-# File ./tests/precedence_3.picoc Ende
+# File precedence_3 Ende

@@ -1,4 +1,4 @@
-# File ./tests/uebungsblatt_5_aufgabe_3.picoc Start
+# File uebungsblatt_5_aufgabe_3 Start
 # Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
@@ -96,4 +96,4 @@ STORE ACC 100;                         # Wert von (x + ((y * z) + 10)) in Variab
 # Zuweisung (x = (x + ((y * z) + 10))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende
-# File ./tests/uebungsblatt_5_aufgabe_3.picoc Ende
+# File uebungsblatt_5_aufgabe_3 Ende

@@ -1,4 +1,4 @@
-# File ./tests/if_with_character_as_condition.picoc Start
+# File if_with_character_as_condition Start
 # Main Funktion (void main If(ToBool(97))) Start
 LOADI SP 200;
 # If Statement If(ToBool(97) ) Start
@@ -20,4 +20,4 @@ JUMP== 1;                              # Branch überspringen
 # If Statement If(ToBool(97) ) Ende
 JUMP 0;
 # Main Funktion (void main If(ToBool(97))) Ende
-# File ./tests/if_with_character_as_condition.picoc Ende
+# File if_with_character_as_condition Ende
