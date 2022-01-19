@@ -183,7 +183,7 @@ class ErrorHandler:
         # The if is only necessary in case _remove_comments already emptied a
         # */ commment and in turn set multiline_comment_started to True. When
         # returning from this function The emptied comment would be copied again.
-        if self.removed_comments[-1][2] != comment:
+        if self.removed_comments[-1][0] != row:
             self.removed_comments += [(row, col, comment)]
 
     def _undo_removing_commments(self, ):
