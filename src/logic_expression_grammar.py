@@ -136,7 +136,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         if self.LTT(1) == TT.NOT:
             self._not_expr()
         elif self.LTT(1) in [
-                TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER, TT.L_PAREN
+                TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER, TT.L_PAREN, TT.MINUS_OP
         ]:
             self._parenthized_logic_expression_or_arithmetic_term_or_comparison(
             )

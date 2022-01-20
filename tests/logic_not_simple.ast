@@ -1,0 +1,1 @@
+(logic_not_simple (void main ((char var) = (ToBool((- 10))))))
