@@ -81,7 +81,6 @@ class Assignment(ASTNode):
                         self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
             case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
-                # TODO: sich hier überlegen wie das ausshen müsste
                 self.expression.visit()
 
                 self._adapt_code(name)

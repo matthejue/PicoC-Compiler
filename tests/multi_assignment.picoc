@@ -1,0 +1,6 @@
+void main() {
+  char var;
+  int var2;
+  int var3 = var2 = va1 = 1 + 1;
+  var3 = var2 = va1 = 1 > 1 && 1;
+}

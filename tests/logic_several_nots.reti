@@ -1,4 +1,4 @@
-# File logic_not_several Start
+# File logic_several_nots Start
 # Main Funktion (void main ((char bool) = 0) ... ) Start
 LOADI SP 200;
 # Zuweisung ((char bool) = 0) Start
@@ -117,4 +117,4 @@ STORE ACC 101;                         # Wert von Not(Not(Not((Not(Not(((1 - 1) 
 # Zuweisung ((char var) = Not(Not(Not((Not(Not(((1 - 1) < 12))) && Not(Not(ToBool(bool)))))))) Ende
 JUMP 0;
 # Main Funktion (void main ((char bool) = 0) ... ) Ende
-# File logic_not_several Ende
+# File logic_several_nots Ende
