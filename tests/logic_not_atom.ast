@@ -1,1 +1,1 @@
-(logic_not_atom (void main ((char var) = ((10 < (34 + 1))))))
+(logic_not_atom (void main ((char var) = Not((10 < (34 + 1))))))

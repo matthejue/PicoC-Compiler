@@ -1,1 +1,1 @@
-(logic_not_several (void main ((char bool) = 0) ((char var) = ((((((((1 - 1) < 12))) && ((ToBool(bool))))))))))
+(logic_not_several (void main ((char bool) = 0) ((char var) = Not(Not(Not((Not(Not(((1 - 1) < 12))) && Not(Not(ToBool(bool))))))))))

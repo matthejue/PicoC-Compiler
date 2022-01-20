@@ -1,11 +1,11 @@
 # File logic_not_simple Start
-# Main Funktion (void main ((char var) = (ToBool((- 10))))) Start
+# Main Funktion (void main ((char var) = Not(ToBool((- 10))))) Start
 LOADI SP 200;
-# Zuweisung ((char var) = (ToBool((- 10)))) Start
+# Zuweisung ((char var) = Not(ToBool((- 10)))) Start
 # Allokation (char var) Start
 # Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
-# Logische unäre Verknüpfung (ToBool((- 10))) Start
+# Logische unäre Verknüpfung Not(ToBool((- 10))) Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((- 10)) Start
 # Arithmetische unäre Operation (- 10) Start
 # Arithmetischer Operand 10 Start
@@ -27,11 +27,11 @@ LOADI ACC 1;                           # 1 in ACC laden
 LOADIN SP IN2 1;                       # Wert von ToBool((- 10)) in IN2 laden
 OPLUS ACC IN2;                         # !(ToBool((- 10))) in ACC laden
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logische unäre Verknüpfung (ToBool((- 10))) Ende
-LOADIN SP ACC 1;                       # Wert von (ToBool((- 10))) in ACC laden
+# Logische unäre Verknüpfung Not(ToBool((- 10))) Ende
+LOADIN SP ACC 1;                       # Wert von Not(ToBool((- 10))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (ToBool((- 10))) in Variable var speichern
-# Zuweisung ((char var) = (ToBool((- 10)))) Ende
+STORE ACC 100;                         # Wert von Not(ToBool((- 10))) in Variable var speichern
+# Zuweisung ((char var) = Not(ToBool((- 10)))) Ende
 JUMP 0;
-# Main Funktion (void main ((char var) = (ToBool((- 10))))) Ende
+# Main Funktion (void main ((char var) = Not(ToBool((- 10))))) Ende
 # File logic_not_simple Ende

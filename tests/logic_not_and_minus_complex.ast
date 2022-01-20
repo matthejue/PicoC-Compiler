@@ -1,0 +1,1 @@
+(logic_not_and_minus_complex (void main ((char bool) = 0) ((char var) = Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool))))))))))))

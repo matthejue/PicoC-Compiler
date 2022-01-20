@@ -1,0 +1,56 @@
+# File logic_not_and_minus_simple_2 Start
+# Main Funktion (void main ((char bool) = 0) ... ) Start
+LOADI SP 200;
+# Zuweisung ((char bool) = 0) Start
+# Allokation (char bool) Start
+# Variable bool vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char bool) Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 0 in Variable bool speichern
+# Zuweisung ((char bool) = 0) Ende
+# Zuweisung ((char var) = Not(Not(ToBool((- bool))))) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Logische unäre Verknüpfung Not(Not(ToBool((- bool)))) Start
+# Logische unäre Verknüpfung Not(ToBool((- bool))) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((- bool)) Start
+# Arithmetische unäre Operation (- bool) Start
+# Arithmetischer Operand bool Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von bool in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand bool Ende
+LOADI ACC 0;                           # 0 in ACC laden
+LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
+SUB ACC IN2;                           # (0 - e1) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation (- bool) Ende
+LOADIN SP ACC 1;                       # Wert von (- bool) in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn (- bool) den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool((- bool)) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool((- bool)) in IN2 laden
+OPLUS ACC IN2;                         # !(ToBool((- bool))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung Not(ToBool((- bool))) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von Not(ToBool((- bool))) in IN2 laden
+OPLUS ACC IN2;                         # !(Not(ToBool((- bool)))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung Not(Not(ToBool((- bool)))) Ende
+LOADIN SP ACC 1;                       # Wert von Not(Not(ToBool((- bool)))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von Not(Not(ToBool((- bool)))) in Variable var speichern
+# Zuweisung ((char var) = Not(Not(ToBool((- bool))))) Ende
+JUMP 0;
+# Main Funktion (void main ((char bool) = 0) ... ) Ende
+# File logic_not_and_minus_simple_2 Ende

@@ -95,9 +95,6 @@ class Not(ASTNode):
         self.end = self.code_generator.replace_code_pre(
             self.end, "l1", str(self.atom))
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
-
 
 class Atom(ASTNode):
     """Abstract Syntax Tree Node for logic atom"""

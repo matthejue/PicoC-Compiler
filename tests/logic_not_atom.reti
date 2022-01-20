@@ -1,11 +1,11 @@
 # File logic_not_atom Start
-# Main Funktion (void main ((char var) = ((10 < (34 + 1))))) Start
+# Main Funktion (void main ((char var) = Not((10 < (34 + 1))))) Start
 LOADI SP 200;
-# Zuweisung ((char var) = ((10 < (34 + 1)))) Start
+# Zuweisung ((char var) = Not((10 < (34 + 1)))) Start
 # Allokation (char var) Start
 # Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
-# Logische unäre Verknüpfung ((10 < (34 + 1))) Start
+# Logische unäre Verknüpfung Not((10 < (34 + 1))) Start
 # Logisches Atom (10 < (34 + 1)) Start
 # Arithmetischer Operand 10 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -43,11 +43,11 @@ LOADI ACC 1;                           # 1 in ACC laden
 LOADIN SP IN2 1;                       # Wert von (10 < (34 + 1)) in IN2 laden
 OPLUS ACC IN2;                         # !((10 < (34 + 1))) in ACC laden
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logische unäre Verknüpfung ((10 < (34 + 1))) Ende
-LOADIN SP ACC 1;                       # Wert von ((10 < (34 + 1))) in ACC laden
+# Logische unäre Verknüpfung Not((10 < (34 + 1))) Ende
+LOADIN SP ACC 1;                       # Wert von Not((10 < (34 + 1))) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von ((10 < (34 + 1))) in Variable var speichern
-# Zuweisung ((char var) = ((10 < (34 + 1)))) Ende
+STORE ACC 100;                         # Wert von Not((10 < (34 + 1))) in Variable var speichern
+# Zuweisung ((char var) = Not((10 < (34 + 1)))) Ende
 JUMP 0;
-# Main Funktion (void main ((char var) = ((10 < (34 + 1))))) Ende
+# Main Funktion (void main ((char var) = Not((10 < (34 + 1))))) Ende
 # File logic_not_atom Ende

@@ -4,6 +4,7 @@ from logic_nodes import LogicBinaryOperation, Not, Atom, ToBool
 from errors import Errors
 from dummy_nodes import NT
 from itertools import chain
+from reference import Reference
 
 
 class LogicExpressionGrammar(ArithmeticExpressionGrammar):
@@ -30,23 +31,24 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # because both arithmetic and logic grammar have single numbers. In
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
-        errors = []
-        if self.taste(self._taste_consume_ae, errors):
+        error = Reference()
+        if self.taste(self._taste_consume_ae, error):
             self._taste_consume_ae()
-        elif self.taste(self.code_le, errors):
+        elif self.taste(self.code_le, error):
             self.code_le()
         else:
-            self._handle_all_tastes_unsuccessful(
-                "arithmetic or logic expression", errors)
+            raise error.val
+            #  self._handle_all_tastes_unsuccessful(
+            #  "arithmetic or logic expression", error)
 
-    def _handle_all_tastes_unsuccessful(self, expected, errors):
-        # if both threw the same error print that error out
-        if all(elem == errors[0] for elem in errors):
-            raise errors[0]
-        else:
-            token = self.LT(1)
-            raise Errors.NoApplicableRuleError(expected, token.value,
-                                               token.position)
+    #  def _handle_all_tastes_unsuccessful(self, expected, errors):
+    #      # if both threw the same error print that error out
+    #      if all(elem == errors[0] for elem in errors):
+    #          raise errors[0]
+    #      else:
+    #          token = self.LT(1)
+    #          raise Errors.NoApplicableRuleError(expected, token.value,
+    #                                             token.position)
 
     def _taste_consume_ae(self):
         """taste whether the next expression is a arithmetic expression
@@ -169,18 +171,19 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         """
-        errors = []
+        error = Reference()
         if self.taste(self._taste_consume_parenthesized_logic_expression,
-                      errors):
+                      error):
             self._taste_consume_parenthesized_logic_expression()
-        elif self.taste(self._taste_consume_arithmetic_term, errors):
+        elif self.taste(self._taste_consume_arithmetic_term, error):
             self._taste_consume_arithmetic_term()
-        elif self.taste(self._atom, errors):
+        elif self.taste(self._atom, error):
             self._atom()
         else:
-            self._handle_all_tastes_unsuccessful(
-                "parenthized logic formula or arithmetic term or comparison",
-                errors)
+            raise error.val
+            #  self._handle_all_tastes_unsuccessful(
+            #  "parenthized logic formula or arithmetic term or comparison",
+            #  errors)
 
     def _taste_consume_parenthesized_logic_expression(self, ):
         self._parenthesized_logic_expression()
@@ -193,7 +196,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         :grammar: ( <code_le> )
         """
-        self.consume_next_token()  # [TT.L_PAREN]
+        self.match([TT.L_PAREN])
         self.code_le()
         self.match([TT.R_PAREN])
 

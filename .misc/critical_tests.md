@@ -15,3 +15,5 @@
 - error_no_operand_left
 - error_no_closing_parenthesis
 - error_allocation
+
+error_no_operand_right

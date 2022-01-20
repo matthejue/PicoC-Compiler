@@ -143,7 +143,7 @@ class BacktrackingParser():
         self.lt_idx = self.markers.pop()
         global_vars.is_tasting -= 1
 
-    def taste(self, rule, errors):
+    def taste(self, rule, error):
         """Tries ("tastes") out alternative and says whether it will raise a
         exception so one can go on and try out the next alternative. Is used in
         case of syntactically undistinguishable grammar rules.
@@ -161,7 +161,7 @@ class BacktrackingParser():
                 Errors.UnclosedCharacterError) as e:
             raise e
         except Exception as e:
-            errors += [e]
+            error.val = e
             tastes_good = False
         self._release()
         return tastes_good

@@ -2,6 +2,7 @@ from lexer import TT
 from errors import Errors
 from if_else_nodes import If, IfElse
 from dummy_nodes import NT
+from reference import Reference
 #  from statement_grammar import StatementGrammar
 
 
@@ -15,14 +16,15 @@ class IfElseGrammar:
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) (else ({
         <code_ss> }|<s>))?
         """
-        errors = []
-        if self.taste(self._taste_consume_if_without_else, errors):
+        error = Reference()
+        if self.taste(self._taste_consume_if_without_else, error):
             self._taste_consume_if_without_else()
-        elif self.taste(self._if_else, errors):
+        elif self.taste(self._if_else, error):
             self._if_else()
         else:
-            self._handle_all_tastes_unsuccessful("if or if else statement",
-                                                 errors)
+            raise error.val
+            #  self._handle_all_tastes_unsuccessful("if or if else statement",
+            #                                       error)
 
     def _taste_consume_if_without_else(self):
         """taste whether the next expression is a if without else

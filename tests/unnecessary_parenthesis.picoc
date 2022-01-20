@@ -1,0 +1,6 @@
+void main() {
+  char bool = 0;
+  char var = !(-bool);
+  var = -(-bool);
+  var = -(!bool);
+}
