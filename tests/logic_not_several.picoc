@@ -1,4 +1,4 @@
 void main() {
   char bool = 0;
-  char var = !!!(!(!1 - 1 < 12) && !!bool)
+  char var = !!!(!(!1 - 1 < 12) && !!bool);
 }

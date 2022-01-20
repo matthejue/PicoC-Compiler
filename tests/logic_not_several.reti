@@ -1,0 +1,120 @@
+# File logic_not_several Start
+# Main Funktion (void main ((char bool) = 0) ... ) Start
+LOADI SP 200;
+# Zuweisung ((char bool) = 0) Start
+# Allokation (char bool) Start
+# Variable bool vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char bool) Ende
+# Arithmetischer Operand 0 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von 0 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 0 Ende
+LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 0 in Variable bool speichern
+# Zuweisung ((char bool) = 0) Ende
+# Zuweisung ((char var) = ((((((((1 - 1) < 12))) && ((ToBool(bool)))))))) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Logische unäre Verknüpfung ((((((((1 - 1) < 12))) && ((ToBool(bool))))))) Start
+# Logische unäre Verknüpfung (((((((1 - 1) < 12))) && ((ToBool(bool)))))) Start
+# Logische unäre Verknüpfung ((((((1 - 1) < 12))) && ((ToBool(bool))))) Start
+# Logische binäre Verknüpfung (((((1 - 1) < 12))) && ((ToBool(bool)))) Start
+# Logische unäre Verknüpfung ((((1 - 1) < 12))) Start
+# Logische unäre Verknüpfung (((1 - 1) < 12)) Start
+# Logisches Atom ((1 - 1) < 12) Start
+# Arithmetische binäre Operation (1 - 1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+SUB ACC IN2;                           # Wert von (1 - 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (1 - 1) Ende
+# Arithmetischer Operand 12 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 12 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 12 Ende
+LOADIN SP ACC 2;                       # Wert von (1 - 1) in ACC laden
+LOADIN SP IN2 1;                       # Wert von 12 in IN2 laden
+SUB ACC IN2;                           # (1 - 1) - 12 in ACC laden
+JUMP< 3;                               # Ergebnis 1, wenn ((1 - 1) < 12) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn ((1 - 1) < 12) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn (1 - 1) < 12 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom ((1 - 1) < 12) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von ((1 - 1) < 12) in IN2 laden
+OPLUS ACC IN2;                         # !(((1 - 1) < 12)) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung (((1 - 1) < 12)) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (((1 - 1) < 12)) in IN2 laden
+OPLUS ACC IN2;                         # !((((1 - 1) < 12))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung ((((1 - 1) < 12))) Ende
+# Logische unäre Verknüpfung ((ToBool(bool))) Start
+# Logische unäre Verknüpfung (ToBool(bool)) Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(bool) Start
+# Arithmetischer Operand bool Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von bool in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand bool Ende
+LOADIN SP ACC 1;                       # Wert von bool in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn bool den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(bool) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool(bool) in IN2 laden
+OPLUS ACC IN2;                         # !(ToBool(bool)) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung (ToBool(bool)) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (ToBool(bool)) in IN2 laden
+OPLUS ACC IN2;                         # !((ToBool(bool))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung ((ToBool(bool))) Ende
+LOADIN SP ACC 2;                       # Wert von ((((1 - 1) < 12))) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ((ToBool(bool))) in IN2 laden
+AND ACC IN2;                           # (((((1 - 1) < 12))) && ((ToBool(bool)))) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung (((((1 - 1) < 12))) && ((ToBool(bool)))) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (((((1 - 1) < 12))) && ((ToBool(bool)))) in IN2 laden
+OPLUS ACC IN2;                         # !((((((1 - 1) < 12))) && ((ToBool(bool))))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung ((((((1 - 1) < 12))) && ((ToBool(bool))))) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von ((((((1 - 1) < 12))) && ((ToBool(bool))))) in IN2 laden
+OPLUS ACC IN2;                         # !(((((((1 - 1) < 12))) && ((ToBool(bool)))))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung (((((((1 - 1) < 12))) && ((ToBool(bool)))))) Ende
+LOADI ACC 1;                           # 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von (((((((1 - 1) < 12))) && ((ToBool(bool)))))) in IN2 laden
+OPLUS ACC IN2;                         # !((((((((1 - 1) < 12))) && ((ToBool(bool))))))) in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung ((((((((1 - 1) < 12))) && ((ToBool(bool))))))) Ende
+LOADIN SP ACC 1;                       # Wert von ((((((((1 - 1) < 12))) && ((ToBool(bool))))))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von ((((((((1 - 1) < 12))) && ((ToBool(bool))))))) in Variable var speichern
+# Zuweisung ((char var) = ((((((((1 - 1) < 12))) && ((ToBool(bool)))))))) Ende
+JUMP 0;
+# Main Funktion (void main ((char bool) = 0) ... ) Ende
+# File logic_not_several Ende
