@@ -47,7 +47,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (x <= 42) Ende
 LOADIN SP ACC 1;                       # Wert von (x <= 42) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 38;                             # Statements überspringen, wenn (x <= 42) nicht erfüllt
+JUMP== 35;                             # Statements überspringen, wenn (x <= 42) nicht erfüllt
 # While Statement While((y <= 42) (z = (x & y))) Start
 # Logisches Atom (y <= 42) Start
 # Arithmetischer Operand y Start
@@ -72,13 +72,8 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (y <= 42) Ende
 LOADIN SP ACC 1;                       # Wert von (y <= 42) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 19;                             # Statements überspringen, wenn (y <= 42) nicht erfüllt
+JUMP== 16;                             # Statements überspringen, wenn (y <= 42) nicht erfüllt
 # Zuweisung (z = (x & y)) Start
-# Arithmetischer Operand z Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von z in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand z Ende
 # Arithmetische binäre Operation (x & y) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -100,9 +95,9 @@ LOADIN SP ACC 1;                       # Wert von (x & y) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von (x & y) in Variable z speichern
 # Zuweisung (z = (x & y)) Ende
-JUMP -35;                              # Zurück zur Auswertung von (y <= 42)
+JUMP -32;                              # Zurück zur Auswertung von (y <= 42)
 # While Statement While((y <= 42) (z = (x & y))) Ende
-JUMP -54;                              # Zurück zur Auswertung von (x <= 42)
+JUMP -51;                              # Zurück zur Auswertung von (x <= 42)
 # While Statement While((x <= 42) While((y <= 42) (z = (x & y)))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende

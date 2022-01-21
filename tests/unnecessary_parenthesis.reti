@@ -46,11 +46,6 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von Not(ToBool((- bool))) in Variable var speichern
 # Zuweisung ((char var) = Not(ToBool((- bool)))) Ende
 # Zuweisung (var = (- (- bool))) Start
-# Arithmetischer Operand var Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
 # Arithmetische unäre Operation (- (- bool)) Start
 # Arithmetische unäre Operation (- bool) Start
 # Arithmetischer Operand bool Start
@@ -73,11 +68,6 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von (- (- bool)) in Variable var speichern
 # Zuweisung (var = (- (- bool))) Ende
 # Zuweisung (var = (- Not(ToBool(bool)))) Start
-# Arithmetischer Operand var Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
 # Arithmetische unäre Operation (- Not(ToBool(bool))) Start
 # Logische unäre Verknüpfung Not(ToBool(bool)) Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(bool) Start

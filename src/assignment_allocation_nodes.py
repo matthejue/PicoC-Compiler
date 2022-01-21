@@ -30,8 +30,9 @@ class Assignment(ASTNode):
         self.code_generator.add_code(
             f"# Zuweisung {self} Start\n", 0)
 
-        self.location.update_match_args()
-        self.location.visit()
+        match self.location:
+            case Allocation():
+                self.location.visit()
 
         self._pretty_comments()
 
@@ -81,7 +82,7 @@ class Assignment(ASTNode):
                         #  symbol.value = self.symbol_table.resolve(value).value
                         #  self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
-            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
+            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment()):
                 self.expression.visit()
 
                 self._adapt_code(name)

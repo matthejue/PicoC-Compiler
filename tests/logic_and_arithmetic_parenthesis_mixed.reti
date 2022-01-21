@@ -11,11 +11,6 @@ LOADI SP 200;
 # Variable cars vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
 # Allokation (char cars) Ende
 # Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Start
-# Arithmetischer Operand var Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
 # Logische binäre Verknüpfung (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Start
 # Logische binäre Verknüpfung ((12 <= ((dom - 1) * 2)) || (42 != cars)) Start
 # Logisches Atom (12 <= ((dom - 1) * 2)) Start

@@ -19,11 +19,6 @@ STORE ACC 100;                                                     # Wert von 1 
 # Allokation (char y) Ende
 # Do While DoWhile((y = (x + 1)) (y < 10)) Start
 # Zuweisung (y = (x + 1)) Start
-# Arithmetischer Operand y Start
-SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 101;                                                      # Wert von y in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand y Ende
 # Arithmetische binäre Operation (x + 1) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern

@@ -22,11 +22,6 @@ ADDI SP 1;                                                         # Stack um ei
 STORE ACC 100;                                                     # Wert von 10 in Variable y speichern
 # Zuweisung ((int y) = 10) Ende
 # Zuweisung (y = (y + x)) Start
-# Arithmetischer Operand y Start
-SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von y in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand y Ende
 # Arithmetische binäre Operation (y + x) Start
 # Arithmetischer Operand y Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern

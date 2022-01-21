@@ -12,17 +12,7 @@ LOADI SP 200;
 # Variable var3 vom Typ int mit Adresse 102 zur Symboltabelle hinzugefügt
 # Allokation (int var3) Ende
 # Zuweisung (var2 = (var1 = (1 + 1))) Start
-# Arithmetischer Operand var2 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von var2 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var2 Ende
 # Zuweisung (var1 = (1 + 1)) Start
-# Arithmetischer Operand var1 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var1 Ende
 # Arithmetische binäre Operation (1 + 1) Start
 # Arithmetischer Operand 1 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -44,32 +34,13 @@ LOADIN SP ACC 1;                       # Wert von (1 + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (1 + 1) in Variable var1 speichern
 # Zuweisung (var1 = (1 + 1)) Ende
-LOADIN SP ACC 1;                       # Wert von (var1 = (1 + 1)) in ACC laden
-ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von (var1 = (1 + 1)) in Variable var2 speichern
 # Zuweisung (var2 = (var1 = (1 + 1))) Ende
-LOADIN SP ACC 1;                       # Wert von (var2 = (var1 = (1 + 1))) in ACC laden
-ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 102;                         # Wert von (var2 = (var1 = (1 + 1))) in Variable var3 speichern
 # Zuweisung ((int var3) = (var2 = (var1 = (1 + 1)))) Ende
 # Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Start
-# Arithmetischer Operand var3 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von var3 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var3 Ende
 # Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Start
-# Arithmetischer Operand var2 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von var2 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var2 Ende
 # Zuweisung (var1 = ((1 > 1) && ToBool(1))) Start
-# Arithmetischer Operand var1 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var1 Ende
 # Logische binäre Verknüpfung ((1 > 1) && ToBool(1)) Start
 # Logisches Atom (1 > 1) Start
 # Arithmetischer Operand 1 Start
@@ -113,12 +84,8 @@ LOADIN SP ACC 1;                       # Wert von ((1 > 1) && ToBool(1)) in ACC 
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von ((1 > 1) && ToBool(1)) in Variable var1 speichern
 # Zuweisung (var1 = ((1 > 1) && ToBool(1))) Ende
-LOADIN SP ACC 1;                       # Wert von (var1 = ((1 > 1) && ToBool(1))) in ACC laden
-ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von (var1 = ((1 > 1) && ToBool(1))) in Variable var2 speichern
 # Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Ende
-LOADIN SP ACC 1;                       # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in ACC laden
-ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 102;                         # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in Variable var3 speichern
 # Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Ende
 JUMP 0;

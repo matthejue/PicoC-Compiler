@@ -38,13 +38,8 @@ ADDI SP 1;                                                         # Stack um ei
 # Logisches Atom (x <= 100) Ende
 LOADIN SP ACC 1;                                                   # Wert von (x <= 100) in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-JUMP== 19;                                                         # Statements überspringen, wenn (x <= 100) nicht erfüllt
+JUMP== 16;                                                         # Statements überspringen, wenn (x <= 100) nicht erfüllt
 # Zuweisung (x = (x + 1)) Start
-# Arithmetischer Operand x Start
-SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von x in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
 # Arithmetische binäre Operation (x + 1) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
@@ -66,14 +61,9 @@ LOADIN SP ACC 1;                                                   # Wert von (x
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
 STORE ACC 100;                                                     # Wert von (x + 1) in Variable x speichern
 # Zuweisung (x = (x + 1)) Ende
-JUMP -35;                                                          # Zurück zur Auswertung von (x <= 100)
+JUMP -32;                                                          # Zurück zur Auswertung von (x <= 100)
 # While Statement While((x <= 100) (x = (x + 1))) Ende
 # Zuweisung (x = 10) Start
-# Arithmetischer Operand x Start
-SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von x in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
 # Arithmetischer Operand 10 Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
 LOADI ACC 10;                                                      # Wert von 10 in ACC laden
@@ -85,11 +75,6 @@ STORE ACC 100;                                                     # Wert von 10
 # Zuweisung (x = 10) Ende
 # Do While DoWhile((x = (x + 1)) (x <= 100)) Start
 # Zuweisung (x = (x + 1)) Start
-# Arithmetischer Operand x Start
-SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von x in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
 # Arithmetische binäre Operation (x + 1) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern

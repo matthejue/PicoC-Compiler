@@ -44,14 +44,9 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (var == 0) Ende
 LOADIN SP ACC 1;                       # Wert von (var == 0) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 28;                             # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
+JUMP== 22;                             # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
 # If-Branch
 # Zuweisung (var = 100) Start
-# Arithmetischer Operand var Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
 # Arithmetischer Operand 100 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 100;                         # Wert von 100 in ACC laden
@@ -62,11 +57,6 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von 100 in Variable var speichern
 # Zuweisung (var = 100) Ende
 # Zuweisung (cars = (cars + 1)) Start
-# Arithmetischer Operand cars Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
 # Arithmetische binäre Operation (cars + 1) Start
 # Arithmetischer Operand cars Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -88,14 +78,9 @@ LOADIN SP ACC 1;                       # Wert von (cars + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von (cars + 1) in Variable cars speichern
 # Zuweisung (cars = (cars + 1)) Ende
-JUMP 27;                               # Else-Branch überspringen
+JUMP 21;                               # Else-Branch überspringen
 # Else-Branch
 # Zuweisung (var = (var - 1)) Start
-# Arithmetischer Operand var Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
 # Arithmetische binäre Operation (var - 1) Start
 # Arithmetischer Operand var Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -118,11 +103,6 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (var - 1) in Variable var speichern
 # Zuweisung (var = (var - 1)) Ende
 # Zuweisung (b = 1) Start
-# Arithmetischer Operand b Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von b in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand b Ende
 # Arithmetischer Operand 1 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 1;                           # Wert von 1 in ACC laden

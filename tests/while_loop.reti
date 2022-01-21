@@ -38,13 +38,8 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (x < 12) Ende
 LOADIN SP ACC 1;                       # Wert von (x < 12) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 19;                             # Statements überspringen, wenn (x < 12) nicht erfüllt
+JUMP== 16;                             # Statements überspringen, wenn (x < 12) nicht erfüllt
 # Zuweisung (x = (x + 1)) Start
-# Arithmetischer Operand x Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von x in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
 # Arithmetische binäre Operation (x + 1) Start
 # Arithmetischer Operand x Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -66,7 +61,7 @@ LOADIN SP ACC 1;                       # Wert von (x + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert von (x + 1) in Variable x speichern
 # Zuweisung (x = (x + 1)) Ende
-JUMP -35;                              # Zurück zur Auswertung von (x < 12)
+JUMP -32;                              # Zurück zur Auswertung von (x < 12)
 # While Statement While((x < 12) (x = (x + 1))) Ende
 JUMP 0;
 # Main Funktion (void main ((char x) = 10) ... ) Ende
