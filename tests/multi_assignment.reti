@@ -1,0 +1,126 @@
+# File multi_assignment Start
+# Main Funktion (void main (char var1) ... ) Start
+LOADI SP 200;
+# Allokation (char var1) Start
+# Variable var1 vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char var1) Ende
+# Allokation (int var2) Start
+# Variable var2 vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (int var2) Ende
+# Zuweisung ((int var3) = (var2 = (var1 = (1 + 1)))) Start
+# Allokation (int var3) Start
+# Variable var3 vom Typ int mit Adresse 102 zur Symboltabelle hinzugefügt
+# Allokation (int var3) Ende
+# Zuweisung (var2 = (var1 = (1 + 1))) Start
+# Arithmetischer Operand var2 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von var2 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var2 Ende
+# Zuweisung (var1 = (1 + 1)) Start
+# Arithmetischer Operand var1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var1 Ende
+# Arithmetische binäre Operation (1 + 1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+ADD ACC IN2;                           # Wert von (1 + 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (1 + 1) Ende
+LOADIN SP ACC 1;                       # Wert von (1 + 1) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von (1 + 1) in Variable var1 speichern
+# Zuweisung (var1 = (1 + 1)) Ende
+LOADIN SP ACC 1;                       # Wert von (var1 = (1 + 1)) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von (var1 = (1 + 1)) in Variable var2 speichern
+# Zuweisung (var2 = (var1 = (1 + 1))) Ende
+LOADIN SP ACC 1;                       # Wert von (var2 = (var1 = (1 + 1))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von (var2 = (var1 = (1 + 1))) in Variable var3 speichern
+# Zuweisung ((int var3) = (var2 = (var1 = (1 + 1)))) Ende
+# Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Start
+# Arithmetischer Operand var3 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 102;                          # Wert von var3 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var3 Ende
+# Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Start
+# Arithmetischer Operand var2 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 101;                          # Wert von var2 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var2 Ende
+# Zuweisung (var1 = ((1 > 1) && ToBool(1))) Start
+# Arithmetischer Operand var1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von var1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var1 Ende
+# Logische binäre Verknüpfung ((1 > 1) && ToBool(1)) Start
+# Logisches Atom (1 > 1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von 1 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+SUB ACC IN2;                           # 1 - 1 in ACC laden
+JUMP> 3;                               # Ergebnis 1, wenn (1 > 1) erfüllt
+LOADI ACC 0;                           # Ergebnis 0, wenn (1 > 1) nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis 1, wenn 1 > 1 wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom (1 > 1) Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(1) Start
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn 1 den Wert 0 hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(1) Ende
+LOADIN SP ACC 2;                       # Wert von (1 > 1) in ACC laden
+LOADIN SP IN2 1;                       # Wert von ToBool(1) in IN2 laden
+AND ACC IN2;                           # ((1 > 1) && ToBool(1)) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung ((1 > 1) && ToBool(1)) Ende
+LOADIN SP ACC 1;                       # Wert von ((1 > 1) && ToBool(1)) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von ((1 > 1) && ToBool(1)) in Variable var1 speichern
+# Zuweisung (var1 = ((1 > 1) && ToBool(1))) Ende
+LOADIN SP ACC 1;                       # Wert von (var1 = ((1 > 1) && ToBool(1))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von (var1 = ((1 > 1) && ToBool(1))) in Variable var2 speichern
+# Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Ende
+LOADIN SP ACC 1;                       # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 102;                         # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in Variable var3 speichern
+# Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Ende
+JUMP 0;
+# Main Funktion (void main (char var1) ... ) Ende
+# File multi_assignment Ende

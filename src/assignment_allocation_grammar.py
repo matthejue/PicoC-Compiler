@@ -81,16 +81,16 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
         self.match([TT.ASSIGNMENT])
 
-        if self.LTT(1) == TT.IDENTIFIER:
-            self.add_and_consume(classname=Identifier)
-        elif self.LTT(1) == TT.NUMBER:
+        #  if self.LTT(1) == TT.IDENTIFIER:
+        #  self.add_and_consume(classname=Identifier)
+        if self.LTT(1) == TT.NUMBER:
             self.add_and_consume(classname=Number)
         elif self.LTT(1) == TT.CHARACTER:
             self.add_and_consume(classname=Character)
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError(
-                "Identifier, Number or Character", token.value, token.position)
+            raise Errors.NoApplicableRuleError("Number or Character",
+                                               token.value, token.position)
 
     def _assign(self, ):
         self.ast_builder.discard("_aa")

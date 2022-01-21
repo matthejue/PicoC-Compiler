@@ -73,12 +73,12 @@ class Assignment(ASTNode):
                         self._error_check(name, symbol, value, position)
                         symbol.value = value
                         self._comment_for_constant(name, value)
-                    case Identifier(value, position):
-                        symbol = self.symbol_table.resolve(name)
-                        self._error_check(
-                            name, symbol, self.symbol_table.resolve(value).value, position)
-                        symbol.value = self.symbol_table.resolve(value).value
-                        self._comment_for_constant(name, value)
+                    #  case Identifier(value, position):
+                        #  symbol = self.symbol_table.resolve(name)
+                        #  self._error_check(
+                        #  name, symbol, self.symbol_table.resolve(value).value, position)
+                        #  symbol.value = self.symbol_table.resolve(value).value
+                        #  self._comment_for_constant(name, value)
             # nested assignment that is the assignment of another assignment
             case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment(_, _)):
                 self.expression.visit()

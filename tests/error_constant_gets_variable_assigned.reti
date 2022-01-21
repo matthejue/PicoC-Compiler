@@ -1,0 +1,50 @@
+# File error_constant_gets_variable_assigned Start
+# Main Funktion (void main ((char car) = 99) ... ) Start
+LOADI SP 200;
+# Zuweisung ((char car) = 99) Start
+# Allokation (char car) Start
+# Variable car vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char car) Ende
+# Arithmetischer Operand 99 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 99;                          # Wert von 99 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 99 Ende
+LOADIN SP ACC 1;                       # Wert von 99 in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von 99 in Variable car speichern
+# Zuweisung ((char car) = 99) Ende
+# Zuweisung ((const int var) = car) Start
+# Allokation (const int var) Start
+# Konstante var vom Typ int zur Symboltabelle hinzugefügt
+# Allokation (const int var) Ende
+# Konstante var in Symboltabelle den Wert car zugewiesen
+# Zuweisung ((const int var) = car) Ende
+# Zuweisung ((int tar) = (var + car)) Start
+# Allokation (int tar) Start
+# Variable tar vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
+# Allokation (int tar) Ende
+# Arithmetische binäre Operation (var + car) Start
+# Arithmetischer Operand var Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 100;                         # Wert von var in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand var Ende
+# Arithmetischer Operand car Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOAD ACC 100;                          # Wert von car in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand car Ende
+LOADIN SP ACC 2;                       # Wert von var in ACC laden
+LOADIN SP IN2 1;                       # Wert von car in IN2 laden
+ADD ACC IN2;                           # Wert von (var + car) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (var + car) Ende
+LOADIN SP ACC 1;                       # Wert von (var + car) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert von (var + car) in Variable tar speichern
+# Zuweisung ((int tar) = (var + car)) Ende
+JUMP 0;
+# Main Funktion (void main ((char car) = 99) ... ) Ende
+# File error_constant_gets_variable_assigned Ende

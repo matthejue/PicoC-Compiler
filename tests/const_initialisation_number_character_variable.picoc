@@ -1,5 +1,5 @@
 void main(){
   const char var1 = 'c';
   const char var2 = 12;
-  const char var3 = var1;
+  /* const char var3 = var1; */
 }

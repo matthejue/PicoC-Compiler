@@ -1,0 +1,1 @@
+(error_multi_assignment_not_definined (void main (char var) ((int var3) = (var2 = (va1 = (1 + 1))))))

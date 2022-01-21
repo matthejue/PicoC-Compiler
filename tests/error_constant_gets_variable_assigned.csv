@@ -1,5 +1,6 @@
 name,type,datatype,position,value,range_from_to
 char,built in,-,-,-,(-128:127)
 int,built in,-,-,-,(-2147483648:2147483647)
-var1,named constant,char,(2:13),99,-
-var2,named constant,char,(3:13),12,-
+car,variable,char,(2:7),100,-
+var,named constant,int,(3:12),100,-
+tar,variable,int,(4:6),101,-

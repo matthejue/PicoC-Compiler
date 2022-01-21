@@ -1,1 +1,1 @@
-(const_initialisation_number_character_variable (void main ((const char var1) = 99) ((const char var2) = 12) ((const char var3) = var1)))
+(const_initialisation_number_character_variable (void main ((const char var1) = 99) ((const char var2) = 12)))
