@@ -1,5 +1,4 @@
 class Errors:
-    """Every error needs a self.found variable because of the _handle_all_tasts_unsuccessful function"""
     class InvalidCharacterError(Exception):
         """If there're Token sequences generated from the input that are not
         permitted by the grammar rules"""
@@ -48,7 +47,6 @@ class Errors:
         def __init__(self, ):
             self.description = "This error should never be visible"
             super().__init__(self.description)
-            self.found = self.description
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
@@ -85,13 +83,21 @@ class Errors:
             self.first = first
             self.first_pos = first_pos
 
+    class ConstReassignmentError(Exception):
+        def __init__(self, found, found_pos, first, first_pos):
+            self.description = "ConstReassignmentError: Can't reassign a new "
+            f"value to constant '{found}'"
+            self.found = found
+            self.found_pos = found_pos
+            self.first = first
+            self.first_pos = first_pos
+
     class NoMainFunctionError(Exception):
         """If there's no main function within the given file"""
         def __init__(self, fname):
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file {fname}"
             super().__init__(self.description)
-            self.found = fname
 
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
@@ -99,4 +105,3 @@ class Errors:
             self.description = "NotImplementedYet: The feature of using "\
                 f"{feature_description} is not implemented yet"
             super().__init__(self.description)
-            self.found = feature_description

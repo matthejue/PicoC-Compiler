@@ -1,0 +1,1 @@
+(error_const_reassignment (void main ((const int var) = 12) (var = 13)))

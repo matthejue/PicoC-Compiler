@@ -1,1 +1,1 @@
-void main() {  const int x = 'e'; do { int y = x; x = x + 1; } while ( x < 10 ); }
+void main() {  const int x = 'e'; do { int y = 10; y = y + x; } while ( x < 10 ); }

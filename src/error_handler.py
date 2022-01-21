@@ -111,6 +111,21 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen) + note_header +
                   str(error_screen_2))
             exit(0)
+        except Errors.ConstReassignmentError as e:
+            error_header = self._error_header(e.found_pos, e.description)
+            error_screen = ErrorScreen(self.finput, e.found_pos[0],
+                                       e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            note_header = self._error_header(
+                e.first_pos, "Note: Constant was initialised here:")
+            error_screen_2 = ErrorScreen(self.finput, e.first_pos[0],
+                                         e.first_pos[0])
+            error_screen_2.mark(e.first_pos, len(e.first))
+            error_screen.filter()
+            error_screen_2.filter()
+            print('\n' + error_header + str(error_screen) + note_header +
+                  str(error_screen_2))
+            exit(0)
         except Errors.NoMainFunctionError as e:
             error_header = e.description + '\n'
             print('\n' + error_header)
