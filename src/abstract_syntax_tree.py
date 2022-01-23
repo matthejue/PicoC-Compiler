@@ -20,6 +20,9 @@ class ASTNode:
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
 
+    def update_match_args(self, ):
+        pass
+
     __match_args__ = ("value", "position")
 
     def add_child(self, node):
@@ -30,9 +33,6 @@ class ASTNode:
 
     def show_generated_code(self, ):
         return self.code_generator.show_code()
-
-    def update_match_args(self, ):
-        pass
 
     def __repr__(self):
         global_vars.show_node = True

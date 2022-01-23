@@ -5,7 +5,6 @@ class Errors:
         def __init__(self, found, found_pos):
             self.description = f"InvalidCharacterError: '{found}' is not a "\
                 "permitted character"
-            super().__init__(self.description)
             self.found = found
             self.found_pos = found_pos
 
@@ -14,7 +13,6 @@ class Errors:
         def __init__(self, expected, found, found_pos):
             self.description = f"UnclosedCharacterError: Expected {expected},"\
                 f" found {found}"
-            super().__init__(self.description)
             self.expected = expected
             self.found = found
             self.found_pos = found_pos
@@ -25,7 +23,6 @@ class Errors:
         def __init__(self, expected, found, found_pos):
             self.description = f"NoApplicableRuleError: Expected '{expected}'"\
                 f", found '{found}'"
-            super().__init__(self.description)
             self.expected = expected
             self.found = found
             self.found_pos = found_pos
@@ -36,7 +33,6 @@ class Errors:
             # there can be several expected and these already have single quotes
             self.description = f"MismatchedTokenError: Expected {expected}"\
                 f", found '{found}'"
-            super().__init__(self.description)
             self.expected = expected
             self.found = found
             self.found_pos = found_pos
@@ -46,38 +42,26 @@ class Errors:
         Token appears that can only be part of the other tasting choice"""
         def __init__(self, ):
             self.description = "This error should never be visible"
-            super().__init__(self.description)
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, found, found_pos):
             self.description = "UnknownIdentifierError: Identifier "\
                 f"'{found}' wasn't declared yet"
-            super().__init__(self.description)
             self.found = found
             self.found_pos = found_pos
 
     class TooLargeLiteralError(Exception):
         """If the literal assigned to a variable is too large for the datatype of
         the variable"""
-        def __init__(self, variable, variable_pos, variable_type,
-                     variable_from, variable_to, found, found_pos):
-            variable_description = f"assigned to variable '{variable}' of type '{variable_type}' " if variable else ""
-            self.description = f"TooLargeLiteralError: Literal '{found}' "\
-                 + variable_description +"is too large"
-            super().__init__(self.description)
-            self.variable = variable
-            self.variable_pos = variable_pos
-            self.variable_type = variable_type
-            self.variable_from = variable_from
-            self.variable_to = variable_to
+        def __init__(self, found, found_pos):
+            self.description = f"TooLargeLiteralError: Literal '{found}' is too large"
             self.found = found
             self.found_pos = found_pos
 
     class RedefinitionError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
             self.description = f"RedefinitionError: Redefinition of '{found}'"
-            super().__init__(self.description)
             self.found = found
             self.found_pos = found_pos
             self.first = first
@@ -97,11 +81,9 @@ class Errors:
         def __init__(self, fname):
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file {fname}"
-            super().__init__(self.description)
 
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
         def __init__(self, feature_description):
             self.description = "NotImplementedYet: The feature of using "\
                 f"{feature_description} is not implemented yet"
-            super().__init__(self.description)

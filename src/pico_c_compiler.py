@@ -5,6 +5,7 @@ import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
 from error_handler import ErrorHandler
+from warning_handler import _WarningHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
 import global_vars
@@ -155,8 +156,9 @@ def _compile(code, infile, outbase=None):
 
     lexer = Lexer(code_without_cr)
 
-    # Handle errors
+    # Handle errors and warning
     error_handler = ErrorHandler(infile, code_without_cr)
+    warning_handler = _WarningHandler(infile, code_without_cr)
 
     if global_vars.args.tokens:
         error_handler.handle(_tokens_option, lexer, outbase)

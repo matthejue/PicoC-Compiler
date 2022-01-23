@@ -106,16 +106,11 @@ class ArithmeticOperand(ASTNode):
         return code
 
     def _error_check(self, value, position):
-        variable = global_vars.variable_context
-        range_from = variable.datatype.range_from_to[0] if variable else self.RANGE_OF_INT[0]
-        range_to = variable.datatype.range_from_to[1] if variable else self.RANGE_OF_INT[1]
-        if not (int(value) <= range_to):  # range_from <=
-            if variable:
-                raise Errors.TooLargeLiteralError(
-                    variable.name, variable.position, variable.datatype, range_from, range_to, value, position)
-            else:
-                raise Errors.TooLargeLiteralError(
-                    None, None, None, range_from, range_to, value, position)
+        min_int = self.RANGE_OF_INT[0]
+        max_int = self.RANGE_OF_INT[1]
+        if int(value) > max_int:  # range_from <=
+            raise Errors.TooLargeLiteralError(
+                None, None, None, min_int, max_int, value, position)
 
 
 class Identifier(ArithmeticOperand):

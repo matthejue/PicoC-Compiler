@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 int main() {
-  char car;
-  char var = car = door = 10;
+  int car = 10;
+  const char var = car = 2147483647;
+  printf("%c", var);
 }

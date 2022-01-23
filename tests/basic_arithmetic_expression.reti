@@ -1,11 +1,10 @@
-# File ./tests/basic_arithmetic_expression.picoc Start
+# File basic_arithmetic_expression Start
 # Main Funktion (void main ((char var) = (12 - 374))) Start
 LOADI SP 200;
 # Zuweisung ((char var) = (12 - 374)) Start
 # Allokation (char var) Start
 # Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
-STORE ACC 100;                         # Wert von (12 - 374) in Variable (char var) speichern
 # Arithmetische binäre Operation (12 - 374) Start
 # Arithmetischer Operand 12 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -25,8 +24,8 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (12 - 374) Ende
 LOADIN SP ACC 1;                       # Wert von (12 - 374) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (12 - 374) in Variable (char var) speichern
+STORE ACC 100;                         # Wert von (12 - 374) in Variable var speichern
 # Zuweisung ((char var) = (12 - 374)) Ende
 JUMP 0;
 # Main Funktion (void main ((char var) = (12 - 374))) Ende
-# File ./tests/basic_arithmetic_expression.picoc Ende
+# File basic_arithmetic_expression Ende

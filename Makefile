@@ -2,24 +2,30 @@
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
-all: read-all-verbose clean
+all: read-all-verbose
 
-read-all:
+read-all: _read_all clean
+_read-all:
 	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
-read-all-verbose:
+read-all-verbose: _read-all-verbose clean
+_read-all-verbose:
 	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
-shell-all:
+shell-all: _shell-all clean
+_shell-all:
 	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
 
-shell-all-verbose:
+shell-all-verbose: _shell-all-verbose clean
+_shell-all-verbose:
 	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
 
-test:
+test: _test clean
+_test:
 	./run_tests.sh
 
-test-arg:
+test-arg: test-arg clean
+_test-arg:
 	# start with 'make test-arg ARG=file_basename'
 	./run_tests.sh $(ARG_BASE)
 

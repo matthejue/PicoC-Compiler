@@ -20,91 +20,72 @@ class ErrorHandler:
         try:
             function(*args)
         except Errors.InvalidCharacterError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
-            error_header = self._error_header(e.found_pos, e.description)
+            error_header = self._warning_header(e.found_pos, e.description)
             expected_pos = self._find_space_after_previous_token(e.found_pos)
-            error_screen = ErrorScreen(self.finput, expected_pos[0],
-                                       e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, expected_pos[0],
+                                            e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.point_at(expected_pos, e.expected)
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
-            error_header = self._error_header(None, e.description)
+            error_header = self._warning_header(None, e.description)
             print('\n' + error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            if e.variable:
-                error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                           e.found_pos[0])
-                error_screen.mark(e.found_pos, len(e.found))
-                node_header = self._error_header(
-                    e.variable_pos,
-                    f"Note: Variable '{e.variable}' definied as type "
-                    f"'{e.variable_type}' here:")
-                error_screen_2 = ErrorScreen(self.finput, e.variable_pos[0],
-                                             e.variable_pos[0])
-                error_screen_2.mark(e.variable_pos, len(e.variable))
-                error_screen.filter()
-                error_screen_2.filter()
-                node_end = self._error_header(
-                    None, f"Note: Datatype '{e.variable_type}' has only range "
-                    f"{e.variable_from} to {e.variable_to}")
-                print('\n' + error_header + str(error_screen) + node_header +
-                      str(error_screen_2) + node_end)
-            else:
-                error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                           e.found_pos[0])
-                error_screen.mark(e.found_pos, len(e.found))
-                node_header = self._error_header(
-                    None,
-                    f"Note: The max literal size is that of an int (-2147483648 to 2147483647)"
-                )
-                error_screen.filter()
-                print('\n' + error_header + str(error_screen) + node_header)
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
+            error_screen.mark(e.found_pos, len(e.found))
+            node_header = self._warning_header(
+                None,
+                f"Note: The max literal size is that of an int (-2147483648 to 2147483647)"
+            )
+            error_screen.filter()
+            print('\n' + error_header + str(error_screen) + node_header)
             exit(0)
         except Errors.RedefinitionError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(e.first_pos,
-                                             "Note: Already defined here:")
-            error_screen_2 = ErrorScreen(self.finput, e.first_pos[0],
-                                         e.first_pos[0])
+            note_header = self._warning_header(e.first_pos,
+                                               "Note: Already defined here:")
+            error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
+                                              e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
@@ -112,14 +93,14 @@ class ErrorHandler:
                   str(error_screen_2))
             exit(0)
         except Errors.ConstReassignmentError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = ErrorScreen(self.finput, e.found_pos[0],
-                                       e.found_pos[0])
+            error_header = self._warning_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
+                                            e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(
+            note_header = self._warning_header(
                 e.first_pos, "Note: Constant was initialised here:")
-            error_screen_2 = ErrorScreen(self.finput, e.first_pos[0],
-                                         e.first_pos[0])
+            error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
+                                              e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
@@ -135,7 +116,7 @@ class ErrorHandler:
             print('\n' + error_header)
             exit(0)
 
-    def _error_header(self, pos, descirption):
+    def _warning_header(self, pos, descirption):
         if not pos:
             return descirption + '\n'
         return self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
@@ -222,7 +203,7 @@ class ErrorHandler:
         return row, col
 
 
-class ErrorScreen:
+class AnnotationScreen:
     def __init__(self, finput, row_from, row_to):
         # because the filename gets pasted in the first line of file content
         context_from=row_from - global_vars.args.sight if row_from -\

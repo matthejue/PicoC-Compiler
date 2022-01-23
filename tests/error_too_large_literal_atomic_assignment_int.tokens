@@ -1,0 +1,1 @@
+[<TT.IDENTIFIER,'error_too_large_literal_atomic_assignment_int',(0, 0)>, <TT.VOID,'void',(1, 0)>, <TT.MAIN,'main',(1, 5)>, <TT.L_PAREN,'(',(1, 9)>, <TT.R_PAREN,')',(1, 10)>, <TT.L_BRACE,'{',(1, 12)>, <TT.INT,'int',(2, 2)>, <TT.IDENTIFIER,'var',(2, 6)>, <TT.ASSIGNMENT,'=',(2, 10)>, <TT.NUMBER,'2147483648',(2, 12)>, <TT.SEMICOLON,';',(2, 22)>, <TT.R_BRACE,'}',(3, 0)>]

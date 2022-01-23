@@ -1,0 +1,31 @@
+# File too_large_literal_complex_assignment_char Start
+# Main Funktion (void main ((char var) = (128 + 1))) Start
+LOADI SP 200;
+# Zuweisung ((char var) = (128 + 1)) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Arithmetische binäre Operation (128 + 1) Start
+# Arithmetischer Operand 128 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 128;                         # Wert von 128 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 128 Ende
+# Arithmetischer Operand 1 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von 1 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 1 Ende
+LOADIN SP ACC 2;                       # Wert von 128 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
+ADD ACC IN2;                           # Wert von (128 + 1) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (128 + 1) Ende
+LOADIN SP ACC 1;                       # Wert von (128 + 1) in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert von (128 + 1) in Variable var speichern
+# Zuweisung ((char var) = (128 + 1)) Ende
+JUMP 0;
+# Main Funktion (void main ((char var) = (128 + 1))) Ende
+# File too_large_literal_complex_assignment_char Ende

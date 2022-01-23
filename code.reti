@@ -1,4 +1,4 @@
-# File ./code.picoc Start
+# File code Start
 # Main Funktion (void main (int x) ... ) Start
 LOADI SP 200;
 # Allokation (int x) Start
@@ -54,7 +54,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand z Ende
 LOADIN SP ACC 2;                       # Wert von y in ACC laden
 LOADIN SP IN2 1;                       # Wert von z in IN2 laden
-MUL ACC IN2;                           # Wert von (y * z) in ACC laden
+MULT ACC IN2;                          # Wert von (y * z) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (y * z) Ende
@@ -81,4 +81,4 @@ STORE ACC 100;                         # Wert von (x + ((y * z) + 10)) in Variab
 # Zuweisung (x = (x + ((y * z) + 10))) Ende
 JUMP 0;
 # Main Funktion (void main (int x) ... ) Ende
-# File ./code.picoc Ende
+# File code Ende

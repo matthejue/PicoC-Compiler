@@ -1,13 +1,19 @@
+import global_vars
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from dummy_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
-import global_vars
+from warnings import Warnings
+from warning_handler import WarningHandler
 
 
 class Assignment(ASTNode):
     """Abstract Syntax Tree Node for assignement"""
+
+    def __init__(self, value=None, position=None):
+        self.warning_handler = WarningHandler()
+        super().__init__(value, position)
 
     assign = strip_multiline_string(
         """LOADIN SP ACC 1;  # Wert von e1 in ACC laden
@@ -67,12 +73,12 @@ class Assignment(ASTNode):
 
     def _assignment(self, ):
         match self:
-            case Assignment(Allocation(NT.Const(), _, Identifier(name)), assignment):
-                match assignment:
+            case Assignment(Allocation(NT.Const(), _, Identifier(name)), expression):
+                match expression:
                     case (Number(value, position) | Character(value, position)):
                         symbol = self.symbol_table.resolve(name)
-                        self._const_initialisation_error_check(
-                            name, symbol, value, position)
+                        self._too_large_number_warning_check(
+                            symbol, value, position)
                         symbol.value = value
                         self._comment_for_constant(name, value)
                     #  case Identifier(value, position):
@@ -87,15 +93,24 @@ class Assignment(ASTNode):
 
                 self._adapt_code(name)
             # assigment that assigns a variable to a expression
-            case Assignment((Identifier(name, position) | Allocation(_, _, Identifier(name, position))), _):
-                # all literals in the assignent (context of the variable) must
-                # be in the range of the datatype of the variable
+            case Assignment((Identifier(name, position) | Allocation(_, _, Identifier(name, position))), expression):
                 symbol = self.symbol_table.resolve(name)
+                # error checks
+                match expression:
+                    case (Character(value, position) | Number(value, position)):
+
+                        self._too_large_number_warning_check(symbol, value,
+                                                             position)
+                    case Identifier(name, position):
+                        symbol_2 = self.symbol_table.resolve(name)
+                        self._too_large_number_warning_check(
+                            symbol, symbol_2.name, symbol_2.position)
+                # there should never be a const identifier on the left side in
+                # a assignment if it's not the initialisation of the const
+                # identifier
                 self._const_reassignment_error_check(name, position, symbol)
 
-                global_vars.variable_context = symbol
                 self.expression.visit()
-                global_vars.variable_context = None
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
 
@@ -107,12 +122,13 @@ class Assignment(ASTNode):
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
-    def _const_initialisation_error_check(self, name, symbol, value, position):
+    def _too_large_number_warning_check(self, symbol, value, position):
         range_from = symbol.datatype.range_from_to[0]
         range_to = symbol.datatype.range_from_to[1]
-        if not (int(value) <= range_to):  # range_from <=
-            raise Errors.TooLargeLiteralError(
-                name, symbol.position, symbol.datatype, range_from, range_to, value, position)
+        if int(value) > range_to:  # < range_from
+            warning = Warnings.TooLargeLiteralWarning(
+                symbol.name, symbol.position, symbol.datatype, range_from, range_to, value, position)
+            self.warning_handler.add_warning(warning)
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:
