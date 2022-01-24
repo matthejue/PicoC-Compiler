@@ -1,3 +1,4 @@
 void main() {
-  char var = 128;
+  int car = 128;
+  char var = car;
 }

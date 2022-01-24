@@ -15,9 +15,9 @@ class ArithmeticOperand(ASTNode):
     variable_identifier = "LOAD ACC var_identifier;  # Wert von e1 in ACC laden\n"
 
     build_huge_number = strip_multiline_string(
-        """LOADI ACC higher_bits;  # Higher Bits 'HBITS' in ACC laden
+        """LOADI ACC higher_bits;  # Higher Bits in ACC laden: 'HBITS'
         MULTI ACC 65536;  # Higher Bits um 16 Bits shiften
-        ORI ACC lower_bits;  # Lower Bits 'LBITS' in ACC einfügen
+        ORI ACC lower_bits;  # Lower Bits in ACC einfügen: 'LBITS'
         """)
     build_huge_number_loc = 3
 
@@ -97,9 +97,9 @@ class ArithmeticOperand(ASTNode):
     def _pretty_comments_huge_number(self, code, higher_bits, lower_bits):
         if global_vars.args.verbose:
             code = self.code_generator.replace_code_pre(
-                code, "HBITS", '0'*6+'_'+higher_bits)
+                code, "HBITS", '0'*16+'_'+higher_bits)
             code = self.code_generator.replace_code_pre(
-                code, "LBITS", '0'*6+'_'+lower_bits)
+                code, "LBITS", higher_bits + '_' + lower_bits)
         return code
 
     def _error_check(self, value, position):

@@ -7,9 +7,9 @@ LOADI SP 200;
 # Allokation (int car) Ende
 # Arithmetischer Operand 2097152 Start
 SUBI SP 1;                              # Stack um eine Zelle erweitern
-LOADI ACC 32;                           # Higher Bits '000000_0000000000100000' in ACC laden
+LOADI ACC 32;                           # Higher Bits in ACC laden: '0000000000000000_0000000000100000'
 MULTI ACC 65536;                        # Higher Bits um 16 Bits shiften
-ORI ACC 0;                              # Lower Bits '000000_0000000000000000' in ACC einfügen
+ORI ACC 0;                              # Lower Bits in ACC einfügen: '0000000000100000_0000000000000000'
 STOREIN SP ACC 1;                       # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2097152 Ende
 LOADIN SP ACC 1;                        # Wert von 2097152 in ACC laden
@@ -30,9 +30,9 @@ STOREIN SP ACC 1;                       # Wert in oberste Stacke-Zelle
 # Arithmetische unäre Operation (- 2097160) Start
 # Arithmetischer Operand 2097160 Start
 SUBI SP 1;                              # Stack um eine Zelle erweitern
-LOADI ACC 32;                           # Higher Bits '000000_0000000000100000' in ACC laden
+LOADI ACC 32;                           # Higher Bits in ACC laden: '0000000000000000_0000000000100000'
 MULTI ACC 65536;                        # Higher Bits um 16 Bits shiften
-ORI ACC 8;                              # Lower Bits '000000_0000000000001000' in ACC einfügen
+ORI ACC 8;                              # Lower Bits in ACC einfügen: '0000000000100000_0000000000001000'
 STOREIN SP ACC 1;                       # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 2097160 Ende
 LOADI ACC 0;                            # 0 in ACC laden

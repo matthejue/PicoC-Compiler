@@ -32,11 +32,19 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (1 + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (1 + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
+LOADI IN1 255;                         # Bitmaske 1 für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+LOADI IN2 32768;                       # Bitvektor 10000000_00000000 laden
+MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
+ANDI ACC IN1;                          # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
+LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
 STORE ACC 100;                         # Wert von (1 + 1) in Variable var1 speichern
 # Zuweisung (var1 = (1 + 1)) Ende
-STORE ACC 101;                         # Wert von (var1 = (1 + 1)) in Variable var2 speichern
+STORE ACC 100;                         # Wert von (var1 = (1 + 1)) in Variable var2 speichern
 # Zuweisung (var2 = (var1 = (1 + 1))) Ende
-STORE ACC 102;                         # Wert von (var2 = (var1 = (1 + 1))) in Variable var3 speichern
+STORE ACC 101;                         # Wert von (var2 = (var1 = (1 + 1))) in Variable var3 speichern
 # Zuweisung ((int var3) = (var2 = (var1 = (1 + 1)))) Ende
 # Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Start
 # Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Start
@@ -82,11 +90,19 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung ((1 > 1) && ToBool(1)) Ende
 LOADIN SP ACC 1;                       # Wert von ((1 > 1) && ToBool(1)) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
+LOADI IN1 255;                         # Bitmaske 1 für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+LOADI IN2 32768;                       # Bitvektor 10000000_00000000 laden
+MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
+ANDI ACC IN1;                          # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
+LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
 STORE ACC 100;                         # Wert von ((1 > 1) && ToBool(1)) in Variable var1 speichern
 # Zuweisung (var1 = ((1 > 1) && ToBool(1))) Ende
-STORE ACC 101;                         # Wert von (var1 = ((1 > 1) && ToBool(1))) in Variable var2 speichern
+STORE ACC 100;                         # Wert von (var1 = ((1 > 1) && ToBool(1))) in Variable var2 speichern
 # Zuweisung (var2 = (var1 = ((1 > 1) && ToBool(1)))) Ende
-STORE ACC 102;                         # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in Variable var3 speichern
+STORE ACC 101;                         # Wert von (var2 = (var1 = ((1 > 1) && ToBool(1)))) in Variable var3 speichern
 # Zuweisung (var3 = (var2 = (var1 = ((1 > 1) && ToBool(1))))) Ende
 JUMP 0;
 # Main Funktion (void main (char var1) ... ) Ende

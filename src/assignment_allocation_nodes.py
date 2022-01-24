@@ -7,6 +7,15 @@ from arithmetic_nodes import Identifier, Number, Character
 from warnings_ import Warnings
 from warning_handler import WarningHandler
 from bitstring import Bits
+from enum import Enum
+
+
+class TYPE(Enum):
+    """Type of assignment"""
+    CONST_ASSIGNMENT = 1
+    ASSIGNMENT_WITH_LITERAL = 2
+    ASSIGNMENT_WITH_VARIABLE = 3
+    ASSIGNMENT_WITH_COMPLEX_EXPRESSION = 4
 
 
 class Assignment(ASTNode):
@@ -23,8 +32,14 @@ class Assignment(ASTNode):
     assign_loc = 2
 
     implicit_conversion = strip_multiline_string(
-        """LOADI IN1 255  # Bitmaske für char Datentyp erstellen
-        AND ACC IN1  # Wo in der Bitmaske eine 1 ist, bleiben die Bits erhalten
+        """LOADI IN1 255;  # Bitmaske 1 für char Datentyp erstellen
+        AND ACC IN1;  # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+        LOADI IN2 32768;  # Bitvektor 10000000_00000000 laden
+        MULTI IN2 65536;  # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
+        ANDI ACC IN1;  # Testen, ob Zahl negativ ist
+        JUMP== 3;  # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
+        LOADI IN1 -256;  # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+        OR ACC IN1;  # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
         """)
     implicit_conversion_loc = 2
 
@@ -86,16 +101,24 @@ class Assignment(ASTNode):
                         symbol = self.symbol_table.resolve(name)
 
                         # error check
-                        possibly_new_value = self._implicit_conversion_warning_check(
-                            symbol, value, position)
+                        possibly_new_value = self._implicit_conversion_and_warning_check(
+                            symbol, value, position, TYPE.CONST_ASSIGNMENT)
                         symbol.value = possibly_new_value
-                        self._comment_for_constant(name, possibly_new_value)
+                        self._comment_for_constant(
+                            name, str(possibly_new_value))
 
             # nested assignment that is the assignment of another assignment
             case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment()):
                 self.expression.visit()
 
+                match self.expression:
+                    case Assignment(Identifier(name, position), _):
+                        symbol = self.symbol_table.resolve(name)
+                        self._implicit_conversion_and_warning_check(
+                            symbol, name, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+
                 self._adapt_code(name)
+
             # assigment that assigns a variable to a expression
             case Assignment((Identifier(name, position) | Allocation(_, _, Identifier(name, position))), expression):
                 symbol = self.symbol_table.resolve(name)
@@ -116,17 +139,14 @@ class Assignment(ASTNode):
                 # and make a impilicit converstion
                 match expression:
                     case (Character(value, position) | Number(value, position)):
-                        self._implicit_conversion_warning_check(
-                            symbol, value, position)
+                        self._implicit_conversion_and_warning_check(
+                            symbol, value, position, TYPE.ASSIGNMENT_WITH_LITERAL)
                     case Identifier(name, position):
-                        symbol_2 = self.symbol_table.resolve(name)
-                        # send upper range to find out if the datatype of the
-                        # variable on the right is bigger
-                        range_of_char_or_int = global_vars.RANGE_OF_CHAR[1]\
-                            if symbol_2.datatype.name == "char" else\
-                            global_vars.RANGE_OF_INT[1]
-                        self._implicit_conversion_warning_check(
-                            symbol, range_of_char_or_int, symbol_2.position)
+                        self._implicit_conversion_and_warning_check(
+                            symbol, name, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+                    case _:
+                        self._implicit_conversion_and_warning_check(
+                            symbol, None, None, TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION)
 
                 self._adapt_code(name)
 
@@ -136,29 +156,46 @@ class Assignment(ASTNode):
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
-    def _implicit_conversion_warning_check(self, symbol, value, position):
-        """return value only important for const
-        """
+    def _implicit_conversion_and_warning_check(self, symbol, value, position, type_of_assignment):
+        """return value only important for const"""
         char_range_from = global_vars.RANGE_OF_CHAR[0]
         char_range_to = global_vars.RANGE_OF_CHAR[1]
-        max_int = global_vars.RANGE_OF_INT[1]
-        if int(value) > max_int:
-            raise Errors.TooLargeLiteralError(value, position)
-        if symbol.datatype.name == "char" and int(value) > char_range_to:
-            bits = Bits(int=value, length=32).bin
-            # deal with signbit
-            char_bits = '1' + \
-                bits[32-8:32] if bits[0] == '1' else '0' + bits[32-8:32]
-            new_value = Bits(bin=char_bits).int
-            warning = Warnings.ImplicitConversionWarning(
-                symbol.name, symbol.position, symbol.datatype, char_range_from,
-                char_range_to, value, position, "int", new_value)
-            self.warning_handler.add_warning(warning)
 
-            self.code_generator.add_code(
-                self.implicit_conversion, self.implicit_conversion_loc)
-            return new_value
-        return value
+        # if value is a variabl identifier
+        match type_of_assignment:
+            case TYPE.ASSIGNMENT_WITH_VARIABLE:
+                symbol_2 = self.symbol_table.resolve(value)
+                if symbol.datatype.name == "char" and symbol_2.datatype.name == "int":
+                    warning = Warnings.ImplicitConversionWarning(
+                        symbol.name, symbol.position, symbol.datatype, char_range_from,
+                        char_range_to, value, position, "int", None)
+                    self.warning_handler.add_warning(warning)
+                    self.code_generator.add_code(
+                        self.implicit_conversion, self.implicit_conversion_loc)
+            case TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION:
+                if symbol.datatype.name == "char":
+                    self.code_generator.add_code(
+                        self.implicit_conversion, self.implicit_conversion_loc)
+            case _:
+                if symbol.datatype.name == "char" and int(value) > char_range_to:
+                    bits = Bits(int=int(value), length=32).bin
+
+                    # deal with signbit
+                    char_bits = '1' + \
+                        bits[32-8:32] if bits[0] == '1' else '0' + bits[32-8:32]
+                    new_value = Bits(bin=char_bits).int
+                    warning = Warnings.ImplicitConversionWarning(
+                        symbol.name, symbol.position, symbol.datatype, char_range_from,
+                        char_range_to, value, position, "int", new_value)
+                    self.warning_handler.add_warning(warning)
+                    match type_of_assignment:
+                        case TYPE.ASSIGNMENT_WITH_LITERAL:
+                            self.code_generator.add_code(
+                                self.implicit_conversion, self.implicit_conversion_loc)
+                        case TYPE.CONST_ASSIGNMENT:
+                            return new_value
+                else:
+                    return value
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:

@@ -16,6 +16,6 @@ class Warnings:
             self.variable_from = variable_from
             self.variable_to = variable_to
             self.found = found
-            self.found_new = found_new
             self.found_pos = found_pos
             self.found_type = found_type
+            self.found_new = found_new

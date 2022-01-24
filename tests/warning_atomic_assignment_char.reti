@@ -1,20 +1,10 @@
-# File error_too_large_literal_variable_assignment_char Start
-# Main Funktion (void main ((char var) = 127) ... ) Start
+# File warning_atomic_assignment_char Start
+# Main Funktion (void main ((char var) = 128)) Start
 LOADI SP 200;
-# Zuweisung ((char var) = 127) Start
+# Zuweisung ((char var) = 128) Start
 # Allokation (char var) Start
 # Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
 # Allokation (char var) Ende
-# Arithmetischer Operand 127 Start
-SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 127;                         # Wert von 127 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 127 Ende
-LOADIN SP ACC 1;                       # Wert von 127 in ACC laden
-ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 127 in Variable var speichern
-# Zuweisung ((char var) = 127) Ende
-# Zuweisung (var = 128) Start
 # Arithmetischer Operand 128 Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 128;                         # Wert von 128 in ACC laden
@@ -31,7 +21,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
 OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
 STORE ACC 100;                         # Wert von 128 in Variable var speichern
-# Zuweisung (var = 128) Ende
+# Zuweisung ((char var) = 128) Ende
 JUMP 0;
-# Main Funktion (void main ((char var) = 127) ... ) Ende
-# File error_too_large_literal_variable_assignment_char Ende
+# Main Funktion (void main ((char var) = 128)) Ende
+# File warning_atomic_assignment_char Ende

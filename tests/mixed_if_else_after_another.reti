@@ -43,7 +43,7 @@ LOADIN SP ACC 1;                       # Wert von 10 in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert von 10 in Variable cars speichern
 # Zuweisung (cars = 10) Ende
-JUMP 15;                               # Else-Branch überspringen
+JUMP 17;                               # Else-Branch überspringen
 # Else-Branch
 # Zuweisung (cars = (cars + 1)) Start
 # Arithmetische binäre Operation (cars + 1) Start
@@ -65,6 +65,14 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (cars + 1) Ende
 LOADIN SP ACC 1;                       # Wert von (cars + 1) in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
+LOADI IN1 255;                         # Bitmaske 1 für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+LOADI IN2 32768;                       # Bitvektor 10000000_00000000 laden
+MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
+ANDI ACC IN1;                          # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
+LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
 STORE ACC 101;                         # Wert von (cars + 1) in Variable cars speichern
 # Zuweisung (cars = (cars + 1)) Ende
 # If und Else Statement IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) Ende
