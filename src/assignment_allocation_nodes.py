@@ -4,8 +4,9 @@ from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from dummy_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
-from warnings import Warnings
+from warnings_ import Warnings
 from warning_handler import WarningHandler
+from bitstring import Bits
 
 
 class Assignment(ASTNode):
@@ -20,6 +21,12 @@ class Assignment(ASTNode):
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
     assign_loc = 2
+
+    implicit_conversion = strip_multiline_string(
+        """LOADI IN1 255  # Bitmaske für char Datentyp erstellen
+        AND ACC IN1  # Wo in der Bitmaske eine 1 ist, bleiben die Bits erhalten
+        """)
+    implicit_conversion_loc = 2
 
     assign_more = "STORE ACC var_address;  # Wert von e1 in Variable v1 speichern\n"
     assign_more_loc = 1
@@ -77,16 +84,13 @@ class Assignment(ASTNode):
                 match expression:
                     case (Number(value, position) | Character(value, position)):
                         symbol = self.symbol_table.resolve(name)
-                        self._too_large_number_warning_check(
+
+                        # error check
+                        possibly_new_value = self._implicit_conversion_warning_check(
                             symbol, value, position)
-                        symbol.value = value
-                        self._comment_for_constant(name, value)
-                    #  case Identifier(value, position):
-                        #  symbol = self.symbol_table.resolve(name)
-                        #  self._error_check(
-                        #  name, symbol, self.symbol_table.resolve(value).value, position)
-                        #  symbol.value = self.symbol_table.resolve(value).value
-                        #  self._comment_for_constant(name, value)
+                        symbol.value = possibly_new_value
+                        self._comment_for_constant(name, possibly_new_value)
+
             # nested assignment that is the assignment of another assignment
             case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment()):
                 self.expression.visit()
@@ -95,17 +99,9 @@ class Assignment(ASTNode):
             # assigment that assigns a variable to a expression
             case Assignment((Identifier(name, position) | Allocation(_, _, Identifier(name, position))), expression):
                 symbol = self.symbol_table.resolve(name)
-                # error checks
-                match expression:
-                    case (Character(value, position) | Number(value, position)):
 
-                        self._too_large_number_warning_check(symbol, value,
-                                                             position)
-                    case Identifier(name, position):
-                        symbol_2 = self.symbol_table.resolve(name)
-                        self._too_large_number_warning_check(
-                            symbol, symbol_2.name, symbol_2.position)
-                # there should never be a const identifier on the left side in
+                # error check 1
+                # There should never be a const identifier on the left side in
                 # a assignment if it's not the initialisation of the const
                 # identifier
                 self._const_reassignment_error_check(name, position, symbol)
@@ -113,6 +109,24 @@ class Assignment(ASTNode):
                 self.expression.visit()
 
                 self.code_generator.add_code(self.assign, self.assign_loc)
+
+                # error check 2 and possible implicit conversion
+                # If the literal or variable on the right side has a larger
+                # type then the variable on the left side, then throw a warning
+                # and make a impilicit converstion
+                match expression:
+                    case (Character(value, position) | Number(value, position)):
+                        self._implicit_conversion_warning_check(
+                            symbol, value, position)
+                    case Identifier(name, position):
+                        symbol_2 = self.symbol_table.resolve(name)
+                        # send upper range to find out if the datatype of the
+                        # variable on the right is bigger
+                        range_of_char_or_int = global_vars.RANGE_OF_CHAR[1]\
+                            if symbol_2.datatype.name == "char" else\
+                            global_vars.RANGE_OF_INT[1]
+                        self._implicit_conversion_warning_check(
+                            symbol, range_of_char_or_int, symbol_2.position)
 
                 self._adapt_code(name)
 
@@ -122,13 +136,29 @@ class Assignment(ASTNode):
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
-    def _too_large_number_warning_check(self, symbol, value, position):
-        range_from = symbol.datatype.range_from_to[0]
-        range_to = symbol.datatype.range_from_to[1]
-        if int(value) > range_to:  # < range_from
-            warning = Warnings.TooLargeLiteralWarning(
-                symbol.name, symbol.position, symbol.datatype, range_from, range_to, value, position)
+    def _implicit_conversion_warning_check(self, symbol, value, position):
+        """return value only important for const
+        """
+        char_range_from = global_vars.RANGE_OF_CHAR[0]
+        char_range_to = global_vars.RANGE_OF_CHAR[1]
+        max_int = global_vars.RANGE_OF_INT[1]
+        if int(value) > max_int:
+            raise Errors.TooLargeLiteralError(value, position)
+        if symbol.datatype.name == "char" and int(value) > char_range_to:
+            bits = Bits(int=value, length=32).bin
+            # deal with signbit
+            char_bits = '1' + \
+                bits[32-8:32] if bits[0] == '1' else '0' + bits[32-8:32]
+            new_value = Bits(bin=char_bits).int
+            warning = Warnings.ImplicitConversionWarning(
+                symbol.name, symbol.position, symbol.datatype, char_range_from,
+                char_range_to, value, position, "int", new_value)
             self.warning_handler.add_warning(warning)
+
+            self.code_generator.add_code(
+                self.implicit_conversion, self.implicit_conversion_loc)
+            return new_value
+        return value
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:

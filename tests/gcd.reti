@@ -85,7 +85,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand n Ende
 LOADIN SP ACC 1;                       # Wert von n in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von n in Variable m speichern
+STORE ACC 101;                         # Wert von n in Variable m speichern
 # Zuweisung (m = n) Ende
 # Zuweisung (n = h) Start
 # Arithmetischer Operand h Start
@@ -95,7 +95,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand h Ende
 LOADIN SP ACC 1;                       # Wert von h in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von h in Variable n speichern
+STORE ACC 102;                         # Wert von h in Variable n speichern
 # Zuweisung (n = h) Ende
 JUMP -44;                              # Zurück zur Auswertung von (n > 0)
 # While Statement While((n > 0) (h = (m % n)) ... ) Ende

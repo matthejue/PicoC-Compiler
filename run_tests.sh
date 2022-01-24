@@ -9,7 +9,7 @@ not_passed=();
   echo ===============================================================================;
   ./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 20 $testfile;
   if [[ $? != 0 ]]; then
-    not_passed+=($(basename --suffix=.picoc $testfile));
+    not_passed+=($testfile);
   fi;
   ((num_tests++));
 done;

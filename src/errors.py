@@ -69,8 +69,8 @@ class Errors:
 
     class ConstReassignmentError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
-            self.description = "ConstReassignmentError: Can't reassign a new "
-            f"value to constant '{found}'"
+            self.description = "ConstReassignmentError: Can't reassign a new "\
+            f"value to constant identifier '{found}'"
             self.found = found
             self.found_pos = found_pos
             self.first = first

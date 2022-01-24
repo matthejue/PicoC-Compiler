@@ -6,7 +6,7 @@ class Symbol:
 
     __match_args__ = ("value", "datatype")
 
-    def __init__(self, name, datatype, position, value, range_from_to):
+    def __init__(self, name, datatype, position, value):
         """
         :name: string
         :datatype: Symbol
@@ -17,7 +17,6 @@ class Symbol:
         self.datatype = datatype
         self.position = position
         self.value = value
-        self.range_from_to = range_from_to
 
     def get_name(self, ):
         return self.name
@@ -32,7 +31,7 @@ class Symbol:
 class VariableSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, '-', '-')
+        super().__init__(name, datatype, position, '-')
 
     def get_type(self, ):
         return "variable"
@@ -41,7 +40,7 @@ class VariableSymbol(Symbol):
 class ConstantSymbol(Symbol):
     """Represents a variable definition (name, datatype) in symbol table"""
     def __init__(self, name, datatype, position):
-        super().__init__(name, datatype, position, '-', '-')
+        super().__init__(name, datatype, position, '-')
 
     def get_type(self, ):
         return "named constant"
@@ -52,8 +51,8 @@ class BuiltInTypeSymbol(Symbol):
 
     __match_args__ = ("name", )
 
-    def __init__(self, name, range):
-        super().__init__(name, '-', '-', '-', range)
+    def __init__(self, name):
+        super().__init__(name, '-', '-', '-')
 
     def get_type(self, ):
         return "built in"
@@ -110,8 +109,8 @@ class _SymbolTable(Scope):
         self.fa_pointer = global_vars.args.begin_data_segment
 
     def initTypeSystem(self, ):
-        self.define(BuiltInTypeSymbol('char', (-128, 127)))
-        self.define(BuiltInTypeSymbol('int', (-2147483648, 2147483647)))
+        self.define(BuiltInTypeSymbol('char'))
+        self.define(BuiltInTypeSymbol('int'))
 
     def allocate(self, sym):
         """Determine address of variable

@@ -7,7 +7,7 @@ class _WarningHandler(ErrorHandler):
 
     _instance = None
 
-    def __init__(self, finput, fname):
+    def __init__(self, fname, finput):
         self.fname = fname
         self.finput = finput
         # list of warnings collected during execution
@@ -19,7 +19,7 @@ class _WarningHandler(ErrorHandler):
     def show_warnings(self, ):
         for warning in self.warnings:
             match warning:
-                case Warnings.TooLargeLiteralWarning as w:
+                case Warnings.ImplicitConversionWarning() as w:
                     warning_header = self._warning_header(
                         w.found_pos, w.description)
                     warning_screen = AnnotationScreen(self.finput, w.found_pos[0],

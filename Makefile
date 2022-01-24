@@ -24,7 +24,7 @@ test: _test clean
 _test:
 	./run_tests.sh
 
-test-arg: test-arg clean
+test-arg: _test-arg clean
 _test-arg:
 	# start with 'make test-arg ARG=file_basename'
 	./run_tests.sh $(ARG_BASE)

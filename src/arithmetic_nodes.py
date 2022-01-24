@@ -26,9 +26,6 @@ class ArithmeticOperand(ASTNode):
 
     __match_args__ = ("value", "position")
 
-    RANGE_OF_INT = (-2147483648, 2147483647)
-    RANGE_OF_PARAMETER = (-2097152, 2097151)
-
     def visit(self, ):
         self.code_generator.add_code(
             f"# Arithmetischer Operand {self} Start\n", 0)
@@ -69,7 +66,7 @@ class ArithmeticOperand(ASTNode):
                                                      self.all_loc)
             case (Number(value, position) | Character(value, position)):
                 self._error_check(value, position)
-                if int(value) <= self.RANGE_OF_PARAMETER[1]:
+                if int(value) <= global_vars.RANGE_OF_PARAMETER[1]:
                     self.constant = self.code_generator.replace_code_pre(
                         self.constant, "encode(w)", value)
                     self.constant = self._pretty_comments(self.constant)
@@ -106,11 +103,9 @@ class ArithmeticOperand(ASTNode):
         return code
 
     def _error_check(self, value, position):
-        min_int = self.RANGE_OF_INT[0]
-        max_int = self.RANGE_OF_INT[1]
-        if int(value) > max_int:  # range_from <=
-            raise Errors.TooLargeLiteralError(
-                None, None, None, min_int, max_int, value, position)
+        max_int = global_vars.RANGE_OF_INT[1]
+        if int(value) > max_int:
+            raise Errors.TooLargeLiteralError(value, position)
 
 
 class Identifier(ArithmeticOperand):

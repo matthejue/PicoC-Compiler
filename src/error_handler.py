@@ -98,7 +98,7 @@ class ErrorHandler:
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._warning_header(
-                e.first_pos, "Note: Constant was initialised here:")
+                e.first_pos, "Note: Constant identifier was initialised here:")
             error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
                                               e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))

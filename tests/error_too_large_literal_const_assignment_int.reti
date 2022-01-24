@@ -1,0 +1,12 @@
+# File error_too_large_literal_const_assignment_int Start
+# Main Funktion (void main ((const int var) = 2147483648)) Start
+LOADI SP 200;
+# Zuweisung ((const int var) = 2147483648) Start
+# Allokation (const int var) Start
+# Konstante var vom Typ int zur Symboltabelle hinzugefügt
+# Allokation (const int var) Ende
+# Konstante var in Symboltabelle den Wert 2147483648 zugewiesen
+# Zuweisung ((const int var) = 2147483648) Ende
+JUMP 0;
+# Main Funktion (void main ((const int var) = 2147483648)) Ende
+# File error_too_large_literal_const_assignment_int Ende

@@ -18,7 +18,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand x Ende
 LOADIN SP ACC 1;                       # Wert von x in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von x in Variable y speichern
+STORE ACC 97;                          # Wert von x in Variable y speichern
 # Zuweisung ((int y) = x) Ende
 # While Statement While((x < 12) (y = (y + 1)) ... ) Start
 # Logisches Atom (x < 12) Start

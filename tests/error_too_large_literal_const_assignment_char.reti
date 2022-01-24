@@ -1,0 +1,12 @@
+# File error_too_large_literal_const_assignment_char Start
+# Main Funktion (void main ((const char var) = 128)) Start
+LOADI SP 200;
+# Zuweisung ((const char var) = 128) Start
+# Allokation (const char var) Start
+# Konstante var vom Typ char zur Symboltabelle hinzugefügt
+# Allokation (const char var) Ende
+# Konstante var in Symboltabelle den Wert 128 zugewiesen
+# Zuweisung ((const char var) = 128) Ende
+JUMP 0;
+# Main Funktion (void main ((const char var) = 128)) Ende
+# File error_too_large_literal_const_assignment_char Ende

@@ -1,1 +1,0 @@
-(error_too_large_literal_atomic_assignment_char (void main ((char var) = 128)))

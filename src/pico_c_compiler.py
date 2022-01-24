@@ -5,7 +5,7 @@ import argparse
 from lexer import Lexer, TT
 from grammar import Grammar
 from error_handler import ErrorHandler
-from warning_handler import _WarningHandler
+from warning_handler import WarningHandler
 from symbol_table import SymbolTable
 from tabulate import tabulate
 import global_vars
@@ -156,9 +156,10 @@ def _compile(code, infile, outbase=None):
 
     lexer = Lexer(code_without_cr)
 
-    # Handle errors and warning
+    # Handle errors and warnings
     error_handler = ErrorHandler(infile, code_without_cr)
-    warning_handler = _WarningHandler(infile, code_without_cr)
+    warning_handler = WarningHandler(infile,
+                                     code_without_cr)  # initialise singleton
 
     if global_vars.args.tokens:
         error_handler.handle(_tokens_option, lexer, outbase)
@@ -176,6 +177,9 @@ def _compile(code, infile, outbase=None):
 
     if global_vars.args.symbol_table:
         _symbol_table_option(outbase)
+
+    # show warnings before reti code gets output
+    warning_handler.show_warnings()
 
     _reti_code(abstract_syntax_tree, outbase)
 
@@ -206,14 +210,11 @@ def _abstract_syntax_option(grammar: Grammar, outbase):
 
 def _symbol_table_option(outbase):
     if global_vars.args.print:
-        header = [
-            "name", "type", "datatype", "position", "value", "range_from_to"
-        ]
+        header = ["name", "type", "datatype", "position", "value"]
         symbols = SymbolTable().symbols
         print('\n' + str(
             tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
-                       str(v.value), str(v.range_from_to))
-                      for k, v in symbols.items()],
+                       str(v.value)) for k, v in symbols.items()],
                      headers=header)))
 
     if outbase:
@@ -221,19 +222,16 @@ def _symbol_table_option(outbase):
 
 
 def _write_symbol_table(outbase):
-    output = "name,type,datatype,position,value,range_from_to\n"
+    output = "name,type,datatype,position,value\n"
     symbols = SymbolTable().symbols
     for name in symbols.keys():
         position = f"({symbols[name].position[0]}:{symbols[name].position[1]})"\
             if symbols[name].position != '-' else '-'
-        range_from_to = f"({symbols[name].range_from_to[0]}:{symbols[name].range_from_to[1]})" if symbols[
-            name].range_from_to != '-' else '-'
         output += f"{name},"\
             f"{symbols[name].get_type()},"\
             f"{symbols[name].datatype},"\
             f"{position},"\
-            f"{symbols[name].value},"\
-            f"{range_from_to}\n"
+            f"{symbols[name].value}\n"
     with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
         fout.write(output)
 

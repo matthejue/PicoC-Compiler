@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-  int car = 10;
-  const char var = car = 2147483647;
-  printf("%c", var);
+  char car = 10;
+  char var = car = 2147483646;
+  printf("adsfa %d asdfdasfh", var);
 }
