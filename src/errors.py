@@ -54,10 +54,14 @@ class Errors:
     class TooLargeLiteralError(Exception):
         """If the literal assigned to a variable is too large for the datatype of
         the variable"""
-        def __init__(self, found, found_pos):
+        def __init__(self, found, found_pos, found_symbol_type, found_from,
+                     found_to):
             self.description = f"TooLargeLiteralError: Literal '{found}' is too large"
             self.found = found
             self.found_pos = found_pos
+            self.found_symbol_type = found_symbol_type
+            self.found_from = found_from
+            self.found_to = found_to
 
     class RedefinitionError(Exception):
         def __init__(self, found, found_pos, first, first_pos):

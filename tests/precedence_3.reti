@@ -37,9 +37,9 @@ MULT ACC IN2;                          # Wert von (cars * (4 / 2)) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (cars * (4 / 2)) Ende
-LOADIN SP ACC 1;                       # Wert von (cars * (4 / 2)) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(cars * (4 / 2))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (cars * (4 / 2)) in Variable var speichern
+STORE ACC 101;                         # Wert '(cars * (4 / 2))' in Variable 'var' speichern
 # Zuweisung ((int var) = (cars * (4 / 2))) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

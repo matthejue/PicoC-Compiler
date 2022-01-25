@@ -1,0 +1,1 @@
+(no_warning_atomic_assignment_int_huge_number (void main ((int var) = 2147483647)))

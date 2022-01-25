@@ -103,9 +103,11 @@ class ArithmeticOperand(ASTNode):
         return code
 
     def _error_check(self, value, position):
+        min_int = global_vars.RANGE_OF_INT[0]
         max_int = global_vars.RANGE_OF_INT[1]
         if int(value) > max_int:
-            raise Errors.TooLargeLiteralError(value, position)
+            raise Errors.TooLargeLiteralError(
+                value, position, "variable", min_int, max_int)
 
 
 class Identifier(ArithmeticOperand):

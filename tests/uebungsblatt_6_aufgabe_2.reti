@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 42;                          # Wert von 42 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 42 Ende
-LOADIN SP ACC 1;                       # Wert von 42 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '42' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 42 in Variable x speichern
+STORE ACC 100;                         # Wert '42' in Variable 'x' speichern
 # Zuweisung ((int x) = 42) Ende
 # Zuweisung ((int y) = (- 24)) Start
 # Allokation (int y) Start
@@ -29,9 +29,9 @@ LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
 SUB ACC IN2;                           # (0 - e1) in ACC laden
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- 24) Ende
-LOADIN SP ACC 1;                       # Wert von (- 24) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(- 24)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (- 24) in Variable y speichern
+STORE ACC 101;                         # Wert '(- 24)' in Variable 'y' speichern
 # Zuweisung ((int y) = (- 24)) Ende
 # Allokation (char is_less) Start
 # Variable is_less vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
@@ -118,17 +118,19 @@ LOADI ACC 1;                           # Ergebnis 1, wenn x <= y wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom (x <= y) Ende
-LOADIN SP ACC 1;                       # Wert von (x <= y) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(x <= y)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-LOADI IN1 255;                         # Bitmaske 1 für char Datentyp erstellen
+# Implizite Konversion von int zu char Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
 AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
-LOADI IN2 32768;                       # Bitvektor 10000000_00000000 laden
-MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
-ANDI ACC IN1;                          # Testen, ob Zahl negativ ist
-JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
-LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
-STORE ACC 102;                         # Wert von (x <= y) in Variable is_less speichern
+# Implizite Konversion von int zu char Ende
+STORE ACC 102;                         # Wert '(x <= y)' in Variable 'is_less' speichern
 # Zuweisung (is_less = (x <= y)) Ende
 JUMP 32;                               # Else-Branch überspringen
 # Else-Branch
@@ -164,9 +166,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 0;                           # Wert von 0 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
-LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 102;                         # Wert von 0 in Variable is_less speichern
+STORE ACC 102;                         # Wert '0' in Variable 'is_less' speichern
 # Zuweisung (is_less = 0) Ende
 JUMP 7;                                # Else-Branch überspringen
 # Else-Branch
@@ -176,9 +178,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 1;                           # Wert von 1 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 1 Ende
-LOADIN SP ACC 1;                       # Wert von 1 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '1' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 102;                         # Wert von 1 in Variable is_less speichern
+STORE ACC 102;                         # Wert '1' in Variable 'is_less' speichern
 # Zuweisung (is_less = 1) Ende
 # If und Else Statement IfElse((x > 0) (is_less = 0) else (is_less = 1)) Ende
 # If und Else Statement IfElse(ToBool(((x > 0) ^ (y > 0))) (is_less = (x <= y)) else IfElse((x > 0) (is_less = 0) else (is_less = 1))) Ende

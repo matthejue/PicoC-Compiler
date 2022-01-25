@@ -1,5 +1,0 @@
-void main() {
-  char car = 'c';
-  const int var = car;
-  int tar = var + car;
-}

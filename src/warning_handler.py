@@ -25,6 +25,7 @@ class _WarningHandler(ErrorHandler):
                     warning_screen = AnnotationScreen(self.finput, w.found_pos[0],
                                                       w.found_pos[0])
                     warning_screen.mark(w.found_pos, len(w.found))
+
                     node_header = self._warning_header(
                         w.variable_pos,
                         f"Note: Variable '{w.variable}' definied as type "
@@ -32,16 +33,18 @@ class _WarningHandler(ErrorHandler):
                     warning_screen_2 = AnnotationScreen(self.finput, w.variable_pos[0],
                                                         w.variable_pos[0])
                     warning_screen_2.mark(w.variable_pos, len(w.variable))
+
                     warning_screen.filter()
                     warning_screen_2.filter()
+
                     node_end = self._warning_header(
                         None, f"Note: Datatype '{w.variable_type}' has only range "
                         f"{w.variable_from} to {w.variable_to}")
-                    print('\n' + warning_header + str(warning_screen) + node_header +
-                          str(warning_screen_2) + node_end)
+                    print('\n' + warning_header + str(warning_screen) +
+                          node_header + str(warning_screen_2) + node_end)
 
     def _warning_header(self, pos, descirption):
-        return super()._warning_header(pos, descirption)
+        return super()._error_header(pos, descirption)
 
 
 def WarningHandler(fname=None, finput=None):

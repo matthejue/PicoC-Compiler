@@ -37,9 +37,9 @@ ADD ACC IN2;                           # Wert von ((8 * cars) + 2) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation ((8 * cars) + 2) Ende
-LOADIN SP ACC 1;                       # Wert von ((8 * cars) + 2) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '((8 * cars) + 2)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von ((8 * cars) + 2) in Variable var speichern
+STORE ACC 101;                         # Wert '((8 * cars) + 2)' in Variable 'var' speichern
 # Zuweisung ((int var) = ((8 * cars) + 2)) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

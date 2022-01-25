@@ -1,0 +1,1 @@
+(warning_atomic_assignment_char_int_const_variable (void main ((const int var1) = 1024) ((char var2) = var1)))

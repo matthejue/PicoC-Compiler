@@ -1,0 +1,4 @@
+void main() {
+  char var2;
+  char var = var2 = 'c';
+}

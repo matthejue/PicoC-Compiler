@@ -1,0 +1,1 @@
+(no_warning_const_assignment_int_char (void main ((const int var) = 128)))

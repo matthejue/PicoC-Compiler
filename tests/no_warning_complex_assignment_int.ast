@@ -1,0 +1,1 @@
+(no_warning_complex_assignment_int (void main ((int var) = (99 + 1))))

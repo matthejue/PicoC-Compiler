@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 0;                           # Wert von 0 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 0 Ende
-LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 0 in Variable bool speichern
+STORE ACC 100;                         # Wert '0' in Variable 'bool' speichern
 # Zuweisung ((char bool) = 0) Ende
 # Zuweisung ((char var) = Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool)))))))))) Start
 # Allokation (char var) Start
@@ -117,17 +117,19 @@ LOADIN SP IN2 1;                       # Wert von Not(ToBool((- (- (Not(((1 - 1)
 OPLUS ACC IN2;                         # !(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool))))))))) in ACC laden
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Logische unäre Verknüpfung Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool))))))))) Ende
-LOADIN SP ACC 1;                       # Wert von Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool))))))))) in ACC laden
+LOADIN SP ACC 1;                       # Wert von 'Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool)))))))))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-LOADI IN1 255;                         # Bitmaske 1 für char Datentyp erstellen
+# Implizite Konversion von int zu char Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
 AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
-LOADI IN2 32768;                       # Bitvektor 10000000_00000000 laden
-MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
-ANDI ACC IN1;                          # Testen, ob Zahl negativ ist
-JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
-LOADI IN1 -256;                        # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
-STORE ACC 101;                         # Wert von Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool))))))))) in Variable var speichern
+# Implizite Konversion von int zu char Ende
+STORE ACC 101;                         # Wert 'Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool)))))))))' in Variable 'var' speichern
 # Zuweisung ((char var) = Not(Not(ToBool((- (- (Not(((1 - 1) < 12)) && Not(ToBool((- bool)))))))))) Ende
 JUMP 0;
 # Main Funktion (void main ((char bool) = 0) ... ) Ende

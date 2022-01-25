@@ -1,0 +1,1 @@
+(warning_atomic_assignment_char_variable_real_char (void main ((int car) = 99) ((char var) = car)))

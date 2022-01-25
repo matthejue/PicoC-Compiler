@@ -37,9 +37,9 @@ OR ACC IN2;                            # Wert von ((4 + 7) | cars) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation ((4 + 7) | cars) Ende
-LOADIN SP ACC 1;                       # Wert von ((4 + 7) | cars) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '((4 + 7) | cars)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von ((4 + 7) | cars) in Variable var speichern
+STORE ACC 101;                         # Wert '((4 + 7) | cars)' in Variable 'var' speichern
 # Zuweisung ((int var) = ((4 + 7) | cars)) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

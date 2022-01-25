@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 12;                          # Wert von 12 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 12 Ende
-LOADIN SP ACC 1;                       # Wert von 12 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 12 in Variable x speichern
+STORE ACC 100;                         # Wert '12' in Variable 'x' speichern
 # Zuweisung ((int x) = 12) Ende
 # If Statement If((x < 10) ) Start
 # Logisches Atom (x < 10) Start

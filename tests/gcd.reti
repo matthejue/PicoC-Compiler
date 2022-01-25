@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 12;                          # Wert von 12 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 12 Ende
-LOADIN SP ACC 1;                       # Wert von 12 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 12 in Variable m speichern
+STORE ACC 100;                         # Wert '12' in Variable 'm' speichern
 # Zuweisung ((int m) = 12) Ende
 # Zuweisung ((int n) = 7) Start
 # Allokation (int n) Start
@@ -23,9 +23,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 7;                           # Wert von 7 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 7 Ende
-LOADIN SP ACC 1;                       # Wert von 7 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '7' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von 7 in Variable n speichern
+STORE ACC 101;                         # Wert '7' in Variable 'n' speichern
 # Zuweisung ((int n) = 7) Ende
 # Allokation (int h) Start
 # Variable h vom Typ int mit Adresse 102 zur Symboltabelle hinzugefügt
@@ -73,9 +73,9 @@ MOD ACC IN2;                           # Wert von (m % n) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (m % n) Ende
-LOADIN SP ACC 1;                       # Wert von (m % n) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(m % n)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 102;                         # Wert von (m % n) in Variable h speichern
+STORE ACC 102;                         # Wert '(m % n)' in Variable 'h' speichern
 # Zuweisung (h = (m % n)) Ende
 # Zuweisung (m = n) Start
 # Arithmetischer Operand n Start
@@ -83,9 +83,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOAD ACC 101;                          # Wert von n in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand n Ende
-LOADIN SP ACC 1;                       # Wert von n in ACC laden
+LOADIN SP ACC 1;                       # Wert von 'n' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von n in Variable m speichern
+STORE ACC 100;                         # Wert 'n' in Variable 'm' speichern
 # Zuweisung (m = n) Ende
 # Zuweisung (n = h) Start
 # Arithmetischer Operand h Start
@@ -93,9 +93,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOAD ACC 102;                          # Wert von h in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand h Ende
-LOADIN SP ACC 1;                       # Wert von h in ACC laden
+LOADIN SP ACC 1;                       # Wert von 'h' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 102;                         # Wert von h in Variable n speichern
+STORE ACC 101;                         # Wert 'h' in Variable 'n' speichern
 # Zuweisung (n = h) Ende
 JUMP -44;                              # Zurück zur Auswertung von (n > 0)
 # While Statement While((n > 0) (h = (m % n)) ... ) Ende

@@ -17,9 +17,9 @@ SUBI SP 1;                                                         # Stack um ei
 LOADI ACC 10;                                                      # Wert von 10 in ACC laden
 STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 10 Ende
-LOADIN SP ACC 1;                                                   # Wert von 10 in ACC laden
+LOADIN SP ACC 1;                                                   # Wert von '10' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 100;                                                     # Wert von 10 in Variable y speichern
+STORE ACC 100;                                                     # Wert '10' in Variable 'y' speichern
 # Zuweisung ((int y) = 10) Ende
 # Zuweisung (y = (y + x)) Start
 # Arithmetische binäre Operation (y + x) Start
@@ -39,9 +39,9 @@ ADD ACC IN2;                                                       # Wert von (y
 STOREIN SP ACC 2;                                                  # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (y + x) Ende
-LOADIN SP ACC 1;                                                   # Wert von (y + x) in ACC laden
+LOADIN SP ACC 1;                                                   # Wert von '(y + x)' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 100;                                                     # Wert von (y + x) in Variable y speichern
+STORE ACC 100;                                                     # Wert '(y + x)' in Variable 'y' speichern
 # Zuweisung (y = (y + x)) Ende
 # Logisches Atom (x < 10) Start
 # Arithmetischer Operand x Start

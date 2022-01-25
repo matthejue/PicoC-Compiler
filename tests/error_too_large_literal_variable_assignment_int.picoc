@@ -1,4 +1,4 @@
 void main() {
-  int var;
+  int var = 2147483647;
   var = 2147483648;
 }

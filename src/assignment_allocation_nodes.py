@@ -26,24 +26,24 @@ class Assignment(ASTNode):
         super().__init__(value, position)
 
     assign = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von e1 in ACC laden
+        """LOADIN SP ACC 1;  # Wert von 'e1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
     assign_loc = 2
 
     implicit_conversion = strip_multiline_string(
-        """LOADI IN1 255;  # Bitmaske 1 für char Datentyp erstellen
+        """LOADI IN1 255;  # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
         AND ACC IN1;  # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
-        LOADI IN2 32768;  # Bitvektor 10000000_00000000 laden
-        MULTI IN2 65536;  # Bit 1 im Bitvektor um 16 Bits shiften: 10000000_00000000_00000000_00000000
-        ANDI ACC IN1;  # Testen, ob Zahl negativ ist
-        JUMP== 3;  # Signextension für negative Zahl überspringen, wenn Zahl positiv ist
-        LOADI IN1 -256;  # Bitsmaske 2, die überall dort eine 1 hat, wo Bitmaske 1 eine 0 hat
+        LOADI IN2 32768;  # Bitvektor '10000000_00000000' laden
+        MULTI IN2 65536;  # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+        AND ACC IN1;  # Testen, ob Zahl negativ ist
+        JUMP== 3;  # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+        LOADI IN1 -256;  # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
         OR ACC IN1;  # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
         """)
     implicit_conversion_loc = 2
 
-    assign_more = "STORE ACC var_address;  # Wert von e1 in Variable v1 speichern\n"
+    assign_more = "STORE ACC var_address;  # Wert 'e1' in Variable 'v1' speichern\n"
     assign_more_loc = 1
 
     def update_match_args(self, ):
@@ -112,10 +112,10 @@ class Assignment(ASTNode):
                 self.expression.visit()
 
                 match self.expression:
-                    case Assignment(Identifier(name, position), _):
+                    case Assignment(Identifier(name_2, position), _):
                         symbol = self.symbol_table.resolve(name)
                         self._implicit_conversion_and_warning_check(
-                            symbol, name, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
 
                 self._adapt_code(name)
 
@@ -141,9 +141,9 @@ class Assignment(ASTNode):
                     case (Character(value, position) | Number(value, position)):
                         self._implicit_conversion_and_warning_check(
                             symbol, value, position, TYPE.ASSIGNMENT_WITH_LITERAL)
-                    case Identifier(name, position):
+                    case Identifier(name_2, position):
                         self._implicit_conversion_and_warning_check(
-                            symbol, name, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
                     case _:
                         self._implicit_conversion_and_warning_check(
                             symbol, None, None, TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION)
@@ -160,8 +160,9 @@ class Assignment(ASTNode):
         """return value only important for const"""
         char_range_from = global_vars.RANGE_OF_CHAR[0]
         char_range_to = global_vars.RANGE_OF_CHAR[1]
+        parameter_range_from = global_vars.RANGE_OF_PARAMETER[0]
+        parameter_range_to = global_vars.RANGE_OF_PARAMETER[1]
 
-        # if value is a variabl identifier
         match type_of_assignment:
             case TYPE.ASSIGNMENT_WITH_VARIABLE:
                 symbol_2 = self.symbol_table.resolve(value)
@@ -170,32 +171,41 @@ class Assignment(ASTNode):
                         symbol.name, symbol.position, symbol.datatype, char_range_from,
                         char_range_to, value, position, "int", None)
                     self.warning_handler.add_warning(warning)
-                    self.code_generator.add_code(
-                        self.implicit_conversion, self.implicit_conversion_loc)
+                    self._implicit_conversion()
             case TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION:
                 if symbol.datatype.name == "char":
-                    self.code_generator.add_code(
-                        self.implicit_conversion, self.implicit_conversion_loc)
-            case _:
+                    self._implicit_conversion()
+            case TYPE.ASSIGNMENT_WITH_LITERAL:
                 if symbol.datatype.name == "char" and int(value) > char_range_to:
-                    bits = Bits(int=int(value), length=32).bin
-
-                    # deal with signbit
-                    char_bits = '1' + \
-                        bits[32-8:32] if bits[0] == '1' else '0' + bits[32-8:32]
+                    char_bits = Bits(int=int(value), length=32).bin[32-8:32]
                     new_value = Bits(bin=char_bits).int
                     warning = Warnings.ImplicitConversionWarning(
                         symbol.name, symbol.position, symbol.datatype, char_range_from,
                         char_range_to, value, position, "int", new_value)
                     self.warning_handler.add_warning(warning)
-                    match type_of_assignment:
-                        case TYPE.ASSIGNMENT_WITH_LITERAL:
-                            self.code_generator.add_code(
-                                self.implicit_conversion, self.implicit_conversion_loc)
-                        case TYPE.CONST_ASSIGNMENT:
-                            return new_value
+                    self._implicit_conversion()
+            case TYPE.CONST_ASSIGNMENT:
+                if int(value) > parameter_range_to:
+                    raise Errors.TooLargeLiteralError(
+                        value, position, "constant identifier", parameter_range_from, parameter_range_to)
+                elif symbol.datatype.name == "char" and int(value) > char_range_to:
+                    char_bits = Bits(int=int(value), length=32).bin[32-8:32]
+                    new_value = Bits(bin=char_bits).int
+                    warning = Warnings.ImplicitConversionWarning(
+                        symbol.name, symbol.position, symbol.datatype, char_range_from,
+                        char_range_to, value, position, "int", new_value)
+                    self.warning_handler.add_warning(warning)
+                    return new_value
                 else:
                     return value
+
+    def _implicit_conversion(self, ):
+        self.code_generator.add_code(
+            f"# Implizite Konversion von int zu char Start\n", 0)
+        self.code_generator.add_code(
+            self.implicit_conversion, self.implicit_conversion_loc)
+        self.code_generator.add_code(
+            f"# Implizite Konversion von int zu char Ende\n", 0)
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:

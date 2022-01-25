@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 99;                          # Wert von 99 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 99 Ende
-LOADIN SP ACC 1;                       # Wert von 99 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '99' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 99 in Variable dom speichern
+STORE ACC 100;                         # Wert '99' in Variable 'dom' speichern
 # Zuweisung ((char dom) = 99) Ende
 # Zuweisung ((int var) = ((12 > 3) && (dom <= 4))) Start
 # Allokation (int var) Start
@@ -67,9 +67,9 @@ AND ACC IN2;                           # ((12 > 3) && (dom <= 4)) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung ((12 > 3) && (dom <= 4)) Ende
-LOADIN SP ACC 1;                       # Wert von ((12 > 3) && (dom <= 4)) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '((12 > 3) && (dom <= 4))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von ((12 > 3) && (dom <= 4)) in Variable var speichern
+STORE ACC 101;                         # Wert '((12 > 3) && (dom <= 4))' in Variable 'var' speichern
 # Zuweisung ((int var) = ((12 > 3) && (dom <= 4))) Ende
 JUMP 0;
 # Main Funktion (void main ((char dom) = 99) ... ) Ende

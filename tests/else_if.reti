@@ -10,9 +10,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 97;                          # Wert von 97 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 97 Ende
-LOADIN SP ACC 1;                       # Wert von 97 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '97' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 97 in Variable var speichern
+STORE ACC 100;                         # Wert '97' in Variable 'var' speichern
 # Zuweisung ((int var) = 97) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Start
 # Logisches Atom (var == 0) Start
@@ -46,9 +46,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 100;                         # Wert von 100 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 100 Ende
-LOADIN SP ACC 1;                       # Wert von 100 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '100' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 100 in Variable var speichern
+STORE ACC 100;                         # Wert '100' in Variable 'var' speichern
 # Zuweisung (var = 100) Ende
 JUMP 40;                               # Else-Branch überspringen
 # Else-Branch
@@ -84,9 +84,9 @@ SUBI SP 1;                             # Stack um eine Zelle erweitern
 LOADI ACC 5;                           # Wert von 5 in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
 # Arithmetischer Operand 5 Ende
-LOADIN SP ACC 1;                       # Wert von 5 in ACC laden
+LOADIN SP ACC 1;                       # Wert von '5' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von 5 in Variable var speichern
+STORE ACC 100;                         # Wert '5' in Variable 'var' speichern
 # Zuweisung (var = 5) Ende
 JUMP 15;                               # Else-Branch überspringen
 # Else-Branch
@@ -108,9 +108,9 @@ ADD ACC IN2;                           # Wert von (var + 1) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (var + 1) Ende
-LOADIN SP ACC 1;                       # Wert von (var + 1) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(var + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (var + 1) in Variable var speichern
+STORE ACC 100;                         # Wert '(var + 1)' in Variable 'var' speichern
 # Zuweisung (var = (var + 1)) Ende
 # If und Else Statement IfElse((var == 10) (var = 5) else (var = (var + 1))) Ende
 # If und Else Statement IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1)))) Ende

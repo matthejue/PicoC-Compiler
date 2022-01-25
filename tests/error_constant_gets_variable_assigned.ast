@@ -1,1 +1,0 @@
-(error_constant_gets_variable_assigned (void main ((char car) = 99) ((const int var) = car) ((int tar) = (var + car))))

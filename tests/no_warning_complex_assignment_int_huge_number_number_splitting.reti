@@ -1,0 +1,33 @@
+# File no_warning_complex_assignment_int_huge_number_number_splitting Start
+# Main Funktion (void main ((int var) = (99 + 2147483647))) Start
+LOADI SP 200;
+# Zuweisung ((int var) = (99 + 2147483647)) Start
+# Allokation (int var) Start
+# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (int var) Ende
+# Arithmetische binäre Operation (99 + 2147483647) Start
+# Arithmetischer Operand 99 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 99;                          # Wert von 99 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 99 Ende
+# Arithmetischer Operand 2147483647 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 32767;                       # Higher Bits in ACC laden: '0000000000000000_0111111111111111'
+MULTI ACC 65536;                       # Higher Bits um 16 Bits shiften
+ORI ACC 65535;                         # Lower Bits in ACC einfügen: '0111111111111111_1111111111111111'
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 2147483647 Ende
+LOADIN SP ACC 2;                       # Wert von 99 in ACC laden
+LOADIN SP IN2 1;                       # Wert von 2147483647 in IN2 laden
+ADD ACC IN2;                           # Wert von (99 + 2147483647) in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation (99 + 2147483647) Ende
+LOADIN SP ACC 1;                       # Wert von '(99 + 2147483647)' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert '(99 + 2147483647)' in Variable 'var' speichern
+# Zuweisung ((int var) = (99 + 2147483647)) Ende
+JUMP 0;
+# Main Funktion (void main ((int var) = (99 + 2147483647))) Ende
+# File no_warning_complex_assignment_int_huge_number_number_splitting Ende

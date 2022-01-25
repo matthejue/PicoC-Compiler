@@ -9,7 +9,7 @@ class Warnings:
             self.description = f"ImplicitConversionWarning: " + literal_or_variable\
                 + f" '{found}' will be implicitly converted from '{found_type}' to "\
                 f"'{variable_type}' in the course of being assigned to '{variable_old}'"\
-                + f". Changes value from '{found}' to '{found_new}'" if found_new else ""
+                + (f". Changes value from '{found}' to '{found_new}'" if found_new else "")
             self.variable = variable_old
             self.variable_pos = variable_pos
             self.variable_type = variable_type

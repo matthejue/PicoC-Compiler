@@ -37,9 +37,9 @@ LOADIN SP IN2 1;                       # Wert von e1 in IN2 laden
 SUB ACC IN2;                           # (0 - e1) in ACC laden
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation (- ((- cars) % 2)) Ende
-LOADIN SP ACC 1;                       # Wert von (- ((- cars) % 2)) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(- ((- cars) % 2))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert von (- ((- cars) % 2)) in Variable var speichern
+STORE ACC 101;                         # Wert '(- ((- cars) % 2))' in Variable 'var' speichern
 # Zuweisung ((int var) = (- ((- cars) % 2))) Ende
 JUMP 0;
 # Main Funktion (void main (char cars) ... ) Ende

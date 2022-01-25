@@ -1,0 +1,5 @@
+void main() {
+  char var3;
+  int var2;
+  char var = var2 = var3 = 2147483647;
+}

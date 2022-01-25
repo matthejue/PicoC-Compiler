@@ -1,0 +1,1 @@
+(warning_multi_assignment_char_char_huge_number (void main (char var2) ((char var) = (var2 = 2147483647))))

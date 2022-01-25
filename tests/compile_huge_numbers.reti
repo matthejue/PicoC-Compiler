@@ -50,9 +50,9 @@ AND ACC IN2;                               # Wert von (2147483647 & ((- 21474836
 STOREIN SP ACC 2;                          # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                                 # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (2147483647 & ((- 2147483647) | car)) Ende
-LOADIN SP ACC 1;                           # Wert von (2147483647 & ((- 2147483647) | car)) in ACC laden
+LOADIN SP ACC 1;                           # Wert von '(2147483647 & ((- 2147483647) | car))' in ACC laden
 ADDI SP 1;                                 # Stack um eine Zelle verkürzen
-STORE ACC 100;                             # Wert von (2147483647 & ((- 2147483647) | car)) in Variable var speichern
+STORE ACC 100;                             # Wert von '(2147483647 & ((- 2147483647) | car))' in Variable 'var' speichern
 # Zuweisung ((int var) = (2147483647 & ((- 2147483647) | car))) Ende
 JUMP 0;
 # Main Funktion (void main ((const int car) = 2147483647) ... ) Ende

@@ -20,7 +20,7 @@ class ErrorHandler:
         try:
             function(*args)
         except Errors.InvalidCharacterError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
@@ -28,7 +28,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
@@ -36,7 +36,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
@@ -44,7 +44,7 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             expected_pos = self._find_space_after_previous_token(e.found_pos)
             error_screen = AnnotationScreen(self.finput, expected_pos[0],
                                             e.found_pos[0])
@@ -54,11 +54,11 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
-            error_header = self._warning_header(None, e.description)
+            error_header = self._error_header(None, e.description)
             print('\n' + error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
@@ -66,24 +66,23 @@ class ErrorHandler:
             print('\n' + error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            node_header = self._warning_header(
-                None,
-                f"Note: The max literal size is that of an int (-2147483648 to 2147483647)"
-            )
+            node_header = self._error_header(
+                None, f"Note: The max size of a literal for a {e.found_symbol_type} is "\
+                f"in range {e.found_from} to {e.found_to}")
             error_screen.filter()
             print('\n' + error_header + str(error_screen) + node_header)
             exit(0)
         except Errors.RedefinitionError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._warning_header(e.first_pos,
-                                               "Note: Already defined here:")
+            note_header = self._error_header(e.first_pos,
+                                             "Note: Already defined here:")
             error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
                                               e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
@@ -93,11 +92,11 @@ class ErrorHandler:
                   str(error_screen_2))
             exit(0)
         except Errors.ConstReassignmentError as e:
-            error_header = self._warning_header(e.found_pos, e.description)
+            error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._warning_header(
+            note_header = self._error_header(
                 e.first_pos, "Note: Constant identifier was initialised here:")
             error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
                                               e.first_pos[0])
@@ -116,7 +115,7 @@ class ErrorHandler:
             print('\n' + error_header)
             exit(0)
 
-    def _warning_header(self, pos, descirption):
+    def _error_header(self, pos, descirption):
         if not pos:
             return descirption + '\n'
         return self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
@@ -206,7 +205,7 @@ class ErrorHandler:
 class AnnotationScreen:
     def __init__(self, finput, row_from, row_to):
         # because the filename gets pasted in the first line of file content
-        context_from=row_from - global_vars.args.sight if row_from -\
+        context_from = row_from - global_vars.args.sight if row_from -\
             global_vars.args.sight > 0 else 1
         self.context_above = finput[context_from:row_from]
 

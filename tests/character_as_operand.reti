@@ -22,9 +22,9 @@ ADD ACC IN2;                           # Wert von (67 + 1) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (67 + 1) Ende
-LOADIN SP ACC 1;                       # Wert von (67 + 1) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(67 + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (67 + 1) in Variable x speichern
+STORE ACC 100;                         # Wert '(67 + 1)' in Variable 'x' speichern
 # Zuweisung ((int x) = (67 + 1)) Ende
 # Zuweisung (x = (x + (97 - 65))) Start
 # Arithmetische binäre Operation (x + (97 - 65)) Start
@@ -56,9 +56,9 @@ ADD ACC IN2;                           # Wert von (x + (97 - 65)) in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation (x + (97 - 65)) Ende
-LOADIN SP ACC 1;                       # Wert von (x + (97 - 65)) in ACC laden
+LOADIN SP ACC 1;                       # Wert von '(x + (97 - 65))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert von (x + (97 - 65)) in Variable x speichern
+STORE ACC 100;                         # Wert '(x + (97 - 65))' in Variable 'x' speichern
 # Zuweisung (x = (x + (97 - 65))) Ende
 JUMP 0;
 # Main Funktion (void main ((int x) = (67 + 1)) ... ) Ende

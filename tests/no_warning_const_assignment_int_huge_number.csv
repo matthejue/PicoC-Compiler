@@ -1,0 +1,4 @@
+name,type,datatype,position,value
+char,built in,-,-,-
+int,built in,-,-,-
+var,named constant,int,(2:12),None

@@ -1,0 +1,19 @@
+# File no_warning_atomic_assignment_char_char Start
+# Main Funktion (void main ((char var) = 127)) Start
+LOADI SP 200;
+# Zuweisung ((char var) = 127) Start
+# Allokation (char var) Start
+# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
+# Allokation (char var) Ende
+# Arithmetischer Operand 127 Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 127;                         # Wert von 127 in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
+# Arithmetischer Operand 127 Ende
+LOADIN SP ACC 1;                       # Wert von '127' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert '127' in Variable 'var' speichern
+# Zuweisung ((char var) = 127) Ende
+JUMP 0;
+# Main Funktion (void main ((char var) = 127)) Ende
+# File no_warning_atomic_assignment_char_char Ende
