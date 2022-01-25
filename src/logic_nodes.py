@@ -6,9 +6,9 @@ class LogicBinaryOperation(ASTNode):
     """Abstract Syntax Tree Node for logic 'and' and 'or'"""
 
     end = strip_multiline_string(
-        """ LOADIN SP ACC 2;  # Wert von l1 in ACC laden
-        LOADIN SP IN2 1;  # Wert von l2 in IN2 laden
-        LOP ACC IN2;  # l1 lop l2 in ACC laden
+        """ LOADIN SP ACC 2;  # Wert von 'l1' in ACC laden
+        LOADIN SP IN2 1;  # Wert von 'l2' in IN2 laden
+        LOP ACC IN2;  # 'l1 lop l2' in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
@@ -25,7 +25,7 @@ class LogicBinaryOperation(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logische binäre Verknüpfung {self} Start\n", 0)
+            f"# Logische binäre Verknüpfung '{self}' Start\n", 0)
 
         self._pretty_comments()
 
@@ -37,7 +37,7 @@ class LogicBinaryOperation(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Logische binäre Verknüpfung {self} Ende\n", 0)
+            f"# Logische binäre Verknüpfung '{self}' Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -64,9 +64,9 @@ class Not(ASTNode):
     """Abstract Syntax Tree Node for logic not"""
 
     end = strip_multiline_string(
-        """LOADI ACC 1;  # 1 in ACC laden
-        LOADIN SP IN2 1;  # Wert von l1 in IN2 laden
-        OPLUS ACC IN2;  # !(l1) in ACC laden
+        """LOADI ACC 1;  # '1' in ACC laden
+        LOADIN SP IN2 1;  # Wert von 'l1' in IN2 laden
+        OPLUS ACC IN2;  # '!(l1)' in ACC laden
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """)
     end_loc = 4
@@ -80,7 +80,7 @@ class Not(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logische unäre Verknüpfung {self} Start\n", 0)
+            f"# Logische unäre Verknüpfung '{self}' Start\n", 0)
 
         self._pretty_comments()
 
@@ -89,7 +89,7 @@ class Not(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Logische unäre Verknüpfung {self} Ende\n", 0)
+            f"# Logische unäre Verknüpfung '{self}' Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -100,13 +100,13 @@ class Atom(ASTNode):
     """Abstract Syntax Tree Node for logic atom"""
 
     end = strip_multiline_string(
-        """LOADIN SP ACC 2;  # Wert von e1 in ACC laden
-        LOADIN SP IN2 1;  # Wert von e2 in IN2 laden
-        SUB ACC IN2;  # e1 - e2 in ACC laden
-        JUMPvglop 3;  # Ergebnis 1, wenn e1 rel e2 erfüllt
-        LOADI ACC 0;  # Ergebnis 0, wenn e1 rel e2 nicht erfüllt
+        """LOADIN SP ACC 2;  # Wert von 'e1' in ACC laden
+        LOADIN SP IN2 1;  # Wert von 'e2' in IN2 laden
+        SUB ACC IN2;  # 'e1 - e2' in ACC laden
+        JUMPvglop 3;  # Ergebnis '1', wenn 'e1 rel e2' erfüllt
+        LOADI ACC 0;  # Ergebnis '0', wenn 'e1 rel e2' nicht erfüllt
         JUMP 2;
-        LOADI ACC 1;  # Ergebnis 1, wenn e1 vglop e2 wahr
+        LOADI ACC 1;  # Ergebnis '1', wenn 'e1 rel e2' wahr
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
@@ -122,7 +122,7 @@ class Atom(ASTNode):
     def visit(self, ):
         self.update_match_args()
 
-        self.code_generator.add_code(f"# Logisches Atom {self} Start\n", 0)
+        self.code_generator.add_code(f"# Logisches Atom '{self}' Start\n", 0)
 
         self._pretty_comments()
 
@@ -133,7 +133,7 @@ class Atom(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code(f"# Logisches Atom {self} Ende\n", 0)
+        self.code_generator.add_code(f"# Logisches Atom '{self}' Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(
@@ -172,8 +172,8 @@ class ToBool(ASTNode):
     """Abstract Syntax Tree Node for logic top bottom"""
 
     end = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von e1 in ACC laden
-        JUMP== 3;  # Überspringe 2 Befehle, wenn e1 den Wert 0 hat
+        """LOADIN SP ACC 1;  # Wert von 'e1' in ACC laden
+        JUMP== 3;  # Überspringe 2 Befehle, wenn 'e1' den Wert '0' hat
         LOADI ACC 1;
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
         """)
@@ -188,7 +188,7 @@ class ToBool(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck {self} Start\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Start\n", 0)
 
         self._pretty_comments()
 
@@ -197,7 +197,7 @@ class ToBool(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck {self} Ende\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.end = self.code_generator.replace_code_pre(

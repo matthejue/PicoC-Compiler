@@ -5,13 +5,13 @@ class While(ASTNode):
     """Abstract Syntax Tree Node for while loop"""
 
     condition_check = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        """LOADIN SP ACC 1;  # Wert von 'l1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        JUMP== codelength(af) + 2;  # Statements überspringen, wenn l1 nicht erfüllt
+        JUMP== codelength(af) + 2;  # Statements überspringen, wenn 'l1' nicht erfüllt
         """)
     condition_check_loc = 3
 
-    end = "JUMP -(codelength(af) + codelength(l) + 3);  # Zurück zur Auswertung von l1\n"
+    end = "JUMP -(codelength(af) + codelength(l) + 3);  # Zurück zur Auswertung von 'l1'\n"
     end_loc = 1
 
     def update_match_args(self, ):
@@ -26,7 +26,7 @@ class While(ASTNode):
         dot_more = " ... " if len(self.branch) > 1 else ""
         branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# While Statement While({self.condition} {branch}{dot_more}) Start\n",
+            f"# While Statement 'While({self.condition} {branch}{dot_more})' Start\n",
             0)
 
         self._pretty_comments()
@@ -54,8 +54,8 @@ class While(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# While Statement While({self.condition} "
-            f"{branch}{dot_more}) Ende\n", 0)
+            f"# While Statement 'While({self.condition} "
+            f"{branch}{dot_more})' Ende\n", 0)
 
     def _pretty_comments(self, ):
         self.condition_check = self.code_generator.replace_code_pre(
@@ -81,9 +81,9 @@ class DoWhile(ASTNode):
     """Abstract Syntax Tree Node for do while Grammar"""
 
     condition_check = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        """LOADIN SP ACC 1;  # Wert von 'l1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        JUMP!= -(codelength(af) + codelength(l) + 2);  # zurück zur Ausführung der Statements
+        JUMP!= -(codelength(af) + codelength(l) + 2);  # Zurück zur Ausführung der Statements
         """)
     condition_check_loc = 3
 
@@ -99,7 +99,7 @@ class DoWhile(ASTNode):
         dot_more = " ..." if len(self.branch) > 1 else ""
         branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# Do While DoWhile({branch}{dot_more} {self.condition}) Start\n",
+            f"# Do While 'DoWhile({branch}{dot_more} {self.condition})' Start\n",
             0)
 
         self.code_generator.add_marker()
@@ -117,7 +117,7 @@ class DoWhile(ASTNode):
                                      self.condition_check_loc)
 
         self.code_generator.add_code(
-            f"# Do While DoWhile({branch}{dot_more} {self.condition}) Ende\n",
+            f"# Do While 'DoWhile({branch}{dot_more} {self.condition})' Ende\n",
             0)
 
     def _pretty_comments(self, ):

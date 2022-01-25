@@ -1,23 +1,23 @@
-# File if_with_character_as_condition Start
-# Main Funktion (void main If(ToBool(97))) Start
+# File 'if_with_character_as_condition' Start
+# Main Funktion '(void main If(ToBool(97)))' Start
 LOADI SP 200;
-# If Statement If(ToBool(97) ) Start
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(97) Start
-# Arithmetischer Operand 97 Start
+# If Statement 'If(ToBool(97) )' Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(97)' Start
+# Arithmetischer Operand '97' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 97;                          # Wert von 97 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 97 Ende
-LOADIN SP ACC 1;                       # Wert von 97 in ACC laden
-JUMP== 3;                              # Überspringe 2 Befehle, wenn 97 den Wert 0 hat
+LOADI ACC 97;                          # Wert von '97' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '97' Ende
+LOADIN SP ACC 1;                       # Wert von '97' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '97' den Wert '0' hat
 LOADI ACC 1;
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(97) Ende
-LOADIN SP ACC 1;                       # Wert von ToBool(97) in ACC laden
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(97)' Ende
+LOADIN SP ACC 1;                       # Wert 'ToBool(97)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 JUMP== 1;                              # Branch überspringen
 # If-Branch
-# If Statement If(ToBool(97) ) Ende
+# If Statement 'If(ToBool(97) )' Ende
 JUMP 0;
-# Main Funktion (void main If(ToBool(97))) Ende
-# File if_with_character_as_condition Ende
+# Main Funktion '(void main If(ToBool(97)))' Ende
+# File 'if_with_character_as_condition' Ende

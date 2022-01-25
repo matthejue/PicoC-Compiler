@@ -1,12 +1,12 @@
-# File no_warning_const_assignment_char_real_char Start
-# Main Funktion (void main ((const char var) = 99)) Start
+# File 'no_warning_const_assignment_char_real_char' Start
+# Main Funktion '(void main ((const char var) = 99))' Start
 LOADI SP 200;
-# Zuweisung ((const char var) = 99) Start
-# Allokation (const char var) Start
-# Konstante var vom Typ char zur Symboltabelle hinzugefügt
-# Allokation (const char var) Ende
-# Konstante var in Symboltabelle den Wert 99 zugewiesen
-# Zuweisung ((const char var) = 99) Ende
+# Zuweisung '((const char var) = 99)' Start
+# Allokation '(const char var)' Start
+# Konstante 'var' vom Typ 'char' zur Symboltabelle hinzugefügt
+# Allokation '(const char var)' Ende
+# Konstante 'var' in Symboltabelle den Wert '99' zugewiesen
+# Zuweisung '((const char var) = 99)' Ende
 JUMP 0;
-# Main Funktion (void main ((const char var) = 99)) Ende
-# File no_warning_const_assignment_char_real_char Ende
+# Main Funktion '(void main ((const char var) = 99))' Ende
+# File 'no_warning_const_assignment_char_real_char' Ende

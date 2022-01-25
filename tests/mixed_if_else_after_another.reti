@@ -1,120 +1,120 @@
-# File mixed_if_else_after_another Start
-# Main Funktion (void main (int var) ... ) Start
+# File 'mixed_if_else_after_another' Start
+# Main Funktion '(void main (int var) ... )' Start
 LOADI SP 200;
-# Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (int var) Ende
-# Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 101 zur Symboltabelle hinzugefügt
-# Allokation (char cars) Ende
-# If und Else Statement IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) Start
-# Logisches Atom (var == 0) Start
-# Arithmetischer Operand var Start
+# Allokation '(int var)' Start
+# Variable 'var' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(int var)' Ende
+# Allokation '(char cars)' Start
+# Variable 'cars' vom Typ 'char' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Allokation '(char cars)' Ende
+# If und Else Statement 'IfElse((var == 0) (cars = 10) else (cars = (cars + 1)))' Start
+# Logisches Atom '(var == 0)' Start
+# Arithmetischer Operand 'var' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
-# Arithmetischer Operand 0 Start
+LOAD ACC 100;                          # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '0' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 0;                           # Wert von 0 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 0 Ende
-LOADIN SP ACC 2;                       # Wert von var in ACC laden
-LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
-SUB ACC IN2;                           # var - 0 in ACC laden
-JUMP== 3;                              # Ergebnis 1, wenn (var == 0) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (var == 0) nicht erfüllt
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 2;                       # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '0' in IN2 laden
+SUB ACC IN2;                           # 'var - 0' in ACC laden
+JUMP== 3;                              # Ergebnis '1', wenn '(var == 0)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(var == 0)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn var == 0 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(var == 0)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (var == 0) Ende
-LOADIN SP ACC 1;                       # Wert von (var == 0) in ACC laden
+# Logisches Atom '(var == 0)' Ende
+LOADIN SP ACC 1;                       # Wert von '(var == 0)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (var == 0) nicht erfüllt
+JUMP== 8;                              # Zu Else-Branch springen, wenn '(var == 0)' nicht erfüllt
 # If-Branch
-# Zuweisung (cars = 10) Start
-# Arithmetischer Operand 10 Start
+# Zuweisung '(cars = 10)' Start
+# Arithmetischer Operand '10' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 10;                          # Wert von 10 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 10 Ende
+LOADI ACC 10;                          # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
 LOADIN SP ACC 1;                       # Wert von '10' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert '10' in Variable 'cars' speichern
-# Zuweisung (cars = 10) Ende
-JUMP 17;                               # Else-Branch überspringen
+# Zuweisung '(cars = 10)' Ende
+JUMP 23;                               # Else-Branch überspringen
 # Else-Branch
-# Zuweisung (cars = (cars + 1)) Start
-# Arithmetische binäre Operation (cars + 1) Start
-# Arithmetischer Operand cars Start
+# Zuweisung '(cars = (cars + 1))' Start
+# Arithmetische binäre Operation '(cars + 1)' Start
+# Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
-# Arithmetischer Operand 1 Start
+LOAD ACC 101;                          # Wert von 'cars' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'cars' Ende
+# Arithmetischer Operand '1' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 1;                           # Wert von 1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 1 Ende
-LOADIN SP ACC 2;                       # Wert von cars in ACC laden
-LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
-ADD ACC IN2;                           # Wert von (cars + 1) in ACC laden
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von 'cars' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+ADD ACC IN2;                           # Wert von '(cars + 1)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (cars + 1) Ende
+# Arithmetische binäre Operation '(cars + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(cars + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Implizite Konversion von int zu char Start
+# Implizite Konversion von 'int' zu 'char' Start
 LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
-AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
 LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
-MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
 AND ACC IN1;                           # Testen, ob Zahl negativ ist
 JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
-OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
-# Implizite Konversion von int zu char Ende
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
 STORE ACC 101;                         # Wert '(cars + 1)' in Variable 'cars' speichern
-# Zuweisung (cars = (cars + 1)) Ende
-# If und Else Statement IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) Ende
-# If Statement If((cars == 10) (var = 42)) Start
-# Logisches Atom (cars == 10) Start
-# Arithmetischer Operand cars Start
+# Zuweisung '(cars = (cars + 1))' Ende
+# If und Else Statement 'IfElse((var == 0) (cars = 10) else (cars = (cars + 1)))' Ende
+# If Statement 'If((cars == 10) (var = 42))' Start
+# Logisches Atom '(cars == 10)' Start
+# Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
-# Arithmetischer Operand 10 Start
+LOAD ACC 101;                          # Wert von 'cars' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'cars' Ende
+# Arithmetischer Operand '10' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 10;                          # Wert von 10 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 10 Ende
-LOADIN SP ACC 2;                       # Wert von cars in ACC laden
-LOADIN SP IN2 1;                       # Wert von 10 in IN2 laden
-SUB ACC IN2;                           # cars - 10 in ACC laden
-JUMP== 3;                              # Ergebnis 1, wenn (cars == 10) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (cars == 10) nicht erfüllt
+LOADI ACC 10;                          # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
+LOADIN SP ACC 2;                       # Wert von 'cars' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '10' in IN2 laden
+SUB ACC IN2;                           # 'cars - 10' in ACC laden
+JUMP== 3;                              # Ergebnis '1', wenn '(cars == 10)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(cars == 10)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn cars == 10 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(cars == 10)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (cars == 10) Ende
-LOADIN SP ACC 1;                       # Wert von (cars == 10) in ACC laden
+# Logisches Atom '(cars == 10)' Ende
+LOADIN SP ACC 1;                       # Wert '(cars == 10)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 JUMP== 7;                              # Branch überspringen
 # If-Branch
-# Zuweisung (var = 42) Start
-# Arithmetischer Operand 42 Start
+# Zuweisung '(var = 42)' Start
+# Arithmetischer Operand '42' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 42;                          # Wert von 42 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 42 Ende
+LOADI ACC 42;                          # Wert von '42' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '42' Ende
 LOADIN SP ACC 1;                       # Wert von '42' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert '42' in Variable 'var' speichern
-# Zuweisung (var = 42) Ende
-# If Statement If((cars == 10) (var = 42)) Ende
+# Zuweisung '(var = 42)' Ende
+# If Statement 'If((cars == 10) (var = 42))' Ende
 JUMP 0;
-# Main Funktion (void main (int var) ... ) Ende
-# File mixed_if_else_after_another Ende
+# Main Funktion '(void main (int var) ... )' Ende
+# File 'mixed_if_else_after_another' Ende

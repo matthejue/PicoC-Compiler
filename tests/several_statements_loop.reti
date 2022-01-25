@@ -1,73 +1,73 @@
-# File several_statements_loop Start
-# Main Funktion (void main ((const int x) = 101) ... ) Start
+# File 'several_statements_loop' Start
+# Main Funktion '(void main ((const int x) = 101) ... )' Start
 LOADI SP 200;
-# Zuweisung ((const int x) = 101) Start
-# Allokation (const int x) Start
-# Konstante x vom Typ int zur Symboltabelle hinzugefügt
-# Allokation (const int x) Ende
-# Konstante x in Symboltabelle den Wert 101 zugewiesen
-# Zuweisung ((const int x) = 101) Ende
-# Do While DoWhile(((int y) = 10) ... (x < 10)) Start
-# Zuweisung ((int y) = 10) Start
-# Allokation (int y) Start
-# Variable y vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (int y) Ende
-# Arithmetischer Operand 10 Start
+# Zuweisung '((const int x) = 101)' Start
+# Allokation '(const int x)' Start
+# Konstante 'x' vom Typ 'int' zur Symboltabelle hinzugefügt
+# Allokation '(const int x)' Ende
+# Konstante 'x' in Symboltabelle den Wert '101' zugewiesen
+# Zuweisung '((const int x) = 101)' Ende
+# Do While 'DoWhile(((int y) = 10) ... (x < 10))' Start
+# Zuweisung '((int y) = 10)' Start
+# Allokation '(int y)' Start
+# Variable 'y' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(int y)' Ende
+# Arithmetischer Operand '10' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOADI ACC 10;                                                      # Wert von 10 in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 10 Ende
+LOADI ACC 10;                                                      # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
 LOADIN SP ACC 1;                                                   # Wert von '10' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
 STORE ACC 100;                                                     # Wert '10' in Variable 'y' speichern
-# Zuweisung ((int y) = 10) Ende
-# Zuweisung (y = (y + x)) Start
-# Arithmetische binäre Operation (y + x) Start
-# Arithmetischer Operand y Start
+# Zuweisung '((int y) = 10)' Ende
+# Zuweisung '(y = (y + x))' Start
+# Arithmetische binäre Operation '(y + x)' Start
+# Arithmetischer Operand 'y' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von y in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand y Ende
-# Arithmetischer Operand x Start
+LOAD ACC 100;                                                      # Wert von 'y' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'y' Ende
+# Arithmetischer Operand 'x' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOADI ACC 101;                                                     # Wert von x in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
-LOADIN SP ACC 2;                                                   # Wert von y in ACC laden
-LOADIN SP IN2 1;                                                   # Wert von x in IN2 laden
-ADD ACC IN2;                                                       # Wert von (y + x) in ACC laden
+LOADI ACC 101;                                                     # Wert von 'x' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'x' Ende
+LOADIN SP ACC 2;                                                   # Wert von 'y' in ACC laden
+LOADIN SP IN2 1;                                                   # Wert von 'x' in IN2 laden
+ADD ACC IN2;                                                       # Wert von '(y + x)' in ACC laden
 STOREIN SP ACC 2;                                                  # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (y + x) Ende
+# Arithmetische binäre Operation '(y + x)' Ende
 LOADIN SP ACC 1;                                                   # Wert von '(y + x)' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
 STORE ACC 100;                                                     # Wert '(y + x)' in Variable 'y' speichern
-# Zuweisung (y = (y + x)) Ende
-# Logisches Atom (x < 10) Start
-# Arithmetischer Operand x Start
+# Zuweisung '(y = (y + x))' Ende
+# Logisches Atom '(x < 10)' Start
+# Arithmetischer Operand 'x' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOADI ACC 101;                                                     # Wert von x in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
-# Arithmetischer Operand 10 Start
+LOADI ACC 101;                                                     # Wert von 'x' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'x' Ende
+# Arithmetischer Operand '10' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOADI ACC 10;                                                      # Wert von 10 in ACC laden
-STOREIN SP ACC 1;                                                  # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 10 Ende
-LOADIN SP ACC 2;                                                   # Wert von x in ACC laden
-LOADIN SP IN2 1;                                                   # Wert von 10 in IN2 laden
-SUB ACC IN2;                                                       # x - 10 in ACC laden
-JUMP< 3;                                                           # Ergebnis 1, wenn (x < 10) erfüllt
-LOADI ACC 0;                                                       # Ergebnis 0, wenn (x < 10) nicht erfüllt
+LOADI ACC 10;                                                      # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
+LOADIN SP ACC 2;                                                   # Wert von 'x' in ACC laden
+LOADIN SP IN2 1;                                                   # Wert von '10' in IN2 laden
+SUB ACC IN2;                                                       # 'x - 10' in ACC laden
+JUMP< 3;                                                           # Ergebnis '1', wenn '(x < 10)' erfüllt
+LOADI ACC 0;                                                       # Ergebnis '0', wenn '(x < 10)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                                                       # Ergebnis 1, wenn x < 10 wahr
+LOADI ACC 1;                                                       # Ergebnis '1', wenn '(x < 10)' wahr
 STOREIN SP ACC 2;                                                  # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-# Logisches Atom (x < 10) Ende
-LOADIN SP ACC 1;                                                   # Wert von l1 in ACC laden
+# Logisches Atom '(x < 10)' Ende
+LOADIN SP ACC 1;                                                   # Wert von 'l1' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-JUMP!= -(codelength(af) + codelength(l) + 2);                      # zurück zur Ausführung der Statements
-# Do While DoWhile(((int y) = 10) ... (x < 10)) Ende
+JUMP!= -(codelength(af) + codelength(l) + 2);                      # Zurück zur Ausführung der Statements
+# Do While 'DoWhile(((int y) = 10) ... (x < 10))' Ende
 JUMP 0;
-# Main Funktion (void main ((const int x) = 101) ... ) Ende
-# File several_statements_loop Ende
+# Main Funktion '(void main ((const int x) = 101) ... )' Ende
+# File 'several_statements_loop' Ende

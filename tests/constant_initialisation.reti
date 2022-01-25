@@ -1,12 +1,12 @@
-# File constant_initialisation Start
-# Main Funktion (void main ((const int var) = 12)) Start
+# File 'constant_initialisation' Start
+# Main Funktion '(void main ((const int var) = 12))' Start
 LOADI SP 200;
-# Zuweisung ((const int var) = 12) Start
-# Allokation (const int var) Start
-# Konstante var vom Typ int zur Symboltabelle hinzugefügt
-# Allokation (const int var) Ende
-# Konstante var in Symboltabelle den Wert 12 zugewiesen
-# Zuweisung ((const int var) = 12) Ende
+# Zuweisung '((const int var) = 12)' Start
+# Allokation '(const int var)' Start
+# Konstante 'var' vom Typ 'int' zur Symboltabelle hinzugefügt
+# Allokation '(const int var)' Ende
+# Konstante 'var' in Symboltabelle den Wert '12' zugewiesen
+# Zuweisung '((const int var) = 12)' Ende
 JUMP 0;
-# Main Funktion (void main ((const int var) = 12)) Ende
-# File constant_initialisation Ende
+# Main Funktion '(void main ((const int var) = 12))' Ende
+# File 'constant_initialisation' Ende

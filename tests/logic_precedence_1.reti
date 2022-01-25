@@ -1,84 +1,84 @@
-# File logic_precedence_1 Start
-# Main Funktion (void main (char dom) ... ) Start
+# File 'logic_precedence_1' Start
+# Main Funktion '(void main (char dom) ... )' Start
 LOADI SP 200;
-# Allokation (char dom) Start
-# Variable dom vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (char dom) Ende
-# Zuweisung ((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0))) Start
-# Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
-# Allokation (int var) Ende
-# Logische binäre Verknüpfung (((12 >= dom) && (34 < 4)) || ToBool(0)) Start
-# Logische binäre Verknüpfung ((12 >= dom) && (34 < 4)) Start
-# Logisches Atom (12 >= dom) Start
-# Arithmetischer Operand 12 Start
+# Allokation '(char dom)' Start
+# Variable 'dom' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char dom)' Ende
+# Zuweisung '((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0)))' Start
+# Allokation '(int var)' Start
+# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Allokation '(int var)' Ende
+# Logische binäre Verknüpfung '(((12 >= dom) && (34 < 4)) || ToBool(0))' Start
+# Logische binäre Verknüpfung '((12 >= dom) && (34 < 4))' Start
+# Logisches Atom '(12 >= dom)' Start
+# Arithmetischer Operand '12' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 12;                          # Wert von 12 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 12 Ende
-# Arithmetischer Operand dom Start
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetischer Operand 'dom' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von dom in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand dom Ende
-LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
-LOADIN SP IN2 1;                       # Wert von dom in IN2 laden
-SUB ACC IN2;                           # 12 - dom in ACC laden
-JUMP>= 3;                              # Ergebnis 1, wenn (12 >= dom) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (12 >= dom) nicht erfüllt
+LOAD ACC 100;                          # Wert von 'dom' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'dom' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'dom' in IN2 laden
+SUB ACC IN2;                           # '12 - dom' in ACC laden
+JUMP>= 3;                              # Ergebnis '1', wenn '(12 >= dom)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 >= dom)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn 12 >= dom wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 >= dom)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (12 >= dom) Ende
-# Logisches Atom (34 < 4) Start
-# Arithmetischer Operand 34 Start
+# Logisches Atom '(12 >= dom)' Ende
+# Logisches Atom '(34 < 4)' Start
+# Arithmetischer Operand '34' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 34;                          # Wert von 34 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 34 Ende
-# Arithmetischer Operand 4 Start
+LOADI ACC 34;                          # Wert von '34' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '34' Ende
+# Arithmetischer Operand '4' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 4;                           # Wert von 4 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 4 Ende
-LOADIN SP ACC 2;                       # Wert von 34 in ACC laden
-LOADIN SP IN2 1;                       # Wert von 4 in IN2 laden
-SUB ACC IN2;                           # 34 - 4 in ACC laden
-JUMP< 3;                               # Ergebnis 1, wenn (34 < 4) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (34 < 4) nicht erfüllt
+LOADI ACC 4;                           # Wert von '4' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '4' Ende
+LOADIN SP ACC 2;                       # Wert von '34' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '4' in IN2 laden
+SUB ACC IN2;                           # '34 - 4' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(34 < 4)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(34 < 4)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn 34 < 4 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(34 < 4)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (34 < 4) Ende
-LOADIN SP ACC 2;                       # Wert von (12 >= dom) in ACC laden
-LOADIN SP IN2 1;                       # Wert von (34 < 4) in IN2 laden
-AND ACC IN2;                           # ((12 >= dom) && (34 < 4)) in ACC laden
+# Logisches Atom '(34 < 4)' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 >= dom)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(34 < 4)' in IN2 laden
+AND ACC IN2;                           # '((12 >= dom) && (34 < 4))' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logische binäre Verknüpfung ((12 >= dom) && (34 < 4)) Ende
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(0) Start
-# Arithmetischer Operand 0 Start
+# Logische binäre Verknüpfung '((12 >= dom) && (34 < 4))' Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Start
+# Arithmetischer Operand '0' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 0;                           # Wert von 0 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 0 Ende
-LOADIN SP ACC 1;                       # Wert von 0 in ACC laden
-JUMP== 3;                              # Überspringe 2 Befehle, wenn 0 den Wert 0 hat
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '0' den Wert '0' hat
 LOADI ACC 1;
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(0) Ende
-LOADIN SP ACC 2;                       # Wert von ((12 >= dom) && (34 < 4)) in ACC laden
-LOADIN SP IN2 1;                       # Wert von ToBool(0) in IN2 laden
-OR ACC IN2;                            # (((12 >= dom) && (34 < 4)) || ToBool(0)) in ACC laden
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Ende
+LOADIN SP ACC 2;                       # Wert von '((12 >= dom) && (34 < 4))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'ToBool(0)' in IN2 laden
+OR ACC IN2;                            # '(((12 >= dom) && (34 < 4)) || ToBool(0))' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logische binäre Verknüpfung (((12 >= dom) && (34 < 4)) || ToBool(0)) Ende
+# Logische binäre Verknüpfung '(((12 >= dom) && (34 < 4)) || ToBool(0))' Ende
 LOADIN SP ACC 1;                       # Wert von '(((12 >= dom) && (34 < 4)) || ToBool(0))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert '(((12 >= dom) && (34 < 4)) || ToBool(0))' in Variable 'var' speichern
-# Zuweisung ((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0))) Ende
+# Zuweisung '((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0)))' Ende
 JUMP 0;
-# Main Funktion (void main (char dom) ... ) Ende
-# File logic_precedence_1 Ende
+# Main Funktion '(void main (char dom) ... )' Ende
+# File 'logic_precedence_1' Ende

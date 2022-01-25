@@ -1,29 +1,29 @@
-# File warning_atomic_assignment_char_char Start
-# Main Funktion (void main ((char var) = 128)) Start
+# File 'warning_atomic_assignment_char_char' Start
+# Main Funktion '(void main ((char var) = 128))' Start
 LOADI SP 200;
-# Zuweisung ((char var) = 128) Start
-# Allokation (char var) Start
-# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (char var) Ende
-# Arithmetischer Operand 128 Start
+# Zuweisung '((char var) = 128)' Start
+# Allokation '(char var)' Start
+# Variable 'var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char var)' Ende
+# Arithmetischer Operand '128' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 128;                         # Wert von 128 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 128 Ende
+LOADI ACC 128;                         # Wert von '128' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '128' Ende
 LOADIN SP ACC 1;                       # Wert von '128' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Implizite Konversion von int zu char Start
+# Implizite Konversion von 'int' zu 'char' Start
 LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
-AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
 LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
-MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
 AND ACC IN1;                           # Testen, ob Zahl negativ ist
 JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
-OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
-# Implizite Konversion von int zu char Ende
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
 STORE ACC 100;                         # Wert '128' in Variable 'var' speichern
-# Zuweisung ((char var) = 128) Ende
+# Zuweisung '((char var) = 128)' Ende
 JUMP 0;
-# Main Funktion (void main ((char var) = 128)) Ende
-# File warning_atomic_assignment_char_char Ende
+# Main Funktion '(void main ((char var) = 128))' Ende
+# File 'warning_atomic_assignment_char_char' Ende

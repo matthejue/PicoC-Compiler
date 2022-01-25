@@ -1,18 +1,18 @@
-# File const_initialisation_number_character_variable Start
-# Main Funktion (void main ((const char var1) = 99) ... ) Start
+# File 'const_initialisation_number_character_variable' Start
+# Main Funktion '(void main ((const char var1) = 99) ... )' Start
 LOADI SP 200;
-# Zuweisung ((const char var1) = 99) Start
-# Allokation (const char var1) Start
-# Konstante var1 vom Typ char zur Symboltabelle hinzugefügt
-# Allokation (const char var1) Ende
-# Konstante var1 in Symboltabelle den Wert 99 zugewiesen
-# Zuweisung ((const char var1) = 99) Ende
-# Zuweisung ((const char var2) = 12) Start
-# Allokation (const char var2) Start
-# Konstante var2 vom Typ char zur Symboltabelle hinzugefügt
-# Allokation (const char var2) Ende
-# Konstante var2 in Symboltabelle den Wert 12 zugewiesen
-# Zuweisung ((const char var2) = 12) Ende
+# Zuweisung '((const char var1) = 99)' Start
+# Allokation '(const char var1)' Start
+# Konstante 'var1' vom Typ 'char' zur Symboltabelle hinzugefügt
+# Allokation '(const char var1)' Ende
+# Konstante 'var1' in Symboltabelle den Wert '99' zugewiesen
+# Zuweisung '((const char var1) = 99)' Ende
+# Zuweisung '((const char var2) = 12)' Start
+# Allokation '(const char var2)' Start
+# Konstante 'var2' vom Typ 'char' zur Symboltabelle hinzugefügt
+# Allokation '(const char var2)' Ende
+# Konstante 'var2' in Symboltabelle den Wert '12' zugewiesen
+# Zuweisung '((const char var2) = 12)' Ende
 JUMP 0;
-# Main Funktion (void main ((const char var1) = 99) ... ) Ende
-# File const_initialisation_number_character_variable Ende
+# Main Funktion '(void main ((const char var1) = 99) ... )' Ende
+# File 'const_initialisation_number_character_variable' Ende

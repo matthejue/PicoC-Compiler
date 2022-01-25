@@ -7,7 +7,7 @@ class If(ASTNode):
     """Abstract Syntax Tree Node for If"""
 
     start = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        """LOADIN SP ACC 1;  # Wert 'l1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af) + 1;  # Branch überspringen
         # If-Branch
@@ -26,7 +26,7 @@ class If(ASTNode):
         dot_more = " ... " if len(self.branch) > 1 else ""
         branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# If Statement If({self.condition} {branch}{dot_more}) "
+            f"# If Statement 'If({self.condition} {branch}{dot_more})' "
             "Start\n", 0)
 
         self._pretty_comments()
@@ -45,7 +45,7 @@ class If(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If Statement If({self.condition} {branch}{dot_more}) "
+            f"# If Statement 'If({self.condition} {branch}{dot_more})' "
             "Ende\n", 0)
 
     def _pretty_comments(self, ):
@@ -64,9 +64,9 @@ class IfElse(ASTNode):
     """Abstract Syntax Tree Node for Else"""
 
     start = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von l1 in ACC laden
+        """LOADIN SP ACC 1;  # Wert von 'l1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        JUMP== codelength(af1) + 2;  # Zu Else-Branch springen, wenn l1 nicht erfüllt
+        JUMP== codelength(af1) + 2;  # Zu Else-Branch springen, wenn 'l1' nicht erfüllt
         # If-Branch
         """)
     start_loc = 3
@@ -102,8 +102,8 @@ class IfElse(ASTNode):
         branch1 = self.branch1[0] if self.branch1 else ""
         branch2 = self.branch2[0] if self.branch2 else ""
         self.code_generator.add_code(
-            f"# If und Else Statement IfElse({self.condition} {branch1}"
-            f"{dot_more1} else {branch2}{dot_more2}) Start\n", 0)
+            f"# If und Else Statement 'IfElse({self.condition} {branch1}"
+            f"{dot_more1} else {branch2}{dot_more2})' Start\n", 0)
 
         self._pretty_comments()
 
@@ -132,8 +132,8 @@ class IfElse(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If und Else Statement IfElse({self.condition} {branch1}"
-            f"{dot_more1} else {branch2}{dot_more2}) Ende\n", 0)
+            f"# If und Else Statement 'IfElse({self.condition} {branch1}"
+            f"{dot_more1} else {branch2}{dot_more2})' Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:

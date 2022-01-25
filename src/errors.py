@@ -31,7 +31,7 @@ class Errors:
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, expected, found, found_pos):
             # there can be several expected and these already have single quotes
-            self.description = f"MismatchedTokenError: Expected {expected}"\
+            self.description = f"MismatchedTokenError: Expected '{expected}'"\
                 f", found '{found}'"
             self.expected = expected
             self.found = found
@@ -74,7 +74,7 @@ class Errors:
     class ConstReassignmentError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
             self.description = "ConstReassignmentError: Can't reassign a new "\
-            f"value to constant identifier '{found}'"
+            f"value to named constant '{found}'"
             self.found = found
             self.found_pos = found_pos
             self.first = first
@@ -84,7 +84,7 @@ class Errors:
         """If there's no main function within the given file"""
         def __init__(self, fname):
             self.description = "NoMainFunctionError: There's no main function"\
-                f" in file {fname}"
+                f" in file '{fname}'"
 
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""

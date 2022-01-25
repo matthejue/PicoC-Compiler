@@ -1,123 +1,123 @@
-# File loop_and_nested_if_else Start
-# Main Funktion (void main ((const char x) = 97) ... ) Start
+# File 'loop_and_nested_if_else' Start
+# Main Funktion '(void main ((const char x) = 97) ... )' Start
 LOADI SP 200;
-# Zuweisung ((const char x) = 97) Start
-# Allokation (const char x) Start
-# Konstante x vom Typ char zur Symboltabelle hinzugefügt
-# Allokation (const char x) Ende
-# Konstante x in Symboltabelle den Wert 97 zugewiesen
-# Zuweisung ((const char x) = 97) Ende
-# Zuweisung ((int y) = x) Start
-# Allokation (int y) Start
-# Variable y vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (int y) Ende
-# Arithmetischer Operand x Start
+# Zuweisung '((const char x) = 97)' Start
+# Allokation '(const char x)' Start
+# Konstante 'x' vom Typ 'char' zur Symboltabelle hinzugefügt
+# Allokation '(const char x)' Ende
+# Konstante 'x' in Symboltabelle den Wert '97' zugewiesen
+# Zuweisung '((const char x) = 97)' Ende
+# Zuweisung '((int y) = x)' Start
+# Allokation '(int y)' Start
+# Variable 'y' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(int y)' Ende
+# Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 97;                          # Wert von x in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
+LOADI ACC 97;                          # Wert von 'x' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'x' Ende
 LOADIN SP ACC 1;                       # Wert von 'x' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert 'x' in Variable 'y' speichern
-# Zuweisung ((int y) = x) Ende
-# While Statement While((x < 12) (y = (y + 1)) ... ) Start
-# Logisches Atom (x < 12) Start
-# Arithmetischer Operand x Start
+# Zuweisung '((int y) = x)' Ende
+# While Statement 'While((x < 12) (y = (y + 1)) ... )' Start
+# Logisches Atom '(x < 12)' Start
+# Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 97;                          # Wert von x in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
-# Arithmetischer Operand 12 Start
+LOADI ACC 97;                          # Wert von 'x' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'x' Ende
+# Arithmetischer Operand '12' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 12;                          # Wert von 12 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 12 Ende
-LOADIN SP ACC 2;                       # Wert von x in ACC laden
-LOADIN SP IN2 1;                       # Wert von 12 in IN2 laden
-SUB ACC IN2;                           # x - 12 in ACC laden
-JUMP< 3;                               # Ergebnis 1, wenn (x < 12) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (x < 12) nicht erfüllt
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+LOADIN SP ACC 2;                       # Wert von 'x' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '12' in IN2 laden
+SUB ACC IN2;                           # 'x - 12' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(x < 12)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(x < 12)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn x < 12 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(x < 12)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (x < 12) Ende
-LOADIN SP ACC 1;                       # Wert von (x < 12) in ACC laden
+# Logisches Atom '(x < 12)' Ende
+LOADIN SP ACC 1;                       # Wert von '(x < 12)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 48;                             # Statements überspringen, wenn (x < 12) nicht erfüllt
-# Zuweisung (y = (y + 1)) Start
-# Arithmetische binäre Operation (y + 1) Start
-# Arithmetischer Operand y Start
+JUMP== 48;                             # Statements überspringen, wenn '(x < 12)' nicht erfüllt
+# Zuweisung '(y = (y + 1))' Start
+# Arithmetische binäre Operation '(y + 1)' Start
+# Arithmetischer Operand 'y' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von y in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand y Ende
-# Arithmetischer Operand 1 Start
+LOAD ACC 100;                          # Wert von 'y' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'y' Ende
+# Arithmetischer Operand '1' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 1;                           # Wert von 1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 1 Ende
-LOADIN SP ACC 2;                       # Wert von y in ACC laden
-LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
-ADD ACC IN2;                           # Wert von (y + 1) in ACC laden
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von 'y' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+ADD ACC IN2;                           # Wert von '(y + 1)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (y + 1) Ende
+# Arithmetische binäre Operation '(y + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(y + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert '(y + 1)' in Variable 'y' speichern
-# Zuweisung (y = (y + 1)) Ende
-# If Statement If((x == 42) (y = (y + 1))) Start
-# Logisches Atom (x == 42) Start
-# Arithmetischer Operand x Start
+# Zuweisung '(y = (y + 1))' Ende
+# If Statement 'If((x == 42) (y = (y + 1)))' Start
+# Logisches Atom '(x == 42)' Start
+# Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 97;                          # Wert von x in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand x Ende
-# Arithmetischer Operand 42 Start
+LOADI ACC 97;                          # Wert von 'x' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'x' Ende
+# Arithmetischer Operand '42' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 42;                          # Wert von 42 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 42 Ende
-LOADIN SP ACC 2;                       # Wert von x in ACC laden
-LOADIN SP IN2 1;                       # Wert von 42 in IN2 laden
-SUB ACC IN2;                           # x - 42 in ACC laden
-JUMP== 3;                              # Ergebnis 1, wenn (x == 42) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (x == 42) nicht erfüllt
+LOADI ACC 42;                          # Wert von '42' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '42' Ende
+LOADIN SP ACC 2;                       # Wert von 'x' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '42' in IN2 laden
+SUB ACC IN2;                           # 'x - 42' in ACC laden
+JUMP== 3;                              # Ergebnis '1', wenn '(x == 42)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(x == 42)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn x == 42 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(x == 42)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (x == 42) Ende
-LOADIN SP ACC 1;                       # Wert von (x == 42) in ACC laden
+# Logisches Atom '(x == 42)' Ende
+LOADIN SP ACC 1;                       # Wert '(x == 42)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 JUMP== 15;                             # Branch überspringen
 # If-Branch
-# Zuweisung (y = (y + 1)) Start
-# Arithmetische binäre Operation (y + 1) Start
-# Arithmetischer Operand y Start
+# Zuweisung '(y = (y + 1))' Start
+# Arithmetische binäre Operation '(y + 1)' Start
+# Arithmetischer Operand 'y' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von y in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand y Ende
-# Arithmetischer Operand 1 Start
+LOAD ACC 100;                          # Wert von 'y' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'y' Ende
+# Arithmetischer Operand '1' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 1;                           # Wert von 1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 1 Ende
-LOADIN SP ACC 2;                       # Wert von y in ACC laden
-LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
-ADD ACC IN2;                           # Wert von (y + 1) in ACC laden
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von 'y' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+ADD ACC IN2;                           # Wert von '(y + 1)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (y + 1) Ende
+# Arithmetische binäre Operation '(y + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(y + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert '(y + 1)' in Variable 'y' speichern
-# Zuweisung (y = (y + 1)) Ende
-# If Statement If((x == 42) (y = (y + 1))) Ende
-JUMP -64;                              # Zurück zur Auswertung von (x < 12)
-# While Statement While((x < 12) (y = (y + 1)) ... ) Ende
+# Zuweisung '(y = (y + 1))' Ende
+# If Statement 'If((x == 42) (y = (y + 1)))' Ende
+JUMP -64;                              # Zurück zur Auswertung von '(x < 12)'
+# While Statement 'While((x < 12) (y = (y + 1)) ... )' Ende
 JUMP 0;
-# Main Funktion (void main ((const char x) = 97) ... ) Ende
-# File loop_and_nested_if_else Ende
+# Main Funktion '(void main ((const char x) = 97) ... )' Ende
+# File 'loop_and_nested_if_else' Ende

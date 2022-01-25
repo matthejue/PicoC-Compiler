@@ -24,8 +24,8 @@ class MainFunction(ASTNode):
         dot_more = " ... " if len(self.branch) > 1 else ""
         branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# Main Funktion ({self.prim_dt} {self.function_name} "
-            f"{branch}{dot_more}) Start\n", 0)
+            f"# Main Funktion '({self.prim_dt} {self.function_name} "
+            f"{branch}{dot_more})' Start\n", 0)
 
         self._adapt_code()
 
@@ -37,8 +37,8 @@ class MainFunction(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Main Funktion ({self.prim_dt} {self.function_name} "
-            f"{branch}{dot_more}) Ende\n", 0)
+            f"# Main Funktion '({self.prim_dt} {self.function_name} "
+            f"{branch}{dot_more})' Ende\n", 0)
 
     def _adapt_code(self, ):
         self.start = self.code_generator.replace_code_pre(

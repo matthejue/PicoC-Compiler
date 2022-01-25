@@ -33,15 +33,15 @@ class Assignment(ASTNode):
 
     implicit_conversion = strip_multiline_string(
         """LOADI IN1 255;  # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
-        AND ACC IN1;  # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+        AND ACC IN1;  # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
         LOADI IN2 32768;  # Bitvektor '10000000_00000000' laden
-        MULTI IN2 65536;  # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+        MULTI IN2 65536;  # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
         AND ACC IN1;  # Testen, ob Zahl negativ ist
         JUMP== 3;  # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
         LOADI IN1 -256;  # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
-        OR ACC IN1;  # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
+        OR ACC IN1;  # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
         """)
-    implicit_conversion_loc = 2
+    implicit_conversion_loc = 8
 
     assign_more = "STORE ACC var_address;  # Wert 'e1' in Variable 'v1' speichern\n"
     assign_more_loc = 1
@@ -56,7 +56,7 @@ class Assignment(ASTNode):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Zuweisung {self} Start\n", 0)
+            f"# Zuweisung '{self}' Start\n", 0)
 
         match self.location:
             case Allocation():
@@ -73,7 +73,7 @@ class Assignment(ASTNode):
                     raise Errors.UnknownIdentifierError(value, position)
 
         self.code_generator.add_code(
-            f"# Zuweisung {self} Ende\n", 0)
+            f"# Zuweisung '{self}' Ende\n", 0)
 
     def _pretty_comments(self, ):
         if global_vars.args.verbose:
@@ -90,8 +90,8 @@ class Assignment(ASTNode):
                         self.assign_more, "v1", str(self.location))
 
     def _comment_for_constant(self, name, value):
-        self.code_generator.add_code("# Konstante " + name + " in Symboltabelle "
-                                     "den Wert " + value + " zugewiesen\n", 0)
+        self.code_generator.add_code(f"# Konstante '{name}' in Symboltabelle "
+                                     f"den Wert '{value}' zugewiesen\n", 0)
 
     def _assignment(self, ):
         match self:
@@ -201,11 +201,11 @@ class Assignment(ASTNode):
 
     def _implicit_conversion(self, ):
         self.code_generator.add_code(
-            f"# Implizite Konversion von int zu char Start\n", 0)
+            f"# Implizite Konversion von 'int' zu 'char' Start\n", 0)
         self.code_generator.add_code(
             self.implicit_conversion, self.implicit_conversion_loc)
         self.code_generator.add_code(
-            f"# Implizite Konversion von int zu char Ende\n", 0)
+            f"# Implizite Konversion von 'int' zu 'char' Ende\n", 0)
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:
@@ -238,20 +238,19 @@ class Allocation(ASTNode):
     def visit(self, ):
         self.update_match_args()
 
-        self.code_generator.add_code(f"# Allokation {self} Start\n", 0)
+        self.code_generator.add_code(f"# Allokation '{self}' Start\n", 0)
 
         self._adapt_code()
 
-        self.code_generator.add_code(f"# Allokation {self} Ende\n", 0)
+        self.code_generator.add_code(f"# Allokation '{self}' Ende\n", 0)
 
     def _pretty_comments(self, const_var, name, dtype, value=None):
         suppl = ""
         if value:
-            suppl += " mit Adresse " + value
+            suppl += f" mit Adresse '{value}'"
 
-        self.code_generator.add_code("# " + const_var + " " + name + " vom Typ "
-                                     + dtype + suppl + " zur Symboltabelle "
-                                     "hinzugefügt\n", 0)
+        self.code_generator.add_code(f"# {const_var} '{name}' vom Typ '{dtype}'"
+                                     f"{suppl} zur Symboltabelle hinzugefügt\n", 0)
 
     def _adapt_code(self, ):
         match self:

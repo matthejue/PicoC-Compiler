@@ -72,7 +72,7 @@ class ErrorHandler:
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
                 None, f"Note: The max size of a literal for a {e.found_symbol_type} is "\
-                f"in range {e.found_from} to {e.found_to}")
+                f"in range '{e.found_from}' to '{e.found_to}'")
             error_screen.filter()
             print('\n' + error_header + str(error_screen) + node_header)
             exit(0)

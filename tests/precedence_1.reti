@@ -1,46 +1,46 @@
-# File precedence_1 Start
-# Main Funktion (void main (char cars) ... ) Start
+# File 'precedence_1' Start
+# Main Funktion '(void main (char cars) ... )' Start
 LOADI SP 200;
-# Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (char cars) Ende
-# Zuweisung ((int var) = ((8 * cars) + 2)) Start
-# Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
-# Allokation (int var) Ende
-# Arithmetische binäre Operation ((8 * cars) + 2) Start
-# Arithmetische binäre Operation (8 * cars) Start
-# Arithmetischer Operand 8 Start
+# Allokation '(char cars)' Start
+# Variable 'cars' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char cars)' Ende
+# Zuweisung '((int var) = ((8 * cars) + 2))' Start
+# Allokation '(int var)' Start
+# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Allokation '(int var)' Ende
+# Arithmetische binäre Operation '((8 * cars) + 2)' Start
+# Arithmetische binäre Operation '(8 * cars)' Start
+# Arithmetischer Operand '8' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 8;                           # Wert von 8 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 8 Ende
-# Arithmetischer Operand cars Start
+LOADI ACC 8;                           # Wert von '8' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '8' Ende
+# Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
-LOADIN SP ACC 2;                       # Wert von 8 in ACC laden
-LOADIN SP IN2 1;                       # Wert von cars in IN2 laden
-MULT ACC IN2;                          # Wert von (8 * cars) in ACC laden
+LOAD ACC 100;                          # Wert von 'cars' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'cars' Ende
+LOADIN SP ACC 2;                       # Wert von '8' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'cars' in IN2 laden
+MULT ACC IN2;                          # Wert von '(8 * cars)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (8 * cars) Ende
-# Arithmetischer Operand 2 Start
+# Arithmetische binäre Operation '(8 * cars)' Ende
+# Arithmetischer Operand '2' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 2;                           # Wert von 2 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 2 Ende
-LOADIN SP ACC 2;                       # Wert von (8 * cars) in ACC laden
-LOADIN SP IN2 1;                       # Wert von 2 in IN2 laden
-ADD ACC IN2;                           # Wert von ((8 * cars) + 2) in ACC laden
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 2;                       # Wert von '(8 * cars)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '2' in IN2 laden
+ADD ACC IN2;                           # Wert von '((8 * cars) + 2)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation ((8 * cars) + 2) Ende
+# Arithmetische binäre Operation '((8 * cars) + 2)' Ende
 LOADIN SP ACC 1;                       # Wert von '((8 * cars) + 2)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 101;                         # Wert '((8 * cars) + 2)' in Variable 'var' speichern
-# Zuweisung ((int var) = ((8 * cars) + 2)) Ende
+# Zuweisung '((int var) = ((8 * cars) + 2))' Ende
 JUMP 0;
-# Main Funktion (void main (char cars) ... ) Ende
-# File precedence_1 Ende
+# Main Funktion '(void main (char cars) ... )' Ende
+# File 'precedence_1' Ende

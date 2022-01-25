@@ -1,23 +1,23 @@
-# File empty_if Start
-# Main Funktion (void main If(ToBool(99))) Start
+# File 'empty_if' Start
+# Main Funktion '(void main If(ToBool(99)))' Start
 LOADI SP 200;
-# If Statement If(ToBool(99) ) Start
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(99) Start
-# Arithmetischer Operand 99 Start
+# If Statement 'If(ToBool(99) )' Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(99)' Start
+# Arithmetischer Operand '99' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 99;                          # Wert von 99 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 99 Ende
-LOADIN SP ACC 1;                       # Wert von 99 in ACC laden
-JUMP== 3;                              # Überspringe 2 Befehle, wenn 99 den Wert 0 hat
+LOADI ACC 99;                          # Wert von '99' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '99' Ende
+LOADIN SP ACC 1;                       # Wert von '99' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '99' den Wert '0' hat
 LOADI ACC 1;
 STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
-# Logischer Wahrheitswert aus arithmetischem Ausdruck ToBool(99) Ende
-LOADIN SP ACC 1;                       # Wert von ToBool(99) in ACC laden
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(99)' Ende
+LOADIN SP ACC 1;                       # Wert 'ToBool(99)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 JUMP== 1;                              # Branch überspringen
 # If-Branch
-# If Statement If(ToBool(99) ) Ende
+# If Statement 'If(ToBool(99) )' Ende
 JUMP 0;
-# Main Funktion (void main If(ToBool(99))) Ende
-# File empty_if Ende
+# Main Funktion '(void main If(ToBool(99)))' Ende
+# File 'empty_if' Ende

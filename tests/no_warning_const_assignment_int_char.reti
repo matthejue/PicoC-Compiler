@@ -1,12 +1,12 @@
-# File no_warning_const_assignment_int_char Start
-# Main Funktion (void main ((const int var) = 128)) Start
+# File 'no_warning_const_assignment_int_char' Start
+# Main Funktion '(void main ((const int var) = 128))' Start
 LOADI SP 200;
-# Zuweisung ((const int var) = 128) Start
-# Allokation (const int var) Start
-# Konstante var vom Typ int zur Symboltabelle hinzugefügt
-# Allokation (const int var) Ende
-# Konstante var in Symboltabelle den Wert 128 zugewiesen
-# Zuweisung ((const int var) = 128) Ende
+# Zuweisung '((const int var) = 128)' Start
+# Allokation '(const int var)' Start
+# Konstante 'var' vom Typ 'int' zur Symboltabelle hinzugefügt
+# Allokation '(const int var)' Ende
+# Konstante 'var' in Symboltabelle den Wert '128' zugewiesen
+# Zuweisung '((const int var) = 128)' Ende
 JUMP 0;
-# Main Funktion (void main ((const int var) = 128)) Ende
-# File no_warning_const_assignment_int_char Ende
+# Main Funktion '(void main ((const int var) = 128))' Ende
+# File 'no_warning_const_assignment_int_char' Ende

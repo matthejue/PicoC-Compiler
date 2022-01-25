@@ -1,121 +1,121 @@
-# File logic_and_arithmetic_parenthesis_mixed Start
-# Main Funktion (void main (int var) ... ) Start
+# File 'logic_and_arithmetic_parenthesis_mixed' Start
+# Main Funktion '(void main (int var) ... )' Start
 LOADI SP 200;
-# Allokation (int var) Start
-# Variable var vom Typ int mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (int var) Ende
-# Allokation (int dom) Start
-# Variable dom vom Typ int mit Adresse 101 zur Symboltabelle hinzugefügt
-# Allokation (int dom) Ende
-# Allokation (char cars) Start
-# Variable cars vom Typ char mit Adresse 102 zur Symboltabelle hinzugefügt
-# Allokation (char cars) Ende
-# Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Start
-# Logische binäre Verknüpfung (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Start
-# Logische binäre Verknüpfung ((12 <= ((dom - 1) * 2)) || (42 != cars)) Start
-# Logisches Atom (12 <= ((dom - 1) * 2)) Start
-# Arithmetischer Operand 12 Start
+# Allokation '(int var)' Start
+# Variable 'var' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(int var)' Ende
+# Allokation '(int dom)' Start
+# Variable 'dom' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Allokation '(int dom)' Ende
+# Allokation '(char cars)' Start
+# Variable 'cars' vom Typ 'char' mit Adresse '102' zur Symboltabelle hinzugefügt
+# Allokation '(char cars)' Ende
+# Zuweisung '(var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)))' Start
+# Logische binäre Verknüpfung '(((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))' Start
+# Logische binäre Verknüpfung '((12 <= ((dom - 1) * 2)) || (42 != cars))' Start
+# Logisches Atom '(12 <= ((dom - 1) * 2))' Start
+# Arithmetischer Operand '12' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 12;                          # Wert von 12 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 12 Ende
-# Arithmetische binäre Operation ((dom - 1) * 2) Start
-# Arithmetische binäre Operation (dom - 1) Start
-# Arithmetischer Operand dom Start
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetische binäre Operation '((dom - 1) * 2)' Start
+# Arithmetische binäre Operation '(dom - 1)' Start
+# Arithmetischer Operand 'dom' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von dom in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand dom Ende
-# Arithmetischer Operand 1 Start
+LOAD ACC 101;                          # Wert von 'dom' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'dom' Ende
+# Arithmetischer Operand '1' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 1;                           # Wert von 1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 1 Ende
-LOADIN SP ACC 2;                       # Wert von dom in ACC laden
-LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
-SUB ACC IN2;                           # Wert von (dom - 1) in ACC laden
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von 'dom' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+SUB ACC IN2;                           # Wert von '(dom - 1)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (dom - 1) Ende
-# Arithmetischer Operand 2 Start
+# Arithmetische binäre Operation '(dom - 1)' Ende
+# Arithmetischer Operand '2' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 2;                           # Wert von 2 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 2 Ende
-LOADIN SP ACC 2;                       # Wert von (dom - 1) in ACC laden
-LOADIN SP IN2 1;                       # Wert von 2 in IN2 laden
-MULT ACC IN2;                          # Wert von ((dom - 1) * 2) in ACC laden
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 2;                       # Wert von '(dom - 1)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '2' in IN2 laden
+MULT ACC IN2;                          # Wert von '((dom - 1) * 2)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation ((dom - 1) * 2) Ende
-LOADIN SP ACC 2;                       # Wert von 12 in ACC laden
-LOADIN SP IN2 1;                       # Wert von ((dom - 1) * 2) in IN2 laden
-SUB ACC IN2;                           # 12 - ((dom - 1) * 2) in ACC laden
-JUMP<= 3;                              # Ergebnis 1, wenn (12 <= ((dom - 1) * 2)) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (12 <= ((dom - 1) * 2)) nicht erfüllt
+# Arithmetische binäre Operation '((dom - 1) * 2)' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '((dom - 1) * 2)' in IN2 laden
+SUB ACC IN2;                           # '12 - ((dom - 1) * 2)' in ACC laden
+JUMP<= 3;                              # Ergebnis '1', wenn '(12 <= ((dom - 1) * 2))' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 <= ((dom - 1) * 2))' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn 12 <= ((dom - 1) * 2) wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 <= ((dom - 1) * 2))' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (12 <= ((dom - 1) * 2)) Ende
-# Logisches Atom (42 != cars) Start
-# Arithmetischer Operand 42 Start
+# Logisches Atom '(12 <= ((dom - 1) * 2))' Ende
+# Logisches Atom '(42 != cars)' Start
+# Arithmetischer Operand '42' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 42;                          # Wert von 42 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 42 Ende
-# Arithmetischer Operand cars Start
+LOADI ACC 42;                          # Wert von '42' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '42' Ende
+# Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
-LOADIN SP ACC 2;                       # Wert von 42 in ACC laden
-LOADIN SP IN2 1;                       # Wert von cars in IN2 laden
-SUB ACC IN2;                           # 42 - cars in ACC laden
-JUMP!= 3;                              # Ergebnis 1, wenn (42 != cars) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (42 != cars) nicht erfüllt
+LOAD ACC 102;                          # Wert von 'cars' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'cars' Ende
+LOADIN SP ACC 2;                       # Wert von '42' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'cars' in IN2 laden
+SUB ACC IN2;                           # '42 - cars' in ACC laden
+JUMP!= 3;                              # Ergebnis '1', wenn '(42 != cars)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(42 != cars)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn 42 != cars wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(42 != cars)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (42 != cars) Ende
-LOADIN SP ACC 2;                       # Wert von (12 <= ((dom - 1) * 2)) in ACC laden
-LOADIN SP IN2 1;                       # Wert von (42 != cars) in IN2 laden
-OR ACC IN2;                            # ((12 <= ((dom - 1) * 2)) || (42 != cars)) in ACC laden
+# Logisches Atom '(42 != cars)' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 <= ((dom - 1) * 2))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(42 != cars)' in IN2 laden
+OR ACC IN2;                            # '((12 <= ((dom - 1) * 2)) || (42 != cars))' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logische binäre Verknüpfung ((12 <= ((dom - 1) * 2)) || (42 != cars)) Ende
-# Logisches Atom (cars == 0) Start
-# Arithmetischer Operand cars Start
+# Logische binäre Verknüpfung '((12 <= ((dom - 1) * 2)) || (42 != cars))' Ende
+# Logisches Atom '(cars == 0)' Start
+# Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 102;                          # Wert von cars in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand cars Ende
-# Arithmetischer Operand 0 Start
+LOAD ACC 102;                          # Wert von 'cars' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'cars' Ende
+# Arithmetischer Operand '0' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 0;                           # Wert von 0 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 0 Ende
-LOADIN SP ACC 2;                       # Wert von cars in ACC laden
-LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
-SUB ACC IN2;                           # cars - 0 in ACC laden
-JUMP== 3;                              # Ergebnis 1, wenn (cars == 0) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (cars == 0) nicht erfüllt
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 2;                       # Wert von 'cars' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '0' in IN2 laden
+SUB ACC IN2;                           # 'cars - 0' in ACC laden
+JUMP== 3;                              # Ergebnis '1', wenn '(cars == 0)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(cars == 0)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn cars == 0 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(cars == 0)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (cars == 0) Ende
-LOADIN SP ACC 2;                       # Wert von ((12 <= ((dom - 1) * 2)) || (42 != cars)) in ACC laden
-LOADIN SP IN2 1;                       # Wert von (cars == 0) in IN2 laden
-AND ACC IN2;                           # (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) in ACC laden
+# Logisches Atom '(cars == 0)' Ende
+LOADIN SP ACC 2;                       # Wert von '((12 <= ((dom - 1) * 2)) || (42 != cars))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(cars == 0)' in IN2 laden
+AND ACC IN2;                           # '(((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logische binäre Verknüpfung (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)) Ende
+# Logische binäre Verknüpfung '(((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))' Ende
 LOADIN SP ACC 1;                       # Wert von '(((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert '(((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))' in Variable 'var' speichern
-# Zuweisung (var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0))) Ende
+# Zuweisung '(var = (((12 <= ((dom - 1) * 2)) || (42 != cars)) && (cars == 0)))' Ende
 JUMP 0;
-# Main Funktion (void main (int var) ... ) Ende
-# File logic_and_arithmetic_parenthesis_mixed Ende
+# Main Funktion '(void main (int var) ... )' Ende
+# File 'logic_and_arithmetic_parenthesis_mixed' Ende

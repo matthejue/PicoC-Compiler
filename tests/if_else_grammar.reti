@@ -1,80 +1,80 @@
-# File if_else_grammar Start
-# Main Funktion (void main (char var) ... ) Start
+# File 'if_else_grammar' Start
+# Main Funktion '(void main (char var) ... )' Start
 LOADI SP 200;
-# Allokation (char var) Start
-# Variable var vom Typ char mit Adresse 100 zur Symboltabelle hinzugefügt
-# Allokation (char var) Ende
-# If und Else Statement IfElse((var >= 0) (var = 12) else (var = (var + 1))) Start
-# Logisches Atom (var >= 0) Start
-# Arithmetischer Operand var Start
+# Allokation '(char var)' Start
+# Variable 'var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char var)' Ende
+# If und Else Statement 'IfElse((var >= 0) (var = 12) else (var = (var + 1)))' Start
+# Logisches Atom '(var >= 0)' Start
+# Arithmetischer Operand 'var' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
-# Arithmetischer Operand 0 Start
+LOAD ACC 100;                          # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '0' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 0;                           # Wert von 0 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 0 Ende
-LOADIN SP ACC 2;                       # Wert von var in ACC laden
-LOADIN SP IN2 1;                       # Wert von 0 in IN2 laden
-SUB ACC IN2;                           # var - 0 in ACC laden
-JUMP>= 3;                              # Ergebnis 1, wenn (var >= 0) erfüllt
-LOADI ACC 0;                           # Ergebnis 0, wenn (var >= 0) nicht erfüllt
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 2;                       # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '0' in IN2 laden
+SUB ACC IN2;                           # 'var - 0' in ACC laden
+JUMP>= 3;                              # Ergebnis '1', wenn '(var >= 0)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(var >= 0)' nicht erfüllt
 JUMP 2;
-LOADI ACC 1;                           # Ergebnis 1, wenn var >= 0 wahr
+LOADI ACC 1;                           # Ergebnis '1', wenn '(var >= 0)' wahr
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Logisches Atom (var >= 0) Ende
-LOADIN SP ACC 1;                       # Wert von (var >= 0) in ACC laden
+# Logisches Atom '(var >= 0)' Ende
+LOADIN SP ACC 1;                       # Wert von '(var >= 0)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-JUMP== 8;                              # Zu Else-Branch springen, wenn (var >= 0) nicht erfüllt
+JUMP== 8;                              # Zu Else-Branch springen, wenn '(var >= 0)' nicht erfüllt
 # If-Branch
-# Zuweisung (var = 12) Start
-# Arithmetischer Operand 12 Start
+# Zuweisung '(var = 12)' Start
+# Arithmetischer Operand '12' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 12;                          # Wert von 12 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 12 Ende
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
 LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
 STORE ACC 100;                         # Wert '12' in Variable 'var' speichern
-# Zuweisung (var = 12) Ende
-JUMP 17;                               # Else-Branch überspringen
+# Zuweisung '(var = 12)' Ende
+JUMP 23;                               # Else-Branch überspringen
 # Else-Branch
-# Zuweisung (var = (var + 1)) Start
-# Arithmetische binäre Operation (var + 1) Start
-# Arithmetischer Operand var Start
+# Zuweisung '(var = (var + 1))' Start
+# Arithmetische binäre Operation '(var + 1)' Start
+# Arithmetischer Operand 'var' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von var in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand var Ende
-# Arithmetischer Operand 1 Start
+LOAD ACC 100;                          # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '1' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOADI ACC 1;                           # Wert von 1 in ACC laden
-STOREIN SP ACC 1;                      # Wert in oberste Stacke-Zelle
-# Arithmetischer Operand 1 Ende
-LOADIN SP ACC 2;                       # Wert von var in ACC laden
-LOADIN SP IN2 1;                       # Wert von 1 in IN2 laden
-ADD ACC IN2;                           # Wert von (var + 1) in ACC laden
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+ADD ACC IN2;                           # Wert von '(var + 1)' in ACC laden
 STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Arithmetische binäre Operation (var + 1) Ende
+# Arithmetische binäre Operation '(var + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(var + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-# Implizite Konversion von int zu char Start
+# Implizite Konversion von 'int' zu 'char' Start
 LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
-AND ACC IN1;                           # Wo in der Bitmaske eine 0 ist, werden die Bits ebenfalls zu 0
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
 LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
-MULTI IN2 65536;                       # Bit 1 im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
 AND ACC IN1;                           # Testen, ob Zahl negativ ist
 JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
-OR ACC IN1;                            # Wo in der Bitmaske eine 1 ist, werden die Bits ebenfallls zu 1
-# Implizite Konversion von int zu char Ende
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
 STORE ACC 100;                         # Wert '(var + 1)' in Variable 'var' speichern
-# Zuweisung (var = (var + 1)) Ende
-# If und Else Statement IfElse((var >= 0) (var = 12) else (var = (var + 1))) Ende
+# Zuweisung '(var = (var + 1))' Ende
+# If und Else Statement 'IfElse((var >= 0) (var = 12) else (var = (var + 1)))' Ende
 JUMP 0;
-# Main Funktion (void main (char var) ... ) Ende
-# File if_else_grammar Ende
+# Main Funktion '(void main (char var) ... )' Ende
+# File 'if_else_grammar' Ende
