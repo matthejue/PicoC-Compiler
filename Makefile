@@ -18,11 +18,11 @@ _shell:
 
 # shell-all: _shell-all clean
 # _shell-all:
-	# ./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
+#   ./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
 
 # shell-all-verbose: _shell-all-verbose clean
 # _shell-all-verbose:
-	# ./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
+#   ./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
 
 test: _test clean
 _test:
