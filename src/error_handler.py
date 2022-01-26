@@ -71,7 +71,8 @@ class ErrorHandler:
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
-                None, f"Note: The max size of a literal for a {e.found_symbol_type} is "\
+                None,
+                f"Note: The max size of a literal for a {e.found_symbol_type} is "
                 f"in range '{e.found_from}' to '{e.found_to}'")
             error_screen.filter()
             print('\n' + error_header + str(error_screen) + node_header)
@@ -109,6 +110,21 @@ class ErrorHandler:
         except Errors.NoMainFunctionError as e:
             error_header = e.description + '\n'
             print('\n' + error_header)
+            exit(0)
+        except Errors.MoreThanOneMainFunctionError as e:
+            error_header = self._error_header(e.first_pos, e.description)
+            error_screen = AnnotationScreen(self.finput, e.first_pos[0],
+                                            e.first_pos[0])
+            error_screen.mark(e.first_pos, 4)
+            note_header = self._error_header(
+                e.second_pos, "Note: Second main function defined here:")
+            error_screen_2 = AnnotationScreen(self.finput, e.second_pos[0],
+                                              e.second_pos[0])
+            error_screen_2.mark(e.second_pos, 4)
+            error_screen.filter()
+            error_screen_2.filter()
+            print('\n' + error_header + str(error_screen) + note_header +
+                  str(error_screen_2))
             exit(0)
         except Errors.NotImplementedYetError as e:
             error_header = e.description + '\n'

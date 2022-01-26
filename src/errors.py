@@ -86,6 +86,13 @@ class Errors:
             self.description = "NoMainFunctionError: There's no main function"\
                 f" in file '{fname}'"
 
+    class MoreThanOneMainFunctionError(Exception):
+        def __init__(self, first_pos, second_pos):
+            self.description = "MoreThanOneMainFunctionError: There're at "\
+            "least two main functions"
+            self.first_pos = first_pos
+            self.second_pos = second_pos
+
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
         def __init__(self, feature_description):

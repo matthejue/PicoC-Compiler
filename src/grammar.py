@@ -5,6 +5,12 @@ from lexer import TT
 class Grammar(FileGrammar):
     """the function part of the context free grammar of the piocC
     language"""
+    def __init__(self, lexer):
+        super().__init__(lexer)
+
+        # to check for the MoreThanOneMainFunctionError
+        self.mains = []
+
     def start_parse(self):
         """start parsing the grammar
 

@@ -68,9 +68,8 @@ class BacktrackingParser():
         else:
             token = self.LT(1)
             raise Errors.MismatchedTokenError(
-                " or ".join("'" + tokentype.value + "'"
-                            for tokentype in tokentypes), token.value,
-                token.position)
+                " or ".join(tokentype.value for tokentype in tokentypes),
+                token.value, token.position)
 
     def add_and_match(self, tokentypes, classname=None, mapping=None):
         """Same as add, but also check for match

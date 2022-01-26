@@ -6,19 +6,19 @@ all: read-all-verbose
 
 read-all: _read_all clean
 _read-all:
-	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./code.picoc
+	./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
 read-all-verbose: _read-all-verbose clean
 _read-all-verbose:
-	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
+	./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
 
 shell-all: _shell-all clean
 _shell-all:
-	./src/pico_c_compiler.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
+	./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2
 
 shell-all-verbose: _shell-all-verbose clean
 _shell-all-verbose:
-	./src/pico_c_compiler.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
+	./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2
 
 test: _test clean
 _test:
@@ -48,16 +48,16 @@ setup_pyinstaller_windows:
 	pip install pyinstaller
 
 create_bin_linux:
-	pyinstaller ./src/pico_c_compiler.py --onefile --hidden-import=tabulate --distpath=./dist
+	pyinstaller ./src/main.py --onefile --hidden-import=tabulate --distpath=./dist
 	staticx ./dist/pico_c_compiler ./dist/pico_c_compiler_linux
 	rm ./dist/pico_c_compiler
 
 create_bin_wine:
-	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/Scripts/pyinstaller.exe ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/src/pico_c_compiler.py  --onefile --hidden-import=tabulate --distpath=~/Documents/Studium/pico_c_compiler/dist
+	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/Scripts/pyinstaller.exe ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/src/main.py  --onefile --hidden-import=tabulate --distpath=~/Documents/Studium/pico_c_compiler/dist
 	mv ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler_wine.exe
 
 create_bin_windows:
-	pyinstaller src\pico_c_compiler.py --onefile --hidden-import=tabulate --distpath=dist
+	pyinstaller src\main.py --onefile --hidden-import=tabulate --distpath=dist
 	# rename file to pico_c_compiler_windows.exe
 
 exec_bin_linux:
@@ -71,7 +71,7 @@ exec_bin_windows:
 	pico_c_compiler_windows.exe -S
 
 help:
-	./src/pico_c_compiler.py -h
+	./src/main.py -h
 
 clean:
 	find . -type f -name "*.pyc" -delete
