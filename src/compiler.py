@@ -10,6 +10,7 @@ from symbol_table import SymbolTable
 from code_generator import CodeGenerator
 from warning_handler import WarningHandler
 from tabulate import tabulate
+import argparse
 
 
 class Compiler(cmd2.Cmd):
@@ -28,20 +29,24 @@ class Compiler(cmd2.Cmd):
     The cli-options are the same as for calling the compiler from outside,
     except for the 'infile' argument, which is interpreted as string with
     PiooC-Code which will be compiled as if it was enclosed in a main function.
-    The shell can be exited again by typing 'quit'.
+
     The 'compile <cli-options>;' command can also be written over multiple
     lines and thus has to end with a ';'.
-
-    In the shell the cursor can be moved with the left and right arrow key.
-    Previous and next commands can be retrieved with the up and down arrow key.
     All multiline_commands have to end with a ';'.
+
+    In the shell the cursor can be moved with the <left> and <right> arrow key.
+    Previous and next commands can be retrieved with the <up> and <down> arrow key.
+    A command can be completed with <tab>.
+
+    The shell can be exited again by typing 'quit'.
 
     If you discover any bugs I would be very grateful if you could report it
     via email to juergmatth@gmail.com, attaching the malicious code to the
     email. ^_^
     """
-    #  cli_args_parser = argparse.ArgumentParser(description=description)
-    cli_args_parser = cmd2.Cmd2ArgumentParser(description=description)
+    cli_args_parser = (cmd2.Cmd2ArgumentParser(description=description)
+                       if global_vars.shell_on else argparse.ArgumentParser(
+                           description=description))
     cli_args_parser.add_argument(
         "infile",
         nargs='?',
@@ -116,7 +121,8 @@ class Compiler(cmd2.Cmd):
         default=0)
 
     def __init__(self, ):
-        super().__init__(multiline_commands=['compile'])
+        if global_vars.shell_on:
+            super().__init__()
 
         shortcuts = cmd2.DEFAULT_SHORTCUTS
         shortcuts.update({'c': 'compile'})
@@ -124,11 +130,17 @@ class Compiler(cmd2.Cmd):
         # shell is always executed with print
         cmd2.Cmd.prompt = "PicoC> "
         cmd2.Cmd.continuation_prompt = "> "
+        cmd2.Cmd.persistent_history_file = "~/.config/pico_c_compiler/history.txt"
+        cmd2.Cmd.persistent_history_length = 100
+        cmd2.Cmd.multiline_commands = ['compile']
         global_vars.args = self.cli_args_parser.parse_args()
 
     @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
         global_vars.args = args
+        # printing is always on in shell
+
+        global_vars.args.print = True
         try:
             self._compile(["void main() {"] + args.infile.split('\n') + ["}"],
                           "stdin")

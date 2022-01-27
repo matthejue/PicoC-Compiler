@@ -13,3 +13,6 @@ show_node = True
 RANGE_OF_CHAR = (-128, 127)
 RANGE_OF_PARAMETER = (-2097152, 2097151)
 RANGE_OF_INT = (-2147483648, 2147483647)
+
+# use a different parser if shell is not on
+shell_on = True

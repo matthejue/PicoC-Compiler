@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 
-from sys import exit
+import sys
 import global_vars
 from compiler import Compiler, remove_extension
 
 
 def main():
+    if len(sys.argv) > 0:
+        global_vars.shell_on = False
+
     compiler = Compiler()
 
     if not global_vars.args.infile:
-        global_vars.args.print = True
-        exit(compiler.cmdloop())
+        sys.exit(compiler.cmdloop())
     else:
         infile = global_vars.args.infile
         outbase = remove_extension(infile)
