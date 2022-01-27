@@ -117,8 +117,21 @@ style: |
 
 ## Funktionsumfang
 ### Kommentare
-
-- content
+```c
+void main() {}
+  const int var = 12;  // Einzeiliger Kommentar
+  /* Mehrzeiliger Kommentar,
+  der sich über mehrere Zeilen
+  erstreckt */
+  char var2;
+  if (var > 100)
+    var2 = 2;
+  else if (/* Störender Kommentar */ var > 10)
+    var2 = 1;
+  else
+    var2 = 0;
+}
+```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -127,8 +140,10 @@ style: |
 
 ## Funktionsumfang
 ### Präzidenzregeln
-
-- content
+- **Konkrette Syntax:** `int var = 12 + 3 - 1`
+  - **Astrakte Syntax:**
+- **Konkrette Syntax:** `int var = 12 * 3 - 1`
+  - **Astrakte Syntax:**
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
