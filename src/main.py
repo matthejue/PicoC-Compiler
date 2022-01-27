@@ -6,7 +6,7 @@ from compiler import Compiler, remove_extension
 
 
 def main():
-    if len(sys.argv) > 0:
+    if len(sys.argv) > 1:
         global_vars.shell_on = False
 
     compiler = Compiler()
