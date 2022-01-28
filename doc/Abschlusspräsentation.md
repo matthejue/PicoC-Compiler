@@ -14,7 +14,7 @@ style: |
   a { color: #2a8892; }
   strong { color: #2a8892; }
   em { color: #e96e1a; }
-  footer { color: #2a8892; font-size: 20px; text-align: center; }
+  footer { color: #e96e1a; font-size: 20px; text-align: center; }
   ul { color: #252a2f; list-style: none; font-size: 25px; margin-bottom: 0px; }
   p { color: #252a2f; list-style: none;  font-size: 25px; text-align: center; margin-top: 0px; }
   ul li::before {
@@ -190,10 +190,10 @@ style: |
 - keine Seperation von von **Deklarations-** und **Anweisungsteil**
 - "**else if**": `if <single-statement> else if { <statement(s)> } else { <statement(s)> }`
 - **Präzidenzregeln**
-- **Implicit Conversion**
+- zu **großes Literal** für `char` Datentyp (**Implicit Conversion**)
+- zu **großes Literal** für Parameter
 - **Fehlermeldungen** und **Warnings**
 - **Shell** oder **Datei** angeben
-
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -242,11 +242,13 @@ void main() {
 ---
 
 ## Funktionsumfang
-### Implicit Conversion
+### Zu großes Literal für `char`
 ```c
-const char var = 127; // ✅
-const char var = 128; // ❌
+char var = 127;  // ✅
+char var = 128;  // ❌
 ```
+- `0b1000000`
+- **Implicit Conversion** von `int` zu `char`
 
 
 <!--small-->
@@ -255,8 +257,37 @@ const char var = 128; // ❌
 ---
 
 ## Funktionsumfang
+### Zu großes Literal für Parameter
+- semantischer Wert des **Literals** zwischen $-2^{21}$ und $2^{21}-1$ liegen
+![height:100px](_resources/_2022-01-28-17-10-21.png)
+  ```c
+  int var = 2097151;  // = 2^21-1 ✅
+  int var = 2097152;  // = 2^21   ❌
+  ```
+  ```
+    10000000_00000000_00000000_10000000
+  v 11111111_11111111_11111111_00000000
+    00000000_00000000_00000001_00000000
+  ```
+  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** dem mit $0$en oder $1$en übeschreiben
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Zu großes Literal für Compiler
+- sobald Wert des Literals $> 2^{31}-1$ **🠒** **Error**
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
 ### Fehlermeldungen
-- content
+- 2147483648
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
