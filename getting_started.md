@@ -1,5 +1,5 @@
 # Compiling a file
-With the following **cli-options** u won't miss anything when compiling **PicoC** into **RETI-Code**:
+With the following **cli-options** you won't miss anything when compiling **PicoC** into **RETI-Code**:
 ```bash
 ./pico_c_compiler -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
 ```
@@ -11,4 +11,4 @@ Start the **shell** by passing **no arguments**. To compile **PicoC** into **RET
 PicoC> compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "char bool_val = (12 < 1 + 2);";
 
 ```
-- **Leave** the **shell** again by typign in `quit`.
+- **Leave** the **shell** again by typing `quit`.

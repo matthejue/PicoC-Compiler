@@ -1,10 +1,13 @@
 # Used patterns
 - **LL(1) Recursive-Descent Lexer** (p. 50 et seq. from [[1]](#1))
 - **Backtracking Parser** (p. 71 et seq. from [[1]](#1)))
+- **Normalized Heterogeneous AST** (p.111 et seq. from [[1]](#1))
+- **Embedded Heterogeneous Tree Walker** (p.128 et seq. from [[1]](#1))
 - **Factory Function** used to implement **Singleton Pattern** (from [[2]](#2))
 
 # Used literature
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
+  - inter alia **Mapping Grammars to Recursive-Descent Recognizers** (p.45 et seq. from [[1]](#1))
 - the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
 
 # Used software
@@ -13,6 +16,9 @@
 - **Drawio-desktop** for planning the **architecture** [[7]](#7)
 - **PyInstaller** [[8]](#8) and **StaticX** [[9]](#9) to create the **executable**
 - **Zatero** for **citing** [[10]](#10)
+
+# Misc
+- the **template** of the README.md is greatly inspired by [[11]](#11)
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
@@ -27,3 +33,4 @@
 - <a id="8">[8]</a> https://github.com/pyinstaller/pyinstaller/wiki/FAQ
 - <a id="9">[9]</a> https://github.com/JonathonReinhart/staticx/
 - <a id="10">[10]</a> https://www.zotero.org/
+- <a id="11">[11]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
