@@ -23,7 +23,7 @@
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <link:link rdf:resource="#item_5"/>
+        <link:link rdf:resource="#item_25"/>
         <dc:subject>
             <z:AutomaticTag>
                <rdf:value>Computers / General</rdf:value>
@@ -54,7 +54,7 @@
         <dc:identifier>ISBN 978-1-68050-374-6</dc:identifier>
         <z:numPages>456</z:numPages>
     </bib:Book>
-    <z:Attachment rdf:about="#item_5">
+    <z:Attachment rdf:about="#item_25">
         <z:itemType>attachment</z:itemType>
         <dc:title>Google Books Link</dc:title>
         <dc:identifier>
@@ -78,8 +78,9 @@
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <link:link rdf:resource="#item_7"/>
+        <link:link rdf:resource="#item_27"/>
         <dc:title>Singleton Pattern In Python</dc:title>
+        <dc:date>2022-01-28 02:00:44</dc:date>
         <dc:identifier>
             <dcterms:URI>
                 <rdf:value>https://stackoverflow.com/questions/52351312/singleton-pattern-in-python</rdf:value>
@@ -87,7 +88,7 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:00:44</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_7">
+    <z:Attachment rdf:about="#item_27">
         <z:itemType>attachment</z:itemType>
         <dc:title>Snapshot</dc:title>
         <dc:identifier>
@@ -96,7 +97,7 @@
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:00:50</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
     <bib:Document rdf:about="https://iucompilercourse.github.io/IU-Fall-2021/">
@@ -104,9 +105,10 @@
         <dcterms:isPartOf>
            <z:Website><dc:title>IU-Fall-2021</dc:title></z:Website>
         </dcterms:isPartOf>
-        <link:link rdf:resource="#item_11"/>
+        <link:link rdf:resource="#item_29"/>
         <dc:title>Course Webpage for Compilers (P423, P523, E313, and E513)</dc:title>
         <dcterms:abstract>Course web page for Fall 2021.</dcterms:abstract>
+        <dc:date>2022-01-28 02:58:36</dc:date>
         <z:language>en-US</z:language>
         <dc:identifier>
             <dcterms:URI>
@@ -115,7 +117,7 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:58:36</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_11">
+    <z:Attachment rdf:about="#item_29">
         <z:itemType>attachment</z:itemType>
         <dc:title>Snapshot</dc:title>
         <dc:identifier>
@@ -124,7 +126,45 @@
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:58:41</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
+    <bib:Data rdf:about="https://github.com/othneildrew/Best-README-Template">
+        <z:itemType>computerProgram</z:itemType>
+        <z:programmers>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Drew</foaf:surname>
+                        <foaf:givenName>Othneil</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:programmers>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>readme</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>readme-template</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>othneildrew/Best-README-Template</dc:title>
+        <dcterms:abstract>An awesome README template to jumpstart your projects!</dcterms:abstract>
+        <dc:date>2022-01-28T05:33:43Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.com/othneildrew/Best-README-Template</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 08:31:21</dcterms:dateSubmitted>
+        <dc:rights>MIT</dc:rights>
+        <dc:description>original-date: 2018-12-10T17:56:03Z</dc:description>
+    </bib:Data>
+    <z:Collection rdf:about="#collection_4">
+        <dc:title>Bachelorprojekt</dc:title>
+        <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
+        <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
+        <dcterms:hasPart rdf:resource="https://iucompilercourse.github.io/IU-Fall-2021/"/>
+        <dcterms:hasPart rdf:resource="https://github.com/othneildrew/Best-README-Template"/>
+    </z:Collection>
 </rdf:RDF>
