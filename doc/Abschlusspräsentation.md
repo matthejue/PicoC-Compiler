@@ -391,7 +391,8 @@ const char var = 128; // ❌
 
 ## Quellen
 ### Wissenquellen
-- **[1]**, **[2]** und **[3]** in https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
+- Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
+- IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -400,8 +401,16 @@ const char var = 128; // ❌
 
 ## Quellen
 ### Bildquellen
-- **[16]** in https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
+- “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
 
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Quellen
+### Quellen des Projekts
+- alle verwendete(n) Patterns, Software, Packages usw.: https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
 
 <!--small-->
 ![bg right:10%](_resources/background.png)

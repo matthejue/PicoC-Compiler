@@ -1,11 +1,38 @@
 <rdf:RDF
  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
  xmlns:z="http://www.zotero.org/namespaces/export#"
- xmlns:dc="http://purl.org/dc/elements/1.1/"
- xmlns:foaf="http://xmlns.com/foaf/0.1/"
- xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:dcterms="http://purl.org/dc/terms/"
  xmlns:link="http://purl.org/rss/1.0/modules/link/"
- xmlns:dcterms="http://purl.org/dc/terms/">
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/">
+    <bib:Document rdf:about="https://wallpapercave.com/w/wp9774690">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_2"/>
+        <dc:title>manjaro</dc:title>
+        <z:language>en</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://wallpapercave.com/w/wp9774690</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 14:54:03</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_2">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://wallpapercave.com/w/wp9774690</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 14:54:10</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
     <bib:Book rdf:about="urn:isbn:978-1-68050-374-6">
         <z:itemType>book</z:itemType>
         <dc:publisher>
@@ -23,7 +50,7 @@
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <link:link rdf:resource="#item_25"/>
+        <link:link rdf:resource="#item_4"/>
         <dc:subject>
             <z:AutomaticTag>
                <rdf:value>Computers / General</rdf:value>
@@ -54,7 +81,7 @@
         <dc:identifier>ISBN 978-1-68050-374-6</dc:identifier>
         <z:numPages>456</z:numPages>
     </bib:Book>
-    <z:Attachment rdf:about="#item_25">
+    <z:Attachment rdf:about="#item_4">
         <z:itemType>attachment</z:itemType>
         <dc:title>Google Books Link</dc:title>
         <dc:identifier>
@@ -78,7 +105,7 @@
                 </rdf:li>
             </rdf:Seq>
         </bib:authors>
-        <link:link rdf:resource="#item_27"/>
+        <link:link rdf:resource="#item_6"/>
         <dc:title>Singleton Pattern In Python</dc:title>
         <dc:date>2022-01-28 02:00:44</dc:date>
         <dc:identifier>
@@ -88,7 +115,7 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:00:44</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_27">
+    <z:Attachment rdf:about="#item_6">
         <z:itemType>attachment</z:itemType>
         <dc:title>Snapshot</dc:title>
         <dc:identifier>
@@ -105,7 +132,7 @@
         <dcterms:isPartOf>
            <z:Website><dc:title>IU-Fall-2021</dc:title></z:Website>
         </dcterms:isPartOf>
-        <link:link rdf:resource="#item_29"/>
+        <link:link rdf:resource="#item_8"/>
         <dc:title>Course Webpage for Compilers (P423, P523, E313, and E513)</dc:title>
         <dcterms:abstract>Course web page for Fall 2021.</dcterms:abstract>
         <dc:date>2022-01-28 02:58:36</dc:date>
@@ -117,7 +144,7 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 02:58:36</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_29">
+    <z:Attachment rdf:about="#item_8">
         <z:itemType>attachment</z:itemType>
         <dc:title>Snapshot</dc:title>
         <dc:identifier>
@@ -158,16 +185,18 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 08:31:21</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>original-date: 2018-12-10T17:56:03Z</dc:description>
+        <dc:description>Programmers: _:n16
+original-date: 2018-12-10T17:56:03Z</dc:description>
     </bib:Data>
     <bib:Document rdf:about="https://github.com/python-cmd2/cmd2">
         <z:itemType>webpage</z:itemType>
         <dcterms:isPartOf>
            <z:Website><dc:title>GitHub</dc:title></z:Website>
         </dcterms:isPartOf>
-        <link:link rdf:resource="#item_34"/>
+        <link:link rdf:resource="#item_11"/>
         <dc:title>cmd2/index.rst at bef3c758829fe2aa82d58699d61fa78aa961f29d · python-cmd2/cmd2</dc:title>
         <dcterms:abstract>cmd2 - quickly build feature-rich and user-friendly interactive command line applications in Python - cmd2/index.rst at bef3c758829fe2aa82d58699d61fa78aa961f29d · python-cmd2/cmd2</dcterms:abstract>
+        <dc:date>2022-01-28 09:40:31</dc:date>
         <z:language>en</z:language>
         <dc:identifier>
             <dcterms:URI>
@@ -176,7 +205,7 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:40:31</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_34">
+    <z:Attachment rdf:about="#item_11">
         <z:itemType>attachment</z:itemType>
         <dc:title>Snapshot</dc:title>
         <dc:identifier>
@@ -185,7 +214,7 @@
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:40:39</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
     <bib:Data rdf:about="https://github.com/scott-griffiths/bitstring">
@@ -228,7 +257,8 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:41:11</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>original-date: 2015-04-11T20:49:04Z</dc:description>
+        <dc:description>Programmers: _:n24
+original-date: 2015-04-11T20:49:04Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
     <bib:Data rdf:about="https://github.com/inducer/pudb">
@@ -243,6 +273,9 @@
                 </rdf:li>
             </rdf:Seq>
         </z:programmers>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
+        </dc:subject>
         <dc:subject>
            <z:AutomaticTag><rdf:value>bpython</rdf:value></z:AutomaticTag>
         </dc:subject>
@@ -265,9 +298,6 @@
            <z:AutomaticTag><rdf:value>pytest-plugin</rdf:value></z:AutomaticTag>
         </dc:subject>
         <dc:subject>
-           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
-        </dc:subject>
-        <dc:subject>
            <z:AutomaticTag><rdf:value>urwid</rdf:value></z:AutomaticTag>
         </dc:subject>
         <dc:title>PuDB: a console-based visual debugger for Python</dc:title>
@@ -281,7 +311,8 @@
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:42:04</dcterms:dateSubmitted>
-        <dc:description>original-date: 2011-05-13T23:44:30Z</dc:description>
+        <dc:description>Programmers: _:n32
+original-date: 2011-05-13T23:44:30Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
     <bib:Data rdf:about="https://github.com/astanin/python-tabulate">
@@ -307,10 +338,207 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:43:25</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>original-date: 2019-09-02T14:34:19Z</dc:description>
+        <dc:description>Programmers: _:n44
+original-date: 2019-09-02T14:34:19Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
-    <z:Collection rdf:about="#collection_4">
+    <bib:Document rdf:about="https://www.zotero.org/">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_16"/>
+        <dc:title>Zotero | Your personal research assistant</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://www.zotero.org/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:11:06</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_16">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Zotero | Your personal research assistant</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://www.zotero.org/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:11:13</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Data rdf:about="https://github.com/JonathonReinhart/staticx">
+        <z:itemType>computerProgram</z:itemType>
+        <z:programmers>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Reinhart</foaf:surname>
+                        <foaf:givenName>Jonathon</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:programmers>
+        <dc:title>JonathonReinhart/staticx</dc:title>
+        <dcterms:abstract>Create static executable from dynamic executable</dcterms:abstract>
+        <dc:date>2022-01-23T08:49:58Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/JonathonReinhart/staticx</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:11:34</dcterms:dateSubmitted>
+        <dc:description>original-date: 2017-05-27T18:37:54Z</dc:description>
+        <z:programmingLanguage>C</z:programmingLanguage>
+    </bib:Data>
+    <bib:Document rdf:about="https://github.com/pyinstaller/pyinstaller">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website><dc:title>GitHub</dc:title></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_19"/>
+        <dc:title>FAQ · pyinstaller/pyinstaller Wiki</dc:title>
+        <dcterms:abstract>Freeze (package) Python programs into stand-alone executables - FAQ · pyinstaller/pyinstaller Wiki</dcterms:abstract>
+        <z:language>en</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/pyinstaller/pyinstaller</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:11:58</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_19">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/pyinstaller/pyinstaller</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:12:07</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="https://github.com/jgraph/drawio-desktop/releases">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website><dc:title>GitHub</dc:title></z:Website>
+        </dcterms:isPartOf>
+        <dc:title>Releases · jgraph/drawio-desktop</dc:title>
+        <dcterms:abstract>Official electron build of diagrams.net. Contribute to jgraph/drawio-desktop development by creating an account on GitHub.</dcterms:abstract>
+        <z:language>en</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.com/jgraph/drawio-desktop/releases</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:12:22</dcterms:dateSubmitted>
+    </bib:Document>
+    <bib:Document rdf:about="https://github.com/marp-team/marp-cli">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_23"/>
+        <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/marp-team/marp-cli</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:12:42</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_23">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/marp-team/marp-cli</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:13:01</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="#item_22">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/marp-team/marp-cli</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:12:45</dcterms:dateSubmitted>
+    </bib:Document>
+    <bib:Data rdf:about="#item_24">
+        <z:itemType>computerProgram</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+               <foaf:name>PyInstaller</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>bundle</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>package</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>py2app</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>py2exe</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>pyinstaller</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python-3</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python-to-exe</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>PyInstaller Overview</dc:title>
+        <dcterms:abstract>Freeze (package) Python programs into stand-alone executables</dcterms:abstract>
+        <dc:date>2022-01-28T13:44:34Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/pyinstaller/pyinstaller</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 15:14:51</dcterms:dateSubmitted>
+        <dc:description>original-date: 2011-11-23T11:05:56Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
+    <z:Collection rdf:about="#collection_1">
+        <dc:title>Bachelorprojekt</dc:title>
+        <dcterms:hasPart rdf:resource="#collection_2"/>
+        <dcterms:hasPart rdf:resource="https://wallpapercave.com/w/wp9774690"/>
+        <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
+        <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
+        <dcterms:hasPart rdf:resource="https://iucompilercourse.github.io/IU-Fall-2021/"/>
+        <dcterms:hasPart rdf:resource="https://github.com/othneildrew/Best-README-Template"/>
+        <dcterms:hasPart rdf:resource="https://github.com/python-cmd2/cmd2"/>
+        <dcterms:hasPart rdf:resource="https://github.com/scott-griffiths/bitstring"/>
+        <dcterms:hasPart rdf:resource="https://github.com/inducer/pudb"/>
+        <dcterms:hasPart rdf:resource="https://github.com/astanin/python-tabulate"/>
+        <dcterms:hasPart rdf:resource="https://www.zotero.org/"/>
+        <dcterms:hasPart rdf:resource="https://github.com/JonathonReinhart/staticx"/>
+        <dcterms:hasPart rdf:resource="https://github.com/pyinstaller/pyinstaller"/>
+        <dcterms:hasPart rdf:resource="https://github.com/jgraph/drawio-desktop/releases"/>
+        <dcterms:hasPart rdf:resource="https://github.com/marp-team/marp-cli"/>
+        <dcterms:hasPart rdf:resource="#item_24"/>
+    </z:Collection>
+    <z:Collection rdf:about="#collection_2">
         <dc:title>Bachelorprojekt</dc:title>
         <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
         <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
