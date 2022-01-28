@@ -9,6 +9,7 @@
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
   - inter alia **Mapping Grammars to Recursive-Descent Recognizers** (p.45 et seq. from [[1]](#1))
 - the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
+- for the knowledge about building **optimized** compilers using **graph coloring** to find a optimal assignment of **locations** to **registers** [[3]](#3)
 
 # Used software
 - **Neovim** with plugins in [[4]](#4) and **Tmux** with plugins in [[5]](#5) for **coding** the compiler and writing the **presentation**
