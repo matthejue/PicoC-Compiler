@@ -11,7 +11,7 @@ style: |
   h3 { color: #e96e1a; font-size: 40px; text-align: left; margin-top: 10px; margin-bottom: 20px; line-height: 40px;}
   h4 { color: #2a8892; font-size: 30px; text-align: left; margin-top: 40px; margin-bottom: 30px; line-height: 0px; font-weight: normal; }
   h5 { color: #2a8892; font-size: 20px; text-align: center; margin-top: 0px; margin-bottom: 20px; line-height: 0px; font-weight: normal; }
-  a { color: #e96e1a; }
+  a { color: #2a8892; }
   strong { color: #2a8892; }
   em { color: #e96e1a; }
   footer { color: #2a8892; font-size: 20px; text-align: center; }
@@ -201,7 +201,7 @@ style: |
 ---
 
 ## Funktionsumfang
-### Kommentare
+### Kommentare und else if
 ```c
 void main() {
   const int var = 12;  // Einzeiliger Kommentar
@@ -209,9 +209,9 @@ void main() {
   der sich über mehrere Zeilen
   erstreckt */
   char var2;
-  if (var > 100)
+  if (var > 100) {
     var2 = 2;
-  else if (/* Störender Kommentar */ var > 10)
+  } else if (/* Störender Kommentar */ var > 10)
     var2 = 1;
   else
     var2 = 0;
@@ -225,14 +225,16 @@ void main() {
 
 ## Funktionsumfang
 ### Präzidenzregeln
-- **Konkrette Syntax:** `char var = 12 + 'c' - 1;`
-  - **Astrakte Syntax:** `((char var) = (12 + (99 - 1)))`
-- **Konkrette Syntax:** `int var = 12 * 'c' - 1;`
-  - **Astrakte Syntax:** `((int var) = ((12 * 99) - 1))`
-- **Konkrette Syntax:** `int bool_var = (12 < 1 + 2) * 2;`
-- **Konkrette Syntax:** `int bool_var = -(0 || !(12 < 3 || 3 >= 12));`
-- **Konkrette Syntax:** `int bool_var = 12 < 1 + 2 && 12 || 0;`
-- **Konkrette Syntax:** `int bool_var = 12 || 12 < 3 && 0;`
+- **Konkrette Syntax:** `12 + 'c' - 1;`
+  - **Astrakte Syntax:** `(12 + (99 - 1))`
+- **Konkrette Syntax:** `12 * 'c' - 1;`
+  - **Astrakte Syntax:** `((12 * 99) - 1)`
+- **Konkrette Syntax:** `(12 < 1 + 2) * 2;`
+  - **Astrakte Syntax:** `((12 < (1 + 2)) * 2)`
+- **Konkrette Syntax:** `-(0 || !(12 < 3 || 3 >= 12));`
+  - **Astrakte Syntax:** `(- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))) `
+- **Konkrette Syntax:** `12 < 1 + 2 && 12 || 0;`
+  - **Astrakte Syntax:** `(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -241,8 +243,11 @@ void main() {
 
 ## Funktionsumfang
 ### Implicit Conversion
+```c
+const char var = 127; // ✅
+const char var = 128; // ❌
+```
 
-- content
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -386,8 +391,7 @@ void main() {
 
 ## Quellen
 ### Wissenquellen
-
-- source
+- https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -396,8 +400,7 @@ void main() {
 
 ## Quellen
 ### Bildquellen
-
-- source
+- “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
