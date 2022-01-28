@@ -1,0 +1,59 @@
+./src/main.py -h
+Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT]
+               [-e END_DATA_SEGMENT] [-d DISTANCE] [-S SIGHT] [-v]
+               [-O OPTIMIZATION_LEVEL]
+               [infile]
+
+    Compiles PicoC-Code into RETI-Code.
+    PicoC is a subset of C including while loops, if and else statements,
+    assignments, arithmetic and logic expressions.
+    Please keep in mind that all statements have to be enclosed in a
+
+    void main() { /* your program */ }
+
+    main function.
+
+    If called without arguments, a shell is going to open up where you can
+    compile PicoC-Code into RETI-Code with the 'compile <cli-options>;' command.
+    The cli-options are the same as for calling the compiler from outside,
+    except for the 'infile' argument, which is interpreted as string with
+    PiooC-Code which will be compiled as if it was enclosed in a main function.
+
+    The 'compile <cli-options>;' command can also be written over multiple
+    lines and thus has to end with a ';'.
+    All multiline_commands have to end with a ';'.
+
+    In the shell the cursor can be moved with the <left> and <right> arrow key.
+    Previous and next commands can be retrieved with the <up> and <down> arrow key.
+    A command can be completed with <tab>.
+
+    The shell can be exited again by typing 'quit'.
+
+    If you discover any bugs I would be very grateful if you could report it
+    via email to juergmatth@gmail.com, attaching the malicious code to the
+    email. ^_^
+    
+
+positional arguments:
+  infile                input file with PicoC-code. In the shell this is interpreted as string with PicoC-Code
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c, --concrete_syntax
+                        also print the concrete syntax (= content of input file). Only works if --print option is active
+  -t, --tokens          also write the tokenlist
+  -a, --abstract-syntax
+                        also write the abstract syntax
+  -s, --symbol_table    also write the final symbol table into a .csv file
+  -p, --print           print all file outputs to the terminal
+  -b, --begin_data_segment BEGIN_DATA_SEGMENT
+                        where the datasegment starts (default 100)
+  -e, --end_data_segment END_DATA_SEGMENT
+                        where the datasegment ends and where the stackpointer starts (default 200)
+  -d, --distance DISTANCE
+                        distance of the comments from the instructions for the --verboseoption. The passed value gets added to the minimum distance of 2 spaces
+  -S, --sight SIGHT     sets the number of lines visible around a error message
+  -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
+  -O, --optimization-level OPTIMIZATION_LEVEL
+                        set the optimiziation level of the compiler (0=save all variables on the stack, 1=use graph coloring to find the best assignment of variables to registers, 2=partially interpret expressions) [NOT IMPLEMENTED YET]
+
