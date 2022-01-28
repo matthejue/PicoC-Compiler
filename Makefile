@@ -76,6 +76,7 @@ exec_bin_windows:
 
 help:
 	./src/main.py -h
+	./src/main.py -h > ./help-page.txt
 
 clean:
 	find . -type f -name "*.pyc" -delete

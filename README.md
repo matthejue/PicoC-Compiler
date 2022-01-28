@@ -7,26 +7,26 @@
 <img height="20px" src="http://ForTheBadge.com/images/badges/made-with-python.svg">
 </p>
 
-# Usage
+## Usage
+- on the help page: [help page](./help-page.txt)
 
-
-# Used patterns
+## Used patterns
 - **LL(1) Recursive-Descent Lexer** (p. 50 et seq. from [[1]](#1))
 - **Backtracking Parser** (p. 71 et seq. from [[1]](#1)))
 - **Factory Function** used to implement **Singleton Pattern** (from [[2]](#2))
 
-# Used literature
+## Used literature
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
 - the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
 
-# Used software
+## Used software
 - **Neovim** with plugins in [[4]](#4) and **Tmux** with plugins in [[5]](#5) for **coding** the compiler and writing the **presentation**
 - **Marp** for creating the **presentation** [[6]](#6)
 - **Drawio-desktop** for planning the **architecture** [[7]](#7)
 - **PyInstaller** [[8]](#8) and **StaticX** [[9]](#9) to create the **executable**
 - **Zatero** for **citing** [[10]](#10)
 
-# References
+## References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
 - <a id="2">[2]</a> Keith. “Singleton Pattern In Python.” Stack Overflow. Accessed January 28, 2022. https://stackoverflow.com/questions/52351312/singleton-pattern-in-python.
 - <a id="3">[3]</a> IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
