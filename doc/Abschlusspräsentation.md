@@ -229,6 +229,10 @@ void main() {
   - **Astrakte Syntax:** `((char var) = (12 + (99 - 1)))`
 - **Konkrette Syntax:** `int var = 12 * 'c' - 1;`
   - **Astrakte Syntax:** `((int var) = ((12 * 99) - 1))`
+- `int bool_var = (12 < 1 + 2) * 2;`
+- `int bool_var = -(0 || !(12 < 3 || 3 >= 12));`
+- `int bool_var = 12 < 1 + 2 && 12 || 0;`
+- `int bool_var = 12 || 12 < 3 && 0;`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
