@@ -3,9 +3,9 @@
 
 <p align="center">
 <a href="./LICENSE.md"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
-<a href="https://img.shields.io/github/issues/matthejue/PicoC-Compiler.svg"
-<a href="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"</a>
-<a href="https://img.shields.io/badge/Maintained%3F-yes-green.svg"</a>
+<img src="https://img.shields.io/github/issues/matthejue/PicoC-Compiler.svg">
+<img src=href="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+<img src=="https://img.shields.io/badge/Maintained%3F-yes-green.svg">
 </p>
 
 ## Used Patterns
@@ -17,7 +17,7 @@
 [2] Keith. “Singleton Pattern In Python.” Stack Overflow. Accessed January 28, 2022. https://stackoverflow.com/questions/52351312/singleton-pattern-in-python.
 
 
-# Used Softwarwe
+# Used Software
 - Neovim with plugins in [3] and Tmux with plugins in [4] for coding and writing the presentation
 - Marp for creating the presentation (https://github.com/marp-team/marp-cli)
 - drawio-desktop for planning the architecture (https://github.com/jgraph/drawio-desktop/releases)
