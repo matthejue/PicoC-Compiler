@@ -160,11 +160,154 @@
         <dc:rights>MIT</dc:rights>
         <dc:description>original-date: 2018-12-10T17:56:03Z</dc:description>
     </bib:Data>
-    <z:Collection rdf:about="#collection_4">
-        <dc:title>Bachelorprojekt</dc:title>
-        <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
-        <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
-        <dcterms:hasPart rdf:resource="https://iucompilercourse.github.io/IU-Fall-2021/"/>
-        <dcterms:hasPart rdf:resource="https://github.com/othneildrew/Best-README-Template"/>
-    </z:Collection>
+    <bib:Document rdf:about="https://github.com/python-cmd2/cmd2">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website><dc:title>GitHub</dc:title></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_34"/>
+        <dc:title>cmd2/index.rst at bef3c758829fe2aa82d58699d61fa78aa961f29d · python-cmd2/cmd2</dc:title>
+        <dcterms:abstract>cmd2 - quickly build feature-rich and user-friendly interactive command line applications in Python - cmd2/index.rst at bef3c758829fe2aa82d58699d61fa78aa961f29d · python-cmd2/cmd2</dcterms:abstract>
+        <z:language>en</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/python-cmd2/cmd2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 09:40:31</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_34">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/python-cmd2/cmd2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 09:40:39</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Data rdf:about="https://github.com/scott-griffiths/bitstring">
+        <z:itemType>computerProgram</z:itemType>
+        <z:programmers>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Griffiths</foaf:surname>
+                        <foaf:givenName>Scott</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:programmers>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>binary-data</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>bit-manipulation</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>bitarray</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>bitstring</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>scott-griffiths/bitstring</dc:title>
+        <dcterms:abstract>A Python module to help you manage your bits</dcterms:abstract>
+        <dc:date>2022-01-20T15:57:21Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/scott-griffiths/bitstring</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 09:41:11</dcterms:dateSubmitted>
+        <dc:rights>MIT</dc:rights>
+        <dc:description>original-date: 2015-04-11T20:49:04Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
+    <bib:Data rdf:about="https://github.com/inducer/pudb">
+        <z:itemType>computerProgram</z:itemType>
+        <z:programmers>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Klöckner</foaf:surname>
+                        <foaf:givenName>Andreas</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:programmers>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>bpython</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>debug</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>debugger</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>ipython</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>pdb</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>pytest</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>pytest-plugin</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>urwid</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>PuDB: a console-based visual debugger for Python</dc:title>
+        <dcterms:abstract>Full-screen console debugger for Python</dcterms:abstract>
+        <dc:date>2022-01-25T14:51:05Z</dc:date>
+        <z:shortTitle>PuDB</z:shortTitle>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/inducer/pudb</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 09:42:04</dcterms:dateSubmitted>
+        <dc:description>original-date: 2011-05-13T23:44:30Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
+    <bib:Data rdf:about="https://github.com/astanin/python-tabulate">
+        <z:itemType>computerProgram</z:itemType>
+        <z:programmers>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Astanin</foaf:surname>
+                        <foaf:givenName>Sergey</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:programmers>
+        <dc:title>python-tabulate</dc:title>
+        <dcterms:abstract>Pretty-print tabular data in Python, a library and a command-line utility. Repository migrated from bitbucket.org/astanin/python-tabulate.</dcterms:abstract>
+        <dc:date>2022-01-26T22:19:28Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/astanin/python-tabulate</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-01-28 09:43:25</dcterms:dateSubmitted>
+        <dc:rights>MIT</dc:rights>
+        <dc:description>original-date: 2019-09-02T14:34:19Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
 </rdf:RDF>
