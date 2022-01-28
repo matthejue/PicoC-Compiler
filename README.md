@@ -34,4 +34,4 @@
 - <a id="1">[7]</a> https://github.com/jgraph/drawio-desktop/releases
 - <a id="1">[8]</a> https://github.com/pyinstaller/pyinstaller/wiki/FAQ
 - <a id="1">[9]</a> https://github.com/JonathonReinhart/staticx/
-- <a id="1">[10]</a> https://www.jabref.org/#downloads
+- <a id="1">[10]</a> https://www.zotero.org/
