@@ -14,10 +14,10 @@
     <img height="20px" src="http://ForTheBadge.com/images/badges/made-with-python.svg">
     <br />
     <br />
-    <a href="./getting_started.md">Getting Started</a>
+    <a href="./doc/getting_started.md">Getting Started</a>
     ·
-    <a href="./help-page.txt">Usage</a>
+    <a href="./doc/help-page.txt">Usage</a>
     ·
-    <a href="./references.md">References</a>
+    <a href="./doc/references.md">References</a>
   </p>
 </div>
