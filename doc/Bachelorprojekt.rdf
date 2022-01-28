@@ -310,4 +310,11 @@
         <dc:description>original-date: 2019-09-02T14:34:19Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
+    <z:Collection rdf:about="#collection_4">
+        <dc:title>Bachelorprojekt</dc:title>
+        <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
+        <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
+        <dcterms:hasPart rdf:resource="https://iucompilercourse.github.io/IU-Fall-2021/"/>
+        <dcterms:hasPart rdf:resource="https://github.com/othneildrew/Best-README-Template"/>
+    </z:Collection>
 </rdf:RDF>
