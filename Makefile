@@ -6,11 +6,11 @@ all: read-all-verbose
 
 read-all: _read_all clean
 _read-all:
-	./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./code.picoc
+	./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 ./run/code.picoc
 
 read-all-verbose: _read-all-verbose clean
 _read-all-verbose:
-	./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./code.picoc
+	./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 ./run/code.picoc
 
 shell: _shell clean
 _shell:
@@ -76,7 +76,7 @@ exec_bin_windows:
 
 help:
 	./src/main.py -h
-	./src/main.py -h > ./help-page.txt
+	./src/main.py -h > ./doc/help-page.txt
 
 clean:
 	find . -type f -name "*.pyc" -delete
