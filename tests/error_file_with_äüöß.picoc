@@ -1,0 +1,3 @@
+void main() {
+  // there will be an error for using äüöß in the filename >_<
+}

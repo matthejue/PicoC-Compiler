@@ -1,0 +1,412 @@
+# File 'abschlusspraesentation_praezidenzregeln' Start
+# Main Funktion '(void main ((char arith_var) = (12 + (99 - 1))) ... )' Start
+LOADI SP 200;
+# Zuweisung '((char arith_var) = (12 + (99 - 1)))' Start
+# Allokation '(char arith_var)' Start
+# Variable 'arith_var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char arith_var)' Ende
+# Arithmetische binäre Operation '(12 + (99 - 1))' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetische binäre Operation '(99 - 1)' Start
+# Arithmetischer Operand '99' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 99;                          # Wert von '99' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '99' Ende
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von '99' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+SUB ACC IN2;                           # Wert von '(99 - 1)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(99 - 1)' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(99 - 1)' in IN2 laden
+ADD ACC IN2;                           # Wert von '(12 + (99 - 1))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(12 + (99 - 1))' Ende
+LOADIN SP ACC 1;                       # Wert von '(12 + (99 - 1))' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Implizite Konversion von 'int' zu 'char' Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
+STORE ACC 100;                         # Wert '(12 + (99 - 1))' in Variable 'arith_var' speichern
+# Zuweisung '((char arith_var) = (12 + (99 - 1)))' Ende
+# Zuweisung '((int arith_var_2) = ((12 * 99) - 1))' Start
+# Allokation '(int arith_var_2)' Start
+# Variable 'arith_var_2' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Allokation '(int arith_var_2)' Ende
+# Arithmetische binäre Operation '((12 * 99) - 1)' Start
+# Arithmetische binäre Operation '(12 * 99)' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetischer Operand '99' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 99;                          # Wert von '99' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '99' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '99' in IN2 laden
+MULT ACC IN2;                          # Wert von '(12 * 99)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(12 * 99)' Ende
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 * 99)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '1' in IN2 laden
+SUB ACC IN2;                           # Wert von '((12 * 99) - 1)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '((12 * 99) - 1)' Ende
+LOADIN SP ACC 1;                       # Wert von '((12 * 99) - 1)' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 101;                         # Wert '((12 * 99) - 1)' in Variable 'arith_var_2' speichern
+# Zuweisung '((int arith_var_2) = ((12 * 99) - 1))' Ende
+# Zuweisung '((char arith_var_3) = ((12 < (1 + 2)) * 2))' Start
+# Allokation '(char arith_var_3)' Start
+# Variable 'arith_var_3' vom Typ 'char' mit Adresse '102' zur Symboltabelle hinzugefügt
+# Allokation '(char arith_var_3)' Ende
+# Arithmetische binäre Operation '((12 < (1 + 2)) * 2)' Start
+# Logisches Atom '(12 < (1 + 2))' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetische binäre Operation '(1 + 2)' Start
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+# Arithmetischer Operand '2' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 2;                       # Wert von '1' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '2' in IN2 laden
+ADD ACC IN2;                           # Wert von '(1 + 2)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(1 + 2)' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(1 + 2)' in IN2 laden
+SUB ACC IN2;                           # '12 - (1 + 2)' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(12 < (1 + 2))' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 < (1 + 2))' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 < (1 + 2))' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(12 < (1 + 2))' Ende
+# Arithmetischer Operand '2' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 < (1 + 2))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '2' in IN2 laden
+MULT ACC IN2;                          # Wert von '((12 < (1 + 2)) * 2)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '((12 < (1 + 2)) * 2)' Ende
+LOADIN SP ACC 1;                       # Wert von '((12 < (1 + 2)) * 2)' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Implizite Konversion von 'int' zu 'char' Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
+STORE ACC 102;                         # Wert '((12 < (1 + 2)) * 2)' in Variable 'arith_var_3' speichern
+# Zuweisung '((char arith_var_3) = ((12 < (1 + 2)) * 2))' Ende
+# Zuweisung '((char arith_var_4) = (- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))))' Start
+# Allokation '(char arith_var_4)' Start
+# Variable 'arith_var_4' vom Typ 'char' mit Adresse '103' zur Symboltabelle hinzugefügt
+# Allokation '(char arith_var_4)' Ende
+# Arithmetische unäre Operation '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' Start
+# Logische binäre Verknüpfung '(ToBool(0) || Not(((12 < 3) || (3 >= 12))))' Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Start
+# Arithmetischer Operand '0' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '0' den Wert '0' hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Ende
+# Logische unäre Verknüpfung 'Not(((12 < 3) || (3 >= 12)))' Start
+# Logische binäre Verknüpfung '((12 < 3) || (3 >= 12))' Start
+# Logisches Atom '(12 < 3)' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetischer Operand '3' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von '3' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '3' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '3' in IN2 laden
+SUB ACC IN2;                           # '12 - 3' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(12 < 3)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 < 3)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 < 3)' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(12 < 3)' Ende
+# Logisches Atom '(3 >= 12)' Start
+# Arithmetischer Operand '3' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von '3' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '3' Ende
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+LOADIN SP ACC 2;                       # Wert von '3' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '12' in IN2 laden
+SUB ACC IN2;                           # '3 - 12' in ACC laden
+JUMP>= 3;                              # Ergebnis '1', wenn '(3 >= 12)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(3 >= 12)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(3 >= 12)' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(3 >= 12)' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 < 3)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(3 >= 12)' in IN2 laden
+OR ACC IN2;                            # '((12 < 3) || (3 >= 12))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '((12 < 3) || (3 >= 12))' Ende
+LOADI ACC 1;                           # '1' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '((12 < 3) || (3 >= 12))' in IN2 laden
+OPLUS ACC IN2;                         # '!(((12 < 3) || (3 >= 12)))' in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logische unäre Verknüpfung 'Not(((12 < 3) || (3 >= 12)))' Ende
+LOADIN SP ACC 2;                       # Wert von 'ToBool(0)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'Not(((12 < 3) || (3 >= 12)))' in IN2 laden
+OR ACC IN2;                            # '(ToBool(0) || Not(((12 < 3) || (3 >= 12))))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '(ToBool(0) || Not(((12 < 3) || (3 >= 12))))' Ende
+LOADI ACC 0;                           # '0' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'e1' in IN2 laden
+SUB ACC IN2;                           # '(0 - e1)' in ACC laden
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Arithmetische unäre Operation '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' Ende
+LOADIN SP ACC 1;                       # Wert von '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Implizite Konversion von 'int' zu 'char' Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
+STORE ACC 103;                         # Wert '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' in Variable 'arith_var_4' speichern
+# Zuweisung '((char arith_var_4) = (- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))))' Ende
+# Zuweisung '((char logic_var) = (((12 < (1 + 2)) && ToBool(12)) || ToBool(0)))' Start
+# Allokation '(char logic_var)' Start
+# Variable 'logic_var' vom Typ 'char' mit Adresse '104' zur Symboltabelle hinzugefügt
+# Allokation '(char logic_var)' Ende
+# Logische binäre Verknüpfung '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' Start
+# Logische binäre Verknüpfung '((12 < (1 + 2)) && ToBool(12))' Start
+# Logisches Atom '(12 < (1 + 2))' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetische binäre Operation '(1 + 2)' Start
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+# Arithmetischer Operand '2' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 2;                       # Wert von '1' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '2' in IN2 laden
+ADD ACC IN2;                           # Wert von '(1 + 2)' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(1 + 2)' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '(1 + 2)' in IN2 laden
+SUB ACC IN2;                           # '12 - (1 + 2)' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(12 < (1 + 2))' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 < (1 + 2))' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 < (1 + 2))' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(12 < (1 + 2))' Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(12)' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '12' den Wert '0' hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(12)' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 < (1 + 2))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'ToBool(12)' in IN2 laden
+AND ACC IN2;                           # '((12 < (1 + 2)) && ToBool(12))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '((12 < (1 + 2)) && ToBool(12))' Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Start
+# Arithmetischer Operand '0' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '0' den Wert '0' hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Ende
+LOADIN SP ACC 2;                       # Wert von '((12 < (1 + 2)) && ToBool(12))' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'ToBool(0)' in IN2 laden
+OR ACC IN2;                            # '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' Ende
+LOADIN SP ACC 1;                       # Wert von '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Implizite Konversion von 'int' zu 'char' Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
+STORE ACC 104;                         # Wert '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' in Variable 'logic_var' speichern
+# Zuweisung '((char logic_var) = (((12 < (1 + 2)) && ToBool(12)) || ToBool(0)))' Ende
+# Zuweisung '((char logic_var_2) = (ToBool(12) || ((12 < 3) && ToBool(0))))' Start
+# Allokation '(char logic_var_2)' Start
+# Variable 'logic_var_2' vom Typ 'char' mit Adresse '105' zur Symboltabelle hinzugefügt
+# Allokation '(char logic_var_2)' Ende
+# Logische binäre Verknüpfung '(ToBool(12) || ((12 < 3) && ToBool(0)))' Start
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(12)' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '12' den Wert '0' hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(12)' Ende
+# Logische binäre Verknüpfung '((12 < 3) && ToBool(0))' Start
+# Logisches Atom '(12 < 3)' Start
+# Arithmetischer Operand '12' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von '12' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '12' Ende
+# Arithmetischer Operand '3' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 3;                           # Wert von '3' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '3' Ende
+LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '3' in IN2 laden
+SUB ACC IN2;                           # '12 - 3' in ACC laden
+JUMP< 3;                               # Ergebnis '1', wenn '(12 < 3)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(12 < 3)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(12 < 3)' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(12 < 3)' Ende
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Start
+# Arithmetischer Operand '0' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
+JUMP== 3;                              # Überspringe 2 Befehle, wenn '0' den Wert '0' hat
+LOADI ACC 1;
+STOREIN SP ACC 1;                      # Ergebnis in oberste Stack-Zelle
+# Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(0)' Ende
+LOADIN SP ACC 2;                       # Wert von '(12 < 3)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von 'ToBool(0)' in IN2 laden
+AND ACC IN2;                           # '((12 < 3) && ToBool(0))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '((12 < 3) && ToBool(0))' Ende
+LOADIN SP ACC 2;                       # Wert von 'ToBool(12)' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '((12 < 3) && ToBool(0))' in IN2 laden
+OR ACC IN2;                            # '(ToBool(12) || ((12 < 3) && ToBool(0)))' in ACC laden
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logische binäre Verknüpfung '(ToBool(12) || ((12 < 3) && ToBool(0)))' Ende
+LOADIN SP ACC 1;                       # Wert von '(ToBool(12) || ((12 < 3) && ToBool(0)))' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Implizite Konversion von 'int' zu 'char' Start
+LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
+AND ACC IN1;                           # Wo in der Bitmaske eine '0' ist, werden die Bits ebenfalls zu '0'
+LOADI IN2 32768;                       # Bitvektor '10000000_00000000' laden
+MULTI IN2 65536;                       # Bit '1' im Bitvektor um 16 Bits shiften: '10000000_00000000_00000000_00000000'
+AND ACC IN1;                           # Testen, ob Zahl negativ ist
+JUMP== 3;                              # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
+LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
+OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
+# Implizite Konversion von 'int' zu 'char' Ende
+STORE ACC 105;                         # Wert '(ToBool(12) || ((12 < 3) && ToBool(0)))' in Variable 'logic_var_2' speichern
+# Zuweisung '((char logic_var_2) = (ToBool(12) || ((12 < 3) && ToBool(0))))' Ende
+JUMP 0;
+# Main Funktion '(void main ((char arith_var) = (12 + (99 - 1))) ... )' Ende
+# File 'abschlusspraesentation_praezidenzregeln' Ende

@@ -1,0 +1,1 @@
+(abschlusspraesentation_praezidenzregeln (void main ((char arith_var) = (12 + (99 - 1))) ((int arith_var_2) = ((12 * 99) - 1)) ((char arith_var_3) = ((12 < (1 + 2)) * 2)) ((char arith_var_4) = (- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))) ((char logic_var) = (((12 < (1 + 2)) && ToBool(12)) || ToBool(0))) ((char logic_var_2) = (ToBool(12) || ((12 < 3) && ToBool(0))))))
