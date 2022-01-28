@@ -8,20 +8,20 @@
 </p>
 
 # Used Patterns
-- LL(1) Recursive-Descent Lexer (p. 50 et seq. from [[1]](#1))
-- Backtracking Parser (p. 71 et seq. from [[1]](#1)))
-- Factory Function combined with Singleton Pattern (from [[2]](#2))
+- **LL(1) Recursive-Descent Lexer** (p. 50 et seq. from [[1]](#1))
+- **Backtracking Parser** (p. 71 et seq. from [[1]](#1)))
+- **Factory Function** used to implement **Singleton Pattern** (from [[2]](#2))
 
 # Used literature
-- for the patterns and knowledge about lexers and parsers [[1]](#1)
-- the desgin of the abstract syntax is greatly inspired by [[3]](#3)
+- for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
+- the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
 
 # Used Software
-- Neovim with plugins in [[4]](#4) and Tmux with plugins in [[5]](#5) for coding and writing the presentation
-- Marp for creating the presentation [[6]](#6)
-- drawio-desktop for planning the architecture [[7]](#7)
-- PyInstaller [[8]](#8) and StaticX [[9]](#9) to create the executable
-- Zatero for citing [[10]](#10)
+- Neovim with plugins in [[4]](#4) and Tmux with plugins in [[5]](#5) for **coding** the compiler and writing the **presentation**
+- Marp for creating the **presentation** [[6]](#6)
+- drawio-desktop for planning the **architecture** [[7]](#7)
+- PyInstaller [[8]](#8) and StaticX [[9]](#9) to create the **executable**
+- Zatero for **citing** [[10]](#10)
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
