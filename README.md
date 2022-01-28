@@ -1,5 +1,5 @@
 <h1 align="center">PicoC-Compiler</h3>
-<p align="center">Compiles **PicoC** (a subset of C) into **RETI-Assembler**.</p>
+<p align="center">Compiles <strong>PicoC</strong> (a subset of C) into <strong>RETI-Assembler</strong>.</p>
 
 <p align="center">
 <a href="./LICENSE.md"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
