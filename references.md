@@ -41,7 +41,7 @@
 - <a id="9">[9]</a> https://github.com/JonathonReinhart/staticx/
 - <a id="10">[10]</a> https://www.zotero.org/
 - <a id="11">[11]</a> https://github.com/inducer/pudb.
-- <a id="12">[12]</a> Griffiths, Scott. Scott-Griffiths/Bitstring. Python, 2022. https://github.com/scott-griffiths/bitstring
+- <a id="12">[12]</a> https://github.com/scott-griffiths/bitstring
 - <a id="13">[13]</a> https://github.com/python-cmd2/cmd2.
 - <a id="14">[14]</a> https://github.com/astanin/python-tabulate.
 - <a id="15">[15]</a> https://github.com/othneildrew/Best-README-Template.
