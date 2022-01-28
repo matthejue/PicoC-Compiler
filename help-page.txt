@@ -1,4 +1,3 @@
-./src/main.py -h
 Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT]
                [-e END_DATA_SEGMENT] [-d DISTANCE] [-S SIGHT] [-v]
                [-O OPTIMIZATION_LEVEL]
