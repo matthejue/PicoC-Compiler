@@ -17,8 +17,14 @@
 - **PyInstaller** [[8]](#8) and **StaticX** [[9]](#9) to create the **executable**
 - **Zatero** for **citing** [[10]](#10)
 
+# Used python packages
+- **Bitstring** [[11]](#11)
+- **Cmd2** [[12]](#12)
+- **Tabulate** [[13]](#13)
+- TUI-Debugger **PuDB** [[14]](#14)
+
 # Misc
-- the **template** of the README.md is greatly inspired by [[11]](#11)
+- the **template** of the README.md is greatly inspired by [[15]](#15)
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
@@ -33,4 +39,8 @@
 - <a id="8">[8]</a> https://github.com/pyinstaller/pyinstaller/wiki/FAQ
 - <a id="9">[9]</a> https://github.com/JonathonReinhart/staticx/
 - <a id="10">[10]</a> https://www.zotero.org/
-- <a id="11">[11]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
+- <a id="10">[11]</a> Griffiths, Scott. Scott-Griffiths/Bitstring. Python, 2022. https://github.com/scott-griffiths/bitstring
+- <a id="10">[12]</a> GitHub. “Cmd2/Index.Rst at Bef3c758829fe2aa82d58699d61fa78aa961f29d · Python-Cmd2/Cmd2.” Accessed January 28, 2022. https://github.com/python-cmd2/cmd2.
+- <a id="10">[13]</a> Astanin, Sergey. Python-Tabulate. Python, 2022. https://github.com/astanin/python-tabulate.
+- <a id="10">[14]</a> Klöckner, Andreas. PuDB: A Console-Based Visual Debugger for Python. Python, 2022. https://github.com/inducer/pudb.
+- <a id="15">[15]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
