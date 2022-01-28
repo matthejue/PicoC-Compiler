@@ -2,12 +2,9 @@
 </p>
 
 <div align="center">
-  <!-- <a href="https://github.com/othneildrew/Best-README-Template"> -->
-    <!-- <img src="images/logo.png" alt="Logo" width="80" height="80"> -->
-  <!-- </a> -->
-
-  <h1 align="center">PicoC-Compiler</h1>
-
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="./doc/logo.png" alt="Logo" height="80px">
+  </a>
   <p align="center">
     Compiles <strong>PicoC</strong> (a subset of C) into <strong>RETI-Assembler</strong>.
     <br />
