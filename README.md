@@ -23,7 +23,3 @@
     <a href="./references.md">References</a>
   </p>
 </div>
-
-
-## Usage
-- on the help page: [help page](./help-page.txt)
