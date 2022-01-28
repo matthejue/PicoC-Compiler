@@ -243,13 +243,23 @@ void main() {
 
 ## Funktionsumfang
 ### Zu großes Literal für `char`
+- Wertebereich von `char` ist zwischen $-2^7$ und $-2^7-1$
 ```c
-char var = 127;  // ✅
-char var = 128;  // ❌
+char var = -128;   // ✅
+char var_2 = 128;  // ❌
+char var_3 = var;  // ❌
 ```
-- `0b1000000`
 - **Implicit Conversion** von `int` zu `char`
-
+  ```
+  - Fall 1: Variable auf rechter Seite positiv
+    00000000_00010110_01100100_10110001
+  & 00000000_00000000_00000000_11111111
+    00000000_00000000_00000000_10110001
+  - Fall 2: Variable auf rechter Seite negativ
+    11111111_10101100_11010011_10110001
+  v 11111111_11111111_11111111_00000000
+    00000000_00000000_00000001_00000000
+  ```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -262,14 +272,8 @@ char var = 128;  // ❌
 ![height:100px](_resources/_2022-01-28-17-10-21.png)
   ```c
   int var = 2097151;  // = 2^21-1 ✅
-  int var = 2097152;  // = 2^21   ❌
-  ```
-  ```
-    10000000_00000000_00000000_10000000
-  v 11111111_11111111_11111111_00000000
-    00000000_00000000_00000001_00000000
-  ```
-  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** dem mit $0$en oder $1$en übeschreiben
+  int var_2 = 2097152;  // = 2^21   ❌
+  int var
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -277,6 +281,9 @@ char var = 128;  // ❌
 ---
 
 ## Funktionsumfang
+
+  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** dem mit $0$en oder $1$en übeschreiben
+
 ### Zu großes Literal für Compiler
 - sobald Wert des Literals $> 2^{31}-1$ **🠒** **Error**
 
@@ -393,7 +400,7 @@ char var = 128;  // ❌
 ---
 
 ## Vorführung
-### Vergleich Fehlengen in Clang / GCC und PCC
+### Vergleich von Fehlermeldungen in Clang / GCC und PCC
 
 - content
 
