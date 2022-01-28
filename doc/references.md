@@ -26,6 +26,7 @@
 
 # Misc
 - the **template** of the README.md is greatly inspired by [[15]](#15)
+- wallpaper from manjaro linux used as **background image** for the **presentation** [[16]](#16)
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
@@ -53,3 +54,5 @@
 - <a id="14">[14]</a> Astanin, Sergey. Python-Tabulate. Python, 2022. https://github.com/astanin/python-tabulate.
 
 - <a id="15">[15]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
+
+- <a id="16">[16] “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.

@@ -391,7 +391,7 @@ const char var = 128; // ❌
 
 ## Quellen
 ### Wissenquellen
-- https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
+- **[1]**, **[2]** und **[3]** in https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -400,7 +400,8 @@ const char var = 128; // ❌
 
 ## Quellen
 ### Bildquellen
-- “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
+- **[16]** in https://github.com/matthejue/PicoC-Compiler/blob/master/doc/references.md
+
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
