@@ -24,14 +24,14 @@
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
-- <a id="1">[2]</a> Keith. “Singleton Pattern In Python.” Stack Overflow. Accessed January 28, 2022. https://stackoverflow.com/questions/52351312/singleton-pattern-in-python.
-- <a id="1">[3]</a> IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
-- <a id="1">[4]</a> Used Vim Plugins:
+- <a id="2">[2]</a> Keith. “Singleton Pattern In Python.” Stack Overflow. Accessed January 28, 2022. https://stackoverflow.com/questions/52351312/singleton-pattern-in-python.
+- <a id="3">[3]</a> IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
+- <a id="4">[4]</a> Used Vim Plugins:
 'vifm/vifm.vim', 'lilydjwg/colorizer', 'ferrine/md-img-paste.vim', 'tpope/vim-fugitive', 'airblade/vim-gitgutter', 'tpope/vim-dispatch', 'honza/vim-snippets', 'tpope/vim-surround', 'godlygeek/tabular', 'justinmk/vim-sneak', 'unblevable/quick-scope', puremourning/vimspector', 'tpope/vim-eunuch', 'Vimjas/vim-python-pep8-indent', 'terrortylor/nvim-comment', 'neoclide/coc.nvim', 'airblade/vim-rooter', 'sk1418/howmuch', 'metakirby5/codi.vim', 'sedm0784/vim-you-autocorrect', 'wfxr/minimap.vim', 'folke/which-key.nvim', 'voldikss/vim-floaterm', 'mhinz/vim-startify', 'nvim-telescope/telescope.nvim', 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim', 'folke/zen-mode.nvim', 'romgrk/barbar.nvim', 'karb94/neoscroll.nvim', 'chaoren/vim-wordmotion', 'gcmt/wildfire.vim', 'cohama/lexima.vim', 'AckslD/nvim-neoclip.lua', 'preservim/tagbar', 'xolox/vim-easytags', 'xolox/vim-misc', 'tversteeg/registers.nvim', 'svermeulen/vim-subversive', 'mg979/vim-visual-multi', 'akinsho/toggleterm.nvim', 'simnalamburt/vim-mundo', 'AndrewRadev/switch.vim'
-- <a id="1">[5]</a> Used Tmux Plugins:
+- <a id="5">[5]</a> Used Tmux Plugins:
 'tmux-plugins/tmux-copycat', 'tmux-plugins/tmux-open', 'tmux-plugins/tmux-resurrect', 'schasse/tmux-jump', 'laktak/extrakto'
-- <a id="1">[6]</a> https://github.com/marp-team/marp-cli
-- <a id="1">[7]</a> https://github.com/jgraph/drawio-desktop/releases
-- <a id="1">[8]</a> https://github.com/pyinstaller/pyinstaller/wiki/FAQ
-- <a id="1">[9]</a> https://github.com/JonathonReinhart/staticx/
-- <a id="1">[10]</a> https://www.zotero.org/
+- <a id="6">[6]</a> https://github.com/marp-team/marp-cli
+- <a id="7">[7]</a> https://github.com/jgraph/drawio-desktop/releases
+- <a id="8">[8]</a> https://github.com/pyinstaller/pyinstaller/wiki/FAQ
+- <a id="9">[9]</a> https://github.com/JonathonReinhart/staticx/
+- <a id="10">[10]</a> https://www.zotero.org/
