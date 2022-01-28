@@ -4,8 +4,8 @@
 <p align="center">
 <a href="./LICENSE.md"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
 <img src="https://img.shields.io/github/issues/matthejue/PicoC-Compiler.svg">
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white">
-<img src=="https://img.shields.io/badge/Maintained%3F-yes-green.svg">
+<img src="http://ForTheBadge.com/images/badges/made-with-python.svg">
+<img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg">
 </p>
 
 ## Used Patterns
