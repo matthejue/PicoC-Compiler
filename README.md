@@ -1,69 +1,33 @@
-# Pico-C Compiler
+<h3 align="center">PicoC-Compiler</h3>
+<p align="center">Compiles PicoC into RETI-Assembler.</p>
 
-## Usage
-```
-usage: pico_c_compiler.py [-h] [-p] [-a] [-t] [-s START_DATA_SEGMENT]
-                          [-e END_DATA_SEGMENT] [-m] [-S]
-                          [-O OPTIMIZATION_LEVEL] [-b] [-P] [-v]
-                          [infile] [outfile]
+<p align="center">
+<a href="./LICENSE.md"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
+<a href="https://img.shields.io/github/issues/matthejue/PicoC-Compiler.svg"
+<a href="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"</a>
+<a href="https://img.shields.io/badge/Maintained%3F-yes-green.svg"</a>
+</p>
 
-Compiles Pico-C Code into RETI Code.
-PicoC is a subset of C including while loops, if and else statements,
-assignments, arithmetic and logic expressions.
-All Code has to be written into a
+## Used Patterns
+- LL(1) Recursive-Descent Lexer (p. 50 et seq. from [1])
+- Backtracking Parser (p. 71 et seq. from [1])
+- Factory Function combined with Singleton Pattern (from [2])
 
-void main() { /* your program */ }
+[1] Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
+[2] Keith. “Singleton Pattern In Python.” Stack Overflow. Accessed January 28, 2022. https://stackoverflow.com/questions/52351312/singleton-pattern-in-python.
 
-main function.
 
-If you discover any bugs I would be very grateful if you could report it
-via email to juergmatth@gmail.com, attaching the malicious code to the
-email ^_^
+# Used Softwarwe
+- Neovim with plugins in [3] and Tmux with plugins in [4] for coding and writing the presentation
+- Marp for creating the presentation (https://github.com/marp-team/marp-cli)
+- drawio-desktop for planning the architecture (https://github.com/jgraph/drawio-desktop/releases)
+- PyInstaller [5] and StaticX [6] to create the executable
+- Zatero for citing [7]
 
-positional arguments:
-  infile                input file with Pico-C Code
-  outfile               output file with RETI Code
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -p, --print           output the file output to the terminal and if
-                        --symbol_table is active output the symbol table
-                        beneath
-  -a, --ast             output the Abstract Syntax Tree instead of RETI Code
-  -t, --tokens          output the Tokenlist instead of RETI Code
-  -s START_DATA_SEGMENT, --start_data_segment START_DATA_SEGMENT
-                        where the allocation of variables starts (default 100)
-  -e END_DATA_SEGMENT, --end_data_segment END_DATA_SEGMENT
-                        where the stackpointer starts (default 200)
-  -m, --python_stracktrace_error_message
-                        show python error messages with stacktrace
-  -S, --symbol_table    output the final symbol table into a CSV file after
-                        the whole Abstract Syntax Tree was visited
-  -O OPTIMIZATION_LEVEL, --optimization-level OPTIMIZATION_LEVEL
-                        set the optimiziation level of the compiler (0=save
-                        all variables on the stack, 1=use graph coloring to
-                        find the best assignment of variables to registers,
-                        2=partially interpret expressions) [NOT IMPLEMENTED
-                        YET]
-  -b, --binary          produce binary encoded RETI code [NOT IMPLEMENTED YET]
-  -P, --prefix-notation
-                        write Abstract Syntax Tree in prefix notation [NOT
-                        IMPLEMENTED YET]
-  -v, --verbose         also show tokentypes in the ast, add comments to the
-                        RETI Code and show more context around error messages
-                        [NOT IMPLEMENTED YET]
-
-```
-
-## Used Resources
-- After a rewrite of the whole codebase, the code is now based on the really
-  great Lookahead Lexer Parser Patterns from [1], more precisely:
-  - LL(1) Recursive-Descent Lexer (p. 31 et seq. from [1])
-  - LL(k) Recursive-Descent Parser (p. 41 et seq. from [1])
-
-[1] Parr, Terence. Language implementation patterns: create your own
-domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
-
-## Useful sites
-- https://github.com/pyinstaller/pyinstaller/wiki/FAQ
-- https://github.com/JonathonReinhart/staticx/
+[3] Used Vim Plugins:
+'vifm/vifm.vim', 'lilydjwg/colorizer', 'ferrine/md-img-paste.vim', 'tpope/vim-fugitive', 'airblade/vim-gitgutter', 'tpope/vim-dispatch', 'honza/vim-snippets', 'tpope/vim-surround', 'godlygeek/tabular', 'justinmk/vim-sneak', 'unblevable/quick-scope', puremourning/vimspector', 'tpope/vim-eunuch', 'Vimjas/vim-python-pep8-indent', 'terrortylor/nvim-comment', 'neoclide/coc.nvim', 'airblade/vim-rooter', 'sk1418/howmuch', 'metakirby5/codi.vim', 'sedm0784/vim-you-autocorrect', 'wfxr/minimap.vim', 'folke/which-key.nvim', 'voldikss/vim-floaterm', 'mhinz/vim-startify', 'nvim-telescope/telescope.nvim', 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim', 'folke/zen-mode.nvim', 'romgrk/barbar.nvim', 'karb94/neoscroll.nvim', 'chaoren/vim-wordmotion', 'gcmt/wildfire.vim', 'cohama/lexima.vim', 'AckslD/nvim-neoclip.lua', 'preservim/tagbar', 'xolox/vim-easytags', 'xolox/vim-misc', 'tversteeg/registers.nvim', 'svermeulen/vim-subversive', 'mg979/vim-visual-multi', 'akinsho/toggleterm.nvim', 'simnalamburt/vim-mundo', 'AndrewRadev/switch.vim'
+[4] Used Tmux Plugins:
+'tmux-plugins/tmux-copycat', 'tmux-plugins/tmux-open', 'tmux-plugins/tmux-resurrect', 'schasse/tmux-jump', 'laktak/extrakto'
+[5]
+[6]
+[7] https://www.jabref.org/#downloads
