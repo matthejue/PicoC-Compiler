@@ -21,7 +21,7 @@
 
 # Used python packages
 - **Bitstring** [[12]](#12)
-- **Cmd3** [[13]](#13)
+- **Cmd2** [[13]](#13)
 - **Tabulate** [[14]](#14)
 
 # Misc
