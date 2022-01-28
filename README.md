@@ -2,7 +2,7 @@
 </p>
 
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/matthejue/PicoC-Compiler">
     <img src="./doc/logo.png" alt="Logo" height="80px">
   </a>
   <p align="center">
