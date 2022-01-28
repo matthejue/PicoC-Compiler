@@ -1,0 +1,103 @@
+# File 'abschlusspraesentation_kommentare_und_else_if' Start
+# Main Funktion '(void main ((const int var) = 12) ... )' Start
+LOADI SP 200;
+# Zuweisung '((const int var) = 12)' Start
+# Allokation '(const int var)' Start
+# Konstante 'var' vom Typ 'int' zur Symboltabelle hinzugefügt
+# Allokation '(const int var)' Ende
+# Konstante 'var' in Symboltabelle den Wert '12' zugewiesen
+# Zuweisung '((const int var) = 12)' Ende
+# Allokation '(char var2)' Start
+# Variable 'var2' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Allokation '(char var2)' Ende
+# If und Else Statement 'IfElse((var > 100) (var2 = 2) else IfElse((var > 10) (var2 = 1) else (var2 = 0)))' Start
+# Logisches Atom '(var > 100)' Start
+# Arithmetischer Operand 'var' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '100' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 100;                         # Wert von '100' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '100' Ende
+LOADIN SP ACC 2;                       # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '100' in IN2 laden
+SUB ACC IN2;                           # 'var - 100' in ACC laden
+JUMP> 3;                               # Ergebnis '1', wenn '(var > 100)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(var > 100)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(var > 100)' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(var > 100)' Ende
+LOADIN SP ACC 1;                       # Wert von '(var > 100)' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 8;                              # Zu Else-Branch springen, wenn '(var > 100)' nicht erfüllt
+# If-Branch
+# Zuweisung '(var2 = 2)' Start
+# Arithmetischer Operand '2' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 2;                           # Wert von '2' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '2' Ende
+LOADIN SP ACC 1;                       # Wert von '2' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert '2' in Variable 'var2' speichern
+# Zuweisung '(var2 = 2)' Ende
+JUMP 32;                               # Else-Branch überspringen
+# Else-Branch
+# If und Else Statement 'IfElse((var > 10) (var2 = 1) else (var2 = 0))' Start
+# Logisches Atom '(var > 10)' Start
+# Arithmetischer Operand 'var' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 12;                          # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '10' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 10;                          # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
+LOADIN SP ACC 2;                       # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                       # Wert von '10' in IN2 laden
+SUB ACC IN2;                           # 'var - 10' in ACC laden
+JUMP> 3;                               # Ergebnis '1', wenn '(var > 10)' erfüllt
+LOADI ACC 0;                           # Ergebnis '0', wenn '(var > 10)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                           # Ergebnis '1', wenn '(var > 10)' wahr
+STOREIN SP ACC 2;                      # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+# Logisches Atom '(var > 10)' Ende
+LOADIN SP ACC 1;                       # Wert von '(var > 10)' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+JUMP== 8;                              # Zu Else-Branch springen, wenn '(var > 10)' nicht erfüllt
+# If-Branch
+# Zuweisung '(var2 = 1)' Start
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 1;                           # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 1;                       # Wert von '1' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert '1' in Variable 'var2' speichern
+# Zuweisung '(var2 = 1)' Ende
+JUMP 7;                                # Else-Branch überspringen
+# Else-Branch
+# Zuweisung '(var2 = 0)' Start
+# Arithmetischer Operand '0' Start
+SUBI SP 1;                             # Stack um eine Zelle erweitern
+LOADI ACC 0;                           # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
+ADDI SP 1;                             # Stack um eine Zelle verkürzen
+STORE ACC 100;                         # Wert '0' in Variable 'var2' speichern
+# Zuweisung '(var2 = 0)' Ende
+# If und Else Statement 'IfElse((var > 10) (var2 = 1) else (var2 = 0))' Ende
+# If und Else Statement 'IfElse((var > 100) (var2 = 2) else IfElse((var > 10) (var2 = 1) else (var2 = 0)))' Ende
+JUMP 0;
+# Main Funktion '(void main ((const int var) = 12) ... )' Ende
+# File 'abschlusspraesentation_kommentare_und_else_if' Ende
