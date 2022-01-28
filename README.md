@@ -13,6 +13,7 @@
 - Factory Function combined with Singleton Pattern (from [[2]](#2))
 
 # Used literature
+- for the patterns and knowledge about lexers and parsers [[1]](#1)
 - the desgin of the abstract syntax is greatly inspired by [[3]](#3)
 
 # Used Software
