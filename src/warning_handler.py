@@ -1,5 +1,6 @@
 from error_handler import ErrorHandler, AnnotationScreen
 from warnings_ import Warnings
+from colorama import Fore, Style
 
 
 class _WarningHandler(ErrorHandler):
@@ -40,7 +41,7 @@ class _WarningHandler(ErrorHandler):
                     node_end = self._warning_header(
                         None, f"Note: Datatype '{w.variable_type}' has only range "
                         f"{w.variable_from} to {w.variable_to}")
-                    print('\n' + warning_header + str(warning_screen) +
+                    print(f'\n' + warning_header + str(warning_screen) +
                           node_header + str(warning_screen_2) + node_end)
 
     def _warning_header(self, pos, descirption):
