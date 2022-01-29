@@ -3,6 +3,11 @@
 import sys
 import global_vars
 from compiler import Compiler, remove_extension
+from colorama import init
+
+# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 
 def main():
@@ -10,6 +15,11 @@ def main():
         global_vars.shell_on = False
 
     compiler = Compiler()
+
+    if global_vars.args.color:
+        init(strip=False)
+    else:
+        init(strip=True)
 
     if not global_vars.args.infile:
         sys.exit(compiler.cmdloop())

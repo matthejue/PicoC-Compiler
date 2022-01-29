@@ -243,23 +243,36 @@ void main() {
 
 ## Funktionsumfang
 ### Zu großes Literal für `char`
-- Wertebereich von `char` ist zwischen $-2^7$ und $-2^7-1$
+- Wertebereich von `char` ist zwischen $-2^7$ und $2^7-1$
 ```c
-char var = -128;   // ✅
+char var = 127;    // ✅
 char var_2 = 128;  // ❌
-char var_3 = var;  // ❌
 ```
-- **Implicit Conversion** von `int` zu `char`
+- **Implicit Conversion** von `int` zu `char`:
+    ```
+      00000000_00101011_10100110_01111111  // 128
+    & 00000000_00000000_00000000_11111111  // 255
+      00000000_00000000_00000000_01111111  // 128
+    ```
+    - **Fall 1:** 8-Bit Wert auf rechter Seite **positiv**
+      - keine **Signextension** nötig
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Zu großes Literal für `char`
+- **Fall 2:** 8-Bit Wert auf rechter Seite **negativ**
   ```
-  - Fall 1: Variable auf rechter Seite positiv
-    00000000_00010110_01100100_10110001
-  & 00000000_00000000_00000000_11111111
-    00000000_00000000_00000000_10110001
-  - Fall 2: Variable auf rechter Seite negativ
-    11111111_10101100_11010011_10110001
-  v 11111111_11111111_11111111_00000000
-    00000000_00000000_00000001_00000000
+    00000000_00000000_00000000_10000000  //  128
+  v 11111111_11111111_11111111_00000000  // -256
+    11111111_11111111_11111111_10000000  // -128
   ```
+- Vergleich **PicoC-Compiler** und **Clang**:
+  ![height:80px](_resources/_2022-01-29-10-54-10.png)
+  ![height:150px](_resources/_2022-01-29-10-59-04.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)

@@ -102,6 +102,11 @@ class Compiler(cmd2.Cmd):
                                  " a error message",
                                  type=int,
                                  default=0)
+    cli_args_parser.add_argument('-C',
+                                 '--color',
+                                 action='store_true',
+                                 help="gives the terminal output color"
+                                 "")
     cli_args_parser.add_argument(
         '-v',
         '--verbose',
