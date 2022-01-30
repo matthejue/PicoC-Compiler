@@ -1,6 +1,7 @@
 from sys import exit
 from errors import Errors
 import global_vars
+from colorama import Style, Fore
 
 
 class ErrorHandler:
@@ -134,8 +135,8 @@ class ErrorHandler:
     def _error_header(self, pos, descirption):
         if not pos:
             return descirption + '\n'
-        return self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
-            descirption + '\n'
+        return Style.BRIGHT + self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
+            descirption + Style.RESET_ALL + '\n'
 
     def _find_space_after_previous_token(self, pos):
         row, col = pos[0], pos[1]
@@ -240,15 +241,16 @@ class AnnotationScreen:
     def point_at(self, pos, word):
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
-                                                 '^', pos[1])
+                                                 '^', pos[1], Fore.RED)
         self.screen[3 * rel_row + 2] = overwrite(self.screen[3 * rel_row + 2],
-                                                 word, pos[1])
+                                                 word, pos[1], Fore.RED)
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
     def mark(self, pos, length):
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
-                                                 '~' * length, pos[1])
+                                                 '~' * length, pos[1],
+                                                 Fore.BLUE)
         self.marked_lines += [3 * rel_row + 1]
 
     def filter(self, ):
@@ -268,5 +270,6 @@ class AnnotationScreen:
         return acc
 
 
-def overwrite(old, replace_with, idx):
-    return old[:idx] + replace_with + old[idx + len(replace_with):]
+def overwrite(old, replace_with, idx, color=""):
+    return old[:idx] + color + replace_with + (
+        Fore.RESET if color else "") + old[idx + len(replace_with):]

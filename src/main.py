@@ -5,10 +5,6 @@ import global_vars
 from compiler import Compiler, remove_extension
 from colorama import init
 
-# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-# Style: DIM, NORMAL, BRIGHT, RESET_ALL
-
 
 def main():
     if len(sys.argv) > 1:

@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 class Warnings:
     class ImplicitConversionWarning:
         """If the literal assigned to a variable is too large for the datatype of
@@ -6,7 +9,7 @@ class Warnings:
                      variable_from, variable_to, found, found_pos, found_type,
                      found_new):
             literal_or_variable = "Literal" if found_new else "Value of variable"
-            self.description = f"ImplicitConversionWarning: " + literal_or_variable\
+            self.description = f"{Fore.GREEN}ImplicitConversionWarning{Fore.RESET}: " + literal_or_variable\
                 + f" '{found}' will be implicitly converted from '{found_type}' to "\
                 f"'{variable_type}' in the course of being assigned to '{variable_old}'"\
                 + (f". Changes value from '{found}' to '{found_new}'" if found_new else "")

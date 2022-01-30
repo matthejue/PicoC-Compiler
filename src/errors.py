@@ -1,9 +1,12 @@
+from colorama import Fore
+
+
 class Errors:
     class InvalidCharacterError(Exception):
         """If there're Token sequences generated from the input that are not
         permitted by the grammar rules"""
         def __init__(self, found, found_pos):
-            self.description = f"InvalidCharacterError: '{found}' is not a "\
+            self.description = f"{Fore.MAGENTA}InvalidCharacterError{Fore.RESET}: '{found}' is not a "\
                 "permitted character"
             self.found = found
             self.found_pos = found_pos
@@ -11,7 +14,7 @@ class Errors:
     class UnclosedCharacterError(Exception):
         """If a character has a opening apostrophe but not a closing one"""
         def __init__(self, expected, found, found_pos):
-            self.description = f"UnclosedCharacterError: Expected {expected},"\
+            self.description = f"{Fore.MAGENTA}UnclosedCharacterError{Fore.RESET}: Expected {expected},"\
                 f" found {found}"
             self.expected = expected
             self.found = found
@@ -21,7 +24,7 @@ class Errors:
         """If no rule is applicable in a situation where several undistinguishable
         alternatives are possible"""
         def __init__(self, expected, found, found_pos):
-            self.description = f"NoApplicableRuleError: Expected '{expected}'"\
+            self.description = f"{Fore.MAGENTA}NoApplicableRuleError{Fore.RESET}: Expected '{expected}'"\
                 f", found '{found}'"
             self.expected = expected
             self.found = found
@@ -31,7 +34,7 @@ class Errors:
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, expected, found, found_pos):
             # there can be several expected and these already have single quotes
-            self.description = f"MismatchedTokenError: Expected '{expected}'"\
+            self.description = f"{Fore.MAGENTA}MismatchedTokenError{Fore.RESET}: Expected '{expected}'"\
                 f", found '{found}'"
             self.expected = expected
             self.found = found
@@ -46,7 +49,7 @@ class Errors:
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
         def __init__(self, found, found_pos):
-            self.description = "UnknownIdentifierError: Identifier "\
+            self.description = f"{Fore.MAGENTA}UnknownIdentifierError{Fore.RESET}: Identifier "\
                 f"'{found}' wasn't declared yet"
             self.found = found
             self.found_pos = found_pos
@@ -56,7 +59,7 @@ class Errors:
         the variable"""
         def __init__(self, found, found_pos, found_symbol_type, found_from,
                      found_to):
-            self.description = f"TooLargeLiteralError: Literal '{found}' is too large"
+            self.description = f"{Fore.MAGENTA}TooLargeLiteralError{Fore.RESET}: Literal '{found}' is too large"
             self.found = found
             self.found_pos = found_pos
             self.found_symbol_type = found_symbol_type
@@ -65,7 +68,7 @@ class Errors:
 
     class RedefinitionError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
-            self.description = f"RedefinitionError: Redefinition of '{found}'"
+            self.description = f"{Fore.MAGENTA}RedefinitionError{Fore.RESET}: Redefinition of '{found}'"
             self.found = found
             self.found_pos = found_pos
             self.first = first
@@ -73,7 +76,7 @@ class Errors:
 
     class ConstReassignmentError(Exception):
         def __init__(self, found, found_pos, first, first_pos):
-            self.description = "ConstReassignmentError: Can't reassign a new "\
+            self.description = f"{Fore.MAGENTA}ConstReassignmentError{Fore.RESET}: Can't reassign a new "\
             f"value to named constant '{found}'"
             self.found = found
             self.found_pos = found_pos
@@ -83,12 +86,12 @@ class Errors:
     class NoMainFunctionError(Exception):
         """If there's no main function within the given file"""
         def __init__(self, fname):
-            self.description = "NoMainFunctionError: There's no main function"\
+            self.description = f"{Fore.MAGENTA}NoMainFunctionError{Fore.RESET}: There's no main function"\
                 f" in file '{fname}'"
 
     class MoreThanOneMainFunctionError(Exception):
         def __init__(self, first_pos, second_pos):
-            self.description = "MoreThanOneMainFunctionError: There're at "\
+            self.description = f"{Fore.MAGENTA}MoreThanOneMainFunctionError{Fore.RESET}: There're at "\
             "least two main functions"
             self.first_pos = first_pos
             self.second_pos = second_pos
@@ -96,5 +99,5 @@ class Errors:
     class NotImplementedYetError(Exception):
         """Feature that isn't implemented yet"""
         def __init__(self, feature_description):
-            self.description = "NotImplementedYet: The feature of using "\
+            self.description = f"{Fore.MAGENTA}NotImplementedYet{Fore.RESET}: The feature of using "\
                 f"{feature_description} is not implemented yet"
