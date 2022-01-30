@@ -1,6 +1,5 @@
 from error_handler import ErrorHandler, AnnotationScreen
 from warnings_ import Warnings
-from colorama import Fore, Style
 
 
 class _WarningHandler(ErrorHandler):
