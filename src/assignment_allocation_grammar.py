@@ -89,7 +89,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.add_and_consume(classname=Character)
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError("Number or Character",
+            raise Errors.NoApplicableRuleError("number or character",
                                                token.value, token.position)
 
     def _assign(self, ):

@@ -10,7 +10,9 @@ from symbol_table import SymbolTable
 from code_generator import CodeGenerator
 from warning_handler import WarningHandler
 from tabulate import tabulate
-import argparse
+from enum import Enum
+from colormanager import ColorManager as CM
+from os.path import exists
 
 
 class Compiler(cmd2.Cmd):
@@ -44,9 +46,7 @@ class Compiler(cmd2.Cmd):
     via email to juergmatth@gmail.com, attaching the malicious code to the
     email. ^_^
     """
-    cli_args_parser = (cmd2.Cmd2ArgumentParser(description=description)
-                       if global_vars.shell_on else argparse.ArgumentParser(
-                           description=description))
+    cli_args_parser = cmd2.Cmd2ArgumentParser(description=description)
     cli_args_parser.add_argument(
         "infile",
         nargs='?',
@@ -92,10 +92,17 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument(
         '-d',
         '--distance',
-        help="distance of the comments from the instructions for the --verbose"
+        help="distance of the comments from the instructions for the --verbose "
         "option. The passed value gets added to the minimum distance of 2 spaces",
         type=int,
         default=0)
+    cli_args_parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help="also show tokentype and position for tokens, write the nodetype "
+        "in front of parenthesis in the abstract syntax tree, add comments to "
+        "the RETI Code")
     cli_args_parser.add_argument('-S',
                                  '--sight',
                                  help="sets the number of lines visible around"
@@ -105,18 +112,10 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument('-C',
                                  '--color',
                                  action='store_true',
-                                 help="gives the terminal output color"
-                                 "")
-    cli_args_parser.add_argument(
-        '-v',
-        '--verbose',
-        action='store_true',
-        help="also show tokentype and position for tokens, write the nodetype "
-        "in front of parenthesis in the abstract syntax tree, add comments to "
-        "the RETI Code")
+                                 help="gives the terminal output color")
     cli_args_parser.add_argument(
         '-O',
-        '--optimization-level',
+        '--optimization_level',
         help="set the optimiziation level of the "
         "compiler (0=save all variables on the "
         "stack, 1=use graph coloring to find the "
@@ -125,27 +124,85 @@ class Compiler(cmd2.Cmd):
         type=int,
         default=0)
 
+    HISTORY_FILE = "/home/areo/.config/pico_c_compiler/history.json"
+    SETTINGS_FILE = "/home/areo/.config/pico_c_compiler/settings.conf"
+
     def __init__(self, ):
-        if global_vars.shell_on:
-            super().__init__()
+        super().__init__(allow_cli_args=False, persistent_history_length=100)
 
-        shortcuts = cmd2.DEFAULT_SHORTCUTS
-        shortcuts.update({'c': 'compile'})
+        shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
+        shortcuts.update({'cpl': 'compile', 'ct': 'color_toggle'})
+        cmd2.Cmd.__init__(self,
+                          shortcuts=shortcuts,
+                          allow_cli_args=False,
+                          multiline_commands=['compile'])
 
-        # shell is always executed with print
-        cmd2.Cmd.prompt = "PicoC> "
-        cmd2.Cmd.continuation_prompt = "> "
-        cmd2.Cmd.persistent_history_file = "~/.config/pico_c_compiler/history.txt"
-        cmd2.Cmd.persistent_history_length = 100
-        cmd2.Cmd.multiline_commands = ['compile']
+        # save history hook
+        self.register_postcmd_hook(self.save_history)
+
+        self._deal_with_history_and_settings()
+
+        self._colorprompt()
+
         global_vars.args = self.cli_args_parser.parse_args()
+
+    def _deal_with_history_and_settings(self, ):
+        # load history
+        if exists(self.HISTORY_FILE):
+            with open(self.HISTORY_FILE) as fin:
+                self.history = self.history.from_json(fin.read())
+
+        # for the tc command
+        if exists(self.SETTINGS_FILE):
+            with open(self.SETTINGS_FILE) as fin:
+                lines = fin.read().split('\n')
+                for line in lines:
+                    if "colorprompt" in line:
+                        if "True" in line:
+                            global_vars.args.color = True
+                        else:  # "False" in line:
+                            global_vars.args.color = False
+        else:
+            self.colorprompt = False
+
+    def save_history(
+            self,
+            data: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
+        with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
+            fout.write(self.history.to_json())
+        return data
+
+    def _colorprompt(self, ):
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+        self.prompt = (
+            f"{CM().BRIGHT}{CM().GREEN}P{CM().CYAN}ico{CM().MAGENTA}C{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
+            if global_vars.args.color else "PicoC> ")
+        self.continuation_prompt = (
+            f"{CM().BRIGHT}{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
+            if global_vars.args.color else "> ")
+
+    def do_color_toggle(self, _=None):
+        global_vars.args.color = False if global_vars.args.color else True
+        if exists(self.SETTINGS_FILE):
+            with open(self.SETTINGS_FILE, "w", encoding="utf-8") as fout:
+                fout.write(f"colorprompt: {global_vars.args.color}")
+        self._colorprompt()
 
     @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
         global_vars.args = args
-        # printing is always on in shell
 
+        # printing is always on in shell
         global_vars.args.print = True
+
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         try:
             self._compile(["void main() {"] + args.infile.split('\n') + ["}"],
                           "stdin")
@@ -157,7 +214,6 @@ class Compiler(cmd2.Cmd):
     def read_and_write_file(self, infile, outbase):
         """reads a pico_c file and compiles it
         :returns: pico_c Code compiled in RETI Assembler
-
         """
         with open(infile, encoding="utf-8") as fin:
             pico_c_in = fin.readlines()
@@ -178,7 +234,6 @@ class Compiler(cmd2.Cmd):
         code_without_cr = [basename(infile) + " "] + list(
             filter(lambda line: line, map(lambda line: line.strip('\n'),
                                           code)))
-
         # reset everything to defaults
         self._reset(infile, code_without_cr)
 
@@ -267,10 +322,91 @@ class Compiler(cmd2.Cmd):
 
     def _reti_code(self, abstract_syntax_tree, outbase):
         if global_vars.args.print:
-            print('\n' + str(abstract_syntax_tree.show_generated_code()))
+            code = Colorizer(str(abstract_syntax_tree.show_generated_code(
+            ))).colorize_reti_code() if global_vars.args.color else str(
+                abstract_syntax_tree.show_generated_code())
+            print('\n' + code)
         if outbase:
             with open(outbase + ".reti", 'w', encoding="utf-8") as fout:
                 fout.write(str(abstract_syntax_tree.show_generated_code()))
+
+
+class Colorizer:
+    EOF_CHAR = 'EOF'
+
+    class States(Enum):
+        COMMAND = 0
+        PARAMETER = 1
+        SEMICOLON = 2
+        COMMENT = 3
+
+    def __init__(self, cinput):
+        """
+        :lc: lookahead character
+        :c: character
+        """
+        self.cinput = cinput
+        self.idx = 0
+        self.c = cinput[self.idx]
+
+        # position variable to be available between methods
+        self.state = self.States.COMMAND
+
+        # so that the color ansi escape sequence won't get inserted several times
+        self.color_not_inserted = True
+
+    def colorize_reti_code(self, ):
+        while self.c != self.EOF_CHAR:
+            if self.c == ' ' and self.state == self.States.COMMAND:
+                self.state = self.States.PARAMETER
+                self.color_not_inserted = True
+            elif self.c == ';':
+                self.state = self.States.SEMICOLON
+                self.color_not_inserted = True
+            elif self.c == '#':
+                self.state = self.States.COMMENT
+                self.color_not_inserted = True
+            elif self.c == '\n':
+                self.state = self.States.COMMAND
+                self.color_not_inserted = True
+
+            if self.state == self.States.COMMAND and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().BLUE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.PARAMETER and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.SEMICOLON and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().WHITE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.COMMENT and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().MAGENTA)
+                self.color_not_inserted = False
+                self.next_char()
+            else:
+                self.next_char()
+        return self.cinput + CM().RESET
+
+    def insert_colorcode(self, idx, color):
+        self.cinput = self.cinput[:idx] + color + self.cinput[idx:]
+        self.idx += len(color)
+
+    def next_char(self):
+        """go to the next character, detect if "end of file" is reached
+
+        :returns: None
+        """
+        # next index
+        self.idx += 1
+
+        # next character
+        if self.idx == len(self.cinput):
+            self.c = self.EOF_CHAR
+        else:
+            self.c = self.cinput[self.idx]
 
 
 def remove_extension(fname):

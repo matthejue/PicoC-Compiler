@@ -14,7 +14,7 @@ _read-all-verbose:
 
 shell: _shell clean
 _shell:
-	./src/main.py
+	./src/main.py -C
 
 test: _test clean
 _test:

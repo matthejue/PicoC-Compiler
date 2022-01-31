@@ -1,9 +1,9 @@
 # File 'compile_too_big_numbers' Start
 # Main Funktion '(void main ((int car) = 2097152) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int car) = 2097152)' Start
 # Allokation '(int car)' Start
-# Variable 'car' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'car' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int car)' Ende
 # Arithmetischer Operand '2097152' Start
 SUBI SP 1;                              # Stack um eine Zelle erweitern
@@ -14,11 +14,11 @@ STOREIN SP ACC 1;                       # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '2097152' Ende
 LOADIN SP ACC 1;                        # Wert von '2097152' in ACC laden
 ADDI SP 1;                              # Stack um eine Zelle verkürzen
-STORE ACC 100;                          # Wert '2097152' in Variable 'car' speichern
+STORE ACC 128;                          # Wert '2097152' in Variable 'car' speichern
 # Zuweisung '((int car) = 2097152)' Ende
 # Zuweisung '((int var) = (2097151 & ((- 2097160) | car)))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Arithmetische binäre Operation '(2097151 & ((- 2097160) | car))' Start
 # Arithmetischer Operand '2097151' Start
@@ -42,7 +42,7 @@ STOREIN SP ACC 1;                       # Ergebnis in oberste Stack-Zelle
 # Arithmetische unäre Operation '(- 2097160)' Ende
 # Arithmetischer Operand 'car' Start
 SUBI SP 1;                              # Stack um eine Zelle erweitern
-LOAD ACC 100;                           # Wert von 'car' in ACC laden
+LOAD ACC 128;                           # Wert von 'car' in ACC laden
 STOREIN SP ACC 1;                       # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'car' Ende
 LOADIN SP ACC 2;                        # Wert von '(- 2097160)' in ACC laden
@@ -59,7 +59,7 @@ ADDI SP 1;                              # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(2097151 & ((- 2097160) | car))' Ende
 LOADIN SP ACC 1;                        # Wert von '(2097151 & ((- 2097160) | car))' in ACC laden
 ADDI SP 1;                              # Stack um eine Zelle verkürzen
-STORE ACC 101;                          # Wert '(2097151 & ((- 2097160) | car))' in Variable 'var' speichern
+STORE ACC 129;                          # Wert '(2097151 & ((- 2097160) | car))' in Variable 'var' speichern
 # Zuweisung '((int var) = (2097151 & ((- 2097160) | car)))' Ende
 JUMP 0;
 # Main Funktion '(void main ((int car) = 2097152) ... )' Ende

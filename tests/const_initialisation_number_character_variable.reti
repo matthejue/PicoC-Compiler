@@ -1,6 +1,6 @@
 # File 'const_initialisation_number_character_variable' Start
 # Main Funktion '(void main ((const char var1) = 99) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const char var1) = 99)' Start
 # Allokation '(const char var1)' Start
 # Konstante 'var1' vom Typ 'char' zur Symboltabelle hinzugefügt

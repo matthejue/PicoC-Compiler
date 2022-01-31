@@ -1,5 +1,5 @@
 Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT]
-               [-e END_DATA_SEGMENT] [-d DISTANCE] [-S SIGHT] [-v]
+               [-e END_DATA_SEGMENT] [-d DISTANCE] [-S SIGHT] [-C] [-v]
                [-O OPTIMIZATION_LEVEL]
                [infile]
 
@@ -50,8 +50,9 @@ optional arguments:
   -e, --end_data_segment END_DATA_SEGMENT
                         where the datasegment ends and where the stackpointer starts (default 200)
   -d, --distance DISTANCE
-                        distance of the comments from the instructions for the --verboseoption. The passed value gets added to the minimum distance of 2 spaces
+                        distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
   -S, --sight SIGHT     sets the number of lines visible around a error message
+  -C, --color           gives the terminal output color
   -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
   -O, --optimization-level OPTIMIZATION_LEVEL
                         set the optimiziation level of the compiler (0=save all variables on the stack, 1=use graph coloring to find the best assignment of variables to registers, 2=partially interpret expressions) [NOT IMPLEMENTED YET]

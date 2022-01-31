@@ -1,9 +1,9 @@
 # File 'abschlusspraesentation_praezidenzregeln' Start
 # Main Funktion '(void main ((char arith_var) = (12 + (99 - 1))) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((char arith_var) = (12 + (99 - 1)))' Start
 # Allokation '(char arith_var)' Start
-# Variable 'arith_var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'arith_var' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char arith_var)' Ende
 # Arithmetische binäre Operation '(12 + (99 - 1))' Start
 # Arithmetischer Operand '12' Start
@@ -45,11 +45,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '(12 + (99 - 1))' in Variable 'arith_var' speichern
+STORE ACC 128;                         # Wert '(12 + (99 - 1))' in Variable 'arith_var' speichern
 # Zuweisung '((char arith_var) = (12 + (99 - 1)))' Ende
 # Zuweisung '((int arith_var_2) = ((12 * 99) - 1))' Start
 # Allokation '(int arith_var_2)' Start
-# Variable 'arith_var_2' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'arith_var_2' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int arith_var_2)' Ende
 # Arithmetische binäre Operation '((12 * 99) - 1)' Start
 # Arithmetische binäre Operation '(12 * 99)' Start
@@ -82,11 +82,11 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '((12 * 99) - 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '((12 * 99) - 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert '((12 * 99) - 1)' in Variable 'arith_var_2' speichern
+STORE ACC 129;                         # Wert '((12 * 99) - 1)' in Variable 'arith_var_2' speichern
 # Zuweisung '((int arith_var_2) = ((12 * 99) - 1))' Ende
 # Zuweisung '((char arith_var_3) = ((12 < (1 + 2)) * 2))' Start
 # Allokation '(char arith_var_3)' Start
-# Variable 'arith_var_3' vom Typ 'char' mit Adresse '102' zur Symboltabelle hinzugefügt
+# Variable 'arith_var_3' vom Typ 'char' mit Adresse '130' zur Symboltabelle hinzugefügt
 # Allokation '(char arith_var_3)' Ende
 # Arithmetische binäre Operation '((12 < (1 + 2)) * 2)' Start
 # Logisches Atom '(12 < (1 + 2))' Start
@@ -144,11 +144,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 102;                         # Wert '((12 < (1 + 2)) * 2)' in Variable 'arith_var_3' speichern
+STORE ACC 130;                         # Wert '((12 < (1 + 2)) * 2)' in Variable 'arith_var_3' speichern
 # Zuweisung '((char arith_var_3) = ((12 < (1 + 2)) * 2))' Ende
 # Zuweisung '((char arith_var_4) = (- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))))' Start
 # Allokation '(char arith_var_4)' Start
-# Variable 'arith_var_4' vom Typ 'char' mit Adresse '103' zur Symboltabelle hinzugefügt
+# Variable 'arith_var_4' vom Typ 'char' mit Adresse '131' zur Symboltabelle hinzugefügt
 # Allokation '(char arith_var_4)' Ende
 # Arithmetische unäre Operation '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' Start
 # Logische binäre Verknüpfung '(ToBool(0) || Not(((12 < 3) || (3 >= 12))))' Start
@@ -240,11 +240,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 103;                         # Wert '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' in Variable 'arith_var_4' speichern
+STORE ACC 131;                         # Wert '(- (ToBool(0) || Not(((12 < 3) || (3 >= 12)))))' in Variable 'arith_var_4' speichern
 # Zuweisung '((char arith_var_4) = (- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))))' Ende
 # Zuweisung '((char logic_var) = (((12 < (1 + 2)) && ToBool(12)) || ToBool(0)))' Start
 # Allokation '(char logic_var)' Start
-# Variable 'logic_var' vom Typ 'char' mit Adresse '104' zur Symboltabelle hinzugefügt
+# Variable 'logic_var' vom Typ 'char' mit Adresse '132' zur Symboltabelle hinzugefügt
 # Allokation '(char logic_var)' Ende
 # Logische binäre Verknüpfung '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' Start
 # Logische binäre Verknüpfung '((12 < (1 + 2)) && ToBool(12))' Start
@@ -326,11 +326,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 104;                         # Wert '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' in Variable 'logic_var' speichern
+STORE ACC 132;                         # Wert '(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))' in Variable 'logic_var' speichern
 # Zuweisung '((char logic_var) = (((12 < (1 + 2)) && ToBool(12)) || ToBool(0)))' Ende
 # Zuweisung '((char logic_var_2) = (ToBool(12) || ((12 < 3) && ToBool(0))))' Start
 # Allokation '(char logic_var_2)' Start
-# Variable 'logic_var_2' vom Typ 'char' mit Adresse '105' zur Symboltabelle hinzugefügt
+# Variable 'logic_var_2' vom Typ 'char' mit Adresse '133' zur Symboltabelle hinzugefügt
 # Allokation '(char logic_var_2)' Ende
 # Logische binäre Verknüpfung '(ToBool(12) || ((12 < 3) && ToBool(0)))' Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(12)' Start
@@ -400,7 +400,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 105;                         # Wert '(ToBool(12) || ((12 < 3) && ToBool(0)))' in Variable 'logic_var_2' speichern
+STORE ACC 133;                         # Wert '(ToBool(12) || ((12 < 3) && ToBool(0)))' in Variable 'logic_var_2' speichern
 # Zuweisung '((char logic_var_2) = (ToBool(12) || ((12 < 3) && ToBool(0))))' Ende
 JUMP 0;
 # Main Funktion '(void main ((char arith_var) = (12 + (99 - 1))) ... )' Ende

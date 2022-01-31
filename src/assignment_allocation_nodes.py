@@ -26,7 +26,7 @@ class Assignment(ASTNode):
         super().__init__(value, position)
 
     assign = strip_multiline_string(
-        """LOADIN SP ACC 1;  # Wert von 'e1' in ACC laden
+        f"""LOADIN SP ACC 1;  # Wert von 'e1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         """)
     assign_loc = 2

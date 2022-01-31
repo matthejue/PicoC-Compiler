@@ -1,6 +1,6 @@
 # File 'empty_do_while' Start
 # Main Funktion '(void main DoWhile(ToBool(99)))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Do While 'DoWhile( ToBool(99))' Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(99)' Start
 # Arithmetischer Operand '99' Start

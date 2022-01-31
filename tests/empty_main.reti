@@ -1,6 +1,6 @@
 # File 'empty_main' Start
 # Main Funktion '(void main )' Start
-LOADI SP 200;
+LOADI SP 256;
 JUMP 0;
 # Main Funktion '(void main )' Ende
 # File 'empty_main' Ende
