@@ -1,11 +1,11 @@
 # File 'uebungsblatt_5_aufgabe_3' Start
 # Main Funktion '(void main (int x) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(int x)' Start
-# Variable 'x' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'x' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int x)' Ende
 # Allokation '(int y)' Start
-# Variable 'y' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'y' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int y)' Ende
 # Zuweisung '((const int z) = 5)' Start
 # Allokation '(const int z)' Start
@@ -21,7 +21,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '3' Ende
 LOADIN SP ACC 1;                       # Wert von '3' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert '3' in Variable 'y' speichern
+STORE ACC 129;                         # Wert '3' in Variable 'y' speichern
 # Zuweisung '(y = 3)' Ende
 # Zuweisung '(x = 2)' Start
 # Arithmetischer Operand '2' Start
@@ -31,20 +31,20 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '2' Ende
 LOADIN SP ACC 1;                       # Wert von '2' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '2' in Variable 'x' speichern
+STORE ACC 128;                         # Wert '2' in Variable 'x' speichern
 # Zuweisung '(x = 2)' Ende
 # Zuweisung '(x = (x + ((y * z) + 10)))' Start
 # Arithmetische binäre Operation '(x + ((y * z) + 10))' Start
 # Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'x' in ACC laden
+LOAD ACC 128;                          # Wert von 'x' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'x' Ende
 # Arithmetische binäre Operation '((y * z) + 10)' Start
 # Arithmetische binäre Operation '(y * z)' Start
 # Arithmetischer Operand 'y' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 101;                          # Wert von 'y' in ACC laden
+LOAD ACC 129;                          # Wert von 'y' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'y' Ende
 # Arithmetischer Operand 'z' Start
@@ -77,7 +77,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(x + ((y * z) + 10))' Ende
 LOADIN SP ACC 1;                       # Wert von '(x + ((y * z) + 10))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '(x + ((y * z) + 10))' in Variable 'x' speichern
+STORE ACC 128;                         # Wert '(x + ((y * z) + 10))' in Variable 'x' speichern
 # Zuweisung '(x = (x + ((y * z) + 10)))' Ende
 JUMP 0;
 # Main Funktion '(void main (int x) ... )' Ende

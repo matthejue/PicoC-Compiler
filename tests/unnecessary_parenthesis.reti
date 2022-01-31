@@ -1,9 +1,9 @@
 # File 'unnecessary_parenthesis' Start
 # Main Funktion '(void main ((char bool) = 0) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((char bool) = 0)' Start
 # Allokation '(char bool)' Start
-# Variable 'bool' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'bool' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char bool)' Ende
 # Arithmetischer Operand '0' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,18 +12,18 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '0' Ende
 LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '0' in Variable 'bool' speichern
+STORE ACC 128;                         # Wert '0' in Variable 'bool' speichern
 # Zuweisung '((char bool) = 0)' Ende
 # Zuweisung '((char var) = Not(ToBool((- bool))))' Start
 # Allokation '(char var)' Start
-# Variable 'var' vom Typ 'char' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'char' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(char var)' Ende
 # Logische unäre Verknüpfung 'Not(ToBool((- bool)))' Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool((- bool))' Start
 # Arithmetische unäre Operation '(- bool)' Start
 # Arithmetischer Operand 'bool' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'bool' in ACC laden
+LOAD ACC 128;                          # Wert von 'bool' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'bool' Ende
 LOADI ACC 0;                           # '0' in ACC laden
@@ -52,14 +52,14 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 101;                         # Wert 'Not(ToBool((- bool)))' in Variable 'var' speichern
+STORE ACC 129;                         # Wert 'Not(ToBool((- bool)))' in Variable 'var' speichern
 # Zuweisung '((char var) = Not(ToBool((- bool))))' Ende
 # Zuweisung '(var = (- (- bool)))' Start
 # Arithmetische unäre Operation '(- (- bool))' Start
 # Arithmetische unäre Operation '(- bool)' Start
 # Arithmetischer Operand 'bool' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'bool' in ACC laden
+LOAD ACC 128;                          # Wert von 'bool' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'bool' Ende
 LOADI ACC 0;                           # '0' in ACC laden
@@ -83,7 +83,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 101;                         # Wert '(- (- bool))' in Variable 'var' speichern
+STORE ACC 129;                         # Wert '(- (- bool))' in Variable 'var' speichern
 # Zuweisung '(var = (- (- bool)))' Ende
 # Zuweisung '(var = (- Not(ToBool(bool))))' Start
 # Arithmetische unäre Operation '(- Not(ToBool(bool)))' Start
@@ -91,7 +91,7 @@ STORE ACC 101;                         # Wert '(- (- bool))' in Variable 'var' s
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(bool)' Start
 # Arithmetischer Operand 'bool' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'bool' in ACC laden
+LOAD ACC 128;                          # Wert von 'bool' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'bool' Ende
 LOADIN SP ACC 1;                       # Wert von 'bool' in ACC laden
@@ -120,7 +120,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 101;                         # Wert '(- Not(ToBool(bool)))' in Variable 'var' speichern
+STORE ACC 129;                         # Wert '(- Not(ToBool(bool)))' in Variable 'var' speichern
 # Zuweisung '(var = (- Not(ToBool(bool))))' Ende
 JUMP 0;
 # Main Funktion '(void main ((char bool) = 0) ... )' Ende

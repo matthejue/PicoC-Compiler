@@ -1,6 +1,6 @@
 # File 'several_statements_loop' Start
 # Main Funktion '(void main ((const int x) = 101) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const int x) = 101)' Start
 # Allokation '(const int x)' Start
 # Konstante 'x' vom Typ 'int' zur Symboltabelle hinzugefügt
@@ -10,7 +10,7 @@ LOADI SP 200;
 # Do While 'DoWhile(((int y) = 10) ... (x < 10))' Start
 # Zuweisung '((int y) = 10)' Start
 # Allokation '(int y)' Start
-# Variable 'y' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'y' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int y)' Ende
 # Arithmetischer Operand '10' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
@@ -19,13 +19,13 @@ STOREIN SP ACC 1;                                                  # Wert in obe
 # Arithmetischer Operand '10' Ende
 LOADIN SP ACC 1;                                                   # Wert von '10' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 100;                                                     # Wert '10' in Variable 'y' speichern
+STORE ACC 128;                                                     # Wert '10' in Variable 'y' speichern
 # Zuweisung '((int y) = 10)' Ende
 # Zuweisung '(y = (y + x))' Start
 # Arithmetische binäre Operation '(y + x)' Start
 # Arithmetischer Operand 'y' Start
 SUBI SP 1;                                                         # Stack um eine Zelle erweitern
-LOAD ACC 100;                                                      # Wert von 'y' in ACC laden
+LOAD ACC 128;                                                      # Wert von 'y' in ACC laden
 STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'y' Ende
 # Arithmetischer Operand 'x' Start
@@ -41,7 +41,7 @@ ADDI SP 1;                                                         # Stack um ei
 # Arithmetische binäre Operation '(y + x)' Ende
 LOADIN SP ACC 1;                                                   # Wert von '(y + x)' in ACC laden
 ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
-STORE ACC 100;                                                     # Wert '(y + x)' in Variable 'y' speichern
+STORE ACC 128;                                                     # Wert '(y + x)' in Variable 'y' speichern
 # Zuweisung '(y = (y + x))' Ende
 # Logisches Atom '(x < 10)' Start
 # Arithmetischer Operand 'x' Start

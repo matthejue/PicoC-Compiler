@@ -1,6 +1,6 @@
 # File 'no_error_too_large_literal_const_assignment_for_parameter_int_lower_border' Start
 # Main Funktion '(void main ((const char var) = 2097151))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const char var) = 2097151)' Start
 # Allokation '(const char var)' Start
 # Konstante 'var' vom Typ 'char' zur Symboltabelle hinzugefügt

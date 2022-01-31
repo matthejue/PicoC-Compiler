@@ -1,15 +1,15 @@
 # File 'warning_multiple_warnings' Start
 # Main Funktion '(void main (char var3) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(char var3)' Start
-# Variable 'var3' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var3' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char var3)' Ende
 # Allokation '(int var2)' Start
-# Variable 'var2' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var2' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var2)' Ende
 # Zuweisung '((char var) = (var2 = (var3 = 2147483647)))' Start
 # Allokation '(char var)' Start
-# Variable 'var' vom Typ 'char' mit Adresse '102' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'char' mit Adresse '130' zur Symboltabelle hinzugefügt
 # Allokation '(char var)' Ende
 # Zuweisung '(var2 = (var3 = 2147483647))' Start
 # Zuweisung '(var3 = 2147483647)' Start
@@ -31,9 +31,9 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '2147483647' in Variable 'var3' speichern
+STORE ACC 128;                         # Wert '2147483647' in Variable 'var3' speichern
 # Zuweisung '(var3 = 2147483647)' Ende
-STORE ACC 101;                         # Wert '(var3 = 2147483647)' in Variable 'var2' speichern
+STORE ACC 129;                         # Wert '(var3 = 2147483647)' in Variable 'var2' speichern
 # Zuweisung '(var2 = (var3 = 2147483647))' Ende
 # Implizite Konversion von 'int' zu 'char' Start
 LOADI IN1 255;                         # Bitmaske '00000000_00000000_00000000_11111111' für char Datentyp erstellen
@@ -44,7 +44,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 102;                         # Wert '(var2 = (var3 = 2147483647))' in Variable 'var' speichern
+STORE ACC 130;                         # Wert '(var2 = (var3 = 2147483647))' in Variable 'var' speichern
 # Zuweisung '((char var) = (var2 = (var3 = 2147483647)))' Ende
 JUMP 0;
 # Main Funktion '(void main (char var3) ... )' Ende

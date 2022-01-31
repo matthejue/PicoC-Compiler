@@ -1,6 +1,6 @@
 # File 'if_with_character_as_condition' Start
 # Main Funktion '(void main If(ToBool(97)))' Start
-LOADI SP 200;
+LOADI SP 256;
 # If Statement 'If(ToBool(97) )' Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(97)' Start
 # Arithmetischer Operand '97' Start

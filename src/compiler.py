@@ -12,7 +12,8 @@ from warning_handler import WarningHandler
 from tabulate import tabulate
 from enum import Enum
 from colormanager import ColorManager as CM
-from os.path import exists
+import os
+from string import ascii_letters
 
 
 class Compiler(cmd2.Cmd):
@@ -124,17 +125,23 @@ class Compiler(cmd2.Cmd):
         type=int,
         default=0)
 
-    HISTORY_FILE = "/home/areo/.config/pico_c_compiler/history.json"
-    SETTINGS_FILE = "/home/areo/.config/pico_c_compiler/settings.conf"
+    HISTORY_FILE = os.path.expanduser(
+        '~') + "/.config/pico_c_compiler/history.json"
+    SETTINGS_FILE = os.path.expanduser(
+        '~') + "/.config/pico_c_compiler/settings.conf"
 
     def __init__(self, ):
-        super().__init__(allow_cli_args=False, persistent_history_length=100)
+        global_vars.args = self.cli_args_parser.parse_args()
+        if not global_vars.args.infile:
+            self._shell__init__()
+
+    def _shell__init__(self, ):
+        super().__init__(persistent_history_length=100)
 
         shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
         shortcuts.update({'cpl': 'compile', 'ct': 'color_toggle'})
         cmd2.Cmd.__init__(self,
                           shortcuts=shortcuts,
-                          allow_cli_args=False,
                           multiline_commands=['compile'])
 
         # save history hook
@@ -144,16 +151,14 @@ class Compiler(cmd2.Cmd):
 
         self._colorprompt()
 
-        global_vars.args = self.cli_args_parser.parse_args()
-
     def _deal_with_history_and_settings(self, ):
         # load history
-        if exists(self.HISTORY_FILE):
+        if os.path.exists(self.HISTORY_FILE):
             with open(self.HISTORY_FILE) as fin:
                 self.history = self.history.from_json(fin.read())
 
         # for the tc command
-        if exists(self.SETTINGS_FILE):
+        if os.path.exists(self.SETTINGS_FILE):
             with open(self.SETTINGS_FILE) as fin:
                 lines = fin.read().split('\n')
                 for line in lines:
@@ -167,10 +172,10 @@ class Compiler(cmd2.Cmd):
 
     def save_history(
             self,
-            data: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
+            _: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
         with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
             fout.write(self.history.to_json())
-        return data
+        return _
 
     def _colorprompt(self, ):
         if global_vars.args.color:
@@ -186,7 +191,7 @@ class Compiler(cmd2.Cmd):
 
     def do_color_toggle(self, _=None):
         global_vars.args.color = False if global_vars.args.color else True
-        if exists(self.SETTINGS_FILE):
+        if os.path.exists(self.SETTINGS_FILE):
             with open(self.SETTINGS_FILE, "w", encoding="utf-8") as fout:
                 fout.write(f"colorprompt: {global_vars.args.color}")
         self._colorprompt()
@@ -285,7 +290,9 @@ class Compiler(cmd2.Cmd):
 
     def _abstract_syntax_option(self, grammar: Grammar, outbase):
         if global_vars.args.print:
-            print('\n' + str(grammar.reveal_ast()))
+            ast = str(grammar.reveal_ast())
+            ast = Colorizer(ast).colorize_abstract_syntax()
+            print('\n' + ast)
 
         if outbase:
             with open(outbase + ".ast", 'w', encoding="utf-8") as fout:
@@ -301,22 +308,28 @@ class Compiler(cmd2.Cmd):
     def _print_symbol_table(self, ):
         header = ["name", "type", "datatype", "position", "value"]
         symbols = SymbolTable().symbols
-        print('\n' + str(
-            tabulate([(k, v.get_type(), str(v.datatype), str(v.position),
-                       str(v.value)) for k, v in symbols.items()],
-                     headers=header)))
+
+        output = str(
+            tabulate([(k, v.get_type(), str(v.datatype), str(
+                v.position), str(v.value)) for k, v in symbols.items()],
+                     headers=header))
+
+        output = (Colorizer(output).colorize_symbol_table()
+                  if global_vars.args.color else output)
+        print('\n' + output)
 
     def _write_symbol_table(self, outbase):
         output = "name,type,datatype,position,value\n"
         symbols = SymbolTable().symbols
         for name in symbols.keys():
-            position = f"({symbols[name].position[0]}:{symbols[name].position[1]})"\
-                if symbols[name].position != '-' else '-'
-            output += f"{name},"\
-                f"{symbols[name].get_type()},"\
-                f"{symbols[name].datatype},"\
-                f"{position},"\
-                f"{symbols[name].value}\n"
+            position = (
+                f"({symbols[name].position[0]}:{symbols[name].position[1]})"
+                if symbols[name].position != '-' else '-')
+            output += f"{name},"
+            f"{symbols[name].get_type()},"
+            f"{symbols[name].datatype},"
+            f"{position},"
+            f"{symbols[name].value}\n"
         with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
             fout.write(output)
 
@@ -335,10 +348,18 @@ class Colorizer:
     EOF_CHAR = 'EOF'
 
     class States(Enum):
+        # to reti code
         COMMAND = 0
         PARAMETER = 1
         SEMICOLON = 2
         COMMENT = 3
+        # for symbol table
+        TABLE = 4
+        HEADING = 5
+        CONTENT = 6
+        # for abstract syntax
+        PARENTHESIS = 7
+        OPERATOR = 8
 
     def __init__(self, cinput):
         """
@@ -350,12 +371,13 @@ class Colorizer:
         self.c = cinput[self.idx]
 
         # position variable to be available between methods
-        self.state = self.States.COMMAND
+        self.state = None
 
         # so that the color ansi escape sequence won't get inserted several times
         self.color_not_inserted = True
 
     def colorize_reti_code(self, ):
+        self.state = self.States.COMMAND
         while self.c != self.EOF_CHAR:
             if self.c == ' ' and self.state == self.States.COMMAND:
                 self.state = self.States.PARAMETER
@@ -389,6 +411,71 @@ class Colorizer:
             else:
                 self.next_char()
         return self.cinput + CM().RESET
+
+    def colorize_symbol_table(self, ):
+        self.state = self.States.HEADING
+        while self.c != self.EOF_CHAR:
+            if (self.c in ascii_letters + '_' + "1234567890"
+                    and self.state == self.States.TABLE):
+                self.state = self.States.CONTENT
+                self.color_not_inserted = True
+            elif self.c == '-' and self.state in [
+                    self.States.HEADING, self.States.CONTENT
+            ]:
+                self.state = self.States.TABLE
+                self.color_not_inserted = True
+            elif self.c in '(),':
+                self.state = self.States.TABLE
+                self.color_not_inserted = True
+
+            if self.state == self.States.HEADING and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().BLUE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.CONTENT and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.TABLE and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().WHITE)
+                self.color_not_inserted = False
+                self.next_char()
+            else:
+                self.next_char()
+        return self.cinput + CM().RESET
+
+    def colorize_abstract_syntax(self, ):
+        self.state = self.States.PARENTHESIS
+        while self.c != self.EOF_CHAR:
+            if (self.c in ascii_letters + '_' + "1234567890" and self.state
+                    in [self.States.PARENTHESIS, self.States.OPERATOR]):
+                self.state = self.States.CONTENT
+                self.color_not_inserted = True
+            elif self.c in '()':
+                self.state = self.States.PARENTHESIS
+                self.color_not_inserted = True
+            elif self.c in '+~-*%/&|!^<>=' and self.state != self.States.OPERATOR:
+                self.state = self.States.OPERATOR
+                self.color_not_inserted = True
+
+            if self.state == self.States.CONTENT and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.PARENTHESIS and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().WHITE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.OPERATOR and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().BLUE)
+                self.color_not_inserted = False
+                self.next_char()
+            else:
+                self.next_char()
+        return self.cinput + CM().RESET
+
+    def colorize_tokens(self, ):
+        ...
 
     def insert_colorcode(self, idx, color):
         self.cinput = self.cinput[:idx] + color + self.cinput[idx:]

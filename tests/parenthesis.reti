@@ -1,12 +1,12 @@
 # File 'parenthesis' Start
 # Main Funktion '(void main (char cars) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(char cars)' Start
-# Variable 'cars' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'cars' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char cars)' Ende
 # Zuweisung '((int var) = ((4 + 7) | cars))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Arithmetische binäre Operation '((4 + 7) | cars)' Start
 # Arithmetische binäre Operation '(4 + 7)' Start
@@ -28,7 +28,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(4 + 7)' Ende
 # Arithmetischer Operand 'cars' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'cars' in ACC laden
+LOAD ACC 128;                          # Wert von 'cars' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'cars' Ende
 LOADIN SP ACC 2;                       # Wert von '(4 + 7)' in ACC laden
@@ -39,7 +39,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '((4 + 7) | cars)' Ende
 LOADIN SP ACC 1;                       # Wert von '((4 + 7) | cars)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert '((4 + 7) | cars)' in Variable 'var' speichern
+STORE ACC 129;                         # Wert '((4 + 7) | cars)' in Variable 'var' speichern
 # Zuweisung '((int var) = ((4 + 7) | cars))' Ende
 JUMP 0;
 # Main Funktion '(void main (char cars) ... )' Ende

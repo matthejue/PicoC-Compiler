@@ -1,6 +1,6 @@
 # File 'warning_const_assignment_char_char' Start
 # Main Funktion '(void main ((const char var) = 128))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const char var) = 128)' Start
 # Allokation '(const char var)' Start
 # Konstante 'var' vom Typ 'char' zur Symboltabelle hinzugefügt

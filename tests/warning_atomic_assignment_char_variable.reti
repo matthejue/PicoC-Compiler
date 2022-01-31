@@ -1,9 +1,9 @@
 # File 'warning_atomic_assignment_char_variable' Start
 # Main Funktion '(void main ((int car) = 128) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int car) = 128)' Start
 # Allokation '(int car)' Start
-# Variable 'car' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'car' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int car)' Ende
 # Arithmetischer Operand '128' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,15 +12,15 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '128' Ende
 LOADIN SP ACC 1;                       # Wert von '128' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '128' in Variable 'car' speichern
+STORE ACC 128;                         # Wert '128' in Variable 'car' speichern
 # Zuweisung '((int car) = 128)' Ende
 # Zuweisung '((char var) = car)' Start
 # Allokation '(char var)' Start
-# Variable 'var' vom Typ 'char' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'char' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(char var)' Ende
 # Arithmetischer Operand 'car' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'car' in ACC laden
+LOAD ACC 128;                          # Wert von 'car' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'car' Ende
 LOADIN SP ACC 1;                       # Wert von 'car' in ACC laden
@@ -34,7 +34,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 101;                         # Wert 'car' in Variable 'var' speichern
+STORE ACC 129;                         # Wert 'car' in Variable 'var' speichern
 # Zuweisung '((char var) = car)' Ende
 JUMP 0;
 # Main Funktion '(void main ((int car) = 128) ... )' Ende
