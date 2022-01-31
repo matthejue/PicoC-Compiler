@@ -194,6 +194,7 @@ style: |
 - zu **großes Literal** für Parameter
 - **Fehlermeldungen** und **Warnings**
 - **Shell** oder **Datei** angeben
+- **Config- bzw. Dot-Files**
 
 <!--small-->
 ![bg right:10%](_resources/background.png)

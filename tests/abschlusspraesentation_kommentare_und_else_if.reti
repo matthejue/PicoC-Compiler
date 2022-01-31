@@ -1,6 +1,6 @@
 # File 'abschlusspraesentation_kommentare_und_else_if' Start
 # Main Funktion '(void main ((const int var) = 12) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const int var) = 12)' Start
 # Allokation '(const int var)' Start
 # Konstante 'var' vom Typ 'int' zur Symboltabelle hinzugefügt
@@ -8,7 +8,7 @@ LOADI SP 200;
 # Konstante 'var' in Symboltabelle den Wert '12' zugewiesen
 # Zuweisung '((const int var) = 12)' Ende
 # Allokation '(char var2)' Start
-# Variable 'var2' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var2' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char var2)' Ende
 # If und Else Statement 'IfElse((var > 100) (var2 = 2) else IfElse((var > 10) (var2 = 1) else (var2 = 0)))' Start
 # Logisches Atom '(var > 100)' Start
@@ -44,7 +44,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '2' Ende
 LOADIN SP ACC 1;                       # Wert von '2' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '2' in Variable 'var2' speichern
+STORE ACC 128;                         # Wert '2' in Variable 'var2' speichern
 # Zuweisung '(var2 = 2)' Ende
 JUMP 32;                               # Else-Branch überspringen
 # Else-Branch
@@ -82,7 +82,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '1' Ende
 LOADIN SP ACC 1;                       # Wert von '1' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '1' in Variable 'var2' speichern
+STORE ACC 128;                         # Wert '1' in Variable 'var2' speichern
 # Zuweisung '(var2 = 1)' Ende
 JUMP 7;                                # Else-Branch überspringen
 # Else-Branch
@@ -94,7 +94,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '0' Ende
 LOADIN SP ACC 1;                       # Wert von '0' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '0' in Variable 'var2' speichern
+STORE ACC 128;                         # Wert '0' in Variable 'var2' speichern
 # Zuweisung '(var2 = 0)' Ende
 # If und Else Statement 'IfElse((var > 10) (var2 = 1) else (var2 = 0))' Ende
 # If und Else Statement 'IfElse((var > 100) (var2 = 2) else IfElse((var > 10) (var2 = 1) else (var2 = 0)))' Ende

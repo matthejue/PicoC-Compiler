@@ -1,6 +1,6 @@
 # File 'empty_else' Start
 # Main Funktion '(void main IfElse(ToBool(99) else))' Start
-LOADI SP 200;
+LOADI SP 256;
 # If und Else Statement 'IfElse(ToBool(99)  else )' Start
 # Logischer Wahrheitswert aus arithmetischem Ausdruck 'ToBool(99)' Start
 # Arithmetischer Operand '99' Start

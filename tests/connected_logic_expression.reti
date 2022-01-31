@@ -1,9 +1,9 @@
 # File 'connected_logic_expression' Start
 # Main Funktion '(void main ((char dom) = 99) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((char dom) = 99)' Start
 # Allokation '(char dom)' Start
-# Variable 'dom' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'dom' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char dom)' Ende
 # Arithmetischer Operand '99' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,11 +12,11 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '99' Ende
 LOADIN SP ACC 1;                       # Wert von '99' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '99' in Variable 'dom' speichern
+STORE ACC 128;                         # Wert '99' in Variable 'dom' speichern
 # Zuweisung '((char dom) = 99)' Ende
 # Zuweisung '((int var) = ((12 > 3) && (dom <= 4)))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Logische binäre Verknüpfung '((12 > 3) && (dom <= 4))' Start
 # Logisches Atom '(12 > 3)' Start
@@ -43,7 +43,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logisches Atom '(dom <= 4)' Start
 # Arithmetischer Operand 'dom' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'dom' in ACC laden
+LOAD ACC 128;                          # Wert von 'dom' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'dom' Ende
 # Arithmetischer Operand '4' Start
@@ -69,7 +69,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung '((12 > 3) && (dom <= 4))' Ende
 LOADIN SP ACC 1;                       # Wert von '((12 > 3) && (dom <= 4))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert '((12 > 3) && (dom <= 4))' in Variable 'var' speichern
+STORE ACC 129;                         # Wert '((12 > 3) && (dom <= 4))' in Variable 'var' speichern
 # Zuweisung '((int var) = ((12 > 3) && (dom <= 4)))' Ende
 JUMP 0;
 # Main Funktion '(void main ((char dom) = 99) ... )' Ende

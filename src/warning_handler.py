@@ -1,5 +1,6 @@
 from error_handler import ErrorHandler, AnnotationScreen
 from warnings_ import Warnings
+from colormanager import ColorManager as CM
 
 
 class _WarningHandler(ErrorHandler):
@@ -28,7 +29,7 @@ class _WarningHandler(ErrorHandler):
 
                     node_header = self._warning_header(
                         w.variable_pos,
-                        f"Note: Variable '{w.variable}' definied as type "
+                        f"{CM().MAGENTA}Note{CM().RESET}: Variable '{w.variable}' definied as type "
                         f"'{w.variable_type}' here:")
                     warning_screen_2 = AnnotationScreen(self.finput, w.variable_pos[0],
                                                         w.variable_pos[0])
@@ -38,7 +39,7 @@ class _WarningHandler(ErrorHandler):
                     warning_screen_2.filter()
 
                     node_end = self._warning_header(
-                        None, f"Note: Datatype '{w.variable_type}' has only range "
+                        None, f"{CM().MAGENTA}Note{CM().RESET}: Datatype '{w.variable_type}' has only range "
                         f"{w.variable_from} to {w.variable_to}")
                     print(f'\n' + warning_header + str(warning_screen) +
                           node_header + str(warning_screen_2) + node_end)

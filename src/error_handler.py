@@ -1,7 +1,7 @@
 from sys import exit
 from errors import Errors
 import global_vars
-from colorama import Style, Fore
+from colormanager import ColorManager as CM
 
 
 class ErrorHandler:
@@ -50,6 +50,11 @@ class ErrorHandler:
             error_screen = AnnotationScreen(self.finput, expected_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
+            if e.found_pos == expected_pos:
+                pos = expected_pos
+                row_from = expected_pos[0]
+                rel_row = pos[0] - row_from
+                error_screen.clear(rel_row + 1, pos[1])
             error_screen.point_at(expected_pos, e.expected)
             error_screen.filter()
             print('\n' + error_header + str(error_screen))
@@ -73,7 +78,7 @@ class ErrorHandler:
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
                 None,
-                f"Note: The max size of a literal for a {e.found_symbol_type} is "
+                f"{CM().MAGENTA}Note{CM().RESET}: The max size of a literal for a {e.found_symbol_type} is "
                 f"in range '{e.found_from}' to '{e.found_to}'")
             error_screen.filter()
             print('\n' + error_header + str(error_screen) + node_header)
@@ -83,8 +88,9 @@ class ErrorHandler:
             error_screen = AnnotationScreen(self.finput, e.found_pos[0],
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(e.first_pos,
-                                             "Note: Already defined here:")
+            note_header = self._error_header(
+                e.first_pos,
+                f"{CM().MAGENTA}Note{CM().RESET}: Already defined here:")
             error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
                                               e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
@@ -99,7 +105,9 @@ class ErrorHandler:
                                             e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
-                e.first_pos, "Note: Constant identifier was initialised here:")
+                e.first_pos,
+                f"{CM().MAGENTA}Note{CM().RESET}: Constant identifier was initialised here:"
+            )
             error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
                                               e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
@@ -118,7 +126,9 @@ class ErrorHandler:
                                             e.first_pos[0])
             error_screen.mark(e.first_pos, 4)
             note_header = self._error_header(
-                e.second_pos, "Note: Second main function defined here:")
+                e.second_pos,
+                f"{CM().MAGENTA}Note{CM().RESET}: Second main function defined here:"
+            )
             error_screen_2 = AnnotationScreen(self.finput, e.second_pos[0],
                                               e.second_pos[0])
             error_screen_2.mark(e.second_pos, 4)
@@ -134,9 +144,9 @@ class ErrorHandler:
 
     def _error_header(self, pos, descirption):
         if not pos:
-            return descirption + '\n'
-        return Style.BRIGHT + self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
-            descirption + Style.RESET_ALL + '\n'
+            return CM().BRIGHT + descirption + CM().RESET_ALL + '\n'
+        return CM().BRIGHT + self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
+            descirption + CM().RESET_ALL + '\n'
 
     def _find_space_after_previous_token(self, pos):
         row, col = pos[0], pos[1]
@@ -241,16 +251,18 @@ class AnnotationScreen:
     def point_at(self, pos, word):
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
-                                                 '^', pos[1], Fore.RED)
+                                                 '^', pos[1],
+                                                 CM().RED)
         self.screen[3 * rel_row + 2] = overwrite(self.screen[3 * rel_row + 2],
-                                                 word, pos[1], Fore.RED)
+                                                 word, pos[1],
+                                                 CM().RED)
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
     def mark(self, pos, length):
         rel_row = pos[0] - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
                                                  '~' * length, pos[1],
-                                                 Fore.BLUE)
+                                                 CM().BLUE)
         self.marked_lines += [3 * rel_row + 1]
 
     def filter(self, ):
@@ -260,6 +272,10 @@ class AnnotationScreen:
                         set(self.marked_lines),
                         reverse=True):
             del self.screen[i]
+
+    def clear(self, row, col):
+        self.screen[row] = overwrite(self.screen[row],
+                                     ' ' * len(self.screen[row]), col)
 
     def __repr__(self, ):
         acc = ""
@@ -272,4 +288,4 @@ class AnnotationScreen:
 
 def overwrite(old, replace_with, idx, color=""):
     return old[:idx] + color + replace_with + (
-        Fore.RESET if color else "") + old[idx + len(replace_with):]
+        CM().RESET if color else "") + old[idx + len(replace_with):]

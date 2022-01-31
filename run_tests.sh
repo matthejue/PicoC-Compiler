@@ -7,7 +7,7 @@ not_passed=();
   echo -e \\n===============================================================================;
   echo $testfile;
   echo ===============================================================================;
-  ./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 -C $testfile;
+  ./src/main.py -c -t -a -s -p -v -b 128 -e 256 -d 20 -S 2 -C $testfile;
   if [[ $? != 0 ]]; then
     not_passed+=($testfile);
   fi;

@@ -4,24 +4,24 @@ import sys
 import global_vars
 from compiler import Compiler, remove_extension
 from colorama import init
+from colormanager import ColorManager as CM
 
 
 def main():
-    if len(sys.argv) > 1:
-        global_vars.shell_on = False
-
     compiler = Compiler()
 
-    if global_vars.args.color:
-        init(strip=False)
-    else:
-        init(strip=True)
+    init(strip=False)
 
     if not global_vars.args.infile:
         sys.exit(compiler.cmdloop())
+
+    if global_vars.args.color:
+        CM().color_on()
     else:
-        infile = global_vars.args.infile
-        outbase = remove_extension(infile)
+        CM().color_off()
+
+    infile = global_vars.args.infile
+    outbase = remove_extension(infile)
 
     try:
         compiler.read_and_write_file(infile, outbase)
