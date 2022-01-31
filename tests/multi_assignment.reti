@@ -1,15 +1,15 @@
 # File 'multi_assignment' Start
 # Main Funktion '(void main (char var1) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(char var1)' Start
-# Variable 'var1' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var1' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char var1)' Ende
 # Allokation '(int var2)' Start
-# Variable 'var2' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var2' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var2)' Ende
 # Zuweisung '((int var3) = (var2 = (var1 = (1 + 1))))' Start
 # Allokation '(int var3)' Start
-# Variable 'var3' vom Typ 'int' mit Adresse '102' zur Symboltabelle hinzugefügt
+# Variable 'var3' vom Typ 'int' mit Adresse '130' zur Symboltabelle hinzugefügt
 # Allokation '(int var3)' Ende
 # Zuweisung '(var2 = (var1 = (1 + 1)))' Start
 # Zuweisung '(var1 = (1 + 1))' Start
@@ -41,11 +41,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '(1 + 1)' in Variable 'var1' speichern
+STORE ACC 128;                         # Wert '(1 + 1)' in Variable 'var1' speichern
 # Zuweisung '(var1 = (1 + 1))' Ende
-STORE ACC 101;                         # Wert '(var1 = (1 + 1))' in Variable 'var2' speichern
+STORE ACC 129;                         # Wert '(var1 = (1 + 1))' in Variable 'var2' speichern
 # Zuweisung '(var2 = (var1 = (1 + 1)))' Ende
-STORE ACC 102;                         # Wert '(var2 = (var1 = (1 + 1)))' in Variable 'var3' speichern
+STORE ACC 130;                         # Wert '(var2 = (var1 = (1 + 1)))' in Variable 'var3' speichern
 # Zuweisung '((int var3) = (var2 = (var1 = (1 + 1))))' Ende
 # Zuweisung '(var3 = (var2 = (var1 = ((1 > 1) && ToBool(1)))))' Start
 # Zuweisung '(var2 = (var1 = ((1 > 1) && ToBool(1))))' Start
@@ -100,11 +100,11 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '((1 > 1) && ToBool(1))' in Variable 'var1' speichern
+STORE ACC 128;                         # Wert '((1 > 1) && ToBool(1))' in Variable 'var1' speichern
 # Zuweisung '(var1 = ((1 > 1) && ToBool(1)))' Ende
-STORE ACC 101;                         # Wert '(var1 = ((1 > 1) && ToBool(1)))' in Variable 'var2' speichern
+STORE ACC 129;                         # Wert '(var1 = ((1 > 1) && ToBool(1)))' in Variable 'var2' speichern
 # Zuweisung '(var2 = (var1 = ((1 > 1) && ToBool(1))))' Ende
-STORE ACC 102;                         # Wert '(var2 = (var1 = ((1 > 1) && ToBool(1))))' in Variable 'var3' speichern
+STORE ACC 130;                         # Wert '(var2 = (var1 = ((1 > 1) && ToBool(1))))' in Variable 'var3' speichern
 # Zuweisung '(var3 = (var2 = (var1 = ((1 > 1) && ToBool(1)))))' Ende
 JUMP 0;
 # Main Funktion '(void main (char var1) ... )' Ende

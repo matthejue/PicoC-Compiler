@@ -194,7 +194,8 @@ style: |
 - zu **großes Literal** für Parameter
 - **Fehlermeldungen** und **Warnings**
 - **Shell** oder **Datei** angeben
-- **Config- bzw. Dot-Files**
+- **Config- bzw. Dot-Files** um Einstellungen und Historie zu speichern
+- **Farbige Ausgabe** von **Fehlermeldungen** und **Code**
 
 <!--small-->
 ![bg right:10%](_resources/background.png)

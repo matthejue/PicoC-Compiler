@@ -1,6 +1,6 @@
 # File 'loop_and_nested_if_else' Start
 # Main Funktion '(void main ((const char x) = 97) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const char x) = 97)' Start
 # Allokation '(const char x)' Start
 # Konstante 'x' vom Typ 'char' zur Symboltabelle hinzugefügt
@@ -9,7 +9,7 @@ LOADI SP 200;
 # Zuweisung '((const char x) = 97)' Ende
 # Zuweisung '((int y) = x)' Start
 # Allokation '(int y)' Start
-# Variable 'y' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'y' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int y)' Ende
 # Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -18,7 +18,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'x' Ende
 LOADIN SP ACC 1;                       # Wert von 'x' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert 'x' in Variable 'y' speichern
+STORE ACC 128;                         # Wert 'x' in Variable 'y' speichern
 # Zuweisung '((int y) = x)' Ende
 # While Statement 'While((x < 12) (y = (y + 1)) ... )' Start
 # Logisches Atom '(x < 12)' Start
@@ -49,7 +49,7 @@ JUMP== 48;                             # Statements überspringen, wenn '(x < 12
 # Arithmetische binäre Operation '(y + 1)' Start
 # Arithmetischer Operand 'y' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'y' in ACC laden
+LOAD ACC 128;                          # Wert von 'y' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'y' Ende
 # Arithmetischer Operand '1' Start
@@ -65,7 +65,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(y + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(y + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '(y + 1)' in Variable 'y' speichern
+STORE ACC 128;                         # Wert '(y + 1)' in Variable 'y' speichern
 # Zuweisung '(y = (y + 1))' Ende
 # If Statement 'If((x == 42) (y = (y + 1)))' Start
 # Logisches Atom '(x == 42)' Start
@@ -97,7 +97,7 @@ JUMP== 15;                             # Branch überspringen
 # Arithmetische binäre Operation '(y + 1)' Start
 # Arithmetischer Operand 'y' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'y' in ACC laden
+LOAD ACC 128;                          # Wert von 'y' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'y' Ende
 # Arithmetischer Operand '1' Start
@@ -113,7 +113,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(y + 1)' Ende
 LOADIN SP ACC 1;                       # Wert von '(y + 1)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '(y + 1)' in Variable 'y' speichern
+STORE ACC 128;                         # Wert '(y + 1)' in Variable 'y' speichern
 # Zuweisung '(y = (y + 1))' Ende
 # If Statement 'If((x == 42) (y = (y + 1)))' Ende
 JUMP -64;                              # Zurück zur Auswertung von '(x < 12)'

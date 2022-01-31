@@ -1,14 +1,14 @@
 # File 'if_else_grammar' Start
 # Main Funktion '(void main (char var) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(char var)' Start
-# Variable 'var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char var)' Ende
 # If und Else Statement 'IfElse((var >= 0) (var = 12) else (var = (var + 1)))' Start
 # Logisches Atom '(var >= 0)' Start
 # Arithmetischer Operand 'var' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'var' in ACC laden
+LOAD ACC 128;                          # Wert von 'var' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'var' Ende
 # Arithmetischer Operand '0' Start
@@ -38,7 +38,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '12' Ende
 LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '12' in Variable 'var' speichern
+STORE ACC 128;                         # Wert '12' in Variable 'var' speichern
 # Zuweisung '(var = 12)' Ende
 JUMP 23;                               # Else-Branch überspringen
 # Else-Branch
@@ -46,7 +46,7 @@ JUMP 23;                               # Else-Branch überspringen
 # Arithmetische binäre Operation '(var + 1)' Start
 # Arithmetischer Operand 'var' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'var' in ACC laden
+LOAD ACC 128;                          # Wert von 'var' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'var' Ende
 # Arithmetischer Operand '1' Start
@@ -71,7 +71,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '(var + 1)' in Variable 'var' speichern
+STORE ACC 128;                         # Wert '(var + 1)' in Variable 'var' speichern
 # Zuweisung '(var = (var + 1))' Ende
 # If und Else Statement 'IfElse((var >= 0) (var = 12) else (var = (var + 1)))' Ende
 JUMP 0;

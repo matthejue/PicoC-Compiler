@@ -1,6 +1,6 @@
 # File 'named_constant_number_character' Start
 # Main Funktion '(void main ((const char var) = 113) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((const char var) = 113)' Start
 # Allokation '(const char var)' Start
 # Konstante 'var' vom Typ 'char' zur Symboltabelle hinzugefügt
@@ -9,7 +9,7 @@ LOADI SP 200;
 # Zuweisung '((const char var) = 113)' Ende
 # Zuweisung '((char x) = (var * (- (5 ^ (- 67)))))' Start
 # Allokation '(char x)' Start
-# Variable 'x' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'x' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char x)' Ende
 # Arithmetische binäre Operation '(var * (- (5 ^ (- 67))))' Start
 # Arithmetischer Operand 'var' Start
@@ -63,7 +63,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '(var * (- (5 ^ (- 67))))' in Variable 'x' speichern
+STORE ACC 128;                         # Wert '(var * (- (5 ^ (- 67))))' in Variable 'x' speichern
 # Zuweisung '((char x) = (var * (- (5 ^ (- 67)))))' Ende
 JUMP 0;
 # Main Funktion '(void main ((const char var) = 113) ... )' Ende

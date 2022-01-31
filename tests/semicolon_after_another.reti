@@ -1,9 +1,9 @@
 # File 'semicolon_after_another' Start
 # Main Funktion '(void main ((int x) = 12) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int x) = 12)' Start
 # Allokation '(int x)' Start
-# Variable 'x' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'x' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int x)' Ende
 # Arithmetischer Operand '12' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,13 +12,13 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '12' Ende
 LOADIN SP ACC 1;                       # Wert von '12' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '12' in Variable 'x' speichern
+STORE ACC 128;                         # Wert '12' in Variable 'x' speichern
 # Zuweisung '((int x) = 12)' Ende
 # If Statement 'If((x < 10) )' Start
 # Logisches Atom '(x < 10)' Start
 # Arithmetischer Operand 'x' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'x' in ACC laden
+LOAD ACC 128;                          # Wert von 'x' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'x' Ende
 # Arithmetischer Operand '10' Start

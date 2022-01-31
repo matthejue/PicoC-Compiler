@@ -1,9 +1,9 @@
 # File 'unary_operators' Start
 # Main Funktion '(void main ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189))))))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189)))))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Arithmetische binäre Operation '((- 12) % ((- (- (- 154))) - (- (- 189))))' Start
 # Arithmetische unäre Operation '(- 12)' Start
@@ -72,7 +72,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '((- 12) % ((- (- (- 154))) - (- (- 189))))' Ende
 LOADIN SP ACC 1;                       # Wert von '((- 12) % ((- (- (- 154))) - (- (- 189))))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '((- 12) % ((- (- (- 154))) - (- (- 189))))' in Variable 'var' speichern
+STORE ACC 128;                         # Wert '((- 12) % ((- (- (- 154))) - (- (- 189))))' in Variable 'var' speichern
 # Zuweisung '((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189)))))' Ende
 JUMP 0;
 # Main Funktion '(void main ((int var) = ((- 12) % ((- (- (- 154))) - (- (- 189))))))' Ende

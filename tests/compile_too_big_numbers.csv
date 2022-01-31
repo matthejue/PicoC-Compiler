@@ -1,5 +1,2 @@
 name,type,datatype,position,value
-char,built in,-,-,-
-int,built in,-,-,-
-car,variable,int,(2:6),128
-var,variable,int,(3:6),129
+char,int,car,var,

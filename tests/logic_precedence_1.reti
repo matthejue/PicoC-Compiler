@@ -1,12 +1,12 @@
 # File 'logic_precedence_1' Start
 # Main Funktion '(void main (char dom) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Allokation '(char dom)' Start
-# Variable 'dom' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'dom' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char dom)' Ende
 # Zuweisung '((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0)))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Logische binäre Verknüpfung '(((12 >= dom) && (34 < 4)) || ToBool(0))' Start
 # Logische binäre Verknüpfung '((12 >= dom) && (34 < 4))' Start
@@ -18,7 +18,7 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '12' Ende
 # Arithmetischer Operand 'dom' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'dom' in ACC laden
+LOAD ACC 128;                          # Wert von 'dom' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'dom' Ende
 LOADIN SP ACC 2;                       # Wert von '12' in ACC laden
@@ -77,7 +77,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Logische binäre Verknüpfung '(((12 >= dom) && (34 < 4)) || ToBool(0))' Ende
 LOADIN SP ACC 1;                       # Wert von '(((12 >= dom) && (34 < 4)) || ToBool(0))' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert '(((12 >= dom) && (34 < 4)) || ToBool(0))' in Variable 'var' speichern
+STORE ACC 129;                         # Wert '(((12 >= dom) && (34 < 4)) || ToBool(0))' in Variable 'var' speichern
 # Zuweisung '((int var) = (((12 >= dom) && (34 < 4)) || ToBool(0)))' Ende
 JUMP 0;
 # Main Funktion '(void main (char dom) ... )' Ende

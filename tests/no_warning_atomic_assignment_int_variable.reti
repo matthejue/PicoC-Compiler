@@ -1,9 +1,9 @@
 # File 'no_warning_atomic_assignment_int_variable' Start
 # Main Funktion '(void main ((int car) = 128) ... )' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int car) = 128)' Start
 # Allokation '(int car)' Start
-# Variable 'car' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'car' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int car)' Ende
 # Arithmetischer Operand '128' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
@@ -12,20 +12,20 @@ STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand '128' Ende
 LOADIN SP ACC 1;                       # Wert von '128' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '128' in Variable 'car' speichern
+STORE ACC 128;                         # Wert '128' in Variable 'car' speichern
 # Zuweisung '((int car) = 128)' Ende
 # Zuweisung '((int var) = car)' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '101' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Arithmetischer Operand 'car' Start
 SUBI SP 1;                             # Stack um eine Zelle erweitern
-LOAD ACC 100;                          # Wert von 'car' in ACC laden
+LOAD ACC 128;                          # Wert von 'car' in ACC laden
 STOREIN SP ACC 1;                      # Wert in oberste Stack-Zelle
 # Arithmetischer Operand 'car' Ende
 LOADIN SP ACC 1;                       # Wert von 'car' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 101;                         # Wert 'car' in Variable 'var' speichern
+STORE ACC 129;                         # Wert 'car' in Variable 'var' speichern
 # Zuweisung '((int var) = car)' Ende
 JUMP 0;
 # Main Funktion '(void main ((int car) = 128) ... )' Ende

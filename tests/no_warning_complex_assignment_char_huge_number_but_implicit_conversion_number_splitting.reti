@@ -1,9 +1,9 @@
 # File 'no_warning_complex_assignment_char_huge_number_but_implicit_conversion_number_splitting' Start
 # Main Funktion '(void main ((char var) = (99 + 2147483647)))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((char var) = (99 + 2147483647))' Start
 # Allokation '(char var)' Start
-# Variable 'var' vom Typ 'char' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'char' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(char var)' Ende
 # Arithmetische binäre Operation '(99 + 2147483647)' Start
 # Arithmetischer Operand '99' Start
@@ -35,7 +35,7 @@ JUMP== 3;                              # Signextension für negative Zahl übers
 LOADI IN1 -256;                        # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
 OR ACC IN1;                            # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
 # Implizite Konversion von 'int' zu 'char' Ende
-STORE ACC 100;                         # Wert '(99 + 2147483647)' in Variable 'var' speichern
+STORE ACC 128;                         # Wert '(99 + 2147483647)' in Variable 'var' speichern
 # Zuweisung '((char var) = (99 + 2147483647))' Ende
 JUMP 0;
 # Main Funktion '(void main ((char var) = (99 + 2147483647)))' Ende

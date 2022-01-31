@@ -1,9 +1,9 @@
 # File 'no_warning_complex_assignment_int_huge_number_number_splitting' Start
 # Main Funktion '(void main ((int var) = (99 + 2147483647)))' Start
-LOADI SP 200;
+LOADI SP 256;
 # Zuweisung '((int var) = (99 + 2147483647))' Start
 # Allokation '(int var)' Start
-# Variable 'var' vom Typ 'int' mit Adresse '100' zur Symboltabelle hinzugefügt
+# Variable 'var' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
 # Allokation '(int var)' Ende
 # Arithmetische binäre Operation '(99 + 2147483647)' Start
 # Arithmetischer Operand '99' Start
@@ -26,7 +26,7 @@ ADDI SP 1;                             # Stack um eine Zelle verkürzen
 # Arithmetische binäre Operation '(99 + 2147483647)' Ende
 LOADIN SP ACC 1;                       # Wert von '(99 + 2147483647)' in ACC laden
 ADDI SP 1;                             # Stack um eine Zelle verkürzen
-STORE ACC 100;                         # Wert '(99 + 2147483647)' in Variable 'var' speichern
+STORE ACC 128;                         # Wert '(99 + 2147483647)' in Variable 'var' speichern
 # Zuweisung '((int var) = (99 + 2147483647))' Ende
 JUMP 0;
 # Main Funktion '(void main ((int var) = (99 + 2147483647)))' Ende

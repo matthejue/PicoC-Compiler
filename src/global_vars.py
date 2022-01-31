@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Args:
+    infile = None
     concrete_syntax = True
     token = True
     abstract_syntax = True
