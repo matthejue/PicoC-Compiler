@@ -169,7 +169,7 @@ class Compiler(cmd2.Cmd):
             with open(self.SETTINGS_FILE) as fin:
                 lines = fin.read().split('\n')
                 for line in lines:
-                    if "colorprompt" in line:
+                    if "color_on" in line:
                         if "True" in line:
                             global_vars.args.color = True
                         else:  # "False" in line:
@@ -202,7 +202,7 @@ class Compiler(cmd2.Cmd):
         global_vars.args.color = False if global_vars.args.color else True
         if os.path.exists(self.SETTINGS_FILE):
             with open(self.SETTINGS_FILE, "w", encoding="utf-8") as fout:
-                fout.write(f"colorprompt: {global_vars.args.color}")
+                fout.write(f"color_on: {global_vars.args.color}")
         self._colorprompt()
 
     @cmd2.with_argparser(cli_args_parser)
