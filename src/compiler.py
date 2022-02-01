@@ -75,7 +75,9 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument('-p',
                                  '--print',
                                  action='store_true',
-                                 help="print all file outputs to the terminal")
+                                 help="print all file outputs to the terminal."
+                                 " Is always activated in the shell. Doesn't "
+                                 "have to be activated manually in the shell.")
     cli_args_parser.add_argument(
         '-b',
         '--begin_data_segment',
