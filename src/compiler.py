@@ -111,17 +111,20 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument('-C',
                                  '--color',
                                  action='store_true',
-                                 help="gives the terminal output color")
-    cli_args_parser.add_argument(
-        '-O',
-        '--optimization_level',
-        help="set the optimiziation level of the "
-        "compiler (0=save all variables on the "
-        "stack, 1=use graph coloring to find the "
-        "best assignment of variables to registers, "
-        "2=partially interpret expressions) [NOT IMPLEMENTED YET]",
-        type=int,
-        default=0)
+                                 help="colorizes the terminal output."
+                                 " Gets ignored in the shell. Instead in the "
+                                 "shell colors can be toggled via the "
+                                 "'color_toggle' command (shortcut 'ct')")
+    #  cli_args_parser.add_argument(
+    #      '-O',
+    #      '--optimization_level',
+    #      help="set the optimiziation level of the "
+    #      "compiler (0=save all variables on the "
+    #      "stack, 1=use graph coloring to find the "
+    #      "best assignment of variables to registers, "
+    #      "2=partially interpret expressions) [NOT IMPLEMENTED YET]",
+    #      type=int,
+    #      default=0)
 
     HISTORY_FILE = os.path.expanduser(
         '~') + "/.config/pico_c_compiler/history.json"
