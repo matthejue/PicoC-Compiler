@@ -44,7 +44,7 @@ optional arguments:
   -a, --abstract-syntax
                         also write the abstract syntax
   -s, --symbol_table    also write the final symbol table into a .csv file
-  -p, --print           print all file outputs to the terminal
+  -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
   -b, --begin_data_segment BEGIN_DATA_SEGMENT
                         where the datasegment starts (default 100)
   -e, --end_data_segment END_DATA_SEGMENT
