@@ -126,7 +126,7 @@ style: |
 
 ## Definitionen
 ### Lexer und Tokens
-- **Lexer:** erstellt Tokens aus einem Stream von Symbolen, indem er lexikalische Patterns erkennt
+- **Lexer:** erstellt *Tokens* aus einem Stream von Symbolen, indem er lexikalische Patterns erkennt
 
 ```c
 void main() {
@@ -155,6 +155,7 @@ void main() {
 ```
 (stdin (void main ((char var) = (12 + 1))))
 ```
+- **Terminalsymbole** innerhalb der Tokens dienen als Ankerpunkte zu **Unterscheidung** zweier Weggabelungen
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -169,7 +170,7 @@ void main() {
   - Beziehung von **Operatoren** und **Operanden** soll hervorgehoben werden, **unempfindlich** gegenüber **Änderungen** der Grammatik
 
 ![_2022-02-01-11-30-44](_resources/_2022-02-01-11-30-44.png) ![_2022-02-01-11-31-23](_resources/_2022-02-01-11-31-23.png)
-##### from parse tree to abstract syntax tree
+##### from Parse Tree to Abstract Syntax Tree
 - durch Enkopplung von ursprünglicher Syntax, kommt man **Operator-Operand Model** des RETI-Assembler näher
 - mehrere Sprachen in diese **Indermediate Representatio (IR)** übersetzbar
 
@@ -642,66 +643,6 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ---
 
-###### Architektur
-
-<!--_class: lead-->
-<!--big-->
-![bg right:30%](_resources/background_2.png)
-<!-- _backgroundColor: #a8dec5; -->
-
----
-
-## Architektur
-### LL(1) Recursive-Descent Lexer
-- *Terminalsymbole* innerhalb der Tokens dienen als Ankerpunkte zu *Unterscheidung* zweier Weggabelungen
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### LL(k) Recursive-Descent Parser
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### Backtracking Parser
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### Normalized Heterogeneoues AST
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### Embedded Heterogeneous Tree Walker
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### Codegenerator
-
-- content
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
 ###### Bachelorabeit Themenvorschlag
 
 <!--_class: lead-->
@@ -713,10 +654,42 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ## Bachelorarbeit Themenvorschlag
 ### Umfang
-- einen optimierten Compiler, der Graph Coloring nutzt, um Locations
--
+- ein **optimierter Compiler**, der **Graph Coloring** nutzt, um **Locations** möglichst optimal an **Register** zuzuweisen
+  - es wird vermieden **Locations** zu **Stack Positionen** zuzuweisen
+    - **Registerzugriffe** schneller als **Hauptspeicherzugriffe**
+    - Zugriff auf Register braucht **weniger RETI-Code** (keine `push` und `pop` Operationen)
+- **Web Interface**, indem man den Compiler bedienen kann
 
-- content
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Bachelorarbeit Themenvorschlag
+### Beispiel optimierter Compiler
+```
+SUBI SP 1;
+LOADI ACC 12;
+STOREIN SP ACC 1;
+LOADIN SP ACC 1;
+ADDI SP 1;
+STORE ACC 100;
+```
+##### $\Downarrow$
+```
+LOADI ACC 12;
+STORE ACC 100;
+```
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Bachelorarbeit Themenvorschlag
+### Passes eines optimalen Compilers ähnlicher Funktionalität
+
+![_2022-02-01-12-50-39](_resources/_2022-02-01-12-50-39.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
