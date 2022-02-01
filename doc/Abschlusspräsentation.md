@@ -79,8 +79,10 @@ style: |
 
 ## Definitionen
 ### Compiler und Interpreter
-
-- content
+![_2022-02-01-09-00-02](_resources/_2022-02-01-09-00-02.png)
+##### Compiler und Parser
+- **Compiler:** *High-level Programm* $\xRightarrow{übersetzen}$ *Maschinencode* (ließt *ganzen* Code ein)
+- **Interpreter:** *Zeile für Zeile* einlesen und *direkt ausführen*
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -90,8 +92,15 @@ style: |
 ## Definitionen
 ### Concrete Syntax
 - Programm als **Textrepräsentation**
-- genau das was man dem Compiler als **Input** gibt
-- wird durch **Grammatik** dargestellt
+- das was man Compiler als **Input** gibt
+- durch **Grammatik** dargestellt:
+  ```
+  <code_le> = <pred_2>
+  <pred_2> =  <pred_1> '||' <pred_1>
+  <pred_1> = <logic_operand> '&&' <logic_operand>
+  <logic_operand> = !<logic_operand> | (<code_le>) | <code_ae> | <code_ae> <cmp> <code_ae>
+  <cmp> = '<' | '>' | '<=' | '>=' | '==' | '!='
+  ```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -101,9 +110,14 @@ style: |
 ## Definitionen
 ### Abstract Syntax
 - Darstellung **innerhalb** des Compilers
-- **Abstract Syntax Tree**, der aus **Nodes** besteht und so aufgebaut ist, dass er die Operationen, die der Compiler ausführen muss optimal unterstützt
-- wird durch **Grammatik** dargestellt
-
+- **Abstract Syntax Tree**, der aus **Nodes** besteht und so aufgebaut ist, dass er die **Operationen**, die der Compiler ausführen muss **optimal unterstützt**
+- durch **Grammatik** dargestellt:
+  ```
+  <code_le> = LogicBinaryOperation(<logic_operand>, <logic_connective>, <logic_operand>)
+  <logic_operand> = Not(<logic_operand>) | <code_le> | ToBool(<code_ae>) | Atom(<code_ae>, <cmp>, <code_ae>)
+  <logic_connective> = LAnd() | LOr()
+  <cmp> = Lt() | Gt() | Le() | Ge() | Eq() | UEq()
+  ```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -112,8 +126,17 @@ style: |
 
 ## Definitionen
 ### Lexer und Tokens
+- **Lexer:** erstellt Tokens aus einem Stream von Symbolen, indem er lexikalische Patterns erkennt
 
-- content
+```c
+void main() {
+  char var = 12 + 1;
+}
+```
+##### $\Downarrow$
+```
+['stdin', 'void', 'main', '(', ')', '{', 'char', 'var', '=', '12', '+', '1', ';', '}']
+```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -122,8 +145,94 @@ style: |
 
 ## Definitionen
 ### Parser und Abstract Syntax Tree
+- **Parser:** *Unwandlung* einer *Eingabe* in ein für die Weiterverarbeitung geignetes *Format*
+  - *Tokens* $\xRightarrow{baut}$ *Abstract Syntax Tree*
 
-- content
+```
+['stdin', 'void', 'main', '(', ')', '{', 'char', 'var', '=', '12', '+', '1', ';', '}']
+```
+##### $\Downarrow$
+```
+(stdin (void main ((char var) = (12 + 1))))
+```
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Abstract Sytax Tree
+- **Vorrausssetzungen:**
+  - Nutzlose Nodes rauswerfen
+  - **einfach** den Tree **entlanglzulaufen**, **Pattern** im Baum leicht **identifizierbar**
+  - Beziehung von **Operatoren** und **Operanden** soll hervorgehoben werden, **unempfindlich** gegenüber **Änderungen** der Grammatik
+
+![_2022-02-01-11-30-44](_resources/_2022-02-01-11-30-44.png) ![_2022-02-01-11-31-23](_resources/_2022-02-01-11-31-23.png)
+##### from parse tree to abstract syntax tree
+- durch Enkopplung von ursprünglicher Syntax, kommt man **Operator-Operand Model** des RETI-Assembler näher
+- mehrere Sprachen in diese **Indermediate Representatio (IR)** übersetzbar
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Grammatiken in Code übersetzen
+![_2022-02-01-09-49-20](_resources/_2022-02-01-09-49-20.png)
+![_2022-02-01-09-50-34](_resources/_2022-02-01-09-50-34.png)
+##### $\Downarrow$
+![_2022-02-01-09-50-56](_resources/_2022-02-01-09-50-56.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Grammatiken in Code übersetzen
+
+![_2022-02-01-09-52-02](_resources/_2022-02-01-09-52-02.png)
+![_2022-02-01-09-52-22](_resources/_2022-02-01-09-52-22.png)
+##### $\Downarrow$
+![_2022-02-01-09-52-39](_resources/_2022-02-01-09-52-39.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Grammatiken in Code übersetzen
+![_2022-02-01-09-54-09](_resources/_2022-02-01-09-54-09.png)
+![_2022-02-01-09-53-54](_resources/_2022-02-01-09-53-54.png)
+##### $\Downarrow$
+![_2022-02-01-09-54-42](_resources/_2022-02-01-09-54-42.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Grammatiken in Code übersetzen
+![_2022-02-01-09-55-15](_resources/_2022-02-01-09-55-15.png)
+![_2022-02-01-09-55-34](_resources/_2022-02-01-09-55-34.png)
+##### $\Downarrow$
+![_2022-02-01-09-55-46](_resources/_2022-02-01-09-55-46.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Definitionen
+### Passes
+- **Problem:** von der **abstrakten Syntax** von **PicoC** zu **abstrakter Syntax** des **RETI-Assembler** übersetzen
+  - dazu das Problem in mehrere **Passes** unterteilen
+  - ein einem **Pass** nur **ein Ziel** erfüllen und nicht mehrere gleichzeitig
+  - "passing over"
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -133,7 +242,21 @@ style: |
 ## Definitionen
 ### Passes
 
-- content
+```
+(stdin (void main ((char var) = (12 + 1))))
+```
+##### $\Downarrow$ alle Passes
+```
+LOADI SP 256;
+SUBI SP 1;
+LOADI ACC 12;
+STOREIN SP ACC 1;
+# ...
+LOADI IN1 -256;
+OR ACC IN1;
+STORE ACC 128;
+JUMP 0;
+```
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -529,29 +652,8 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 ---
 
 ## Architektur
-### Klassendiagramm
-
-- content
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
-### Sequenzdiagramm
-
-- content
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Architektur
 ### LL(1) Recursive-Descent Lexer
-
-- content
+- *Terminalsymbole* innerhalb der Tokens dienen als Ankerpunkte zu *Unterscheidung* zweier Weggabelungen
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -561,8 +663,6 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 ## Architektur
 ### LL(k) Recursive-Descent Parser
 
-- Nicht-Terminalsymbole
-
 <!--small-->
 ![bg right:10%](_resources/background.png)
 
@@ -571,7 +671,21 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 ## Architektur
 ### Backtracking Parser
 
-- content
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Architektur
+### Normalized Heterogeneoues AST
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Architektur
+### Embedded Heterogeneous Tree Walker
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -580,35 +694,6 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ## Architektur
 ### Codegenerator
-
-- content
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-###### Vorführung
-
-<!--_class: lead-->
-<!--big-->
-![bg right:30%](_resources/background_2.png)
-<!-- _backgroundColor: #a8dec5; -->
-
----
-
-## Vorführung
-### Kompilieren einer `.picoc` Datei
-
-- content
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Vorführung
-### Vergleich von Fehlermeldungen in Clang / GCC und PCC
 
 - content
 
@@ -626,6 +711,18 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ---
 
+## Bachelorarbeit Themenvorschlag
+### Umfang
+- einen optimierten Compiler, der Graph Coloring nutzt, um Locations
+-
+
+- content
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
 ###### Quellen
 
 <!--_class: lead-->
@@ -637,8 +734,8 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ## Quellen
 ### Wissenquellen
-- Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
-- IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
+- **[1]** Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
+- **[2]** IU-Fall-2021. “Course Webpage for Compilers (P423, P523, E313, and E513).” Accessed January 28, 2022. https://iucompilercourse.github.io/IU-Fall-2021/.
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -647,7 +744,7 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
 
 ## Quellen
 ### Bildquellen
-- “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
+- **[3]** “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
 
 <!--small-->
 ![bg right:10%](_resources/background.png)

@@ -23,10 +23,11 @@
 - **Bitstring** [[12]](#12)
 - **Cmd2** [[13]](#13)
 - **Tabulate** [[14]](#14)
+- **Colorama** [[15]](#15)
 
 # Misc
-- the **template** of the README.md is greatly inspired by [[15]](#15)
-- wallpaper from manjaro linux used as **background image** for the **presentation** [[16]](#16)
+- the **template** of the README.md is greatly inspired by [[16]](#16)
+- wallpaper from manjaro linux used as **background image** for the **presentation** [[17]](#17)
 
 # References
 - <a id="1">[1]</a> Parr, Terence. Language implementation patterns: create your own domain-specific and general programming languages. Pragmatic Bookshelf, 2009.
@@ -53,6 +54,8 @@
 - <a id="13">[13]</a> GitHub. “Cmd2/Index.Rst at Bef3c758829fe2aa82d58699d61fa78aa961f29d · Python-Cmd2/Cmd2,” January 28, 2022. https://github.com/python-cmd2/cmd2.
 - <a id="14">[14]</a> Astanin, Sergey. Python-Tabulate. Python, 2022. https://github.com/astanin/python-tabulate.
 
-- <a id="15">[15]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
+- <a id="15">[15]</a> Hartley, Jonathan. Tartley/Colorama. Python, 2022. https://github.com/tartley/colorama.
 
-- <a id="16">[16] “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
+- <a id="16">[16]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
+
+- <a id="17">[17] “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
