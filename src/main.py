@@ -28,9 +28,13 @@ def main():
     except FileNotFoundError:
         print("File does not exist\n")
     except:
-        print("Compilation unsuccessfull\n")
+        print(
+            f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
+        )
     else:
-        print("Compilation successfull\n")
+        print(
+            f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+        )
 
 
 if __name__ == '__main__':

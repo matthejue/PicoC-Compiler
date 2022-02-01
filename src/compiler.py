@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import global_vars
 import cmd2
 from lexer import Lexer, TT
@@ -129,6 +127,7 @@ class Compiler(cmd2.Cmd):
         '~') + "/.config/pico_c_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser(
         '~') + "/.config/pico_c_compiler/settings.conf"
+    PERSISTENT_HISTORY_LENGTH = 100
 
     def __init__(self, ):
         global_vars.args = self.cli_args_parser.parse_args()
@@ -136,10 +135,14 @@ class Compiler(cmd2.Cmd):
             self._shell__init__()
 
     def _shell__init__(self, ):
-        super().__init__(persistent_history_length=100)
+        super().__init__()
 
         shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
-        shortcuts.update({'cpl': 'compile', 'ct': 'color_toggle'})
+        shortcuts.update({
+            'cpl': 'compile',
+            'ct': 'color_toggle',
+            'mu': 'most_used'
+        })
         cmd2.Cmd.__init__(self,
                           shortcuts=shortcuts,
                           multiline_commands=['compile'])
@@ -173,6 +176,8 @@ class Compiler(cmd2.Cmd):
     def save_history(
             self,
             _: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
+        if len(self.history) > self.PERSISTENT_HISTORY_LENGTH:
+            del self.history[0]
         with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
             fout.write(self.history.to_json())
         return _
@@ -197,8 +202,19 @@ class Compiler(cmd2.Cmd):
         self._colorprompt()
 
     @cmd2.with_argparser(cli_args_parser)
+    def do_most_used(self, args):
+        args = global_vars.Args(args.infile)
+        self._do_compile(args)
+
+    @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
+        # don't chang anything about the color setting
+        self._do_compile(args)
+
+    def _do_compile(self, args):
+        color = global_vars.args.color
         global_vars.args = args
+        global_vars.args.color = color
 
         # printing is always on in shell
         global_vars.args.print = True
@@ -212,9 +228,13 @@ class Compiler(cmd2.Cmd):
             self._compile(["void main() {"] + args.infile.split('\n') + ["}"],
                           "stdin")
         except:
-            print("Compilation unsuccessfull\n")
+            print(
+                f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
+            )
         else:
-            print("Compilation successfull\n")
+            print(
+                f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+            )
 
     def read_and_write_file(self, infile, outbase):
         """reads a pico_c file and compiles it
@@ -243,7 +263,9 @@ class Compiler(cmd2.Cmd):
         self._reset(infile, code_without_cr)
 
         if global_vars.args.concrete_syntax and global_vars.args.print:
-            print(code_without_cr)
+            code_without_cr_str = Colorizer(
+                str(code_without_cr)).colorize_conrete_syntax()
+            print(code_without_cr_str)
 
         lexer = Lexer(code_without_cr)
 
@@ -282,7 +304,8 @@ class Compiler(cmd2.Cmd):
             t = lexer.next_token()
 
         if global_vars.args.print:
-            print('\n' + str(tokens))
+            tokens_str = Colorizer(str(tokens)).colorize_tokens()
+            print('\n' + tokens_str)
 
         if outbase:
             with open(outbase + ".tokens", 'w', encoding="utf-8") as fout:
@@ -350,16 +373,27 @@ class Colorizer:
     class States(Enum):
         # to reti code
         COMMAND = 0
-        PARAMETER = 1
-        SEMICOLON = 2
-        COMMENT = 3
+        SPACE = 1
+        PARAMETER = 2
+        REGISTER = 3
+        SEMICOLON = 4
+        COMMENT = 5
         # for symbol table
-        TABLE = 4
-        HEADING = 5
-        CONTENT = 6
+        TABLE = 6
+        HEADING = 7
+        WORD_CELL = 8
+        NUMBER_CELL = 9
         # for abstract syntax
-        PARENTHESIS = 7
-        OPERATOR = 8
+        PARENTHESIS = 10
+        OPERATOR = 11
+        NUMBER = 12
+        WORD = 13
+        # for tokens
+        STRUCTURE = 14
+        TOKEN = 15
+        TOKENTYPE = 16
+        STRING = 17
+        POSITION = 18
 
     def __init__(self, cinput):
         """
@@ -379,7 +413,16 @@ class Colorizer:
     def colorize_reti_code(self, ):
         self.state = self.States.COMMAND
         while self.c != self.EOF_CHAR:
-            if self.c == ' ' and self.state == self.States.COMMAND:
+            if self.c == ' ' and self.state != self.States.COMMENT:
+                self.state = self.States.SPACE
+                self.color_not_inserted = True
+            elif (self.c in ascii_letters + '_'
+                  and self.state == self.States.SPACE
+                  and self.state != self.States.COMMENT):
+                self.state = self.States.REGISTER
+                self.color_not_inserted = True
+            elif (self.c in '-1234567890' and self.state == self.States.SPACE
+                  and self.state != self.States.COMMENT):
                 self.state = self.States.PARAMETER
                 self.color_not_inserted = True
             elif self.c == ';':
@@ -396,8 +439,12 @@ class Colorizer:
                 self.insert_colorcode(self.idx, CM().BLUE)
                 self.color_not_inserted = False
                 self.next_char()
-            elif self.state == self.States.PARAMETER and self.color_not_inserted:
+            elif self.state == self.States.REGISTER and self.color_not_inserted:
                 self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.PARAMETER and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().GREEN)
                 self.color_not_inserted = False
                 self.next_char()
             elif self.state == self.States.SEMICOLON and self.color_not_inserted:
@@ -415,12 +462,16 @@ class Colorizer:
     def colorize_symbol_table(self, ):
         self.state = self.States.HEADING
         while self.c != self.EOF_CHAR:
-            if (self.c in ascii_letters + '_' + "1234567890"
-                    and self.state == self.States.TABLE):
-                self.state = self.States.CONTENT
+            if (self.c in ascii_letters + '_' and self.state
+                    in [self.States.TABLE, self.States.NUMBER_CELL]):
+                self.state = self.States.WORD_CELL
+                self.color_not_inserted = True
+            elif (self.c in '1234567890'
+                  and self.state != self.States.WORD_CELL):
+                self.state = self.States.NUMBER_CELL
                 self.color_not_inserted = True
             elif self.c == '-' and self.state in [
-                    self.States.HEADING, self.States.CONTENT
+                    self.States.HEADING, self.States.WORD_CELL
             ]:
                 self.state = self.States.TABLE
                 self.color_not_inserted = True
@@ -432,8 +483,12 @@ class Colorizer:
                 self.insert_colorcode(self.idx, CM().BLUE)
                 self.color_not_inserted = False
                 self.next_char()
-            elif self.state == self.States.CONTENT and self.color_not_inserted:
+            elif self.state == self.States.WORD_CELL and self.color_not_inserted:
                 self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.NUMBER_CELL and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().GREEN)
                 self.color_not_inserted = False
                 self.next_char()
             elif self.state == self.States.TABLE and self.color_not_inserted:
@@ -447,9 +502,12 @@ class Colorizer:
     def colorize_abstract_syntax(self, ):
         self.state = self.States.PARENTHESIS
         while self.c != self.EOF_CHAR:
-            if (self.c in ascii_letters + '_' + "1234567890" and self.state
+            if (self.c in ascii_letters + '_' and self.state
                     in [self.States.PARENTHESIS, self.States.OPERATOR]):
-                self.state = self.States.CONTENT
+                self.state = self.States.WORD
+                self.color_not_inserted = True
+            elif self.c in '1234567890' and self.state != self.States.WORD:
+                self.state = self.States.NUMBER
                 self.color_not_inserted = True
             elif self.c in '()':
                 self.state = self.States.PARENTHESIS
@@ -458,8 +516,12 @@ class Colorizer:
                 self.state = self.States.OPERATOR
                 self.color_not_inserted = True
 
-            if self.state == self.States.CONTENT and self.color_not_inserted:
+            if self.state == self.States.WORD and self.color_not_inserted:
                 self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            if self.state == self.States.NUMBER and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().GREEN)
                 self.color_not_inserted = False
                 self.next_char()
             elif self.state == self.States.PARENTHESIS and self.color_not_inserted:
@@ -475,7 +537,70 @@ class Colorizer:
         return self.cinput + CM().RESET
 
     def colorize_tokens(self, ):
-        ...
+        self.state = self.States.STRUCTURE
+        while self.c != self.EOF_CHAR:
+            if self.c in '()[],':
+                self.state = self.States.STRUCTURE
+                self.color_not_inserted = True
+            elif self.c in '<>':
+                self.state = self.States.TOKEN
+                self.color_not_inserted = True
+            elif self.c == 'T' and self.state == self.States.TOKEN:
+                self.state = self.States.TOKENTYPE
+                self.color_not_inserted = True
+            elif self.c in "'":
+                self.state = self.States.STRING
+                self.color_not_inserted = True
+            elif (self.c in "1234567890"
+                  and self.state == self.States.STRUCTURE):
+                self.state = self.States.POSITION
+                self.color_not_inserted = True
+
+            if self.state == self.States.STRUCTURE and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().WHITE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.TOKEN and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().MAGENTA)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.TOKENTYPE and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().BLUE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.STRING and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.POSITION and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().GREEN)
+                self.color_not_inserted = False
+                self.next_char()
+            else:
+                self.next_char()
+        return self.cinput + CM().RESET
+
+    def colorize_conrete_syntax(self, ):
+        self.state = self.States.STRUCTURE
+        while self.c != self.EOF_CHAR:
+            if self.c in '[],':
+                self.state = self.States.STRUCTURE
+                self.color_not_inserted = True
+            elif self.c in "\"'":
+                self.state = self.States.STRING
+                self.color_not_inserted = True
+
+            if self.state == self.States.STRUCTURE and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().WHITE)
+                self.color_not_inserted = False
+                self.next_char()
+            elif self.state == self.States.STRING and self.color_not_inserted:
+                self.insert_colorcode(self.idx, CM().RED)
+                self.color_not_inserted = False
+                self.next_char()
+            else:
+                self.next_char()
+        return self.cinput + CM().RESET
 
     def insert_colorcode(self, idx, color):
         self.cinput = self.cinput[:idx] + color + self.cinput[idx:]

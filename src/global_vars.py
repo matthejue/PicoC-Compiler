@@ -1,25 +1,22 @@
-from dataclasses import dataclass
-
-
-@dataclass
 class Args:
-    infile = None
-    concrete_syntax = True
-    token = True
-    abstract_syntax = True
-    symbol_table = True
-    print = True
-    begin_data_segment = 128
-    end_data_segment = 256
-    distance = 20
-    verbose = True
-    sight = 2
-    color = False
-    opimization_level = 0
+    def __init__(self, infile):
+        self.infile = infile
+        self.concrete_syntax = True
+        self.tokens = True
+        self.abstract_syntax = True
+        self.symbol_table = True
+        self.print = True
+        self.begin_data_segment = 128
+        self.end_data_segment = 256
+        self.distance = 20
+        self.verbose = True
+        self.sight = 2
+        self.color = True
+        self.opimization_level = 0
 
 
 # options from command-line arguments
-args = Args()
+args = Args("")
 
 # for the taste method of the BacktrackingParser
 is_tasting = 0
