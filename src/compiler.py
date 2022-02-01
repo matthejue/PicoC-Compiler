@@ -26,10 +26,11 @@ class Compiler(cmd2.Cmd):
     main function.
 
     If called without arguments, a shell is going to open up where you can
-    compile PicoC-Code into RETI-Code with the 'compile <cli-options>;' command.
-    The cli-options are the same as for calling the compiler from outside,
-    except for the 'infile' argument, which is interpreted as string with
-    PiooC-Code which will be compiled as if it was enclosed in a main function.
+    compile PicoC-Code into RETI-Code with the `compile <cli-options>
+    "<code>";` command (shortcut 'cpl'). The cli-options are the same as for
+    calling the compiler from outside, except for the 'infile' argument which
+    is interpreted as string with PiooC-Code and which will be compiled as if
+    it was enclosed in a main function.
 
     The 'compile <cli-options>;' command can also be written over multiple
     lines and thus has to end with a ';'.
