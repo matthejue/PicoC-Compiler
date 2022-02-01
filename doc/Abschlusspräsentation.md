@@ -392,14 +392,75 @@ char var_2 = 128;  // ❌
 ## Funktionsumfang
 ### Fehlermeldungen
 #### ConstReassignmentError
-![height:240px](_resources/_2022-02-01-06-23-25.png)
+#### ![height:240px](_resources/_2022-02-01-06-23-25.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
 
 ---
-- `ConstReassignmentError`
 
+## Funktionsumfang
+### Fehlermeldungen
+#### TooLargeLiteralError
+#### ![height:140px](_resources/_2022-02-01-06-29-45.png)
+#### NoMainFunctionError
+#### ![height:70px](_resources/_2022-02-01-06-34-34.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Fehlermeldungen
+#### MoreThanOneMainFunctionError
+#### ![height:170px](_resources/_2022-02-01-06-39-57.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Fehlermeldungen
+#### InvalidCharacterError
+#### ![height:120px](_resources/_2022-02-01-06-41-48.png)
+#### UnclosedCharacterError
+#### ![height:160px](_resources/_2022-02-01-06-43-44.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Warnungen
+- `ImplicitConversionWarning`
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Warnungen
+#### ImplicitConversionWarning
+#### ![height:270px](_resources/_2022-02-01-06-47-45.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Warnungen
+#### ImplicitConversionWarning
+#### ![height:270px](_resources/_2022-02-01-06-47-45_2.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
 
 ## Funktionsumfang
 ### Datei direkt kompilieren
