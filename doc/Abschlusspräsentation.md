@@ -89,8 +89,9 @@ style: |
 
 ## Definitionen
 ### Concrete Syntax
-
-- content
+- Programm als **Textrepräsentation**
+- genau das was man dem Compiler als **Input** gibt
+- wird durch **Grammatik** dargestellt
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -99,8 +100,10 @@ style: |
 
 ## Definitionen
 ### Abstract Syntax
+- Darstellung **innerhalb** des Compilers
+- **Abstract Syntax Tree**, der aus **Nodes** besteht und so aufgebaut ist, dass er die Operationen, die der Compiler ausführen muss optimal unterstützt
+- wird durch **Grammatik** dargestellt
 
-- content
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -193,7 +196,7 @@ style: |
 - zu **großes Literal** für Parameter
 - **Fehlermeldungen** und **Warnings**
 - **Shell** oder **Datei** angeben
-- **Config- bzw. Dot-Files** um Einstellungen und Historie zu speichern
+- **Config-** bzw. **Dot-Files** um Einstellungen und Historie zu speichern
 - **Farbige Ausgabe** von **Fehlermeldungen**, **RETI-Code**, **Symboltabelle**, **Abstraker Syntax**, **Token** usw.
 
 <!-- keine Seperation von von **Deklarations-** und **Anweisungsteil** -->
@@ -276,8 +279,8 @@ void main() {
     & 00000000_00000000_00000000_11111111  // 255
       00000000_00000000_00000000_01111111
     ```
-  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** mit $0$en oder $1$en überschreiben
-    - **Fall 1:** 8-Bit Wert auf rechter Seite **positiv**
+  - mit **Bitmaske** abhängig vom **"Vorzeichenbit"** an der **8ten Stelle** nach der **8ten Stelle** mit $0$en oder $1$en überschreiben
+    - **Fall 1:** 8te Stelle, Wert auf rechter Seite **positiv**
       - keine **Signextension** nötig
 
 <!--small-->
@@ -287,7 +290,7 @@ void main() {
 
 ## Funktionsumfang
 ### Zu großes Literal für `char`
-- **Fall 2:** 8-Bit Wert auf rechter Seite **negativ**
+- **Fall 2:** 8te Stelle, Wert auf rechter Seite **negativ**
   ```
     00000000_00000000_00000000_10000000  //  128
   v 11111111_11111111_11111111_00000000  // -256
@@ -307,25 +310,17 @@ void main() {
 - semantischer Wert des **Literals** zwischen $-2^{21}$ und $2^{21}-1$
 ![height:100px](_resources/_2022-01-28-17-10-21.png)
   ```c
-  int var = 2097151;    // = 2^21-1 ✅
-  int var_2 = 2097152;  // = 2^21   ❌
+  int var = 2097151;       // 2^21-1 ✅
+  int var_2 = 2147483647;  // 2^31-1 ❌
   ```
 - Wert des Literals durch **Shiften** erreichen:
-  ```c
-
+  ```txt
+    00000000_00000000_01111111_11111111  // 2^15-1
+  * 00000000_00000001_00000000_00000000  // 2^16
+    01111111_11111111_11111111_11111111  // 2^31-1
   ```
+- aber sobald Wert des Literals $> 2^{31}-1$ **🠒** `TooLargeLiteralError`
 
-
-<!--small-->
-![bg right:10%](_resources/background.png)
-
----
-
-## Funktionsumfang
-
-
-### Zu großes Literal für Compiler
-- sobald Wert des Literals $> 2^{31}-1$ **🠒** `TooLargeLiteralError`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -499,6 +494,8 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
   - `-e <command-nr>`: command mit Nr. `<command-nr>` **editieren** mit `$EDITOR`
   - `-c <command-nr>`: Historie **leeren**
   - `ctrl+r` command mit substring **suchen**
+- **Config Dateien** `settings.conf` und `history.json` in `~/.config/pico_c_compiler/`
+  - `color_on: True` um gleich mit angeschalteten colors zu starten
 
 
 <!--small-->
@@ -513,6 +510,9 @@ PicoC> most_used "char bool_val = (12 < 1 + 2);";
   - `pico_c_compiler -h`
   - in der **Shell**: `PicoC> help compile`
 
+### 16-farbige  Ausgabe
+- (so gut wie) alle Terminals unterstützen **16 Farben ANSI-Escapesequenzen**
+- **Windows Cmd-Terminal** wird speziell gehandelt
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
