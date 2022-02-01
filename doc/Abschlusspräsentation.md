@@ -266,16 +266,17 @@ void main() {
 ## Funktionsumfang
 ### Zu großes Literal für `char`
 - Wertebereich von `char` ist zwischen $-2^7$ und $2^7-1$
-```c
-char var = 127;    // ✅
-char var_2 = 128;  // ❌
-```
+  ```c
+  char var = 127;    // 2^7-1 ✅
+  char var_2 = 128;  // 2^7   ❌
+  ```
 - **Implicit Conversion** von `int` zu `char`:
     ```
-      00000000_00101011_10100110_01111111  // 128
+      00000000_00101011_10100110_01111111
     & 00000000_00000000_00000000_11111111  // 255
-      00000000_00000000_00000000_01111111  // 128
+      00000000_00000000_00000000_01111111
     ```
+  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** mit $0$en oder $1$en überschreiben
     - **Fall 1:** 8-Bit Wert auf rechter Seite **positiv**
       - keine **Signextension** nötig
 
@@ -293,8 +294,8 @@ char var_2 = 128;  // ❌
     11111111_11111111_11111111_10000000  // -128
   ```
 - Vergleich **PicoC-Compiler** und **Clang**:
+  ![height:160px](_resources/_2022-02-01-07-16-38.png)
   ![height:80px](_resources/_2022-01-29-10-54-10.png)
-  ![height:150px](_resources/_2022-01-29-10-59-04.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -303,12 +304,17 @@ char var_2 = 128;  // ❌
 
 ## Funktionsumfang
 ### Zu großes Literal für Parameter
-- semantischer Wert des **Literals** zwischen $-2^{21}$ und $2^{21}-1$ liegen
+- semantischer Wert des **Literals** zwischen $-2^{21}$ und $2^{21}-1$
 ![height:100px](_resources/_2022-01-28-17-10-21.png)
   ```c
-  int var = 2097151;  // = 2^21-1 ✅
+  int var = 2097151;    // = 2^21-1 ✅
   int var_2 = 2097152;  // = 2^21   ❌
-  int var
+  ```
+- Wert des Literals durch **Shiften** erreichen:
+  ```c
+
+  ```
+
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -317,10 +323,9 @@ char var_2 = 128;  // ❌
 
 ## Funktionsumfang
 
-  - mit **Bitmaske** abhängig vom **Vorzeichenbit** nach der **8ten Stelle** dem mit $0$en oder $1$en übeschreiben
 
 ### Zu großes Literal für Compiler
-- sobald Wert des Literals $> 2^{31}-1$ **🠒** **Error**
+- sobald Wert des Literals $> 2^{31}-1$ **🠒** `TooLargeLiteralError`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
