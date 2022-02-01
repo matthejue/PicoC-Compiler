@@ -2,19 +2,23 @@
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
-all: read-all-verbose
+all: read-all-color
 
 read-all: _read_all clean
 _read-all:
-	./src/main.py -c -t -a -s -p -b 100 -e 200 -d 20 -S 2 -C ./run/code.picoc
+	./src/main.py -c -t -a -s -p -b 128 -e 256 -d 20 -S 2 ./run/code.picoc
 
 read-all-verbose: _read-all-verbose clean
 _read-all-verbose:
-	./src/main.py -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 -C ./run/code.picoc
+	./src/main.py -c -t -a -s -p -v -b 128 -e 256 -d 20 -S 2 ./run/code.picoc
+
+read-all-color: _read-all-color clean
+_read-all-color:
+	./src/main.py -c -t -a -s -p -v -b 128 -e 256 -d 20 -S 2 -C ./run/code.picoc
 
 shell: _shell clean
 _shell:
-	./src/main.py -C
+	./src/main.py
 
 test: _test clean
 _test:
