@@ -1,0 +1,80 @@
+# File 'abschlusspraesentation_anweisungs_und_deklarationsteil' Start
+# Main Funktion '(void main ((int var) = 0) ... )' Start
+LOADI SP 256;
+# Zuweisung '((int var) = 0)' Start
+# Allokation '(int var)' Start
+# Variable 'var' vom Typ 'int' mit Adresse '128' zur Symboltabelle hinzugefügt
+# Allokation '(int var)' Ende
+# Arithmetischer Operand '0' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOADI ACC 0;                                                       # Wert von '0' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '0' Ende
+LOADIN SP ACC 1;                                                   # Wert von '0' in ACC laden
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+STORE ACC 128;                                                     # Wert '0' in Variable 'var' speichern
+# Zuweisung '((int var) = 0)' Ende
+# Do While 'DoWhile((var = (var + 1)) (var < 10))' Start
+# Zuweisung '(var = (var + 1))' Start
+# Arithmetische binäre Operation '(var + 1)' Start
+# Arithmetischer Operand 'var' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOAD ACC 128;                                                      # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '1' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOADI ACC 1;                                                       # Wert von '1' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '1' Ende
+LOADIN SP ACC 2;                                                   # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                                                   # Wert von '1' in IN2 laden
+ADD ACC IN2;                                                       # Wert von '(var + 1)' in ACC laden
+STOREIN SP ACC 2;                                                  # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+# Arithmetische binäre Operation '(var + 1)' Ende
+LOADIN SP ACC 1;                                                   # Wert von '(var + 1)' in ACC laden
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+STORE ACC 128;                                                     # Wert '(var + 1)' in Variable 'var' speichern
+# Zuweisung '(var = (var + 1))' Ende
+# Logisches Atom '(var < 10)' Start
+# Arithmetischer Operand 'var' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOAD ACC 128;                                                      # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+# Arithmetischer Operand '10' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOADI ACC 10;                                                      # Wert von '10' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand '10' Ende
+LOADIN SP ACC 2;                                                   # Wert von 'var' in ACC laden
+LOADIN SP IN2 1;                                                   # Wert von '10' in IN2 laden
+SUB ACC IN2;                                                       # 'var - 10' in ACC laden
+JUMP< 3;                                                           # Ergebnis '1', wenn '(var < 10)' erfüllt
+LOADI ACC 0;                                                       # Ergebnis '0', wenn '(var < 10)' nicht erfüllt
+JUMP 2;
+LOADI ACC 1;                                                       # Ergebnis '1', wenn '(var < 10)' wahr
+STOREIN SP ACC 2;                                                  # Ergebnis in zweitoberste Stack-Zelle
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+# Logisches Atom '(var < 10)' Ende
+LOADIN SP ACC 1;                                                   # Wert von 'l1' in ACC laden
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+JUMP!= -(codelength(af) + codelength(l) + 2);                      # Zurück zur Ausführung der Statements
+# Do While 'DoWhile((var = (var + 1)) (var < 10))' Ende
+# Zuweisung '((int var_2) = var)' Start
+# Allokation '(int var_2)' Start
+# Variable 'var_2' vom Typ 'int' mit Adresse '129' zur Symboltabelle hinzugefügt
+# Allokation '(int var_2)' Ende
+# Arithmetischer Operand 'var' Start
+SUBI SP 1;                                                         # Stack um eine Zelle erweitern
+LOAD ACC 128;                                                      # Wert von 'var' in ACC laden
+STOREIN SP ACC 1;                                                  # Wert in oberste Stack-Zelle
+# Arithmetischer Operand 'var' Ende
+LOADIN SP ACC 1;                                                   # Wert von 'var' in ACC laden
+ADDI SP 1;                                                         # Stack um eine Zelle verkürzen
+STORE ACC 129;                                                     # Wert 'var' in Variable 'var_2' speichern
+# Zuweisung '((int var_2) = var)' Ende
+JUMP 0;
+# Main Funktion '(void main ((int var) = 0) ... )' Ende
+# File 'abschlusspraesentation_anweisungs_und_deklarationsteil' Ende

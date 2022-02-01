@@ -187,7 +187,6 @@ style: |
 ## Funktionsumfang
 ### Zusätze / Änderungen
 - **Kommentare**
-- keine Seperation von von **Deklarations-** und **Anweisungsteil**
 - "**else if**": `if <single-statement> else if { <statement(s)> } else { <statement(s)> }`
 - **Präzidenzregeln**
 - zu **großes Literal** für `char` Datentyp (**Implicit Conversion**)
@@ -195,7 +194,9 @@ style: |
 - **Fehlermeldungen** und **Warnings**
 - **Shell** oder **Datei** angeben
 - **Config- bzw. Dot-Files** um Einstellungen und Historie zu speichern
-- **Farbige Ausgabe** von **Fehlermeldungen** und **Code**
+- **Farbige Ausgabe** von **Fehlermeldungen**, **RETI-Code**, **Symboltabelle**, **Abstraker Syntax**, **Token** usw.
+
+<!-- keine Seperation von von **Deklarations-** und **Anweisungsteil** -->
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -225,6 +226,25 @@ void main() {
 
 ---
 
+<!-- ## Funktionsumfang -->
+<!-- ### Deklarations- und Anweisungsteil -->
+<!-- - **Deklaration** von **Variablen** und **Konstanten** an beliebiger Stelle möglich -->
+<!--  -->
+<!-- ```c -->
+<!-- void main() { -->
+<!--   int var = 0; -->
+<!--   do { -->
+<!--     var = var + 1; -->
+<!--   } while (var < 10); -->
+<!--   int var_2 = var; -->
+<!-- } -->
+<!-- ``` -->
+<!--  -->
+<!-- [> small <] -->
+<!-- ![bg right:10%](_resources/background.png) -->
+<!--  -->
+<!-- --- -->
+
 ## Funktionsumfang
 ### Präzidenzregeln
 - **Konkrette Syntax:** `12 + 'c' - 1;`
@@ -236,7 +256,7 @@ void main() {
 - **Konkrette Syntax:** `-(0 || !(12 < 3 || 3 >= 12));`
   - **Astrakte Syntax:** `(- (ToBool(0) || Not(((12 < 3) || (3 >= 12))))) `
 - **Konkrette Syntax:** `12 < 1 + 2 && 12 || 0;`
-  - **Astrakte Syntax:** `(((12 < (1 + 2)) && ToBool(12)) || ToBool(0))`
+  - **Astrakte Syntax:** `(((12 < (1 ^ 2)) && ToBool(12)) || ToBool(0))`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -309,7 +329,17 @@ char var_2 = 128;  // ❌
 
 ## Funktionsumfang
 ### Fehlermeldungen
-- 2147483648
+- `MismatchedTokenError`
+- `NoApplicableRuleError`
+- `UnknownIdentifierError`
+- `RedefinitionError`
+- `ConstReassignmentError`
+- `TooLargeLiteralError`
+- `NoMainFunctionError`
+- `MoreThanOneMainFunctionError`
+- `InvalidCharacterError`
+- `UnclosedCharacterError`
+- `NotImplementedYetError`
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -317,8 +347,68 @@ char var_2 = 128;  // ❌
 ---
 
 ## Funktionsumfang
-### Help-page
--  sdf
+### Fehlermeldungen
+
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Warnungen
+- `ImplicitConversionWarning`
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Datei direkt kompilieren
+```bash
+./pico_c_compiler -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 -C ./code.picoc
+```
+
+### Shell
+```bash
+./pico_c_compiler
+PicoC> compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "char bool_val = (12 < 1 + 2);";
+PicoC> most_used "char bool_val = (12 < 1 + 2);";
+```
+- `compile <cli-options> "<code>";` (shortcut `cpl`, **multiline**)
+- `most_used "<code>";` (shortcut `mu`, **multiline**)
+- `color_toggle` (shortcut `ct`, **not** multiline), `-C` gets ignored
+- `quit`: Shell verlassen
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Shell
+- `←`, `→`: **Cursor** links und rechs bewegen
+- `↑`, `↓`: in der **Historie** vor- und rückwärts gehen
+- **Multiline Command**: mit `↩` weitere Zeile, mit `;` terminieren
+- `history`: ohne Argumente Liste aller ausgeführten Commands
+  - `-r <command-nr>`: command mit Nr. `<command-nr>` **ausführen**
+  - `-e <command-nr>`: command mit Nr. `<command-nr>` **editieren** mit `$EDITOR`
+  - `-c <command-nr>`: Historie **leeren**
+  - `ctrl+r` command mit substring **suchen**
+
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Verwendung
+- **Übersichtsseite:** https://github.com/matthejue/PicoC-Compiler
+- **Help-page:** https://github.com/matthejue/PicoC-Compiler/blob/master/doc/help-page.txt
+  - `pico_c_compiler -h`
+  - in der **Shell**: `PicoC> help compile`
 
 
 <!--small-->
