@@ -348,7 +348,9 @@ char var_2 = 128;  // ❌
 
 ## Funktionsumfang
 ### Fehlermeldungen
-
+#### MismatchedTokenError
+#### ![height:200px](_resources/_2022-02-01-05-55-02.png)
+#### ![height:140px](_resources/_2022-02-01-05-58-47.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
@@ -356,13 +358,48 @@ char var_2 = 128;  // ❌
 ---
 
 ## Funktionsumfang
-### Warnungen
-- `ImplicitConversionWarning`
+### Fehlermeldungen
+#### NoApplicableRuleError
+#### ![height:150px](_resources/_2022-02-01-06-07-35.png)
+#### ![height:141px](_resources/_2022-02-01-06-10-04.png)
 
 <!--small-->
 ![bg right:10%](_resources/background.png)
 
 ---
+
+## Funktionsumfang
+### Fehlermeldungen
+#### UnknownIdentifierError
+#### ![height:125px](_resources/_2022-02-01-06-15-22.png)
+#### ![height:112px](_resources/_2022-02-01-06-17-03.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Fehlermeldungen
+#### RedefinitionError
+#### ![height:250px](_resources/_2022-02-01-06-20-14.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+
+## Funktionsumfang
+### Fehlermeldungen
+#### ConstReassignmentError
+![height:240px](_resources/_2022-02-01-06-23-25.png)
+
+<!--small-->
+![bg right:10%](_resources/background.png)
+
+---
+- `ConstReassignmentError`
+
 
 ## Funktionsumfang
 ### Datei direkt kompilieren
