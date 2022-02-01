@@ -1,6 +1,5 @@
 Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT]
-               [-e END_DATA_SEGMENT] [-d DISTANCE] [-S SIGHT] [-C] [-v]
-               [-O OPTIMIZATION_LEVEL]
+               [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C]
                [infile]
 
     Compiles PicoC-Code into RETI-Code.
@@ -51,9 +50,7 @@ optional arguments:
                         where the datasegment ends and where the stackpointer starts (default 200)
   -d, --distance DISTANCE
                         distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
-  -S, --sight SIGHT     sets the number of lines visible around a error message
-  -C, --color           gives the terminal output color
   -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
-  -O, --optimization-level OPTIMIZATION_LEVEL
-                        set the optimiziation level of the compiler (0=save all variables on the stack, 1=use graph coloring to find the best assignment of variables to registers, 2=partially interpret expressions) [NOT IMPLEMENTED YET]
+  -S, --sight SIGHT     sets the number of lines visible around a error message
+  -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the 'color_toggle' command (shortcut 'ct')
 
