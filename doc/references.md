@@ -3,6 +3,7 @@
 - **Backtracking Parser** (p. 71 et seq. from [[1]](#1)))
 - **Normalized Heterogeneous AST** (p.111 et seq. from [[1]](#1))
 - **Embedded Heterogeneous Tree Walker** (p.128 et seq. from [[1]](#1))
+- **Symbol Table for Nested Scopes** (p.161 et seq. from [[1]](#1))
 - **Factory Function** used to implement **Singleton Pattern** (from [[2]](#2))
 
 # Used literature
