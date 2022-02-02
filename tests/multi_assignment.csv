@@ -1,2 +1,6 @@
 name,type,datatype,position,value
-char,int,var1,var2,var3,
+char,built in,/,/,/
+int,built in,/,/,/
+var1,variable,char,(2:7),128
+var2,variable,int,(3:6),129
+var3,variable,int,(4:6),130

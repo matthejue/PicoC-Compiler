@@ -1,2 +1,8 @@
 name,type,datatype,position,value
-char,int,dom,a,b,c,var,
+char,built in,/,/,/
+int,built in,/,/,/
+dom,variable,int,(1:18),128
+a,variable,int,(1:27),129
+b,variable,char,(1:35),130
+c,variable,char,(1:43),131
+var,variable,int,(1:50),132

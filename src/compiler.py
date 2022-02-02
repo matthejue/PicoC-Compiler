@@ -353,12 +353,12 @@ class Compiler(cmd2.Cmd):
         for name in symbols.keys():
             position = (
                 f"({symbols[name].position[0]}:{symbols[name].position[1]})"
-                if symbols[name].position != '-' else '-')
-            output += f"{name},"
-            f"{symbols[name].get_type()},"
-            f"{symbols[name].datatype},"
-            f"{position},"
-            f"{symbols[name].value}\n"
+                if symbols[name].position != '/' else '/')
+            output += f"{name},"\
+                f"{symbols[name].get_type()},"\
+                f"{symbols[name].datatype},"\
+                f"{position},"\
+                f"{symbols[name].value}\n"
         with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
             fout.write(output)
 
@@ -476,7 +476,7 @@ class Colorizer:
                   and self.state != self.States.WORD_CELL):
                 self.state = self.States.NUMBER_CELL
                 self.color_not_inserted = True
-            elif self.c == '-' and self.state in [
+            elif self.c in '-/' and self.state in [
                     self.States.HEADING, self.States.WORD_CELL
             ]:
                 self.state = self.States.TABLE
