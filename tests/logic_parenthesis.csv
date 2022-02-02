@@ -1,2 +1,4 @@
 name,type,datatype,position,value
-char,int,bool_var,
+char,built in,/,/,/
+int,built in,/,/,/
+bool_var,variable,int,(2:6),128

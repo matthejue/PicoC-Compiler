@@ -83,9 +83,9 @@ class CodeArranger:
     def remove_comments(self, ):
         clean_code = ""
         for code_line in self._convert_to_lines():
-            comment_start = code_line.find('#')
+            comment_start = code_line.find(';')
             if comment_start > 0:
-                clean_code += code_line[:comment_start - 2] + '\n'
+                clean_code += code_line[:comment_start + 1] + '\n'
         return clean_code
 
     def align_comments(self, ):

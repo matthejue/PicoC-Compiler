@@ -1,2 +1,5 @@
 name,type,datatype,position,value
-char,int,var,x,
+char,built in,/,/,/
+int,built in,/,/,/
+var,named constant,char,(2:13),113
+x,variable,char,(3:7),128
