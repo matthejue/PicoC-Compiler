@@ -17,17 +17,21 @@ from string import ascii_letters
 class Compiler(cmd2.Cmd):
     description = """
     Compiles PicoC-Code into RETI-Code.
-    PicoC is a subset of C including while loops, if and else statements,
-    assignments, arithmetic and logic expressions.
-    Please keep in mind that all statements have to be enclosed in a
+    PicoC is a subset of C including the datatypes int and char, if, else if
+    and else statements, while and do-while loops, arithmetic expressions,
+    including the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and
+    unary operators '-', '~', logic expressions, including comparison relations
+    '==', '!=', '<', '>', '<=', '>=' and logical connectives '!', '&&', '||'
+    and assignments with the assignment operator '='.
+    All statements have to be enclosed in a
 
     void main() { /* your program */ }
 
     main function.
 
     If called without arguments, a shell is going to open up where you can
-    compile PicoC-Code into RETI-Code with the `compile <cli-options>
-    "<code>";` command (shortcut 'cpl'). The cli-options are the same as for
+    compile PicoC-Code into RETI-Code with the 'compile <cli-options>
+    "<code>";' command (shortcut 'cpl'). The cli-options are the same as for
     calling the compiler from outside, except for the 'infile' argument which
     is interpreted as string with PiooC-Code and which will be compiled as if
     it was enclosed in a main function.
