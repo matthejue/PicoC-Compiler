@@ -17,38 +17,68 @@ from string import ascii_letters
 class Compiler(cmd2.Cmd):
     description = """
     Compiles PicoC-Code into RETI-Code.
-    PicoC is a subset of C including the datatypes int and char, if, else if
-    and else statements, while and do-while loops, arithmetic expressions,
-    including the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and
-    unary operators '-', '~', logic expressions, including comparison relations
-    '==', '!=', '<', '>', '<=', '>=' and logical connectives '!', '&&', '||'
-    and assignments with the assignment operator '='.
+
+    ===========================================================================
+    =                                  PicoC                                  =
+    ===========================================================================
+    PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do-while loops, arithmetic expressions, including the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and unary operators '-', '~', logic expressions, including comparison relations '==', '!=', '<', '>', '<=', '>=' and logical connectives '!', '&&', '||' and assignments with the assignment operator '='.
+    The code can be commented with single line comments ('//') and multiline comments ('/*' and '*/').
+
     All statements have to be enclosed in a
 
     void main() { /* your program */ }
 
-    main function.
+    function.
 
-    If called without arguments, a shell is going to open up where you can
-    compile PicoC-Code into RETI-Code with the 'compile <cli-options>
-    "<code>";' command (shortcut 'cpl'). The cli-options are the same as for
-    calling the compiler from outside, except for the 'infile' argument which
-    is interpreted as string with PiooC-Code and which will be compiled as if
-    it was enclosed in a main function.
+    ===========================================================================
+    =                                  Shell                                  =
+    ===========================================================================
+    If called without arguments, a shell is going to open.
 
-    The 'compile <cli-options>;' command can also be written over multiple
-    lines and thus has to end with a ';'.
-    All multiline_commands have to end with a ';'.
-
-    In the shell the cursor can be moved with the <left> and <right> arrow key.
-    Previous and next commands can be retrieved with the <up> and <down> arrow key.
-    A command can be completed with <tab>.
+    In the shell the cursor can be moved with the <left> and <right> arrow key. Previous and next commands can be retrieved with the <up> and <down> arrow key. A command can be completed with <tab>.
 
     The shell can be exited again by typing 'quit'.
 
-    If you discover any bugs I would be very grateful if you could report it
-    via email to juergmatth@gmail.com, attaching the malicious code to the
-    email. ^_^
+    ---------------------------------------------------------------------------
+    -                            'compile' command                            -
+    ---------------------------------------------------------------------------
+    PicoC-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl'). The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
+
+    ---------------------------------------------------------------------------
+    -                           'most_used' command                           -
+    ---------------------------------------------------------------------------
+    If you don't want to type the most likely used cli-options out every time, you can use the 'most_used "<code>"' command (shortcut 'mu').
+    It's a shortcut for:
+
+    compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "<code>";
+
+    and shrinks it down to:
+
+    most_used "<code>";
+
+    ---------------------------------------------------------------------------
+    -                            'history' command                            -
+    ---------------------------------------------------------------------------
+    To geht an overview over all
+
+    ---------------------------------------------------------------------------
+    -                          'color_toggle' command                         -
+    ---------------------------------------------------------------------------
+
+    ---------------------------------------------------------------------------
+    -                            Multiline commands                           -
+    ---------------------------------------------------------------------------
+    Multiline commands can be written over multiple lines by hitting <enter> and terminating it with a ';' at the end.
+    The 'compile' and 'most_used' command are multiline commands and thus always have to end with a ';'.
+
+    ---------------------------------------------------------------------------
+    -                               Config files                              -
+    ---------------------------------------------------------------------------
+
+    ===========================================================================
+    =                                   Misc                                  =
+    ===========================================================================
+    If you discover any bugs I would be very grateful if you could report it via email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
     """
     cli_args_parser = cmd2.Cmd2ArgumentParser(description=description)
     cli_args_parser.add_argument(
