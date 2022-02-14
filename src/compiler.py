@@ -17,7 +17,9 @@ from abstract_syntax_tree import strip_multiline_string
 
 def header(heading, terminal_width):
     return f"""{'=' * terminal_width}
-    {'= ' + ' ' * ((terminal_width - len(heading) - 4) // 2 + (1 if (terminal_width - len(heading) - 4) % 2 else 0))}{heading}{' ' * ((terminal_width - len(heading) - 4) // 2) + ' ='}
+    {'= ' + ' ' * ((terminal_width - len(heading) - 4) // 2 +
+    (1 if (terminal_width - len(heading) - 4) % 2 else 0))}{heading}{' ' *
+    ((terminal_width - len(heading) - 4) // 2) + ' ='}
     {'=' * terminal_width}
     """
 
@@ -77,7 +79,7 @@ class Compiler(cmd2.Cmd):
     most_used "<code>";
 
     {header("'history' command", terminal_width)}
-    To geht an overview over all previously executed commands, use the 'history' command without any arguments (shortcut 'hi').
+    To geht an overview over all previously executed commands, use the 'history' command without any arguments.
 
     If you want to select one of the previously executed commands, this can be done by going back and forth in history with <up> and <down> or be searching the command with ctrl+r by providing a substring of the desired command.
 
@@ -101,38 +103,38 @@ class Compiler(cmd2.Cmd):
     If you discover any bugs I would be very grateful if you could report it via email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
     """), terminal_width)
     INDEND_BY_CLI_OPTIONS = 24
-    terminal_width -= INDEND_BY_CLI_OPTIONS
+    max_width = terminal_width - INDEND_BY_CLI_OPTIONS
     cli_args_parser = cmd2.Cmd2ArgumentParser(description=description)
     cli_args_parser.add_argument(
         "infile",
         nargs='?',
         help=wrap_text(
             "input file with PicoC-code. In the shell this is interpreted as"
-            " string with PicoC-Code", terminal_width))
+            " string with PicoC-Code", max_width))
     cli_args_parser.add_argument(
         '-c',
         '--concrete_syntax',
         action='store_true',
         help=wrap_text(
             "also print the concrete syntax (= content of input file). Only works"
-            " if --print option is active", terminal_width))
+            " if --print option is active", max_width))
     cli_args_parser.add_argument('-t',
                                  '--tokens',
                                  action='store_true',
                                  help=wrap_text("also write the tokenlist",
-                                                terminal_width))
+                                                max_width))
     cli_args_parser.add_argument('-a',
                                  '--abstract-syntax',
                                  action='store_true',
                                  help=wrap_text(
                                      "also write the abstract syntax",
-                                     terminal_width))
+                                     max_width))
     cli_args_parser.add_argument(
         '-s',
         '--symbol_table',
         action='store_true',
         help=wrap_text("also write the final symbol table into a .csv file",
-                       terminal_width))
+                       max_width))
     cli_args_parser.add_argument(
         '-p',
         '--print',
@@ -140,12 +142,12 @@ class Compiler(cmd2.Cmd):
         help=wrap_text(
             "print all file outputs to the terminal."
             " Is always activated in the shell. Doesn't "
-            "have to be activated manually in the shell.", terminal_width))
+            "have to be activated manually in the shell.", max_width))
     cli_args_parser.add_argument(
         '-b',
         '--begin_data_segment',
         help=wrap_text("where the datasegment starts (default 100)",
-                       terminal_width),
+                       max_width),
         type=int,
         default=100)
     cli_args_parser.add_argument(
@@ -154,7 +156,7 @@ class Compiler(cmd2.Cmd):
         help=wrap_text(
             "where the "
             "datasegment ends and where the stackpointer starts (default 200)",
-            terminal_width),
+            max_width),
         type=int,
         default=200)
     cli_args_parser.add_argument(
@@ -163,7 +165,7 @@ class Compiler(cmd2.Cmd):
         help=wrap_text(
             "distance of the comments from the instructions for the --verbose "
             "option. The passed value gets added to the minimum distance of 2 spaces",
-            terminal_width),
+            max_width),
         type=int,
         default=0)
     cli_args_parser.add_argument(
@@ -173,12 +175,12 @@ class Compiler(cmd2.Cmd):
         help=wrap_text(
             "also show tokentype and position for tokens, write the nodetype "
             "in front of parenthesis in the abstract syntax tree, add comments to "
-            "the RETI Code", terminal_width))
+            "the RETI Code", max_width))
     cli_args_parser.add_argument('-S',
                                  '--sight',
                                  help=wrap_text(
                                      "sets the number of lines visible around"
-                                     " a error message", terminal_width),
+                                     " a error message", max_width),
                                  type=int,
                                  default=0)
     cli_args_parser.add_argument(
@@ -189,7 +191,7 @@ class Compiler(cmd2.Cmd):
             "colorizes the terminal output."
             " Gets ignored in the shell. Instead in the "
             "shell colors can be toggled via the "
-            "'color_toggle' command (shortcut 'ct')", terminal_width))
+            "'color_toggle' command (shortcut 'ct')", max_width))
     #  cli_args_parser.add_argument(
     #      '-O',
     #      '--optimization_level',
@@ -223,7 +225,7 @@ class Compiler(cmd2.Cmd):
         })
         cmd2.Cmd.__init__(self,
                           shortcuts=shortcuts,
-                          multiline_commands=['compile'])
+                          multiline_commands=['compile', 'most_used'])
 
         # save history hook
         self.register_postcmd_hook(self.save_history)
