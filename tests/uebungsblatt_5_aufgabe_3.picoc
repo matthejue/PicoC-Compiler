@@ -7,5 +7,6 @@ void main() {
   //Anweisungsteil
   y = 3;
   x = 2;
+
   x = (x + ((y * z) + 10)); // vollstaendig geklammerter Ausdruck
 }
