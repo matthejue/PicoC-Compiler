@@ -67,7 +67,7 @@ most_used "<code>";
 ===============================================================================
 
 To geht an overview over all previously executed commands, use the 'history'
-command without any arguments (shortcut 'hi').
+command without any arguments.
 
 If you want to select one of the previously executed commands, this can be done
 by going back and forth in history with <up> and <down> or be searching the
