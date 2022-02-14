@@ -15,39 +15,45 @@ from string import ascii_letters
 
 
 class Compiler(cmd2.Cmd):
-    description = """
+    if os.get_terminal_size():
+        terminal_width = os.get_terminal_size().columns - 4
+    else:
+        terminal_width = 79
+    description = f"""
     Compiles PicoC-Code into RETI-Code.
 
-    ===========================================================================
-    =                                  PicoC                                  =
-    ===========================================================================
+    {'=' * terminal_width}
+    {'= ' + ' ' * ((terminal_width - len('PicoC') - 4) // 2 + (0 if len('PicoC') % 2 else 1))}PicoC{' ' * ((terminal_width - len('PicoC') - 4) // 2) + ' ='}
+    {'=' * terminal_width}
     PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do-while loops, arithmetic expressions, including the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and unary operators '-', '~', logic expressions, including comparison relations '==', '!=', '<', '>', '<=', '>=' and logical connectives '!', '&&', '||' and assignments with the assignment operator '='.
     The code can be commented with single line comments ('//') and multiline comments ('/*' and '*/').
 
     All statements have to be enclosed in a
 
-    void main() { /* your program */ }
+    void main() {{ /* your program */ }}
 
     function.
 
-    ===========================================================================
-    =                                  Shell                                  =
-    ===========================================================================
+    {'=' * terminal_width}
+    {'= ' + ' ' * ((terminal_width - len('Shell') - 4) // 2 + (0 if len('Shell') % 2 else 1))}Shell{' ' * ((terminal_width - len('Shell') - 4) // 2) + ' ='}
+    {'=' * terminal_width}
     If called without arguments, a shell is going to open.
 
     In the shell the cursor can be moved with the <left> and <right> arrow key. Previous and next commands can be retrieved with the <up> and <down> arrow key. A command can be completed with <tab>.
 
+    In the shell "commands" like 'compile', 'most_used', 'color_toggle', 'history' etc. can be executed.
+
     The shell can be exited again by typing 'quit'.
 
-    ---------------------------------------------------------------------------
-    -                            'compile' command                            -
-    ---------------------------------------------------------------------------
-    PicoC-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl'). The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
+    {'=' * terminal_width}
+    {'= ' + ' ' * ((terminal_width - len("'comile' command") - 4) // 2 + (0 if len("'comile' command") % 2 else 1))}'compile' command{' ' * ((terminal_width - len("'comile' command") - 4) // 2) + ' ='}
+    {'=' * terminal_width}
+    Shell-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl'). The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
 
     ---------------------------------------------------------------------------
     -                           'most_used' command                           -
     ---------------------------------------------------------------------------
-    If you don't want to type the most likely used cli-options out every time, you can use the 'most_used "<code>"' command (shortcut 'mu').
+    If you don't want to type the most likely used cli-options out every time, you can use the 'most_used "<code>";' command (shortcut 'mu').
     It's a shortcut for:
 
     compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "<code>";
@@ -59,21 +65,28 @@ class Compiler(cmd2.Cmd):
     ---------------------------------------------------------------------------
     -                            'history' command                            -
     ---------------------------------------------------------------------------
-    To geht an overview over all
+    To geht an overview over all previously executed commands, use the 'history' command without any arguments (shortcut 'hi').
+
+    If you want to select one of the previously executed commands, this can be done by going back and forth in history with <up> and <down> or be searching the command with ctrl+r by providing a substring of the desired command.
+
+    If you want to execute one of the commands in the history again, this can either done by "selecting" it and executing the choosen command or by looking up the <index> of the command with 'history' and executing 'history -r <index>'.
+
+    If you want to change something about a command that was already executed, you can do that by "selecting" it and changing the choosen command or by looking up the <index> of the command with 'history' and executing 'history -e <index>'. This will open the choosen command in the default Editor (which is definid with the $EDITOR variable under Unix systems) where the command can be edited. When saving and quiting out of the editor the edited command will be executed.
+
+    The history will get saved to the file '~/.config/pico_c_compiler/history.json' if this file exists under this path.
 
     ---------------------------------------------------------------------------
     -                          'color_toggle' command                         -
     ---------------------------------------------------------------------------
+    If you want to have colorized output, this options can be toggled with the 'color_toggle' command (shortcut 'ct').
+
+    The truth value of this option will be saved between sessions if the file '~/.config/pico_c_compiler/settings.conf' with the option 'color_on: <truth-value>' exists.
 
     ---------------------------------------------------------------------------
     -                            Multiline commands                           -
     ---------------------------------------------------------------------------
     Multiline commands can be written over multiple lines by hitting <enter> and terminating it with a ';' at the end.
     The 'compile' and 'most_used' command are multiline commands and thus always have to end with a ';'.
-
-    ---------------------------------------------------------------------------
-    -                               Config files                              -
-    ---------------------------------------------------------------------------
 
     ===========================================================================
     =                                   Misc                                  =
