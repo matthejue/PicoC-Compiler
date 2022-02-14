@@ -1,0 +1,150 @@
+Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT]
+               [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C]
+               [infile]
+
+Compiles PicoC-Code into RETI-Code.
+
+===============================================================================
+=                                    PicoC                                    =
+===============================================================================
+
+PicoC is a subset of C including the datatypes int and char, if, else if and
+else statements, while and do-while loops, arithmetic expressions, including
+the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and unary operators
+'-', '~', logic expressions, including comparison relations '==', '!=', '<',
+'>', '<=', '>=' and logical connectives '!', '&&', '||' and assignments with
+the assignment operator '='.
+The code can be commented with single line comments ('//') and multiline
+comments ('/*' and '*/').
+
+All statements have to be enclosed in a
+
+void main() { /* your program */ }
+
+function.
+
+===============================================================================
+=                                    Shell                                    =
+===============================================================================
+
+If called without arguments, a shell is going to open.
+
+In the shell the cursor can be moved with the <left> and <right> arrow key.
+Previous and next commands can be retrieved with the <up> and <down> arrow key.
+A command can be completed with <tab>.
+
+In the shell "commands" like 'compile', 'most_used', 'color_toggle', 'history'
+etc. can be executed.
+
+The shell can be exited again by typing 'quit'.
+
+===============================================================================
+=                              'compile' command                              =
+===============================================================================
+
+Shell-Code can be compiled into RETI-Code with the 'compile <cli-options>
+"<code>";' command (shortcut 'cpl'). The cli-options are the same as for
+calling the compiler from outside, except for the 'infile' argument which is
+interpreted as string with PiooC-Code and which will be compiled as if it was
+enclosed in a main function.
+
+===============================================================================
+=                             'most_used' command                             =
+===============================================================================
+
+If you don't want to type the most likely used cli-options out every time, you
+can use the 'most_used "<code>";' command (shortcut 'mu').
+It's a shortcut for:
+
+compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "<code>";
+
+and shrinks it down to:
+
+most_used "<code>";
+
+===============================================================================
+=                              'history' command                              =
+===============================================================================
+
+To geht an overview over all previously executed commands, use the 'history'
+command without any arguments (shortcut 'hi').
+
+If you want to select one of the previously executed commands, this can be done
+by going back and forth in history with <up> and <down> or be searching the
+command with ctrl+r by providing a substring of the desired command.
+
+If you want to execute one of the commands in the history again, this can
+either done by "selecting" it and executing the choosen command or by looking
+up the <index> of the command with 'history' and executing 'history -r
+<index>'.
+
+If you want to change something about a command that was already executed, you
+can do that by "selecting" it and changing the choosen command or by looking up
+the <index> of the command with 'history' and executing 'history -e <index>'.
+This will open the choosen command in the default Editor (which is definid with
+the $EDITOR variable under Unix systems) where the command can be edited. When
+saving and quiting out of the editor the edited command will be executed.
+
+The history will get saved to the file '~/.config/pico_c_compiler/history.json'
+if this file exists under this path.
+
+===============================================================================
+=                            'color_toggle' command                           =
+===============================================================================
+
+If you want to have colorized output, this options can be toggled with the
+'color_toggle' command (shortcut 'ct').
+
+The truth value of this option will be saved between sessions if the file
+'~/.config/pico_c_compiler/settings.conf' with the option 'color_on:
+<truth-value>' exists.
+
+===============================================================================
+=                              Multiline Command                              =
+===============================================================================
+
+Multiline commands can be written over multiple lines by hitting <enter> and
+terminating it with a ';' at the end.
+The 'compile' and 'most_used' command are multiline commands and thus always
+have to end with a ';'.
+
+===============================================================================
+=                                     Misc                                    =
+===============================================================================
+
+If you discover any bugs I would be very grateful if you could report it via
+email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
+
+positional arguments:
+  infile                input file with PicoC-code. In the shell this is
+                        interpreted as string with PicoC-Code
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c, --concrete_syntax
+                        also print the concrete syntax (= content of input
+                        file). Only works if --print option is active
+  -t, --tokens          also write the tokenlist
+  -a, --abstract-syntax
+                        also write the abstract syntax
+  -s, --symbol_table    also write the final symbol table into a .csv file
+  -p, --print           print all file outputs to the terminal. Is always
+                        activated in the shell. Doesn't have to be activated
+                        manually in the shell.
+  -b, --begin_data_segment BEGIN_DATA_SEGMENT
+                        where the datasegment starts (default 100)
+  -e, --end_data_segment END_DATA_SEGMENT
+                        where the datasegment ends and where the stackpointer
+                        starts (default 200)
+  -d, --distance DISTANCE
+                        distance of the comments from the instructions for the
+                        --verbose option. The passed value gets added to the
+                        minimum distance of 2 spaces
+  -v, --verbose         also show tokentype and position for tokens, write the
+                        nodetype in front of parenthesis in the abstract syntax
+                        tree, add comments to the RETI Code
+  -S, --sight SIGHT     sets the number of lines visible around a error message
+  -C, --color           colorizes the terminal output. Gets ignored in the
+                        shell. Instead in the shell colors can be toggled via
+                        the 'color_toggle' command (shortcut 'ct')
+
