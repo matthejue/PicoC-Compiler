@@ -12,19 +12,38 @@ from enum import Enum
 from colormanager import ColorManager as CM
 import os
 from string import ascii_letters
+from abstract_syntax_tree import strip_multiline_string
+
+
+def header(heading, terminal_width):
+    return f"""{'=' * terminal_width}
+    {'= ' + ' ' * ((terminal_width - len(heading) - 4) // 2 + (1 if (terminal_width - len(heading) - 4) % 2 else 0))}{heading}{' ' * ((terminal_width - len(heading) - 4) // 2) + ' ='}
+    {'=' * terminal_width}
+    """
+
+
+def wrap_text(text, terminal_width):
+    lines = text.split('\n')
+    for l_idx, line in enumerate(lines):
+        if len(line) > terminal_width:
+            for idx in range(terminal_width, -1, -1):
+                if line[idx] == ' ':
+                    lines.insert(l_idx + 1, line[idx + 1:])
+                    lines[l_idx] = line[:idx]
+                    break
+    return "\n".join(lines)
 
 
 class Compiler(cmd2.Cmd):
-    if os.get_terminal_size():
-        terminal_width = os.get_terminal_size().columns - 4
-    else:
+    try:
+        terminal_width = os.get_terminal_size().columns
+    except OSError:
         terminal_width = 79
-    description = f"""
+    description = wrap_text(
+        strip_multiline_string(f"""
     Compiles PicoC-Code into RETI-Code.
 
-    {'=' * terminal_width}
-    {'= ' + ' ' * ((terminal_width - len('PicoC') - 4) // 2 + (0 if len('PicoC') % 2 else 1))}PicoC{' ' * ((terminal_width - len('PicoC') - 4) // 2) + ' ='}
-    {'=' * terminal_width}
+    {header("PicoC", terminal_width)}
     PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do-while loops, arithmetic expressions, including the binary operators '+', '-', '*', '/', '%', '&', '|', '^' and unary operators '-', '~', logic expressions, including comparison relations '==', '!=', '<', '>', '<=', '>=' and logical connectives '!', '&&', '||' and assignments with the assignment operator '='.
     The code can be commented with single line comments ('//') and multiline comments ('/*' and '*/').
 
@@ -34,9 +53,7 @@ class Compiler(cmd2.Cmd):
 
     function.
 
-    {'=' * terminal_width}
-    {'= ' + ' ' * ((terminal_width - len('Shell') - 4) // 2 + (0 if len('Shell') % 2 else 1))}Shell{' ' * ((terminal_width - len('Shell') - 4) // 2) + ' ='}
-    {'=' * terminal_width}
+    {header("Shell", terminal_width)}
     If called without arguments, a shell is going to open.
 
     In the shell the cursor can be moved with the <left> and <right> arrow key. Previous and next commands can be retrieved with the <up> and <down> arrow key. A command can be completed with <tab>.
@@ -45,14 +62,10 @@ class Compiler(cmd2.Cmd):
 
     The shell can be exited again by typing 'quit'.
 
-    {'=' * terminal_width}
-    {'= ' + ' ' * ((terminal_width - len("'comile' command") - 4) // 2 + (0 if len("'comile' command") % 2 else 1))}'compile' command{' ' * ((terminal_width - len("'comile' command") - 4) // 2) + ' ='}
-    {'=' * terminal_width}
+    {header("'compile' command", terminal_width)}
     Shell-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl'). The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
 
-    ---------------------------------------------------------------------------
-    -                           'most_used' command                           -
-    ---------------------------------------------------------------------------
+    {header("'most_used' command", terminal_width)}
     If you don't want to type the most likely used cli-options out every time, you can use the 'most_used "<code>";' command (shortcut 'mu').
     It's a shortcut for:
 
@@ -62,9 +75,7 @@ class Compiler(cmd2.Cmd):
 
     most_used "<code>";
 
-    ---------------------------------------------------------------------------
-    -                            'history' command                            -
-    ---------------------------------------------------------------------------
+    {header("'history' command", terminal_width)}
     To geht an overview over all previously executed commands, use the 'history' command without any arguments (shortcut 'hi').
 
     If you want to select one of the previously executed commands, this can be done by going back and forth in history with <up> and <down> or be searching the command with ctrl+r by providing a substring of the desired command.
@@ -75,96 +86,109 @@ class Compiler(cmd2.Cmd):
 
     The history will get saved to the file '~/.config/pico_c_compiler/history.json' if this file exists under this path.
 
-    ---------------------------------------------------------------------------
-    -                          'color_toggle' command                         -
-    ---------------------------------------------------------------------------
+    {header("'color_toggle' command", terminal_width)}
     If you want to have colorized output, this options can be toggled with the 'color_toggle' command (shortcut 'ct').
 
     The truth value of this option will be saved between sessions if the file '~/.config/pico_c_compiler/settings.conf' with the option 'color_on: <truth-value>' exists.
 
-    ---------------------------------------------------------------------------
-    -                            Multiline commands                           -
-    ---------------------------------------------------------------------------
+
+    {header("Multiline Command", terminal_width)}
     Multiline commands can be written over multiple lines by hitting <enter> and terminating it with a ';' at the end.
     The 'compile' and 'most_used' command are multiline commands and thus always have to end with a ';'.
 
-    ===========================================================================
-    =                                   Misc                                  =
-    ===========================================================================
+    {header("Misc", terminal_width)}
     If you discover any bugs I would be very grateful if you could report it via email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
-    """
+    """), terminal_width)
+    INDEND_BY_CLI_OPTIONS = 24
+    terminal_width -= INDEND_BY_CLI_OPTIONS
     cli_args_parser = cmd2.Cmd2ArgumentParser(description=description)
     cli_args_parser.add_argument(
         "infile",
         nargs='?',
-        help="input file with PicoC-code. In the shell this is interpreted as"
-        " string with PicoC-Code")
+        help=wrap_text(
+            "input file with PicoC-code. In the shell this is interpreted as"
+            " string with PicoC-Code", terminal_width))
     cli_args_parser.add_argument(
         '-c',
         '--concrete_syntax',
         action='store_true',
-        help=
-        "also print the concrete syntax (= content of input file). Only works"
-        " if --print option is active")
+        help=wrap_text(
+            "also print the concrete syntax (= content of input file). Only works"
+            " if --print option is active", terminal_width))
     cli_args_parser.add_argument('-t',
                                  '--tokens',
                                  action='store_true',
-                                 help="also write the tokenlist")
+                                 help=wrap_text("also write the tokenlist",
+                                                terminal_width))
     cli_args_parser.add_argument('-a',
                                  '--abstract-syntax',
                                  action='store_true',
-                                 help="also write the abstract syntax")
+                                 help=wrap_text(
+                                     "also write the abstract syntax",
+                                     terminal_width))
     cli_args_parser.add_argument(
         '-s',
         '--symbol_table',
         action='store_true',
-        help="also write the final symbol table into a .csv file")
-    cli_args_parser.add_argument('-p',
-                                 '--print',
-                                 action='store_true',
-                                 help="print all file outputs to the terminal."
-                                 " Is always activated in the shell. Doesn't "
-                                 "have to be activated manually in the shell.")
+        help=wrap_text("also write the final symbol table into a .csv file",
+                       terminal_width))
+    cli_args_parser.add_argument(
+        '-p',
+        '--print',
+        action='store_true',
+        help=wrap_text(
+            "print all file outputs to the terminal."
+            " Is always activated in the shell. Doesn't "
+            "have to be activated manually in the shell.", terminal_width))
     cli_args_parser.add_argument(
         '-b',
         '--begin_data_segment',
-        help="where the datasegment starts (default 100)",
+        help=wrap_text("where the datasegment starts (default 100)",
+                       terminal_width),
         type=int,
         default=100)
     cli_args_parser.add_argument(
         '-e',
         '--end_data_segment',
-        help="where the "
-        "datasegment ends and where the stackpointer starts (default 200)",
+        help=wrap_text(
+            "where the "
+            "datasegment ends and where the stackpointer starts (default 200)",
+            terminal_width),
         type=int,
         default=200)
     cli_args_parser.add_argument(
         '-d',
         '--distance',
-        help="distance of the comments from the instructions for the --verbose "
-        "option. The passed value gets added to the minimum distance of 2 spaces",
+        help=wrap_text(
+            "distance of the comments from the instructions for the --verbose "
+            "option. The passed value gets added to the minimum distance of 2 spaces",
+            terminal_width),
         type=int,
         default=0)
     cli_args_parser.add_argument(
         '-v',
         '--verbose',
         action='store_true',
-        help="also show tokentype and position for tokens, write the nodetype "
-        "in front of parenthesis in the abstract syntax tree, add comments to "
-        "the RETI Code")
+        help=wrap_text(
+            "also show tokentype and position for tokens, write the nodetype "
+            "in front of parenthesis in the abstract syntax tree, add comments to "
+            "the RETI Code", terminal_width))
     cli_args_parser.add_argument('-S',
                                  '--sight',
-                                 help="sets the number of lines visible around"
-                                 " a error message",
+                                 help=wrap_text(
+                                     "sets the number of lines visible around"
+                                     " a error message", terminal_width),
                                  type=int,
                                  default=0)
-    cli_args_parser.add_argument('-C',
-                                 '--color',
-                                 action='store_true',
-                                 help="colorizes the terminal output."
-                                 " Gets ignored in the shell. Instead in the "
-                                 "shell colors can be toggled via the "
-                                 "'color_toggle' command (shortcut 'ct')")
+    cli_args_parser.add_argument(
+        '-C',
+        '--color',
+        action='store_true',
+        help=wrap_text(
+            "colorizes the terminal output."
+            " Gets ignored in the shell. Instead in the "
+            "shell colors can be toggled via the "
+            "'color_toggle' command (shortcut 'ct')", terminal_width))
     #  cli_args_parser.add_argument(
     #      '-O',
     #      '--optimization_level',
