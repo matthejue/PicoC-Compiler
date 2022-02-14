@@ -63,7 +63,8 @@ class Compiler(cmd2.Cmd):
     The shell can be exited again by typing 'quit'.
 
     {header("'compile' command", terminal_width)}
-    Shell-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl'). The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
+    Shell-Code can be compiled into RETI-Code with the 'compile <cli-options> "<code>";' command (shortcut 'cpl').
+    The cli-options are the same as for calling the compiler from outside, except for the 'infile' argument which is interpreted as string with PiooC-Code and which will be compiled as if it was enclosed in a main function.
 
     {header("'most_used' command", terminal_width)}
     If you don't want to type the most likely used cli-options out every time, you can use the 'most_used "<code>";' command (shortcut 'mu').
