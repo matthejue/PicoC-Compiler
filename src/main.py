@@ -5,12 +5,17 @@ import global_vars
 from compiler import Compiler, remove_extension
 from colorama import init
 from colormanager import ColorManager as CM
+from help_message import generate_help_message
 
 
 def main():
     compiler = Compiler()
 
     init(strip=False)
+
+    if global_vars.args.manual:
+        print(generate_help_message())
+        return
 
     if not global_vars.args.infile:
         sys.exit(compiler.cmdloop())

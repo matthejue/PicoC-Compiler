@@ -20,6 +20,7 @@ class _ColorManager:
         self.WHITE = Fore.WHITE
         self.RESET = Fore.RESET
         self.BRIGHT = Style.BRIGHT
+        self.NORMAL = Style.NORMAL
         self.RESET_ALL = Style.RESET_ALL
 
 
