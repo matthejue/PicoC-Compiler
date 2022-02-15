@@ -81,7 +81,7 @@ def generate_help_message():
     The history will get saved to the file `~/.config/pico_c_compiler/history.json` if this file exists under this path.
 
     {header("color_toggle command", terminal_width)}
-    If you want to have colorized output, this options can be toggled with the `color_toggle` command (shortcut `tc`).
+    If you want to have colorized output, this options can be toggled with the `color_toggle` command (shortcut `ct`).
 
     The truth value of this option will be saved between sessions if the file `~/.config/pico_c_compiler/settings.conf` with the option `color_on: <truth-value>` exists.
 

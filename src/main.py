@@ -9,13 +9,13 @@ from help_message import generate_help_message
 
 
 def main():
-    compiler = Compiler()
+    if set(['-h', '--help']).intersection(sys.argv):
+        _deal_with_help_page()
+        return
 
     init(strip=False)
 
-    if global_vars.args.manual:
-        print(generate_help_message())
-        return
+    compiler = Compiler()
 
     if not global_vars.args.infile:
         sys.exit(compiler.cmdloop())
@@ -40,6 +40,16 @@ def main():
         print(
             f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
         )
+
+
+def _deal_with_help_page():
+    if set(['-C', '--color']).intersection(sys.argv):
+        global_vars.args.color = True
+        CM().color_on()
+    else:
+        global_vars.args.color = False
+        CM().color_off()
+    print(generate_help_message())
 
 
 if __name__ == '__main__':

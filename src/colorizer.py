@@ -289,6 +289,9 @@ class Colorizer:
             elif self.c == ' ' and self.state == self.States.CLI_ARGUMENT:
                 self.state = self.States.TEXT
                 self.color_not_inserted = True
+            elif self.c == '\n':
+                self.state = self.States.TEXT
+                self.color_not_inserted = True
             elif self.c in "[]":
                 self.state = self.States.OPTIONAL
                 self.color_not_inserted = True

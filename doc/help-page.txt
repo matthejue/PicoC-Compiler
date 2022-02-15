@@ -1,156 +1,156 @@
 [34m[22m
-Usage: compile [35m[22m[[32m[22m-[32m[22mm[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mc[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mt[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22ma[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22ms[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mp[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mb[33m[22m [33m[22mB[33m[22mE[33m[22mG[33m[22mI[33m[22mN_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22me
-[32m[22mE[32m[22mN[32m[22mD_[32m[22mD[32m[22mA[32m[22mT[32m[22mA_[32m[22mS[32m[22mE[32m[22mG[32m[22mM[32m[22mE[32m[22mN[32m[22mT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22md[33m[22m [33m[22mD[33m[22mI[33m[22mS[33m[22mT[33m[22mA[33m[22mN[33m[22mC[33m[22mE[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mv[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mS[33m[22m [33m[22mS[33m[22mI[33m[22mG[33m[22mH[33m[22mT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mC[35m[22m][34m[22m [35m[22m[[34m[22minfile[35m[22m]
-
-[34m[22mCompiles PicoC Code into RETI Code.
-
-[37m[1m===============================================================================
-=[34m[22m                                   [31m[1m`[31m[1mP[31m[1mi[31m[1mc[31m[1mo[31m[1mC[31m[1m`[34m[22m                                   [37m[1m=
-===============================================================================
-
-[34m[22mPicoC is a subset of C including the datatypes int and char, if, else if and
-else statements, while and do while loops, arithmetic expressions, including
-the binary operators [31m[1m`+[31m[1m`[34m[22m, [31m[1m`[31m[1m-[31m[1m`[34m[22m, [31m[1m`[31m[1m*[31m[1m`[34m[22m, [31m[1m`[31m[1m/[31m[1m`[34m[22m, [31m[1m`%[31m[1m`[34m[22m, [31m[1m`[31m[1m&[31m[1m`[34m[22m, [31m[1m`[31m[1m|[31m[1m`[34m[22m, [31m[1m`[31m[1m^[31m[1m`[34m[22m and unary operators
-[31m[1m`[31m[1m-[31m[1m`[34m[22m, [31m[1m`[31m[1m~[31m[1m`[34m[22m, logic expressions, including comparison relations [31m[1m`[31m[1m=[31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m![31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m<[31m[1m`[34m[22m,
-[31m[1m`[31m[1m>[31m[1m`[34m[22m, [31m[1m`[31m[1m<[31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m>[31m[1m=[31m[1m`[34m[22m and logical connectives [31m[1m`[31m[1m![31m[1m`[34m[22m, [31m[1m`[31m[1m&[31m[1m&[31m[1m`[34m[22m, [31m[1m`[31m[1m|[31m[1m|[31m[1m`[34m[22m and assignments with
-the assignment operator [31m[1m`[31m[1m=[31m[1m`[34m[22m.
-The code can be commented with single line comments ([31m[1m`[31m[1m/[31m[1m/[31m[1m`[34m[22m) and multiline
-comments ([31m[1m`[31m[1m/[31m[1m*[31m[1m`[34m[22m and [31m[1m`[31m[1m*[31m[1m/[31m[1m`[34m[22m).
-
-All statements have to be enclosed in a
-
-void main() { /* your program */ }
-
-function.
-
-[37m[1m===============================================================================
-=[34m[22m                                   [31m[1m`[31m[1mS[31m[1mh[31m[1me[31m[1ml[31m[1ml[31m[1m`[34m[22m                                   [37m[1m=
-===============================================================================
-
-[34m[22mIf called without arguments, a shell is going to open.
-
-In the shell the cursor can be moved with the <left> and <right> arrow key.
-Previous and next commands can be retrieved with the <up> and <down> arrow key.
-A command can be completed with <tab>.
-
-In the shell "commands" like [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m, [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m`[34m[22m, [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m, [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`
-[34m[22metc. can be executed.
-
-The shell can be exited again by typing [31m[1m`[31m[1mq[31m[1mu[31m[1mi[31m[1mt[31m[1m`[34m[22m.
-
-[37m[1m===============================================================================
-=[34m[22m                              [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                              [37m[1m=
-===============================================================================
-
-[34m[22mPicoC Code can be compiled into RETI Code with the [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1m<[31m[1mc[31m[1ml[31m[1mi[31m[1m [31m[1mo[31m[1mp[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ms[31m[1m>
-"[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`[34m[22m command (shortcut [31m[1m`[31m[1mc[31m[1mp[31m[1ml[31m[1m`[34m[22m).
-The cli options are the same as for calling the compiler from outside, except
-for the [31m[1m`[31m[1mi[31m[1mn[31m[1mf[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m argument which is interpreted as string with PicoC Code and
-which will be compiled as if it was enclosed in a main function.
-
-[37m[1m===============================================================================
-=[34m[22m                             [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                             [37m[1m=
-===============================================================================
-
-[34m[22mIf you don't want to type the most likely used cli options out every time, you
-can use the [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`[34m[22m command (shortcut [31m[1m`[31m[1mm[31m[1mu[31m[1m`[34m[22m).
-It's a shortcut for:
-
-[31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1m-[31m[1mc[31m[1m [31m[1m-[31m[1mt[31m[1m [31m[1m-[31m[1ma[31m[1m [31m[1m-[31m[1ms[31m[1m [31m[1m-[31m[1mp[31m[1m [31m[1m-[31m[1mv[31m[1m [31m[1m-[31m[1mb[31m[1m 100[31m[1m [31m[1m-[31m[1me[31m[1m 200[31m[1m [31m[1m-[31m[1md[31m[1m 20[31m[1m [31m[1m-[31m[1mS[31m[1m 2[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`
-
-[34m[22mand shrinks it down to:
-
-[31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`
-
-[37m[1m===============================================================================
-=[34m[22m                              [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                              [37m[1m=
-===============================================================================
-
-[34m[22mTo geht an overview over all previously executed commands, use the [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`
-[34m[22mcommand without any arguments.
-
-If you want to select one of the previously executed commands, this can be done
-by going back and forth in history with <up> and <down> or be searching the
-command with ctrl+r by providing a substring of the desired command.
-
-If you want to execute one of the commands in the history again, this can
-either done by "selecting" it and executing the choosen command or by looking
-up the <index> of the command with [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m and executing [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1m-[31m[1mr
-[31m[1m<[31m[1mi[31m[1mn[31m[1md[31m[1me[31m[1mx[31m[1m>[31m[1m`[34m[22m.
-
-If you want to change something about a command that was already executed, you
-can do that by "selecting" it and changing the choosen command or by looking up
-the <index> of the command with [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m and executing [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1m-[31m[1me[31m[1m [31m[1m<[31m[1mi[31m[1mn[31m[1md[31m[1me[31m[1mx[31m[1m>[31m[1m`[34m[22m.
-This will open the choosen command in the default Editor (which is definid with
-the $EDITOR variable under Unix systems) where the command can be edited. When
-saving and quiting out of the editor the edited command will be executed.
-
-The history will get saved to the file [31m[1m`[31m[1m~[31m[1m/[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1mi[31m[1mg[31m[1m/[31m[1mp[31m[1mi[31m[1mc[31m[1mo_[31m[1mc_[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1mr[31m[1m/[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m.[31m[1mj[31m[1ms[31m[1mo[31m[1mn[31m[1m`
-[34m[22mif this file exists under this path.
-
-[37m[1m===============================================================================
-=[34m[22m                            [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                           [37m[1m=
-===============================================================================
-
-[34m[22mIf you want to have colorized output, this options can be toggled with the
-[31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m command (shortcut [31m[1m`[31m[1mt[31m[1mc[31m[1m`[34m[22m).
-
-The truth value of this option will be saved between sessions if the file
-[31m[1m`[31m[1m~[31m[1m/[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1mi[31m[1mg[31m[1m/[31m[1mp[31m[1mi[31m[1mc[31m[1mo_[31m[1mc_[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1mr[31m[1m/[31m[1ms[31m[1me[31m[1mt[31m[1mt[31m[1mi[31m[1mn[31m[1mg[31m[1ms[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1m`[34m[22m with the option [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mo[31m[1mn:
-[31m[1m<[31m[1mt[31m[1mr[31m[1mu[31m[1mt[31m[1mh[31m[1m-[31m[1mv[31m[1ma[31m[1ml[31m[1mu[31m[1me[31m[1m>[31m[1m`[34m[22m exists.
-
-
-[37m[1m===============================================================================
-=[34m[22m                             [31m[1m`[31m[1mM[31m[1mu[31m[1ml[31m[1mt[31m[1mi[31m[1ml[31m[1mi[31m[1mn[31m[1me[31m[1m [31m[1mC[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                             [37m[1m=
-===============================================================================
-
-[34m[22mMultiline commands can be written over multiple lines by hitting <enter> and
-terminating it with a [31m[1m`[31m[1m;[31m[1m`[34m[22m at the end.
-The [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m and [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m`[34m[22m command are multiline commands and thus always
-have to end with a [31m[1m`[31m[1m;[31m[1m`[34m[22m.
-
-[37m[1m===============================================================================
-=[34m[22m                                    [31m[1m`[31m[1mM[31m[1mi[31m[1ms[31m[1mc[31m[1m`[34m[22m                                   [37m[1m=
-===============================================================================
-
-[34m[22mIf you discover any bugs I would be very grateful if you could report it via
-email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
-
-[37m[1m===============================================================================
-=[34m[22m                            [31m[1m`[31m[1mp[31m[1mo[31m[1ms[31m[1mi[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ma[31m[1ml[31m[1m [31m[1ma[31m[1mr[31m[1mg[31m[1mu[31m[1mm[31m[1me[31m[1mn[31m[1mt[31m[1ms[31m[1m`[34m[22m                           [37m[1m=
-===============================================================================
-
-[34m[22minfile                input file with PicoC Code. In the shell this is
-interpreted as string with PicoC Code
-
-[37m[1m===============================================================================
-=[34m[22m                             [31m[1m`[31m[1mo[31m[1mp[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ma[31m[1ml[31m[1m [31m[1ma[31m[1mr[31m[1mg[31m[1mu[31m[1mm[31m[1me[31m[1mn[31m[1mt[31m[1ms[31m[1m`[34m[22m                            [37m[1m=
-===============================================================================
-
-[32m[22m-[32m[22mh,[33m[22m [32m[22m--[32m[22mh[32m[22me[32m[22ml[32m[22mp[33m[22m [34m[22m           show this help message and exit
-[32m[22m-[32m[22mc,[33m[22m [32m[22m--[32m[22mc[32m[22mo[32m[22mn[32m[22mc[32m[22mr[32m[22me[32m[22mt[32m[22me_[32m[22ms[32m[22my[32m[22mn[32m[22mt[32m[22ma[32m[22mx
->[33m[22m [34m[22m                    also print the concrete syntax (content of input file).
-Only works if [31m[1m`[31m[1m-[31m[1m-[31m[1mp[31m[1mr[31m[1mi[31m[1mn[31m[1mt[31m[1m`[34m[22m option is active
-[32m[22m-[32m[22mt,[33m[22m [32m[22m--[32m[22mt[32m[22mo[32m[22mk[32m[22me[32m[22mn[32m[22ms[33m[22m [34m[22m         also write the tokenlist
-[32m[22m-[32m[22ma,[33m[22m [32m[22m--[32m[22ma[32m[22mb[32m[22ms[32m[22mt[32m[22mr[32m[22ma[32m[22mc[32m[22mt-[32m[22ms[32m[22my[32m[22mn[32m[22mt[32m[22ma[32m[22mx
->[33m[22m [34m[22m                    also write the abstract syntax
-[32m[22m-[32m[22ms,[33m[22m [32m[22m--[32m[22ms[32m[22my[32m[22mm[32m[22mb[32m[22mo[32m[22ml_[32m[22mt[32m[22ma[32m[22mb[32m[22ml[32m[22me[33m[22m [34m[22m   also write the final symbol table into a [31m[1m`[31m[1m.[31m[1mc[31m[1ms[31m[1mv[31m[1m`[34m[22m file
-[32m[22m-[32m[22mp,[33m[22m [32m[22m--[32m[22mp[32m[22mr[32m[22mi[32m[22mn[32m[22mt[33m[22m [34m[22m          print all file outputs to the terminal. Is always
-activated in the shell. Doesn't have to be activated manually in the shell.
-[32m[22m-[32m[22mb,[33m[22m [32m[22m--[32m[22mb[32m[22me[32m[22mg[32m[22mi[32m[22mn_[32m[22md[32m[22ma[32m[22mt[32m[22ma_[32m[22ms[32m[22me[32m[22mg[32m[22mm[32m[22me[32m[22mn[32m[22mt[33m[22m [33m[22mB[33m[22mE[33m[22mG[33m[22mI[33m[22mN_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT
->[34m[22m                     where the datasegment starts (default [31m[1m`100[31m[1m`[34m[22m)
-[32m[22m-[32m[22me,[33m[22m [32m[22m--[32m[22me[32m[22mn[32m[22md_[32m[22md[32m[22ma[32m[22mt[32m[22ma_[32m[22ms[32m[22me[32m[22mg[32m[22mm[32m[22me[32m[22mn[32m[22mt[33m[22m [33m[22mE[33m[22mN[33m[22mD_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT
->[34m[22m                     where the datasegment ends and where the stackpointer
-starts (default [31m[1m`200[31m[1m`[34m[22m)
-[32m[22m-[32m[22md,[33m[22m [32m[22m--[32m[22md[32m[22mi[32m[22ms[32m[22mt[32m[22ma[32m[22mn[32m[22mc[32m[22me[33m[22m [33m[22mD[33m[22mI[33m[22mS[33m[22mT[33m[22mA[33m[22mN[33m[22mC[33m[22mE
->[34m[22m                     distance of the comments from the instructions for the
-[31m[1m`[31m[1m-[31m[1m-[31m[1mv[31m[1me[31m[1mr[31m[1mb[31m[1mo[31m[1ms[31m[1me[31m[1m`[34m[22m option. The passed value gets added to the minimum distance of 2
-spaces
-[32m[22m-[32m[22mv,[33m[22m [32m[22m--[32m[22mv[32m[22me[32m[22mr[32m[22mb[32m[22mo[32m[22ms[32m[22me[33m[22m [34m[22m        also show tokentype and position for tokens, write the
-nodetype in front of parenthesis in the abstract syntax tree, add comments to
-the RETI Code
-[32m[22m-[32m[22mS,[33m[22m [32m[22m--[32m[22ms[32m[22mi[32m[22mg[32m[22mh[32m[22mt[33m[22m [33m[22mS[33m[22mI[33m[22mG[33m[22mH[33m[22mT[34m[22m     sets the number of lines visible around a error message
-[32m[22m-[32m[22mC,[33m[22m [32m[22m--[32m[22mc[32m[22mo[32m[22ml[32m[22mo[32m[22mr[33m[22m [34m[22m          colorizes the terminal output. Gets ignored in the shell.
-Instead in the shell colors can be toggled via the [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m command
-(shortcut [31m[1m`[31m[1mc[31m[1mt[31m[1m`[34m[22m)
+Usage: compile [35m[22m[[32m[22m-[32m[22mm[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mc[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mt[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22ma[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22ms[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mp[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mb[33m[22m [33m[22mB[33m[22mE[33m[22mG[33m[22mI[33m[22mN_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22me[34m[22m
+END_DATA_SEGMENT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22md[33m[22m [33m[22mD[33m[22mI[33m[22mS[33m[22mT[33m[22mA[33m[22mN[33m[22mC[33m[22mE[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mv[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mS[33m[22m [33m[22mS[33m[22mI[33m[22mG[33m[22mH[33m[22mT[35m[22m][34m[22m [35m[22m[[32m[22m-[32m[22mC[35m[22m][34m[22m [35m[22m[[34m[22minfile[35m[22m][34m[22m
+[34m[22m
+Compiles PicoC Code into RETI Code.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                                   [31m[1m`[31m[1mP[31m[1mi[31m[1mc[31m[1mo[31m[1mC[31m[1m`[34m[22m                                   [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+PicoC is a subset of C including the datatypes int and char, if, else if and[34m[22m
+else statements, while and do while loops, arithmetic expressions, including[34m[22m
+the binary operators [31m[1m`+[31m[1m`[34m[22m, [31m[1m`[31m[1m-[31m[1m`[34m[22m, [31m[1m`[31m[1m*[31m[1m`[34m[22m, [31m[1m`[31m[1m/[31m[1m`[34m[22m, [31m[1m`%[31m[1m`[34m[22m, [31m[1m`[31m[1m&[31m[1m`[34m[22m, [31m[1m`[31m[1m|[31m[1m`[34m[22m, [31m[1m`[31m[1m^[31m[1m`[34m[22m and unary operators[34m[22m
+[31m[1m`[31m[1m-[31m[1m`[34m[22m, [31m[1m`[31m[1m~[31m[1m`[34m[22m, logic expressions, including comparison relations [31m[1m`[31m[1m=[31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m![31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m<[31m[1m`[34m[22m,[34m[22m
+[31m[1m`[31m[1m>[31m[1m`[34m[22m, [31m[1m`[31m[1m<[31m[1m=[31m[1m`[34m[22m, [31m[1m`[31m[1m>[31m[1m=[31m[1m`[34m[22m and logical connectives [31m[1m`[31m[1m![31m[1m`[34m[22m, [31m[1m`[31m[1m&[31m[1m&[31m[1m`[34m[22m, [31m[1m`[31m[1m|[31m[1m|[31m[1m`[34m[22m and assignments with[34m[22m
+the assignment operator [31m[1m`[31m[1m=[31m[1m`[34m[22m.[34m[22m
+The code can be commented with single line comments ([31m[1m`[31m[1m/[31m[1m/[31m[1m`[34m[22m) and multiline[34m[22m
+comments ([31m[1m`[31m[1m/[31m[1m*[31m[1m`[34m[22m and [31m[1m`[31m[1m*[31m[1m/[31m[1m`[34m[22m).[34m[22m
+[34m[22m
+All statements have to be enclosed in a[34m[22m
+[34m[22m
+void main() { /* your program */ }[34m[22m
+[34m[22m
+function.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                                   [31m[1m`[31m[1mS[31m[1mh[31m[1me[31m[1ml[31m[1ml[31m[1m`[34m[22m                                   [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+If called without arguments, a shell is going to open.[34m[22m
+[34m[22m
+In the shell the cursor can be moved with the <left> and <right> arrow key.[34m[22m
+Previous and next commands can be retrieved with the <up> and <down> arrow key.[34m[22m
+A command can be completed with <tab>.[34m[22m
+[34m[22m
+In the shell "commands" like [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m, [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m`[34m[22m, [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m, [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m
+etc. can be executed.[34m[22m
+[34m[22m
+The shell can be exited again by typing [31m[1m`[31m[1mq[31m[1mu[31m[1mi[31m[1mt[31m[1m`[34m[22m.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                              [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                              [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+PicoC Code can be compiled into RETI Code with the [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1m<[31m[1mc[31m[1ml[31m[1mi[31m[1m [31m[1mo[31m[1mp[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ms[31m[1m>[34m[22m
+"<code>";[31m[1m`[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m ([31m[1ms[31m[1mh[31m[1mo[31m[1mr[31m[1mt[31m[1mc[31m[1mu[31m[1mt[31m[1m [31m[1m`[34m[22mcpl[31m[1m`[34m[22m).[34m[22m
+The cli options are the same as for calling the compiler from outside, except[34m[22m
+for the [31m[1m`[31m[1mi[31m[1mn[31m[1mf[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m argument which is interpreted as string with PicoC Code and[34m[22m
+which will be compiled as if it was enclosed in a main function.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                             [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                             [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+If you don't want to type the most likely used cli options out every time, you[34m[22m
+can use the [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`[34m[22m command (shortcut [31m[1m`[31m[1mm[31m[1mu[31m[1m`[34m[22m).[34m[22m
+It's a shortcut for:[34m[22m
+[34m[22m
+[31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m [31m[1m-[31m[1mc[31m[1m [31m[1m-[31m[1mt[31m[1m [31m[1m-[31m[1ma[31m[1m [31m[1m-[31m[1ms[31m[1m [31m[1m-[31m[1mp[31m[1m [31m[1m-[31m[1mv[31m[1m [31m[1m-[31m[1mb[31m[1m 100[31m[1m [31m[1m-[31m[1me[31m[1m 200[31m[1m [31m[1m-[31m[1md[31m[1m 20[31m[1m [31m[1m-[31m[1mS[31m[1m 2[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`[34m[22m
+[34m[22m
+and shrinks it down to:[34m[22m
+[34m[22m
+[31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m "[31m[1m<[31m[1mc[31m[1mo[31m[1md[31m[1me[31m[1m>"[31m[1m;[31m[1m`[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                              [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                              [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+To geht an overview over all previously executed commands, use the [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m
+command without any arguments.[34m[22m
+[34m[22m
+If you want to select one of the previously executed commands, this can be done[34m[22m
+by going back and forth in history with <up> and <down> or be searching the[34m[22m
+command with ctrl+r by providing a substring of the desired command.[34m[22m
+[34m[22m
+If you want to execute one of the commands in the history again, this can[34m[22m
+either done by "selecting" it and executing the choosen command or by looking[34m[22m
+up the <index> of the command with [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m and executing [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1m-[31m[1mr[34m[22m
+<index>[31m[1m`[31m[1m.[34m[22m
+[34m[22m
+If you want to change something about a command that was already executed, you[34m[22m
+can do that by "selecting" it and changing the choosen command or by looking up[34m[22m
+the <index> of the command with [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m`[34m[22m and executing [31m[1m`[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m [31m[1m-[31m[1me[31m[1m [31m[1m<[31m[1mi[31m[1mn[31m[1md[31m[1me[31m[1mx[31m[1m>[31m[1m`[34m[22m.[34m[22m
+This will open the choosen command in the default Editor (which is definid with[34m[22m
+the $EDITOR variable under Unix systems) where the command can be edited. When[34m[22m
+saving and quiting out of the editor the edited command will be executed.[34m[22m
+[34m[22m
+The history will get saved to the file [31m[1m`[31m[1m~[31m[1m/[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1mi[31m[1mg[31m[1m/[31m[1mp[31m[1mi[31m[1mc[31m[1mo_[31m[1mc_[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1mr[31m[1m/[31m[1mh[31m[1mi[31m[1ms[31m[1mt[31m[1mo[31m[1mr[31m[1my[31m[1m.[31m[1mj[31m[1ms[31m[1mo[31m[1mn[31m[1m`[34m[22m
+if this file exists under this path.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                            [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m [31m[1mc[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                           [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+If you want to have colorized output, this options can be toggled with the[34m[22m
+[31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m command (shortcut [31m[1m`[31m[1mt[31m[1mc[31m[1m`[34m[22m).[34m[22m
+[34m[22m
+The truth value of this option will be saved between sessions if the file[34m[22m
+[31m[1m`[31m[1m~[31m[1m/[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1mi[31m[1mg[31m[1m/[31m[1mp[31m[1mi[31m[1mc[31m[1mo_[31m[1mc_[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1mr[31m[1m/[31m[1ms[31m[1me[31m[1mt[31m[1mt[31m[1mi[31m[1mn[31m[1mg[31m[1ms[31m[1m.[31m[1mc[31m[1mo[31m[1mn[31m[1mf[31m[1m`[34m[22m with the option [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mo[31m[1mn:[34m[22m
+<truth[32m[22m-[32m[22mv[32m[22ma[32m[22ml[32m[22mu[32m[22me>[31m[1m`[31m[1m [31m[1me[31m[1mx[31m[1mi[31m[1ms[31m[1mt[31m[1ms[31m[1m.[34m[22m
+[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                             [31m[1m`[31m[1mM[31m[1mu[31m[1ml[31m[1mt[31m[1mi[31m[1ml[31m[1mi[31m[1mn[31m[1me[31m[1m [31m[1mC[31m[1mo[31m[1mm[31m[1mm[31m[1ma[31m[1mn[31m[1md[31m[1m`[34m[22m                             [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+Multiline commands can be written over multiple lines by hitting <enter> and[34m[22m
+terminating it with a [31m[1m`[31m[1m;[31m[1m`[34m[22m at the end.[34m[22m
+The [31m[1m`[31m[1mc[31m[1mo[31m[1mm[31m[1mp[31m[1mi[31m[1ml[31m[1me[31m[1m`[34m[22m and [31m[1m`[31m[1mm[31m[1mo[31m[1ms[31m[1mt_[31m[1mu[31m[1ms[31m[1me[31m[1md[31m[1m`[34m[22m command are multiline commands and thus always[34m[22m
+have to end with a [31m[1m`[31m[1m;[31m[1m`[34m[22m.[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                                    [31m[1m`[31m[1mM[31m[1mi[31m[1ms[31m[1mc[31m[1m`[34m[22m                                   [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+If you discover any bugs I would be very grateful if you could report it via[34m[22m
+email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                            [31m[1m`[31m[1mp[31m[1mo[31m[1ms[31m[1mi[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ma[31m[1ml[31m[1m [31m[1ma[31m[1mr[31m[1mg[31m[1mu[31m[1mm[31m[1me[31m[1mn[31m[1mt[31m[1ms[31m[1m`[34m[22m                           [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+infile                input file with PicoC Code. In the shell this is[34m[22m
+interpreted as string with PicoC Code[34m[22m
+[34m[22m
+[37m[1m===============================================================================[34m[22m
+[37m[1m=[34m[22m                             [31m[1m`[31m[1mo[31m[1mp[31m[1mt[31m[1mi[31m[1mo[31m[1mn[31m[1ma[31m[1ml[31m[1m [31m[1ma[31m[1mr[31m[1mg[31m[1mu[31m[1mm[31m[1me[31m[1mn[31m[1mt[31m[1ms[31m[1m`[34m[22m                            [37m[1m=[34m[22m
+[37m[1m===============================================================================[34m[22m
+[34m[22m
+[32m[22m-[32m[22mh,[33m[22m [32m[22m--[32m[22mh[32m[22me[32m[22ml[32m[22mp[33m[22m [34m[22m           show this help message and exit[34m[22m
+[32m[22m-[32m[22mc,[33m[22m [32m[22m--[32m[22mc[32m[22mo[32m[22mn[32m[22mc[32m[22mr[32m[22me[32m[22mt[32m[22me_[32m[22ms[32m[22my[32m[22mn[32m[22mt[32m[22ma[32m[22mx[34m[22m
+>                     also print the concrete syntax (content of input file).[34m[22m
+Only works if [31m[1m`[31m[1m-[31m[1m-[31m[1mp[31m[1mr[31m[1mi[31m[1mn[31m[1mt[31m[1m`[34m[22m option is active[34m[22m
+[32m[22m-[32m[22mt,[33m[22m [32m[22m--[32m[22mt[32m[22mo[32m[22mk[32m[22me[32m[22mn[32m[22ms[33m[22m [34m[22m         also write the tokenlist[34m[22m
+[32m[22m-[32m[22ma,[33m[22m [32m[22m--[32m[22ma[32m[22mb[32m[22ms[32m[22mt[32m[22mr[32m[22ma[32m[22mc[32m[22mt-[32m[22ms[32m[22my[32m[22mn[32m[22mt[32m[22ma[32m[22mx[34m[22m
+>                     also write the abstract syntax[34m[22m
+[32m[22m-[32m[22ms,[33m[22m [32m[22m--[32m[22ms[32m[22my[32m[22mm[32m[22mb[32m[22mo[32m[22ml_[32m[22mt[32m[22ma[32m[22mb[32m[22ml[32m[22me[33m[22m [34m[22m   also write the final symbol table into a [31m[1m`[31m[1m.[31m[1mc[31m[1ms[31m[1mv[31m[1m`[34m[22m file[34m[22m
+[32m[22m-[32m[22mp,[33m[22m [32m[22m--[32m[22mp[32m[22mr[32m[22mi[32m[22mn[32m[22mt[33m[22m [34m[22m          print all file outputs to the terminal. Is always[34m[22m
+activated in the shell. Doesn't have to be activated manually in the shell.[34m[22m
+[32m[22m-[32m[22mb,[33m[22m [32m[22m--[32m[22mb[32m[22me[32m[22mg[32m[22mi[32m[22mn_[32m[22md[32m[22ma[32m[22mt[32m[22ma_[32m[22ms[32m[22me[32m[22mg[32m[22mm[32m[22me[32m[22mn[32m[22mt[33m[22m [33m[22mB[33m[22mE[33m[22mG[33m[22mI[33m[22mN_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT[34m[22m
+>                     where the datasegment starts (default [31m[1m`100[31m[1m`[34m[22m)[34m[22m
+[32m[22m-[32m[22me,[33m[22m [32m[22m--[32m[22me[32m[22mn[32m[22md_[32m[22md[32m[22ma[32m[22mt[32m[22ma_[32m[22ms[32m[22me[32m[22mg[32m[22mm[32m[22me[32m[22mn[32m[22mt[33m[22m [33m[22mE[33m[22mN[33m[22mD_[33m[22mD[33m[22mA[33m[22mT[33m[22mA_[33m[22mS[33m[22mE[33m[22mG[33m[22mM[33m[22mE[33m[22mN[33m[22mT[34m[22m
+>                     where the datasegment ends and where the stackpointer[34m[22m
+starts (default [31m[1m`200[31m[1m`[34m[22m)[34m[22m
+[32m[22m-[32m[22md,[33m[22m [32m[22m--[32m[22md[32m[22mi[32m[22ms[32m[22mt[32m[22ma[32m[22mn[32m[22mc[32m[22me[33m[22m [33m[22mD[33m[22mI[33m[22mS[33m[22mT[33m[22mA[33m[22mN[33m[22mC[33m[22mE[34m[22m
+>                     distance of the comments from the instructions for the[34m[22m
+[31m[1m`[31m[1m-[31m[1m-[31m[1mv[31m[1me[31m[1mr[31m[1mb[31m[1mo[31m[1ms[31m[1me[31m[1m`[34m[22m option. The passed value gets added to the minimum distance of 2[34m[22m
+spaces[34m[22m
+[32m[22m-[32m[22mv,[33m[22m [32m[22m--[32m[22mv[32m[22me[32m[22mr[32m[22mb[32m[22mo[32m[22ms[32m[22me[33m[22m [34m[22m        also show tokentype and position for tokens, write the[34m[22m
+nodetype in front of parenthesis in the abstract syntax tree, add comments to[34m[22m
+the RETI Code[34m[22m
+[32m[22m-[32m[22mS,[33m[22m [32m[22m--[32m[22ms[32m[22mi[32m[22mg[32m[22mh[32m[22mt[33m[22m [33m[22mS[33m[22mI[33m[22mG[33m[22mH[33m[22mT[34m[22m     sets the number of lines visible around a error message[34m[22m
+[32m[22m-[32m[22mC,[33m[22m [32m[22m--[32m[22mc[32m[22mo[32m[22ml[32m[22mo[32m[22mr[33m[22m [34m[22m          colorizes the terminal output. Gets ignored in the shell.[34m[22m
+Instead in the shell colors can be toggled via the [31m[1m`[31m[1mc[31m[1mo[31m[1ml[31m[1mo[31m[1mr_[31m[1mt[31m[1mo[31m[1mg[31m[1mg[31m[1ml[31m[1me[31m[1m`[34m[22m command[34m[22m
+(shortcut [31m[1m`[31m[1mc[31m[1mt[31m[1m`[34m[22m)[34m[22m
 [39m

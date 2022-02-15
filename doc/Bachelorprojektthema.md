@@ -1,0 +1,10 @@
+- Compiler mit den restlichen Syntaxoptionen, wie:
+  - lange Jumps / Sprünge
+  - Structs / Verbunde
+  - Arrays / Felder -> mehrdimensional, Deklaration, Feldzugriff
+  - Pointer -> Referenzierung, Dereferenzierung
+  - Funktionen -> verschiedene Parameterübergaben, Stackframes, Funktionsaufruf und Funktionsdefinition, Namespaces (vielleicht vereinfachen, Einschränkungen, Deklarationen nur am Anfang vom Scope)
+  - neue mögliche Fehlermeldungen usw. die sich da ergeben
+  - (malloc und free -> Dynamischer Speicher)
+  - (mehrere Dateien -> Linker, Headerdateien)
+- Webapp entwickeln in man den Compiler bedienen und auch den RETI-Code interpretieren kann

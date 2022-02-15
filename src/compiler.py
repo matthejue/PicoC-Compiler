@@ -11,6 +11,7 @@ from tabulate import tabulate
 from colormanager import ColorManager as CM
 import os
 from colorizer import Colorizer
+from help_message import generate_help_message
 
 
 class Compiler(cmd2.Cmd):
@@ -37,7 +38,6 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument('-v', '--verbose', action='store_true')
     cli_args_parser.add_argument('-S', '--sight', type=int, default=0)
     cli_args_parser.add_argument('-C', '--color', action='store_true')
-    cli_args_parser.add_argument('-m', '--manual', action='store_true')
 
     #  cli_args_parser.add_argument(
     #      '-O',
@@ -67,19 +67,20 @@ class Compiler(cmd2.Cmd):
         shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
         shortcuts.update({
             'cpl': 'compile',
+            'mu': 'most_used',
             'ct': 'color_toggle',
-            'mu': 'most_used'
         })
         cmd2.Cmd.__init__(self,
                           shortcuts=shortcuts,
                           multiline_commands=['compile', 'most_used'])
+        del cmd2.Cmd.do_help
 
         # save history hook
         self.register_postcmd_hook(self.save_history)
 
         self._deal_with_history_and_settings()
 
-        self._colorprompt()
+        self._colorprompt_and_intro()
 
     def _deal_with_history_and_settings(self, ):
         # load history
@@ -109,11 +110,13 @@ class Compiler(cmd2.Cmd):
             fout.write(self.history.to_json())
         return _
 
-    def _colorprompt(self, ):
+    def _colorprompt_and_intro(self, ):
         if global_vars.args.color:
             CM().color_on()
         else:
             CM().color_off()
+
+        # prompts
         self.prompt = (
             f"{CM().BRIGHT}{CM().GREEN}P{CM().CYAN}ico{CM().MAGENTA}C{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
             if global_vars.args.color else "PicoC> ")
@@ -121,12 +124,15 @@ class Compiler(cmd2.Cmd):
             f"{CM().BRIGHT}{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
             if global_vars.args.color else "> ")
 
-    def do_color_toggle(self, _=None):
+        # intro
+        self.intro = f"{CM().BLUE}PicoC Shell ready. Enter {CM().RED + CM().BRIGHT}`help` {CM().BLUE + CM().NORMAL}to see the manual." if global_vars.args.color else "PicoC Shell. Enter `help` to see the manual."
+
+    def do_color_toggle(self, _):
         global_vars.args.color = False if global_vars.args.color else True
         if os.path.exists(self.SETTINGS_FILE):
             with open(self.SETTINGS_FILE, "w", encoding="utf-8") as fout:
                 fout.write(f"color_on: {global_vars.args.color}")
-        self._colorprompt()
+        self._colorprompt_and_intro()
 
     @cmd2.with_argparser(cli_args_parser)
     def do_most_used(self, args):
@@ -146,11 +152,6 @@ class Compiler(cmd2.Cmd):
         # printing is always on in shell
         global_vars.args.print = True
 
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
-
         try:
             self._compile(["void main() {"] + args.infile.split('\n') + ["}"],
                           "stdin")
@@ -162,6 +163,9 @@ class Compiler(cmd2.Cmd):
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
             )
+
+    def do_help(self, _):
+        print(generate_help_message())
 
     def read_and_write_file(self, infile, outbase):
         """reads a pico_c file and compiles it
