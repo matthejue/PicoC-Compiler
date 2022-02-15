@@ -115,12 +115,6 @@ class CodeArranger:
 
 
 def CodeGenerator():
-    """Factory Function as possible way to implement Singleton Pattern.
-    Taken from here:
-    https://stackoverflow.com/questions/52351312/singleton-pattern-in-python
-
-    :returns: None
-    """
     if _CodeGenerator._instance is None:
         _CodeGenerator._instance = _CodeGenerator()
     return _CodeGenerator._instance
