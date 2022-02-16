@@ -36,6 +36,28 @@ def generate_help_message():
 
     Compiles PicoC Code into RETI Code.
 
+    {header("Positional arguments", terminal_width)}
+      infile                input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
+
+    {header("Optional arguments", terminal_width)}
+      -h, --help            show this help message and exit. With the -C option it can be colorized.
+      -c, --concrete_syntax
+      >                     also print the concrete syntax (content of input file). Only works if --print option is active
+      -t, --tokens          also write the tokenlist
+      -a, --abstract-syntax
+      >                     also write the abstract syntax
+      -s, --symbol_table    also write the final symbol table into a `.csv` file
+      -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
+      -b, --begin_data_segment BEGIN_DATA_SEGMENT
+      >                     where the datasegment starts (default `100`)
+      -e, --end_data_segment END_DATA_SEGMENT
+      >                     where the datasegment ends and where the stackpointer starts (default `200`)
+      -d, --distance DISTANCE
+      >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
+      -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
+      -S, --sight SIGHT     sets the number of lines visible around a error message
+      -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
+
     {header("PicoC", terminal_width)}
     PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do while loops, arithmetic expressions, including the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^` and unary operators `-`, `~`, logic expressions, including comparison relations `==`, `!=`, `<`, `>`, `<=`, `>=` and logical connectives `!`, `&&`, `||` and assignments with the assignment operator `=`.
     The code can be commented with single line comments (`//`) and multiline comments (`/*` and `*/`).
@@ -106,28 +128,6 @@ def generate_help_message():
 
     {header("Misc", terminal_width)}
     If you discover any bugs I would be very grateful if you could report it via email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
-
-    {header("Positional arguments", terminal_width)}
-      infile                input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
-
-    {header("Optional arguments", terminal_width)}
-      -h, --help            show this help message and exit. With the -C option it can be colorized.
-      -c, --concrete_syntax
-      >                     also print the concrete syntax (content of input file). Only works if --print option is active
-      -t, --tokens          also write the tokenlist
-      -a, --abstract-syntax
-      >                     also write the abstract syntax
-      -s, --symbol_table    also write the final symbol table into a `.csv` file
-      -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
-      -b, --begin_data_segment BEGIN_DATA_SEGMENT
-      >                     where the datasegment starts (default `100`)
-      -e, --end_data_segment END_DATA_SEGMENT
-      >                     where the datasegment ends and where the stackpointer starts (default `200`)
-      -d, --distance DISTANCE
-      >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
-      -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
-      -S, --sight SIGHT     sets the number of lines visible around a error message
-      -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
     """), terminal_width)
     return colorize_help_page(
         description) if global_vars.args.color else description

@@ -5,6 +5,45 @@ END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
 Compiles PicoC Code into RETI Code.
 
 ===============================================================================
+=                            `Positional arguments`                           =
+===============================================================================
+
+infile                input file with PicoC Code. In the shell this is
+interpreted as string with PicoC Code
+
+===============================================================================
+=                             `Optional arguments`                            =
+===============================================================================
+
+-h, --help            show this help message and exit. With the -C option it
+can be colorized.
+-c, --concrete_syntax
+>                     also print the concrete syntax (content of input file).
+Only works if --print option is active
+-t, --tokens          also write the tokenlist
+-a, --abstract-syntax
+>                     also write the abstract syntax
+-s, --symbol_table    also write the final symbol table into a `.csv` file
+-p, --print           print all file outputs to the terminal. Is always
+activated in the shell. Doesn't have to be activated manually in the shell.
+-b, --begin_data_segment BEGIN_DATA_SEGMENT
+>                     where the datasegment starts (default `100`)
+-e, --end_data_segment END_DATA_SEGMENT
+>                     where the datasegment ends and where the stackpointer
+starts (default `200`)
+-d, --distance DISTANCE
+>                     distance of the comments from the instructions for the
+--verbose option. The passed value gets added to the minimum distance of 2
+spaces
+-v, --verbose         also show tokentype and position for tokens, write the
+nodetype in front of parenthesis in the abstract syntax tree, add comments to
+the RETI Code
+-S, --sight SIGHT     sets the number of lines visible around a error message
+-C, --color           colorizes the terminal output. Gets ignored in the shell.
+Instead in the shell colors can be toggled via the `color_toggle` command
+(shortcut `ct`)
+
+===============================================================================
 =                                   `PicoC`                                   =
 ===============================================================================
 
@@ -145,43 +184,4 @@ operator `|`, e.g. `help | wc`.
 
 If you discover any bugs I would be very grateful if you could report it via
 email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
-
-===============================================================================
-=                            `Positional arguments`                           =
-===============================================================================
-
-infile                input file with PicoC Code. In the shell this is
-interpreted as string with PicoC Code
-
-===============================================================================
-=                             `Optional arguments`                            =
-===============================================================================
-
--h, --help            show this help message and exit. With the -C option it
-can be colorized.
--c, --concrete_syntax
->                     also print the concrete syntax (content of input file).
-Only works if --print option is active
--t, --tokens          also write the tokenlist
--a, --abstract-syntax
->                     also write the abstract syntax
--s, --symbol_table    also write the final symbol table into a `.csv` file
--p, --print           print all file outputs to the terminal. Is always
-activated in the shell. Doesn't have to be activated manually in the shell.
--b, --begin_data_segment BEGIN_DATA_SEGMENT
->                     where the datasegment starts (default `100`)
--e, --end_data_segment END_DATA_SEGMENT
->                     where the datasegment ends and where the stackpointer
-starts (default `200`)
--d, --distance DISTANCE
->                     distance of the comments from the instructions for the
---verbose option. The passed value gets added to the minimum distance of 2
-spaces
--v, --verbose         also show tokentype and position for tokens, write the
-nodetype in front of parenthesis in the abstract syntax tree, add comments to
-the RETI Code
--S, --sight SIGHT     sets the number of lines visible around a error message
--C, --color           colorizes the terminal output. Gets ignored in the shell.
-Instead in the shell colors can be toggled via the `color_toggle` command
-(shortcut `ct`)
 
