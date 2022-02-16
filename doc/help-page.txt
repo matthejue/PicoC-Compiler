@@ -1,19 +1,23 @@
 
+===============================================================================
+=                                  `Synopsis`                                 =
+===============================================================================
+
 Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e
 END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
 
 Compiles PicoC Code into RETI Code.
 
-===============================================================================
-=                            `Positional arguments`                           =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                            `Positional arguments`                           ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 infile                input file with PicoC Code. In the shell this is
 interpreted as string with PicoC Code
 
-===============================================================================
-=                             `Optional arguments`                            =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `Optional arguments`                            ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -h, --help            show this help message and exit. With the -C option it
 can be colorized.
@@ -77,9 +81,9 @@ etc. can be executed.
 
 The shell can be exited again by typing `quit`.
 
-===============================================================================
-=                              `compile command`                              =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                              `compile command`                              ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 PicoC Code can be compiled into RETI Code with the `compile <cli options>
 "<code>";` command (shortcut `cpl`).
@@ -87,9 +91,9 @@ The cli options are the same as for calling the compiler from outside, except
 for the `infile` argument which is interpreted as string with PicoC Code and
 which will be compiled as if it was enclosed in a main function.
 
-===============================================================================
-=                             `most_used command`                             =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `most_used command`                             ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you don't want to type the most likely used cli options out every time, you
 can use the `most_used "<code>";` command (shortcut `mu`).
@@ -101,9 +105,9 @@ and shrinks it down to:
 
 `most_used "<code>";`
 
-===============================================================================
-=                              `history command`                              =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                              `history command`                              ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To geht an overview over all previously executed commands, use the `history`
 command without any arguments.
@@ -127,9 +131,9 @@ saving and quiting out of the editor the edited command will be executed.
 The history will get saved to the file `~/.config/pico_c_compiler/history.json`
 if this file exists under this path.
 
-===============================================================================
-=                            `color_toggle command`                           =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                            `color_toggle command`                           ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to have colorized output, this options can be toggled with the
 `color_toggle` command (shortcut `ct`).
@@ -138,41 +142,41 @@ The truth value of this option will be saved between sessions if the file
 `~/.config/pico_c_compiler/settings.conf` with the option `color_on:
 <truth_value>` exists.
 
-===============================================================================
-=                                `help command`                               =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                                `help command`                               ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to see the help page from within the shell, enter `help` (shortcut
 `?`). The help page is the same as the one that can be viewed with the -h
 option.
 
-===============================================================================
-=                             `Multiline Command`                             =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `Multiline Command`                             ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Multiline commands can be written over multiple lines by hitting <enter> and
 terminating it with a `;` at the end.
 The `compile` and `most_used` command are multiline commands and thus always
 have to end with a `;`.
 
-===============================================================================
-=                          `Redirect output to file`                          =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                          `Redirect output to file`                          ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to copy the shell output to a file, enter `command > <filepath>`.
 If you want to append something to a file, enter `command >> <filepath>`.
 
-===============================================================================
-=                          `Copy output to clipboard`                         =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                          `Copy output to clipboard`                         ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to copy the shell output to your clipboard, enter `command >`.
 If you want to append something to your current clipboard copy, enter `command
 >>`.
 
-===============================================================================
-=                `Execute OS level commands and pipe operator`                =
-===============================================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                `Execute OS level commands and pipe operator`                ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to execute a OS level command, use the `!` operator, e.g. `!ls`.
 If you want to pipe the shell output to a OS level command, use the pipe

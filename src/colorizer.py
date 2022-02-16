@@ -356,7 +356,7 @@ def colorize_help_page(cinput):
     cinput = colorize(r'(\[|\])', cinput, CM().MAGENTA, CM().BLUE)
     cinput = colorize('`[^`]+`', cinput, CM().RED, CM().BLUE)
     cinput = colorize('<.+>`', cinput, CM().RED, CM().BLUE)
-    cinput = colorize('=+[^`][^`]', cinput,
+    cinput = colorize('(=+[^`][^`])|(~+[^`][^`])', cinput,
                       CM().BRIGHT + CM().WHITE,
                       CM().NORMAL + CM().BLUE)
     cinput = colorize(r'[A-Z_]{2,}', cinput,
