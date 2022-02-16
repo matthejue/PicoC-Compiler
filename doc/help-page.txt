@@ -103,8 +103,9 @@ The truth value of this option will be saved between sessions if the file
 =                                `help command`                               =
 ===============================================================================
 
-If you want to see the help page from within the shell, enter `help`. The help
-page is the same as the one that can be viewed with the -h option.
+If you want to see the help page from within the shell, enter `help` (shortcut
+`?`). The help page is the same as the one that can be viewed with the -h
+option.
 
 ===============================================================================
 =                             `Multiline Command`                             =
