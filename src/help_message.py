@@ -97,9 +97,9 @@ def generate_help_message():
       infile                input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
 
     {header("optional arguments", terminal_width)}
-      -h, --help            show this help message and exit
+      -h, --help            show this help message and exit. With the -C option it can be colorized.
       -c, --concrete_syntax
-      >                     also print the concrete syntax (content of input file). Only works if `--print` option is active
+      >                     also print the concrete syntax (content of input file). Only works if --print option is active
       -t, --tokens          also write the tokenlist
       -a, --abstract-syntax
       >                     also write the abstract syntax
@@ -110,7 +110,7 @@ def generate_help_message():
       -e, --end_data_segment END_DATA_SEGMENT
       >                     where the datasegment ends and where the stackpointer starts (default `200`)
       -d, --distance DISTANCE
-      >                     distance of the comments from the instructions for the `--verbose` option. The passed value gets added to the minimum distance of 2 spaces
+      >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
       -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
       -S, --sight SIGHT     sets the number of lines visible around a error message
       -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
