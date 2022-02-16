@@ -71,8 +71,8 @@ exec_bin_windows:
 	pico_c_compiler_windows.exe -S
 
 help:
-	./src/main.py -m
-	./src/main.py -m > ./doc/help-page.txt
+	./src/main.py -h -C
+	./src/main.py -h > ./doc/help-page.txt
 
 clean:
 	find . -type f -name "*.pyc" -delete

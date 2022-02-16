@@ -1,7 +1,7 @@
 import os
 import global_vars
 from abstract_syntax_tree import strip_multiline_string
-from colorizer import Colorizer
+from colorizer import colorize_help_page
 
 
 def header(heading, terminal_width):
@@ -42,7 +42,7 @@ def generate_help_message():
 
     All statements have to be enclosed in a
 
-    void main() {{ /* your program */ }}
+    `void main() {{ /* your program */ }}`
 
     function.
 
@@ -83,7 +83,7 @@ def generate_help_message():
     {header("color_toggle command", terminal_width)}
     If you want to have colorized output, this options can be toggled with the `color_toggle` command (shortcut `ct`).
 
-    The truth value of this option will be saved between sessions if the file `~/.config/pico_c_compiler/settings.conf` with the option `color_on: <truth-value>` exists.
+    The truth value of this option will be saved between sessions if the file `~/.config/pico_c_compiler/settings.conf` with the option `color_on: <truth_value>` exists.
 
 
     {header("Multiline Command", terminal_width)}
@@ -115,5 +115,5 @@ def generate_help_message():
       -S, --sight SIGHT     sets the number of lines visible around a error message
       -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
     """), terminal_width)
-    return Colorizer(description).colorize_help_page(
-    ) if global_vars.args.color else description
+    return colorize_help_page(
+        description) if global_vars.args.color else description
