@@ -125,7 +125,7 @@ class Compiler(cmd2.Cmd):
             if global_vars.args.color else "> ")
 
         # intro
-        self.intro = f"{CM().BLUE}PicoC Shell ready. Enter {CM().RED + CM().BRIGHT}`help` {CM().BLUE + CM().NORMAL}to see the manual." if global_vars.args.color else "PicoC Shell. Enter `help` to see the manual."
+        self.intro = f"{CM().BLUE}PicoC Shell ready. Enter {CM().RED + CM().BRIGHT}`help`{CM().BLUE + CM().NORMAL} (shortcut {CM().RED + CM().BRIGHT}`?`{CM().BLUE + CM().NORMAL}) to see the manual." if global_vars.args.color else "PicoC Shell. Enter `help` (shortcut `?`) to see the manual."
 
     def do_color_toggle(self, _):
         global_vars.args.color = False if global_vars.args.color else True
