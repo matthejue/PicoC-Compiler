@@ -247,91 +247,91 @@ class Colorizer:
                 self.next_char()
         return self.cinput + CM().RESET
 
-    def colorize_help_page(self, ):
-        self.state = self.States.TEXT
-        while self.c != self.EOF_CHAR:
-            if self.c == '=' and self.state not in [
-                    self.States.HEADING, self.States.EMPHASIZED,
-                    self.States.EMPHASIZED_CONTENT
-            ]:
-                self.state = self.States.HEADING
-                self.color_not_inserted = True
-            elif self.c == "`" and self.state not in [
-                    self.States.EMPHASIZED_CONTENT, self.States.EMPHASIZED_END
-            ]:
-                self.state = self.States.EMPHASIZED
-                self.color_not_inserted = True
-            elif self.c in ascii_letters + ' =<>/!&|~*;.-^' and self.state in [
-                    self.States.EMPHASIZED, self.States.EMPHASIZED_CONTENT
-            ]:
-                self.state = self.States.EMPHASIZED_CONTENT
-                self.color_not_inserted = True
-            elif self.c == "`" and self.state == self.States.EMPHASIZED_CONTENT:
-                self.state = self.States.EMPHASIZED_END
-                self.color_not_inserted = True
-            elif self.c in ascii_letters + ' .,)' and self.state not in [
-                    self.States.TEXT, self.States.CLI_OPTION,
-                    self.States.CLI_ARGUMENT
-            ]:
-                self.state = self.States.TEXT
-                self.color_not_inserted = True
-            elif self.c in '-' and self.state != self.States.CLI_OPTION:
-                self.state = self.States.CLI_OPTION
-                self.color_not_inserted = True
-            elif self.c in ascii_letters and self.state == self.States.CLI_OPTION:
-                self.state = self.States.CLI_OPTION
-                self.color_not_inserted = True
-            elif self.c == ' ' and self.state == self.States.CLI_OPTION:
-                self.state = self.States.CLI_ARGUMENT
-                self.color_not_inserted = True
-            elif self.c in ascii_letters and self.state == self.States.CLI_ARGUMENT:
-                self.state = self.States.CLI_ARGUMENT
-                self.color_not_inserted = True
-            elif self.c == ' ' and self.state == self.States.CLI_ARGUMENT:
-                self.state = self.States.TEXT
-                self.color_not_inserted = True
-            elif self.c == '\n':
-                self.state = self.States.TEXT
-                self.color_not_inserted = True
-            elif self.c in "[]":
-                self.state = self.States.OPTIONAL
-                self.color_not_inserted = True
-
-            if self.state == self.States.EMPHASIZED and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.EMPHASIZED_CONTENT and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.EMPHASIZED_END and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.HEADING and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().WHITE + CM().BRIGHT)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.TEXT and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().BLUE + CM().NORMAL)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.CLI_OPTION and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().GREEN + CM().NORMAL)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.CLI_ARGUMENT and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().YELLOW + CM().NORMAL)
-                self.color_not_inserted = False
-                self.next_char()
-            elif self.state == self.States.OPTIONAL and self.color_not_inserted:
-                self.insert_colorcode(self.idx, CM().MAGENTA + CM().NORMAL)
-                self.color_not_inserted = False
-                self.next_char()
-            else:
-                self.next_char()
-        return self.cinput + CM().RESET
+    #  def colorize_help_page(self, ):
+    #      self.state = self.States.TEXT
+    #      while self.c != self.EOF_CHAR:
+    #          if self.c == '=' and self.state not in [
+    #                  self.States.HEADING, self.States.EMPHASIZED,
+    #                  self.States.EMPHASIZED_CONTENT
+    #          ]:
+    #              self.state = self.States.HEADING
+    #              self.color_not_inserted = True
+    #          elif self.c == "`" and self.state not in [
+    #                  self.States.EMPHASIZED_CONTENT, self.States.EMPHASIZED_END
+    #          ]:
+    #              self.state = self.States.EMPHASIZED
+    #              self.color_not_inserted = True
+    #          elif self.c in ascii_letters + ' =<>/!&|~*;.-^' and self.state in [
+    #                  self.States.EMPHASIZED, self.States.EMPHASIZED_CONTENT
+    #          ]:
+    #              self.state = self.States.EMPHASIZED_CONTENT
+    #              self.color_not_inserted = True
+    #          elif self.c == "`" and self.state == self.States.EMPHASIZED_CONTENT:
+    #              self.state = self.States.EMPHASIZED_END
+    #              self.color_not_inserted = True
+    #          elif self.c in ascii_letters + ' .,)' and self.state not in [
+    #                  self.States.TEXT, self.States.CLI_OPTION,
+    #                  self.States.CLI_ARGUMENT
+    #          ]:
+    #              self.state = self.States.TEXT
+    #              self.color_not_inserted = True
+    #          elif self.c in '-' and self.state != self.States.CLI_OPTION:
+    #              self.state = self.States.CLI_OPTION
+    #              self.color_not_inserted = True
+    #          elif self.c in ascii_letters and self.state == self.States.CLI_OPTION:
+    #              self.state = self.States.CLI_OPTION
+    #              self.color_not_inserted = True
+    #          elif self.c == ' ' and self.state == self.States.CLI_OPTION:
+    #              self.state = self.States.CLI_ARGUMENT
+    #              self.color_not_inserted = True
+    #          elif self.c in ascii_letters and self.state == self.States.CLI_ARGUMENT:
+    #              self.state = self.States.CLI_ARGUMENT
+    #              self.color_not_inserted = True
+    #          elif self.c == ' ' and self.state == self.States.CLI_ARGUMENT:
+    #              self.state = self.States.TEXT
+    #              self.color_not_inserted = True
+    #          elif self.c == '\n':
+    #              self.state = self.States.TEXT
+    #              self.color_not_inserted = True
+    #          elif self.c in "[]":
+    #              self.state = self.States.OPTIONAL
+    #              self.color_not_inserted = True
+    #
+    #          if self.state == self.States.EMPHASIZED and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.EMPHASIZED_CONTENT and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.EMPHASIZED_END and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().RED + CM().BRIGHT)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.HEADING and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().WHITE + CM().BRIGHT)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.TEXT and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().BLUE + CM().NORMAL)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.CLI_OPTION and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().GREEN + CM().NORMAL)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.CLI_ARGUMENT and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().YELLOW + CM().NORMAL)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          elif self.state == self.States.OPTIONAL and self.color_not_inserted:
+    #              self.insert_colorcode(self.idx, CM().MAGENTA + CM().NORMAL)
+    #              self.color_not_inserted = False
+    #              self.next_char()
+    #          else:
+    #              self.next_char()
+    #      return self.cinput + CM().RESET
 
     def insert_colorcode(self, idx, color):
         self.cinput = self.cinput[:idx] + color + self.cinput[idx:]
@@ -355,11 +355,14 @@ class Colorizer:
 def colorize_help_page(cinput):
     cinput = colorize(r'(\[|\])', cinput, CM().MAGENTA, CM().BLUE)
     cinput = colorize('`[^`]+`', cinput, CM().RED, CM().BLUE)
+    cinput = colorize('<.+>`', cinput, CM().RED, CM().BLUE)
     cinput = colorize('=+[^`][^`]', cinput,
                       CM().BRIGHT + CM().WHITE,
                       CM().NORMAL + CM().BLUE)
-    cinput = colorize(r'-{1,2}\w+', cinput, CM().GREEN, CM().RED)
-    cinput = colorize(r'[A-Z_]{2,}', cinput, CM().YELLOW, CM().BLUE)
+    cinput = colorize(r'[A-Z_]{2,}', cinput,
+                      CM().YELLOW,
+                      CM().BLUE, r'-{1,2}\w+ [A-Z_]{2,}')
+    cinput = colorize(r'-{1,2}\w+', cinput, CM().GREEN, CM().BLUE)
     return CM().BLUE + cinput + CM().RESET_ALL
 
 
@@ -368,7 +371,21 @@ def colorize(pattern, cinput, ansi, default_ansi, condition=None):
     num_extra_letters = 0
     itertr = p.finditer(cinput)
     for span in map(lambda i: i.span(), itertr):
-        cinput = cinput[:span[0] + num_extra_letters] + ansi + cinput[span[0] + num_extra_letters:span[1] + num_extra_letters]\
-            + default_ansi + cinput[span[1] + num_extra_letters:]
+        if condition:
+            match_pre = re.search(
+                pattern, cinput[span[0] + num_extra_letters:span[1] +
+                                num_extra_letters])
+            if match_pre:
+                sub_span_pre = match_pre.span()
+                sub_span = (span[0] + sub_span_pre[0],
+                            span[0] + sub_span_pre[1])
+                cinput = cinput[:sub_span[0] + num_extra_letters] + ansi + \
+                    cinput[sub_span[0] +
+                           num_extra_letters:sub_span[1] + num_extra_letters] +\
+                    default_ansi + cinput[sub_span[1] + num_extra_letters:]
+        else:
+            cinput = cinput[:span[0] + num_extra_letters] + ansi + \
+                cinput[span[0] + num_extra_letters:span[1] + num_extra_letters] +\
+                default_ansi + cinput[span[1] + num_extra_letters:]
         num_extra_letters += len(ansi) + len(default_ansi)
     return cinput
