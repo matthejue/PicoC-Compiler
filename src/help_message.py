@@ -86,7 +86,7 @@ def generate_help_message():
     The truth value of this option will be saved between sessions if the file `~/.config/pico_c_compiler/settings.conf` with the option `color_on: <truth_value>` exists.
 
     {header("help command", terminal_width)}
-    If you want to see the help page from within the shell, enter `help`. The help page is the same as the one that can be viewed with the -h option.
+    If you want to see the help page from within the shell, enter `help` (shortcut `?`). The help page is the same as the one that can be viewed with the -h option.
 
     {header("Multiline Command", terminal_width)}
     Multiline commands can be written over multiple lines by hitting <enter> and terminating it with a `;` at the end.
