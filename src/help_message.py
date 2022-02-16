@@ -32,7 +32,7 @@ def generate_help_message():
         terminal_width = 79
     description = wrap_text(
         strip_multiline_string(f"""
-    Usage: compile [-m] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
+    Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
 
     Compiles PicoC Code into RETI Code.
 
@@ -85,18 +85,32 @@ def generate_help_message():
 
     The truth value of this option will be saved between sessions if the file `~/.config/pico_c_compiler/settings.conf` with the option `color_on: <truth_value>` exists.
 
+    {header("help command", terminal_width)}
+    If you want to see the help page from within the shell, enter `help`. The help page is the same as the one that can be viewed with the -h option.
 
     {header("Multiline Command", terminal_width)}
     Multiline commands can be written over multiple lines by hitting <enter> and terminating it with a `;` at the end.
     The `compile` and `most_used` command are multiline commands and thus always have to end with a `;`.
 
-    {header("Misc", terminal_width)}
-    If you discover any bugs I would be very grateful if you could report it via email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
+    {header("Redirect output to file", terminal_width)}
+    If you want to copy the shell output to a file, enter `command > <filepath>`.
+    If you want to append something to a file, enter `command >> <filepath>`.
 
-    {header("positional arguments", terminal_width)}
+    {header("Copy output to clipboard", terminal_width)}
+    If you want to copy the shell output to your clipboard, enter `command >`.
+    If you want to append something to your current clipboard copy, enter `command >>`.
+
+    {header("Execute OS level commands and pipe operator", terminal_width)}
+    If you want to execute a OS level command, use the `!` operator, e.g. `!ls`.
+    If you want to pipe the shell output to a OS level command, use the pipe operator `|`, e.g. `help | wc`.
+
+    {header("Misc", terminal_width)}
+    If you discover any bugs I would be very grateful if you could report it via email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
+
+    {header("Positional arguments", terminal_width)}
       infile                input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
 
-    {header("optional arguments", terminal_width)}
+    {header("Optional arguments", terminal_width)}
       -h, --help            show this help message and exit. With the -C option it can be colorized.
       -c, --concrete_syntax
       >                     also print the concrete syntax (content of input file). Only works if --print option is active

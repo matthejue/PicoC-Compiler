@@ -1,5 +1,5 @@
 
-Usage: compile [-m] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e
+Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e
 END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
 
 Compiles PicoC Code into RETI Code.
@@ -99,6 +99,12 @@ The truth value of this option will be saved between sessions if the file
 `~/.config/pico_c_compiler/settings.conf` with the option `color_on:
 <truth_value>` exists.
 
+===============================================================================
+=                                `help command`                               =
+===============================================================================
+
+If you want to see the help page from within the shell, enter `help`. The help
+page is the same as the one that can be viewed with the -h option.
 
 ===============================================================================
 =                             `Multiline Command`                             =
@@ -110,21 +116,44 @@ The `compile` and `most_used` command are multiline commands and thus always
 have to end with a `;`.
 
 ===============================================================================
+=                          `Redirect output to file`                          =
+===============================================================================
+
+If you want to copy the shell output to a file, enter `command > <filepath>`.
+If you want to append something to a file, enter `command >> <filepath>`.
+
+===============================================================================
+=                          `Copy output to clipboard`                         =
+===============================================================================
+
+If you want to copy the shell output to your clipboard, enter `command >`.
+If you want to append something to your current clipboard copy, enter `command
+>>`.
+
+===============================================================================
+=                `Execute OS level commands and pipe operator`                =
+===============================================================================
+
+If you want to execute a OS level command, use the `!` operator, e.g. `!ls`.
+If you want to pipe the shell output to a OS level command, use the pipe
+operator `|`, e.g. `help | wc`.
+
+===============================================================================
 =                                    `Misc`                                   =
 ===============================================================================
 
 If you discover any bugs I would be very grateful if you could report it via
-email to juergmatth@gmail.com, attaching the malicious code to the email. ^_^
+email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
 
 ===============================================================================
-=                            `positional arguments`                           =
+=                            `Positional arguments`                           =
 ===============================================================================
 
 infile                input file with PicoC Code. In the shell this is
 interpreted as string with PicoC Code
 
 ===============================================================================
-=                             `optional arguments`                            =
+=                             `Optional arguments`                            =
 ===============================================================================
 
 -h, --help            show this help message and exit. With the -C option it
