@@ -49,8 +49,8 @@ setup_pyinstaller_windows:
 
 create_bin_linux:
 	pyinstaller ./src/main.py --onefile --hidden-import=tabulate --distpath=./dist
-	staticx ./dist/pico_c_compiler ./dist/pico_c_compiler_linux
-	rm ./dist/pico_c_compiler
+	staticx ./dist/main ./dist/pico_c_compiler_linux
+	rm ./dist/main
 
 create_bin_wine:
 	WINEPREFIX=~/Applications/Windows10 WINEARCH=win32 wine ~/Applications/Windows10/drive_c/Python10/Scripts/pyinstaller.exe ~/Applications/Windows10/drive_c/users/areo/Documents/Studium/pico_c_compiler/src/main.py  --onefile --hidden-import=tabulate --distpath=~/Documents/Studium/pico_c_compiler/dist
