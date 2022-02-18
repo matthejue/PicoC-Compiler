@@ -48,7 +48,7 @@ setup_pyinstaller_windows:
 	pip install pyinstaller
 
 create_bin_linux:
-	pyinstaller ./src/main.py --onefile --hidden-import=tabulate --distpath=./dist
+	pyinstaller ./src/main.py --onefile --hidden-import=tabulate,cmd2,colorama,bitstring --distpath=./dist
 	staticx ./dist/main ./dist/pico_c_compiler_linux
 	rm ./dist/main
 
@@ -57,8 +57,9 @@ create_bin_wine:
 	mv ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler.exe ~/Documents/Studium/pico_c_compiler/dist/pico_c_compiler_wine.exe
 
 create_bin_windows:
-	pyinstaller src\main.py --onefile --hidden-import=tabulate --distpath=dist
-	# rename file to pico_c_compiler_windows.exe
+	pyinstaller src\main.py --onefile --hidden-import=tabulate,cmd2,colorama,bitstring --distpath=dist
+	staticx ./dist/main.exe ./dist/pico_c_compiler_windows.exe
+	# entferne ./dist/main.exe
 
 exec_bin_linux:
 	./dist/pico_c_compiler_linux -S
