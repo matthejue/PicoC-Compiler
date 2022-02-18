@@ -106,8 +106,9 @@ class Compiler(cmd2.Cmd):
             _: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
         if len(self.history) > self.PERSISTENT_HISTORY_LENGTH:
             del self.history[0]
-        with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
-            fout.write(self.history.to_json())
+        if os.path.exists(self.HISTORY_FILE):
+            with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
+                fout.write(self.history.to_json())
         return _
 
     def _colorprompt_and_intro(self, ):
