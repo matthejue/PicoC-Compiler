@@ -33,7 +33,7 @@ def generate_help_message():
     description = wrap_text(
         strip_multiline_string(f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
+    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
 
     Compiles PicoC Code into RETI Code.
 
