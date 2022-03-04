@@ -135,7 +135,9 @@ void main() {
 ```
 ##### $\Downarrow$
 ```
-['stdin', 'void', 'main', '(', ')', '{', 'char', 'var', '=', '12', '+', '1', ';', '}']
+[<TT.IDENTIFIER>, <TT.VOID>, <TT.MAIN>, <TT.L_PAREN>, <TT.R_PAREN>,
+<TT.L_BRACE>, <TT.CHAR>, <TT.IDENTIFIER>, <TT.ASSIGNMENT>, <TT.NUMBER>,
+<TT.PLUS_OP>, <TT.NUMBER>, <TT.SEMICOLON>, <TT.R_BRACE>]
 ```
 
 <!--small-->
@@ -149,7 +151,9 @@ void main() {
   - *Tokens* $\xRightarrow{baut}$ *Abstract Syntax Tree*
 
 ```
-['stdin', 'void', 'main', '(', ')', '{', 'char', 'var', '=', '12', '+', '1', ';', '}']
+[<TT.IDENTIFIER>, <TT.VOID>, <TT.MAIN>, <TT.L_PAREN>, <TT.R_PAREN>,
+<TT.L_BRACE>, <TT.CHAR>, <TT.IDENTIFIER>, <TT.ASSIGNMENT>, <TT.NUMBER>,
+<TT.PLUS_OP>, <TT.NUMBER>, <TT.SEMICOLON>, <TT.R_BRACE>]
 ```
 ##### $\Downarrow$
 ```
