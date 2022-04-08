@@ -59,4 +59,4 @@
 
 - <a id="16">[16]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
 
-- <a id="17">[17] “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
+- <a id="17">[17]</a> “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.

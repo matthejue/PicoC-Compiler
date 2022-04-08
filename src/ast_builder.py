@@ -4,6 +4,7 @@ from abstract_syntax_tree import ASTNode
 
 class ASTBuilder:
     """Provides methods for ast construction"""
+
     def __init__(self):
         self.root: ASTNode = None
         self.current_node: ASTNode = None
@@ -53,8 +54,7 @@ class ASTBuilder:
         self.current_node = savestate_node
 
     def save(self, fname):
-        """Save a node
-        """
+        """Save a node"""
         if global_vars.is_tasting:
             return
 
@@ -78,5 +78,5 @@ class ASTBuilder:
 
         self.return_nodes[fname].pop()
 
-    def __repr__(self, ):
+    def __repr__(self):
         return str(self.root)
