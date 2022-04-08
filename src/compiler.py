@@ -16,28 +16,18 @@ from help_message import generate_help_message
 
 class Compiler(cmd2.Cmd):
     cli_args_parser = cmd2.Cmd2ArgumentParser(add_help=False)
-    cli_args_parser.add_argument("infile", nargs='?')
-    cli_args_parser.add_argument('-c',
-                                 '--concrete_syntax',
-                                 action='store_true')
-    cli_args_parser.add_argument('-t', '--tokens', action='store_true')
-    cli_args_parser.add_argument('-a',
-                                 '--abstract-syntax',
-                                 action='store_true')
-    cli_args_parser.add_argument('-s', '--symbol_table', action='store_true')
-    cli_args_parser.add_argument('-p', '--print', action='store_true')
-    cli_args_parser.add_argument('-b',
-                                 '--begin_data_segment',
-                                 type=int,
-                                 default=100)
-    cli_args_parser.add_argument('-e',
-                                 '--end_data_segment',
-                                 type=int,
-                                 default=200)
-    cli_args_parser.add_argument('-d', '--distance', type=int, default=0)
-    cli_args_parser.add_argument('-v', '--verbose', action='store_true')
-    cli_args_parser.add_argument('-S', '--sight', type=int, default=0)
-    cli_args_parser.add_argument('-C', '--color', action='store_true')
+    cli_args_parser.add_argument("infile", nargs="?")
+    cli_args_parser.add_argument("-c", "--concrete_syntax", action="store_true")
+    cli_args_parser.add_argument("-t", "--tokens", action="store_true")
+    cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
+    cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
+    cli_args_parser.add_argument("-p", "--print", action="store_true")
+    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=100)
+    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=200)
+    cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
+    cli_args_parser.add_argument("-v", "--verbose", action="store_true")
+    cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
+    cli_args_parser.add_argument("-C", "--color", action="store_true")
 
     #  cli_args_parser.add_argument(
     #      '-O',
@@ -50,29 +40,29 @@ class Compiler(cmd2.Cmd):
     #      type=int,
     #      default=0)
 
-    HISTORY_FILE = os.path.expanduser(
-        '~') + "/.config/pico_c_compiler/history.json"
-    SETTINGS_FILE = os.path.expanduser(
-        '~') + "/.config/pico_c_compiler/settings.conf"
+    HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"
+    SETTINGS_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/settings.conf"
     PERSISTENT_HISTORY_LENGTH = 100
 
-    def __init__(self, ):
+    def __init__(self):
         global_vars.args = self.cli_args_parser.parse_args()
         if not global_vars.args.infile:
             self._shell__init__()
 
-    def _shell__init__(self, ):
+    def _shell__init__(self):
         super().__init__()
 
         shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
-        shortcuts.update({
-            'cpl': 'compile',
-            'mu': 'most_used',
-            'ct': 'color_toggle',
-        })
-        cmd2.Cmd.__init__(self,
-                          shortcuts=shortcuts,
-                          multiline_commands=['compile', 'most_used'])
+        shortcuts.update(
+            {
+                "cpl": "compile",
+                "mu": "most_used",
+                "ct": "color_toggle",
+            }
+        )
+        cmd2.Cmd.__init__(
+            self, shortcuts=shortcuts, multiline_commands=["compile", "most_used"]
+        )
         del cmd2.Cmd.do_help
 
         # save history hook
@@ -82,7 +72,7 @@ class Compiler(cmd2.Cmd):
 
         self._colorprompt_and_intro()
 
-    def _deal_with_history_and_settings(self, ):
+    def _deal_with_history_and_settings(self):
         # load history
         if os.path.exists(self.HISTORY_FILE):
             with open(self.HISTORY_FILE) as fin:
@@ -91,7 +81,7 @@ class Compiler(cmd2.Cmd):
         # for the tc command
         if os.path.exists(self.SETTINGS_FILE):
             with open(self.SETTINGS_FILE) as fin:
-                lines = fin.read().split('\n')
+                lines = fin.read().split("\n")
                 for line in lines:
                     if "color_on" in line:
                         if "True" in line:
@@ -102,16 +92,16 @@ class Compiler(cmd2.Cmd):
             self.colorprompt = False
 
     def save_history(
-            self,
-            _: cmd2.plugin.PostcommandData) -> cmd2.plugin.PostcommandData:
+        self, _: cmd2.plugin.PostcommandData
+    ) -> cmd2.plugin.PostcommandData:
         if len(self.history) > self.PERSISTENT_HISTORY_LENGTH:
             del self.history[0]
         if os.path.exists(self.HISTORY_FILE):
-            with open(self.HISTORY_FILE, 'w', encoding="utf-8") as fout:
+            with open(self.HISTORY_FILE, "w", encoding="utf-8") as fout:
                 fout.write(self.history.to_json())
         return _
 
-    def _colorprompt_and_intro(self, ):
+    def _colorprompt_and_intro(self):
         if global_vars.args.color:
             CM().color_on()
         else:
@@ -120,13 +110,21 @@ class Compiler(cmd2.Cmd):
         # prompts
         self.prompt = (
             f"{CM().BRIGHT}{CM().GREEN}P{CM().CYAN}ico{CM().MAGENTA}C{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
-            if global_vars.args.color else "PicoC> ")
+            if global_vars.args.color
+            else "PicoC> "
+        )
         self.continuation_prompt = (
             f"{CM().BRIGHT}{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
-            if global_vars.args.color else "> ")
+            if global_vars.args.color
+            else "> "
+        )
 
         # intro
-        self.intro = f"{CM().BLUE}PicoC Shell ready. Enter {CM().RED + CM().BRIGHT}`help`{CM().BLUE + CM().NORMAL} (shortcut {CM().RED + CM().BRIGHT}`?`{CM().BLUE + CM().NORMAL}) to see the manual." if global_vars.args.color else "PicoC Shell. Enter `help` (shortcut `?`) to see the manual."
+        self.intro = (
+            f"{CM().BLUE}PicoC Shell ready. Enter {CM().RED + CM().BRIGHT}`help`{CM().BLUE + CM().NORMAL} (shortcut {CM().RED + CM().BRIGHT}`?`{CM().BLUE + CM().NORMAL}) to see the manual."
+            if global_vars.args.color
+            else "PicoC Shell. Enter `help` (shortcut `?`) to see the manual."
+        )
 
     def do_color_toggle(self, _):
         global_vars.args.color = False if global_vars.args.color else True
@@ -142,7 +140,7 @@ class Compiler(cmd2.Cmd):
 
     @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
-        # don't chang anything about the color setting
+        # don't change anything about the color setting
         self._do_compile(args)
 
     def _do_compile(self, args):
@@ -154,8 +152,7 @@ class Compiler(cmd2.Cmd):
         global_vars.args.print = True
 
         try:
-            self._compile(["void main() {"] + args.infile.split('\n') + ["}"],
-                          "stdin")
+            self._compile(["void main() {"] + args.infile.split("\n") + ["}"], "stdin")
         except:
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
@@ -189,22 +186,22 @@ class Compiler(cmd2.Cmd):
     def _compile(self, code, infile, outbase=None):
         # remove all empty lines and \n from the code lines in the list
         code_without_cr = [basename(infile) + " "] + list(
-            filter(lambda line: line, map(lambda line: line.strip('\n'),
-                                          code)))
+            filter(lambda line: line, map(lambda line: line.strip("\n"), code))
+        )
         # reset everything to defaults
         self._reset(infile, code_without_cr)
 
         if global_vars.args.concrete_syntax and global_vars.args.print:
             code_without_cr_str = Colorizer(
-                str(code_without_cr)).colorize_conrete_syntax()
+                str(code_without_cr)
+            ).colorize_conrete_syntax()
             print(code_without_cr_str)
 
         lexer = Lexer(code_without_cr)
 
         # Handle errors and warnings
         error_handler = ErrorHandler(infile, code_without_cr)
-        warning_handler = WarningHandler(
-            infile, code_without_cr)  # initialise singleton
+        warning_handler = WarningHandler()  # get singleton
 
         if global_vars.args.tokens:
             error_handler.handle(self._tokens_option, lexer, outbase)
@@ -237,20 +234,20 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.print:
             tokens_str = Colorizer(str(tokens)).colorize_tokens()
-            print('\n' + tokens_str)
+            print("\n" + tokens_str)
 
         if outbase:
-            with open(outbase + ".tokens", 'w', encoding="utf-8") as fout:
+            with open(outbase + ".tokens", "w", encoding="utf-8") as fout:
                 fout.write(str(tokens))
 
     def _abstract_syntax_option(self, grammar: Grammar, outbase):
         if global_vars.args.print:
             ast = str(grammar.reveal_ast())
             ast = Colorizer(ast).colorize_abstract_syntax()
-            print('\n' + ast)
+            print("\n" + ast)
 
         if outbase:
-            with open(outbase + ".ast", 'w', encoding="utf-8") as fout:
+            with open(outbase + ".ast", "w", encoding="utf-8") as fout:
                 fout.write(str(grammar.reveal_ast()))
 
     def _symbol_table_option(self, outbase):
@@ -260,18 +257,26 @@ class Compiler(cmd2.Cmd):
         if outbase:
             self._write_symbol_table(outbase)
 
-    def _print_symbol_table(self, ):
+    def _print_symbol_table(self):
         header = ["name", "type", "datatype", "position", "value"]
         symbols = SymbolTable().symbols
 
         output = str(
-            tabulate([(k, v.get_type(), str(v.datatype), str(
-                v.position), str(v.value)) for k, v in symbols.items()],
-                     headers=header))
+            tabulate(
+                [
+                    (k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
+                    for k, v in symbols.items()
+                ],
+                headers=header,
+            )
+        )
 
-        output = (Colorizer(output).colorize_symbol_table()
-                  if global_vars.args.color else output)
-        print('\n' + output)
+        output = (
+            Colorizer(output).colorize_symbol_table()
+            if global_vars.args.color
+            else output
+        )
+        print("\n" + output)
 
     def _write_symbol_table(self, outbase):
         output = "name,type,datatype,position,value\n"
@@ -279,23 +284,31 @@ class Compiler(cmd2.Cmd):
         for name in symbols.keys():
             position = (
                 f"({symbols[name].position[0]}:{symbols[name].position[1]})"
-                if symbols[name].position != '/' else '/')
-            output += f"{name},"\
-                f"{symbols[name].get_type()},"\
-                f"{symbols[name].datatype},"\
-                f"{position},"\
+                if symbols[name].position != "/"
+                else "/"
+            )
+            output += (
+                f"{name},"
+                f"{symbols[name].get_type()},"
+                f"{symbols[name].datatype},"
+                f"{position},"
                 f"{symbols[name].value}\n"
-        with open(outbase + ".csv", 'w', encoding="utf-8") as fout:
+            )
+        with open(outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
     def _reti_code(self, abstract_syntax_tree, outbase):
         if global_vars.args.print:
-            code = Colorizer(str(abstract_syntax_tree.show_generated_code(
-            ))).colorize_reti_code() if global_vars.args.color else str(
-                abstract_syntax_tree.show_generated_code())
-            print('\n' + code)
+            code = (
+                Colorizer(
+                    str(abstract_syntax_tree.show_generated_code())
+                ).colorize_reti_code()
+                if global_vars.args.color
+                else str(abstract_syntax_tree.show_generated_code())
+            )
+            print("\n" + code)
         if outbase:
-            with open(outbase + ".reti", 'w', encoding="utf-8") as fout:
+            with open(outbase + ".reti", "w", encoding="utf-8") as fout:
                 fout.write(str(abstract_syntax_tree.show_generated_code()))
 
 
@@ -306,17 +319,17 @@ def remove_extension(fname):
 
     """
     # if there's no '.' rindex raises a exception, rfind returns -1
-    index_of_extension_start = fname.rfind('.')
+    index_of_extension_start = fname.rfind(".")
     if index_of_extension_start == -1:
         return fname
     return fname[0:index_of_extension_start]
 
 
 def _remove_path(fname):
-    index_of_path_end = fname.rfind('/')
+    index_of_path_end = fname.rfind("/")
     if index_of_path_end == -1:
         return fname
-    return fname[index_of_path_end + 1:]
+    return fname[index_of_path_end + 1 :]
 
 
 def basename(fname):

@@ -236,7 +236,7 @@ void main() {
 ### Passes
 - **Problem:** von der **abstrakten Syntax** von **PicoC** zu **abstrakter Syntax** des **RETI-Assembler** übersetzen
   - dazu das Problem in mehrere **Passes** unterteilen
-  - ein einem **Pass** nur **ein Ziel** erfüllen und nicht mehrere gleichzeitig
+  - in einem **Pass** nur **ein Ziel** erfüllen und nicht mehrere gleichzeitig
   - "passing over"
 
 <!--small-->

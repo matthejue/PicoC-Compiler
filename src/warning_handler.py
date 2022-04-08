@@ -17,32 +17,44 @@ class _WarningHandler(ErrorHandler):
     def add_warning(self, warning):
         self.warnings += [warning]
 
-    def show_warnings(self, ):
+    def show_warnings(
+        self,
+    ):
         for warning in self.warnings:
             match warning:
                 case Warnings.ImplicitConversionWarning() as w:
-                    warning_header = self._warning_header(
-                        w.found_pos, w.description)
-                    warning_screen = AnnotationScreen(self.finput, w.found_pos[0],
-                                                      w.found_pos[0])
+                    warning_header = self._warning_header(w.found_pos, w.description)
+                    warning_screen = AnnotationScreen(
+                        self.finput, w.found_pos[0], w.found_pos[0]
+                    )
                     warning_screen.mark(w.found_pos, len(w.found))
 
                     node_header = self._warning_header(
                         w.variable_pos,
                         f"{CM().MAGENTA}Note{CM().RESET}: Variable '{w.variable}' definied as type "
-                        f"'{w.variable_type}' here:")
-                    warning_screen_2 = AnnotationScreen(self.finput, w.variable_pos[0],
-                                                        w.variable_pos[0])
+                        f"'{w.variable_type}' here:",
+                    )
+                    warning_screen_2 = AnnotationScreen(
+                        self.finput, w.variable_pos[0], w.variable_pos[0]
+                    )
                     warning_screen_2.mark(w.variable_pos, len(w.variable))
 
                     warning_screen.filter()
                     warning_screen_2.filter()
 
                     node_end = self._warning_header(
-                        None, f"{CM().MAGENTA}Note{CM().RESET}: Datatype '{w.variable_type}' has only range "
-                        f"{w.variable_from} to {w.variable_to}")
-                    print(f'\n' + warning_header + str(warning_screen) +
-                          node_header + str(warning_screen_2) + node_end)
+                        None,
+                        f"{CM().MAGENTA}Note{CM().RESET}: Datatype '{w.variable_type}' has only range "
+                        f"{w.variable_from} to {w.variable_to}",
+                    )
+                    print(
+                        f"\n"
+                        + warning_header
+                        + str(warning_screen)
+                        + node_header
+                        + str(warning_screen_2)
+                        + node_end
+                    )
 
     def _warning_header(self, pos, descirption):
         return super()._error_header(pos, descirption)
@@ -55,10 +67,11 @@ def WarningHandler(fname=None, finput=None):
 
     :returns: None
     """
-    if _WarningHandler._instance is None:
+    if not _WarningHandler._instance:
         if not fname or not finput:
             raise Exception(
                 "When being initialised for the first time fname and finput"
-                "must be provided")
+                "must be provided"
+            )
         _WarningHandler._instance = _WarningHandler(fname, finput)
     return _WarningHandler._instance
