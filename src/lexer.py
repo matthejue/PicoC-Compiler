@@ -4,7 +4,7 @@ import string
 import global_vars
 
 
-class Token():
+class Token:
     """Identifies what a certiain string slice is"""
 
     __match_args__ = ("type", "value")
@@ -70,29 +70,40 @@ class TT(Enum):
 
 
 SPECIAL_MAPPINGS = ("&", "|", "=", "<", ">", "!")
-NOT_TO_MAP = ("/", "number", "character", "identifier", "var", "to bool",
-              "end of file")
+NOT_TO_MAP = ("/", "number", "character", "identifier", "var", "to bool", "end of file")
 
 STRING_TO_TT_SIMPLE = {
     value.value: value
     for value in (
-        value for key, value in TT.__dict__.items()
-        if not key.startswith('_') and value.value not in NOT_TO_MAP
-        and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) < 2)
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS
+        and len(value.value) < 2
+    )
 }
 STRING_TO_TT_COMPLEX = {
     value.value: value
     for value in (
-        value for key, value in TT.__dict__.items()
-        if not key.startswith('_') and value.value not in NOT_TO_MAP
-        and value.value[0] in SPECIAL_MAPPINGS and len(value.value) <= 2)
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] in SPECIAL_MAPPINGS
+        and len(value.value) <= 2
+    )
 }
 STRING_TO_TT_WORDS = {
     value.value: value
     for value in (
-        value for key, value in TT.__dict__.items()
-        if not key.startswith('_') and value.value not in NOT_TO_MAP
-        and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) >= 2)
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS
+        and len(value.value) >= 2
+    )
 }
 
 
@@ -106,7 +117,7 @@ class Lexer:
     is used instead of self.match()
     """
 
-    EOF_CHAR = 'EOF'
+    EOF_CHAR = "EOF"
     DIGIT_WITHOUT_ZERO = "123456789"
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
@@ -121,7 +132,7 @@ class Lexer:
         self.lc_col = 0
         self.lc_row = 0
         self.lc = finput[self.lc_row][self.lc_col]
-        self.c = ''
+        self.c = ""
         # position variable to be available between methods
         self.position = (0, 0)
 
@@ -132,14 +143,13 @@ class Lexer:
         """
         while self.lc != self.EOF_CHAR:
             self.position = (self.lc_row, self.lc_col)
-            if self.lc in ' \t':
+            if self.lc in " \t":
                 self.next_char()
             elif STRING_TO_TT_SIMPLE.get(self.lc):
                 # simple symbols
                 # :grammar: ;|+|-|*|%|^|~|(|)|{|}
                 self.next_char()
-                return Token(STRING_TO_TT_SIMPLE[self.c], self.c,
-                             self.position)
+                return Token(STRING_TO_TT_SIMPLE[self.c], self.c, self.position)
             elif STRING_TO_TT_COMPLEX.get(self.lc):
                 # complex symbols that are easily confusable
                 # :grammar: &|&&|<bar>|<bar><bar>|!|!=|<<|>>|=|==|<
@@ -148,11 +158,9 @@ class Lexer:
                 if STRING_TO_TT_COMPLEX.get(self.c + self.lc):
                     symbol = self.c + self.lc
                     self.next_char()
-                    return Token(STRING_TO_TT_COMPLEX[symbol], symbol,
-                                 self.position)
-                return Token(STRING_TO_TT_COMPLEX[self.c], self.c,
-                             self.position)
-            elif self.lc in self.LETTER + '_':
+                    return Token(STRING_TO_TT_COMPLEX[symbol], symbol, self.position)
+                return Token(STRING_TO_TT_COMPLEX[self.c], self.c, self.position)
+            elif self.lc in self.LETTER + "_":
                 # identifier or special keyword symbol
                 # :grammar: <identifier>|if|else|while|do|int|char
                 # |void|const|main
@@ -163,8 +171,7 @@ class Lexer:
                     self.next_char()
                     symbol += self.c
                 if STRING_TO_TT_WORDS.get(symbol):
-                    return Token(STRING_TO_TT_WORDS[symbol], symbol,
-                                 self.position)
+                    return Token(STRING_TO_TT_WORDS[symbol], symbol, self.position)
                 return Token(TT.IDENTIFIER, symbol, self.position)
             elif self.lc in self.DIGIT_WITH_ZERO:
                 # number
@@ -186,7 +193,8 @@ class Lexer:
 
                 if self.lc not in self.LETTER_DIGIT:
                     raise Errors.InvalidCharacterError(
-                        self.lc, (self.lc_row, self.lc_col))
+                        self.lc, (self.lc_row, self.lc_col)
+                    )
 
                 self.next_char()
                 char = self.c
@@ -195,19 +203,20 @@ class Lexer:
                     self.next_char()
                 else:
                     raise Errors.UnclosedCharacterError(
-                        "'" + self.c + "'", "'" + self.c + self.lc,
-                        self.position)
+                        "'" + self.c + "'", "'" + self.c + self.lc, self.position
+                    )
                 return Token(TT.CHARACTER, str(ord(char)), self.position)
-            elif self.lc == '/':
+            elif self.lc == "/":
                 # division or comments
                 # :grammar: /(/|(<star>.*<start>/))?
                 self.next_char()
-                if self.lc == '/':
+                if self.lc == "/":
                     self.lc_col = len(self.finput[self.lc_row]) - 1
                     self.next_char()
-                elif self.lc == '*':
-                    while not (self.lc == '/' and self.c == '*'
-                               or self.lc == self.EOF_CHAR):
+                elif self.lc == "*":
+                    while not (
+                        self.lc == "/" and self.c == "*" or self.lc == self.EOF_CHAR
+                    ):
                         self.next_char()
                     self.next_char()
                 else:
@@ -224,21 +233,29 @@ class Lexer:
         # next column or next row
         if self.lc_col < len(self.finput[self.lc_row]) - 1:
             self.lc_col += 1
-        elif (self.lc_col == len(self.finput[self.lc_row]) - 1
-              and self.lc_row < len(self.finput) - 1):
+        elif (
+            self.lc_col == len(self.finput[self.lc_row]) - 1
+            and self.lc_row < len(self.finput) - 1
+        ):
             self.lc_row += 1
             self.lc_col = 0
-        elif (self.lc_col == len(self.finput[self.lc_row]) - 1
-              and self.lc_row == len(self.finput)) - 1:
+        elif (
+            self.lc_col == len(self.finput[self.lc_row]) - 1
+            and self.lc_row == len(self.finput) - 1
+        ):
             self.lc_col += 1
 
         # next character
         self.c = self.lc
-        if (self.lc_col == len(self.finput[self.lc_row])
-                and self.lc_row == len(self.finput) - 1):
+        if (
+            self.lc_col == len(self.finput[self.lc_row])
+            and self.lc_row == len(self.finput) - 1
+        ):
             self.lc = self.EOF_CHAR
         else:
             self.lc = self.finput[self.lc_row][self.lc_col]
 
-    def __repr__(self, ):
+    def __repr__(
+        self,
+    ):
         return str(self.finput)
