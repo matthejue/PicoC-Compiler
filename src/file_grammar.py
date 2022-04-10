@@ -5,13 +5,13 @@ from dummy_nodes import NT
 
 
 class FileGrammar(FunctionGrammar):
-    def code_fi(self, ):
+    def code_fi(self):
         self._file()
 
-    def _file(self, ):
+    def _file(self):
         savestate_node = self.ast_builder.down(File)
 
-        self.add_and_match([TT.IDENTIFIER], NT.Filename)
+        self.add_and_match([TT.IDENTIFIER], classname=NT.Filename)
 
         while self.LTT(1) in self.PRIM_DT.keys():
             self.code_fu()

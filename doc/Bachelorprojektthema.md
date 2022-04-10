@@ -7,4 +7,4 @@
   - neue mögliche Fehlermeldungen usw. die sich da ergeben
   - (malloc und free -> Dynamischer Speicher)
   - (mehrere Dateien -> Linker, Headerdateien)
-- Webapp entwickeln in man den Compiler bedienen und auch den RETI-Code interpretieren kann
+- (Webapp entwickeln in man den Compiler bedienen und auch den RETI-Code interpretieren kann)
