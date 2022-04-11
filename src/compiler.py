@@ -22,8 +22,6 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=100)
-    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=200)
     cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-S", "--sight", type=int, default=0)

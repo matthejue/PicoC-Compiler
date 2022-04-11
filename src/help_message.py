@@ -14,12 +14,12 @@ def header(heading, terminal_width, symbol):
 
 
 def wrap_text(text, terminal_width):
-    lines = text.split('\n')
+    lines = text.split("\n")
     for l_idx, line in enumerate(lines):
         if len(line) > terminal_width:
             for idx in range(terminal_width, -1, -1):
-                if line[idx] == ' ':
-                    lines.insert(l_idx + 1, line[idx + 1:])
+                if line[idx] == " ":
+                    lines.insert(l_idx + 1, line[idx + 1 :])
                     lines[l_idx] = line[:idx]
                     break
     return "\n".join(lines)
@@ -31,9 +31,10 @@ def generate_help_message():
     except OSError:
         terminal_width = 79
     description = wrap_text(
-        strip_multiline_string(f"""
+        strip_multiline_string(
+            f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
+    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [infile]
 
     Compiles PicoC Code into RETI Code.
 
@@ -49,10 +50,6 @@ def generate_help_message():
     >                     also write the abstract syntax
     -s, --symbol_table    also write the final symbol table into a `.csv` file
     -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
-    -b, --begin_data_segment BEGIN_DATA_SEGMENT
-    >                     where the datasegment starts (default `100`)
-    -e, --end_data_segment END_DATA_SEGMENT
-    >                     where the datasegment ends and where the stackpointer starts (default `200`)
     -d, --distance DISTANCE
     >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
     -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
@@ -86,7 +83,7 @@ def generate_help_message():
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
-    `compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "<code>";`
+    `compile -c -t -a -s -p -v -d 20 -S 2 "<code>";`
 
     and shrinks it down to:
 
@@ -129,6 +126,8 @@ def generate_help_message():
 
     {header("Misc", terminal_width, '=')}
     If you discover any bugs I would be very grateful if you could report it via email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
-    """), terminal_width)
-    return colorize_help_page(
-        description) if global_vars.args.color else description
+    """
+        ),
+        terminal_width,
+    )
+    return colorize_help_page(description) if global_vars.args.color else description
