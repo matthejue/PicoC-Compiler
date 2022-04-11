@@ -8,15 +8,15 @@ install:
 
 read: _read clean
 _read:
-	./src/main.py -c -t -a -s -p -d 20 -S 2 -m ./run/code.picoc
+	./src/main.py -ctas -p -d 20 -S 2 -m ./run/code.picoc
 
 read-verbose: _read-verbose clean
 _read-verbose:
-	./src/main.py -c -t -a -s -p -d 20 -S 2 -v -m ./run/code.picoc
+	./src/main.py -ctas -p -d 20 -S 2 -v -m ./run/code.picoc
 
 read-color: _read-color clean
 _read-color:
-	./src/main.py -c -t -a -s -p -d 20 -S 2 -C -v -m ./run/code.picoc
+	./src/main.py -ctas -p -d 20 -S 2 -C -v -m ./run/code.picoc
 
 shell: _shell clean
 _shell:

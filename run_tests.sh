@@ -7,7 +7,8 @@ not_passed=();
     echo -e "\n\033[1;37m===============================================================================";
     echo $testfile;
     echo -e "===============================================================================\033[0;0m";
-    ./src/main.py -c -t -a -s -P all -p -v -d 20 -S 2 -C $2 $testfile;
+    ./src/main.py -ctas -p -d 20 -S 2 -C -v -m $2 $testfile;
+    ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m $(basename --suffix=.picoc $testfile).reti
 
     if [[ $? != 0 ]]; then
       not_running_through+=($testfile);

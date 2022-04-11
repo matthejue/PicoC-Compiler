@@ -34,7 +34,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [infile]
+    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
 
     Compiles PicoC Code into RETI Code.
 
@@ -46,15 +46,18 @@ def generate_help_message():
     -c, --concrete_syntax
     >                     also print the concrete syntax (content of input file). Only works if --print option is active
     -t, --tokens          also write the tokenlist
-    -a, --abstract-syntax
+    -a, --abstract_syntax
     >                     also write the abstract syntax
     -s, --symbol_table    also write the final symbol table into a `.csv` file
     -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
     -d, --distance DISTANCE
     >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
-    -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
     -S, --sight SIGHT     sets the number of lines visible around a error message
     -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
+    -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
+    -g, --debug           starts the debugger in the code
+    -m, --show_error_message
+    >                     show error message from python
 
     {header("PicoC", terminal_width, '=')}
     PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do while loops, arithmetic expressions, including the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^` and unary operators `-`, `~`, logic expressions, including comparison relations `==`, `!=`, `<`, `>`, `<=`, `>=` and logical connectives `!`, `&&`, `||` and assignments with the assignment operator `=`.
@@ -83,7 +86,7 @@ def generate_help_message():
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
-    `compile -c -t -a -s -p -v -d 20 -S 2 "<code>";`
+    `compile -ctas -p -v -d 20 -S 2 "<code>";`
 
     and shrinks it down to:
 
