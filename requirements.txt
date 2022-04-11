@@ -1,0 +1,4 @@
+bitstring
+cmd2
+tabulate
+colorama

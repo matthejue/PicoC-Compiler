@@ -21,9 +21,7 @@ class Symbol:
     def get_name(self):
         return self.name
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         if self.datatype != "/":
             return "<" + self.name + ":" + str(self.datatype) + ":" + self.value + ">"
         return self.name
@@ -35,9 +33,7 @@ class VariableSymbol(Symbol):
     def __init__(self, name, datatype, position):
         super().__init__(name, datatype, position, "/")
 
-    def get_type(
-        self,
-    ):
+    def get_type(self):
         return "variable"
 
 
@@ -47,9 +43,7 @@ class ConstantSymbol(Symbol):
     def __init__(self, name, datatype, position):
         super().__init__(name, datatype, position, "/")
 
-    def get_type(
-        self,
-    ):
+    def get_type(self):
         return "named constant"
 
 
@@ -71,9 +65,7 @@ class Scope:
     """Code region with with a well-defined boundary which groups symbol
     definitions"""
 
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         """
 
         :fa_pointer: free address pointer
@@ -81,9 +73,7 @@ class Scope:
         """
         self.symbols = dict()
 
-    def get_scope_name(
-        self,
-    ):
+    def get_scope_name(self):
         """
         :return: string
         """
@@ -125,9 +115,7 @@ class _SymbolTable(Scope):
         # TODO
         self.fa_pointer = global_vars.args.begin_data_segment
 
-    def initTypeSystem(
-        self,
-    ):
+    def initTypeSystem(self):
         self.define(BuiltInTypeSymbol("char"))
         self.define(BuiltInTypeSymbol("int"))
 
@@ -142,9 +130,7 @@ class _SymbolTable(Scope):
             return str(self.fa_pointer - 1)
         return -1
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return self.get_scope_name() + ":" + str(self.symbols)
 
 
