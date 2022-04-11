@@ -9,7 +9,7 @@ from help_message import generate_help_message
 
 
 def main():
-    if set(['-h', '--help']).intersection(sys.argv):
+    if set(["-h", "--help"]).intersection(sys.argv):
         _deal_with_help_page()
         return
 
@@ -43,7 +43,7 @@ def main():
 
 
 def _deal_with_help_page():
-    if set(['-C', '--color']).intersection(sys.argv):
+    if set(["-C", "--color"]).intersection(sys.argv):
         global_vars.args.color = True
         CM().color_on()
     else:
@@ -52,5 +52,5 @@ def _deal_with_help_page():
     print(generate_help_message())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

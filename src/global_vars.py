@@ -6,8 +6,6 @@ class Args:
         self.abstract_syntax = True
         self.symbol_table = True
         self.print = True
-        self.begin_data_segment = 128
-        self.end_data_segment = 256
         self.distance = 20
         self.verbose = True
         self.sight = 2

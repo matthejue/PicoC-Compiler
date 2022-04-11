@@ -3,8 +3,7 @@
 =                                  `Synopsis`                                 =
 ===============================================================================
 
-Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b BEGIN_DATA_SEGMENT] [-e
-END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
+Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b PROCESS_BEGIN] [-d DISTANCE] [-S SIGHT] [-C] [-v] [infile]
 
 Compiles PicoC Code into RETI Code.
 
@@ -30,10 +29,8 @@ Only works if --print option is active
 -s, --symbol_table    also write the final symbol table into a `.csv` file
 -p, --print           print all file outputs to the terminal. Is always
 activated in the shell. Doesn't have to be activated manually in the shell.
--b, --begin_data_segment BEGIN_DATA_SEGMENT
+-b, --process_begin PROCESS_BEGIN
 >                     where the datasegment starts (default `100`)
--e, --end_data_segment END_DATA_SEGMENT
->                     where the datasegment ends and where the stackpointer
 starts (default `200`)
 -d, --distance DISTANCE
 >                     distance of the comments from the instructions for the
