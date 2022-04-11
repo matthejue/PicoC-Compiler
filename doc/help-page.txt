@@ -24,7 +24,7 @@ can be colorized.
 >                     also print the concrete syntax (content of input file).
 Only works if --print option is active
 -t, --tokens          also write the tokenlist
--a, --abstract-syntax
+-a, --abstract_syntax
 >                     also write the abstract syntax
 -s, --symbol_table    also write the final symbol table into a `.csv` file
 -p, --print           print all file outputs to the terminal. Is always

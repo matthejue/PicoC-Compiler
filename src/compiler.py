@@ -19,13 +19,15 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("infile", nargs="?")
     cli_args_parser.add_argument("-c", "--concrete_syntax", action="store_true")
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
-    cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
+    cli_args_parser.add_argument("-a", "--abstract_syntax", action="store_true")
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
-    cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
+    cli_args_parser.add_argument("-v", "--verbose", action="store_true")
+    cli_args_parser.add_argument("-g", "--debug", action="store_true")
+    cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
 
     #  cli_args_parser.add_argument(
     #      '-O',
@@ -182,6 +184,9 @@ class Compiler(cmd2.Cmd):
             WarningHandler().__init__(fname, finput)
 
     def _compile(self, code, infile, outbase=None):
+        if global_vars.args.debug:
+            __import__("pudb").set_trace()
+
         # remove all empty lines and \n from the code lines in the list
         code_without_cr = [basename(infile) + " "] + list(
             filter(lambda line: line, map(lambda line: line.strip("\n"), code))

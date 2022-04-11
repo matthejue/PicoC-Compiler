@@ -5,6 +5,8 @@
 - **Embedded Heterogeneous Tree Walker** (p.128 et seq. from [[1]](#1))
 - **Symbol Table for Nested Scopes** (p.161 et seq. from [[1]](#1))
 - **Factory Function** used to implement **Singleton Pattern** (from [[2]](#2))
+- **Github Action for Python** used for autotesting [[19]](#19)
+  - **small code piece** to execute **shell scripts** in **github actions** [[18]](#18)
 
 # Used literature
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
@@ -60,3 +62,5 @@
 - <a id="16">[16]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
 
 - <a id="17">[17]</a> “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
+- <a id="18">[18]</a> GitHub Community. “Running a Bash Script - Code to Cloud / GitHub Actions,” November 4, 2020. https://github.community/t/running-a-bash-script/141584/2.
+- <a id="19">[19]</a> Actions/Starter-Workflows. TypeScript. 2019. Reprint, GitHub Actions, 2022. https://github.com/actions/starter-workflows/blob/70f16d3552b2b728227019eb69710ed1b44cf811/ci/python-package.yml.

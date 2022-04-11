@@ -13,6 +13,7 @@
         </dcterms:isPartOf>
         <link:link rdf:resource="#item_2"/>
         <dc:title>manjaro</dc:title>
+        <dc:date>2022-01-28 14:54:03</dc:date>
         <z:language>en</z:language>
         <dc:identifier>
             <dcterms:URI>
@@ -30,7 +31,7 @@
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 14:54:10</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
     <bib:Book rdf:about="urn:isbn:978-1-68050-374-6">
@@ -185,7 +186,8 @@
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 08:31:21</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>Programmers: _:n16
+        <dc:description>Programmers: _:n19
+Programmers: _:n16
 original-date: 2018-12-10T17:56:03Z</dc:description>
     </bib:Data>
     <bib:Document rdf:about="https://github.com/python-cmd2/cmd2">
@@ -257,7 +259,8 @@ original-date: 2018-12-10T17:56:03Z</dc:description>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:41:11</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>Programmers: _:n24
+        <dc:description>Programmers: _:n27
+Programmers: _:n24
 original-date: 2015-04-11T20:49:04Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
@@ -311,7 +314,8 @@ original-date: 2015-04-11T20:49:04Z</dc:description>
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:42:04</dcterms:dateSubmitted>
-        <dc:description>Programmers: _:n32
+        <dc:description>Programmers: _:n35
+Programmers: _:n32
 original-date: 2011-05-13T23:44:30Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
@@ -338,7 +342,8 @@ original-date: 2011-05-13T23:44:30Z</dc:description>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 09:43:25</dcterms:dateSubmitted>
         <dc:rights>MIT</dc:rights>
-        <dc:description>Programmers: _:n44
+        <dc:description>Programmers: _:n47
+Programmers: _:n44
 original-date: 2019-09-02T14:34:19Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
@@ -349,6 +354,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         </dcterms:isPartOf>
         <link:link rdf:resource="#item_16"/>
         <dc:title>Zotero | Your personal research assistant</dc:title>
+        <dc:date>2022-01-28 15:11:06</dc:date>
         <dc:identifier>
             <dcterms:URI>
                <rdf:value>https://www.zotero.org/</rdf:value>
@@ -365,7 +371,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 15:11:13</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
     <bib:Data rdf:about="https://github.com/JonathonReinhart/staticx">
@@ -390,7 +396,8 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 15:11:34</dcterms:dateSubmitted>
-        <dc:description>original-date: 2017-05-27T18:37:54Z</dc:description>
+        <dc:description>Programmers: _:n53
+original-date: 2017-05-27T18:37:54Z</dc:description>
         <z:programmingLanguage>C</z:programmingLanguage>
     </bib:Data>
     <bib:Document rdf:about="https://github.com/pyinstaller/pyinstaller">
@@ -401,6 +408,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         <link:link rdf:resource="#item_19"/>
         <dc:title>FAQ · pyinstaller/pyinstaller Wiki</dc:title>
         <dcterms:abstract>Freeze (package) Python programs into stand-alone executables - FAQ · pyinstaller/pyinstaller Wiki</dcterms:abstract>
+        <dc:date>2022-01-28 15:11:58</dc:date>
         <z:language>en</z:language>
         <dc:identifier>
             <dcterms:URI>
@@ -418,7 +426,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 15:12:07</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
     <bib:Document rdf:about="https://github.com/jgraph/drawio-desktop/releases">
@@ -428,6 +436,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         </dcterms:isPartOf>
         <dc:title>Releases · jgraph/drawio-desktop</dc:title>
         <dcterms:abstract>Official electron build of diagrams.net. Contribute to jgraph/drawio-desktop development by creating an account on GitHub.</dcterms:abstract>
+        <dc:date>2022-01-28 15:12:22</dc:date>
         <z:language>en</z:language>
         <dc:identifier>
             <dcterms:URI>
@@ -441,8 +450,9 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         <dcterms:isPartOf>
            <z:Website></z:Website>
         </dcterms:isPartOf>
-        <link:link rdf:resource="#item_23"/>
+        <link:link rdf:resource="#item_22"/>
         <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
+        <dc:date>2022-01-28 15:12:42</dc:date>
         <dc:identifier>
             <dcterms:URI>
                <rdf:value>https://github.com/marp-team/marp-cli</rdf:value>
@@ -450,7 +460,7 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 15:12:42</dcterms:dateSubmitted>
     </bib:Document>
-    <z:Attachment rdf:about="#item_23">
+    <z:Attachment rdf:about="#item_22">
         <z:itemType>attachment</z:itemType>
         <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
         <dc:identifier>
@@ -459,22 +469,9 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
             </dcterms:URI>
         </dc:identifier>
         <dcterms:dateSubmitted>2022-01-28 15:13:01</dcterms:dateSubmitted>
-        <z:linkMode>1</z:linkMode>
+        <z:linkMode>3</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
-    <bib:Document rdf:about="#item_22">
-        <z:itemType>webpage</z:itemType>
-        <dcterms:isPartOf>
-           <z:Website></z:Website>
-        </dcterms:isPartOf>
-        <dc:title>GitHub - marp-team/marp-cli: A CLI interface for Marp and Marpit based converters</dc:title>
-        <dc:identifier>
-            <dcterms:URI>
-               <rdf:value>https://github.com/marp-team/marp-cli</rdf:value>
-            </dcterms:URI>
-        </dc:identifier>
-        <dcterms:dateSubmitted>2022-01-28 15:12:45</dcterms:dateSubmitted>
-    </bib:Document>
     <bib:Data rdf:about="#item_24">
         <z:itemType>computerProgram</z:itemType>
         <dc:publisher>
@@ -519,9 +516,37 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         <dc:description>original-date: 2011-11-23T11:05:56Z</dc:description>
         <z:programmingLanguage>Python</z:programmingLanguage>
     </bib:Data>
+    <bib:Document rdf:about="https://github.community/t/running-a-bash-script/141584/2">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website><dc:title>GitHub Community</dc:title></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_26"/>
+        <dc:title>Running a bash script - Code to Cloud / GitHub Actions</dc:title>
+        <dcterms:abstract>With that setup the path to the script is relative to the root of your repository, so if your script is .github/script.sh that’s all that’s needed in the run step. Remember that the file must be marked as executable, or you need to explicitly call bash with the script as parameter.</dcterms:abstract>
+        <dc:date>2020-11-04T19:50:47+00:00</dc:date>
+        <z:language>en</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.community/t/running-a-bash-script/141584/2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-11 15:55:03</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_26">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.community/t/running-a-bash-script/141584/2</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-11 15:55:08</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
     <z:Collection rdf:about="#collection_1">
         <dc:title>Bachelorprojekt</dc:title>
-        <dcterms:hasPart rdf:resource="#collection_2"/>
         <dcterms:hasPart rdf:resource="https://wallpapercave.com/w/wp9774690"/>
         <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
         <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
@@ -537,12 +562,6 @@ original-date: 2019-09-02T14:34:19Z</dc:description>
         <dcterms:hasPart rdf:resource="https://github.com/jgraph/drawio-desktop/releases"/>
         <dcterms:hasPart rdf:resource="https://github.com/marp-team/marp-cli"/>
         <dcterms:hasPart rdf:resource="#item_24"/>
-    </z:Collection>
-    <z:Collection rdf:about="#collection_2">
-        <dc:title>Bachelorprojekt</dc:title>
-        <dcterms:hasPart rdf:resource="urn:isbn:978-1-68050-374-6"/>
-        <dcterms:hasPart rdf:resource="https://stackoverflow.com/questions/52351312/singleton-pattern-in-python"/>
-        <dcterms:hasPart rdf:resource="https://iucompilercourse.github.io/IU-Fall-2021/"/>
-        <dcterms:hasPart rdf:resource="https://github.com/othneildrew/Best-README-Template"/>
+        <dcterms:hasPart rdf:resource="https://github.community/t/running-a-bash-script/141584/2"/>
     </z:Collection>
 </rdf:RDF>

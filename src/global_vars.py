@@ -7,10 +7,11 @@ class Args:
         self.symbol_table = True
         self.print = True
         self.distance = 20
-        self.verbose = True
         self.sight = 2
         self.color = True
-        self.opimization_level = 0
+        self.verbose = True
+        self.debug = False
+        self.show_error_message = False
 
 
 # options from command-line arguments
