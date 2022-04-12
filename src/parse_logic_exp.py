@@ -1,13 +1,13 @@
-from arithmetic_expression_grammar import ArithmeticExpressionGrammar
+from parse_arithmetic_exp import ArithmeticExpParser
 from lexer import TT
 from logic_nodes import LogicBinaryOperation, Not, Atom, ToBool
 from errors import Errors
-from picoc_ast import NT
+from picoc_nodes import NT
 from itertools import chain
 from reference import Reference
 
 
-class LogicExpressionGrammar(ArithmeticExpressionGrammar):
+class LogicExpParser(ArithmeticExpParser):
     """The logic expression part of the context free grammar of the piocC
     language"""
 
@@ -21,7 +21,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
     }
     LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot
 
-    def code_ae_le(self):
+    def parse_arithmetic_logic_exp(self):
         """point where it's decided if it's a arithmetic expression only or a
         logic expression
 
@@ -32,41 +32,32 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
         error = Reference()
-        if self.taste(self._taste_consume_ae, error):
-            self._taste_consume_ae()
-        elif self.taste(self.code_le, error):
-            self.code_le()
+        if self.taste(self._taste_arithmetic_exp, error):
+            self._taste_arithmetic_exp()
+        elif self.taste(self.parse_logic_exp, error):
+            self.parse_logic_exp()
         else:
             raise error.val
             #  self._handle_all_tastes_unsuccessful(
             #  "arithmetic or logic expression", error)
 
-    #  def _handle_all_tastes_unsuccessful(self, expected, errors):
-    #      # if both threw the same error print that error out
-    #      if all(elem == errors[0] for elem in errors):
-    #          raise errors[0]
-    #      else:
-    #          token = self.LT(1)
-    #          raise Errors.NoApplicableRuleError(expected, token.value,
-    #                                             token.position)
-
-    def _taste_consume_ae(self):
+    def _taste_arithmetic_exp(self):
         """taste whether the next expression is a arithmetic expression
 
         :grammar: <code_ae>
         """
-        self.code_ae()
+        self.parse_arithmetic_exp()
         if self.LTT(1) in chain(self.COMP_REL.keys(), self.LOG_CON.keys()):
             raise Errors.TastingError()
 
-    def code_le(self):
+    def parse_logic_exp(self):
         """logic expression startpoint
 
         :grammar: <or_expr>
         """
-        self._or_expr()
+        self._or_exp()
 
-    def _or_expr(self):
+    def _or_exp(self):
         """or expression
 
         :grammar: #2 <and_expr> (or #2 <and_expr>)*
@@ -75,7 +66,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         savestate_node = self.ast_builder.down(LogicBinaryOperation)
 
-        self._and_expr()
+        self._and_exp()
 
         if self.LTT(1) != TT.OR:
             self.ast_builder.go_back("_or_expr")
@@ -89,7 +80,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self.ast_builder.save("_or_expr")
 
             self.ast_builder.down(LogicBinaryOperation)
-            self._and_expr()
+            self._and_exp()
 
             if self.LTT(1) != TT.OR:
                 self.ast_builder.go_back("_or_expr")
@@ -98,7 +89,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         self.ast_builder.up(savestate_node)
 
-    def _and_expr(self):
+    def _and_exp(self):
         """and expression
 
         :grammar: #2 <lo> (and #2 <lo>)*
@@ -107,7 +98,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         savestate_node = self.ast_builder.down(LogicBinaryOperation)
 
-        self._lo()
+        self._logic_op()
 
         if self.LTT(1) != TT.AND:
             self.ast_builder.go_back("_and_expr")
@@ -121,7 +112,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             self.ast_builder.save("_and_expr")
 
             self.ast_builder.down(LogicBinaryOperation)
-            self._lo()
+            self._logic_op()
 
             if self.LTT(1) != TT.AND:
                 self.ast_builder.go_back("_and_expr")
@@ -130,13 +121,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         self.ast_builder.up(savestate_node)
 
-    def _lo(self):
+    def _logic_op(self):
         """logic operand
 
         :grammar: <not_expr>
         """
         if self.LTT(1) == TT.NOT:
-            self._not_expr()
+            self._not_exp()
         elif self.LTT(1) in [
             TT.NUMBER,
             TT.CHARACTER,
@@ -144,14 +135,14 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             TT.L_PAREN,
             TT.MINUS_OP,
         ]:
-            self._parenthized_logic_expression_or_arithmetic_term_or_comparison()
+            self._paren_logic_exp_or_arithmetic_term_or_comparison()
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
                 "logic operand", token.value, token.position
             )
 
-    def _not_expr(self):
+    def _not_exp(self):
         """not expression
 
         :grammar: !+ <code_le>
@@ -166,20 +157,20 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
             self.ast_builder.down(Not)
 
-        self._lo()
+        self._logic_op()
 
         self.ast_builder.up(savestate_node)
 
-    def _parenthized_logic_expression_or_arithmetic_term_or_comparison(self):
+    def _paren_logic_exp_or_arithmetic_term_or_comparison(self):
         """atomic formula or top / bottom
 
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         """
         error = Reference()
-        if self.taste(self._taste_consume_parenthesized_logic_expression, error):
-            self._taste_consume_parenthesized_logic_expression()
-        elif self.taste(self._taste_consume_arithmetic_term, error):
-            self._taste_consume_arithmetic_term()
+        if self.taste(self._taste_paren_logic_exp, error):
+            self._taste_paren_logic_exp()
+        elif self.taste(self._taste_arithmetic_term, error):
+            self._taste_arithmetic_term()
         elif self.taste(self._atom, error):
             self._atom()
         else:
@@ -188,56 +179,48 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             #  "parenthized logic formula or arithmetic term or comparison",
             #  errors)
 
-    def _taste_consume_parenthesized_logic_expression(
-        self,
-    ):
-        self._parenthesized_logic_expression()
+    def _taste_paren_logic_exp(self):
+        self._paren_logic_exp()
         if self.LTT(1) in chain(
             self.BINOP_PREC_2, self.BINOP_PREC_1, self.COMP_REL.keys()
         ):
             raise Errors.TastingError()
 
-    def _parenthesized_logic_expression(self):
+    def _paren_logic_exp(self):
         """logic parenthesis
 
         :grammar: ( <code_le> )
         """
         self.match([TT.L_PAREN])
-        self.code_le()
+        self.parse_logic_exp()
         self.match([TT.R_PAREN])
 
-    def _taste_consume_arithmetic_term(
-        self,
-    ):
+    def _taste_arithmetic_term(self):
         self._arithmetic_term()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():
             raise Errors.TastingError()
 
-    def _arithmetic_term(
-        self,
-    ):
+    def _arithmetic_term(self):
         """top / bottom
 
         :grammar: #1 <code_ae>
         """
         savestate_node = self.ast_builder.down(ToBool)
 
-        self.code_ae()
+        self.parse_arithmetic_exp()
 
         self.ast_builder.up(savestate_node)
 
-    def _atom(
-        self,
-    ):
+    def _atom(self):
         """atomic formula
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>
         """
         savestate_node = self.ast_builder.down(Atom)
 
-        self.code_ae()
+        self.parse_arithmetic_exp()
         self.add_and_match(list(self.COMP_REL.keys()), mapping=self.COMP_REL)
-        self.code_ae()
+        self.parse_arithmetic_exp()
 
         self.ast_builder.up(savestate_node)

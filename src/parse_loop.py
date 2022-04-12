@@ -2,8 +2,8 @@ from loop_nodes import While, DoWhile
 from lexer import TT
 
 
-class LoopGrammar:
-    def code_lo(self):
+class LoopParser:
+    def parse_loop(self):
         """loop grammar startpoint
 
         :grammar: <loop>
@@ -35,13 +35,13 @@ class LoopGrammar:
 
         self.match([TT.L_PAREN])
 
-        self.code_le()
+        self.parse_logic_exp()
 
         self.match([TT.R_PAREN])
 
         self.match([TT.L_BRACE])
 
-        self.code_ss()
+        self.parse_stmts()
 
         self.match([TT.R_BRACE])
 
@@ -59,7 +59,7 @@ class LoopGrammar:
 
         self.match([TT.L_BRACE])
 
-        self.code_ss()
+        self.parse_stmts()
 
         self.match([TT.R_BRACE])
 
@@ -67,7 +67,7 @@ class LoopGrammar:
 
         self.match([TT.L_PAREN])
 
-        self.code_le()
+        self.parse_logic_exp()
 
         self.match([TT.R_PAREN])
 

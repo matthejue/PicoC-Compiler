@@ -2,7 +2,7 @@ import global_vars
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
-from picoc_ast import NT
+from picoc_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
 from warnings_ import Warnings
 from warning_handler import WarningHandler
@@ -329,7 +329,9 @@ class Allocation(ASTNode):
     ):
         match self:
             case Allocation(
-                NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)
+                NT.Const(),
+                (NT.Char(dtype) | NT.Int(dtype)),
+                Identifier(name, position),
             ):
                 self._error_check(name, position)
                 constant = ConstantSymbol(

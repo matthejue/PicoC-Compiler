@@ -1,7 +1,7 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
-from picoc_ast import NT
+from picoc_nodes import NT
 import global_vars
 from bitstring import Bits
 

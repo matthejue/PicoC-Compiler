@@ -5,7 +5,7 @@ from enum import Enum
 
 
 class TT(Enum):
-    """Tokentypes that are part of the grammar. Their strings are used for
+    """Tokentypes that are part of the picoc_parser. Their strings are used for
     differentiation and for error messages"""
 
     SEMICOLON = ";"
@@ -50,14 +50,41 @@ class TT(Enum):
 
 SPECIAL_MAPPINGS = ("/", "&", "|", "=", "<", ">", "!")
 NOT_TO_MAP = ("identifier", "to bool", "end of file")
-STRING_TO_TT_SIMPLE = {value.value: value for value in (value for key, value in TT.__dict__.items(
-) if not key.startswith('_') and value.value not in NOT_TO_MAP and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) < 2)}
+STRING_TO_TT_SIMPLE = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS
+        and len(value.value) < 2
+    )
+}
 list(STRING_TO_TT_SIMPLE.keys())[:10]
 list(STRING_TO_TT_SIMPLE.keys())[10:20]
-STRING_TO_TT_COMPLEX = {value.value: value for value in (value for key, value in TT.__dict__.items(
-) if not key.startswith('_') and value.value not in NOT_TO_MAP and value.value[0] in SPECIAL_MAPPINGS and len(value.value) <= 2)}
+STRING_TO_TT_COMPLEX = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] in SPECIAL_MAPPINGS
+        and len(value.value) <= 2
+    )
+}
 list(STRING_TO_TT_COMPLEX.keys())[:10]
 list(STRING_TO_TT_COMPLEX.keys())[10:20]
-STRING_TO_TT_WORDS = {value.value: value for value in (value for key, value in TT.__dict__.items(
-) if not key.startswith('_') and value.value not in NOT_TO_MAP and value.value[0] not in SPECIAL_MAPPINGS and len(value.value) >= 2)}
+STRING_TO_TT_WORDS = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP
+        and value.value[0] not in SPECIAL_MAPPINGS
+        and len(value.value) >= 2
+    )
+}
 list(STRING_TO_TT_WORDS.keys())[:10]

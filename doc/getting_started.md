@@ -1,7 +1,7 @@
 # Compiling a file
 With the following **cli-options** you won't miss anything when compiling **PicoC** into **RETI-Code**:
 ```bash
-./pico_c_compiler -c -t -a -s -p -d 20 -S 2 -C -v ./code.picoc
+./picoc_compiler -c -t -a -s -p -d 20 -S 2 -C -v ./code.picoc
 ```
 
 # Compiling via shell

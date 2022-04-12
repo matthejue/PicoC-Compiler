@@ -1,35 +1,29 @@
 from lexer import TT
 from errors import Errors
 from if_else_nodes import If, IfElse
-from picoc_ast import NT
+from picoc_nodes import NT
 from reference import Reference
 
-#  from statement_grammar import StatementGrammar
 
+class IfElseParser:
+    def parse_if_else(self):
+        self._if_if_else()
 
-class IfElseGrammar:
-    def code_ie(
-        self,
-    ):
-        self.code_if_if_else()
-
-    def code_if_if_else(self):
+    def _if_if_else(self):
         """if or if else
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) (else ({
         <code_ss> }|<s>))?
         """
         error = Reference()
-        if self.taste(self._taste_consume_if_without_else, error):
-            self._taste_consume_if_without_else()
+        if self.taste(self._taste_if_without_else, error):
+            self._taste_if_without_else()
         elif self.taste(self._if_else, error):
             self._if_else()
         else:
             raise error.val
-            #  self._handle_all_tastes_unsuccessful("if or if else statement",
-            #                                       error)
 
-    def _taste_consume_if_without_else(self):
+    def _taste_if_without_else(self):
         """taste whether the next expression is a if without else
 
         :grammar: <if_without_else>
@@ -38,30 +32,26 @@ class IfElseGrammar:
         if self.LTT(1) == TT.ELSE:
             raise Errors.TastingError()
 
-    def _if_without_else(
-        self,
-    ):
+    def _if_without_else(self):
         """if
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
         """
         savestate_node = self.ast_builder.down(If)
 
-        self._if_condition()
+        self._condition()
         self._branch()
 
         self.ast_builder.up(savestate_node)
 
-    def _if_else(
-        self,
-    ):
+    def _if_else(self):
         """if else
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) else ({ <code_ss> }|<s>)
         """
         savestate_node = self.ast_builder.down(IfElse)
 
-        self._if_condition()
+        self._condition()
         self._branch()
 
         self.add_and_match([TT.ELSE], NT.Else)
@@ -69,9 +59,7 @@ class IfElseGrammar:
 
         self.ast_builder.up(savestate_node)
 
-    def _if_condition(
-        self,
-    ):
+    def _condition(self):
         """if code piece
 
         :grammar: if '('<code_le>')'
@@ -80,13 +68,11 @@ class IfElseGrammar:
 
         self.match([TT.L_PAREN])
 
-        self.code_le()
+        self.parse_logic_exp()
 
         self.match([TT.R_PAREN])
 
-    def _branch(
-        self,
-    ):
+    def _branch(self):
         """if code piece
 
         :grammar: ({ <code_ss> }|<s>)
@@ -94,11 +80,11 @@ class IfElseGrammar:
         if self.LTT(1) == TT.L_BRACE:
             self.consume_next_token()  # [TT.L_BRACE]
 
-            self.code_ss()
+            self.parse_stmts()
 
             self.match([TT.R_BRACE])
         elif self.LTT(1) in self.STATEMENT:
-            self._s()
+            self._stmt()
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(

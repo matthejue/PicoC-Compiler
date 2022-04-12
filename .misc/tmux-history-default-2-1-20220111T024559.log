@@ -1395,16 +1395,16 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 1, in <module>
-    from logic_expression_grammar import LogicExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 1, in <module>
-    from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py", line 2, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 1, in <module>
+    from parse_logic_exp import LogicExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 1, in <module>
+    from parse_arithmetic_exp import ArithmeticExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_arithmetic_exp.py", line 2, in <module>
     from arithmetic_nodes import ArithUnOp, ArithBinOp, Identifier, Number, Character
   File "/home/areo/Documents/Studium/pico_c_compiler/src/arithmetic_nodes.py", line 161
     class ArithUnOp(ASTNode):
@@ -1455,18 +1455,18 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 1, in <module>
-    from logic_expression_grammar import LogicExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 1, in <module>
-    from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py", line 1, in <module>
-    from parser_ import BacktrackingParser
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 1, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 1, in <module>
+    from parse_logic_exp import LogicExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 1, in <module>
+    from parse_arithmetic_exp import ArithmeticExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_arithmetic_exp.py", line 1, in <module>
+    from parser import BacktrackingParser
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 1, in <module>
     from ast_builder import ASTBuilder
   File "/home/areo/Documents/Studium/pico_c_compiler/src/ast_builder.py", line 3, in <module>
     from file_nodes import File
@@ -1492,18 +1492,18 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 1, in <module>
-    from logic_expression_grammar import LogicExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 1, in <module>
-    from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py", line 1, in <module>
-    from parser_ import BacktrackingParser
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 1, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 1, in <module>
+    from parse_logic_exp import LogicExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 1, in <module>
+    from parse_arithmetic_exp import ArithmeticExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_arithmetic_exp.py", line 1, in <module>
+    from parser import BacktrackingParser
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 1, in <module>
     from ast_builder import ASTBuilder
   File "/home/areo/Documents/Studium/pico_c_compiler/src/ast_builder.py", line 3, in <module>
     from file_nodes import File
@@ -1534,18 +1534,18 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 1, in <module>
-    from logic_expression_grammar import LogicExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 1, in <module>
-    from arithmetic_expression_grammar import ArithmeticExpressionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/arithmetic_expression_grammar.py", line 1, in <module>
-    from parser_ import BacktrackingParser
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 1, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 1, in <module>
+    from parse_logic_exp import LogicExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 1, in <module>
+    from parse_arithmetic_exp import ArithmeticExpressionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_arithmetic_exp.py", line 1, in <module>
+    from parser import BacktrackingParser
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 1, in <module>
     from ast_builder import ASTBuilder
   File "/home/areo/Documents/Studium/pico_c_compiler/src/ast_builder.py", line 3, in <module>
     from file_nodes import File
@@ -2044,19 +2044,19 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 11, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 11, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 16, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 16, in _file
     self.add_and_match([TT.IDENTIFIER], NT.Filename)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 78, in add_and_match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 78, in add_and_match
     self._add(classname, mapping)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 97, in _add
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 97, in _add
     classname(self.LT(1).value,
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 32, in LT
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 32, in LT
     self._sync(i)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 109, in _sync
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 109, in _sync
     self._fill(not_filled_up)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 118, in _fill
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 118, in _fill
     self.lts += [self.lexer.next_token()]
   File "/home/areo/Documents/Studium/pico_c_compiler/src/lexer.py", line 213, in next_token
     raise InvalidCharacterError(self.lc, self.position)
@@ -2096,9 +2096,9 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 11, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 11, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 16, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 16, in _file
     self.add_and_match([TT.FILENAME], NT.Filename)
   File "/usr/lib/python3.10/enum.py", line 437, in __getattr__
     raise AttributeError(name) from None
@@ -2113,7 +2113,7 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 14, in start_parse
     self.match([TT.EOF])
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 68, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 68, in match
     raise MismatchedTokenError(tokentypes, self.LT(1))
 errors.MismatchedTokenError: MismatchedTokenError: Expected '[<TT.EOF: 'end of file'>]', found '.picocvoid'
 
@@ -2143,7 +2143,7 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 14, in start_parse
     self.match([TT.EOF])
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 68, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 68, in match
     raise MismatchedTokenError(tokentypes, self.LT(1))
 errors.MismatchedTokenError: MismatchedTokenError: Expected '[<TT.EOF: 'end of file'>]', found '.picocvoid'
 
@@ -2173,7 +2173,7 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 14, in start_parse
     self.match([TT.EOF])
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 68, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 68, in match
     raise MismatchedTokenError(tokentypes, self.LT(1))
 errors.MismatchedTokenError: MismatchedTokenError: Expected '[<TT.EOF: 'end of file'>]', found '.picocvoid'
 
@@ -2203,7 +2203,7 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 14, in start_parse
     self.match([TT.EOF])
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 68, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 68, in match
     raise MismatchedTokenError(tokentypes, self.LT(1))
 errors.MismatchedTokenError: MismatchedTokenError: Expected '[<TT.EOF: 'end of file'>]', found 'main'
 
@@ -2276,7 +2276,7 @@ Traceback (most recent call last):
     output = _compile(infile, pico_c_in)
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 210, in _compile
     grammar = Grammar(lexer)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 25, in __init__
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 25, in __init__
     self.ast_builder = ASTBuilder()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/ast_builder.py", line 9, in __init__
     root = NT.Root()
@@ -2985,7 +2985,7 @@ areo@ArchPC ~/Documents/Studium/pico_c_compiler                                 
 [master c243a28] comments are aligned, added File and Root Node
  25 files changed, 364 insertions(+), 227 deletions(-)
  create mode 100644 .misc/blockeintrag.txt
- create mode 100644 src/file_grammar.py
+ create mode 100644 src/parse_file.py
  rename src/{file_nodes.py => file_node.py} (57%)
  create mode 100644 src/root_node.py
 Enumerating objects: 50, done.
@@ -3510,14 +3510,14 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from file_grammar import FileGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 2, in <module>
+    from parse_file import FileGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 1, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 2, in <module>
     from assignment_allocation_nodes import Assign, Alloc
   File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py", line 7, in <module>
     from assignment_allocation_nodes import IdentifierAssign
@@ -3531,14 +3531,14 @@ Traceback (most recent call last):
   File "/home/areo/Documents/Studium/pico_c_compiler/./src/pico_c_compiler.py", line 6, in <module>
     from grammar import Grammar
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 1, in <module>
-    from file_grammar import FileGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 1, in <module>
-    from function_grammar import FunctionGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 1, in <module>
-    from statement_grammar import StatementGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 1, in <module>
-    from assignment_allocation_grammar import AssignmentAllocationGrammar
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_grammar.py", line 2, in <module>
+    from parse_file import FileGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 1, in <module>
+    from parse_fun import FunctionGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 1, in <module>
+    from parse_stmts import StatementGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 1, in <module>
+    from parse_assign_alloc import AssignmentAllocationGrammar
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_assign_alloc.py", line 2, in <module>
     from assignment_allocation_nodes import Assign, Alloc
   File "/home/areo/Documents/Studium/pico_c_compiler/src/assignment_allocation_nodes.py", line 7, in <module>
     from assignment_allocation_nodes import IdentifierAssign
@@ -3865,13 +3865,13 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 14, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 14, in _file
     self.add_and_match([TT.NAME], NT.Filename)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 84, in add_and_match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 84, in add_and_match
     self.match(tokentypes)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 70, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 70, in match
     raise Errors.MismatchedTokenError(
 errors.Errors.MismatchedTokenError: MismatchedTokenError: Expected ''name'', found '<'
 
@@ -3902,13 +3902,13 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 14, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 14, in _file
     self.add_and_match([TT.NAME], NT.Filename)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 84, in add_and_match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 84, in add_and_match
     self.match(tokentypes)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 70, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 70, in match
     raise Errors.MismatchedTokenError(
 errors.Errors.MismatchedTokenError: MismatchedTokenError: Expected ''name'', found '<'
 
@@ -3990,21 +3990,21 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 62, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 62, in _s
     raise Errors.NoApplicableRuleError("start of a statement",
 errors.Errors.NoApplicableRuleError: NoApplicableRuleError: Expected 'start of a statement', found '12'
 
@@ -4103,43 +4103,43 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 53, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 53, in _s
     self.code_ie()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 10, in code_ie
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 10, in code_ie
     self.code_if_if_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 24, in code_if_if_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 24, in code_if_if_else
     self._handle_all_tastes_unsuccessful("if or if else statement",
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 47, in _handle_all_tastes_unsuccessful
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 47, in _handle_all_tastes_unsuccessful
     raise errors[0]
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 154, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 154, in taste
     rule()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 32, in _taste_consume_if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 32, in _taste_consume_if_without_else
     self._if_without_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 43, in _if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 43, in _if_without_else
     self._if_condition()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 72, in _if_condition
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 72, in _if_condition
     self.code_le()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 69, in code_le
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 69, in code_le
     self._or_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 81, in _or_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 81, in _or_expr
     self._and_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 115, in _and_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 115, in _and_expr
     self._lo()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 153, in _lo
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 153, in _lo
     raise Errors.MismatchedTokenError("logic operand", token.value,
 errors.Errors.MismatchedTokenError: MismatchedTokenError: Expected 'logic operand', found '99'
 
@@ -4170,43 +4170,43 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 53, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 53, in _s
     self.code_ie()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 10, in code_ie
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 10, in code_ie
     self.code_if_if_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 24, in code_if_if_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 24, in code_if_if_else
     self._handle_all_tastes_unsuccessful("if or if else statement",
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 47, in _handle_all_tastes_unsuccessful
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 47, in _handle_all_tastes_unsuccessful
     raise errors[0]
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 154, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 154, in taste
     rule()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 32, in _taste_consume_if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 32, in _taste_consume_if_without_else
     self._if_without_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 43, in _if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 43, in _if_without_else
     self._if_condition()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 72, in _if_condition
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 72, in _if_condition
     self.code_le()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 69, in code_le
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 69, in code_le
     self._or_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 81, in _or_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 81, in _or_expr
     self._and_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 115, in _and_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 115, in _and_expr
     self._lo()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 153, in _lo
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 153, in _lo
     raise Errors.MismatchedTokenError("logic operand", token.value,
 errors.Errors.MismatchedTokenError: MismatchedTokenError: Expected 'logic operand', found '99'
 
@@ -4237,43 +4237,43 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 53, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 53, in _s
     self.code_ie()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 10, in code_ie
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 10, in code_ie
     self.code_if_if_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 24, in code_if_if_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 24, in code_if_if_else
     self._handle_all_tastes_unsuccessful("if or if else statement",
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 47, in _handle_all_tastes_unsuccessful
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 47, in _handle_all_tastes_unsuccessful
     raise errors[0]
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 154, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 154, in taste
     rule()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 32, in _taste_consume_if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 32, in _taste_consume_if_without_else
     self._if_without_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 43, in _if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 43, in _if_without_else
     self._if_condition()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 72, in _if_condition
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 72, in _if_condition
     self.code_le()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 69, in code_le
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 69, in code_le
     self._or_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 81, in _or_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 81, in _or_expr
     self._and_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 115, in _and_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 115, in _and_expr
     self._lo()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 153, in _lo
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 153, in _lo
     raise Errors.MismatchedTokenError("logic operand", token.value,
 errors.Errors.MismatchedTokenError: MismatchedTokenError: Expected 'logic operand', found '99'
 
@@ -4320,43 +4320,43 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 53, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 53, in _s
     self.code_ie()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 10, in code_ie
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 10, in code_ie
     self.code_if_if_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 24, in code_if_if_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 24, in code_if_if_else
     self._handle_all_tastes_unsuccessful("if or if else statement",
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 47, in _handle_all_tastes_unsuccessful
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 47, in _handle_all_tastes_unsuccessful
     raise errors[0]
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 154, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 154, in taste
     rule()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 32, in _taste_consume_if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 32, in _taste_consume_if_without_else
     self._if_without_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 43, in _if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 43, in _if_without_else
     self._if_condition()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 72, in _if_condition
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 72, in _if_condition
     self.code_le()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 69, in code_le
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 69, in code_le
     self._or_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 81, in _or_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 81, in _or_expr
     self._and_expr()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 115, in _and_expr
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 115, in _and_expr
     self._lo()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/logic_expression_grammar.py", line 153, in _lo
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_logic_exp.py", line 153, in _lo
     raise Errors.NoApplicableRuleError("logic operand", token.value,
 errors.Errors.NoApplicableRuleError: NoApplicableRuleError: Expected 'logic operand', found '99'
 
@@ -4389,43 +4389,43 @@ Traceback (most recent call last):
     function()
   File "/home/areo/Documents/Studium/pico_c_compiler/src/grammar.py", line 13, in start_parse
     self.code_fi()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 9, in code_fi
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 9, in code_fi
     self._file()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/file_grammar.py", line 17, in _file
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_file.py", line 17, in _file
     self.code_fu()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 17, in code_fu
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 17, in code_fu
     self._function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 26, in _function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 26, in _function
     self._main_function()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/function_grammar.py", line 41, in _main_function
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_fun.py", line 41, in _main_function
     self.code_ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 27, in code_ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 27, in code_ss
     self._ss()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 37, in _ss
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 37, in _ss
     self._s()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/statement_grammar.py", line 53, in _s
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_stmts.py", line 53, in _s
     self.code_ie()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 10, in code_ie
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 10, in code_ie
     self.code_if_if_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 19, in code_if_if_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 19, in code_if_if_else
     if self.taste(self._taste_consume_if_without_else, errors):
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 160, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 160, in taste
     raise e
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 154, in taste
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 154, in taste
     rule()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 32, in _taste_consume_if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 32, in _taste_consume_if_without_else
     self._if_without_else()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 43, in _if_without_else
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 43, in _if_without_else
     self._if_condition()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/if_else_grammar.py", line 70, in _if_condition
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parse_if_else.py", line 70, in _if_condition
     self.match([TT.L_PAREN])
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 67, in match
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 67, in match
     self.consume_next_token()
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 57, in consume_next_token
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 57, in consume_next_token
     self._sync(1)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 114, in _sync
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 114, in _sync
     self._fill(not_filled_up)
-  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser_.py", line 123, in _fill
+  File "/home/areo/Documents/Studium/pico_c_compiler/src/parser.py", line 123, in _fill
     self.lts += [self.lexer.next_token()]
   File "/home/areo/Documents/Studium/pico_c_compiler/src/lexer.py", line 193, in next_token
     raise Errors.UnclosedCharacterError(
