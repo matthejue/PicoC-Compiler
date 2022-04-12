@@ -1,0 +1,13 @@
+// in:10
+// expected:10
+
+void main() {
+  int var = 0;  // Einzeiliger Kommentar
+  /* Mehrzeiliger Kommentar,
+  der sich über mehrere Zeilen
+  erstreckt */
+  while(var < input()) {
+    var = var + 1;
+  }
+  print(var);
+}
