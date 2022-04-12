@@ -1,1 +1,0 @@
-(empty_if (void main If(ToBool(99))))

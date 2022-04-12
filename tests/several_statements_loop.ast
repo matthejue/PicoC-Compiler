@@ -1,1 +1,0 @@
-(several_statements_loop (void main ((const int x) = 101) DoWhile(((int y) = 10) (y = (y + x)) (x < 10))))

@@ -1,1 +1,0 @@
-(empty_else (void main IfElse(ToBool(99) else)))

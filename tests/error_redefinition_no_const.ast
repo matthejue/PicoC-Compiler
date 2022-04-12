@@ -1,1 +1,0 @@
-(error_redefinition_no_const (void main ((char var) = 122) ((int var) = 10)))

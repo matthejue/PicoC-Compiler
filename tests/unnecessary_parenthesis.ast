@@ -1,1 +1,0 @@
-(unnecessary_parenthesis (void main ((char bool) = 0) ((char var) = Not(ToBool((- bool)))) (var = (- (- bool))) (var = (- Not(ToBool(bool))))))

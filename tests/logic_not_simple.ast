@@ -1,1 +1,0 @@
-(logic_not_simple (void main ((char var) = Not(ToBool((- 10))))))

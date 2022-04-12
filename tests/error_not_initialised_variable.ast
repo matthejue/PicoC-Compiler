@@ -1,1 +1,0 @@
-(error_not_initialised_variable (void main ((int x) = (12 & var))))

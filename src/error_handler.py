@@ -6,15 +6,17 @@ from colormanager import ColorManager as CM
 
 class ErrorHandler:
     """Output a detailed error message"""
-    def __init__(self, fname, finput):
-        self.fname = fname
+
+    def __init__(self, finput):
         self.finput = finput
         # in case there's a multiline inline comment that spreads over more then 2 lines
         self.multiline_comment_started = False
         # list of removed comments to undo the removing later
         self.removed_comments = [(0, 0, "")]
 
-    def __repr__(self, ):
+    def __repr__(
+        self,
+    ):
         return str(self.finput)
 
     def handle(self, function, *args):
@@ -22,33 +24,31 @@ class ErrorHandler:
             function(*args)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.MismatchedTokenError as e:
             error_header = self._error_header(e.found_pos, e.description)
             expected_pos = self._find_space_after_previous_token(e.found_pos)
-            error_screen = AnnotationScreen(self.finput, expected_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(
+                self.finput, expected_pos[0], e.found_pos[0]
+            )
             error_screen.mark(e.found_pos, len(e.found))
             if e.found_pos == expected_pos:
                 pos = expected_pos
@@ -57,96 +57,120 @@ class ErrorHandler:
                 error_screen.clear(rel_row + 1, pos[1])
             error_screen.point_at(expected_pos, e.expected)
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.TastingError as e:
             error_header = self._error_header(None, e.description)
-            print('\n' + error_header)
+            print("\n" + error_header)
             exit(0)
         except Errors.UnknownIdentifierError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
-            print('\n' + error_header + str(error_screen))
+            print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
                 None,
                 f"{CM().MAGENTA}Note{CM().RESET}: The max size of a literal for a {e.found_symbol_type} is "
-                f"in range '{e.found_from}' to '{e.found_to}'")
+                f"in range '{e.found_from}' to '{e.found_to}'",
+            )
             error_screen.filter()
-            print('\n' + error_header + str(error_screen) + node_header)
+            print("\n" + error_header + str(error_screen) + node_header)
             exit(0)
         except Errors.RedefinitionError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
-                e.first_pos,
-                f"{CM().MAGENTA}Note{CM().RESET}: Already defined here:")
-            error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
-                                              e.first_pos[0])
+                e.first_pos, f"{CM().MAGENTA}Note{CM().RESET}: Already defined here:"
+            )
+            error_screen_2 = AnnotationScreen(
+                self.finput, e.first_pos[0], e.first_pos[0]
+            )
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
-            print('\n' + error_header + str(error_screen) + note_header +
-                  str(error_screen_2))
+            print(
+                "\n"
+                + error_header
+                + str(error_screen)
+                + note_header
+                + str(error_screen_2)
+            )
             exit(0)
         except Errors.ConstReassignmentError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0],
-                                            e.found_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
                 e.first_pos,
-                f"{CM().MAGENTA}Note{CM().RESET}: Constant identifier was initialised here:"
+                f"{CM().MAGENTA}Note{CM().RESET}: Constant identifier was initialised here:",
             )
-            error_screen_2 = AnnotationScreen(self.finput, e.first_pos[0],
-                                              e.first_pos[0])
+            error_screen_2 = AnnotationScreen(
+                self.finput, e.first_pos[0], e.first_pos[0]
+            )
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
-            print('\n' + error_header + str(error_screen) + note_header +
-                  str(error_screen_2))
+            print(
+                "\n"
+                + error_header
+                + str(error_screen)
+                + note_header
+                + str(error_screen_2)
+            )
             exit(0)
         except Errors.NoMainFunctionError as e:
-            error_header = e.description + '\n'
-            print('\n' + error_header)
+            error_header = e.description + "\n"
+            print("\n" + error_header)
             exit(0)
         except Errors.MoreThanOneMainFunctionError as e:
             error_header = self._error_header(e.first_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.first_pos[0],
-                                            e.first_pos[0])
+            error_screen = AnnotationScreen(self.finput, e.first_pos[0], e.first_pos[0])
             error_screen.mark(e.first_pos, 4)
             note_header = self._error_header(
                 e.second_pos,
-                f"{CM().MAGENTA}Note{CM().RESET}: Second main function defined here:"
+                f"{CM().MAGENTA}Note{CM().RESET}: Second main function defined here:",
             )
-            error_screen_2 = AnnotationScreen(self.finput, e.second_pos[0],
-                                              e.second_pos[0])
+            error_screen_2 = AnnotationScreen(
+                self.finput, e.second_pos[0], e.second_pos[0]
+            )
             error_screen_2.mark(e.second_pos, 4)
             error_screen.filter()
             error_screen_2.filter()
-            print('\n' + error_header + str(error_screen) + note_header +
-                  str(error_screen_2))
+            print(
+                "\n"
+                + error_header
+                + str(error_screen)
+                + note_header
+                + str(error_screen_2)
+            )
             exit(0)
         except Errors.NotImplementedYetError as e:
-            error_header = e.description + '\n'
-            print('\n' + error_header)
+            error_header = e.description + "\n"
+            print("\n" + error_header)
             exit(0)
 
     def _error_header(self, pos, descirption):
         if not pos:
-            return CM().BRIGHT + descirption + CM().RESET_ALL + '\n'
-        return CM().BRIGHT + self.fname + ':' + str(pos[0]) + ':' + str(pos[1]) + ': ' +\
-            descirption + CM().RESET_ALL + '\n'
+            return CM().BRIGHT + descirption + CM().RESET_ALL + "\n"
+        return (
+            CM().BRIGHT
+            + global_vars.args.infile
+            + ":"
+            + str(pos[0])
+            + ":"
+            + str(pos[1])
+            + ": "
+            + descirption
+            + CM().RESET_ALL
+            + "\n"
+        )
 
     def _find_space_after_previous_token(self, pos):
         row, col = pos[0], pos[1]
@@ -160,9 +184,9 @@ class ErrorHandler:
                 self.finput[row] = self._remove_comments(row)
                 if self.multiline_comment_started == True:
                     self._store_comment(row, 0, self.finput[row])
-                    self.finput[row] = overwrite(self.finput[row],
-                                                 ' ' * len(self.finput[row]),
-                                                 0)
+                    self.finput[row] = overwrite(
+                        self.finput[row], " " * len(self.finput[row]), 0
+                    )
             if self.finput[row][col] not in " \t":
                 break
         self._undo_removing_commments()
@@ -175,28 +199,28 @@ class ErrorHandler:
         line = self.finput[row]
         col = len(line) - 1
         while col > 0:
-            if line[col - 1] == '/' and line[col] == '/':
+            if line[col - 1] == "/" and line[col] == "/":
                 col -= 1
-                self._store_comment(row, col, line[col:len(line)])
-                line = overwrite(line, ' ' * (len(line) - col), col)
-            elif line[col - 1] == '*' and line[col] == '/':
+                self._store_comment(row, col, line[col : len(line)])
+                line = overwrite(line, " " * (len(line) - col), col)
+            elif line[col - 1] == "*" and line[col] == "/":
                 col_to = col
                 col -= 2
                 while col > 0:
-                    if line[col - 1] == '/' and line[col] == '*':
+                    if line[col - 1] == "/" and line[col] == "*":
                         col -= 1
-                        self._store_comment(row, col, line[col:col_to + 1])
-                        line = overwrite(line, ' ' * (col_to - col + 1), col)
+                        self._store_comment(row, col, line[col : col_to + 1])
+                        line = overwrite(line, " " * (col_to - col + 1), col)
                         break
                     col -= 1
                 else:
-                    self._store_comment(row, 0, line[0:col_to + 1])
-                    line = overwrite(line, ' ' * (col_to + 1), 0)
+                    self._store_comment(row, 0, line[0 : col_to + 1])
+                    line = overwrite(line, " " * (col_to + 1), 0)
                     self.multiline_comment_started = True
-            elif line[col - 1] == '/' and line[col] == '*':
+            elif line[col - 1] == "/" and line[col] == "*":
                 col_from = col - 1
-                self._store_comment(row, col_from, line[col_from:len(line)])
-                line = overwrite(line, ' ' * (len(line) - col_from), col_from)
+                self._store_comment(row, col_from, line[col_from : len(line)])
+                line = overwrite(line, " " * (len(line) - col_from), col_from)
                 self.multiline_comment_started = False
             col -= 1
         return line
@@ -208,7 +232,9 @@ class ErrorHandler:
         if self.removed_comments[-1][0] != row:
             self.removed_comments += [(row, col, comment)]
 
-    def _undo_removing_commments(self, ):
+    def _undo_removing_commments(
+        self,
+    ):
         for row, col, comment in self.removed_comments:
             self.finput[row] = overwrite(self.finput[row], comment, col)
 
@@ -232,17 +258,19 @@ class ErrorHandler:
 class AnnotationScreen:
     def __init__(self, finput, row_from, row_to):
         # because the filename gets pasted in the first line of file content
-        context_from = row_from - global_vars.args.sight if row_from -\
-            global_vars.args.sight > 0 else 1
+        context_from = (
+            row_from - global_vars.args.sight
+            if row_from - global_vars.args.sight > 0
+            else 1
+        )
         self.context_above = finput[context_from:row_from]
 
         self.screen = []
-        for line in finput[row_from:row_to + 1]:
+        for line in finput[row_from : row_to + 1]:
             # len(line)+1 to be able to show expected semicolons
-            self.screen += [line, ' ' * (len(line) + 1), ' ' * (len(line) + 1)]
+            self.screen += [line, " " * (len(line) + 1), " " * (len(line) + 1)]
 
-        self.context_below = finput[row_to + 1:row_to + 1 +
-                                    global_vars.args.sight]
+        self.context_below = finput[row_to + 1 : row_to + 1 + global_vars.args.sight]
 
         self.marked_lines = []
         self.row_from = row_from
@@ -250,42 +278,52 @@ class AnnotationScreen:
 
     def point_at(self, pos, word):
         rel_row = pos[0] - self.row_from
-        self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
-                                                 '^', pos[1],
-                                                 CM().RED)
-        self.screen[3 * rel_row + 2] = overwrite(self.screen[3 * rel_row + 2],
-                                                 word, pos[1],
-                                                 CM().RED)
+        self.screen[3 * rel_row + 1] = overwrite(
+            self.screen[3 * rel_row + 1], "^", pos[1], CM().RED
+        )
+        self.screen[3 * rel_row + 2] = overwrite(
+            self.screen[3 * rel_row + 2], word, pos[1], CM().RED
+        )
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
     def mark(self, pos, length):
         rel_row = pos[0] - self.row_from
-        self.screen[3 * rel_row + 1] = overwrite(self.screen[3 * rel_row + 1],
-                                                 '~' * length, pos[1],
-                                                 CM().BLUE)
+        self.screen[3 * rel_row + 1] = overwrite(
+            self.screen[3 * rel_row + 1], "~" * length, pos[1], CM().BLUE
+        )
         self.marked_lines += [3 * rel_row + 1]
 
-    def filter(self, ):
+    def filter(
+        self,
+    ):
         # -2 da man idx's bei 0 anfängt und man zwischen 0 und 2 usw. sein will
-        for i in sorted(set(range(0, len(self.screen))) -
-                        set(range(0, len(self.screen), 3)) -
-                        set(self.marked_lines),
-                        reverse=True):
+        for i in sorted(
+            set(range(0, len(self.screen)))
+            - set(range(0, len(self.screen), 3))
+            - set(self.marked_lines),
+            reverse=True,
+        ):
             del self.screen[i]
 
     def clear(self, row, col):
-        self.screen[row] = overwrite(self.screen[row],
-                                     ' ' * len(self.screen[row]), col)
+        self.screen[row] = overwrite(self.screen[row], " " * len(self.screen[row]), col)
 
-    def __repr__(self, ):
+    def __repr__(
+        self,
+    ):
         acc = ""
 
         for line in self.context_above + self.screen + self.context_below:
-            acc += line + '\n'
+            acc += line + "\n"
 
         return acc
 
 
 def overwrite(old, replace_with, idx, color=""):
-    return old[:idx] + color + replace_with + (
-        CM().RESET if color else "") + old[idx + len(replace_with):]
+    return (
+        old[:idx]
+        + color
+        + replace_with
+        + (CM().RESET if color else "")
+        + old[idx + len(replace_with) :]
+    )

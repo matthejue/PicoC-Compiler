@@ -1,1 +1,0 @@
-(error_too_large_literal_const_assignment_for_parameter_int_upper_border (void main ((const int var) = 2147483647)))

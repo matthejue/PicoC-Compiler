@@ -1,1 +1,0 @@
-(abschlusspraesentation_kommentare_und_else_if (void main ((const int var) = 12) (char var2) IfElse((var > 100) (var2 = 2) else IfElse((var > 10) (var2 = 1) else (var2 = 0)))))

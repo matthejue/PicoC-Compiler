@@ -1,1 +1,0 @@
-(./tests/while_generation.picoc (void main ((int i) = 0) ((int x) = 1) While((i < 10) If((i == 5) (x = 2)) (i = (i + x))) ((const int y) = (i % 10))))

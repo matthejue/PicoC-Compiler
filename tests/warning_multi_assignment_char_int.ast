@@ -1,1 +1,0 @@
-(warning_multi_assignment_char_int (void main (int var2) ((char var) = (var2 = 2147483647))))

@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
+./extract_input_and_expected.sh
+
 num_tests=0;
 not_running_through=();
 not_passed=();
-  for testfile in ./tests/*$1*.picoc; do
+  for test in ./tests/*$1*.picoc; do
     echo -e "\n\033[1;37m===============================================================================";
-    echo $testfile;
+    echo $test;
     echo -e "===============================================================================\033[0;0m";
-    ./src/main.py -ctas -p -d 20 -S 2 -C -v -m $2 $testfile;
-    ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m $(basename --suffix=.picoc $testfile).reti
+    ./src/main.py -ctas -p -d 20 -S 2 -C -v -m $2 $test;
+    # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -m ${test%.picoc}.reti
 
     if [[ $? != 0 ]]; then
-      not_running_through+=($testfile);
+      not_running_through+=($test);
     fi;
-    diff ./tests/$(basename --suffix=.picoc $testfile).out_except ./tests/$(basename --suffix=.picoc $testfile).out
+
+    diff ${test%.picoc}.out_expected ${test%.picoc}.out
     if [[ $? != 0 ]]; then
-      not_passed+=($testfile);
+      not_passed+=($test);
     fi
     ((num_tests++));
 done;

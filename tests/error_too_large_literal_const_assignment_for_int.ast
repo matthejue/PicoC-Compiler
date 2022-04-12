@@ -1,1 +1,0 @@
-(error_too_large_literal_const_assignment_for_int (void main ((const int var) = 2147483648)))

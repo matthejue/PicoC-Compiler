@@ -1,1 +1,0 @@
-(logic_parenthesis (int main ((int bool_var) = 0) If(((12 != 3) && ((12 > bool_var) || (ToBool((bool_var + 1)) && ToBool(1)))) (bool_var = ((((123 * (- (12 - 3))) >= 12) || ToBool(0)) - 1)))))

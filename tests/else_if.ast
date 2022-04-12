@@ -1,1 +1,0 @@
-(else_if (void main ((int var) = 97) IfElse((var == 0) (var = 100) else IfElse((var == 10) (var = 5) else (var = (var + 1))))))

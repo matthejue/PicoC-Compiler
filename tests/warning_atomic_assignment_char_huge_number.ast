@@ -1,1 +1,0 @@
-(warning_atomic_assignment_char_huge_number (void main ((char var) = 2147483647)))
