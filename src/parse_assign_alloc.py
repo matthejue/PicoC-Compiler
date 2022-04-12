@@ -1,25 +1,25 @@
-from logic_expression_grammar import LogicExpressionGrammar
+from parse_logic_exp import LogicExpParser
 from assignment_allocation_nodes import Assignment, Allocation
 from arithmetic_nodes import Identifier, Character, Number
 from lexer import TT
-from picoc_ast import NT
+from picoc_nodes import NT
 from errors import Errors
 
 
-class AssignmentAllocationGrammar(LogicExpressionGrammar):
+class AssignAllocParser(LogicExpParser):
     """The assignment expression part of the context free grammar of the piocC
     language"""
 
     PRIM_DT = {TT.INT: NT.Int, TT.CHAR: NT.Char, TT.VOID: NT.Void}
 
-    def code_aa(self):
+    def parse_assign_alloc(self):
         """assignment and allocation startpoint
 
         :grammar: <aa>
         """
-        self._aa()
+        self._assign_alloc()
 
-    def _aa(self):
+    def _assign_alloc(self):
         """assignment and allocation
 
         :grammar: #2 (<identifier> | <alloc>) (= #2 (<identifier> = #2)* <ae_le>)?
@@ -67,11 +67,9 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
                 self.add_and_match([TT.IDENTIFIER], classname=Identifier)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
-            self.code_ae_le()
+            self.parse_arithmetic_logic_exp()
 
-    def _constant_assign(
-        self,
-    ):
+    def _constant_assign(self):
         self.ast_builder.discard("_aa")
 
         savestate_node = self.ast_builder.down(Allocation)
@@ -96,9 +94,7 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
                 "number or character", token.value, token.position
             )
 
-    def _assign(
-        self,
-    ):
+    def _assign(self):
         self.ast_builder.discard("_aa")
 
         self.add_and_consume(classname=Identifier)
@@ -109,4 +105,4 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.add_and_match([TT.IDENTIFIER], classname=Identifier)
             self.consume_next_token()  # [TT.ASSIGNMENT]
 
-        self.code_ae_le()
+        self.parse_arithmetic_logic_exp()

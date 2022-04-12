@@ -25,42 +25,42 @@ AND_OP	src/lexer.py	/^    AND_OP = "&"$/;"	v	class:TT
 ARG_BASE	Makefile	/^ARG_BASE = $(shell basename --suffix=.picoc $(ARG))$/;"	m
 ASSIGNMENT	.misc/tokentypes.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
 ASSIGNMENT	src/lexer.py	/^    ASSIGNMENT = "="$/;"	v	class:TT
-ASSIGNMENT_ALLOCATION	src/statement_grammar.py	/^    ASSIGNMENT_ALLOCATION = list(AssignmentAllocationGrammar.PRIM_DT.keys()$/;"	v	class:StatementGrammar
+ASSIGNMENT_ALLOCATION	src/parse_stmts.py	/^    ASSIGNMENT_ALLOCATION = list(AssignmentAllocationGrammar.PRIM_DT.keys()$/;"	v	class:StatementGrammar
 ASTBuilder	src/ast_builder.py	/^class ASTBuilder:$/;"	c
 ASTNode	src/abstract_syntax_tree.py	/^class ASTNode:$/;"	c
 Abstract Syntax	doc/grammer.md	/^# Abstract Syntax$/;"	c
-Add	src/picoc_ast.py	/^    class Add(ASTNode):$/;"	c	class:NT
+Add	src/picoc_nodes.py	/^    class Add(ASTNode):$/;"	c	class:NT
 Allocation	src/assignment_allocation_nodes.py	/^class Allocation(ASTNode):$/;"	c
-And	src/picoc_ast.py	/^    class And(ASTNode):$/;"	c	class:NT
+And	src/picoc_nodes.py	/^    class And(ASTNode):$/;"	c	class:NT
 Apple	.misc/python_match_args_example.py	/^class Apple:$/;"	c
 Args	.misc/testing_helpers.py	/^class Args():$/;"	c
 ArithmeticBinaryOperation	src/arithmetic_nodes.py	/^class ArithmeticBinaryOperation(ASTNode):$/;"	c
-ArithmeticExpressionGrammar	src/arithmetic_expression_grammar.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
+ArithmeticExpressionGrammar	src/parse_arithmetic_exp.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
 ArithmeticOperand	src/arithmetic_nodes.py	/^class ArithmeticOperand(ASTNode):$/;"	c
 ArithmeticUnaryOperation	src/arithmetic_nodes.py	/^class ArithmeticUnaryOperation(ASTNode):$/;"	c
 Assignment	src/assignment_allocation_nodes.py	/^class Assignment(ASTNode):$/;"	c
-AssignmentAllocationGrammar	src/assignment_allocation_grammar.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
+AssignmentAllocationGrammar	src/parse_assign_alloc.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
 Atom	src/logic_nodes.py	/^class Atom(ASTNode):$/;"	c
-BINOP_PREC_1	src/arithmetic_expression_grammar.py	/^    BINOP_PREC_1 = {$/;"	v	class:ArithmeticExpressionGrammar
-BINOP_PREC_2	src/arithmetic_expression_grammar.py	/^    BINOP_PREC_2 = {$/;"	v	class:ArithmeticExpressionGrammar
+BINOP_PREC_1	src/parse_arithmetic_exp.py	/^    BINOP_PREC_1 = {$/;"	v	class:ArithmeticExpressionGrammar
+BINOP_PREC_2	src/parse_arithmetic_exp.py	/^    BINOP_PREC_2 = {$/;"	v	class:ArithmeticExpressionGrammar
 BITSHIFT_L	.misc/tokentypes.py	/^    BITSHIFT_L = "<<"$/;"	v	class:TT
 BITSHIFT_R	.misc/tokentypes.py	/^    BITSHIFT_R = ">>"$/;"	v	class:TT
-BacktrackingParser	src/parser_.py	/^class BacktrackingParser():$/;"	c
+BacktrackingParser	src/parser.py	/^class BacktrackingParser():$/;"	c
 BuiltInTypeSymbol	src/symbol_table.py	/^class BuiltInTypeSymbol(Symbol):$/;"	c
 C	.misc/python_match_args_update_args_function.py	/^class C:$/;"	c
 CHAR	.misc/tokentypes.py	/^    CHAR = "char"$/;"	v	class:TT
 CHAR	src/lexer.py	/^    CHAR = "char"$/;"	v	class:TT
 CHARACTER	src/lexer.py	/^    CHARACTER = "character"$/;"	v	class:TT
 CN	src/ast_builder.py	/^    def CN(self) -> ASTNode:$/;"	m	class:ASTBuilder	typeref:typename:ASTNode
-COMP_REL	src/logic_expression_grammar.py	/^    COMP_REL = {$/;"	v	class:LogicExpressionGrammar
+COMP_REL	src/parse_logic_exp.py	/^    COMP_REL = {$/;"	v	class:LogicExpressionGrammar
 CONST	.misc/tokentypes.py	/^    CONST = "const"  # constant qualifier$/;"	v	class:TT
 CONST	src/lexer.py	/^    CONST = "const"  # constant qualifier$/;"	v	class:TT
-Char	src/picoc_ast.py	/^    class Char(ASTNode):$/;"	c	class:NT
+Char	src/picoc_nodes.py	/^    class Char(ASTNode):$/;"	c	class:NT
 Character	src/arithmetic_nodes.py	/^class Character(ArithmeticOperand):$/;"	c
 CodeArranger	src/code_generator.py	/^class CodeArranger:$/;"	c
 CodeGenerator	src/code_generator.py	/^def CodeGenerator():$/;"	f
 Concrete Syntax	doc/grammer.md	/^# Concrete Syntax$/;"	c
-Const	src/picoc_ast.py	/^    class Const(ASTNode):$/;"	c	class:NT
+Const	src/picoc_nodes.py	/^    class Const(ASTNode):$/;"	c	class:NT
 ConstantSymbol	src/symbol_table.py	/^class ConstantSymbol(Symbol):$/;"	c
 D	.misc/python_match_args_update_args_function.py	/^class D:$/;"	c
 DIGIT_WITHOUT_ZERO	src/lexer.py	/^    DIGIT_WITHOUT_ZERO = "123456789"$/;"	v	class:Lexer
@@ -70,7 +70,7 @@ DIV_OP	src/lexer.py	/^    DIV_OP = "\/"$/;"	v	class:TT
 DO	.misc/tokentypes.py	/^    DO = "do"$/;"	v	class:TT
 DO	src/lexer.py	/^    DO = "do"$/;"	v	class:TT
 Debug	.vimspector.json	/^    "Debug": {$/;"	o	object:configurations
-Div	src/picoc_ast.py	/^    class Div(ASTNode):$/;"	c	class:NT
+Div	src/picoc_nodes.py	/^    class Div(ASTNode):$/;"	c	class:NT
 DoWhile	src/loop_nodes.py	/^class DoWhile(ASTNode):$/;"	c
 ELSE	.misc/tokentypes.py	/^    ELSE = "else"$/;"	v	class:TT
 ELSE	src/lexer.py	/^    ELSE = "else"$/;"	v	class:TT
@@ -79,24 +79,24 @@ EOF	src/lexer.py	/^    EOF = "end of file"$/;"	v	class:TT
 EOF_CHAR	src/lexer.py	/^    EOF_CHAR = 'EOF'$/;"	v	class:Lexer
 EQ_COMP	.misc/tokentypes.py	/^    EQ_COMP = "=="$/;"	v	class:TT
 EQ_COMP	src/lexer.py	/^    EQ_COMP = "=="$/;"	v	class:TT
-Else	src/picoc_ast.py	/^    class Else(ASTNode):$/;"	c	class:NT
-Eq	src/picoc_ast.py	/^    class Eq(ASTNode):$/;"	c	class:NT
+Else	src/picoc_nodes.py	/^    class Else(ASTNode):$/;"	c	class:NT
+Eq	src/picoc_nodes.py	/^    class Eq(ASTNode):$/;"	c	class:NT
 ErrorHandler	src/error_handler.py	/^class ErrorHandler:$/;"	c
 ErrorScreen	src/error_handler.py	/^class ErrorScreen:$/;"	c
 Errors	src/errors.py	/^class Errors:$/;"	c
 File	src/file_node.py	/^class File(ASTNode):$/;"	c
-FileGrammar	src/file_grammar.py	/^class FileGrammar(FunctionGrammar):$/;"	c
-Filename	src/picoc_ast.py	/^    class Filename(ASTNode):$/;"	c	class:NT
-FunctionGrammar	src/function_grammar.py	/^class FunctionGrammar(StatementGrammar):$/;"	c
-FunctionIdentifier	src/picoc_ast.py	/^    class FunctionIdentifier(ASTNode):$/;"	c	class:NT
+FileGrammar	src/parse_file.py	/^class FileGrammar(FunctionGrammar):$/;"	c
+Filename	src/picoc_nodes.py	/^    class Filename(ASTNode):$/;"	c	class:NT
+FunctionGrammar	src/parse_fun.py	/^class FunctionGrammar(StatementGrammar):$/;"	c
+FunctionIdentifier	src/picoc_nodes.py	/^    class FunctionIdentifier(ASTNode):$/;"	c	class:NT
 GE_COMP	.misc/tokentypes.py	/^    GE_COMP = ">="$/;"	v	class:TT
 GE_COMP	src/lexer.py	/^    GE_COMP = ">="$/;"	v	class:TT
 GT_COMP	.misc/tokentypes.py	/^    GT_COMP = ">"$/;"	v	class:TT
 GT_COMP	src/lexer.py	/^    GT_COMP = ">"$/;"	v	class:TT
-Ge	src/picoc_ast.py	/^    class Ge(ASTNode):$/;"	c	class:NT
+Ge	src/picoc_nodes.py	/^    class Ge(ASTNode):$/;"	c	class:NT
 Grammar	src/grammar.py	/^class Grammar(FileGrammar):$/;"	c
 Grap	.misc/class_in_multiple_files/grap.py	/^class Grap(Test):$/;"	c
-Gt	src/picoc_ast.py	/^    class Gt(ASTNode):$/;"	c	class:NT
+Gt	src/picoc_nodes.py	/^    class Gt(ASTNode):$/;"	c	class:NT
 IDENTIFIER	.misc/tokentypes.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
 IDENTIFIER	src/lexer.py	/^    IDENTIFIER = "identifier"$/;"	v	class:TT
 IF	.misc/tokentypes.py	/^    IF = "if"$/;"	v	class:TT
@@ -106,32 +106,32 @@ INT	src/lexer.py	/^    INT = "int"$/;"	v	class:TT
 Identifier	src/arithmetic_nodes.py	/^class Identifier(ArithmeticOperand):$/;"	c
 If	src/if_else_nodes.py	/^class If(ASTNode):$/;"	c
 IfElse	src/if_else_nodes.py	/^class IfElse(ASTNode):$/;"	c
-IfElseGrammar	src/if_else_grammar.py	/^class IfElseGrammar:$/;"	c
-Int	src/picoc_ast.py	/^    class Int(ASTNode):$/;"	c	class:NT
+IfElseGrammar	src/parse_if_else.py	/^class IfElseGrammar:$/;"	c
+Int	src/picoc_nodes.py	/^    class Int(ASTNode):$/;"	c	class:NT
 InvalidCharacterError	src/errors.py	/^    class InvalidCharacterError(Exception):$/;"	c	class:Errors
-LAnd	src/picoc_ast.py	/^    class LAnd(ASTNode):$/;"	c	class:NT
+LAnd	src/picoc_nodes.py	/^    class LAnd(ASTNode):$/;"	c	class:NT
 LETTER	src/lexer.py	/^    LETTER = string.ascii_letters$/;"	v	class:Lexer
 LETTER_DIGIT	src/lexer.py	/^    LETTER_DIGIT = LETTER + DIGIT_WITH_ZERO$/;"	v	class:Lexer
 LE_COMP	.misc/tokentypes.py	/^    LE_COMP = "<="$/;"	v	class:TT
 LE_COMP	src/lexer.py	/^    LE_COMP = "<="$/;"	v	class:TT
-LOG_CON	src/logic_expression_grammar.py	/^    LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot$/;"	v	class:LogicExpressionGrammar
-LOOP	src/statement_grammar.py	/^    LOOP = [TT.WHILE, TT.DO]$/;"	v	class:StatementGrammar
-LOr	src/picoc_ast.py	/^    class LOr(ASTNode):$/;"	c	class:NT
-LT	src/parser_.py	/^    def LT(self, i) -> Token:$/;"	m	class:BacktrackingParser	typeref:typename:Token
-LTT	src/parser_.py	/^    def LTT(self, i) -> TT:$/;"	m	class:BacktrackingParser	typeref:typename:TT
+LOG_CON	src/parse_logic_exp.py	/^    LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot$/;"	v	class:LogicExpressionGrammar
+LOOP	src/parse_stmts.py	/^    LOOP = [TT.WHILE, TT.DO]$/;"	v	class:StatementGrammar
+LOr	src/picoc_nodes.py	/^    class LOr(ASTNode):$/;"	c	class:NT
+LT	src/parser.py	/^    def LT(self, i) -> Token:$/;"	m	class:BacktrackingParser	typeref:typename:Token
+LTT	src/parser.py	/^    def LTT(self, i) -> TT:$/;"	m	class:BacktrackingParser	typeref:typename:TT
 LT_COMP	.misc/tokentypes.py	/^    LT_COMP = "<"$/;"	v	class:TT
 LT_COMP	src/lexer.py	/^    LT_COMP = "<"$/;"	v	class:TT
 L_BRACE	.misc/tokentypes.py	/^    L_BRACE = "{"$/;"	v	class:TT
 L_BRACE	src/lexer.py	/^    L_BRACE = "{"$/;"	v	class:TT
 L_PAREN	.misc/tokentypes.py	/^    L_PAREN = "("$/;"	v	class:TT
 L_PAREN	src/lexer.py	/^    L_PAREN = "("$/;"	v	class:TT
-Le	src/picoc_ast.py	/^    class Le(ASTNode):$/;"	c	class:NT
+Le	src/picoc_nodes.py	/^    class Le(ASTNode):$/;"	c	class:NT
 Lexer	src/lexer.py	/^class Lexer:$/;"	c
 Logic grammar (code_le)	doc/grammer.md	/^# Logic grammar (code_le)$/;"	c
 LogicBinaryOperation	src/logic_nodes.py	/^class LogicBinaryOperation(ASTNode):$/;"	c
-LogicExpressionGrammar	src/logic_expression_grammar.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
-LoopGrammar	src/loop_grammar.py	/^class LoopGrammar:$/;"	c
-Lt	src/picoc_ast.py	/^    class Lt(ASTNode):$/;"	c	class:NT
+LogicExpressionGrammar	src/parse_logic_exp.py	/^class LogicExpressionGrammar(ArithmeticExpressionGrammar):$/;"	c
+LoopGrammar	src/parse_loop.py	/^class LoopGrammar:$/;"	c
+Lt	src/picoc_nodes.py	/^    class Lt(ASTNode):$/;"	c	class:NT
 MAIN	.misc/tokentypes.py	/^    MAIN = "main"$/;"	v	class:TT
 MAIN	src/lexer.py	/^    MAIN = "main"$/;"	v	class:TT
 MINUS_OP	.misc/tokentypes.py	/^    MINUS_OP = "-"$/;"	v	class:TT
@@ -141,20 +141,20 @@ MOD_OP	src/lexer.py	/^    MOD_OP = "%"$/;"	v	class:TT
 MUL_OP	.misc/tokentypes.py	/^    MUL_OP = "*"$/;"	v	class:TT
 MUL_OP	src/lexer.py	/^    MUL_OP = "*"$/;"	v	class:TT
 MainFunction	src/function_nodes.py	/^class MainFunction(ASTNode):$/;"	c
-Minus	src/picoc_ast.py	/^    class Minus(ASTNode):$/;"	c	class:NT
+Minus	src/picoc_nodes.py	/^    class Minus(ASTNode):$/;"	c	class:NT
 MismatchedTokenError	src/errors.py	/^    class MismatchedTokenError(Exception):$/;"	c	class:Errors
-Mod	src/picoc_ast.py	/^    class Mod(ASTNode):$/;"	c	class:NT
-Mul	src/picoc_ast.py	/^    class Mul(ASTNode):$/;"	c	class:NT
+Mod	src/picoc_nodes.py	/^    class Mod(ASTNode):$/;"	c	class:NT
+Mul	src/picoc_nodes.py	/^    class Mul(ASTNode):$/;"	c	class:NT
 NEG_OP	src/lexer.py	/^    NEG_OP = "~"$/;"	v	class:TT
 NOT	.misc/tokentypes.py	/^    NOT = "!"$/;"	v	class:TT
 NOT	src/lexer.py	/^    NOT = "!"$/;"	v	class:TT
 NOT_OP	.misc/tokentypes.py	/^    NOT_OP = "~"$/;"	v	class:TT
 NOT_TO_MAP	.misc/tokentypes.py	/^NOT_TO_MAP = ("identifier", "to bool", "end of file")$/;"	v
 NOT_TO_MAP	src/lexer.py	/^NOT_TO_MAP = ("\/", "number", "character", "identifier", "var", "to bool",$/;"	v
-NT	src/picoc_ast.py	/^class NT:$/;"	c
+NT	src/picoc_nodes.py	/^class NT:$/;"	c
 NUMBER	src/lexer.py	/^    NUMBER = "number"$/;"	v	class:TT
 Needs tobe added	.misc/critical_tests.md	/^# Needs tobe added$/;"	c
-Negation	src/picoc_ast.py	/^    class Negation(ASTNode):$/;"	c	class:NT
+Negation	src/picoc_nodes.py	/^    class Negation(ASTNode):$/;"	c	class:NT
 NoApplicableRuleError	src/errors.py	/^    class NoApplicableRuleError(Exception):$/;"	c	class:Errors
 NoMainFunctionError	src/errors.py	/^    class NoMainFunctionError(Exception):$/;"	c	class:Errors
 Not	src/logic_nodes.py	/^class Not(ASTNode):$/;"	c
@@ -166,11 +166,11 @@ OR	.misc/tokentypes.py	/^    OR = "||"$/;"	v	class:TT
 OR	src/lexer.py	/^    OR = "||"$/;"	v	class:TT
 OR_OP	.misc/tokentypes.py	/^    OR_OP = "|"$/;"	v	class:TT
 OR_OP	src/lexer.py	/^    OR_OP = "|"$/;"	v	class:TT
-Oplus	src/picoc_ast.py	/^    class Oplus(ASTNode):$/;"	c	class:NT
-Or	src/picoc_ast.py	/^    class Or(ASTNode):$/;"	c	class:NT
+Oplus	src/picoc_nodes.py	/^    class Oplus(ASTNode):$/;"	c	class:NT
+Or	src/picoc_nodes.py	/^    class Or(ASTNode):$/;"	c	class:NT
 PLUS_OP	.misc/tokentypes.py	/^    PLUS_OP = "+"$/;"	v	class:TT
 PLUS_OP	src/lexer.py	/^    PLUS_OP = "+"$/;"	v	class:TT
-PRIM_DT	src/assignment_allocation_grammar.py	/^    PRIM_DT = {TT.INT: NT.Int, TT.CHAR: NT.Char, TT.VOID: NT.Void}$/;"	v	class:AssignmentAllocationGrammar
+PRIM_DT	src/parse_assign_alloc.py	/^    PRIM_DT = {TT.INT: NT.Int, TT.CHAR: NT.Char, TT.VOID: NT.Void}$/;"	v	class:AssignmentAllocationGrammar
 Pico-C Compiler	README.md	/^# Pico-C Compiler$/;"	c
 RANGE_OF_INT	src/arithmetic_nodes.py	/^    RANGE_OF_INT = (-2147483648, 2147483647)$/;"	v	class:ArithmeticOperand
 RANGE_OF_PARAMETER	src/arithmetic_nodes.py	/^    RANGE_OF_PARAMETER = (-2097152, 2097151)$/;"	v	class:ArithmeticOperand
@@ -183,7 +183,7 @@ SEMICOLON	.misc/tokentypes.py	/^    SEMICOLON = ";"$/;"	v	class:TT
 SEMICOLON	src/lexer.py	/^    SEMICOLON = ";"$/;"	v	class:TT
 SPECIAL_MAPPINGS	.misc/tokentypes.py	/^SPECIAL_MAPPINGS = ("\/", "&", "|", "=", "<", ">", "!")$/;"	v
 SPECIAL_MAPPINGS	src/lexer.py	/^SPECIAL_MAPPINGS = ("&", "|", "=", "<", ">", "!")$/;"	v
-STATEMENT	src/statement_grammar.py	/^    STATEMENT = [TT.IF, TT.SEMICOLON] + ASSIGNMENT_ALLOCATION + LOOP$/;"	v	class:StatementGrammar
+STATEMENT	src/parse_stmts.py	/^    STATEMENT = [TT.IF, TT.SEMICOLON] + ASSIGNMENT_ALLOCATION + LOOP$/;"	v	class:StatementGrammar
 STRING_TO_TT_COMPLEX	.misc/tokentypes.py	/^STRING_TO_TT_COMPLEX = {value.value: value for value in (value for key, value in TT.__dict__.ite/;"	v
 STRING_TO_TT_COMPLEX	src/lexer.py	/^STRING_TO_TT_COMPLEX = {$/;"	v
 STRING_TO_TT_SIMPLE	.misc/tokentypes.py	/^STRING_TO_TT_SIMPLE = {value.value: value for value in (value for key, value in TT.__dict__.item/;"	v
@@ -192,8 +192,8 @@ STRING_TO_TT_WORDS	.misc/tokentypes.py	/^STRING_TO_TT_WORDS = {value.value: valu
 STRING_TO_TT_WORDS	src/lexer.py	/^STRING_TO_TT_WORDS = {$/;"	v
 Scope	src/symbol_table.py	/^class Scope:$/;"	c
 SessionLoad	Session.vim	/^let SessionLoad = 1$/;"	v
-StatementGrammar	src/statement_grammar.py	/^class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,$/;"	c
-Sub	src/picoc_ast.py	/^    class Sub(ASTNode):$/;"	c	class:NT
+StatementGrammar	src/parse_stmts.py	/^class StatementGrammar(AssignmentAllocationGrammar, IfElseGrammar,$/;"	c
+Sub	src/picoc_nodes.py	/^    class Sub(ASTNode):$/;"	c	class:NT
 Symbol	src/symbol_table.py	/^class Symbol:$/;"	c
 SymbolTable	src/symbol_table.py	/^def SymbolTable():$/;"	f
 TO_BOOL	.misc/tokentypes.py	/^    TO_BOOL = "to bool"$/;"	v	class:TT
@@ -204,24 +204,24 @@ Test	.misc/class_in_multiple_files/test.py	/^class Test:$/;"	c
 Test	.misc/match_args_less_arguments.py	/^class Test:$/;"	c
 Test	.misc/python_match_args_example.py	/^class Test:$/;"	c
 TestArithmeticExpreessions	.misc/test_parser	/^class TestArithmeticExpreessions(unittest.TestCase):$/;"	c
-TestArithmeticExpressionGrammar	.misc/parser_test.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
-TestAssignmentGrammar	.misc/parser_test.py	/^class TestAssignmentGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestArithmeticExpressionGrammar	.misc/parsertest.py	/^class TestArithmeticExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestAssignmentGrammar	.misc/parsertest.py	/^class TestAssignmentGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestCodeGenerator	.misc/code_generator_test.py	/^class TestCodeGenerator(unittest.TestCase, UsefullTools):$/;"	c
 TestErrorMessages	.misc/error_message_test.py	/^class TestErrorMessages(unittest.TestCase, UsefullTools):$/;"	c
 TestErrors	.misc/test_errors	/^class TestErrors(unittest.TestCase):$/;"	c
-TestIfElseGrammar	.misc/parser_test.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestIfElseGrammar	.misc/parsertest.py	/^class TestIfElseGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestLexer	.misc/lexer_test.py	/^class TestLexer(unittest.TestCase, UsefullTools):$/;"	c
-TestLogicExpressionGrammar	.misc/parser_test.py	/^class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
-TestLoopGrammar	.misc/parser_test.py	/^class TestLoopGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestLogicExpressionGrammar	.misc/parsertest.py	/^class TestLogicExpressionGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestLoopGrammar	.misc/parsertest.py	/^class TestLoopGrammar(unittest.TestCase, UsefullTools):$/;"	c
 TestPrograms	.misc/execution_test.py	/^class TestPrograms(unittest.TestCase, UsefullTools):$/;"	c
-TestStatementGrammar	.misc/parser_test.py	/^class TestStatementGrammar(unittest.TestCase, UsefullTools):$/;"	c
+TestStatementGrammar	.misc/parsertest.py	/^class TestStatementGrammar(unittest.TestCase, UsefullTools):$/;"	c
 ToBool	src/logic_nodes.py	/^class ToBool(ASTNode):$/;"	c
 Token	src/lexer.py	/^class Token():$/;"	c
 TooLargeLiteralError	src/errors.py	/^    class TooLargeLiteralError(Exception):$/;"	c	class:Errors
 UEQ_COMP	.misc/tokentypes.py	/^    UEQ_COMP = "!="$/;"	v	class:TT
 UEQ_COMP	src/lexer.py	/^    UEQ_COMP = "!="$/;"	v	class:TT
-UEq	src/picoc_ast.py	/^    class UEq(ASTNode):$/;"	c	class:NT
-UNARY	src/arithmetic_expression_grammar.py	/^    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}$/;"	v	class:ArithmeticExpressionGrammar
+UEq	src/picoc_nodes.py	/^    class UEq(ASTNode):$/;"	c	class:NT
+UNARY	src/parse_arithmetic_exp.py	/^    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}$/;"	v	class:ArithmeticExpressionGrammar
 UnclosedCharacterError	src/errors.py	/^    class UnclosedCharacterError(Exception):$/;"	c	class:Errors
 UnknownIdentifierError	src/errors.py	/^    class UnknownIdentifierError(Exception):$/;"	c	class:Errors
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
@@ -232,7 +232,7 @@ VAR	.misc/tokentypes.py	/^    VAR = "var"  # var qualifier$/;"	v	class:TT
 VAR	src/lexer.py	/^    VAR = "var"  # var qualifier$/;"	v	class:TT
 VOID	src/lexer.py	/^    VOID = "void"$/;"	v	class:TT
 VariableSymbol	src/symbol_table.py	/^class VariableSymbol(Symbol):$/;"	c
-Void	src/picoc_ast.py	/^    class Void(ASTNode):$/;"	c	class:NT
+Void	src/picoc_nodes.py	/^    class Void(ASTNode):$/;"	c	class:NT
 WHILE	.misc/tokentypes.py	/^    WHILE = "while"$/;"	v	class:TT
 WHILE	src/lexer.py	/^    WHILE = "while"$/;"	v	class:TT
 While	src/loop_nodes.py	/^class While(ASTNode):$/;"	c
@@ -263,7 +263,7 @@ __init__	src/errors.py	/^        def __init__(self, found, found_pos, first, fir
 __init__	src/errors.py	/^        def __init__(self, variable, variable_pos, variable_type,$/;"	m	class:Errors.TooLargeLiteralError
 __init__	src/lexer.py	/^    def __init__(self, finput):$/;"	m	class:Lexer
 __init__	src/lexer.py	/^    def __init__(self, tokentype, value, position):$/;"	m	class:Token
-__init__	src/parser_.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
+__init__	src/parser.py	/^    def __init__(self, lexer):$/;"	m	class:BacktrackingParser
 __init__	src/symbol_table.py	/^    def __init__(self):$/;"	m	class:_SymbolTable
 __init__	src/symbol_table.py	/^    def __init__(self, ):$/;"	m	class:Scope
 __init__	src/symbol_table.py	/^    def __init__(self, name, datatype, position):$/;"	m	class:ConstantSymbol
@@ -311,7 +311,7 @@ __repr__	src/logic_nodes.py	/^    def __repr__(self, ):$/;"	m	class:LogicBinaryO
 __repr__	src/logic_nodes.py	/^    def __repr__(self, ):$/;"	m	class:Not
 __repr__	src/symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:Symbol
 __repr__	src/symbol_table.py	/^    def __repr__(self, ):$/;"	m	class:_SymbolTable
-_aa	src/assignment_allocation_grammar.py	/^    def _aa(self):$/;"	m	class:AssignmentAllocationGrammar
+_aa	src/parse_assign_alloc.py	/^    def _aa(self):$/;"	m	class:AssignmentAllocationGrammar
 _abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_abc"><\/a>$/;"	a
 _abstract_syntax_option	src/pico_c_compiler.py	/^def _abstract_syntax_option(grammar: Grammar, outbase):$/;"	f
 _adapt_code	src/arithmetic_nodes.py	/^    def _adapt_code(self, ):$/;"	m	class:ArithmeticBinaryOperation
@@ -328,23 +328,23 @@ _adapt_code_1	src/if_else_nodes.py	/^    def _adapt_code_1(self, ):$/;"	m	class:
 _adapt_code_1	src/loop_nodes.py	/^    def _adapt_code_1(self, ):$/;"	m	class:While
 _adapt_code_2	src/if_else_nodes.py	/^    def _adapt_code_2(self, ):$/;"	m	class:IfElse
 _adapt_code_2	src/loop_nodes.py	/^    def _adapt_code_2(self, ):$/;"	m	class:While
-_add	src/parser_.py	/^    def _add(self, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
+_add	src/parser.py	/^    def _add(self, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
 _aix_support	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_aix_support"><\/a>$/;"	a
-_alloc	src/assignment_allocation_grammar.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
-_and_expr	src/logic_expression_grammar.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
-_ao	src/arithmetic_expression_grammar.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
-_arithmetic_term	src/logic_expression_grammar.py	/^    def _arithmetic_term(self, ):$/;"	m	class:LogicExpressionGrammar
-_assign	src/assignment_allocation_grammar.py	/^    def _assign(self, ):$/;"	m	class:AssignmentAllocationGrammar
+_alloc	src/parse_assign_alloc.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
+_and_expr	src/parse_logic_exp.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
+_ao	src/parse_arithmetic_exp.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
+_arithmetic_term	src/parse_logic_exp.py	/^    def _arithmetic_term(self, ):$/;"	m	class:LogicExpressionGrammar
+_assign	src/parse_assign_alloc.py	/^    def _assign(self, ):$/;"	m	class:AssignmentAllocationGrammar
 _assignment	src/assignment_allocation_nodes.py	/^    def _assignment(self, ):$/;"	m	class:Assignment
 _ast	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_ast"><\/a>$/;"	a
 _asyncio	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_asyncio"><\/a>$/;"	a
-_atom	src/logic_expression_grammar.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
+_atom	src/parse_logic_exp.py	/^    def _atom(self, ):$/;"	m	class:LogicExpressionGrammar
 _basename	src/pico_c_compiler.py	/^def _basename(fname):$/;"	f
 _bisect	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bisect"><\/a>$/;"	a
 _blake2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_blake2"><\/a>$/;"	a
 _bootlocale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootlocale"><\/a>$/;"	a
 _bootsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bootsubprocess"><\/a>$/;"	a
-_branch	src/if_else_grammar.py	/^    def _branch(self, ):$/;"	m	class:IfElseGrammar
+_branch	src/parse_if_else.py	/^    def _branch(self, ):$/;"	m	class:IfElseGrammar
 _bz2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_bz2"><\/a>$/;"	a
 _codecs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs"><\/a>$/;"	a
 _codecs_cn	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_codecs_cn"><\/a>$/;"	a
@@ -360,7 +360,7 @@ _comment_for_constant	src/assignment_allocation_nodes.py	/^    def _comment_for_
 _compat_pickle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_compat_pickle"><\/a>$/;"	a
 _compile	src/pico_c_compiler.py	/^def _compile(code, infile, outbase=None):$/;"	f
 _compression	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_compression"><\/a>$/;"	a
-_constant_assign	src/assignment_allocation_grammar.py	/^    def _constant_assign(self, ):$/;"	m	class:AssignmentAllocationGrammar
+_constant_assign	src/parse_assign_alloc.py	/^    def _constant_assign(self, ):$/;"	m	class:AssignmentAllocationGrammar
 _contextvars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_contextvars"><\/a>$/;"	a
 _convert_to_lines	src/code_generator.py	/^    def _convert_to_lines(self, ):$/;"	m	class:CodeArranger
 _csv	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_csv"><\/a>$/;"	a
@@ -368,55 +368,55 @@ _ctypes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_ctypes"><\
 _curses	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_curses"><\/a>$/;"	a
 _datetime	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_datetime"><\/a>$/;"	a
 _decimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_decimal"><\/a>$/;"	a
-_do_while	src/loop_grammar.py	/^    def _do_while(self):$/;"	m	class:LoopGrammar
+_do_while	src/parse_loop.py	/^    def _do_while(self):$/;"	m	class:LoopGrammar
 _dummy_thread	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_dummy_thread"><\/a>$/;"	a
 _elementtree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_elementtree"><\/a>$/;"	a
 _error_check	src/arithmetic_nodes.py	/^    def _error_check(self, value, position):$/;"	m	class:ArithmeticOperand
 _error_check	src/assignment_allocation_nodes.py	/^    def _error_check(self, found_name, found_pos):$/;"	m	class:Allocation
 _error_check	src/assignment_allocation_nodes.py	/^    def _error_check(self, name, symbol, value, position):$/;"	m	class:Assignment
 _error_header	src/error_handler.py	/^    def _error_header(self, pos, descirption):$/;"	m	class:ErrorHandler
-_file	src/file_grammar.py	/^    def _file(self, ):$/;"	m	class:FileGrammar
-_fill	src/parser_.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
+_file	src/parse_file.py	/^    def _file(self, ):$/;"	m	class:FileGrammar
+_fill	src/parser.py	/^    def _fill(self, not_filled_up):$/;"	m	class:BacktrackingParser
 _find_space_after_previous_token	src/error_handler.py	/^    def _find_space_after_previous_token(self, pos):$/;"	m	class:ErrorHandler
 _frozen_importlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_frozen_importlib"><\/a>$/;"	a
 _frozen_importlib_external	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_frozen_importlib_external"><\/a>$/;"	a
-_function	src/function_grammar.py	/^    def _function(self, ):$/;"	m	class:FunctionGrammar
+_function	src/parse_fun.py	/^    def _function(self, ):$/;"	m	class:FunctionGrammar
 _functools	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_functools"><\/a>$/;"	a
-_handle_all_tastes_unsuccessful	src/logic_expression_grammar.py	/^    def _handle_all_tastes_unsuccessful(self, expected, errors):$/;"	m	class:LogicExpressionGrammar
+_handle_all_tastes_unsuccessful	src/parse_logic_exp.py	/^    def _handle_all_tastes_unsuccessful(self, expected, errors):$/;"	m	class:LogicExpressionGrammar
 _hashlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_hashlib"><\/a>$/;"	a
 _heapq	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_heapq"><\/a>$/;"	a
 _idx_of_else_node	src/if_else_nodes.py	/^    def _idx_of_else_node(self):$/;"	m	class:IfElse
-_if_condition	src/if_else_grammar.py	/^    def _if_condition(self, ):$/;"	m	class:IfElseGrammar
-_if_else	src/if_else_grammar.py	/^    def _if_else(self, ):$/;"	m	class:IfElseGrammar
-_if_without_else	src/if_else_grammar.py	/^    def _if_without_else(self, ):$/;"	m	class:IfElseGrammar
+_if_condition	src/parse_if_else.py	/^    def _if_condition(self, ):$/;"	m	class:IfElseGrammar
+_if_else	src/parse_if_else.py	/^    def _if_else(self, ):$/;"	m	class:IfElseGrammar
+_if_without_else	src/parse_if_else.py	/^    def _if_without_else(self, ):$/;"	m	class:IfElseGrammar
 _imp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_imp"><\/a>$/;"	a
 _instance	src/code_generator.py	/^    _instance = None$/;"	v	class:_CodeGenerator
 _instance	src/symbol_table.py	/^    _instance = None$/;"	v	class:_SymbolTable
 _io	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_io"><\/a>$/;"	a
 _json	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_json"><\/a>$/;"	a
-_lo	src/logic_expression_grammar.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
+_lo	src/parse_logic_exp.py	/^    def _lo(self):$/;"	m	class:LogicExpressionGrammar
 _locale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_locale"><\/a>$/;"	a
-_loop	src/loop_grammar.py	/^    def _loop(self):$/;"	m	class:LoopGrammar
+_loop	src/parse_loop.py	/^    def _loop(self):$/;"	m	class:LoopGrammar
 _lzma	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_lzma"><\/a>$/;"	a
-_main_function	src/function_grammar.py	/^    def _main_function(self, ):$/;"	m	class:FunctionGrammar
-_mark	src/parser_.py	/^    def _mark(self):$/;"	m	class:BacktrackingParser
+_main_function	src/parse_fun.py	/^    def _main_function(self, ):$/;"	m	class:FunctionGrammar
+_mark	src/parser.py	/^    def _mark(self):$/;"	m	class:BacktrackingParser
 _md5	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_md5"><\/a>$/;"	a
 _multibytecodec	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_multibytecodec"><\/a>$/;"	a
 _multiprocessing	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_multiprocessing"><\/a>$/;"	a
-_not_expr	src/logic_expression_grammar.py	/^    def _not_expr(self):$/;"	m	class:LogicExpressionGrammar
+_not_expr	src/parse_logic_exp.py	/^    def _not_expr(self):$/;"	m	class:LogicExpressionGrammar
 _opcode	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_opcode"><\/a>$/;"	a
 _operator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_operator"><\/a>$/;"	a
-_or_expr	src/logic_expression_grammar.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
+_or_expr	src/parse_logic_exp.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
 _osx_support	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_osx_support"><\/a>$/;"	a
 _overlapped	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_overlapped"><\/a>$/;"	a
-_paren_arith	src/arithmetic_expression_grammar.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
-_parenthesized_logic_expression	src/logic_expression_grammar.py	/^    def _parenthesized_logic_expression(self):$/;"	m	class:LogicExpressionGrammar
-_parenthized_logic_expression_or_arithmetic_term_or_comparison	src/logic_expression_grammar.py	/^    def _parenthized_logic_expression_or_arithmetic_term_or_comparison(self):$/;"	m	class:LogicExpressionGrammar
+_paren_arith	src/parse_arithmetic_exp.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
+_parenthesized_logic_expression	src/parse_logic_exp.py	/^    def _parenthesized_logic_expression(self):$/;"	m	class:LogicExpressionGrammar
+_parenthized_logic_expression_or_arithmetic_term_or_comparison	src/parse_logic_exp.py	/^    def _parenthized_logic_expression_or_arithmetic_term_or_comparison(self):$/;"	m	class:LogicExpressionGrammar
 _pickle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_pickle"><\/a>$/;"	a
 _posixshmem	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixshmem"><\/a>$/;"	a
 _posixsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixsubprocess"><\/a>$/;"	a
-_prec1	src/arithmetic_expression_grammar.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
-_prec2	src/arithmetic_expression_grammar.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec1	src/parse_arithmetic_exp.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec2	src/parse_arithmetic_exp.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:ArithmeticBinaryOperation
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:ArithmeticUnaryOperation
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, code):$/;"	m	class:ArithmeticOperand
@@ -438,13 +438,13 @@ _pydecimal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_pydecim
 _queue	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_queue"><\/a>$/;"	a
 _random	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_random"><\/a>$/;"	a
 _read_and_write_file	src/pico_c_compiler.py	/^def _read_and_write_file(infile, outbase):$/;"	f
-_release	src/parser_.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
+_release	src/parser.py	/^    def _release(self):$/;"	m	class:BacktrackingParser
 _remove_comments	src/error_handler.py	/^    def _remove_comments(self, line):$/;"	m	class:ErrorHandler
 _reti_code	src/pico_c_compiler.py	/^def _reti_code(abstract_syntax_tree, outbase):$/;"	f
-_s	src/statement_grammar.py	/^    def _s(self):$/;"	m	class:StatementGrammar
+_s	src/parse_stmts.py	/^    def _s(self):$/;"	m	class:StatementGrammar
 _scproxy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_scproxy"><\/a>$/;"	a
-_semicolons	src/statement_grammar.py	/^    def _semicolons(self, ):$/;"	m	class:StatementGrammar
-_semicolons_or_none	src/statement_grammar.py	/^    def _semicolons_or_none(self, ):$/;"	m	class:StatementGrammar
+_semicolons	src/parse_stmts.py	/^    def _semicolons(self, ):$/;"	m	class:StatementGrammar
+_semicolons_or_none	src/parse_stmts.py	/^    def _semicolons_or_none(self, ):$/;"	m	class:StatementGrammar
 _sha1	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sha1"><\/a>$/;"	a
 _sha256	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sha256"><\/a>$/;"	a
 _sha3	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sha3"><\/a>$/;"	a
@@ -454,7 +454,7 @@ _signal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_signal"><\
 _socket	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_socket"><\/a>$/;"	a
 _split_huge_number	src/arithmetic_nodes.py	/^    def _split_huge_number(self, value):$/;"	m	class:ArithmeticOperand
 _sre	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sre"><\/a>$/;"	a
-_ss	src/statement_grammar.py	/^    def _ss(self):$/;"	m	class:StatementGrammar
+_ss	src/parse_stmts.py	/^    def _ss(self):$/;"	m	class:StatementGrammar
 _ssl	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_ssl"><\/a>$/;"	a
 _stat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_stat"><\/a>$/;"	a
 _statistics	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_statistics"><\/a>$/;"	a
@@ -462,21 +462,21 @@ _string	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_string"><\
 _strptime	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_strptime"><\/a>$/;"	a
 _struct	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_struct"><\/a>$/;"	a
 _symbol_table_option	src/pico_c_compiler.py	/^def _symbol_table_option(outbase):$/;"	f
-_sync	src/parser_.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
+_sync	src/parser.py	/^    def _sync(self, i):$/;"	m	class:BacktrackingParser
 _sysconfigdata__linux_x86_64-linux-gnu	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_sysconfigdata__linux_x86_64-linux-gnu"><\/a>$/;"	a
-_taste_consume_ae	src/logic_expression_grammar.py	/^    def _taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
-_taste_consume_arithmetic_term	src/logic_expression_grammar.py	/^    def _taste_consume_arithmetic_term(self, ):$/;"	m	class:LogicExpressionGrammar
-_taste_consume_if_without_else	src/if_else_grammar.py	/^    def _taste_consume_if_without_else(self):$/;"	m	class:IfElseGrammar
-_taste_consume_parenthesized_logic_expression	src/logic_expression_grammar.py	/^    def _taste_consume_parenthesized_logic_expression(self, ):$/;"	m	class:LogicExpressionGrammar
+_taste_consume_ae	src/parse_logic_exp.py	/^    def _taste_consume_ae(self):$/;"	m	class:LogicExpressionGrammar
+_taste_consume_arithmetic_term	src/parse_logic_exp.py	/^    def _taste_consume_arithmetic_term(self, ):$/;"	m	class:LogicExpressionGrammar
+_taste_consume_if_without_else	src/parse_if_else.py	/^    def _taste_consume_if_without_else(self):$/;"	m	class:IfElseGrammar
+_taste_consume_parenthesized_logic_expression	src/parse_logic_exp.py	/^    def _taste_consume_parenthesized_logic_expression(self, ):$/;"	m	class:LogicExpressionGrammar
 _thread	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_thread"><\/a>$/;"	a
 _threading_local	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_threading_local"><\/a>$/;"	a
 _tokens_option	src/pico_c_compiler.py	/^def _tokens_option(lexer, outbase):$/;"	f
 _tracemalloc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_tracemalloc"><\/a>$/;"	a
-_unop	src/arithmetic_expression_grammar.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
+_unop	src/parse_arithmetic_exp.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
 _warnings	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_warnings"><\/a>$/;"	a
 _weakref	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakref"><\/a>$/;"	a
 _weakrefset	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakrefset"><\/a>$/;"	a
-_while	src/loop_grammar.py	/^    def _while(self):$/;"	m	class:LoopGrammar
+_while	src/parse_loop.py	/^    def _while(self):$/;"	m	class:LoopGrammar
 _winapi	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_winapi"><\/a>$/;"	a
 _winreg	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_winreg"><\/a>$/;"	a
 _write_symbol_table	src/pico_c_compiler.py	/^def _write_symbol_table(outbase):$/;"	f
@@ -488,8 +488,8 @@ aasdg	.misc/python_match_case_if.py	/^aasdg = [13, 24]$/;"	v
 abc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abc"><\/a>$/;"	a
 abstract_syntax_tree	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="abstract_syntax_tree"><\/a>$/;"	a
 adapter	.vimspector.json	/^      "adapter": "debugpy",$/;"	s	object:configurations.Debug
-add_and_consume	src/parser_.py	/^    def add_and_consume(self, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
-add_and_match	src/parser_.py	/^    def add_and_match(self, tokentypes, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
+add_and_consume	src/parser.py	/^    def add_and_consume(self, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
+add_and_match	src/parser.py	/^    def add_and_match(self, tokentypes, classname=None, mapping=None):$/;"	m	class:BacktrackingParser
 add_child	src/abstract_syntax_tree.py	/^    def add_child(self, node):$/;"	m	class:ASTNode
 add_code	src/code_generator.py	/^    def add_code(self, code):$/;"	m	class:CodeArranger
 add_code	src/code_generator.py	/^    def add_code(self, code, loc):$/;"	m	class:_CodeGenerator
@@ -503,14 +503,14 @@ argparse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="argparse">
 args	.misc/pico_c_compiler	/^args = None$/;"	v
 args	.vimspector.json	/^        "args": [$/;"	a	object:configurations.Debug.configuration
 args	src/global_vars.py	/^args = None$/;"	v
-arithmetic_expression_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_expression_grammar"><\/a>$/;"	a
+parse_arithmetic_exp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_expression_grammar"><\/a>$/;"	a
 arithmetic_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_nodes"><\/a>$/;"	a
 array	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="array"><\/a>$/;"	a
 assign	src/assignment_allocation_nodes.py	/^    assign = strip_multiline_string($/;"	v	class:Assignment
 assign_loc	src/assignment_allocation_nodes.py	/^    assign_loc = 2$/;"	v	class:Assignment
 assign_more	src/assignment_allocation_nodes.py	/^    assign_more = "STORE ACC var_address;  # Wert von e1 in Variable v1 speichern\\n"$/;"	v	class:Assignment
 assign_more_loc	src/assignment_allocation_nodes.py	/^    assign_more_loc = 1$/;"	v	class:Assignment
-assignment_allocation_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="assignment_allocation_grammar"><\/a>$/;"	a
+parse_assign_alloc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="assignment_allocation_grammar"><\/a>$/;"	a
 assignment_allocation_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="assignment_allocation_nodes"><\/a>$/;"	a
 ast	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ast"><\/a>$/;"	a
 ast_builder	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ast_builder"><\/a>$/;"	a
@@ -565,18 +565,18 @@ clean	Makefile	/^clean:$/;"	t
 cmd	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="cmd"><\/a>$/;"	a
 code	.misc/code_generator_test.py	/^    code = """SUBI SP 1;$/;"	v	class:TestCodeGenerator
 code	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="code"><\/a>$/;"	a
-code_aa	src/assignment_allocation_grammar.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
+code_aa	src/parse_assign_alloc.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
 code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
-code_ae	src/arithmetic_expression_grammar.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
-code_ae_le	src/logic_expression_grammar.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
-code_fi	src/file_grammar.py	/^    def code_fi(self, ):$/;"	m	class:FileGrammar
-code_fu	src/function_grammar.py	/^    def code_fu(self):$/;"	m	class:FunctionGrammar
+code_ae	src/parse_arithmetic_exp.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
+code_ae_le	src/parse_logic_exp.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
+code_fi	src/parse_file.py	/^    def code_fi(self, ):$/;"	m	class:FileGrammar
+code_fu	src/parse_fun.py	/^    def code_fu(self):$/;"	m	class:FunctionGrammar
 code_generator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="code_generator"><\/a>$/;"	a
-code_ie	src/if_else_grammar.py	/^    def code_ie(self, ):$/;"	m	class:IfElseGrammar
-code_if_if_else	src/if_else_grammar.py	/^    def code_if_if_else(self):$/;"	m	class:IfElseGrammar
-code_le	src/logic_expression_grammar.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
-code_lo	src/loop_grammar.py	/^    def code_lo(self):$/;"	m	class:LoopGrammar
-code_ss	src/statement_grammar.py	/^    def code_ss(self):$/;"	m	class:StatementGrammar
+code_ie	src/parse_if_else.py	/^    def code_ie(self, ):$/;"	m	class:IfElseGrammar
+code_if_if_else	src/parse_if_else.py	/^    def code_if_if_else(self):$/;"	m	class:IfElseGrammar
+code_le	src/parse_logic_exp.py	/^    def code_le(self):$/;"	m	class:LogicExpressionGrammar
+code_lo	src/parse_loop.py	/^    def code_lo(self):$/;"	m	class:LoopGrammar
+code_ss	src/parse_stmts.py	/^    def code_ss(self):$/;"	m	class:StatementGrammar
 codecs	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="codecs"><\/a>$/;"	a
 codeop	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="codeop"><\/a>$/;"	a
 collections	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="collections"><\/a>$/;"	a
@@ -600,7 +600,7 @@ configurations	.vimspector.json	/^  "configurations": {$/;"	o
 console	.vimspector.json	/^        "console": "externalTerminal",$/;"	s	object:configurations.Debug.configuration
 constant	src/arithmetic_nodes.py	/^    constant = "LOADI ACC encode(w);  # Wert von e1 in ACC laden\\n"$/;"	v	class:ArithmeticOperand
 constant_identifier	src/arithmetic_nodes.py	/^    constant_identifier = "LOADI ACC encode(c);  # Wert von e1 in ACC laden\\n"$/;"	v	class:ArithmeticOperand
-consume_next_token	src/parser_.py	/^    def consume_next_token(self):$/;"	m	class:BacktrackingParser
+consume_next_token	src/parser.py	/^    def consume_next_token(self):$/;"	m	class:BacktrackingParser
 contextlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextlib"><\/a>$/;"	a
 contextvars	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="contextvars"><\/a>$/;"	a
 copy	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="copy"><\/a>$/;"	a
@@ -815,7 +815,7 @@ filter	src/error_handler.py	/^    def filter(self, ):$/;"	m	class:ErrorScreen
 fnmatch	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="fnmatch"><\/a>$/;"	a
 fractions	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="fractions"><\/a>$/;"	a
 ftplib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="ftplib"><\/a>$/;"	a
-function_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="function_grammar"><\/a>$/;"	a
+parse_fun	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="function_grammar"><\/a>$/;"	a
 function_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="function_nodes"><\/a>$/;"	a
 functools	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="functools"><\/a>$/;"	a
 gc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="gc"><\/a>$/;"	a
@@ -848,7 +848,7 @@ http	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http"><\/a>$/;
 http.client	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http.client"><\/a>$/;"	a
 http.cookiejar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http.cookiejar"><\/a>$/;"	a
 http.server	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="http.server"><\/a>$/;"	a
-if_else_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="if_else_grammar"><\/a>$/;"	a
+parse_if_else	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="if_else_grammar"><\/a>$/;"	a
 if_else_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="if_else_nodes"><\/a>$/;"	a
 importlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="importlib"><\/a>$/;"	a
 importlib._bootstrap	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="importlib._bootstrap"><\/a>$/;"	a
@@ -886,9 +886,9 @@ lexer_2	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="lexer_2"><\
 linecache	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="linecache"><\/a>$/;"	a
 locale	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="locale"><\/a>$/;"	a
 logging	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="logging"><\/a>$/;"	a
-logic_expression_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="logic_expression_grammar"><\/a>$/;"	a
+parse_logic_exp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="logic_expression_grammar"><\/a>$/;"	a
 logic_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="logic_nodes"><\/a>$/;"	a
-loop_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="loop_grammar"><\/a>$/;"	a
+parse_loop	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="loop_grammar"><\/a>$/;"	a
 loop_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="loop_nodes"><\/a>$/;"	a
 lzma	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="lzma"><\/a>$/;"	a
 main	.misc/pico_c_compiler	/^def main():$/;"	f
@@ -898,7 +898,7 @@ main	.misc/uebungsblatt_6_aufgabe_2.c	/^void main() {$/;"	f	typeref:typename:voi
 main	src/pico_c_compiler.py	/^def main():$/;"	f
 mark	src/error_handler.py	/^    def mark(self, pos, length):$/;"	m	class:ErrorScreen
 marshal	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="marshal"><\/a>$/;"	a
-match	src/parser_.py	/^    def match(self, tokentypes):$/;"	m	class:BacktrackingParser
+match	src/parser.py	/^    def match(self, tokentypes):$/;"	m	class:BacktrackingParser
 math	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="math"><\/a>$/;"	a
 middle	src/if_else_nodes.py	/^    middle = strip_multiline_string($/;"	v	class:IfElse
 middle_loc	src/if_else_nodes.py	/^    middle_loc = 1$/;"	v	class:IfElse
@@ -1132,7 +1132,7 @@ org	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="org"><\/a>$/;"	
 os	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="os"><\/a>$/;"	a
 overwrite	src/error_handler.py	/^def overwrite(old, replace_with, idx):$/;"	f
 parser	.misc/test_errors	/^    parser = Parser(tokens)$/;"	v	class:TestErrors
-parser_	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="parser_"><\/a>$/;"	a
+parser	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="parser_"><\/a>$/;"	a
 pathlib	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pathlib"><\/a>$/;"	a
 pdb	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pdb"><\/a>$/;"	a
 pep517	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="pep517"><\/a>$/;"	a
@@ -1249,7 +1249,7 @@ start_loc	src/if_else_nodes.py	/^    start_loc = 3$/;"	v	class:If
 start_loc	src/if_else_nodes.py	/^    start_loc = 3$/;"	v	class:IfElse
 start_parse	src/grammar.py	/^    def start_parse(self):$/;"	m	class:Grammar
 stat	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="stat"><\/a>$/;"	a
-statement_grammar	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="statement_grammar"><\/a>$/;"	a
+parse_stmts	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="statement_grammar"><\/a>$/;"	a
 statistics	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="statistics"><\/a>$/;"	a
 stopOnEntry	.vimspector.json	/^        "stopOnEntry": true,$/;"	b	object:configurations.Debug.configuration
 string	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="string"><\/a>$/;"	a
@@ -1265,7 +1265,7 @@ t	.misc/class_in_multiple_files/test.py	/^    t = Test()$/;"	v
 t	.misc/match_args_less_arguments.py	/^t = Test(1, 2)$/;"	v
 tabulate	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tabulate"><\/a>$/;"	a
 tarfile	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tarfile"><\/a>$/;"	a
-taste	src/parser_.py	/^    def taste(self, rule, errors):$/;"	m	class:BacktrackingParser
+taste	src/parser.py	/^    def taste(self, rule, errors):$/;"	m	class:BacktrackingParser
 tempfile	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="tempfile"><\/a>$/;"	a
 termios	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="termios"><\/a>$/;"	a
 test	.misc/class_in_multiple_files/test.py	/^    def test(self):$/;"	m	class:Test
@@ -1273,39 +1273,39 @@ test	.misc/python_match_args_example.py	/^test = Test(Apple(3), 12, 4)$/;"	v
 test	Makefile	/^test:$/;"	t
 test-arg	Makefile	/^test-arg:$/;"	t
 test_3	.misc/class_in_multiple_files/test.py	/^    def test_3(self):$/;"	m	class:Test
-test_allocation	.misc/parser_test.py	/^    def test_allocation(self, ):$/;"	m	class:TestAssignmentGrammar
-test_basic_arithmetic_expression	.misc/parser_test.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_allocation	.misc/parsertest.py	/^    def test_allocation(self, ):$/;"	m	class:TestAssignmentGrammar
+test_basic_arithmetic_expression	.misc/parsertest.py	/^    def test_basic_arithmetic_expression(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_char_as_datatype	.misc/code_generator_test.py	/^    def test_char_as_datatype(self, ):$/;"	m	class:TestCodeGenerator
-test_character_as_operand	.misc/parser_test.py	/^    def test_character_as_operand(self, ):$/;"	m	class:TestArithmeticExpressionGrammar
+test_character_as_operand	.misc/parsertest.py	/^    def test_character_as_operand(self, ):$/;"	m	class:TestArithmeticExpressionGrammar
 test_code_replacment_after	.misc/code_generator_test.py	/^    def test_code_replacment_after(self, ):$/;"	m	class:TestCodeGenerator
 test_comments	.misc/lexer_test.py	/^    def test_comments(self, ):$/;"	m	class:TestLexer
 test_compile_time_error_assignment	.misc/error_message_test.py	/^    def test_compile_time_error_assignment(self, ):$/;"	m	class:TestErrorMessages
 test_compile_time_error_not_initialised_variable	.misc/error_message_test.py	/^    def test_compile_time_error_not_initialised_variable(self, ):$/;"	m	class:TestErrorMessages
-test_connected_logic_expression	.misc/parser_test.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
+test_connected_logic_expression	.misc/parsertest.py	/^    def test_connected_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
 test_constant_initialisation	.misc/code_generator_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestCodeGenerator
-test_constant_initialisation	.misc/parser_test.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestAssignmentGrammar
-test_do_while_loop	.misc/parser_test.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_constant_initialisation	.misc/parsertest.py	/^    def test_constant_initialisation(self, ):$/;"	m	class:TestAssignmentGrammar
+test_do_while_loop	.misc/parsertest.py	/^    def test_do_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 test_else_if	.misc/code_generator_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestCodeGenerator
-test_else_if	.misc/parser_test.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
+test_else_if	.misc/parsertest.py	/^    def test_else_if(self, ):$/;"	m	class:TestIfElseGrammar
 test_gcd	.misc/execution_test.py	/^    def test_gcd(self, ):$/;"	m	class:TestPrograms
-test_if_arithmetic_expression_as_logical_expression	.misc/parser_test.py	/^    def test_if_arithmetic_expression_as_logical_expression(self, ):$/;"	m	class:TestIfElseGrammar
-test_if_else_braces	.misc/parser_test.py	/^    def test_if_else_braces(self):$/;"	m	class:TestIfElseGrammar
-test_if_else_grammar	.misc/parser_test.py	/^    def test_if_else_grammar(self):$/;"	m	class:TestIfElseGrammar
+test_if_arithmetic_expression_as_logical_expression	.misc/parsertest.py	/^    def test_if_arithmetic_expression_as_logical_expression(self, ):$/;"	m	class:TestIfElseGrammar
+test_if_else_braces	.misc/parsertest.py	/^    def test_if_else_braces(self):$/;"	m	class:TestIfElseGrammar
+test_parse_if_else	.misc/parsertest.py	/^    def test_if_else_grammar(self):$/;"	m	class:TestIfElseGrammar
 test_if_with_character	.misc/code_generator_test.py	/^    def test_if_with_character(self, ):$/;"	m	class:TestCodeGenerator
 test_illegal_char_error	.misc/test_errors	/^    def test_illegal_char_error()$/;"	m	class:TestErrors
 test_initialising_with_character	.misc/code_generator_test.py	/^    def test_initialising_with_character(self, ):$/;"	m	class:TestCodeGenerator
 test_inline_comment	.misc/error_message_test.py	/^    def test_inline_comment(self, ):$/;"	m	class:TestErrorMessages
 test_invalid_character	.misc/error_message_test.py	/^    def test_invalid_character(self, ):$/;"	m	class:TestErrorMessages
-test_logic_and_arithmetic_parenthesis_mixed	.misc/parser_test.py	/^    def test_logic_and_arithmetic_parenthesis_mixed(self, ):$/;"	m	class:TestLogicExpressionGrammar
-test_logic_expression	.misc/parser_test.py	/^    def test_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
-test_logic_precedence_1	.misc/parser_test.py	/^    def test_logic_precedence_1(self, ):$/;"	m	class:TestLogicExpressionGrammar
-test_logic_precedence_2	.misc/parser_test.py	/^    def test_logic_precedence_2(self, ):$/;"	m	class:TestLogicExpressionGrammar
-test_loop_and_nested_if_else	.misc/parser_test.py	/^    def test_loop_and_nested_if_else(self, ):$/;"	m	class:TestLoopGrammar
-test_loop_statements_after_another	.misc/parser_test.py	/^    def test_loop_statements_after_another(self, ):$/;"	m	class:TestLoopGrammar
-test_mixed_if_else_after_another	.misc/parser_test.py	/^    def test_mixed_if_else_after_another(self, ):$/;"	m	class:TestIfElseGrammar
+test_logic_and_arithmetic_parenthesis_mixed	.misc/parsertest.py	/^    def test_logic_and_arithmetic_parenthesis_mixed(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_expression	.misc/parsertest.py	/^    def test_logic_expression(self):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_precedence_1	.misc/parsertest.py	/^    def test_logic_precedence_1(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_logic_precedence_2	.misc/parsertest.py	/^    def test_logic_precedence_2(self, ):$/;"	m	class:TestLogicExpressionGrammar
+test_loop_and_nested_if_else	.misc/parsertest.py	/^    def test_loop_and_nested_if_else(self, ):$/;"	m	class:TestLoopGrammar
+test_loop_statements_after_another	.misc/parsertest.py	/^    def test_loop_statements_after_another(self, ):$/;"	m	class:TestLoopGrammar
+test_mixed_if_else_after_another	.misc/parsertest.py	/^    def test_mixed_if_else_after_another(self, ):$/;"	m	class:TestIfElseGrammar
 test_more_than_one_character_error	.misc/error_message_test.py	/^    def test_more_than_one_character_error(self, ):$/;"	m	class:TestErrorMessages
-test_negative_parenthesis_and_variable	.misc/parser_test.py	/^    def test_negative_parenthesis_and_variable(self):$/;"	m	class:TestArithmeticExpressionGrammar
-test_nested_loops	.misc/parser_test.py	/^    def test_nested_loops(self, ):$/;"	m	class:TestLoopGrammar
+test_negative_parenthesis_and_variable	.misc/parsertest.py	/^    def test_negative_parenthesis_and_variable(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_nested_loops	.misc/parsertest.py	/^    def test_nested_loops(self, ):$/;"	m	class:TestLoopGrammar
 test_no_assignment_operator	.misc/error_message_test.py	/^    def test_no_assignment_operator(self, ):$/;"	m	class:TestErrorMessages
 test_no_closing_brace_if	.misc/error_message_test.py	/^    def test_no_closing_brace_if(self, ):$/;"	m	class:TestErrorMessages
 test_no_closing_parenthesis	.misc/error_message_test.py	/^    def test_no_closing_parenthesis(self, ):$/;"	m	class:TestErrorMessages
@@ -1317,27 +1317,27 @@ test_no_right_operand	.misc/error_message_test.py	/^    def test_no_right_operan
 test_no_semicolon	.misc/error_message_test.py	/^    def test_no_semicolon(self, ):$/;"	m	class:TestErrorMessages
 test_numbers	.misc/lexer_test.py	/^    def test_numbers(self, ):$/;"	m	class:TestLexer
 test_one_liner	.misc/error_message_test.py	/^    def test_one_liner(self, ):$/;"	m	class:TestErrorMessages
-test_parenthesis	.misc/parser_test.py	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_parenthesis	.misc/parsertest.py	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_parenthesis	.misc/test_parser	/^    def test_parenthesis(self):$/;"	m	class:TestArithmeticExpreessions
-test_precedence_1	.misc/parser_test.py	/^    def test_precedence_1(self):$/;"	m	class:TestArithmeticExpressionGrammar
-test_precedence_2	.misc/parser_test.py	/^    def test_precedence_2(self):$/;"	m	class:TestArithmeticExpressionGrammar
-test_precedence_3	.misc/parser_test.py	/^    def test_precedence_3(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_1	.misc/parsertest.py	/^    def test_precedence_1(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_2	.misc/parsertest.py	/^    def test_precedence_2(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_precedence_3	.misc/parsertest.py	/^    def test_precedence_3(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_precedence_rules	.misc/test_parser	/^    def test_precedence_rules(self):$/;"	m	class:TestArithmeticExpreessions
-test_semicolon_after_another	.misc/parser_test.py	/^    def test_semicolon_after_another(self, ):$/;"	m	class:TestStatementGrammar
+test_semicolon_after_another	.misc/parsertest.py	/^    def test_semicolon_after_another(self, ):$/;"	m	class:TestStatementGrammar
 test_several_parenthesis_nested	.misc/error_message_test.py	/^    def test_several_parenthesis_nested(self, ):$/;"	m	class:TestErrorMessages
-test_several_statements_loop	.misc/parser_test.py	/^    def test_several_statements_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_several_statements_loop	.misc/parsertest.py	/^    def test_several_statements_loop(self, ):$/;"	m	class:TestLoopGrammar
 test_single_line_comment	.misc/error_message_test.py	/^    def test_single_line_comment(self, ):$/;"	m	class:TestErrorMessages
 test_single_line_comment	.misc/lexer_test.py	/^    def test_single_line_comment(self, ):$/;"	m	class:TestLexer
 test_space_and_word_seperation	.misc/lexer_test.py	/^    def test_space_and_word_seperation(self, ):$/;"	m	class:TestLexer
 test_stupid_inline_comment	.misc/error_message_test.py	/^    def test_stupid_inline_comment(self, ):$/;"	m	class:TestErrorMessages
-test_two_if_after_another	.misc/parser_test.py	/^    def test_two_if_after_another(self, ):$/;"	m	class:TestIfElseGrammar
+test_two_if_after_another	.misc/parsertest.py	/^    def test_two_if_after_another(self, ):$/;"	m	class:TestIfElseGrammar
 test_typo_in_const	.misc/error_message_test.py	/^    def test_typo_in_const(self, ):$/;"	m	class:TestErrorMessages
-test_unary_operators	.misc/parser_test.py	/^    def test_unary_operators(self):$/;"	m	class:TestArithmeticExpressionGrammar
+test_unary_operators	.misc/parsertest.py	/^    def test_unary_operators(self):$/;"	m	class:TestArithmeticExpressionGrammar
 test_unclosed_character_error	.misc/error_message_test.py	/^    def test_unclosed_character_error(self, ):$/;"	m	class:TestErrorMessages
 test_unop	.misc/test_parser	/^    def test_unop(self):$/;"	m	class:TestArithmeticExpreessions
 test_varying_spacing	.misc/test_parser	/^    def test_varying_spacing(self):$/;"	m	class:TestArithmeticExpreessions
 test_while_generation	.misc/code_generator_test.py	/^    def test_while_generation(self, ):$/;"	m	class:TestCodeGenerator
-test_while_loop	.misc/parser_test.py	/^    def test_while_loop(self, ):$/;"	m	class:TestLoopGrammar
+test_while_loop	.misc/parsertest.py	/^    def test_while_loop(self, ):$/;"	m	class:TestLoopGrammar
 textwrap	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="textwrap"><\/a>$/;"	a
 threading	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="threading"><\/a>$/;"	a
 time	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="time"><\/a>$/;"	a

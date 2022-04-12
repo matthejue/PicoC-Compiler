@@ -1,22 +1,23 @@
-from file_grammar import FileGrammar
+from parse_file import FileParser
 from lexer import TT
 
 
-class Grammar(FileGrammar):
+class PicoCParser(FileParser):
     """the function part of the context free grammar of the piocC
     language"""
+
     def __init__(self, lexer):
         super().__init__(lexer)
 
         # to check for the MoreThanOneMainFunctionError
         self.mains = []
 
-    def start_parse(self):
+    def parse(self):
         """start parsing the grammar
 
         :returns: None
         """
-        self.code_fi()
+        self.parse_file()
         self.match([TT.EOF])
 
     def reveal_ast(self):
@@ -26,5 +27,5 @@ class Grammar(FileGrammar):
         """
         return self.ast_builder.root
 
-    def __repr__(self, ):
+    def __repr__(self):
         return str(self.ast_builder)

@@ -1,4 +1,4 @@
-# Logic grammar (code_le)
+# Logic picoc_parser (code_le)
 # Concrete Syntax
 <code_le> = <pred_2>
 <pred_2> =  <pred_1> '||' <pred_1>
@@ -14,4 +14,4 @@
 
 
 ae zu at = arithmetic_term umbennenen
-arithmetic_term_grammar umbenennen
+arithmetic_term_picoc_parser umbenennen

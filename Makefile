@@ -4,7 +4,7 @@ ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 all: read-color
 
 install:
-	ln -sr ./src/main.py /usr/local/bin/pico_c_compiler
+	ln -sr ./src/main.py /usr/local/bin/picoc_compiler
 
 read: _read clean
 _read:

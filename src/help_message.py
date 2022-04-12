@@ -34,7 +34,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: pico_c_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
+    Usage: picoc_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
 
     Compiles PicoC Code into RETI Code.
 

@@ -1,4 +1,4 @@
-from parser_ import BacktrackingParser
+from parser import BacktrackingParser
 from arithmetic_nodes import (
     ArithmeticUnaryOperation,
     ArithmeticBinaryOperation,
@@ -8,10 +8,10 @@ from arithmetic_nodes import (
 )
 from errors import Errors
 from lexer import TT
-from picoc_ast import NT
+from picoc_nodes import NT
 
 
-class ArithmeticExpressionGrammar(BacktrackingParser):
+class ArithmeticExpParser(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
@@ -29,7 +29,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
     }
     UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}
 
-    def code_ae(self):
+    def parse_arithmetic_exp(self):
         """arithmetic expression startpoint
 
         :grammer: <prec2>
@@ -78,7 +78,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
 
-        self._ao()
+        self._arithemtic_op()
 
         if self.LTT(1) not in self.BINOP_PREC_1.keys():
             self.ast_builder.go_back("_prec1")
@@ -92,7 +92,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self.ast_builder.save("_prec1_loop")
             self.ast_builder.down(ArithmeticBinaryOperation)
 
-            self._ao()
+            self._arithemtic_op()
 
             if self.LTT(1) not in self.BINOP_PREC_1.keys():
                 self.ast_builder.go_back("_prec1_loop")
@@ -101,7 +101,7 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
         self.ast_builder.up(savestate_node)
 
-    def _ao(self):
+    def _arithemtic_op(self):
         """arithmetic operand
 
         :grammer: <word> | <number> | <paren> | <unop>
@@ -113,25 +113,25 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
         elif self.LTT(1) == TT.CHARACTER:
             self.add_and_consume(classname=Character)
         elif self.LTT(1) == TT.L_PAREN:
-            self._paren_arith()
+            self._paren_arithmetic()
         elif self.LTT(1) in self.UNARY.keys():
-            self._unop()
+            self._unary_op()
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
                 "arithmetic operand", token.value, token.position
             )
 
-    def _paren_arith(self):
+    def _paren_arithmetic(self):
         """arithmetic parenthesis
 
         :grammer: ( <code_ae> )
         """
         self.match([TT.L_PAREN])
-        self.code_ae_le()
+        self.parse_arithmetic_logic_exp()
         self.match([TT.R_PAREN])
 
-    def _unop(self):
+    def _unary_op(self):
         """unary operator
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
@@ -146,6 +146,6 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
 
             self.ast_builder.down(ArithmeticUnaryOperation)
 
-        self._ao()
+        self._arithemtic_op()
 
         self.ast_builder.up(savestate_node)

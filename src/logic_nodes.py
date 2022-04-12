@@ -1,5 +1,5 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
-from picoc_ast import NT
+from picoc_nodes import NT
 
 
 class LogicBinaryOperation(ASTNode):

@@ -1,7 +1,7 @@
 import global_vars
 import cmd2
 from lexer import Lexer, TT
-from grammar import Grammar
+from picoc_parser import PicoCParser
 from error_handler import ErrorHandler
 from warning_handler import WarningHandler
 from symbol_table import SymbolTable
@@ -226,8 +226,8 @@ class Compiler(cmd2.Cmd):
             lexer.__init__(code_without_cr)
 
         # Generate ast
-        grammar = Grammar(lexer)
-        error_handler.handle(grammar.start_parse)
+        grammar = PicoCParser(lexer)
+        error_handler.handle(grammar.parse)
 
         if global_vars.args.abstract_syntax:
             self._abstract_syntax_option(grammar)
@@ -259,7 +259,7 @@ class Compiler(cmd2.Cmd):
             with open(global_vars.outbase + ".tokens", "w", encoding="utf-8") as fout:
                 fout.write(str(tokens))
 
-    def _abstract_syntax_option(self, grammar: Grammar):
+    def _abstract_syntax_option(self, grammar: PicoCParser):
         if global_vars.args.print:
             ast = str(grammar.reveal_ast())
             ast = Colorizer(ast).colorize_abstract_syntax()

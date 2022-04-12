@@ -1,11 +1,11 @@
-from function_grammar import FunctionGrammar
+from parse_fun import FunParser
 from file_node import File
 from lexer import TT
-from picoc_ast import NT
+from picoc_nodes import NT
 
 
-class FileGrammar(FunctionGrammar):
-    def code_fi(self):
+class FileParser(FunParser):
+    def parse_file(self):
         self._file()
 
     def _file(self):
@@ -14,6 +14,6 @@ class FileGrammar(FunctionGrammar):
         self.add_and_match([TT.IDENTIFIER], classname=NT.Filename)
 
         while self.LTT(1) in self.PRIM_DT.keys():
-            self.code_fu()
+            self.parse_fun()
 
         self.ast_builder.up(savestate_node)
