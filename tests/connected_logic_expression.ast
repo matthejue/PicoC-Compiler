@@ -1,1 +1,0 @@
-(connected_logic_expression (void main ((char dom) = 99) ((int var) = ((12 > 3) && (dom <= 4)))))

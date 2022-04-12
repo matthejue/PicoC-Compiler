@@ -1,1 +1,0 @@
-(if_else_grammar (void main (char var) IfElse((var >= 0) (var = 12) else (var = (var + 1)))))

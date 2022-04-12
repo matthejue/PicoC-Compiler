@@ -1,1 +1,0 @@
-(no_warning_atomic_assignment_char_real_char (void main ((char var) = 99)))

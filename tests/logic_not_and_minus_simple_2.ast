@@ -1,1 +1,0 @@
-(logic_not_and_minus_simple_2 (void main ((char bool) = 0) ((char var) = Not(Not(ToBool((- bool)))))))

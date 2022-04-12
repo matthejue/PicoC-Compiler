@@ -1,1 +1,0 @@
-(error_redefinition_first_const (void main ((const char var) = 122) ((char var) = 97)))

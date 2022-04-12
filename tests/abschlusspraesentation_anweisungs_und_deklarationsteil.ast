@@ -1,1 +1,0 @@
-(abschlusspraesentation_anweisungs_und_deklarationsteil (void main ((int var) = 0) DoWhile((var = (var + 1)) (var < 10)) ((int var_2) = var)))

@@ -1,5 +1,0 @@
-name,type,datatype,position,value
-char,built in,/,/,/
-int,built in,/,/,/
-var,variable,int,(2:6),128
-var_2,variable,int,(6:6),129

@@ -1,1 +1,0 @@
-(no_warning_multi_assignment_char_char (void main (char var2) ((char var) = (var2 = 99))))

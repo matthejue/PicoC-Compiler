@@ -112,8 +112,8 @@ class _SymbolTable(Scope):
     def __init__(self):
         super().__init__()
         self.initTypeSystem()
-        # TODO
-        self.fa_pointer = global_vars.args.begin_data_segment
+        # self.fa_pointer = global_vars.args.begin_data_segment
+        self.fa_pointer = 100
 
     def initTypeSystem(self):
         self.define(BuiltInTypeSymbol("char"))

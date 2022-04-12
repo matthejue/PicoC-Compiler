@@ -1,5 +1,0 @@
-name,type,datatype,position,value
-char,built in,/,/,/
-int,built in,/,/,/
-x,named constant,int,(1:25),101
-y,variable,int,(1:43),128

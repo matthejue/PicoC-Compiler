@@ -1,1 +1,0 @@
-(logic_not_atom_parenthesis (void main ((char var) = Not((1 < (34 + 10))))))

@@ -1,1 +1,0 @@
-(mixed_if_else_after_another (void main (int var) (char cars) IfElse((var == 0) (cars = 10) else (cars = (cars + 1))) If((cars == 10) (var = 42))))

@@ -255,7 +255,5 @@ class Lexer:
         else:
             self.lc = self.finput[self.lc_row][self.lc_col]
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return str(self.finput)

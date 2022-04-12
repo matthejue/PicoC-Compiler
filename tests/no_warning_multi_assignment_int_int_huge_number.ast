@@ -1,1 +1,0 @@
-(no_warning_multi_assignment_int_int_huge_number (void main (int var2) ((int var) = (var2 = 2147483647))))

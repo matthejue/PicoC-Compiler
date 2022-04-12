@@ -1,1 +1,0 @@
-(uebungsblatt_6_aufgabe_2 (void main ((int x) = 42) ((int y) = (- 24)) (char is_less) IfElse(ToBool(((x > 0) ^ (y > 0))) (is_less = (x <= y)) else IfElse((x > 0) (is_less = 0) else (is_less = 1)))))

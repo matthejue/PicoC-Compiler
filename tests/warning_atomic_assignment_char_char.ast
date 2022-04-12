@@ -1,1 +1,0 @@
-(warning_atomic_assignment_char_char (void main ((char var) = 128)))

@@ -25,11 +25,10 @@ def main():
     else:
         CM().color_off()
 
-    infile = global_vars.args.infile
-    outbase = remove_extension(infile)
+    global_vars.outbase = remove_extension(global_vars.args.infile)
 
     try:
-        compiler.read_and_write_file(infile, outbase)
+        compiler.read_and_write_file()
     except FileNotFoundError:
         print("File does not exist\n")
     except Exception as e:
