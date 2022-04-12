@@ -12,6 +12,7 @@ from colormanager import ColorManager as CM
 import os
 from colorizer import Colorizer
 from help_message import generate_help_message
+from abstract_syntax_tree import ASTNode
 
 
 class Compiler(cmd2.Cmd):
@@ -315,7 +316,7 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _reti_code(self, abstract_syntax_tree):
+    def _reti_code(self, abstract_syntax_tree: ASTNode):
         if global_vars.args.print:
             code = (
                 Colorizer(

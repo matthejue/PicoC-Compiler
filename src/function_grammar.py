@@ -1,13 +1,14 @@
 from statement_grammar import StatementGrammar
 from function_nodes import MainFunction
 from lexer import TT
-from dummy_nodes import NT
+from picoc_ast import NT
 from errors import Errors
 
 
 class FunctionGrammar(StatementGrammar):
     """the function part of the context free grammar of the piocC
     language"""
+
     def code_fu(self):
         """function grammar startpoint
 
@@ -17,24 +18,32 @@ class FunctionGrammar(StatementGrammar):
         """
         self._function()
 
-    def _function(self, ):
+    def _function(
+        self,
+    ):
         if self.LTT(2) == TT.MAIN:
             self._check_no_second_main()
             self._main_function()
         elif self.LTT(2) == TT.IDENTIFIER:
-            raise Errors.NotImplementedYetError('functions that are not main')
+            raise Errors.NotImplementedYetError("functions that are not main")
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError('function identifier',
-                                               token.value, token.position)
+            raise Errors.NoApplicableRuleError(
+                "function identifier", token.value, token.position
+            )
 
-    def _check_no_second_main(self, ):
+    def _check_no_second_main(
+        self,
+    ):
         self.mains += [self.LT(2)]
         if len(self.mains) > 1:
-            raise Errors.MoreThanOneMainFunctionError(self.mains[0].position,
-                                                      self.mains[1].position)
+            raise Errors.MoreThanOneMainFunctionError(
+                self.mains[0].position, self.mains[1].position
+            )
 
-    def _main_function(self, ):
+    def _main_function(
+        self,
+    ):
         """main function
 
         :grammar: void main () { <code_ss> }

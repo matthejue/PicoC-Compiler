@@ -1,13 +1,16 @@
 from lexer import TT
 from errors import Errors
 from if_else_nodes import If, IfElse
-from dummy_nodes import NT
+from picoc_ast import NT
 from reference import Reference
+
 #  from statement_grammar import StatementGrammar
 
 
 class IfElseGrammar:
-    def code_ie(self, ):
+    def code_ie(
+        self,
+    ):
         self.code_if_if_else()
 
     def code_if_if_else(self):
@@ -35,7 +38,9 @@ class IfElseGrammar:
         if self.LTT(1) == TT.ELSE:
             raise Errors.TastingError()
 
-    def _if_without_else(self, ):
+    def _if_without_else(
+        self,
+    ):
         """if
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
@@ -47,7 +52,9 @@ class IfElseGrammar:
 
         self.ast_builder.up(savestate_node)
 
-    def _if_else(self, ):
+    def _if_else(
+        self,
+    ):
         """if else
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) else ({ <code_ss> }|<s>)
@@ -62,7 +69,9 @@ class IfElseGrammar:
 
         self.ast_builder.up(savestate_node)
 
-    def _if_condition(self, ):
+    def _if_condition(
+        self,
+    ):
         """if code piece
 
         :grammar: if '('<code_le>')'
@@ -75,7 +84,9 @@ class IfElseGrammar:
 
         self.match([TT.R_PAREN])
 
-    def _branch(self, ):
+    def _branch(
+        self,
+    ):
         """if code piece
 
         :grammar: ({ <code_ss> }|<s>)
@@ -91,5 +102,5 @@ class IfElseGrammar:
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
-                TT.L_BRACE.value + " or single statement", token.value,
-                token.position)
+                TT.L_BRACE.value + " or single statement", token.value, token.position
+            )

@@ -2,7 +2,7 @@ from arithmetic_expression_grammar import ArithmeticExpressionGrammar
 from lexer import TT
 from logic_nodes import LogicBinaryOperation, Not, Atom, ToBool
 from errors import Errors
-from dummy_nodes import NT
+from picoc_ast import NT
 from itertools import chain
 from reference import Reference
 
@@ -17,7 +17,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         TT.LT_COMP: NT.Lt,
         TT.GT_COMP: NT.Gt,
         TT.LE_COMP: NT.Le,
-        TT.GE_COMP: NT.Ge
+        TT.GE_COMP: NT.Ge,
     }
     LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot
 
@@ -138,14 +138,18 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         if self.LTT(1) == TT.NOT:
             self._not_expr()
         elif self.LTT(1) in [
-                TT.NUMBER, TT.CHARACTER, TT.IDENTIFIER, TT.L_PAREN, TT.MINUS_OP
+            TT.NUMBER,
+            TT.CHARACTER,
+            TT.IDENTIFIER,
+            TT.L_PAREN,
+            TT.MINUS_OP,
         ]:
-            self._parenthized_logic_expression_or_arithmetic_term_or_comparison(
-            )
+            self._parenthized_logic_expression_or_arithmetic_term_or_comparison()
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError("logic operand", token.value,
-                                               token.position)
+            raise Errors.NoApplicableRuleError(
+                "logic operand", token.value, token.position
+            )
 
     def _not_expr(self):
         """not expression
@@ -172,8 +176,7 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
         """
         error = Reference()
-        if self.taste(self._taste_consume_parenthesized_logic_expression,
-                      error):
+        if self.taste(self._taste_consume_parenthesized_logic_expression, error):
             self._taste_consume_parenthesized_logic_expression()
         elif self.taste(self._taste_consume_arithmetic_term, error):
             self._taste_consume_arithmetic_term()
@@ -185,10 +188,13 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
             #  "parenthized logic formula or arithmetic term or comparison",
             #  errors)
 
-    def _taste_consume_parenthesized_logic_expression(self, ):
+    def _taste_consume_parenthesized_logic_expression(
+        self,
+    ):
         self._parenthesized_logic_expression()
-        if self.LTT(1) in chain(self.BINOP_PREC_2, self.BINOP_PREC_1,
-                                self.COMP_REL.keys()):
+        if self.LTT(1) in chain(
+            self.BINOP_PREC_2, self.BINOP_PREC_1, self.COMP_REL.keys()
+        ):
             raise Errors.TastingError()
 
     def _parenthesized_logic_expression(self):
@@ -200,13 +206,17 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
         self.code_le()
         self.match([TT.R_PAREN])
 
-    def _taste_consume_arithmetic_term(self, ):
+    def _taste_consume_arithmetic_term(
+        self,
+    ):
         self._arithmetic_term()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():
             raise Errors.TastingError()
 
-    def _arithmetic_term(self, ):
+    def _arithmetic_term(
+        self,
+    ):
         """top / bottom
 
         :grammar: #1 <code_ae>
@@ -217,7 +227,9 @@ class LogicExpressionGrammar(ArithmeticExpressionGrammar):
 
         self.ast_builder.up(savestate_node)
 
-    def _atom(self, ):
+    def _atom(
+        self,
+    ):
         """atomic formula
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>

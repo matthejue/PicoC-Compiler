@@ -4,7 +4,9 @@ from errors import Errors
 
 
 class File(ASTNode):
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.filename = self.children[0]
 
         # determine the main function
@@ -14,11 +16,13 @@ class File(ASTNode):
         else:
             raise Errors.NoMainFunctionError(str(self.filename))
         self.main_function = self.children[i]
-        self.functions = self.children[1:i] + self.children[i + 1:]
+        self.functions = self.children[1:i] + self.children[i + 1 :]
 
     __match_args__ = ("filename", "main_function", "functions")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(f"# File '{self.filename}' Start\n", 0)
@@ -27,5 +31,7 @@ class File(ASTNode):
 
         self.code_generator.add_code(f"# File '{self.filename}' Ende\n", 0)
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(
+        self,
+    ):
+        return self.to_string_show_node()

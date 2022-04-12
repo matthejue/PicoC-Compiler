@@ -3,6 +3,7 @@ from abstract_syntax_tree import ASTNode
 
 class NT:
     """Nodetypes"""
+
     class Add(ASTNode):
         pass
 

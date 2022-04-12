@@ -1,6 +1,6 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 import global_vars
-from dummy_nodes import NT
+from picoc_ast import NT
 
 
 class If(ASTNode):
@@ -11,23 +11,28 @@ class If(ASTNode):
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af) + 1;  # Branch überspringen
         # If-Branch
-        """)
+        """
+    )
     start_loc = 3
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.condition = self.children[0]
         self.branch = self.children[1:]
 
     __match_args__ = ("condition", "branch")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         dot_more = " ... " if len(self.branch) > 1 else ""
         branch = self.branch[0] if self.branch else ""
         self.code_generator.add_code(
-            f"# If Statement 'If({self.condition} {branch}{dot_more})' "
-            "Start\n", 0)
+            f"# If Statement 'If({self.condition} {branch}{dot_more})' " "Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -45,19 +50,24 @@ class If(ASTNode):
         self.code_generator.remove_marker()
 
         self.code_generator.add_code(
-            f"# If Statement 'If({self.condition} {branch}{dot_more})' "
-            "Ende\n", 0)
+            f"# If Statement 'If({self.condition} {branch}{dot_more})' " "Ende\n", 0
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
-                self.start, 'l1', str(self.condition))
+                self.start, "l1", str(self.condition)
+            )
 
-    def _adapt_code(self, ):
+    def _adapt_code(
+        self,
+    ):
         self.code_generator.replace_code_after(
             "codelength(af) + 1",
-            str(self.code_generator.loc -
-                self.code_generator.get_marker_loc() + 1))
+            str(self.code_generator.loc - self.code_generator.get_marker_loc() + 1),
+        )
 
 
 class IfElse(ASTNode):
@@ -68,13 +78,15 @@ class IfElse(ASTNode):
         ADDI SP 1;  # Stack um eine Zelle verkürzen
         JUMP== codelength(af1) + 2;  # Zu Else-Branch springen, wenn 'l1' nicht erfüllt
         # If-Branch
-        """)
+        """
+    )
     start_loc = 3
 
     middle = strip_multiline_string(
         """JUMP codelength(af2) + 1;  # Else-Branch überspringen
         # Else-Branch
-        """)
+        """
+    )
     middle_loc = 1
 
     def _idx_of_else_node(self):
@@ -86,15 +98,19 @@ class IfElse(ASTNode):
                 return i
         return -1
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         idx_of_else_node = self._idx_of_else_node()
         self.condition = self.children[0]
         self.branch1 = self.children[1:idx_of_else_node]
-        self.branch2 = self.children[idx_of_else_node + 1:]
+        self.branch2 = self.children[idx_of_else_node + 1 :]
 
     __match_args__ = ("condition", "branch1", "branch2")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         dot_more1 = " ..." if len(self.branch1) > 1 else ""
@@ -103,7 +119,9 @@ class IfElse(ASTNode):
         branch2 = self.branch2[0] if self.branch2 else ""
         self.code_generator.add_code(
             f"# If und Else Statement 'IfElse({self.condition} {branch1}"
-            f"{dot_more1} else {branch2}{dot_more2})' Start\n", 0)
+            f"{dot_more1} else {branch2}{dot_more2})' Start\n",
+            0,
+        )
 
         self._pretty_comments()
 
@@ -133,21 +151,30 @@ class IfElse(ASTNode):
 
         self.code_generator.add_code(
             f"# If und Else Statement 'IfElse({self.condition} {branch1}"
-            f"{dot_more1} else {branch2}{dot_more2})' Ende\n", 0)
+            f"{dot_more1} else {branch2}{dot_more2})' Ende\n",
+            0,
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         if global_vars.args.verbose:
             self.start = self.code_generator.replace_code_pre(
-                self.start, "l1", str(self.condition))
+                self.start, "l1", str(self.condition)
+            )
 
-    def _adapt_code_1(self, ):
+    def _adapt_code_1(
+        self,
+    ):
         self.code_generator.replace_code_after(
             "codelength(af1) + 2",
-            str(self.code_generator.loc -
-                self.code_generator.get_marker_loc() + 2))
+            str(self.code_generator.loc - self.code_generator.get_marker_loc() + 2),
+        )
 
-    def _adapt_code_2(self, ):
+    def _adapt_code_2(
+        self,
+    ):
         self.code_generator.replace_code_after(
             "codelength(af2) + 1",
-            str(self.code_generator.loc -
-                self.code_generator.get_marker_loc() + 1))
+            str(self.code_generator.loc - self.code_generator.get_marker_loc() + 1),
+        )

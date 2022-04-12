@@ -1,7 +1,7 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
-from dummy_nodes import NT
+from picoc_ast import NT
 import global_vars
 from bitstring import Bits
 
@@ -18,7 +18,8 @@ class ArithmeticOperand(ASTNode):
         """LOADI ACC higher_bits;  # Higher Bits in ACC laden: 'HBITS'
         MULTI ACC 65536;  # Higher Bits um 16 Bits shiften
         ORI ACC lower_bits;  # Lower Bits in ACC einfügen: 'LBITS'
-        """)
+        """
+    )
     build_huge_number_loc = 3
 
     end = "STOREIN SP ACC 1;  # Wert in oberste Stack-Zelle\n"
@@ -26,9 +27,8 @@ class ArithmeticOperand(ASTNode):
 
     __match_args__ = ("value", "position")
 
-    def visit(self, ):
-        self.code_generator.add_code(
-            f"# Arithmetischer Operand '{self}' Start\n", 0)
+    def visit(self):
+        self.code_generator.add_code(f"# Arithmetischer Operand '{self}' Start\n", 0)
 
         self.code_generator.add_code(self.start, self.all_loc)
 
@@ -42,46 +42,59 @@ class ArithmeticOperand(ASTNode):
 
         self.code_generator.add_code(self.end, self.all_loc)
 
-        self.code_generator.add_code(
-            f"# Arithmetischer Operand '{self}' Ende\n", 0)
+        self.code_generator.add_code(f"# Arithmetischer Operand '{self}' Ende\n", 0)
 
-    def _adapt_code(self, ):
+    def _adapt_code(self):
         match self:
             case Identifier(value):
                 symbol = self.symbol_table.resolve(value)
                 match symbol:
                     case VariableSymbol(value):
                         self.variable_identifier = self._pretty_comments(
-                            self.variable_identifier)
+                            self.variable_identifier
+                        )
                         self.variable_identifier = self.code_generator.replace_code_pre(
-                            self.variable_identifier, "var_identifier", value)
-                        self.code_generator.add_code(self.variable_identifier,
-                                                     self.all_loc)
+                            self.variable_identifier, "var_identifier", value
+                        )
+                        self.code_generator.add_code(
+                            self.variable_identifier, self.all_loc
+                        )
                     case ConstantSymbol(value):
                         self.constant_identifier = self._pretty_comments(
-                            self.constant_identifier)
+                            self.constant_identifier
+                        )
                         self.constant_identifier = self.code_generator.replace_code_pre(
-                            self.constant_identifier, "encode(c)", value)
-                        self.code_generator.add_code(self.constant_identifier,
-                                                     self.all_loc)
+                            self.constant_identifier, "encode(c)", value
+                        )
+                        self.code_generator.add_code(
+                            self.constant_identifier, self.all_loc
+                        )
             case (Number(value, position) | Character(value, position)):
                 self._error_check(value, position)
                 if int(value) <= global_vars.RANGE_OF_PARAMETER[1]:
                     self.constant = self.code_generator.replace_code_pre(
-                        self.constant, "encode(w)", value)
+                        self.constant, "encode(w)", value
+                    )
                     self.constant = self._pretty_comments(self.constant)
                     self.code_generator.add_code(self.constant, self.all_loc)
                 else:
-                    higher_bits, lower_bits = self._split_huge_number(
-                        int(value))
+                    higher_bits, lower_bits = self._split_huge_number(int(value))
                     self.build_huge_number = self.code_generator.replace_code_pre(
-                        self.build_huge_number, "higher_bits", str(Bits(bin='0'+higher_bits).int))
+                        self.build_huge_number,
+                        "higher_bits",
+                        str(Bits(bin="0" + higher_bits).int),
+                    )
                     self.build_huge_number = self.code_generator.replace_code_pre(
-                        self.build_huge_number, "lower_bits", str(Bits(bin='0'+lower_bits).int))
-                    self.build_huge_number = self._pretty_comments_huge_number(self.build_huge_number,
-                                                                               higher_bits, lower_bits)
+                        self.build_huge_number,
+                        "lower_bits",
+                        str(Bits(bin="0" + lower_bits).int),
+                    )
+                    self.build_huge_number = self._pretty_comments_huge_number(
+                        self.build_huge_number, higher_bits, lower_bits
+                    )
                     self.code_generator.add_code(
-                        self.build_huge_number, self.build_huge_number_loc)
+                        self.build_huge_number, self.build_huge_number_loc
+                    )
 
     def _pretty_comments(self, code):
         if global_vars.args.verbose:
@@ -97,9 +110,11 @@ class ArithmeticOperand(ASTNode):
     def _pretty_comments_huge_number(self, code, higher_bits, lower_bits):
         if global_vars.args.verbose:
             code = self.code_generator.replace_code_pre(
-                code, "HBITS", '0'*16+'_'+higher_bits)
+                code, "HBITS", "0" * 16 + "_" + higher_bits
+            )
             code = self.code_generator.replace_code_pre(
-                code, "LBITS", higher_bits + '_' + lower_bits)
+                code, "LBITS", higher_bits + "_" + lower_bits
+            )
         return code
 
     def _error_check(self, value, position):
@@ -107,7 +122,8 @@ class ArithmeticOperand(ASTNode):
         max_int = global_vars.RANGE_OF_INT[1]
         if int(value) > max_int:
             raise Errors.TooLargeLiteralError(
-                value, position, "variable", min_int, max_int)
+                value, position, "variable", min_int, max_int
+            )
 
 
 class Identifier(ArithmeticOperand):
@@ -134,7 +150,8 @@ class ArithmeticBinaryOperation(ASTNode):
         OP ACC IN2;  # Wert von 'e1 binop e2' in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """)
+        """
+    )
     end_loc = 5
 
     def update_match_args(self):
@@ -144,11 +161,12 @@ class ArithmeticBinaryOperation(ASTNode):
 
     __match_args__ = ("left_operand", "operation", "right_operand")
 
-    def visit(self, ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Arithmetische binäre Operation '{self}' Start\n", 0)
+            f"# Arithmetische binäre Operation '{self}' Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -160,46 +178,45 @@ class ArithmeticBinaryOperation(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Arithmetische binäre Operation '{self}' Ende\n", 0)
+            f"# Arithmetische binäre Operation '{self}' Ende\n", 0
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(self):
         if global_vars.args.verbose:
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'e1 binop e2', str(self))
+                self.end, "e1 binop e2", str(self)
+            )
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'e1', str(self.left_operand))
+                self.end, "e1", str(self.left_operand)
+            )
             self.end = self.code_generator.replace_code_pre(
-                self.end, 'e2', str(self.right_operand))
+                self.end, "e2", str(self.right_operand)
+            )
 
-    def _adapt_code(self, ):
+    def _adapt_code(self):
         match self:
             case ArithmeticBinaryOperation(_, NT.Add(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'ADD')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "ADD")
             case ArithmeticBinaryOperation(_, NT.Sub(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'SUB')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "SUB")
             case ArithmeticBinaryOperation(_, NT.Mul(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'MULT')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "MULT")
             case ArithmeticBinaryOperation(_, NT.Div(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'DIV')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "DIV")
             case ArithmeticBinaryOperation(_, NT.Mod(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'MOD')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "MOD")
             case ArithmeticBinaryOperation(_, NT.Oplus(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'OPLUS')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "OPLUS")
             case ArithmeticBinaryOperation(_, NT.And(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'AND')
-            case ArithmeticBinaryOperation(_, NT.Or(), ):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'OP', 'OR')
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "AND")
+            case ArithmeticBinaryOperation(
+                _,
+                NT.Or(),
+            ):
+                self.end = self.code_generator.replace_code_pre(self.end, "OP", "OR")
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(self):
+        return self.to_string_show_node()
 
 
 class ArithmeticUnaryOperation(ASTNode):
@@ -209,7 +226,8 @@ class ArithmeticUnaryOperation(ASTNode):
         """LOADI ACC 0;  # '0' in ACC laden
         LOADIN SP IN2 1;  # Wert von 'e1' in IN2 laden
         SUB ACC IN2;  # '(0 - e1)' in ACC laden
-        """)
+        """
+    )
     start_loc = 3
 
     bitwise_not = "SUBI ACC 1;  # zu Bitweise Negation unwandeln\n"
@@ -218,17 +236,18 @@ class ArithmeticUnaryOperation(ASTNode):
     end = "STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle\n"
     end_loc = 1
 
-    def update_match_args(self, ):
+    def update_match_args(self):
         self.operation = self.children[0]
         self.operand = self.children[1]
 
     __match_args__ = ("operation", "operand")
 
-    def visit(self, ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Arithmetische unäre Operation '{self}' Start\n", 0)
+            f"# Arithmetische unäre Operation '{self}' Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -241,18 +260,17 @@ class ArithmeticUnaryOperation(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Arithmetische unäre Operation '{self}' Ende\n", 0)
+            f"# Arithmetische unäre Operation '{self}' Ende\n", 0
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(self):
         if global_vars.args.verbose:
-            self.code_generator.replace_code_pre(
-                self.start, "e1", str(self.operand))
+            self.code_generator.replace_code_pre(self.start, "e1", str(self.operand))
 
-    def _adapt_code(self, ):
+    def _adapt_code(self):
         match self:
             case ArithmeticUnaryOperation(NT.Negation(), _):
-                self.code_generator.add_code(self.bitwise_not,
-                                             self.bitwise_not_loc)
+                self.code_generator.add_code(self.bitwise_not, self.bitwise_not_loc)
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(self):
+        return self.to_string_show_node()

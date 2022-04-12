@@ -1,5 +1,5 @@
 from abstract_syntax_tree import ASTNode, strip_multiline_string
-from dummy_nodes import NT
+from picoc_ast import NT
 
 
 class LogicBinaryOperation(ASTNode):
@@ -11,21 +11,27 @@ class LogicBinaryOperation(ASTNode):
         LOP ACC IN2;  # 'l1 lop l2' in ACC laden
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """)
+        """
+    )
     end_loc = 5
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.left_atom = self.children[0]
         self.binary_connective = self.children[1]
         self.right_atom = self.children[2]
 
     __match_args__ = ("left_atom", "binary_connective", "right_atom")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logische binäre Verknüpfung '{self}' Start\n", 0)
+            f"# Logische binäre Verknüpfung '{self}' Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -37,27 +43,35 @@ class LogicBinaryOperation(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Logische binäre Verknüpfung '{self}' Ende\n", 0)
+            f"# Logische binäre Verknüpfung '{self}' Ende\n", 0
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         self.end = self.code_generator.replace_code_pre(
-            self.end, "l1 lop l2", str(self))
+            self.end, "l1 lop l2", str(self)
+        )
         self.end = self.code_generator.replace_code_pre(
-            self.end, "l1", str(self.left_atom))
+            self.end, "l1", str(self.left_atom)
+        )
         self.end = self.code_generator.replace_code_pre(
-            self.end, "l2", str(self.right_atom))
+            self.end, "l2", str(self.right_atom)
+        )
 
-    def _adapt_code(self, ):
+    def _adapt_code(
+        self,
+    ):
         match self:
             case LogicBinaryOperation(_, NT.LAnd(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'LOP', 'AND')
+                self.end = self.code_generator.replace_code_pre(self.end, "LOP", "AND")
             case LogicBinaryOperation(_, NT.LOr(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'LOP', 'OR')
+                self.end = self.code_generator.replace_code_pre(self.end, "LOP", "OR")
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(
+        self,
+    ):
+        return self.to_string_show_node()
 
 
 class Not(ASTNode):
@@ -68,19 +82,25 @@ class Not(ASTNode):
         LOADIN SP IN2 1;  # Wert von 'l1' in IN2 laden
         OPLUS ACC IN2;  # '!(l1)' in ACC laden
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
-        """)
+        """
+    )
     end_loc = 4
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.atom = self.children[0]
 
-    __match_args__ = ("atom", )
+    __match_args__ = ("atom",)
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logische unäre Verknüpfung '{self}' Start\n", 0)
+            f"# Logische unäre Verknüpfung '{self}' Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -88,12 +108,12 @@ class Not(ASTNode):
 
         self.code_generator.add_code(self.end, self.end_loc)
 
-        self.code_generator.add_code(
-            f"# Logische unäre Verknüpfung '{self}' Ende\n", 0)
+        self.code_generator.add_code(f"# Logische unäre Verknüpfung '{self}' Ende\n", 0)
 
-    def _pretty_comments(self, ):
-        self.end = self.code_generator.replace_code_pre(
-            self.end, "l1", str(self.atom))
+    def _pretty_comments(
+        self,
+    ):
+        self.end = self.code_generator.replace_code_pre(self.end, "l1", str(self.atom))
 
 
 class Atom(ASTNode):
@@ -109,17 +129,22 @@ class Atom(ASTNode):
         LOADI ACC 1;  # Ergebnis '1', wenn 'e1 rel e2' wahr
         STOREIN SP ACC 2;  # Ergebnis in zweitoberste Stack-Zelle
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """)
+        """
+    )
     end_loc = 9
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.left_element = self.children[0]
         self.relation = self.children[1]
         self.right_element = self.children[2]
 
     __match_args__ = ("left_element", "relation", "right_element")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(f"# Logisches Atom '{self}' Start\n", 0)
@@ -135,37 +160,40 @@ class Atom(ASTNode):
 
         self.code_generator.add_code(f"# Logisches Atom '{self}' Ende\n", 0)
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         self.end = self.code_generator.replace_code_pre(
-            self.end, "e1 rel e2", str(self))
+            self.end, "e1 rel e2", str(self)
+        )
         self.end = self.code_generator.replace_code_pre(
-            self.end, "e1", str(self.left_element))
+            self.end, "e1", str(self.left_element)
+        )
         self.end = self.code_generator.replace_code_pre(
-            self.end, "e2", str(self.right_element))
+            self.end, "e2", str(self.right_element)
+        )
 
-    def _adapt_code(self, ):
+    def _adapt_code(
+        self,
+    ):
         match self:
             case Atom(_, NT.Eq(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '==')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", "==")
             case Atom(_, NT.UEq(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '!=')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", "!=")
             case Atom(_, NT.Lt(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '<')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", "<")
             case Atom(_, NT.Gt(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '>')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", ">")
             case Atom(_, NT.Le(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '<=')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", "<=")
             case Atom(_, NT.Ge(), _):
-                self.end = self.code_generator.replace_code_pre(
-                    self.end, 'vglop', '>=')
+                self.end = self.code_generator.replace_code_pre(self.end, "vglop", ">=")
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(
+        self,
+    ):
+        return self.to_string_show_node()
 
 
 class ToBool(ASTNode):
@@ -176,19 +204,25 @@ class ToBool(ASTNode):
         JUMP== 3;  # Überspringe 2 Befehle, wenn 'e1' den Wert '0' hat
         LOADI ACC 1;
         STOREIN SP ACC 1;  # Ergebnis in oberste Stack-Zelle
-        """)
+        """
+    )
     end_loc = 4
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.arithmetic_expression = self.children[0]
 
-    __match_args__ = ("arithmetic_expression")
+    __match_args__ = "arithmetic_expression"
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(
-            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Start\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Start\n", 0
+        )
 
         self._pretty_comments()
 
@@ -197,8 +231,12 @@ class ToBool(ASTNode):
         self.code_generator.add_code(self.end, self.end_loc)
 
         self.code_generator.add_code(
-            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Ende\n", 0)
+            f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Ende\n", 0
+        )
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         self.end = self.code_generator.replace_code_pre(
-            self.end, "e1", str(self.arithmetic_expression))
+            self.end, "e1", str(self.arithmetic_expression)
+        )

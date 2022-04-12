@@ -1,8 +1,14 @@
 from parser_ import BacktrackingParser
-from arithmetic_nodes import ArithmeticUnaryOperation, ArithmeticBinaryOperation, Identifier, Number, Character
+from arithmetic_nodes import (
+    ArithmeticUnaryOperation,
+    ArithmeticBinaryOperation,
+    Identifier,
+    Number,
+    Character,
+)
 from errors import Errors
 from lexer import TT
-from dummy_nodes import NT
+from picoc_ast import NT
 
 
 class ArithmeticExpressionGrammar(BacktrackingParser):
@@ -112,8 +118,9 @@ class ArithmeticExpressionGrammar(BacktrackingParser):
             self._unop()
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError("arithmetic operand",
-                                               token.value, token.position)
+            raise Errors.NoApplicableRuleError(
+                "arithmetic operand", token.value, token.position
+            )
 
     def _paren_arith(self):
         """arithmetic parenthesis

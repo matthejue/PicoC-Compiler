@@ -1,7 +1,7 @@
 from function_grammar import FunctionGrammar
 from file_node import File
 from lexer import TT
-from dummy_nodes import NT
+from picoc_ast import NT
 
 
 class FileGrammar(FunctionGrammar):
