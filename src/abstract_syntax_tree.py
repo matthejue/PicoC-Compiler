@@ -10,6 +10,7 @@ class ASTNode:
     across.  Homogeneous AST means having only one node type and all childs
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
+
     def __init__(self, value=None, position=None):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
@@ -20,7 +21,7 @@ class ASTNode:
         self.code_generator = CodeGenerator()
         self.symbol_table = SymbolTable()
 
-    def update_match_args(self, ):
+    def update_match_args(self):
         pass
 
     __match_args__ = ("value", "position")
@@ -31,22 +32,24 @@ class ASTNode:
         """
         self.children += [node]
 
-    def show_generated_code(self, ):
+    def show_generated_code(self):
         return self.code_generator.show_code()
 
     def __repr__(self):
-        global_vars.show_node = True
+        global_vars.show_node = False
         return self.to_string()
 
-    def to_string(self, ):
+    def to_string(self):
         if not self.children:
-            if not self.value and global_vars.args.verbose:
-                return self.__class__.__name__
-            return f"{self.value}"
+            if not self.value:
+                return f"'{self.__class__.__name__}'"
+            if global_vars.args.verbose:
+                return f"{self.__class__.__name__}('{self.value}')"
+            return f"'{self.value}'"
 
         acc = ""
 
-        if global_vars.args.verbose and global_vars.show_node:
+        if global_vars.args.verbose or global_vars.show_node:
             acc += self.__class__.__name__
 
         acc += f"({self.children[0]}"
@@ -56,10 +59,10 @@ class ASTNode:
 
         return acc + ")"
 
-    def alternative_to_string(self, ):
-        global_vars.show_node = False
-        tmp = self.to_string()
+    def to_string_show_node(self):
         global_vars.show_node = True
+        tmp = self.to_string()
+        global_vars.show_node = False
         return tmp
 
 
@@ -70,7 +73,8 @@ def strip_multiline_string(mutline_string):
     :grammar: grammar specification
     :returns: None
     """
-    mutline_string = ''.join(
-        [i.lstrip() + '\n' for i in mutline_string.split('\n')[:-1]])
+    mutline_string = "".join(
+        [i.lstrip() + "\n" for i in mutline_string.split("\n")[:-1]]
+    )
     # every code piece ends with \n, so the last element can always be poped
     return mutline_string

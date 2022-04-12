@@ -2,7 +2,7 @@ import global_vars
 from abstract_syntax_tree import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
-from dummy_nodes import NT
+from picoc_ast import NT
 from arithmetic_nodes import Identifier, Number, Character
 from warnings_ import Warnings
 from warning_handler import WarningHandler
@@ -12,6 +12,7 @@ from enum import Enum
 
 class TYPE(Enum):
     """Type of assignment"""
+
     CONST_ASSIGNMENT = 1
     ASSIGNMENT_WITH_LITERAL = 2
     ASSIGNMENT_WITH_VARIABLE = 3
@@ -28,7 +29,8 @@ class Assignment(ASTNode):
     assign = strip_multiline_string(
         f"""LOADIN SP ACC 1;  # Wert von 'e1' in ACC laden
         ADDI SP 1;  # Stack um eine Zelle verkürzen
-        """)
+        """
+    )
     assign_loc = 2
 
     implicit_conversion = strip_multiline_string(
@@ -39,23 +41,27 @@ class Assignment(ASTNode):
         JUMP== 3;  # Signextension für negative Zahl überspringen, wenn Zahl nicht negativ ist
         LOADI IN1 -256;  # Bitsmaske '11111111_11111111_11111111_00000000' für signextension erstellen
         OR ACC IN1;  # Wo in der Bitmaske eine '1' ist, werden die Bits ebenfallls zu '1'
-        """)
+        """
+    )
     implicit_conversion_loc = 8
 
     assign_more = "STORE ACC var_address;  # Wert 'e1' in Variable 'v1' speichern\n"
     assign_more_loc = 1
 
-    def update_match_args(self, ):
+    def update_match_args(
+        self,
+    ):
         self.location = self.children[0]
         self.expression = self.children[1]
 
     __match_args__ = ("location", "expression")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
-        self.code_generator.add_code(
-            f"# Zuweisung '{self}' Start\n", 0)
+        self.code_generator.add_code(f"# Zuweisung '{self}' Start\n", 0)
 
         match self.location:
             case Allocation():
@@ -71,28 +77,38 @@ class Assignment(ASTNode):
                 case Identifier(value, position):
                     raise Errors.UnknownIdentifierError(value, position)
 
-        self.code_generator.add_code(
-            f"# Zuweisung '{self}' Ende\n", 0)
+        self.code_generator.add_code(f"# Zuweisung '{self}' Ende\n", 0)
 
-    def _pretty_comments(self, ):
+    def _pretty_comments(
+        self,
+    ):
         if global_vars.args.verbose:
             self.assign = self.code_generator.replace_code_pre(
-                self.assign, "e1", str(self.expression))
+                self.assign, "e1", str(self.expression)
+            )
             self.assign_more = self.code_generator.replace_code_pre(
-                self.assign_more, "e1", str(self.expression))
+                self.assign_more, "e1", str(self.expression)
+            )
             match self.location:
                 case Allocation(_, _, _):
                     self.assign_more = self.code_generator.replace_code_pre(
-                        self.assign_more, "v1", str(self.location.identifier))
+                        self.assign_more, "v1", str(self.location.identifier)
+                    )
                 case _:
                     self.assign_more = self.code_generator.replace_code_pre(
-                        self.assign_more, "v1", str(self.location))
+                        self.assign_more, "v1", str(self.location)
+                    )
 
     def _comment_for_constant(self, name, value):
-        self.code_generator.add_code(f"# Konstante '{name}' in Symboltabelle "
-                                     f"den Wert '{value}' zugewiesen\n", 0)
+        self.code_generator.add_code(
+            f"# Konstante '{name}' in Symboltabelle "
+            f"den Wert '{value}' zugewiesen\n",
+            0,
+        )
 
-    def _assignment(self, ):
+    def _assignment(
+        self,
+    ):
         match self:
             case Assignment(Allocation(NT.Const(), _, Identifier(name)), expression):
                 match expression:
@@ -100,26 +116,37 @@ class Assignment(ASTNode):
                         symbol = self.symbol_table.resolve(name)
 
                         # error check
-                        possibly_new_value = self._implicit_conversion_and_warning_check(
-                            symbol, value, position, TYPE.CONST_ASSIGNMENT)
+                        possibly_new_value = (
+                            self._implicit_conversion_and_warning_check(
+                                symbol, value, position, TYPE.CONST_ASSIGNMENT
+                            )
+                        )
                         symbol.value = possibly_new_value
-                        self._comment_for_constant(
-                            name, str(possibly_new_value))
+                        self._comment_for_constant(name, str(possibly_new_value))
 
             # nested assignment that is the assignment of another assignment
-            case Assignment((Identifier(name) | Allocation(_, _, Identifier(name))), Assignment()):
+            case Assignment(
+                (Identifier(name) | Allocation(_, _, Identifier(name))), Assignment()
+            ):
                 self.expression.visit()
 
                 match self.expression:
                     case Assignment(Identifier(name_2, position), _):
                         symbol = self.symbol_table.resolve(name)
                         self._implicit_conversion_and_warning_check(
-                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE
+                        )
 
                 self._adapt_code(name)
 
             # assigment that assigns a variable to a expression
-            case Assignment((Identifier(name, position) | Allocation(_, _, Identifier(name, position))), expression):
+            case Assignment(
+                (
+                    Identifier(name, position)
+                    | Allocation(_, _, Identifier(name, position))
+                ),
+                expression,
+            ):
                 symbol = self.symbol_table.resolve(name)
 
                 # error check 1
@@ -139,23 +166,29 @@ class Assignment(ASTNode):
                 match expression:
                     case (Character(value, position) | Number(value, position)):
                         self._implicit_conversion_and_warning_check(
-                            symbol, value, position, TYPE.ASSIGNMENT_WITH_LITERAL)
+                            symbol, value, position, TYPE.ASSIGNMENT_WITH_LITERAL
+                        )
                     case Identifier(name_2, position):
                         self._implicit_conversion_and_warning_check(
-                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE)
+                            symbol, name_2, position, TYPE.ASSIGNMENT_WITH_VARIABLE
+                        )
                     case _:
                         self._implicit_conversion_and_warning_check(
-                            symbol, None, None, TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION)
+                            symbol, None, None, TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION
+                        )
 
                 self._adapt_code(name)
 
     def _adapt_code(self, name):
         self.assign_more = self.code_generator.replace_code_pre(
-            self.assign_more, "var_address", self.symbol_table.resolve(name).value)
+            self.assign_more, "var_address", self.symbol_table.resolve(name).value
+        )
 
         self.code_generator.add_code(self.assign_more, self.assign_more_loc)
 
-    def _implicit_conversion_and_warning_check(self, symbol, value, position, type_of_assignment):
+    def _implicit_conversion_and_warning_check(
+        self, symbol, value, position, type_of_assignment
+    ):
         """return value only important for const"""
         char_range_from = global_vars.RANGE_OF_CHAR[0]
         char_range_to = global_vars.RANGE_OF_CHAR[1]
@@ -167,8 +200,16 @@ class Assignment(ASTNode):
                 symbol_2 = self.symbol_table.resolve(value)
                 if symbol.datatype.name == "char" and symbol_2.datatype.name == "int":
                     warning = Warnings.ImplicitConversionWarning(
-                        symbol.name, symbol.position, symbol.datatype, char_range_from,
-                        char_range_to, value, position, "int", None)
+                        symbol.name,
+                        symbol.position,
+                        symbol.datatype,
+                        char_range_from,
+                        char_range_to,
+                        value,
+                        position,
+                        "int",
+                        None,
+                    )
                     self.warning_handler.add_warning(warning)
                     self._implicit_conversion()
             case TYPE.ASSIGNMENT_WITH_COMPLEX_EXPRESSION:
@@ -176,41 +217,68 @@ class Assignment(ASTNode):
                     self._implicit_conversion()
             case TYPE.ASSIGNMENT_WITH_LITERAL:
                 if symbol.datatype.name == "char" and int(value) > char_range_to:
-                    char_bits = Bits(int=int(value), length=32).bin[32-8:32]
+                    char_bits = Bits(int=int(value), length=32).bin[32 - 8 : 32]
                     new_value = Bits(bin=char_bits).int
                     warning = Warnings.ImplicitConversionWarning(
-                        symbol.name, symbol.position, symbol.datatype, char_range_from,
-                        char_range_to, value, position, "int", new_value)
+                        symbol.name,
+                        symbol.position,
+                        symbol.datatype,
+                        char_range_from,
+                        char_range_to,
+                        value,
+                        position,
+                        "int",
+                        new_value,
+                    )
                     self.warning_handler.add_warning(warning)
                     self._implicit_conversion()
             case TYPE.CONST_ASSIGNMENT:
                 if int(value) > parameter_range_to:
                     raise Errors.TooLargeLiteralError(
-                        value, position, "constant identifier", parameter_range_from, parameter_range_to)
+                        value,
+                        position,
+                        "constant identifier",
+                        parameter_range_from,
+                        parameter_range_to,
+                    )
                 elif symbol.datatype.name == "char" and int(value) > char_range_to:
-                    char_bits = Bits(int=int(value), length=32).bin[32-8:32]
+                    char_bits = Bits(int=int(value), length=32).bin[32 - 8 : 32]
                     new_value = Bits(bin=char_bits).int
                     warning = Warnings.ImplicitConversionWarning(
-                        symbol.name, symbol.position, symbol.datatype, char_range_from,
-                        char_range_to, value, position, "int", new_value)
+                        symbol.name,
+                        symbol.position,
+                        symbol.datatype,
+                        char_range_from,
+                        char_range_to,
+                        value,
+                        position,
+                        "int",
+                        new_value,
+                    )
                     self.warning_handler.add_warning(warning)
                     return new_value
                 else:
                     return value
 
-    def _implicit_conversion(self, ):
+    def _implicit_conversion(
+        self,
+    ):
         self.code_generator.add_code(
-            f"# Implizite Konversion von 'int' zu 'char' Start\n", 0)
+            f"# Implizite Konversion von 'int' zu 'char' Start\n", 0
+        )
         self.code_generator.add_code(
-            self.implicit_conversion, self.implicit_conversion_loc)
+            self.implicit_conversion, self.implicit_conversion_loc
+        )
         self.code_generator.add_code(
-            f"# Implizite Konversion von 'int' zu 'char' Ende\n", 0)
+            f"# Implizite Konversion von 'int' zu 'char' Ende\n", 0
+        )
 
     def _const_reassignment_error_check(self, name, position, symbol):
         match symbol:
             case ConstantSymbol():
                 raise Errors.ConstReassignmentError(
-                    name, position, symbol.name, symbol.position)
+                    name, position, symbol.name, symbol.position
+                )
 
     def __repr__(self):
         if len(self.children) == 2:
@@ -234,7 +302,9 @@ class Allocation(ASTNode):
 
     __match_args__ = ("const", "prim_dt", "identifier")
 
-    def visit(self, ):
+    def visit(
+        self,
+    ):
         self.update_match_args()
 
         self.code_generator.add_code(f"# Allokation '{self}' Start\n", 0)
@@ -248,21 +318,32 @@ class Allocation(ASTNode):
         if value:
             suppl += f" mit Adresse '{value}'"
 
-        self.code_generator.add_code(f"# {const_var} '{name}' vom Typ '{dtype}'"
-                                     f"{suppl} zur Symboltabelle hinzugefügt\n", 0)
+        self.code_generator.add_code(
+            f"# {const_var} '{name}' vom Typ '{dtype}'"
+            f"{suppl} zur Symboltabelle hinzugefügt\n",
+            0,
+        )
 
-    def _adapt_code(self, ):
+    def _adapt_code(
+        self,
+    ):
         match self:
-            case Allocation(NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(
+                NT.Const(), (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)
+            ):
                 self._error_check(name, position)
                 constant = ConstantSymbol(
-                    name, self.symbol_table.resolve(dtype), position)
+                    name, self.symbol_table.resolve(dtype), position
+                )
                 self.symbol_table.define(constant)
                 self._pretty_comments("Konstante", name, dtype)
-            case Allocation(_, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)):
+            case Allocation(
+                _, (NT.Char(dtype) | NT.Int(dtype)), Identifier(name, position)
+            ):
                 self._error_check(name, position)
                 variable = VariableSymbol(
-                    name, self.symbol_table.resolve(dtype), position)
+                    name, self.symbol_table.resolve(dtype), position
+                )
                 self.symbol_table.define(variable)
                 address = self.symbol_table.allocate(variable)
                 self._pretty_comments("Variable", name, dtype, address)
@@ -271,7 +352,10 @@ class Allocation(ASTNode):
         if self.symbol_table.symbols.get(found_name):
             first = self.symbol_table.symbols[found_name]
             raise Errors.RedefinitionError(
-                found_name, found_pos, first.name, first.position)
+                found_name, found_pos, first.name, first.position
+            )
 
-    def __repr__(self, ):
-        return self.alternative_to_string()
+    def __repr__(
+        self,
+    ):
+        return self.to_string_show_node()

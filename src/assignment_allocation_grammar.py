@@ -2,7 +2,7 @@ from logic_expression_grammar import LogicExpressionGrammar
 from assignment_allocation_nodes import Assignment, Allocation
 from arithmetic_nodes import Identifier, Character, Number
 from lexer import TT
-from dummy_nodes import NT
+from picoc_ast import NT
 from errors import Errors
 
 
@@ -37,7 +37,8 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
-                "allocation and / or assignment", token.value, token.position)
+                "allocation and / or assignment", token.value, token.position
+            )
 
         self.ast_builder.up(savestate_node)
 
@@ -68,7 +69,9 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
 
             self.code_ae_le()
 
-    def _constant_assign(self, ):
+    def _constant_assign(
+        self,
+    ):
         self.ast_builder.discard("_aa")
 
         savestate_node = self.ast_builder.down(Allocation)
@@ -89,10 +92,13 @@ class AssignmentAllocationGrammar(LogicExpressionGrammar):
             self.add_and_consume(classname=Character)
         else:
             token = self.LT(1)
-            raise Errors.NoApplicableRuleError("number or character",
-                                               token.value, token.position)
+            raise Errors.NoApplicableRuleError(
+                "number or character", token.value, token.position
+            )
 
-    def _assign(self, ):
+    def _assign(
+        self,
+    ):
         self.ast_builder.discard("_aa")
 
         self.add_and_consume(classname=Identifier)
