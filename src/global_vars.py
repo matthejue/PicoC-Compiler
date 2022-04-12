@@ -11,7 +11,7 @@ class Args:
         self.distance = 20
         self.sight = 2
         self.color = True
-        self.verbose = True
+        self.verbose = False
         self.debug = False
         self.show_error_message = False
 

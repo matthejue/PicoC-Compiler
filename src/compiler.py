@@ -202,7 +202,7 @@ class Compiler(cmd2.Cmd):
 
         # remove all empty lines and \n from the code lines in the list and
         # add the filename to the start of the code
-        code_without_cr = [basename(global_vars.args.infile)] + list(
+        code_without_cr = [f"{basename(global_vars.args.infile)} "] + list(
             filter(lambda line: line, map(lambda line: line.strip("\n"), code))
         )
         # reset everything to defaults
@@ -241,7 +241,7 @@ class Compiler(cmd2.Cmd):
         # show warnings before reti code gets output
         warning_handler.show_warnings()
 
-        self._reti_code(abstract_syntax_tree)
+        #  self._reti_code(abstract_syntax_tree)
 
     def _tokens_option(self, lexer):
         tokens = []
