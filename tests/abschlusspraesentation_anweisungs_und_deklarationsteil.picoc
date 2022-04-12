@@ -1,7 +1,0 @@
-void main() {
-  int var = 0;
-  do {
-    var = var + 1;
-  } while (var < 10);
-  int var_2 = var;
-}

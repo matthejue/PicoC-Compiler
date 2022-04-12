@@ -1,0 +1,15 @@
+// in:10
+// expected:1
+
+void main() {
+  int var = input() + 1;
+  char var2;
+  if (var > 100) {
+    var2 = 0;
+  } else if (/* Störender Kommentar */ var > 10)
+    var2 = 1;
+  else
+    var2 = 2;
+  print(var2);
+}
+
