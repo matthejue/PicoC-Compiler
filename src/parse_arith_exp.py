@@ -1,17 +1,10 @@
 from parser import BacktrackingParser
-from arithmetic_nodes import (
-    ArithmeticUnaryOperation,
-    ArithmeticBinaryOperation,
-    Identifier,
-    Number,
-    Character,
-)
 from errors import Errors
 from lexer import TT
 from picoc_nodes import NT
 
 
-class ArithmeticExpParser(BacktrackingParser):
+class ArithExpParser(BacktrackingParser):
     """The arithmetic expression part of the context free grammer of the piocC
     language"""
 
@@ -27,9 +20,9 @@ class ArithmeticExpParser(BacktrackingParser):
         TT.AND_OP: NT.And,
         TT.OR_OP: NT.Or,
     }
-    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}
+    UNARY = {TT.NEG_OP: NT.Not, TT.MINUS_OP: NT.Minus}
 
-    def parse_arithmetic_exp(self):
+    def parse_arithm_exp(self):
         """arithmetic expression startpoint
 
         :grammer: <prec2>
@@ -43,7 +36,7 @@ class ArithmeticExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec2")
 
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
+        savestate_node = self.ast_builder.down(NT.ArithBinOp)
 
         self._prec1()
 
@@ -58,7 +51,7 @@ class ArithmeticExpParser(BacktrackingParser):
 
             self.ast_builder.save("_prec2_loop")
 
-            self.ast_builder.down(ArithmeticBinaryOperation)
+            self.ast_builder.down(NT.ArithBinOp)
 
             self._prec1()
 
@@ -76,9 +69,9 @@ class ArithmeticExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec1")
 
-        savestate_node = self.ast_builder.down(ArithmeticBinaryOperation)
+        savestate_node = self.ast_builder.down(NT.ArithBinOp)
 
-        self._arithemtic_op()
+        self._arith_op()
 
         if self.LTT(1) not in self.BINOP_PREC_1.keys():
             self.ast_builder.go_back("_prec1")
@@ -90,9 +83,9 @@ class ArithmeticExpParser(BacktrackingParser):
             self.add_and_consume(mapping=self.BINOP_PREC_1)
 
             self.ast_builder.save("_prec1_loop")
-            self.ast_builder.down(ArithmeticBinaryOperation)
+            self.ast_builder.down(NT.ArithBinOp)
 
-            self._arithemtic_op()
+            self._arith_op()
 
             if self.LTT(1) not in self.BINOP_PREC_1.keys():
                 self.ast_builder.go_back("_prec1_loop")
@@ -101,19 +94,19 @@ class ArithmeticExpParser(BacktrackingParser):
 
         self.ast_builder.up(savestate_node)
 
-    def _arithemtic_op(self):
+    def _arith_op(self):
         """arithmetic operand
 
         :grammer: <word> | <number> | <paren> | <unop>
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.add_and_consume(classname=Identifier)
+            self.add_and_consume(classname=NT.Name)
         elif self.LTT(1) == TT.NUMBER:
-            self.add_and_consume(classname=Number)
+            self.add_and_consume(classname=NT.Num)
         elif self.LTT(1) == TT.CHARACTER:
-            self.add_and_consume(classname=Character)
+            self.add_and_consume(classname=NT.Char)
         elif self.LTT(1) == TT.L_PAREN:
-            self._paren_arithmetic()
+            self._paren_arith()
         elif self.LTT(1) in self.UNARY.keys():
             self._unary_op()
         else:
@@ -122,13 +115,13 @@ class ArithmeticExpParser(BacktrackingParser):
                 "arithmetic operand", token.value, token.position
             )
 
-    def _paren_arithmetic(self):
+    def _paren_arith(self):
         """arithmetic parenthesis
 
         :grammer: ( <code_ae> )
         """
         self.match([TT.L_PAREN])
-        self.parse_arithmetic_logic_exp()
+        self.parse_arith_logic_exp()
         self.match([TT.R_PAREN])
 
     def _unary_op(self):
@@ -136,7 +129,7 @@ class ArithmeticExpParser(BacktrackingParser):
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         """
-        savestate_node = self.ast_builder.down(ArithmeticUnaryOperation)
+        savestate_node = self.ast_builder.down(NT.ArithUnaryOp)
 
         while True:
             self.add_and_consume(mapping=self.UNARY)
@@ -144,8 +137,8 @@ class ArithmeticExpParser(BacktrackingParser):
             if self.LTT(1) not in self.UNARY.keys():
                 break
 
-            self.ast_builder.down(ArithmeticUnaryOperation)
+            self.ast_builder.down(NT.ArithUnaryOp)
 
-        self._arithemtic_op()
+        self._arith_op()
 
         self.ast_builder.up(savestate_node)

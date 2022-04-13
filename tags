@@ -35,14 +35,14 @@ And	src/picoc_nodes.py	/^    class And(ASTNode):$/;"	c	class:NT
 Apple	.misc/python_match_args_example.py	/^class Apple:$/;"	c
 Args	.misc/testing_helpers.py	/^class Args():$/;"	c
 ArithmeticBinaryOperation	src/arithmetic_nodes.py	/^class ArithmeticBinaryOperation(ASTNode):$/;"	c
-ArithmeticExpressionGrammar	src/parse_arithmetic_exp.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
+ArithmeticExpressionGrammar	src/parse_arith_exp.py	/^class ArithmeticExpressionGrammar(BacktrackingParser):$/;"	c
 ArithmeticOperand	src/arithmetic_nodes.py	/^class ArithmeticOperand(ASTNode):$/;"	c
 ArithmeticUnaryOperation	src/arithmetic_nodes.py	/^class ArithmeticUnaryOperation(ASTNode):$/;"	c
 Assignment	src/assignment_allocation_nodes.py	/^class Assignment(ASTNode):$/;"	c
 AssignmentAllocationGrammar	src/parse_assign_alloc.py	/^class AssignmentAllocationGrammar(LogicExpressionGrammar):$/;"	c
 Atom	src/logic_nodes.py	/^class Atom(ASTNode):$/;"	c
-BINOP_PREC_1	src/parse_arithmetic_exp.py	/^    BINOP_PREC_1 = {$/;"	v	class:ArithmeticExpressionGrammar
-BINOP_PREC_2	src/parse_arithmetic_exp.py	/^    BINOP_PREC_2 = {$/;"	v	class:ArithmeticExpressionGrammar
+BINOP_PREC_1	src/parse_arith_exp.py	/^    BINOP_PREC_1 = {$/;"	v	class:ArithmeticExpressionGrammar
+BINOP_PREC_2	src/parse_arith_exp.py	/^    BINOP_PREC_2 = {$/;"	v	class:ArithmeticExpressionGrammar
 BITSHIFT_L	.misc/tokentypes.py	/^    BITSHIFT_L = "<<"$/;"	v	class:TT
 BITSHIFT_R	.misc/tokentypes.py	/^    BITSHIFT_R = ">>"$/;"	v	class:TT
 BacktrackingParser	src/parser.py	/^class BacktrackingParser():$/;"	c
@@ -221,7 +221,7 @@ TooLargeLiteralError	src/errors.py	/^    class TooLargeLiteralError(Exception):$
 UEQ_COMP	.misc/tokentypes.py	/^    UEQ_COMP = "!="$/;"	v	class:TT
 UEQ_COMP	src/lexer.py	/^    UEQ_COMP = "!="$/;"	v	class:TT
 UEq	src/picoc_nodes.py	/^    class UEq(ASTNode):$/;"	c	class:NT
-UNARY	src/parse_arithmetic_exp.py	/^    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}$/;"	v	class:ArithmeticExpressionGrammar
+UNARY	src/parse_arith_exp.py	/^    UNARY = {TT.NEG_OP: NT.Negation, TT.MINUS_OP: NT.Minus}$/;"	v	class:ArithmeticExpressionGrammar
 UnclosedCharacterError	src/errors.py	/^    class UnclosedCharacterError(Exception):$/;"	c	class:Errors
 UnknownIdentifierError	src/errors.py	/^    class UnknownIdentifierError(Exception):$/;"	c	class:Errors
 Usage	README.md	/^## Usage$/;"	s	chapter:Pico-C Compiler
@@ -332,7 +332,7 @@ _add	src/parser.py	/^    def _add(self, classname=None, mapping=None):$/;"	m	cla
 _aix_support	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_aix_support"><\/a>$/;"	a
 _alloc	src/parse_assign_alloc.py	/^    def _alloc(self):$/;"	m	class:AssignmentAllocationGrammar
 _and_expr	src/parse_logic_exp.py	/^    def _and_expr(self):$/;"	m	class:LogicExpressionGrammar
-_ao	src/parse_arithmetic_exp.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
+_ao	src/parse_arith_exp.py	/^    def _ao(self):$/;"	m	class:ArithmeticExpressionGrammar
 _arithmetic_term	src/parse_logic_exp.py	/^    def _arithmetic_term(self, ):$/;"	m	class:LogicExpressionGrammar
 _assign	src/parse_assign_alloc.py	/^    def _assign(self, ):$/;"	m	class:AssignmentAllocationGrammar
 _assignment	src/assignment_allocation_nodes.py	/^    def _assignment(self, ):$/;"	m	class:Assignment
@@ -409,14 +409,14 @@ _operator	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_operator
 _or_expr	src/parse_logic_exp.py	/^    def _or_expr(self):$/;"	m	class:LogicExpressionGrammar
 _osx_support	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_osx_support"><\/a>$/;"	a
 _overlapped	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_overlapped"><\/a>$/;"	a
-_paren_arith	src/parse_arithmetic_exp.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
+_paren_arith	src/parse_arith_exp.py	/^    def _paren_arith(self):$/;"	m	class:ArithmeticExpressionGrammar
 _parenthesized_logic_expression	src/parse_logic_exp.py	/^    def _parenthesized_logic_expression(self):$/;"	m	class:LogicExpressionGrammar
 _parenthized_logic_expression_or_arithmetic_term_or_comparison	src/parse_logic_exp.py	/^    def _parenthized_logic_expression_or_arithmetic_term_or_comparison(self):$/;"	m	class:LogicExpressionGrammar
 _pickle	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_pickle"><\/a>$/;"	a
 _posixshmem	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixshmem"><\/a>$/;"	a
 _posixsubprocess	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_posixsubprocess"><\/a>$/;"	a
-_prec1	src/parse_arithmetic_exp.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
-_prec2	src/parse_arithmetic_exp.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec1	src/parse_arith_exp.py	/^    def _prec1(self):$/;"	m	class:ArithmeticExpressionGrammar
+_prec2	src/parse_arith_exp.py	/^    def _prec2(self):$/;"	m	class:ArithmeticExpressionGrammar
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:ArithmeticBinaryOperation
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, ):$/;"	m	class:ArithmeticUnaryOperation
 _pretty_comments	src/arithmetic_nodes.py	/^    def _pretty_comments(self, code):$/;"	m	class:ArithmeticOperand
@@ -472,7 +472,7 @@ _thread	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_thread"><\
 _threading_local	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_threading_local"><\/a>$/;"	a
 _tokens_option	src/pico_c_compiler.py	/^def _tokens_option(lexer, outbase):$/;"	f
 _tracemalloc	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_tracemalloc"><\/a>$/;"	a
-_unop	src/parse_arithmetic_exp.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
+_unop	src/parse_arith_exp.py	/^    def _unop(self):$/;"	m	class:ArithmeticExpressionGrammar
 warnings	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_warnings"><\/a>$/;"	a
 _weakref	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakref"><\/a>$/;"	a
 _weakrefset	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="_weakrefset"><\/a>$/;"	a
@@ -503,7 +503,7 @@ argparse	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="argparse">
 args	.misc/pico_c_compiler	/^args = None$/;"	v
 args	.vimspector.json	/^        "args": [$/;"	a	object:configurations.Debug.configuration
 args	src/global_vars.py	/^args = None$/;"	v
-parse_arithmetic_exp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_expression_grammar"><\/a>$/;"	a
+parse_arith_exp	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_expression_grammar"><\/a>$/;"	a
 arithmetic_nodes	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="arithmetic_nodes"><\/a>$/;"	a
 array	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="array"><\/a>$/;"	a
 assign	src/assignment_allocation_nodes.py	/^    assign = strip_multiline_string($/;"	v	class:Assignment
@@ -567,7 +567,7 @@ code	.misc/code_generator_test.py	/^    code = """SUBI SP 1;$/;"	v	class:TestCod
 code	build/pico_c_compiler/xref-pico_c_compiler.html	/^  <a name="code"><\/a>$/;"	a
 code_aa	src/parse_assign_alloc.py	/^    def code_aa(self):$/;"	m	class:AssignmentAllocationGrammar
 code_ae	.misc/test_errors	/^    code_ae = ["2 + "]$/;"	v	class:TestErrors
-code_ae	src/parse_arithmetic_exp.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
+code_ae	src/parse_arith_exp.py	/^    def code_ae(self):$/;"	m	class:ArithmeticExpressionGrammar
 code_ae_le	src/parse_logic_exp.py	/^    def code_ae_le(self):$/;"	m	class:LogicExpressionGrammar
 code_fi	src/parse_file.py	/^    def code_fi(self, ):$/;"	m	class:FileGrammar
 code_fu	src/parse_fun.py	/^    def code_fu(self):$/;"	m	class:FunctionGrammar

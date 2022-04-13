@@ -1,5 +1,4 @@
 from parse_stmts import StmtParser
-from function_nodes import MainFunction
 from lexer import TT
 from picoc_nodes import NT
 from errors import Errors
@@ -45,11 +44,11 @@ class FunParser(StmtParser):
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(MainFunction)
+        savestate_node = self.ast_builder.down(NT.Fun)
 
         self.add_and_consume(mapping=self.PRIM_DT)
 
-        self.add_and_match([TT.MAIN], NT.FunctionIdentifier)
+        self.add_and_match([TT.MAIN], NT.Name)
 
         self.match([TT.L_PAREN])
 
