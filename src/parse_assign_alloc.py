@@ -8,7 +8,7 @@ class AssignAllocParser(LogicExpParser):
     """The assignment expression part of the context free grammar of the piocC
     language"""
 
-    PRIM_DT = {TT.INT: NT.IntDT, TT.CHAR: NT.CharDT, TT.VOID: NT.VoidDT}
+    PRIM_DT = {TT.INT: NT.IntType, TT.CHAR: NT.CharType, TT.VOID: NT.VoidType}
 
     def parse_assign_alloc(self):
         """assignment and allocation startpoint
