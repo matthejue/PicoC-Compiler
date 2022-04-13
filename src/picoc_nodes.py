@@ -35,19 +35,19 @@ class NT:
     class Minus(ASTNode):
         pass
 
-    class Negation(ASTNode):
+    class Not(ASTNode):
         pass
 
     class Const(ASTNode):
         pass
 
-    class Char(ASTNode):
+    class CharDT(ASTNode):
         pass
 
-    class Int(ASTNode):
+    class IntDT(ASTNode):
         pass
 
-    class Void(ASTNode):
+    class VoidDT(ASTNode):
         pass
 
     class Else(ASTNode):
@@ -56,7 +56,7 @@ class NT:
     class Eq(ASTNode):
         pass
 
-    class UEq(ASTNode):
+    class NEq(ASTNode):
         pass
 
     class Lt(ASTNode):
@@ -71,22 +71,20 @@ class NT:
     class Ge(ASTNode):
         pass
 
-    class LAnd(ASTNode):
+    class LogicAnd(ASTNode):
         pass
 
-    class LOr(ASTNode):
+    class LogicOr(ASTNode):
         pass
 
-    #  class LNot(ASTNode):
-    #  pass
-
-    #  class Main(ASTNode):
-    #      pass
-
-    class FunctionIdentifier(ASTNode):
+    class Name(ASTNode):
+        # shorter then 'Identifier'
         pass
 
-    class Filename(ASTNode):
+    class Num(ASTNode):
+        pass
+
+    class Char(ASTNode):
         pass
 
     ###########################################################################
@@ -96,13 +94,13 @@ class NT:
     class File(ASTNode):
         pass
 
-    class LogicBinaryOperation(ASTNode):
+    class LogicBinOp(ASTNode):
         pass
 
-    class Not(ASTNode):
+    class LogicNot(ASTNode):
         pass
 
-    class Atom(ASTNode):
+    class LogicAtom(ASTNode):
         pass
 
     class ToBool(ASTNode):
@@ -120,20 +118,23 @@ class NT:
     class DoWhile(ASTNode):
         pass
 
-    class Assignment(ASTNode):
+    class Assign(ASTNode):
         pass
 
-    class Allocation(ASTNode):
+    class Alloc(ASTNode):
         pass
 
-    class Function(ASTNode):
+    class Fun(ASTNode):
         pass
 
-    class ArithmeticOperand(ASTNode):
+    class ArithBinOp(ASTNode):
         pass
 
-    class ArithmeticBinaryOperation(ASTNode):
+    class ArithUnaryOp(ASTNode):
         pass
 
-    class ArithmeticUnaryOperation(ASTNode):
+    class Print(ASTNode):
+        pass
+
+    class Input(ASTNode):
         pass

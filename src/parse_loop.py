@@ -1,5 +1,5 @@
-from loop_nodes import While, DoWhile
 from lexer import TT
+from picoc_nodes import NT
 
 
 class LoopParser:
@@ -29,7 +29,7 @@ class LoopParser:
         :grammar: <while> ( <code_le> ) { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(While)
+        savestate_node = self.ast_builder.down(NT.While)
 
         self.consume_next_token()  # [TT.WHILE]
 
@@ -53,7 +53,7 @@ class LoopParser:
         :grammar: do { <code_ss> } while ( <code_le> ) ;
         :returns: None
         """
-        savestate_node = self.ast_builder.down(DoWhile)
+        savestate_node = self.ast_builder.down(NT.DoWhile)
 
         self.consume_next_token()  # [TT.DO]
 

@@ -1,27 +1,26 @@
-from parse_arithmetic_exp import ArithmeticExpParser
+from parse_arith_exp import ArithExpParser
 from lexer import TT
-from logic_nodes import LogicBinaryOperation, Not, Atom, ToBool
 from errors import Errors
 from picoc_nodes import NT
 from itertools import chain
 from reference import Reference
 
 
-class LogicExpParser(ArithmeticExpParser):
+class LogicExpParser(ArithExpParser):
     """The logic expression part of the context free grammar of the piocC
     language"""
 
     COMP_REL = {
         TT.EQ_COMP: NT.Eq,
-        TT.UEQ_COMP: NT.UEq,
+        TT.UEQ_COMP: NT.NEq,
         TT.LT_COMP: NT.Lt,
         TT.GT_COMP: NT.Gt,
         TT.LE_COMP: NT.Le,
         TT.GE_COMP: NT.Ge,
     }
-    LOG_CON = {TT.AND: NT.LAnd, TT.OR: NT.LOr}  # TT.NOT: NT.LNot
+    LOG_CON = {TT.AND: NT.LogicAnd, TT.OR: NT.LogicOr}  # TT.NOT: NT.LNot
 
-    def parse_arithmetic_logic_exp(self):
+    def parse_arith_logic_exp(self):
         """point where it's decided if it's a arithmetic expression only or a
         logic expression
 
@@ -32,8 +31,8 @@ class LogicExpParser(ArithmeticExpParser):
         # arithmetic grammar they're just numbers and in logic grammar
         # there're 0 and numbers greater 0
         error = Reference()
-        if self.taste(self._taste_arithmetic_exp, error):
-            self._taste_arithmetic_exp()
+        if self.taste(self._taste_arith_exp, error):
+            self._taste_arith_exp()
         elif self.taste(self.parse_logic_exp, error):
             self.parse_logic_exp()
         else:
@@ -41,12 +40,12 @@ class LogicExpParser(ArithmeticExpParser):
             #  self._handle_all_tastes_unsuccessful(
             #  "arithmetic or logic expression", error)
 
-    def _taste_arithmetic_exp(self):
+    def _taste_arith_exp(self):
         """taste whether the next expression is a arithmetic expression
 
         :grammar: <code_ae>
         """
-        self.parse_arithmetic_exp()
+        self.parse_arithm_exp()
         if self.LTT(1) in chain(self.COMP_REL.keys(), self.LOG_CON.keys()):
             raise Errors.TastingError()
 
@@ -64,7 +63,7 @@ class LogicExpParser(ArithmeticExpParser):
         """
         self.ast_builder.save("_or_expr")
 
-        savestate_node = self.ast_builder.down(LogicBinaryOperation)
+        savestate_node = self.ast_builder.down(NT.LogicBinOp)
 
         self._and_exp()
 
@@ -75,11 +74,11 @@ class LogicExpParser(ArithmeticExpParser):
             self.ast_builder.discard("_or_expr")
 
         while self.LTT(1) == TT.OR:
-            self.add_and_consume(classname=NT.LOr)
+            self.add_and_consume(classname=NT.LogicOr)
 
             self.ast_builder.save("_or_expr")
 
-            self.ast_builder.down(LogicBinaryOperation)
+            self.ast_builder.down(NT.LogicBinOp)
             self._and_exp()
 
             if self.LTT(1) != TT.OR:
@@ -96,9 +95,9 @@ class LogicExpParser(ArithmeticExpParser):
         """
         self.ast_builder.save("_and_expr")
 
-        savestate_node = self.ast_builder.down(LogicBinaryOperation)
+        savestate_node = self.ast_builder.down(NT.LogicBinOp)
 
-        self._logic_op()
+        self._logic_opd()
 
         if self.LTT(1) != TT.AND:
             self.ast_builder.go_back("_and_expr")
@@ -107,12 +106,12 @@ class LogicExpParser(ArithmeticExpParser):
             self.ast_builder.discard("_and_expr")
 
         while self.LTT(1) == TT.AND:
-            self.add_and_consume(classname=NT.LAnd)
+            self.add_and_consume(classname=NT.LogicAnd)
 
             self.ast_builder.save("_and_expr")
 
-            self.ast_builder.down(LogicBinaryOperation)
-            self._logic_op()
+            self.ast_builder.down(NT.LogicBinOp)
+            self._logic_opd()
 
             if self.LTT(1) != TT.AND:
                 self.ast_builder.go_back("_and_expr")
@@ -121,7 +120,7 @@ class LogicExpParser(ArithmeticExpParser):
 
         self.ast_builder.up(savestate_node)
 
-    def _logic_op(self):
+    def _logic_opd(self):
         """logic operand
 
         :grammar: <not_expr>
@@ -135,7 +134,7 @@ class LogicExpParser(ArithmeticExpParser):
             TT.L_PAREN,
             TT.MINUS_OP,
         ]:
-            self._paren_logic_exp_or_arithmetic_term_or_comparison()
+            self._paren_logic_exp_or_arith_term_or_comparison()
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
@@ -147,7 +146,7 @@ class LogicExpParser(ArithmeticExpParser):
 
         :grammar: !+ <code_le>
         """
-        savestate_node = self.ast_builder.down(Not)
+        savestate_node = self.ast_builder.down(NT.LogicNot)
 
         while True:
             self.consume_next_token()  # NT.LNot
@@ -155,13 +154,13 @@ class LogicExpParser(ArithmeticExpParser):
             if self.LTT(1) != TT.NOT:
                 break
 
-            self.ast_builder.down(Not)
+            self.ast_builder.down(NT.LogicNot)
 
-        self._logic_op()
+        self._logic_opd()
 
         self.ast_builder.up(savestate_node)
 
-    def _paren_logic_exp_or_arithmetic_term_or_comparison(self):
+    def _paren_logic_exp_or_arith_term_or_comparison(self):
         """atomic formula or top / bottom
 
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
@@ -169,8 +168,8 @@ class LogicExpParser(ArithmeticExpParser):
         error = Reference()
         if self.taste(self._taste_paren_logic_exp, error):
             self._taste_paren_logic_exp()
-        elif self.taste(self._taste_arithmetic_term, error):
-            self._taste_arithmetic_term()
+        elif self.taste(self._taste_arith_term, error):
+            self._taste_arith_term()
         elif self.taste(self._atom, error):
             self._atom()
         else:
@@ -195,20 +194,20 @@ class LogicExpParser(ArithmeticExpParser):
         self.parse_logic_exp()
         self.match([TT.R_PAREN])
 
-    def _taste_arithmetic_term(self):
-        self._arithmetic_term()
+    def _taste_arith_term(self):
+        self._arith_term()
         # don't allow it to be a atom
         if self.LTT(1) in self.COMP_REL.keys():
             raise Errors.TastingError()
 
-    def _arithmetic_term(self):
+    def _arith_term(self):
         """top / bottom
 
         :grammar: #1 <code_ae>
         """
-        savestate_node = self.ast_builder.down(ToBool)
+        savestate_node = self.ast_builder.down(NT.ToBool)
 
-        self.parse_arithmetic_exp()
+        self.parse_arithm_exp()
 
         self.ast_builder.up(savestate_node)
 
@@ -217,10 +216,10 @@ class LogicExpParser(ArithmeticExpParser):
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>
         """
-        savestate_node = self.ast_builder.down(Atom)
+        savestate_node = self.ast_builder.down(NT.LogicAtom)
 
-        self.parse_arithmetic_exp()
+        self.parse_arithm_exp()
         self.add_and_match(list(self.COMP_REL.keys()), mapping=self.COMP_REL)
-        self.parse_arithmetic_exp()
+        self.parse_arithm_exp()
 
         self.ast_builder.up(savestate_node)

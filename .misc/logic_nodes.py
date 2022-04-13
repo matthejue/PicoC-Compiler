@@ -63,9 +63,9 @@ class LogicBinaryOperation(ASTNode):
         self,
     ):
         match self:
-            case LogicBinaryOperation(_, NT.LAnd(), _):
+            case LogicBinaryOperation(_, NT.LogicAnd(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "LOP", "AND")
-            case LogicBinaryOperation(_, NT.LOr(), _):
+            case LogicBinaryOperation(_, NT.LogicOr(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "LOP", "OR")
 
     def __repr__(
@@ -179,7 +179,7 @@ class Atom(ASTNode):
         match self:
             case Atom(_, NT.Eq(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "==")
-            case Atom(_, NT.UEq(), _):
+            case Atom(_, NT.NEq(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "!=")
             case Atom(_, NT.Lt(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "<")

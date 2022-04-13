@@ -1,6 +1,5 @@
 from lexer import TT
 from errors import Errors
-from if_else_nodes import If, IfElse
 from picoc_nodes import NT
 from reference import Reference
 
@@ -37,7 +36,7 @@ class IfElseParser:
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>)
         """
-        savestate_node = self.ast_builder.down(If)
+        savestate_node = self.ast_builder.down(NT.If)
 
         self._condition()
         self._branch()
@@ -49,7 +48,7 @@ class IfElseParser:
 
         :grammar: if '('<code_le>')' ({ <code_ss> }|<s>) else ({ <code_ss> }|<s>)
         """
-        savestate_node = self.ast_builder.down(IfElse)
+        savestate_node = self.ast_builder.down(NT.IfElse)
 
         self._condition()
         self._branch()

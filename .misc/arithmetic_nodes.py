@@ -269,7 +269,7 @@ class ArithmeticUnaryOperation(ASTNode):
 
     def _adapt_code(self):
         match self:
-            case ArithmeticUnaryOperation(NT.Negation(), _):
+            case ArithmeticUnaryOperation(NT.Not(), _):
                 self.code_generator.add_code(self.bitwise_not, self.bitwise_not_loc)
 
     def __repr__(self):
