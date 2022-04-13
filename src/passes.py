@@ -1,0 +1,3 @@
+class PicoCCompiler(object):
+    def remove_complex_opds(self):
+        ...
