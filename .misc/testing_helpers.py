@@ -18,7 +18,7 @@ class UsefullTools:
     """Helper class for testing"""
 
     lexer = None
-    picoc_parser = None
+    parse_picoc = None
 
     def set_everything_up_for_lexer(self, test_name, code):
         global_vars.test_name = test_name
@@ -38,7 +38,7 @@ class UsefullTools:
         global_vars.args = Args()
         self.lexer = Lexer(test_name, [code])
 
-        self.picoc_parser = Grammar(self.lexer)
+        self.parse_picoc = Grammar(self.lexer)
         self.grammar.start_parse()
 
     def set_everything_up_for_ast_multiline(self, test_name, code_without_cr):
@@ -47,7 +47,7 @@ class UsefullTools:
         global_vars.args = Args()
         self.lexer = Lexer(test_name, code_without_cr)
 
-        self.picoc_parser = Grammar(self.lexer)
+        self.parse_picoc = Grammar(self.lexer)
         self.grammar.start_parse()
 
     def set_everything_up_for_visit_multiline(self, test_name, code_without_cr):
@@ -61,15 +61,15 @@ class UsefullTools:
 
         self.lexer = Lexer(test_name, code_without_cr)
 
-        self.picoc_parser = Grammar(self.lexer)
-        error_handler = ErrorHandler(self.picoc_parser)
-        error_handler.handle(self.picoc_parser.start_parse)
+        self.parse_picoc = Grammar(self.lexer)
+        error_handler = ErrorHandler(self.parse_picoc)
+        error_handler.handle(self.parse_picoc.start_parse)
 
-        abstract_syntax_tree = self.picoc_parser.reveal_ast()
-        error_handler.handle(abstract_syntax_tree.visit)
+        ast_node = self.parse_picoc.reveal_ast()
+        error_handler.handle(ast_node.visit)
 
         with open("./output.reti", "w", encoding="utf-8") as fout:
-            fout.writelines(abstract_syntax_tree.show_generated_code())
+            fout.writelines(ast_node.show_generated_code())
 
     def set_everything_up_for_multiline_program(self, test_name, input_string):
         multiline_string = [i.lstrip() for i in input_string.split("\n")]
@@ -89,5 +89,5 @@ if __name__ == "testing_helpers":
     import global_vars
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
-    from abstract_syntax_tree import strip_multiline_string
+    from ast_node import strip_multiline_string
     from error_handler import ErrorHandler

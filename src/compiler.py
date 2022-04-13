@@ -1,7 +1,7 @@
 import global_vars
 import cmd2
 from lexer import Lexer, TT
-from picoc_parser import PicoCParser
+from parse_picoc import PicoCParser
 from error_handler import ErrorHandler
 from warning_handler import WarningHandler
 from symbol_table import SymbolTable
@@ -12,7 +12,7 @@ from colormanager import ColorManager as CM
 import os
 from colorizer import Colorizer
 from help_message import generate_help_message
-from abstract_syntax_tree import ASTNode
+from ast_node import ASTNode
 
 
 class Compiler(cmd2.Cmd):
@@ -227,14 +227,14 @@ class Compiler(cmd2.Cmd):
 
         # Generate ast
         grammar = PicoCParser(lexer)
-        error_handler.handle(grammar.parse)
+        error_handler.handle(grammar.parse_picoc)
 
         if global_vars.args.abstract_syntax:
             self._abstract_syntax_option(grammar)
 
-        abstract_syntax_tree = grammar.reveal_ast()
+        ast_node = grammar.reveal_ast()
         # TODO: new passes
-        #  error_handler.handle(abstract_syntax_tree.visit)
+        #  error_handler.handle(ast_node.visit)
 
         if global_vars.args.symbol_table:
             self._symbol_table_option()
@@ -242,7 +242,7 @@ class Compiler(cmd2.Cmd):
         # show warnings before reti code gets output
         warning_handler.show_warnings()
 
-        #  self._reti_code(abstract_syntax_tree)
+        #  self._reti_code(ast_node)
 
     def _tokens_option(self, lexer):
         tokens = []
@@ -316,12 +316,10 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _reti_code(self, abstract_syntax_tree: ASTNode):
+    def _reti_code(self, ast_node: ASTNode):
         if global_vars.args.print:
             code = (
-                Colorizer(
-                    str(abstract_syntax_tree.show_generated_code())
-                ).colorize_reti_code()
+                Colorizer(str(ast_node.show_generated_code())).colorize_reti_code()
                 if global_vars.args.color
                 else str(abstract_syntax_tree.show_generated_code())
             )

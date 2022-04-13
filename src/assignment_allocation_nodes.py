@@ -1,10 +1,10 @@
 import global_vars
-from abstract_syntax_tree import ASTNode, strip_multiline_string
+from ast_node import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from picoc_nodes import NT
 from arithmetic_nodes import Identifier, Number, Character
-from warnings_ import Warnings
+import warnings
 from warning_handler import WarningHandler
 from bitstring import Bits
 from enum import Enum
@@ -199,7 +199,7 @@ class Assignment(ASTNode):
             case TYPE.ASSIGNMENT_WITH_VARIABLE:
                 symbol_2 = self.symbol_table.resolve(value)
                 if symbol.datatype.name == "char" and symbol_2.datatype.name == "int":
-                    warning = Warnings.ImplicitConversionWarning(
+                    warning = warnings.Warnings.ImplicitConversionWarning(
                         symbol.name,
                         symbol.position,
                         symbol.datatype,
@@ -219,7 +219,7 @@ class Assignment(ASTNode):
                 if symbol.datatype.name == "char" and int(value) > char_range_to:
                     char_bits = Bits(int=int(value), length=32).bin[32 - 8 : 32]
                     new_value = Bits(bin=char_bits).int
-                    warning = Warnings.ImplicitConversionWarning(
+                    warning = warnings.Warnings.ImplicitConversionWarning(
                         symbol.name,
                         symbol.position,
                         symbol.datatype,
@@ -244,7 +244,7 @@ class Assignment(ASTNode):
                 elif symbol.datatype.name == "char" and int(value) > char_range_to:
                     char_bits = Bits(int=int(value), length=32).bin[32 - 8 : 32]
                     new_value = Bits(bin=char_bits).int
-                    warning = Warnings.ImplicitConversionWarning(
+                    warning = warnings.Warnings.ImplicitConversionWarning(
                         symbol.name,
                         symbol.position,
                         symbol.datatype,

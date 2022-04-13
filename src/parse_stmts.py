@@ -1,6 +1,6 @@
 from parse_assign_alloc import AssignAllocParser
 
-# from abstract_syntax_tree import ASTNode
+# from ast_node import ASTNode
 from lexer import TT
 from errors import Errors
 from parse_if_else import IfElseParser

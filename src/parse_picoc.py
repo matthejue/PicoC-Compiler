@@ -12,7 +12,7 @@ class PicoCParser(FileParser):
         # to check for the MoreThanOneMainFunctionError
         self.mains = []
 
-    def parse(self):
+    def parse_picoc(self):
         """start parsing the grammar
 
         :returns: None
