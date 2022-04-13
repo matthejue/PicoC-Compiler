@@ -126,9 +126,6 @@ class NT:
     class Allocation(ASTNode):
         pass
 
-    class MainFunction(ASTNode):
-        pass
-
     class Function(ASTNode):
         pass
 
