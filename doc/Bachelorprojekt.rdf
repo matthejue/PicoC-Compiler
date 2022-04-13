@@ -545,6 +545,135 @@ original-date: 2017-05-27T18:37:54Z</dc:description>
         <z:linkMode>1</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
+    <bib:Data rdf:about="https://github.com/actions/starter-workflows/blob/70f16d3552b2b728227019eb69710ed1b44cf811/ci/python-package.yml">
+        <z:itemType>computerProgram</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+               <foaf:name>GitHub Actions</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <dc:title>actions/starter-workflows</dc:title>
+        <dcterms:abstract>Accelerating new GitHub Actions workflows</dcterms:abstract>
+        <dc:date>2022-04-11T11:10:23Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.com/actions/starter-workflows/blob/70f16d3552b2b728227019eb69710ed1b44cf811/ci/python-package.yml</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-11 16:01:24</dcterms:dateSubmitted>
+        <dc:description>original-date: 2019-07-29T16:26:51Z</dc:description>
+        <z:programmingLanguage>TypeScript</z:programmingLanguage>
+    </bib:Data>
+    <rdf:Description rdf:about="https://en.wikipedia.org/w/index.php?title=Identifier_(computer_languages)&amp;oldid=1081115854">
+        <z:itemType>encyclopediaArticle</z:itemType>
+        <dcterms:isPartOf>
+           <bib:Book><dc:title>Wikipedia</dc:title></bib:Book>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_29"/>
+        <dc:title>Identifier (computer languages)</dc:title>
+        <dcterms:abstract>In computer programming languages, an identifier is a lexical token (also called a symbol, but not to be confused with the symbol primitive data type) that names the language's entities. Some of the kinds of entities an identifier might denote include variables, data types, labels, subroutines,  and modules.</dcterms:abstract>
+        <dc:date>2022-04-05T12:02:45Z</dc:date>
+        <z:language>en</z:language>
+        <z:libraryCatalog>Wikipedia</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://en.wikipedia.org/w/index.php?title=Identifier_(computer_languages)&amp;oldid=1081115854</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:13:38</dcterms:dateSubmitted>
+        <dc:rights>Creative Commons Attribution-ShareAlike License</dc:rights>
+        <dc:description>Page Version ID: 1081115854</dc:description>
+    </rdf:Description>
+    <z:Attachment rdf:about="#item_29">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://en.wikipedia.org/wiki/Identifier_(computer_languages)</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:13:44</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="https://reverseengineering.stackexchange.com/q/17671">
+        <z:itemType>forumPost</z:itemType>
+        <dcterms:isPartOf>
+            <z:Forum>
+               <dc:title>Reverse Engineering Stack Exchange</dc:title>
+            </z:Forum>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                   <foaf:Person><foaf:surname>Ljohhuh</foaf:surname></foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_32"/>
+        <dc:title>What is an immediate value?</dc:title>
+        <dc:date>2018-04-04</dc:date>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://reverseengineering.stackexchange.com/q/17671</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:14:45</dcterms:dateSubmitted>
+        <z:type>Forum post</z:type>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_32">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://reverseengineering.stackexchange.com/questions/17671/what-is-an-immediate-value</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:14:51</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="https://reverseengineering.stackexchange.com/a/17678">
+        <z:itemType>forumPost</z:itemType>
+        <dcterms:isPartOf>
+            <z:Forum>
+               <dc:title>Reverse Engineering Stack Exchange</dc:title>
+            </z:Forum>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Skochinsky</foaf:surname>
+                        <foaf:givenName>Igor</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_33"/>
+        <dc:title>Answer to &quot;What is an immediate value?&quot;</dc:title>
+        <dc:date>2018-03-13</dc:date>
+        <z:shortTitle>Answer to &quot;What is an immediate value?</z:shortTitle>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://reverseengineering.stackexchange.com/a/17678</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:14:45</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_33">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://reverseengineering.stackexchange.com/questions/17671/what-is-an-immediate-value</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 03:14:52</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
     <z:Collection rdf:about="#collection_1">
         <dc:title>Bachelorprojekt</dc:title>
         <dcterms:hasPart rdf:resource="https://wallpapercave.com/w/wp9774690"/>
@@ -563,5 +692,9 @@ original-date: 2017-05-27T18:37:54Z</dc:description>
         <dcterms:hasPart rdf:resource="https://github.com/marp-team/marp-cli"/>
         <dcterms:hasPart rdf:resource="#item_24"/>
         <dcterms:hasPart rdf:resource="https://github.community/t/running-a-bash-script/141584/2"/>
+        <dcterms:hasPart rdf:resource="https://github.com/actions/starter-workflows/blob/70f16d3552b2b728227019eb69710ed1b44cf811/ci/python-package.yml"/>
+        <dcterms:hasPart rdf:resource="https://en.wikipedia.org/w/index.php?title=Identifier_(computer_languages)&amp;oldid=1081115854"/>
+        <dcterms:hasPart rdf:resource="https://reverseengineering.stackexchange.com/q/17671"/>
+        <dcterms:hasPart rdf:resource="https://reverseengineering.stackexchange.com/a/17678"/>
     </z:Collection>
 </rdf:RDF>
