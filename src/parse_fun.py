@@ -36,9 +36,7 @@ class FunParser(StmtParser):
                 self.mains[0].position, self.mains[1].position
             )
 
-    def _main_fun(
-        self,
-    ):
+    def _main_fun(self):
         """main function
 
         :grammar: void main () { <code_ss> }
