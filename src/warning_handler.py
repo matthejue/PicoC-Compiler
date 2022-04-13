@@ -1,5 +1,5 @@
 from error_handler import ErrorHandler, AnnotationScreen
-from warnings_ import Warnings
+import warnings
 from colormanager import ColorManager as CM
 
 
@@ -17,12 +17,10 @@ class _WarningHandler(ErrorHandler):
     def add_warning(self, warning):
         self.warnings += [warning]
 
-    def show_warnings(
-        self,
-    ):
+    def show_warnings(self):
         for warning in self.warnings:
             match warning:
-                case Warnings.ImplicitConversionWarning() as w:
+                case warnings.Warnings.ImplicitConversionWarning() as w:
                     warning_header = self._warning_header(w.found_pos, w.description)
                     warning_screen = AnnotationScreen(
                         self.finput, w.found_pos[0], w.found_pos[0]

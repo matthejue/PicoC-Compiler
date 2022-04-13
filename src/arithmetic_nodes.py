@@ -1,4 +1,4 @@
-from abstract_syntax_tree import ASTNode, strip_multiline_string
+from ast_node import ASTNode, strip_multiline_string
 from symbol_table import VariableSymbol, ConstantSymbol
 from errors import Errors
 from picoc_nodes import NT

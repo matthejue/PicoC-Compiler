@@ -1,4 +1,4 @@
-from abstract_syntax_tree import ASTNode, strip_multiline_string
+from ast_node import ASTNode, strip_multiline_string
 import global_vars
 from picoc_nodes import NT
 

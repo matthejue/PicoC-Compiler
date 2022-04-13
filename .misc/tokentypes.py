@@ -5,7 +5,7 @@ from enum import Enum
 
 
 class TT(Enum):
-    """Tokentypes that are part of the picoc_parser. Their strings are used for
+    """Tokentypes that are part of the parse_picoc. Their strings are used for
     differentiation and for error messages"""
 
     SEMICOLON = ";"

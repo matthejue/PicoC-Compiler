@@ -5,7 +5,7 @@ from sys import argv  # TODO: remove later, temporaly so debugger stops complain
 from testing_helpers import UsefullTools
 
 
-class TestStatementpicoc_parser(unittest.TestCase, UsefullTools):
+class TestStatementparse_picoc(unittest.TestCase, UsefullTools):
     def test_semicolon_after_another(
         self,
     ):
@@ -14,12 +14,12 @@ class TestStatementpicoc_parser(unittest.TestCase, UsefullTools):
             "void main() { ; int x = 12" "; ; if (x < 10) { ; }; }",
         )
         self.assertEqual(
-            str(self.picoc_parser.reveal_ast()),
+            str(self.parse_picoc.reveal_ast()),
             "('main' ('=' ('var' 'int' 'x') '12') ('if' ('<' 'x' '10')))",
         )
 
 
-class TestAssignmentpicoc_parser(unittest.TestCase, UsefullTools):
+class TestAssignmentparse_picoc(unittest.TestCase, UsefullTools):
     def test_constant_initialisation(
         self,
     ):
@@ -27,7 +27,7 @@ class TestAssignmentpicoc_parser(unittest.TestCase, UsefullTools):
             "constant initialisation", "void main() { const int var = 12; }"
         )
         self.assertEqual(
-            str(self.picoc_parser.reveal_ast()),
+            str(self.parse_picoc.reveal_ast()),
             "('main' ('=' ('const' 'int' 'var') '12'))",
         )
 

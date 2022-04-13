@@ -12,7 +12,9 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
     STOREIN SP ACC 1;
     """
 
-    def test_code_replacment_after(self, ):
+    def test_code_replacment_after(
+        self,
+    ):
         global_vars.args = Args()
         global_vars.test_name = "test code replacment after"
 
@@ -22,27 +24,32 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         CodeGenerator().__init__()
         SymbolTable().__init__()
 
-        var = VariableSymbol('car', symbol_table.resolve('int'), (0, 0))
+        var = VariableSymbol("car", symbol_table.resolve("int"), (0, 0))
         symbol_table.define(var)
         symbol_table.allocate(var)
 
-        expected_res = strip_multiline_string("""SUBI SP 1;
+        expected_res = strip_multiline_string(
+            """SUBI SP 1;
         LOAD ACC 100;
         STOREIN SP ACC 1;
-        """)
+        """
+        )
 
         code_generator.add_code(strip_multiline_string(self.code), 3)
 
         code_generator.add_marker()
 
-        code_generator.replace_code_after('encode(w)',
-                                          symbol_table.resolve('car').value)
+        code_generator.replace_code_after(
+            "encode(w)", symbol_table.resolve("car").value
+        )
 
         code_generator.remove_marker()
 
         self.assertEqual(code_generator.show_code(), expected_res)
 
-    def test_while_generation(self, ):
+    def test_while_generation(
+        self,
+    ):
         test_code = """void main() {
                       int i = 0;
                       int x = 1;
@@ -55,26 +62,33 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                       const int y = i % 10;
                     }
                     """
-        self.set_everything_up_for_multiline_program("while generation",
-                                                     test_code)
+        self.set_everything_up_for_multiline_program("while generation", test_code)
 
-    def test_constant_initialisation(self, ):
+    def test_constant_initialisation(
+        self,
+    ):
         test_code = """void main() {
                       const int var = 42;
                     }
                     """
-        self.set_everything_up_for_multiline_program("constant initialisation",
-                                                     test_code)
+        self.set_everything_up_for_multiline_program(
+            "constant initialisation", test_code
+        )
 
-    def test_initialising_with_character(self, ):
+    def test_initialising_with_character(
+        self,
+    ):
         test_code = """void main() {
                       const int var = 'c' + 2;
                     }
                     """
         self.set_everything_up_for_multiline_program(
-            "test initialising with character", test_code)
+            "test initialising with character", test_code
+        )
 
-    def test_if_with_character(self, ):
+    def test_if_with_character(
+        self,
+    ):
         test_code = """void main() {
                       if ('c') {
                         const int var = 'c' + 2;
@@ -83,7 +97,9 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                     """
         self.set_everything_up_for_multiline_program("test if else", test_code)
 
-    def test_char_as_datatype(self, ):
+    def test_char_as_datatype(
+        self,
+    ):
         test_code = """void main() {
                       const char var = 'c' + 2;
                       char x = var - (5 - 'c');
@@ -91,7 +107,9 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
                     """
         self.set_everything_up_for_multiline_program("test if else", test_code)
 
-    def test_else_if(self, ):
+    def test_else_if(
+        self,
+    ):
         test_code = """void main() {
                       const char var = 'c' + 3;
                       char x = 3;
@@ -107,11 +125,12 @@ class TestCodeGenerator(unittest.TestCase, UsefullTools):
         self.set_everything_up_for_multiline_program("test if else", test_code)
 
 
-if __name__ == '__main__':
-    sys.path.append('/home/areo/Documents/Studium/pico_c_compiler/src')
+if __name__ == "__main__":
+    sys.path.append("/home/areo/Documents/Studium/pico_c_compiler/src")
     del sys.argv[1:]
     from code_generator import CodeGenerator
     from symbol_table import SymbolTable, VariableSymbol
-    from abstract_syntax_tree import strip_multiline_string
+    from ast_node import strip_multiline_string
     import global_vars
+
     unittest.main()

@@ -10,7 +10,7 @@
 
 # Used literature
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
-  - inter alia **Mapping picoc_parsers to Recursive-Descent Recognizers** (p.45 et seq. from [[1]](#1))
+  - inter alia **Mapping parse_picocs to Recursive-Descent Recognizers** (p.45 et seq. from [[1]](#1))
 - the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
 - for the knowledge about building **optimized** compilers using **graph coloring** to find a optimal assignment of **locations** to **registers** [[3]](#3)
 
