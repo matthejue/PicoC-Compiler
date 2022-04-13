@@ -41,13 +41,13 @@ class NT:
     class Const(ASTNode):
         pass
 
-    class CharDT(ASTNode):
+    class CharType(ASTNode):
         pass
 
-    class IntDT(ASTNode):
+    class IntType(ASTNode):
         pass
 
-    class VoidDT(ASTNode):
+    class VoidType(ASTNode):
         pass
 
     class Else(ASTNode):
@@ -65,10 +65,10 @@ class NT:
     class Gt(ASTNode):
         pass
 
-    class Le(ASTNode):
+    class LtE(ASTNode):
         pass
 
-    class Ge(ASTNode):
+    class GtE(ASTNode):
         pass
 
     class LogicAnd(ASTNode):
@@ -124,17 +124,14 @@ class NT:
     class Alloc(ASTNode):
         pass
 
-    class Fun(ASTNode):
-        pass
-
     class ArithBinOp(ASTNode):
         pass
 
     class ArithUnaryOp(ASTNode):
         pass
 
-    class Print(ASTNode):
+    class FunDef(ASTNode):
         pass
 
-    class Input(ASTNode):
+    class Call(ASTNode):
         pass
