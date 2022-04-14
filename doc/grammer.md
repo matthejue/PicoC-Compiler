@@ -26,7 +26,7 @@ logic_opd := !+<logic_opd> | (<logic_exp>) | <arith_exp> | <arith_exp> <rel> <ar
 and_exp := <logic_op> [&& <logic_op>)]*
 or_exp := <and_exp> [|| <and_exp>]*
 logic_exp := <or_exp>
-arith_logic_exp :=  <arith_exp> | <logic_exp>
+arith_or_logic_exp :=  <arith_exp> | <logic_exp>
 ```
 ### L_Assign_Alloc
 ```

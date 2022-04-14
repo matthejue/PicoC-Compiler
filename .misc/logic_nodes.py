@@ -185,9 +185,9 @@ class Atom(ASTNode):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "<")
             case Atom(_, NT.Gt(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", ">")
-            case Atom(_, NT.Le(), _):
+            case Atom(_, NT.LtE(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "<=")
-            case Atom(_, NT.Ge(), _):
+            case Atom(_, NT.GtE(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", ">=")
 
     def __repr__(
