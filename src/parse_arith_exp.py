@@ -71,7 +71,7 @@ class ArithExpParser(BacktrackingParser):
 
         savestate_node = self.ast_builder.down(NT.ArithBinOp)
 
-        self._arith_op()
+        self._arith_opd()
 
         if self.LTT(1) not in self.BINOP_PREC_1.keys():
             self.ast_builder.go_back("_prec1")
@@ -85,7 +85,7 @@ class ArithExpParser(BacktrackingParser):
             self.ast_builder.save("_prec1_loop")
             self.ast_builder.down(NT.ArithBinOp)
 
-            self._arith_op()
+            self._arith_opd()
 
             if self.LTT(1) not in self.BINOP_PREC_1.keys():
                 self.ast_builder.go_back("_prec1_loop")
@@ -94,7 +94,7 @@ class ArithExpParser(BacktrackingParser):
 
         self.ast_builder.up(savestate_node)
 
-    def _arith_op(self):
+    def _arith_opd(self):
         """arithmetic operand
 
         :grammer: <word> | <number> | <paren> | <unop>
@@ -139,6 +139,6 @@ class ArithExpParser(BacktrackingParser):
 
             self.ast_builder.down(NT.ArithUnaryOp)
 
-        self._arith_op()
+        self._arith_opd()
 
         self.ast_builder.up(savestate_node)
