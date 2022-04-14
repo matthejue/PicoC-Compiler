@@ -65,7 +65,7 @@ class AssignAllocParser(LogicExpParser):
                 self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
-            self.parse_arith_logic_exp()
+            self.parse_arith_or_logic_exp()
 
     def _constant_assign(self):
         self.ast_builder.discard("_aa")
@@ -103,4 +103,4 @@ class AssignAllocParser(LogicExpParser):
             self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
             self.consume_next_token()  # [TT.ASSIGNMENT]
 
-        self.parse_arith_logic_exp()
+        self.parse_arith_or_logic_exp()
