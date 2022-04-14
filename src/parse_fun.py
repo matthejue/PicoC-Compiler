@@ -42,7 +42,7 @@ class FunParser(StmtParser):
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(NT.Fun)
+        savestate_node = self.ast_builder.down(NT.FunDef)
 
         self.add_and_consume(mapping=self.PRIM_DT)
 
