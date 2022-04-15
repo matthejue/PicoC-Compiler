@@ -10,7 +10,7 @@ char := '<letter>'
 name := [<letter> | _][<letter> | <dig_with_0> | _]\*
 -------------------------------------------------------------------------------
 unary_op := - | ~
-arith_opd := <name> | <num> | <char> | <unary_op>+ <arith_opd> | (<arith_exp_logic_exp>) | input()
+!arith_opd := <name> | <num> | <char> | <unary_op>+ <arith_opd> | (<arith_exp_logic_exp>) | input()
 prec1_op := \* | / | %
 prec2_op := + | - | ^ | & | |
 prec1 := <arith_opd> [<prec1_op> <arith_opd>]*
@@ -36,21 +36,23 @@ stmt := <size_qual> <name> | [const]? <size_qual> <name> = <num> | <name> = <ari
 ### L_Pointer
 ```
 size_qual := <size_qual>\*
-exp := \*<arith_exp_logic_exp> | &\*<arith_exp_logic_exp>
+logic_opd := &<name> | \*<arith_exp_logic_exp>
+logic_opd := &\*<arith_exp_logic_exp>
 stmt := \*<name> = <arith_exp_logic_exp>
 ```
 ### L_Array
 ```
 size_qual := <size_qual>[]
-exp := <name>[<arith_exp_logic_exp>] | &<name>[<arith_exp_logic_exp>]
-stmt := Assign(Subscript(Name(str), <exp>), <exp>) | {Array(<exp>+}
+logic_opd := {[<arith_exp_logic_exp>,]+} | <name>[<arith_exp_logic_exp>]
+logic_opd := &<name>[<arith_exp_logic_exp>]
+stmt := <name>[<arith_exp_logic_exp>] = <arith_exp_logic_exp>
 ```
 ### L_Struct
 ```
 size_qual := struct <name>
-exp := Struct(Assign(Attribute(Name(str), <exp>), <exp>)+) | Attribute(Name(str), Name(str))
-exp := Ref(Attribute(Name(str), Name(str)), <exp>)
-stmt := StructDef(Name(str), Param(Name(str), <size_qual>)+) | Assign(Attribute(Name(str), <exp>), <exp>)
+logic_opd := {[.<name>=<arith_exp_logic_exp>,]+} | <name>.<name>
+logic_opd := &<name>.<name>
+stmt := struct <name> {[<size_qual> <name>;]+} | <name>.<name> = <arith_exp_logic_exp>
 ```
 ### L_If_Else
 ```
@@ -62,8 +64,10 @@ stmt := while(<arith_exp_logic_exp>){<stmt>\*} | do{<stmt>\*}while(<arith_exp_lo
 ```
 ### L_Fun
 ```
-size_qual := fun
-def := FunDef(Name(str), Param(Name(str), <size_qual>)\*, <size_qual>, <stmt>\*) | Return(<exp>) | Call(Name(str), <exp>\*) | Call(Name(str), <exp>\*)
+size_qual := <size_qual> fun
+logic_opd := <name>([<arith_exp_logic_exp>,]\*)
+stmt := return <arith_exp_logic_exp> | <name>([<arith_exp_logic_exp>,]\*)
+def := <size_qual> <name>([<size_qual> <name>,]\*){<stmt>\*}
 ```
 ### L_PicoC
 ```
@@ -123,7 +127,9 @@ stmt := While(<exp>, <stmt>\*) | DoWhile(<exp>, <stmt>\*)
 ### L_Fun
 ```
 size_qual := FunType(<size_qual>)
-def := FunDef(Name(str), Param(Name(str), <size_qual>)\*, <size_qual>, <stmt>\*) | Return(<exp>) | Call(Name(str), <exp>\*) | Call(Name(str), <exp>\*)
+exp := Call(Name(str), <exp>\*)
+stmt := Return(<exp>) | Exp(Call(Name(str), <exp>\*))
+def := FunDef(Name(str), Param(Name(str), <size_qual>)\*, <size_qual>, <stmt>\*)
 ```
 ### L_PicoC
 ```
