@@ -30,25 +30,25 @@ class TT(Enum):
     differentiation and for error messages"""
 
     SEMICOLON = ";"
-    PLUS_OP = "+"
-    MINUS_OP = "-"
-    MUL_OP = "*"
-    DIV_OP = "/"
-    MOD_OP = "%"
-    AND_OP = "&"
-    OR_OP = "|"
-    OPLUS_OP = "^"
-    NEG_OP = "~"
-    EQ_COMP = "=="
-    UEQ_COMP = "!="
-    LT_COMP = "<"
-    GT_COMP = ">"
-    LE_COMP = "<="
-    GE_COMP = ">="
+    ADD = "+"
+    MINUS = "-"
+    MUL = "*"
+    DIV = "/"
+    MOD = "%"
+    AND = "&"
+    OR = "|"
+    OPLUS = "^"
+    NOT = "~"
+    EQ = "=="
+    NEQ = "!="
+    LT = "<"
+    GT = ">"
+    LTE = "<="
+    GTE = ">="
     ASSIGNMENT = "="
-    NOT = "!"
-    AND = "&&"
-    OR = "||"
+    LOGIC_NOT = "!"
+    LOGIC_AND = "&&"
+    LOGIC_OR = "||"
     L_PAREN = "("
     R_PAREN = ")"
     L_BRACE = "{"
@@ -220,7 +220,7 @@ class Lexer:
                         self.next_char()
                     self.next_char()
                 else:
-                    return Token(TT.DIV_OP, self.c, self.position)
+                    return Token(TT.DIV, self.c, self.position)
             else:
                 raise Errors.InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)

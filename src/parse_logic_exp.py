@@ -11,16 +11,16 @@ class LogicExpParser(ArithExpParser):
     language"""
 
     COMP_REL = {
-        TT.EQ_COMP: NT.Eq,
-        TT.UEQ_COMP: NT.NEq,
-        TT.LT_COMP: NT.Lt,
-        TT.GT_COMP: NT.Gt,
-        TT.LE_COMP: NT.LtE,
-        TT.GE_COMP: NT.GtE,
+        TT.EQ: NT.Eq,
+        TT.NEQ: NT.NEq,
+        TT.LT: NT.Lt,
+        TT.GT: NT.Gt,
+        TT.LTE: NT.LtE,
+        TT.GTE: NT.GtE,
     }
-    LOG_CON = {TT.AND: NT.LogicAnd, TT.OR: NT.LogicOr}  # TT.NOT: NT.LNot
+    LOG_CON = {TT.LOGIC_AND: NT.LogicAnd, TT.LOGIC_OR: NT.LogicOr}  # TT.NOT: NT.LNot
 
-    def parse_arith_logic_exp(self):
+    def parse_arith_exp_logic_exp(self):
         """point where it's decided if it's a arithmetic expression only or a
         logic expression
 
@@ -67,13 +67,13 @@ class LogicExpParser(ArithExpParser):
 
         self._and_exp()
 
-        if self.LTT(1) != TT.OR:
+        if self.LTT(1) != TT.LOGIC_OR:
             self.ast_builder.go_back("_or_expr")
             return
         else:
             self.ast_builder.discard("_or_expr")
 
-        while self.LTT(1) == TT.OR:
+        while self.LTT(1) == TT.LOGIC_OR:
             self.add_and_consume(classname=NT.LogicOr)
 
             self.ast_builder.save("_or_expr")
@@ -81,7 +81,7 @@ class LogicExpParser(ArithExpParser):
             self.ast_builder.down(NT.LogicBinOp)
             self._and_exp()
 
-            if self.LTT(1) != TT.OR:
+            if self.LTT(1) != TT.LOGIC_OR:
                 self.ast_builder.go_back("_or_expr")
             else:
                 self.ast_builder.discard("_or_expr")
@@ -99,13 +99,13 @@ class LogicExpParser(ArithExpParser):
 
         self._logic_opd()
 
-        if self.LTT(1) != TT.AND:
+        if self.LTT(1) != TT.LOGIC_AND:
             self.ast_builder.go_back("_and_expr")
             return
         else:
             self.ast_builder.discard("_and_expr")
 
-        while self.LTT(1) == TT.AND:
+        while self.LTT(1) == TT.LOGIC_AND:
             self.add_and_consume(classname=NT.LogicAnd)
 
             self.ast_builder.save("_and_expr")
@@ -113,7 +113,7 @@ class LogicExpParser(ArithExpParser):
             self.ast_builder.down(NT.LogicBinOp)
             self._logic_opd()
 
-            if self.LTT(1) != TT.AND:
+            if self.LTT(1) != TT.LOGIC_AND:
                 self.ast_builder.go_back("_and_expr")
             else:
                 self.ast_builder.discard("_and_expr")
@@ -125,16 +125,16 @@ class LogicExpParser(ArithExpParser):
 
         :grammar: <not_expr>
         """
-        if self.LTT(1) == TT.NOT:
+        if self.LTT(1) == TT.LOGIC_NOT:
             self._not_exp()
         elif self.LTT(1) in [
             TT.NUMBER,
             TT.CHARACTER,
             TT.IDENTIFIER,
             TT.L_PAREN,
-            TT.MINUS_OP,
+            TT.MINUS,
         ]:
-            self._paren_logic_exp_arith_exp_comparison()
+            self._paren_logic_exp_arith_exp_atom()
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
@@ -151,7 +151,7 @@ class LogicExpParser(ArithExpParser):
         while True:
             self.consume_next_token()  # NT.LNot
 
-            if self.LTT(1) != TT.NOT:
+            if self.LTT(1) != TT.LOGIC_NOT:
                 break
 
             self.ast_builder.down(NT.LogicNot)
@@ -160,7 +160,7 @@ class LogicExpParser(ArithExpParser):
 
         self.ast_builder.up(savestate_node)
 
-    def _paren_logic_exp_arith_exp_comparison(self):
+    def _paren_logic_exp_arith_exp_atom(self):
         """atomic formula or top / bottom
 
         :grammar: #1 <code_ae> | (#2 <code_ae> <comp_op> <code_ae>)
