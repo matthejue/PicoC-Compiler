@@ -33,6 +33,7 @@ arith_exp_logic_exp :=  <arith_exp> | <logic_exp>
 size_qual := int | char | void
 stmt := <size_qual> <name> | [const]? <size_qual> <name> = <num> | <name> = <arith_exp_logic_exp>
 ```
+- [const]? <size_qual> <name> = <num> da muss noch was geändert werden
 ### L_Pointer
 ```
 size_qual := <size_qual>\*
@@ -42,7 +43,7 @@ stmt := \*<name> = <arith_exp_logic_exp>
 ```
 ### L_Array
 ```
-size_qual := <size_qual>[]
+size_qual := <size_qual>[\[<num>\]]+
 arith_opd := {[<arith_exp_logic_exp>,]+} | <name>[<arith_exp_logic_exp>]
 arith_opd := &<name>[<arith_exp_logic_exp>]
 stmt := <name>[<arith_exp_logic_exp>] = <arith_exp_logic_exp>
@@ -104,7 +105,7 @@ stmt := Assign(Deref(Name(str), <exp>), <exp>)
 ```
 ### L_Array
 ```
-size_qual := ArrayType(<size_qual>)
+size_qual := ArrayType(<size_qual>, Num(str)+)
 exp := Array(<exp>+, <size_qual>) | Subscript(Name(str), <exp>)
 exp := Ref(Subscript(Name(str), <exp>), <exp>)
 stmt := Assign(Subscript(Name(str), <exp>), <exp>)
