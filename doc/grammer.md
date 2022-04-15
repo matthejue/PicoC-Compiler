@@ -36,22 +36,22 @@ stmt := <size_qual> <name> | [const]? <size_qual> <name> = <num> | <name> = <ari
 ### L_Pointer
 ```
 size_qual := <size_qual>\*
-logic_opd := &<name> | \*<arith_exp_logic_exp>
-logic_opd := &\*<arith_exp_logic_exp>
+arith_opd := &<name> | \*<arith_exp_logic_exp>
+arith_opd := &\*<arith_exp_logic_exp>
 stmt := \*<name> = <arith_exp_logic_exp>
 ```
 ### L_Array
 ```
 size_qual := <size_qual>[]
-logic_opd := {[<arith_exp_logic_exp>,]+} | <name>[<arith_exp_logic_exp>]
-logic_opd := &<name>[<arith_exp_logic_exp>]
+arith_opd := {[<arith_exp_logic_exp>,]+} | <name>[<arith_exp_logic_exp>]
+arith_opd := &<name>[<arith_exp_logic_exp>]
 stmt := <name>[<arith_exp_logic_exp>] = <arith_exp_logic_exp>
 ```
 ### L_Struct
 ```
 size_qual := struct <name>
-logic_opd := {[.<name>=<arith_exp_logic_exp>,]+} | <name>.<name>
-logic_opd := &<name>.<name>
+arith_opd := {[.<name>=<arith_exp_logic_exp>,]+} | <name>.<name>
+arith_opd := &<name>.<name>
 stmt := struct <name> {[<size_qual> <name>;]+} | <name>.<name> = <arith_exp_logic_exp>
 ```
 ### L_If_Else
@@ -65,7 +65,7 @@ stmt := while(<arith_exp_logic_exp>){<stmt>\*} | do{<stmt>\*}while(<arith_exp_lo
 ### L_Fun
 ```
 size_qual := <size_qual> fun
-logic_opd := <name>([<arith_exp_logic_exp>,]\*)
+arith_opd := <name>([<arith_exp_logic_exp>,]\*)
 stmt := return <arith_exp_logic_exp> | <name>([<arith_exp_logic_exp>,]\*)
 def := <size_qual> <name>([<size_qual> <name>,]\*){<stmt>\*}
 ```
