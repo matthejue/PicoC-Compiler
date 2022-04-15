@@ -67,7 +67,7 @@ stmt := while(<arith_exp_logic_exp>){<stmt>\*} | do{<stmt>\*}while(<arith_exp_lo
 size_qual := <size_qual> fun
 arith_opd := <name>([<arith_exp_logic_exp>,]\*)
 stmt := return <arith_exp_logic_exp> | <name>([<arith_exp_logic_exp>,]\*)
-def := <size_qual> <name>([<size_qual> <name>,]\*){<stmt>\*}
+!def := <size_qual> <name>([<size_qual> <name>,]\*){<stmt>\*}
 ```
 ### L_PicoC
 ```
