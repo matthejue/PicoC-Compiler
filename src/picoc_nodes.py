@@ -91,7 +91,10 @@ class NT:
     #                     Nodetypes containing other Nodes                    #
     ###########################################################################
 
-    class File(ASTNode):
+    class ArithBinOp(ASTNode):
+        pass
+
+    class ArithUnaryOp(ASTNode):
         pass
 
     class LogicBinOp(ASTNode):
@@ -106,6 +109,12 @@ class NT:
     class ToBool(ASTNode):
         pass
 
+    class Assign(ASTNode):
+        pass
+
+    class Alloc(ASTNode):
+        pass
+
     class If(ASTNode):
         pass
 
@@ -118,20 +127,23 @@ class NT:
     class DoWhile(ASTNode):
         pass
 
-    class Assign(ASTNode):
-        pass
-
-    class Alloc(ASTNode):
-        pass
-
-    class ArithBinOp(ASTNode):
-        pass
-
-    class ArithUnaryOp(ASTNode):
-        pass
-
     class FunDef(ASTNode):
         pass
 
+    class Param(ASTNode):
+        pass
+
+    class Return(ASTNode):
+        pass
+
+    class Exp(ASTNode):
+        pass
+
     class Call(ASTNode):
+        pass
+
+    class FunType(ASTNode):
+        pass
+
+    class File(ASTNode):
         pass
