@@ -9,18 +9,18 @@ class ArithExpParser(BacktrackingParser):
     language"""
 
     BINOP_PREC_1 = {
-        TT.MUL_OP: NT.Mul,
-        TT.DIV_OP: NT.Div,
-        TT.MOD_OP: NT.Mod,
+        TT.MUL: NT.Mul,
+        TT.DIV: NT.Div,
+        TT.MOD: NT.Mod,
     }
     BINOP_PREC_2 = {
-        TT.PLUS_OP: NT.Add,
-        TT.MINUS_OP: NT.Sub,
-        TT.OPLUS_OP: NT.Oplus,
-        TT.AND_OP: NT.And,
-        TT.OR_OP: NT.Or,
+        TT.ADD: NT.Add,
+        TT.MINUS: NT.Sub,
+        TT.OPLUS: NT.Oplus,
+        TT.LOGIC_AND: NT.And,
+        TT.LOGIC_OR: NT.Or,
     }
-    UNARY = {TT.NEG_OP: NT.Not, TT.MINUS_OP: NT.Minus}
+    UNARY = {TT.LOGIC_NOT: NT.Not, TT.MINUS: NT.Minus}
 
     def parse_arithm_exp(self):
         """arithmetic expression startpoint
