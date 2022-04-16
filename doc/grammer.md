@@ -21,8 +21,8 @@ arith_exp := <prec2>
 ```
 ### L_Logic
 ```
-rel := == | != | < | <= | > | >=
-!logic_opd := !+<logic_opd> | (<logic_exp>) | <arith_exp> | <logic_opd> <rel> <logic_opd>
+relation := == | != | < | <= | > | >=
+!logic_opd := !+<logic_opd> | (<logic_exp>) | <arith_exp> | <logic_opd> <relation> <logic_opd>
 and_exp := <logic_opd> [&& <logic_opd>)]*
 or_exp := <and_exp> [|| <and_exp>]*
 logic_exp := <or_exp>
@@ -43,7 +43,7 @@ stmt := \*<name> = <arith_exp_logic_exp>
 ```
 ### L_Array
 ```
-size_qual := <size_qual>[\[<num>\]]+
+size_qual := <size_qual>[\[<num>\]]
 arith_opd := {[<arith_exp_logic_exp>,]+} | <name>[<arith_exp_logic_exp>]
 arith_opd := &<name>[<arith_exp_logic_exp>]
 stmt := <name>[<arith_exp_logic_exp>] = <arith_exp_logic_exp>
@@ -87,9 +87,9 @@ stmt := Call(Name('print'), <exp>)
 ```
 ### L_Logic
 ```
-rel := Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
+relation := Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
 logic_op := LogicAnd() | LogicOr()
-exp := LogicBinOp(<exp>, <logic_op>, <exp>) | LogicNot(<exp>) | LogicAtom(<exp>, <rel>, <exp>) | ToBool(<exp>)
+exp := LogicBinOp(<exp>, <logic_op>, <exp>) | LogicNot(<exp>) | LogicAtom(<exp>, <relation>, <exp>) | ToBool(<exp>)
 ```
 ### L_Assign_Alloc
 ```
@@ -100,22 +100,23 @@ stmt := Assign(Name(str), <exp>) | Alloc(<type_qual>, <size_qual>, Name(str))
 ### L_Pointer
 ```
 size_qual := PointerType(<size_qual>)
-exp := Ref(Name(str), Num(0)) | Ref(Deref(Name(str), <exp>), <exp>) | Deref(Name(str), <exp>)
-stmt := Assign(Deref(Name(str), <exp>), <exp>)
+exp := Ref(Name(str)) | Deref(<exp>)
+exp := Ref(Deref(<exp>))
+stmt := Assign(Deref(<exp>), <exp>)
 ```
 ### L_Array
 ```
-size_qual := ArrayType(<size_qual>, Num(str)+)
-exp := Array(<exp>+, <size_qual>) | Subscript(Name(str), <exp>)
-exp := Ref(Subscript(Name(str), <exp>), <exp>)
+size_qual := ArrayType(<size_qual>, Num(str))
+exp := Array(<size_qual>, <exp>+) | Subscript(Name(str), <exp>)
+exp := Ref(Subscript(Name(str), <exp>))
 stmt := Assign(Subscript(Name(str), <exp>), <exp>)
 ```
 ### L_Struct
 ```
 size_qual := StructType(Name(str))
-exp := Struct(Assign(Attribute(Name(str), <exp>), <exp>)+) | Attribute(Name(str), Name(str))
-exp := Ref(Attribute(Name(str), Name(str)), <exp>)
-stmt := StructDef(Name(str), Param(Name(str), <size_qual>)+) | Assign(Attribute(Name(str), <exp>), <exp>)
+exp := Struct(Assign(Name(str), <exp>)+) | Attribute(Name(str), Name(str))
+exp := Ref(Attribute(Name(str), Name(str)))
+stmt := StructDef(Name(str), Param(Name(str), <size_qual>)+) | Assign(Attribute(Name(str), Name(str)), <exp>)
 ```
 ### L_If_Else
 ```
