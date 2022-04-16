@@ -15,18 +15,14 @@ class LogicBinaryOperation(ASTNode):
     )
     end_loc = 5
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.left_atom = self.children[0]
         self.binary_connective = self.children[1]
         self.right_atom = self.children[2]
 
     __match_args__ = ("left_atom", "binary_connective", "right_atom")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(
@@ -46,9 +42,7 @@ class LogicBinaryOperation(ASTNode):
             f"# Logische binäre Verknüpfung '{self}' Ende\n", 0
         )
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.end = self.code_generator.replace_code_pre(
             self.end, "l1 lop l2", str(self)
         )
@@ -59,18 +53,14 @@ class LogicBinaryOperation(ASTNode):
             self.end, "l2", str(self.right_atom)
         )
 
-    def _adapt_code(
-        self,
-    ):
+    def _adapt_code(self):
         match self:
             case LogicBinaryOperation(_, NT.LogicAnd(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "LOP", "AND")
             case LogicBinaryOperation(_, NT.LogicOr(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "LOP", "OR")
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return self.to_string_show_node()
 
 
@@ -86,16 +76,12 @@ class Not(ASTNode):
     )
     end_loc = 4
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.atom = self.children[0]
 
     __match_args__ = ("atom",)
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(
@@ -110,9 +96,7 @@ class Not(ASTNode):
 
         self.code_generator.add_code(f"# Logische unäre Verknüpfung '{self}' Ende\n", 0)
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.end = self.code_generator.replace_code_pre(self.end, "l1", str(self.atom))
 
 
@@ -133,18 +117,14 @@ class Atom(ASTNode):
     )
     end_loc = 9
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.left_element = self.children[0]
         self.relation = self.children[1]
         self.right_element = self.children[2]
 
     __match_args__ = ("left_element", "relation", "right_element")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(f"# Logisches Atom '{self}' Start\n", 0)
@@ -160,9 +140,7 @@ class Atom(ASTNode):
 
         self.code_generator.add_code(f"# Logisches Atom '{self}' Ende\n", 0)
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.end = self.code_generator.replace_code_pre(
             self.end, "e1 rel e2", str(self)
         )
@@ -173,9 +151,7 @@ class Atom(ASTNode):
             self.end, "e2", str(self.right_element)
         )
 
-    def _adapt_code(
-        self,
-    ):
+    def _adapt_code(self):
         match self:
             case Atom(_, NT.Eq(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", "==")
@@ -190,9 +166,7 @@ class Atom(ASTNode):
             case Atom(_, NT.GtE(), _):
                 self.end = self.code_generator.replace_code_pre(self.end, "vglop", ">=")
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return self.to_string_show_node()
 
 
@@ -208,16 +182,12 @@ class ToBool(ASTNode):
     )
     end_loc = 4
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.arithmetic_expression = self.children[0]
 
     __match_args__ = "arithmetic_expression"
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(
@@ -234,9 +204,7 @@ class ToBool(ASTNode):
             f"# Logischer Wahrheitswert aus arithmetischem Ausdruck '{self}' Ende\n", 0
         )
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.end = self.code_generator.replace_code_pre(
             self.end, "e1", str(self.arithmetic_expression)
         )

@@ -7,7 +7,7 @@ With the following **cli-options** you won't miss anything when compiling **Pico
 # Compiling via shell
 Start the **shell** by passing **no arguments**. To compile **PicoC** into **RETI-Code** use the `compile <cli-options> "<code>";` command (shortcut `cpl`):
 ```bash
-./pico_c_compiler
+./picoc_compiler
 PicoC> compile -ctas -p -d 20 -S 2 -v "char bool_val = (12 < 1 + 2);";
 PicoC> most_used "char bool_val = (12 < 1 + 2);";
 ```

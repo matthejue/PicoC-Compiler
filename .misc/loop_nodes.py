@@ -15,17 +15,13 @@ class While(ASTNode):
     end = "JUMP -(codelength(af) + codelength(l) + 3);  # Zurück zur Auswertung von 'l1'\n"
     end_loc = 1
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.condition = self.children[0]
         self.branch = self.children[1:]
 
     __match_args__ = ("condition", "branch")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         dot_more = " ... " if len(self.branch) > 1 else ""
@@ -63,9 +59,7 @@ class While(ASTNode):
             0,
         )
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.condition_check = self.code_generator.replace_code_pre(
             self.condition_check, "l1", str(self.condition)
         )
@@ -73,17 +67,13 @@ class While(ASTNode):
             self.end, "l1", str(self.condition)
         )
 
-    def _adapt_code_1(
-        self,
-    ):
+    def _adapt_code_1(self):
         self.code_generator.replace_code_after(
             "codelength(af) + 2",
             str(self.code_generator.loc - self.code_generator.get_marker_loc() + 2),
         )
 
-    def _adapt_code_2(
-        self,
-    ):
+    def _adapt_code_2(self):
         self.end = self.code_generator.replace_code_pre(
             self.end,
             "(codelength(af) + codelength(l) + 3)",
@@ -103,17 +93,13 @@ class DoWhile(ASTNode):
     )
     condition_check_loc = 3
 
-    def update_match_args(
-        self,
-    ):
+    def update_match_args(self):
         self.branch = self.children[:-1]
         self.condition = self.children[-1]
 
     __match_args__ = ("branch", "condition")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         dot_more = " ..." if len(self.branch) > 1 else ""
@@ -139,16 +125,12 @@ class DoWhile(ASTNode):
             f"# Do While 'DoWhile({branch}{dot_more} {self.condition})' Ende\n", 0
         )
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         self.condition_check = self.code_generator.replace_code_pre(
             self.condition_check, "l1", str(self.condition)
         )
 
-    def _adapt_code(
-        self,
-    ):
+    def _adapt_code(self):
         self.condition_check = self.code_generator.replace_code_pre(
             self.condition_check,
             "(codelength(af) + codelength(l) + 2) + 2",

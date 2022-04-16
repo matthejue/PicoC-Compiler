@@ -56,9 +56,7 @@ class Assignment(ASTNode):
 
     __match_args__ = ("location", "expression")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(f"# Zuweisung '{self}' Start\n", 0)
@@ -79,9 +77,7 @@ class Assignment(ASTNode):
 
         self.code_generator.add_code(f"# Zuweisung '{self}' Ende\n", 0)
 
-    def _pretty_comments(
-        self,
-    ):
+    def _pretty_comments(self):
         if global_vars.args.verbose:
             self.assign = self.code_generator.replace_code_pre(
                 self.assign, "e1", str(self.expression)
@@ -106,9 +102,7 @@ class Assignment(ASTNode):
             0,
         )
 
-    def _assignment(
-        self,
-    ):
+    def _assignment(self):
         match self:
             case Assignment(Allocation(NT.Const(), _, Identifier(name)), expression):
                 match expression:
@@ -260,9 +254,7 @@ class Assignment(ASTNode):
                 else:
                     return value
 
-    def _implicit_conversion(
-        self,
-    ):
+    def _implicit_conversion(self):
         self.code_generator.add_code(
             f"# Implizite Konversion von 'int' zu 'char' Start\n", 0
         )
@@ -302,9 +294,7 @@ class Allocation(ASTNode):
 
     __match_args__ = ("const", "prim_dt", "identifier")
 
-    def visit(
-        self,
-    ):
+    def visit(self):
         self.update_match_args()
 
         self.code_generator.add_code(f"# Allokation '{self}' Start\n", 0)
@@ -324,9 +314,7 @@ class Allocation(ASTNode):
             0,
         )
 
-    def _adapt_code(
-        self,
-    ):
+    def _adapt_code(self):
         match self:
             case Allocation(
                 NT.Const(),
@@ -357,7 +345,5 @@ class Allocation(ASTNode):
                 found_name, found_pos, first.name, first.position
             )
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return self.to_string_show_node()
