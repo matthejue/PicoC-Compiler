@@ -1,0 +1,64 @@
+// L_Arith
+COMMENT: "//" /[^\n]*/|"/*" /(.|\n)*?/ "*/"
+DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+DIG_WITH_0: "0"|DIG_NO_0
+NUM: "0"|DIG_NO_0 DIG_WITH_0*
+LETTER: "a".."z"|"A".."Z"
+CHAR: "'"LETTER"'"
+NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
+// ----------------------------------------------------------------------------
+unary_op: "-"|"~"
+unary_opd: unary_op+arith_opd
+input_opd: "input""("")"
+arith_opd: NAME|NUM|CHAR|unary_opd|"("arith_exp_logic_exp")"|input_odp|logic_opd|pntr_opd|array_opd|struct_opd|fun_opd
+PREC1_OP: "*"|"/"|"%"
+PREC2_OP: "+"|"-"|"^"|"&"|"|"
+prec1: arith_opd (PREC1_OP arith_opd)*
+prec2: prec1 (PREC2_OP prec1)*
+arith_exp: prec2
+print_stmt: "print""("arith_exp")"
+arith_stmt: print_stmt
+// L_Logic
+RELATION: "=="|"!="|"<"|"<="|">"|">="
+not: "!"+logic_opd
+atom: logic_opd RELATION logic_opd
+logic_opd: not|"("logic_exp")"|arith_exp|atom
+and_exp: logic_opd ("&&" logic_opd)*
+or_exp: and_exp ("||" and_exp)*
+logic_exp: or_exp
+arith_exp_logic_exp: arith_exp|logic_exp
+// L_Assign_Alloc
+SIZE_QUAL: "int"|"char"|"void"|POINTER_SIZE_QUAL|ARRAY_SIZE_QUAL|STRUCT_SIZE_QUAL|FUN_SIZE_QUAL
+alloc: SIZE_QUAL NAME";"
+const_init: "const" SIZE_QUAL NAME "=" NUM";"
+init: SIZE_QUAL NAME "=" arith_exp_logic_exp";"
+assign: NAME "=" arith_exp_logic_exp";"
+assign_alloc_stmt: alloc|const_init|init|assign
+// L_Pointer
+POINTER_SIZE_QUAL: SIZE_QUAL"*"
+deref: "&"NAME
+ref: "*"arith_exp_logic_exp
+pntr_opd: deref|ref|"&""*"arith_exp_logic_exp
+pntr_stmt: "*"NAME "=" arith_exp_logic_exp
+// L_Array
+ARRAY_SIZE_QUAL: SIZE_QUAL"["NUM"]"
+array_opd: "{"(arith_exp_logic_exp",")+"}"|NAME"["arith_exp_logic_exp"]"|"&"NAME"["arith_exp_logic_exp"]"
+array_stmt: NAME"["arith_exp_logic_exp"]" "=" arith_exp_logic_exp
+// L_Struct
+STRUCT_SIZE_QUAL: "struct" NAME
+struct_opd: "{"("."NAME"="arith_exp_logic_exp",")+"}"|NAME"."NAME|"&"NAME"."NAME
+struct_stmt: "struct" NAME "{"(SIZE_QUAL NAME";")+"}"|NAME"."NAME "=" arith_exp_logic_exp
+// L_If_Else
+if_else_stmt: "if""("arith_exp_logic_exp")""{" stmt* "}"|"if""("arith_exp_logic_exp")""{" stmt* "}" "else" "{" stmt* "}"|"if""("arith_exp_logic_exp")" "{" stmt* "}" "else" stmt
+// L_Loop
+loop_stmt: "while""("arith_exp_logic_exp")""{" stmt* "}"|"do""{" stmt* "}""while""("arith_exp_logic_exp")"";"
+// L_Fun
+FUN_SIZE_QUAL: SIZE_QUAL "fun"
+fun_opd: NAME"("(arith_exp_logic_exp",")*")"
+fun_stmt: "return" arith_exp_logic_exp
+def: SIZE_QUAL NAME"("(SIZE_QUAL NAME",")*")""{" stmt* "}"
+// L_PicoC
+picoc: NAME def*
+
+%import common.WS
+%ignore WS COMMENT

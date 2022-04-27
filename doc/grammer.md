@@ -1,5 +1,5 @@
 # L_PicoC
-## Abstract Syntax
+## Concrete Syntax
 ### L_Arith
 ```
 dig_no_0 := 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9

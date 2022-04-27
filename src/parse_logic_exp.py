@@ -1,7 +1,7 @@
 from parse_arith_exp import ArithExpParser
 from lexer import TT
 from errors import Errors
-from picoc_nodes import NT
+from picoc_nodes import N
 from itertools import chain
 from reference import Reference
 
@@ -11,14 +11,14 @@ class LogicExpParser(ArithExpParser):
     language"""
 
     COMP_REL = {
-        TT.EQ: NT.Eq,
-        TT.NEQ: NT.NEq,
-        TT.LT: NT.Lt,
-        TT.GT: NT.Gt,
-        TT.LTE: NT.LtE,
-        TT.GTE: NT.GtE,
+        TT.EQ: N.Eq,
+        TT.NEQ: N.NEq,
+        TT.LT: N.Lt,
+        TT.GT: N.Gt,
+        TT.LTE: N.LtE,
+        TT.GTE: N.GtE,
     }
-    LOG_CON = {TT.LOGIC_AND: NT.LogicAnd, TT.LOGIC_OR: NT.LogicOr}  # TT.NOT: NT.LNot
+    LOG_CON = {TT.LOGIC_AND: N.LogicAnd, TT.LOGIC_OR: N.LogicOr}  # TT.NOT: NT.LNot
 
     def parse_arith_exp_logic_exp(self):
         """point where it's decided if it's a arithmetic expression only or a
@@ -63,7 +63,7 @@ class LogicExpParser(ArithExpParser):
         """
         self.ast_builder.save("_or_expr")
 
-        savestate_node = self.ast_builder.down(NT.LogicBinOp)
+        savestate_node = self.ast_builder.down(N.LogicBinOp)
 
         self._and_exp()
 
@@ -74,11 +74,11 @@ class LogicExpParser(ArithExpParser):
             self.ast_builder.discard("_or_expr")
 
         while self.LTT(1) == TT.LOGIC_OR:
-            self.add_and_consume(classname=NT.LogicOr)
+            self.add_and_consume(classname=N.LogicOr)
 
             self.ast_builder.save("_or_expr")
 
-            self.ast_builder.down(NT.LogicBinOp)
+            self.ast_builder.down(N.LogicBinOp)
             self._and_exp()
 
             if self.LTT(1) != TT.LOGIC_OR:
@@ -95,7 +95,7 @@ class LogicExpParser(ArithExpParser):
         """
         self.ast_builder.save("_and_expr")
 
-        savestate_node = self.ast_builder.down(NT.LogicBinOp)
+        savestate_node = self.ast_builder.down(N.LogicBinOp)
 
         self._logic_opd()
 
@@ -106,11 +106,11 @@ class LogicExpParser(ArithExpParser):
             self.ast_builder.discard("_and_expr")
 
         while self.LTT(1) == TT.LOGIC_AND:
-            self.add_and_consume(classname=NT.LogicAnd)
+            self.add_and_consume(classname=N.LogicAnd)
 
             self.ast_builder.save("_and_expr")
 
-            self.ast_builder.down(NT.LogicBinOp)
+            self.ast_builder.down(N.LogicBinOp)
             self._logic_opd()
 
             if self.LTT(1) != TT.LOGIC_AND:
@@ -146,7 +146,7 @@ class LogicExpParser(ArithExpParser):
 
         :grammar: !+ <code_le>
         """
-        savestate_node = self.ast_builder.down(NT.LogicNot)
+        savestate_node = self.ast_builder.down(N.LogicNot)
 
         while True:
             self.consume_next_token()  # NT.LNot
@@ -154,7 +154,7 @@ class LogicExpParser(ArithExpParser):
             if self.LTT(1) != TT.LOGIC_NOT:
                 break
 
-            self.ast_builder.down(NT.LogicNot)
+            self.ast_builder.down(N.LogicNot)
 
         self._logic_opd()
 
@@ -205,7 +205,7 @@ class LogicExpParser(ArithExpParser):
 
         :grammar: #1 <code_ae>
         """
-        savestate_node = self.ast_builder.down(NT.ToBool)
+        savestate_node = self.ast_builder.down(N.ToBool)
 
         self.parse_arithm_exp()
 
@@ -216,7 +216,7 @@ class LogicExpParser(ArithExpParser):
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>
         """
-        savestate_node = self.ast_builder.down(NT.LogicAtom)
+        savestate_node = self.ast_builder.down(N.LogicAtom)
 
         self.parse_arithm_exp()
         self.add_and_match(list(self.COMP_REL.keys()), mapping=self.COMP_REL)

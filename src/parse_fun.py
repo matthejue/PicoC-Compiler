@@ -1,6 +1,6 @@
 from parse_stmts import StmtParser
 from lexer import TT
-from picoc_nodes import NT
+from picoc_nodes import N
 from errors import Errors
 
 
@@ -42,11 +42,11 @@ class FunParser(StmtParser):
         :grammar: void main () { <code_ss> }
         :returns: None
         """
-        savestate_node = self.ast_builder.down(NT.FunDef)
+        savestate_node = self.ast_builder.down(N.FunDef)
 
         self.add_and_consume(mapping=self.PRIM_DT)
 
-        self.add_and_match([TT.MAIN], NT.Name)
+        self.add_and_match([TT.MAIN], N.Name)
 
         self.match([TT.L_PAREN])
 

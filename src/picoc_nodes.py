@@ -2,8 +2,8 @@ from ast_node import ASTNode
 from errors import Errors
 
 
-class NT:
-    """Nodetypes"""
+class N:
+    """Nodes"""
 
     ###########################################################################
     #                        Nodetypes replacing Tokens                       #
@@ -252,7 +252,7 @@ class NT:
         def update_match_args(self):
             for (i, child) in enumerate(self.children):
                 match child:
-                    case NT.Else():
+                    case N.Else():
                         break
             else:
                 # TODO: reaise error
@@ -323,7 +323,7 @@ class NT:
             self.fun_name = self.children[1]
             for (i, child) in enumerate(self.children[2:]):
                 match child:
-                    case NT.Param(_, _):
+                    case N.Param(_, _):
                         pass
                     case _:
                         break
@@ -331,9 +331,9 @@ class NT:
                 # TODO: error message
                 ...
             self.params = self.children[2:i]
-            self.stmts = self.children[i:]
+            self.stmts_blocks = self.children[i:]
 
-        __match_args__ = ("size_qual", "fun_name", "params", "stmts")
+        __match_args__ = ("size_qual", "fun_name", "params", "stmts_blocks")
 
     class File(ASTNode):
         def update_match_args(self):
@@ -342,7 +342,7 @@ class NT:
             # determine the main function
             for (i, child) in enumerate(self.children):
                 match child:
-                    case NT.FunDef(NT.Name("main"), _, _, _):
+                    case N.FunDef(N.Name("main"), _, _, _):
                         break
             else:
                 raise Errors.NoMainFunctionError(str(self.filename))
@@ -350,3 +350,10 @@ class NT:
             self.funs = self.children[1:i] + self.children[i + 1 :]
 
         __match_args__ = ("filename", "main_fun", "funs")
+
+    class Block(ASTNode):
+        def update_match_args(self):
+            self.name = self.children[0]
+            self.stmts = self.children[1:]
+
+        __match_args__ = ("name", "stmts")
