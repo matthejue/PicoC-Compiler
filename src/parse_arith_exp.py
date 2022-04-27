@@ -1,7 +1,7 @@
 from parser import BacktrackingParser
 from errors import Errors
 from lexer import TT
-from picoc_nodes import NT
+from picoc_nodes import N
 
 
 class ArithExpParser(BacktrackingParser):
@@ -9,18 +9,18 @@ class ArithExpParser(BacktrackingParser):
     language"""
 
     BINOP_PREC_1 = {
-        TT.MUL: NT.Mul,
-        TT.DIV: NT.Div,
-        TT.MOD: NT.Mod,
+        TT.MUL: N.Mul,
+        TT.DIV: N.Div,
+        TT.MOD: N.Mod,
     }
     BINOP_PREC_2 = {
-        TT.ADD: NT.Add,
-        TT.MINUS: NT.Sub,
-        TT.OPLUS: NT.Oplus,
-        TT.LOGIC_AND: NT.And,
-        TT.LOGIC_OR: NT.Or,
+        TT.ADD: N.Add,
+        TT.MINUS: N.Sub,
+        TT.OPLUS: N.Oplus,
+        TT.LOGIC_AND: N.And,
+        TT.LOGIC_OR: N.Or,
     }
-    UNARY = {TT.LOGIC_NOT: NT.Not, TT.MINUS: NT.Minus}
+    UNARY = {TT.LOGIC_NOT: N.Not, TT.MINUS: N.Minus}
 
     def parse_arithm_exp(self):
         """arithmetic expression startpoint
@@ -36,7 +36,7 @@ class ArithExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec2")
 
-        savestate_node = self.ast_builder.down(NT.ArithBinOp)
+        savestate_node = self.ast_builder.down(N.ArithBinOp)
 
         self._prec1()
 
@@ -51,7 +51,7 @@ class ArithExpParser(BacktrackingParser):
 
             self.ast_builder.save("_prec2_loop")
 
-            self.ast_builder.down(NT.ArithBinOp)
+            self.ast_builder.down(N.ArithBinOp)
 
             self._prec1()
 
@@ -69,7 +69,7 @@ class ArithExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec1")
 
-        savestate_node = self.ast_builder.down(NT.ArithBinOp)
+        savestate_node = self.ast_builder.down(N.ArithBinOp)
 
         self._arith_opd()
 
@@ -83,7 +83,7 @@ class ArithExpParser(BacktrackingParser):
             self.add_and_consume(mapping=self.BINOP_PREC_1)
 
             self.ast_builder.save("_prec1_loop")
-            self.ast_builder.down(NT.ArithBinOp)
+            self.ast_builder.down(N.ArithBinOp)
 
             self._arith_opd()
 
@@ -100,11 +100,11 @@ class ArithExpParser(BacktrackingParser):
         :grammer: <word> | <number> | <paren> | <unop>
         """
         if self.LTT(1) == TT.IDENTIFIER:
-            self.add_and_consume(classname=NT.Name)
+            self.add_and_consume(classname=N.Name)
         elif self.LTT(1) == TT.NUMBER:
-            self.add_and_consume(classname=NT.Num)
+            self.add_and_consume(classname=N.Num)
         elif self.LTT(1) == TT.CHARACTER:
-            self.add_and_consume(classname=NT.Char)
+            self.add_and_consume(classname=N.Char)
         elif self.LTT(1) == TT.L_PAREN:
             self._paren_arith()
         elif self.LTT(1) in self.UNARY.keys():
@@ -129,7 +129,7 @@ class ArithExpParser(BacktrackingParser):
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         """
-        savestate_node = self.ast_builder.down(NT.ArithUnaryOp)
+        savestate_node = self.ast_builder.down(N.ArithUnaryOp)
 
         while True:
             self.add_and_consume(mapping=self.UNARY)
@@ -137,7 +137,7 @@ class ArithExpParser(BacktrackingParser):
             if self.LTT(1) not in self.UNARY.keys():
                 break
 
-            self.ast_builder.down(NT.ArithUnaryOp)
+            self.ast_builder.down(N.ArithUnaryOp)
 
         self._arith_opd()
 

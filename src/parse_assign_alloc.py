@@ -1,6 +1,6 @@
 from parse_logic_exp import LogicExpParser
 from lexer import TT
-from picoc_nodes import NT
+from picoc_nodes import N
 from errors import Errors
 
 
@@ -8,7 +8,7 @@ class AssignAllocParser(LogicExpParser):
     """The assignment expression part of the context free grammar of the piocC
     language"""
 
-    PRIM_DT = {TT.INT: NT.IntType, TT.CHAR: NT.CharType, TT.VOID: NT.VoidType}
+    PRIM_DT = {TT.INT: N.IntType, TT.CHAR: N.CharType, TT.VOID: N.VoidType}
 
     def parse_assign_alloc(self):
         """assignment and allocation startpoint
@@ -24,7 +24,7 @@ class AssignAllocParser(LogicExpParser):
         """
         self.ast_builder.save("_aa")
 
-        savestate_node = self.ast_builder.down(NT.Assign)
+        savestate_node = self.ast_builder.down(N.Assign)
 
         if self.LTT(1) in self.PRIM_DT.keys():
             self._alloc()
@@ -45,10 +45,10 @@ class AssignAllocParser(LogicExpParser):
 
         :grammar: #2 <const>? <prim_dt> <identifier>
         """
-        savestate_node = self.ast_builder.down(NT.Alloc)
+        savestate_node = self.ast_builder.down(N.Alloc)
 
         self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
-        self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
+        self.add_and_match([TT.IDENTIFIER], classname=N.Name)
 
         self.ast_builder.up(savestate_node)
 
@@ -61,8 +61,8 @@ class AssignAllocParser(LogicExpParser):
             self.consume_next_token()  # [TT.ASSIGNMENT]
 
             while self.LTT(2) == TT.ASSIGNMENT:
-                self.ast_builder.down(NT.Assign)
-                self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
+                self.ast_builder.down(N.Assign)
+                self.add_and_match([TT.IDENTIFIER], classname=N.Name)
                 self.consume_next_token()  # [TT.ASSIGNMENT]
 
             self.parse_arith_exp_logic_exp()
@@ -70,11 +70,11 @@ class AssignAllocParser(LogicExpParser):
     def _constant_assign(self):
         self.ast_builder.discard("_aa")
 
-        savestate_node = self.ast_builder.down(NT.Alloc)
+        savestate_node = self.ast_builder.down(N.Alloc)
 
-        self.add_and_consume(classname=NT.Const)
+        self.add_and_consume(classname=N.Const)
         self.add_and_match(list(self.PRIM_DT.keys()), mapping=self.PRIM_DT)
-        self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
+        self.add_and_match([TT.IDENTIFIER], classname=N.Name)
 
         self.ast_builder.up(savestate_node)
 
@@ -83,9 +83,9 @@ class AssignAllocParser(LogicExpParser):
         #  if self.LTT(1) == TT.IDENTIFIER:
         #  self.add_and_consume(classname=NT.Name)
         if self.LTT(1) == TT.NUMBER:
-            self.add_and_consume(classname=NT.Num)
+            self.add_and_consume(classname=N.Num)
         elif self.LTT(1) == TT.CHARACTER:
-            self.add_and_consume(classname=NT.Char)
+            self.add_and_consume(classname=N.Char)
         else:
             token = self.LT(1)
             raise Errors.NoApplicableRuleError(
@@ -95,12 +95,12 @@ class AssignAllocParser(LogicExpParser):
     def _assign(self):
         self.ast_builder.discard("_aa")
 
-        self.add_and_consume(classname=NT.Name)
+        self.add_and_consume(classname=N.Name)
         self.match([TT.ASSIGNMENT])
 
         while self.LTT(2) == TT.ASSIGNMENT:
-            self.ast_builder.down(NT.Assign)
-            self.add_and_match([TT.IDENTIFIER], classname=NT.Name)
+            self.ast_builder.down(N.Assign)
+            self.add_and_match([TT.IDENTIFIER], classname=N.Name)
             self.consume_next_token()  # [TT.ASSIGNMENT]
 
         self.parse_arith_exp_logic_exp()
