@@ -23,7 +23,7 @@ PRIM_SIZE_QUAL: "int"|"char"|"void"
 // ---------------------------------- L_Arith ---------------------------------
 unary_opd: UNARY_OP+arith_opd
 input_odp: "input""("")"
-arith_opd: NAME|NUM|CHAR|unary_opd|input_odp|"("arith_exp_logic_exp")"|input_odp|logic_opd|pntr_opd|array_opd|struct_opd|fun_opd
+arith_opd: NAME|NUM|CHAR|unary_opd|input_odp|"("arith_exp_logic_exp")"|logic_opd|pntr_opd|array_opd|struct_opd|fun_opd
 prec1: arith_opd (PREC1_OP arith_opd)*
 prec2: prec1 (PREC2_OP prec1)*
 arith_exp: prec2
@@ -31,7 +31,7 @@ print_stmt: "print""("arith_exp")"";"
 // ---------------------------------- L_Logic ---------------------------------
 not: "!"+logic_opd
 atom: logic_opd RELATION logic_opd
-logic_opd: not|"("logic_exp")"|arith_exp|atom
+logic_opd: not|atom|"("logic_exp")"|arith_exp
 and_exp: logic_opd ("&&" logic_opd)*
 or_exp: and_exp ("||" and_exp)*
 logic_exp: or_exp
@@ -39,35 +39,36 @@ arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
 size_qual: PRIM_SIZE_QUAL|pntr_size_qual|array_size_qual|struct_size_qual|fun_size_qual
 alloc: size_qual NAME";"
-const_init: "const" size_qual NAME "=" NUM";"
-init: size_qual NAME "=" arith_exp_logic_exp";"
 var_assign: NAME "=" arith_exp_logic_exp";"
-assign: var_assign|pntr_assign|array_assign|attr_assign
-assign_alloc_stmt: alloc|const_init|init|assign
+assign: var_assign|pntr_assign|array_assign|struct_assign
+init: size_qual NAME "=" arith_exp_logic_exp";"
+const_init: "const" size_qual NAME "=" NUM";"
+assign_alloc_stmt: alloc|assign|init|const_init
 // --------------------------------- L_Pointer --------------------------------
 pntr_size_qual: size_qual"*"
-var_deref: "&"NAME
-pntr_deref: "&"ref
-deref: var_deref|pntr_deref|array_deref|attr_deref|fun_deref
+pntr_simple: arith_opd
 pntr_arith: "("arith_opd"+"arith_exp_logic_exp")"|"("arith_opd"-"arith_exp_logic_exp")"
-ref: "*"+(arith_opd|pntr_arith)
+deref: "*"+(pntr_simple|pntr_arith)
+var_ref: "&"NAME
+pntr_ref: "&"deref
+ref: var_ref|pntr_ref|array_ref|struct_ref
 pntr_opd: deref|ref
-pntr_assign: ref "=" arith_exp_logic_exp";"
+pntr_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
 array_size_qual: size_qual"["[NUM]"]"
-array_creation: "{"arith_exp_logic_exp(","arith_exp_logic_exp)*"}"
+array_creation: "{"arith_exp_logic_exp("," arith_exp_logic_exp)*"}"
 subscript: arith_opd"["arith_exp_logic_exp"]"
-array_deref: "&"arith_opd"["arith_exp_logic_exp"]"
-array_opd: array_creation|subscript|array_deref
+array_opd: array_creation|subscript
+array_ref: "&"subscript
 array_assign: subscript "=" arith_exp_logic_exp";"
 // --------------------------------- L_Struct ---------------------------------
 struct_size_qual: "struct" NAME
 struct_creation: "{""."NAME"="arith_exp_logic_exp("," "."NAME"="arith_exp_logic_exp)*"}"
 attr: NAME"."NAME
-attr_deref: "&"NAME"."NAME
-struct_opd: struct_creation|attr|attr_deref
-struct_decl: "struct" NAME "{"size_qual NAME(";" size_qual NAME)*"}"";"
-attr_assign: NAME"."NAME "=" arith_exp_logic_exp";"
+struct_opd: struct_creation|attr
+struct_ref: "&"attr
+struct_assign: attr "=" arith_exp_logic_exp";"
+struct_decl_stmt: "struct" NAME "{"size_qual NAME(";" size_qual NAME)*"}"";"
 // --------------------------------- L_If_Else --------------------------------
 if_without_else: "if""("arith_exp_logic_exp")" "{" stmt* "}"
 if_with_else: "if""("arith_exp_logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"|"if""("arith_exp_logic_exp")" "{" stmt* "}" "else" stmt
@@ -77,13 +78,13 @@ while: "while""("arith_exp_logic_exp")" "{" stmt* "}"
 do_while: "do" "{" stmt* "}" "while""("arith_exp_logic_exp")"";"
 loop_stmt: while|do_while
 // ---------------------------------- L_Stmt ----------------------------------
-stmt: print_stmt|assign_alloc_stmt|struct_decl|if_else_stmt|loop_stmt
+stmt: print_stmt|assign_alloc_stmt|struct_decl_stmt|if_else_stmt|loop_stmt
 // ----------------------------------- L_Fun ----------------------------------
-fun_size_qual: size_qual "fun"
+fun_size_qual: "fun" size_qual
 fun_call: NAME"("[arith_exp_logic_exp("," arith_exp_logic_exp)*]")"
-fun_deref: "&"arith_opd"["arith_exp_logic_exp"]"
-fun_opd: fun_call|fun_deref
-return_stmt: fun_call|"return" arith_exp_logic_exp
+fun_opd: fun_call
+return: "return" arith_exp_logic_exp
+fun_stmt: fun_call|return
 def: size_qual NAME"("[size_qual NAME("," size_qual NAME)*]")" "{" stmt* "}"
 // ---------------------------------- L_File ----------------------------------
 file: NAME def*
