@@ -18,7 +18,7 @@
     ·
     <a href="./doc/help-page.txt">Usage</a>
     ·
-    <a href="./src/./src/concrete_syntax.lark/">Concrete Syntax</a>
+    <a href="./src/concrete_syntax.lark/">Concrete Syntax</a>
     ·
     <a href="./doc/abstract_syntax.txt">Abstract Syntax</a>
     ·
