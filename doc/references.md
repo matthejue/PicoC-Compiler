@@ -12,7 +12,6 @@
 - for the patterns and knowledge about **lexers** and **parsers** [[1]](#1)
   - inter alia **Mapping parse_picocs to Recursive-Descent Recognizers** (p.45 et seq. from [[1]](#1))
 - the desgin of the **abstract syntax** is greatly inspired by [[3]](#3)
-- for the knowledge about building **optimized** compilers using **graph coloring** to find a optimal assignment of **locations** to **registers** [[3]](#3)
 
 # Used software
 - **Neovim** with plugins in [[4]](#4) and **Tmux** with plugins in [[5]](#5) for **coding** the compiler and writing the **presentation**
@@ -27,6 +26,7 @@
 - **Cmd2** [[13]](#13)
 - **Tabulate** [[14]](#14)
 - **Colorama** [[15]](#15)
+- **Lark** [[20]](#20)
 
 # Misc
 - the **template** of the README.md is greatly inspired by [[16]](#16)
@@ -64,3 +64,5 @@
 - <a id="17">[17]</a> “Manjaro.” Accessed January 28, 2022. https://wallpapercave.com/w/wp9774690.
 - <a id="18">[18]</a> GitHub Community. “Running a Bash Script - Code to Cloud / GitHub Actions,” November 4, 2020. https://github.community/t/running-a-bash-script/141584/2.
 - <a id="19">[19]</a> Actions/Starter-Workflows. TypeScript. 2019. Reprint, GitHub Actions, 2022. https://github.com/actions/starter-workflows/blob/70f16d3552b2b728227019eb69710ed1b44cf811/ci/python-package.yml.
+- <a id="20">[20]</a> Lark - a Parsing Toolkit for Python. Python. 2017. Reprint, Lark - Parsing Library & Toolkit, 2022. https://github.com/lark-parser/lark.
+
