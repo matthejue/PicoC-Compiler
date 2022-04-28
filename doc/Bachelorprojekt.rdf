@@ -674,6 +674,239 @@ original-date: 2017-05-27T18:37:54Z</dc:description>
         <z:linkMode>1</z:linkMode>
         <link:type>text/html</link:type>
     </z:Attachment>
+    <bib:Document rdf:about="https://learnprogramo.com/qualifiers-in-c-9/">
+        <z:itemType>blogPost</z:itemType>
+        <dcterms:isPartOf>
+           <z:Blog><dc:title>Learnprogramo</dc:title></z:Blog>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_35"/>
+        <dc:title>Qualifiers in C [ Size, Sign and Type Qualifiers in Detail ]</dc:title>
+        <dcterms:abstract>Qualifiers in C. The Qualifiers are the keywords which are applied to the data types. There are three types of qualifiers in C. 1.Type Qualifiers 2.Size Qua</dcterms:abstract>
+        <dc:date>2020-05-18T17:08:52+00:00</dc:date>
+        <z:language>en-us</z:language>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://learnprogramo.com/qualifiers-in-c-9/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 19:16:28</dcterms:dateSubmitted>
+        <dc:description>Section: Tutorials</dc:description>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_35">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Snapshot</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://learnprogramo.com/qualifiers-in-c-9/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 19:16:48</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="https://peps.python.org/pep-0020/#id3">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_37"/>
+        <dc:title>PEP 20 – The Zen of Python | peps.python.org</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://peps.python.org/pep-0020/#id3</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 20:15:49</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_37">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>PEP 20 – The Zen of Python | peps.python.org</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://peps.python.org/pep-0020/#id3</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-13 20:15:50</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="#item_38">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dc:title>CACM</dc:title>
+                <dc:identifier>DOI 10.1145/355598.362740</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Earley</foaf:surname>
+                        <foaf:givenName>J.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Sturgis</foaf:surname>
+                        <foaf:givenName>Howard E.</foaf:givenName>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <link:link rdf:resource="#item_39"/>
+        <dc:title>A formalism for translator interactions</dc:title>
+        <dcterms:abstract>A formalism is presented for describing the actions of processors for programming languages—compilers, interpreters, assemblers—and their interactions in complex systems such as compiler-compilers or extendible languages. The formalism here might be used to define and answer such a question as “Can one do bootstrapping using a metacompiler whose metaphase is interpretive?” In addition an algorithm is presented for deciding whether or not a given system can be produced from a given set of component processors.</dcterms:abstract>
+        <dc:date>1970</dc:date>
+        <z:libraryCatalog>Semantic Scholar</z:libraryCatalog>
+    </bib:Article>
+    <z:Attachment rdf:about="#item_39">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>Semantic Scholar Link</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.semanticscholar.org/paper/A-formalism-for-translator-interactions-Earley-Sturgis/f8535523d3bb7b35aaffbc06f0c5106a2332d582</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-19 08:00:01</dcterms:dateSubmitted>
+        <z:linkMode>3</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <z:Attachment rdf:about="#item_40">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>chapter6.pdf</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://pu.inf.uni-tuebingen.de/cc-0304/skript/chapter6.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-19 09:01:02</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Document rdf:about="https://en.cppreference.com/w/c/language/operator_precedence">
+        <z:itemType>webpage</z:itemType>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <link:link rdf:resource="#item_42"/>
+        <dc:title>C Operator Precedence - cppreference.com</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://en.cppreference.com/w/c/language/operator_precedence</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-27 21:38:37</dcterms:dateSubmitted>
+    </bib:Document>
+    <z:Attachment rdf:about="#item_42">
+        <z:itemType>attachment</z:itemType>
+        <dc:title>C Operator Precedence - cppreference.com</dc:title>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://en.cppreference.com/w/c/language/operator_precedence</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-27 21:38:45</dcterms:dateSubmitted>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Data rdf:about="https://github.com/lark-parser/lark">
+        <z:itemType>computerProgram</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+               <foaf:name>Lark - Parsing Library &amp; Toolkit</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>cyk</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>earley</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>grammar</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>lalr</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>lark</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parse</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parser</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parser-library</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parsing-engine</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parsing-library</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>python</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>tree</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:title>Lark - a parsing toolkit for Python</dc:title>
+        <dcterms:abstract>Lark is a parsing toolkit for Python, built with a focus on ergonomics, performance and modularity.</dcterms:abstract>
+        <dc:date>2022-04-26T13:44:12Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>https://github.com/lark-parser/lark</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-28 06:49:02</dcterms:dateSubmitted>
+        <dc:rights>MIT</dc:rights>
+        <dc:description>original-date: 2017-02-04T20:38:59Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
+    <bib:Data rdf:about="https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/lexical-analysis.pdf">
+        <z:itemType>computerProgram</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+               <foaf:name>Compiler-Construction-Uni-Freiburg</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <dc:title>lecture-notes-2021</dc:title>
+        <dc:date>2022-01-20T09:39:52Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/lexical-analysis.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-28 07:04:59</dcterms:dateSubmitted>
+        <dc:rights>BSD-3-Clause</dc:rights>
+        <dc:description>original-date: 2021-10-19T12:38:11Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
+    <bib:Data rdf:about="https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/syntax-analysis.pdf">
+        <z:itemType>computerProgram</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+               <foaf:name>Compiler-Construction-Uni-Freiburg</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <dc:title>lecture-notes-2021</dc:title>
+        <dc:date>2022-01-20T09:39:52Z</dc:date>
+        <z:libraryCatalog>GitHub</z:libraryCatalog>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/syntax-analysis.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2022-04-28 07:05:13</dcterms:dateSubmitted>
+        <dc:rights>BSD-3-Clause</dc:rights>
+        <dc:description>original-date: 2021-10-19T12:38:11Z</dc:description>
+        <z:programmingLanguage>Python</z:programmingLanguage>
+    </bib:Data>
     <z:Collection rdf:about="#collection_1">
         <dc:title>Bachelorprojekt</dc:title>
         <dcterms:hasPart rdf:resource="https://wallpapercave.com/w/wp9774690"/>
@@ -696,5 +929,13 @@ original-date: 2017-05-27T18:37:54Z</dc:description>
         <dcterms:hasPart rdf:resource="https://en.wikipedia.org/w/index.php?title=Identifier_(computer_languages)&amp;oldid=1081115854"/>
         <dcterms:hasPart rdf:resource="https://reverseengineering.stackexchange.com/q/17671"/>
         <dcterms:hasPart rdf:resource="https://reverseengineering.stackexchange.com/a/17678"/>
+        <dcterms:hasPart rdf:resource="https://learnprogramo.com/qualifiers-in-c-9/"/>
+        <dcterms:hasPart rdf:resource="https://peps.python.org/pep-0020/#id3"/>
+        <dcterms:hasPart rdf:resource="#item_38"/>
+        <dcterms:hasPart rdf:resource="#item_40"/>
+        <dcterms:hasPart rdf:resource="https://en.cppreference.com/w/c/language/operator_precedence"/>
+        <dcterms:hasPart rdf:resource="https://github.com/lark-parser/lark"/>
+        <dcterms:hasPart rdf:resource="https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/lexical-analysis.pdf"/>
+        <dcterms:hasPart rdf:resource="https://github.com/Compiler-Construction-Uni-Freiburg/lecture-notes-2021/blob/56300e6649e32f0594bbbd046a2e19351c57dd0c/material/syntax-analysis.pdf"/>
     </z:Collection>
 </rdf:RDF>
