@@ -2,7 +2,7 @@
 
 from lark import Lark
 
-with open("./src/parser_spec.lark") as fin:
+with open("./src/concrete_syntax.lark") as fin:
     parser = Lark(fin.read(), start="file")
     print(
         parser.parse(
