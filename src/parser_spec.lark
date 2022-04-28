@@ -24,17 +24,17 @@ PRIM_SIZE_QUAL: "int"|"char"|"void"
 unary_opd: UNARY_OP+arith_opd
 input_odp: "input""("")"
 arith_opd: NAME|NUM|CHAR|unary_opd|input_odp|"("arith_exp_logic_exp")"|logic_opd|pntr_opd|array_opd|struct_opd|fun_opd
-prec1: arith_opd (PREC1_OP arith_opd)*
-prec2: prec1 (PREC2_OP prec1)*
-arith_exp: prec2
+arith_prec1: arith_opd (PREC1_OP arith_opd)*
+arith_prec2: arith_prec1 (PREC2_OP arith_prec1)*
+arith_exp: arith_prec2
 print_stmt: "print""("arith_exp")"";"
 // ---------------------------------- L_Logic ---------------------------------
-not: "!"+logic_opd
-atom: logic_opd RELATION logic_opd
-logic_opd: not|atom|"("logic_exp")"|arith_exp
-and_exp: logic_opd ("&&" logic_opd)*
-or_exp: and_exp ("||" and_exp)*
-logic_exp: or_exp
+logic_not: "!"+logic_opd
+logic_atom: logic_opd RELATION logic_opd
+logic_opd: logic_not|logic_atom|"("logic_exp")"|arith_exp
+logic_and: logic_opd ("&&" logic_opd)*
+logic_or: logic_and ("||" logic_and)*
+logic_exp: logic_or
 arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
 size_qual: PRIM_SIZE_QUAL|pntr_size_qual|array_size_qual|struct_size_qual|fun_size_qual
