@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
-from lark import Lark, Transformer
+from lark import Lark, Transformer, Token
+from picoc_nodes import N
 
 
 class ASTTransformer(Transformer):
@@ -205,14 +206,14 @@ class ASTTransformer(Transformer):
         return nodes
 
 
-with open("./src/concrete_syntax.lark") as fin:
+with open("./concrete_syntax.lark") as fin:
     parser = Lark(fin.read(), start="file")
     dt = parser.parse(
         r"""
         testus
         char test(){
             int var = ----10;  // das ist doof
-            char* pntr = &var;
+            char pntr = *(var + 10);
         }
         """
         #  r"""
