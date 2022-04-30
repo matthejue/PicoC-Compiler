@@ -73,6 +73,9 @@ class N:
     class LogicOr(ASTNode):
         pass
 
+    class LogicNot(ASTNode):
+        pass
+
     class Const(ASTNode):
         pass
 
@@ -95,39 +98,22 @@ class N:
     #                     Nodetypes containing other Nodes                    #
     ###########################################################################
 
-    class ArithBinOp(ASTNode):
+    class BinOp(ASTNode):
         def update_match_args(self):
-            self.left_arith_exp = self.children[0]
+            self.left_exp = self.children[0]
             self.op = self.children[1]
-            self.right_arith_exp = self.children[2]
+            self.right_exp = self.children[2]
 
-        __match_args__ = ("left_arith_exp", "op", "right_arith_exp")
+        __match_args__ = ("left_exp", "op", "right_exp")
 
-    class ArithUnaryOp(ASTNode):
+    class UnOp(ASTNode):
         def update_match_args(self):
-            self.op = self.children[0]
-            self.arith_opd = self.children[1]
+            self.un_op = self.children[0]
+            self.opd = self.children[1]
 
-        __match_args__ = ("op", "arith_opd")
+        __match_args__ = ("un_op", "opd")
 
-    class LogicBinOp(ASTNode):
-        def update_match_args(self):
-            self.left_logic_exp = self.children[0]
-            self.logic_bin_op = self.children[1]
-            self.right_logic_exp = self.children[2]
-
-        __match_args__ = ("left_logic_exp", "logic_bin_op", "right_logic_exp")
-
-    class LogicNot(ASTNode):
-        def update_match_args(self):
-            self.logic_opd = self.children[0]
-
-        __match_args__ = ("logic_opd",)
-
-        def __repr__(self):
-            return self.to_string_show_node()
-
-    class LogicAtom(ASTNode):
+    class Atom(ASTNode):
         def update_match_args(self):
             self.left_logic_opd = self.children[0]
             self.relation = self.children[1]
@@ -147,9 +133,9 @@ class N:
     class Assign(ASTNode):
         def update_match_args(self):
             self.location = self.children[0]
-            self.arith_exp_logic_exp = self.children[1]
+            self.logic_exp = self.children[1]
 
-        __match_args__ = ("location", "arith_exp_logic_exp")
+        __match_args__ = ("location", "logic_exp")
 
         def __repr__(self):
             if len(self.children) == 2:
@@ -181,9 +167,9 @@ class N:
 
     class Deref(ASTNode):
         def update_match_args(self):
-            self.arith_exp_logic_exp = self.children[0]
+            self.location = self.children[0]
 
-        __match_args__ = ("arith_exp_logic_exp",)
+        __match_args__ = ("location",)
 
     class ArrayType(ASTNode):
         def update_match_args(self):
@@ -201,9 +187,9 @@ class N:
     class Subscript(ASTNode):
         def update_match_args(self):
             self.identifier = self.children[0]
-            self.arith_exp_logic_exp = self.children[1]
+            self.logic_exp = self.children[1]
 
-        __match_args__ = ("identifier", "arith_exp_logic_exp")
+        __match_args__ = ("identifier", "logic_exp")
 
     class StructType(ASTNode):
         def update_match_args(self):
@@ -255,7 +241,7 @@ class N:
                     case N.Else():
                         break
             else:
-                # TODO: reaise error
+                # should never happen
                 ...
             self.condition = self.children[0]
             self.branch1 = self.children[1:i]
@@ -304,9 +290,9 @@ class N:
 
     class Return(ASTNode):
         def update_match_args(self):
-            self.arith_exp_logic_exp = self.children[0]
+            self.logic_exp = self.children[0]
 
-        __match_args__ = ("arith_exp_logic_exp",)
+        __match_args__ = ("logic_exp",)
 
         def __repr__(self):
             return self.to_string_show_node()
