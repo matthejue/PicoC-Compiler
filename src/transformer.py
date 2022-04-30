@@ -196,6 +196,7 @@ with open("./concrete_syntax.lark") as fin:
         char test(){
             int var = ----10;  // das ist doof
             char pntr = *(var + 10);
+            var = 10 + 3;
         }
         """
         #  r"""
@@ -210,4 +211,5 @@ with open("./concrete_syntax.lark") as fin:
     )
     ast = ASTTransformer().transform(dt)
     print(dt.pretty())
+    print(dt)
     print(ast)
