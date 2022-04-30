@@ -1,12 +1,13 @@
 // ---------------------------------- L_Arith ---------------------------------
 unary_op ::= Minus() | Not()
 bin_op ::= Add() | Sub() | Mul() | Div() | Mod() | Oplus() | And() | Or()
-exp ::= Name(str) | Num(str) | Char(str) | ArithBinOp(<exp>, <bin_op>, <exp>) | ArithUnaryOp(<unary_op>, <exp>) | Call(Name('input'), $\empty$)
+exp ::= Name(str) | Num(str) | Char(str) | BinOp(<exp>, <bin_op>, <exp>) | UnOp(<unary_op>, <exp>) | Call(Name('input'), $\empty$)
 stmt ::= Call(Name('print'), <exp>)
 // ---------------------------------- L_Logic ---------------------------------
+unary_op ::= LogicNot()
 relation ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
 logic_op ::= LogicAnd() | LogicOr()
-exp ::= LogicBinOp(<exp>, <logic_op>, <exp>) | LogicNot(<exp>) | LogicAtom(<exp>, <relation>, <exp>) | ToBool(<exp>)
+exp ::= BinOp(<exp>, <logic_op>, <exp>) | Atom(<exp>, <relation>, <exp>) | ToBool(<exp>)
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_qual ::= Const() | Writeable()
 size_qual ::= IntType() | CharType() | VoidType()

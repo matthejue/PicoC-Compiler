@@ -10,10 +10,11 @@ NUM: "0"|DIG_NO_0 DIG_WITH_0*
 LETTER: "a".."z"|"A".."Z"
 CHAR: "'"LETTER"'"
 NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
-UNARY_OP: "-"|"~"
+UN_OP: "-"|"~"|"!"
 PREC1_OP: "*"|"/"|"%"
 PREC2_OP: "+"|"-"|"^"|"&"|"|"
 // ---------------------------------- L_Logic ---------------------------------
+// ! is new but gets added under L_Arith
 RELATION: "=="|"!="|"<"|"<="|">"|">="
 // ------------------------------ L_Assign_Alloc ------------------------------
 PRIM_SIZE_QUAL: "int"|"char"|"void"
@@ -23,10 +24,8 @@ PRIM_SIZE_QUAL: "int"|"char"|"void"
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
 ?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|logic_opd|pntr_opd|array_opd|struct_opd|fun_call
-arith_unary: UNARY_OP unary_opd|unary_opd
-logic_not: "!"logic_opd|unary_opd
-?unary_opd: arith_unary|logic_not|arith_opd
-arith_prec1: unary_opd (PREC1_OP unary_opd)*
+un_opd: UN_OP un_opd|arith_opd
+arith_prec1: un_opd (PREC1_OP un_opd)*
 arith_prec2: arith_prec1 (PREC2_OP arith_prec1)*
 ?arith_exp: arith_prec2
 print_stmt: "print""("arith_exp")"";"
@@ -48,7 +47,7 @@ const_init: "const" size_qual NAME "=" NUM";"
 // --------------------------------- L_Pointer --------------------------------
 pntr_size_qual: size_qual"*"
 pntr_simple: arith_opd
-pntr_arith: "("arith_opd"+"logic_exp")"|"("arith_opd"-"logic_exp")"
+!pntr_arith: "("arith_opd"+"logic_exp")"|"("arith_opd"-"logic_exp")"
 ?deref: "*"(pntr_simple|pntr_arith)
 var_ref: "&"NAME
 pntr_ref: "&"deref
