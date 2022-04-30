@@ -70,9 +70,9 @@ struct_ref: "&"attr
 struct_assign: attr "=" logic_exp";"
 struct_decl_stmt: "struct" NAME "{"size_qual NAME(";" size_qual NAME)*"}"";"
 // --------------------------------- L_If_Else --------------------------------
-if_without_else: "if""("logic_exp")" "{" stmt* "}"
-if_with_else: "if""("logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"|"if""("logic_exp")" "{" stmt* "}" "else" stmt
-?if_else_stmt: if_without_else|if_with_else
+if_: "if""("logic_exp")" "{" stmt* "}"
+if_else: "if""("logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"|"if""("logic_exp")" "{" stmt* "}" "else" stmt
+?if_else_stmt: if_|if_else
 // ---------------------------------- L_Loop ----------------------------------
 while_: "while""("logic_exp")" "{" stmt* "}"
 do_while: "do" "{" stmt* "}" "while""("logic_exp")"";"

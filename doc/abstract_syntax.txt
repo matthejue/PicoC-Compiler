@@ -1,10 +1,10 @@
 // ---------------------------------- L_Arith ---------------------------------
-unary_op ::= Minus() | Not()
+un_op ::= Minus() | Not()
 bin_op ::= Add() | Sub() | Mul() | Div() | Mod() | Oplus() | And() | Or()
-exp ::= Name(str) | Num(str) | Char(str) | BinOp(<exp>, <bin_op>, <exp>) | UnOp(<unary_op>, <exp>) | Call(Name('input'), $\empty$)
+exp ::= Name(str) | Num(str) | Char(str) | BinOp(<exp>, <bin_op>, <exp>) | UnOp(<un_op>, <exp>) | Call(Name('input'), $\empty$)
 stmt ::= Call(Name('print'), <exp>)
 // ---------------------------------- L_Logic ---------------------------------
-unary_op ::= LogicNot()
+un_op ::= LogicNot()
 relation ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
 logic_op ::= LogicAnd() | LogicOr()
 exp ::= BinOp(<exp>, <logic_op>, <exp>) | Atom(<exp>, <relation>, <exp>) | ToBool(<exp>)

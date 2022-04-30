@@ -36,7 +36,7 @@ class ArithExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec2")
 
-        savestate_node = self.ast_builder.down(N.ArithBinOp)
+        savestate_node = self.ast_builder.down(N.BinOp)
 
         self._prec1()
 
@@ -51,7 +51,7 @@ class ArithExpParser(BacktrackingParser):
 
             self.ast_builder.save("_prec2_loop")
 
-            self.ast_builder.down(N.ArithBinOp)
+            self.ast_builder.down(N.BinOp)
 
             self._prec1()
 
@@ -69,7 +69,7 @@ class ArithExpParser(BacktrackingParser):
         """
         self.ast_builder.save("_prec1")
 
-        savestate_node = self.ast_builder.down(N.ArithBinOp)
+        savestate_node = self.ast_builder.down(N.BinOp)
 
         self._arith_opd()
 
@@ -83,7 +83,7 @@ class ArithExpParser(BacktrackingParser):
             self.add_and_consume(mapping=self.BINOP_PREC_1)
 
             self.ast_builder.save("_prec1_loop")
-            self.ast_builder.down(N.ArithBinOp)
+            self.ast_builder.down(N.BinOp)
 
             self._arith_opd()
 
@@ -129,7 +129,7 @@ class ArithExpParser(BacktrackingParser):
 
         :grammer: #1 (<unop>|<minus> #1)+ <ao>
         """
-        savestate_node = self.ast_builder.down(N.ArithUnaryOp)
+        savestate_node = self.ast_builder.down(N.UnOp)
 
         while True:
             self.add_and_consume(mapping=self.UNARY)
@@ -137,7 +137,7 @@ class ArithExpParser(BacktrackingParser):
             if self.LTT(1) not in self.UNARY.keys():
                 break
 
-            self.ast_builder.down(N.ArithUnaryOp)
+            self.ast_builder.down(N.UnOp)
 
         self._arith_opd()
 
