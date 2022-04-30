@@ -216,7 +216,7 @@ class LogicExpParser(ArithExpParser):
 
         :grammar: #2 <code_ae> <comp_op> <code_ae>
         """
-        savestate_node = self.ast_builder.down(N.LogicAtom)
+        savestate_node = self.ast_builder.down(N.Atom)
 
         self.parse_arithm_exp()
         self.add_and_match(list(self.COMP_REL.keys()), mapping=self.COMP_REL)

@@ -210,7 +210,7 @@ class N:
 
         __match_args__ = ("array_identifier", "attribute_identifier")
 
-    class StructDef(ASTNode):
+    class StructDecl(ASTNode):
         def update_match_args(self):
             self.struct_identifier = self.children[0]
             self.params = self.children[1:]

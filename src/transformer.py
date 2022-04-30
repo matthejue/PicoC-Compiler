@@ -5,205 +5,187 @@ from picoc_nodes import N
 
 
 class ASTTransformer(Transformer):
-    # ----------------------------- L_Assign_Alloc ----------------------------
-    def input_odp(self):
-        ...
+    # --------------------------------- L_Arith -------------------------------
+    def input_odp(self, nodes):
+        return N.Call("input", nodes)
 
     def arith_opd(self, nodes):
-        print("arith_opd", nodes)
         return nodes
 
-    def unary_opd(self, nodes):
-        print("unary_opd", nodes)
-        return nodes
+    def un_opd(self, nodes):
+        return N.UnOp(nodes)
 
     def arith_prec1(self, nodes):
-        print("arith_prec1", nodes)
-        return nodes
+        return N.BinOp(nodes)
 
     def arith_prec2(self, nodes):
-        print("arith_prec2", nodes)
-        return nodes
+        return N.BinOp(nodes)
 
     def arith_exp(self, nodes):
-        print("arith_exp", nodes)
         return nodes
 
-    def print_stmt(self):
-        ...
+    def print_stmt(self, nodes):
+        return N.Call("print", nodes)
 
     # --------------------------------- L_Logic -------------------------------
+    def to_bool(self, nodes):
+        return N.ToBool(nodes)
+
     def logic_opd(self, nodes):
-        print("logic_opd", nodes)
         return nodes
 
     def logic_not(self, nodes):
-        print("logic_not", nodes)
-        return nodes
+        return N.UnOp(nodes)
 
     def logic_atom(self, nodes):
-        print("logic_atom", nodes)
-        return nodes
+        return N.Atom(nodes)
 
     def logic_and(self, nodes):
-        print("logic_and", nodes)
-        return nodes
+        return N.BinOp(nodes)
 
     def logic_or(self, nodes):
-        print("logic_or", nodes)
-        return nodes
+        return N.BinOp(nodes)
 
     def logic_exp(self, nodes):
-        print("logic_exp", nodes)
         return nodes
 
     # ----------------------------- L_Assign_Alloc ----------------------------
     def size_qual(self, nodes):
-        print("size_qual", nodes)
         return nodes
 
-    def alloc(self):
-        ...
+    def alloc(self, nodes):
+        return N.Alloc(nodes)
 
-    def var_assign(self):
-        ...
+    def var_assign(self, nodes):
+        return N.Assign(nodes)
 
-    def assign(self):
-        ...
+    def assign(self, nodes):
+        return nodes
 
     def init(self, nodes):
-        print("init", nodes)
-        return nodes
+        return N.Assign(nodes)
 
-    def const_init(self):
-        ...
+    def const_init(self, nodes):
+        return N.Assign(nodes)
 
     def assign_alloc_stmt(self, nodes):
-        print("assign_alloc_stmt", nodes)
-        return nodes
+        return N.Assign()
 
     # -------------------------------- L_Pointer ------------------------------
     def pntr_size_qual(self, nodes):
-        print("pntr_size_qual", nodes)
+        return N.PointerType(nodes)
+
+    def pntr_simple(self, nodes):
+        return N.Deref(nodes)
+
+    def pntr_arith(self, nodes):
+        return N.Deref(nodes)
+
+    def deref(self, nodes):
         return nodes
-
-    def pntr_simple(self):
-        ...
-
-    def pntr_arith(self):
-        ...
-
-    def deref(self):
-        ...
 
     def var_ref(self, nodes):
-        print("var_ref", nodes)
-        return nodes
+        return N.Ref(nodes)
 
-    def pntr_ref(self):
-        ...
+    def pntr_ref(self, nodes):
+        return N.Ref(nodes)
 
     def ref(self, nodes):
-        print("ref", nodes)
         return nodes
 
     def pntr_opd(self, nodes):
-        print("pntr_opd", nodes)
         return nodes
 
-    def pntr_assign(self):
-        ...
+    def pntr_assign(self, nodes):
+        return N.Assign(nodes)
 
     # --------------------------------- L_Array -------------------------------
-    def array_size_qual(self):
-        ...
+    def array_size_qual(self, nodes):
+        return N.ArrayType(nodes)
 
-    def array_creation(self):
-        ...
+    def array_creation(self, nodes):
+        return N.Array(nodes)
 
-    def subscript(self):
-        ...
+    def subscript(self, nodes):
+        return N.Attribute(nodes)
 
-    def array_opd(self):
-        ...
+    def array_opd(self, nodes):
+        return nodes
 
-    def array_ref(self):
-        ...
+    def array_ref(self, nodes):
+        return N.Ref(nodes)
 
-    def array_assign(self):
-        ...
+    def array_assign(self, nodes):
+        return N.Assign(nodes)
 
     # -------------------------------- L_Struct -------------------------------
-    def struct_size_qual(self):
-        ...
+    def struct_size_qual(self, nodes):
+        return N.StructType(nodes)
 
-    def struct_creation(self):
-        ...
+    def struct_creation(self, nodes):
+        return N.Struct(nodes)
 
-    def attr(self):
-        ...
+    def attr(self, nodes):
+        return N.Attribute(nodes)
 
-    def struct_opd(self):
-        ...
+    def struct_opd(self, nodes):
+        return nodes
 
-    def struct_ref(self):
-        ...
+    def struct_ref(self, nodes):
+        return N.Ref(nodes)
 
-    def struct_assign(self):
-        ...
+    def struct_assign(self, nodes):
+        return N.Assign(nodes)
 
-    def struct_decl_stmt(self):
-        ...
+    def struct_decl_stmt(self, nodes):
+        return N.StructDecl(nodes)
 
     # -------------------------------- L_If_Else ------------------------------
-    def if_without_else(self):
-        ...
+    def if_(self, nodes):
+        return N.If(nodes)
 
-    def if_with_else(self):
-        ...
+    def if_else(self, nodes):
+        return N.IfElse(nodes)
 
-    def if_else_stmt(self):
-        ...
+    def if_else_stmt(self, nodes):
+        return nodes
 
     # --------------------------------- L_Loop --------------------------------
-    def while_(self):
-        ...
+    def while_(self, nodes):
+        return N.While(nodes)
 
-    def do_while(self):
-        ...
+    def do_while(self, nodes):
+        return N.DoWhile(nodes)
 
-    def loop_stmt(self):
-        ...
+    def loop_stmt(self, nodes):
+        return nodes
 
     # --------------------------------- L_Stmt --------------------------------
     def stmt(self, nodes):
-        print("stmt", nodes)
         return nodes
 
     # ---------------------------------- L_Fun --------------------------------
-    def fun_size_qual(self):
-        ...
+    def fun_size_qual(self, nodes):
+        return N.FunType(nodes)
 
-    def fun_call(self):
-        ...
+    def fun_call(self, nodes):
+        return N.Call(nodes)
 
-    def fun_opd(self):
-        ...
+    def fun_opd(self, nodes):
+        return nodes
 
-    def return_(self):
-        ...
+    def return_(self, nodes):
+        return N.Return(nodes)
 
-    def fun_stmt(self):
-        ...
+    def fun_stmt(self, nodes):
+        return nodes
 
     def def_(self, nodes):
-        print("def_", nodes)
-        return nodes
+        return N.FunDef(nodes)
 
     # --------------------------------- L_File --------------------------------
     def file(self, nodes):
-        print("file", nodes)
-        return nodes
+        return N.File(nodes)
 
 
 with open("./concrete_syntax.lark") as fin:
