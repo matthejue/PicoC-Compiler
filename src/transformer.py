@@ -2,6 +2,14 @@
 
 from lark import Lark, Transformer, Token
 from picoc_nodes import N
+from errors import Errors
+
+
+def replace_token(token: Token):
+    if token.type == "NAME":
+        return N.Name(token.value, (token.start_pos, token.end_pos))
+    elif token.type == "":
+        ...
 
 
 class ASTTransformer(Transformer):
@@ -145,7 +153,14 @@ class ASTTransformer(Transformer):
         return N.If(nodes)
 
     def if_else(self, nodes):
-        return N.IfElse(nodes)
+        for (i, child) in enumerate(nodes):
+            match child:
+                case N.Else():
+                    break
+        else:
+            # should never happen
+            ...
+        return N.IfElse(nodes[0], nodes[1:i], nodes[i + 1 :])
 
     def if_else_stmt(self, nodes):
         return nodes
@@ -181,13 +196,31 @@ class ASTTransformer(Transformer):
         return nodes
 
     def def_(self, nodes):
-        return N.FunDef(nodes)
+        for (i, child) in enumerate(nodes[2:]):
+            match child:
+                case N.Param(_, _):
+                    pass
+                case _:
+                    break
+        else:
+            # TODO: error message
+            ...
+        return N.FunDef(nodes[0], nodes[1], nodes[2:i], nodes[i:])
 
     # --------------------------------- L_File --------------------------------
     def file(self, nodes):
-        return N.File(nodes)
+        for (i, node) in enumerate(nodes):
+            match node:
+                case N.FunDef(N.Name("main"), _, _, _):
+                    break
+        else:
+            raise Errors.NoMainFunctionError(str(nodes[0].value))
+        return N.File(nodes[0], nodes[i], nodes[1:i] + nodes[i + 1 :])
 
 
+#  ----------------------------------------------------------------------------
+#  -                                  Testing                                 -
+#  ----------------------------------------------------------------------------
 with open("./concrete_syntax.lark") as fin:
     parser = Lark(fin.read(), start="file")
     dt = parser.parse(

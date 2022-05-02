@@ -15,25 +15,14 @@ class ASTNode:
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
-        #  self.children = []
+        self.children = []
         self.value = value
         self.position = position
-        #  self.code_generator = CodeGenerator()
-        #  self.symbol_table = SymbolTable()
 
     def update_match_args(self):
         pass
 
     __match_args__ = ("value", "position")
-
-    #  def add_child(self, node):
-    #  """
-    #  :returns: None
-    #  """
-    #  self.children += [node]
-
-    #  def show_generated_code(self):
-    #  return self.code_generator.show_code()
 
     def __repr__(self):
         global_vars.show_node = False
@@ -64,17 +53,3 @@ class ASTNode:
         tmp = self.to_string()
         global_vars.show_node = False
         return tmp
-
-
-#  def strip_multiline_string(mutline_string):
-#      """helper function to make mutlineline string usable on different
-#      indent levels
-#
-#      :grammar: grammar specification
-#      :returns: None
-#      """
-#      mutline_string = "".join(
-#          [i.lstrip() + "\n" for i in mutline_string.split("\n")[:-1]]
-#      )
-#      # every code piece ends with \n, so the last element can always be poped
-#      return mutline_string
