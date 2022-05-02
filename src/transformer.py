@@ -69,7 +69,7 @@ class ASTTransformer(Transformer):
         return N.Assign(nodes)
 
     def assign_alloc_stmt(self, nodes):
-        return N.Assign()
+        return N.Assign(nodes)
 
     # -------------------------------- L_Pointer ------------------------------
     def pntr_size_qual(self, nodes):
