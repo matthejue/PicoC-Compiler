@@ -23,7 +23,8 @@ PRIM_SIZE_QUAL: "int"|"char"|"void"
 // ----------------------------------------------------------------------------
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
-?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|logic_opd|pntr_opd|array_opd|struct_opd|fun_call
+?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|logic_opd|pntr_opd
+           |array_opd|struct_opd|fun_call
 un_opd: UN_OP un_opd|arith_opd
 arith_prec1: un_opd (PREC1_OP un_opd)*
 arith_prec2: arith_prec1 (PREC2_OP arith_prec1)*
@@ -38,7 +39,8 @@ logic_or: logic_and ("||" logic_and)*
 ?logic_exp: logic_or
 ?arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
-?size_qual: PRIM_SIZE_QUAL|pntr_size_qual|array_size_qual|struct_size_qual|fun_size_qual
+?size_qual: PRIM_SIZE_QUAL|pntr_size_qual|array_size_qual|struct_size_qual
+           |fun_size_qual
 alloc: size_qual NAME";"
 var_assign: NAME "=" arith_exp_logic_exp";"
 ?assign: var_assign|pntr_assign|array_assign|struct_assign
@@ -48,7 +50,8 @@ const_init: "const" size_qual NAME "=" NUM";"
 // --------------------------------- L_Pointer --------------------------------
 pntr_size_qual: size_qual"*"
 pntr_simple: arith_opd
-!pntr_arith: "("arith_opd"+"arith_exp_logic_exp")"|"("arith_opd"-"arith_exp_logic_exp")"
+!pntr_arith: "("arith_opd"+"arith_exp_logic_exp")"
+            |"("arith_opd"-"arith_exp_logic_exp")"
 ?deref: "*"(pntr_simple|pntr_arith)
 var_ref: "&"NAME
 pntr_ref: "&"deref
@@ -64,7 +67,8 @@ array_ref: "&"subscript
 array_assign: subscript "=" arith_exp_logic_exp";"
 // --------------------------------- L_Struct ---------------------------------
 struct_size_qual: "struct" NAME
-struct_creation: "{""."NAME"="arith_exp_logic_exp("," "."NAME"="arith_exp_logic_exp)*"}"
+struct_creation:
+  "{""."NAME"="arith_exp_logic_exp("," "."NAME"="arith_exp_logic_exp)*"}"
 attr: NAME"."NAME
 ?struct_opd: struct_creation|attr
 struct_ref: "&"attr
@@ -72,14 +76,16 @@ struct_assign: attr "=" arith_exp_logic_exp";"
 struct_decl_stmt: "struct" NAME "{"size_qual NAME(";" size_qual NAME)*"}"";"
 // --------------------------------- L_If_Else --------------------------------
 if_: "if""("arith_exp_logic_exp")" "{" stmt* "}"
-if_else: "if""("arith_exp_logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"|"if""("arith_exp_logic_exp")" "{" stmt* "}" "else" stmt
+!if_else: "if""("arith_exp_logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"
+         |"if""("arith_exp_logic_exp")" "{" stmt* "}" "else" stmt
 ?if_else_stmt: if_|if_else
 // ---------------------------------- L_Loop ----------------------------------
 while_: "while""("arith_exp_logic_exp")" "{" stmt* "}"
 do_while: "do" "{" stmt* "}" "while""("arith_exp_logic_exp")"";"
 ?loop_stmt: while_|do_while
 // ---------------------------------- L_Stmt ----------------------------------
-?stmt: print_stmt|assign_alloc_stmt|struct_decl_stmt|if_else_stmt|loop_stmt|fun_stmt
+?stmt: print_stmt|assign_alloc_stmt|struct_decl_stmt|if_else_stmt|loop_stmt
+      |fun_stmt
 // ----------------------------------- L_Fun ----------------------------------
 fun_size_qual: "fun" size_qual
 fun_call: NAME"("[arith_exp_logic_exp("," arith_exp_logic_exp)*]")"
