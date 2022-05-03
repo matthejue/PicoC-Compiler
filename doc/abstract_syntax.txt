@@ -25,7 +25,7 @@ exp ::= Deref(<exp>, <exp>)
       | Ref(Deref(<exp>))
 stmt ::= Assign(Deref(<exp>), <exp>)
 // ---------------------------------- L_Array ---------------------------------
-size_qual ::= ArrayType(<size_qual>, Num(str)?)
+size_qual ::= ArrayType(<size_qual>, [Num(str)])
 exp ::= Array(<size_qual>, <exp>+)
       | Subscript(<exp>, <exp>)
       | Ref(Subscript(<exp>, <exp>))
@@ -51,3 +51,5 @@ stmt ::= Exp(Call(Name(str), <exp>*))
 def ::= FunDef(<size_qual>, Name(str), Param(<size_qual>, Name(str))*, <stmt>*)
 // ---------------------------------- L_File ----------------------------------
 file ::= File(Name(str), <def>*)
+// ---------------------------------- L_Block ---------------------------------
+block ::= Block(Name(str), <stmt>*)
