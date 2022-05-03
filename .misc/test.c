@@ -8,5 +8,7 @@ int main(int argc, char *argv[])
   printf("%d", a[0].y);
   printf("%d", a[1].x);
   printf("%d", a[1].y);
+  int var[] = {10, 11, 12};
+  int *var2 = 10;
   return 0;
 }
