@@ -347,11 +347,8 @@ with open("./concrete_syntax.lark") as fin:
     dt = parser.parse(
         r"""
         testus
-        char test(){
-            int var = ----10;  // das ist doof
-            char pntr = *(var + 10);
-            var = 10 + 3;
-        }
+        // char test(){
+        // }
         """
         #  r"""
         #  test

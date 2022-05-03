@@ -70,7 +70,7 @@ array_ref: "&"array_subscr
 array_assign: array_subscr "=" arith_exp_logic_exp";"
 array_subexp: "{"entry_subexp("," entry_subexp)*"}"
 ?entry_subexp: arith_exp_logic_exp|array_subexp|struct_subexp
-array_init: datatype NAME array_decl "=" ("{"entry_subexp("," entry_subexp)*"}"
+array_init: datatype NAME array_decl "=" "{"entry_subexp("," entry_subexp)*"}"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" NAME
 struct_attr: NAME"."NAME
