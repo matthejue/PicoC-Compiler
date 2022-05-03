@@ -4,10 +4,10 @@ from ast_node import ASTNode
 class N:
     """Nodes"""
 
-    ###########################################################################
-    #                        Nodetypes replacing Tokens                       #
-    ###########################################################################
-
+    # -------------------------------------------------------------------------
+    # -                              Token Nodes                              -
+    # -------------------------------------------------------------------------
+    # -------------------------------- L_Arith --------------------------------
     class Name(ASTNode):
         # shorter then 'Identifier'
         pass
@@ -48,6 +48,7 @@ class N:
     class Or(ASTNode):
         pass
 
+    # -------------------------------- L_Logic --------------------------------
     class Eq(ASTNode):
         pass
 
@@ -75,6 +76,7 @@ class N:
     class LogicNot(ASTNode):
         pass
 
+    # ----------------------------- L_Assign_Alloc ----------------------------
     class Const(ASTNode):
         pass
 
@@ -90,13 +92,14 @@ class N:
     class VoidType(ASTNode):
         pass
 
+    # ------------------------------- L_If_Else -------------------------------
     class Else(ASTNode):
         pass
 
-    ###########################################################################
-    #                     Nodetypes containing other Nodes                    #
-    ###########################################################################
-
+    # -------------------------------------------------------------------------
+    # -                            Container Nodes                            -
+    # -------------------------------------------------------------------------
+    # -------------------------------- L_Arith --------------------------------
     class BinOp(ASTNode):
         def __init__(self, left_exp, op, right_exp):
             self.left_exp = left_exp
@@ -112,6 +115,7 @@ class N:
 
         __match_args__ = ("un_op", "opd")
 
+    # -------------------------------- L_Logic --------------------------------
     class Atom(ASTNode):
         def __init__(self, left_logic_opd, relation, right_logic_opd):
             self.left_logic_opd = left_logic_opd
@@ -129,12 +133,13 @@ class N:
         def __repr__(self):
             return self.to_string_show_node()
 
+    # ----------------------------- L_Assign_Alloc ----------------------------
     class Assign(ASTNode):
-        def __init__(self, location, logic_exp):
+        def __init__(self, location, arith_exp_logic_exp):
             self.location = location
-            self.logic_exp = logic_exp
+            self.arith_exp_logic_exp = arith_exp_logic_exp
 
-        __match_args__ = ("location", "logic_exp")
+        __match_args__ = ("location", "arith_exp_logic_exp")
 
         def __repr__(self):
             if len(self.children) == 2:
@@ -152,6 +157,7 @@ class N:
 
         __match_args__ = ("type_qual", "size_qual", "identifier")
 
+    # ------------------------------- L_Pointer -------------------------------
     class PointerType(ASTNode):
         def __init__(self, size_qual):
             self.size_qual = size_qual
@@ -165,14 +171,17 @@ class N:
         __match_args__ = ("location",)
 
     class Deref(ASTNode):
-        def __init__(self, location):
+        def __init__(self, location, offset):
             self.location = location
+            self.offset = offset
 
-        __match_args__ = ("location",)
+        __match_args__ = ("location", "offset")
 
+    # -------------------------------- L_Array --------------------------------
     class ArrayType(ASTNode):
-        def __init__(self, size_qual):
+        def __init__(self, size_qual, dims):
             self.size_qual = size_qual
+            self.dims = dims
 
         __match_args__ = ("size_qual",)
 
@@ -184,12 +193,13 @@ class N:
         __match_args__ = ("size_qual", "entries")
 
     class Subscript(ASTNode):
-        def __init__(self, identifier, logic_exp):
+        def __init__(self, identifier, arith_exp_logic_exp):
             self.identifier = identifier
-            self.logic_exp = logic_exp
+            self.arith_exp_logic_exp = arith_exp_logic_exp
 
-        __match_args__ = ("identifier", "logic_exp")
+        __match_args__ = ("identifier", "arith_exp_logic_exp")
 
+    # -------------------------------- L_Struct -------------------------------
     class StructType(ASTNode):
         def __init__(self, identifier):
             self.identifier = identifier
@@ -223,6 +233,7 @@ class N:
 
         __match_args__ = ("size_qual", "identifier")
 
+    # ------------------------------- L_If_Else -------------------------------
     class If(ASTNode):
         def __init__(self, condition, branch):
             self.condition = condition
@@ -244,6 +255,7 @@ class N:
         def __repr__(self):
             return self.to_string_show_node()
 
+    # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
         def __init__(self, condition, branch):
             self.condition = condition
@@ -264,6 +276,7 @@ class N:
         def __repr__(self):
             return self.to_string_show_node()
 
+    # --------------------------------- L_Fun ---------------------------------
     class FunType(ASTNode):
         def __init__(self, size_qual):
             self.size_qual = size_qual
@@ -281,10 +294,10 @@ class N:
             return self.to_string_show_node()
 
     class Return(ASTNode):
-        def __init__(self, logic_exp):
-            self.logic_exp = logic_exp
+        def __init__(self, arith_exp_logic_exp):
+            self.arith_exp_logic_exp = arith_exp_logic_exp
 
-        __match_args__ = ("logic_exp",)
+        __match_args__ = ("arith_exp_logic_exp",)
 
         def __repr__(self):
             return self.to_string_show_node()
@@ -304,6 +317,7 @@ class N:
 
         __match_args__ = ("size_qual", "fun_name", "params", "stmts_blocks")
 
+    # --------------------------------- L_File --------------------------------
     class File(ASTNode):
         def __init__(self, filename, main_fun, funs):
             self.filename = filename
@@ -312,9 +326,10 @@ class N:
 
         __match_args__ = ("filename", "main_fun", "funs")
 
+    # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
-        def __init__(self, name, stmsts):
-            self.name = name
+        def __init__(self, blockname, stmsts):
+            self.blockname = blockname
             self.stmts = stmsts
 
-        __match_args__ = ("name", "stmts")
+        __match_args__ = ("blockname", "stmts")

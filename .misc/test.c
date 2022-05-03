@@ -2,11 +2,11 @@
 
 int main(int argc, char *argv[])
 {
-  printf("%d\n", ~0);
-  printf("%d\n", ~1);
-  int var = !~0;
-  printf("%d\n", var);
-  int var2 = ~!0;
-  printf("%d\n", var2);
+  struct point {int x; int y;};
+  struct point a[2] = {{.x=12, .y=13}, 1};
+  printf("%d", a[0].x);
+  printf("%d", a[0].y);
+  printf("%d", a[1].x);
+  printf("%d", a[1].y);
   return 0;
 }
