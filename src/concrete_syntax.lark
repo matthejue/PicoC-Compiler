@@ -17,15 +17,20 @@ PREC2_OP: "+"|"-"|"^"|"&"|"|"
 // ! is new but gets added under L_Arith
 RELATION: "=="|"!="|"<"|"<="|">"|">="
 // ------------------------------ L_Assign_Alloc ------------------------------
-PRIM_SIZE_QUAL: "int"|"char"|"void"
+SIZE_QUAL: "int"|"char"|"void"
+// --------------------------------- L_Pointer --------------------------------
+PNTR_PLUS: "+"
+PNTR_MINUS: "-"
+// --------------------------------- L_If_Else --------------------------------
+ELSE: "else"
 // ----------------------------------------------------------------------------
 // -                                  Parser                                  -
 // ----------------------------------------------------------------------------
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
 ?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|logic_opd|pntr_opd
-           |array_subscript|struct_attr|fun_call
-un_opd: UN_OP un_opd|arith_opd
+           |array_subscr|struct_attr|fun_call
+un_opd: UN_OP* arith_opd
 arith_prec1: un_opd (PREC1_OP un_opd)*
 arith_prec2: arith_prec1 (PREC2_OP arith_prec1)*
 ?arith_exp: arith_prec2
@@ -39,19 +44,19 @@ logic_or: logic_and ("||" logic_and)*
 ?logic_exp: logic_or
 ?arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
-?size_qual: PRIM_SIZE_QUAL|pntr_size_qual|array_size_qual|struct_size_qual
-           |fun_size_qual
-alloc: size_qual NAME";"
+?datatype: SIZE_QUAL|struct_spec
+alloc: datatype [pntr_decl] NAME [array_decl]";"
+?alloc_stmt: alloc";"
 var_assign: NAME "=" arith_exp_logic_exp";"
 ?assign: var_assign|pntr_assign|array_assign|struct_assign
-init: size_qual NAME "=" arith_exp_logic_exp";"
-const_init: "const" size_qual NAME "=" NUM";"
-?assign_alloc_stmt: alloc|assign|init|const_init|array_init|struct_init
+init: alloc "=" arith_exp_logic_exp";"
+const_init: "const" SIZE_QUAL NAME "=" NUM";"
+?assign_alloc_stmt: alloc_stmt|assign|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
-pntr_size_qual: size_qual"*"
+!pntr_decl: "*"+
 pntr_simple: arith_opd
-!pntr_arith: "("arith_opd"+"arith_exp_logic_exp")"
-            |"("arith_opd"-"arith_exp_logic_exp")"
+pntr_arith: "("arith_opd"PNTR_PLUS"arith_exp_logic_exp")"
+            |"("arith_opd"PNTR_MINUS"arith_exp_logic_exp")"
 ?deref: "*"(pntr_simple|pntr_arith)
 var_ref: "&"NAME
 pntr_ref: "&"deref
@@ -59,26 +64,26 @@ pntr_ref: "&"deref
 ?pntr_opd: deref|ref
 pntr_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
-array_size_qual: size_qual"["[arith_exp_logic_exp]"]"
-array_subscript: arith_opd("["arith_exp_logic_exp"]")
-array_ref: "&"array_subscript
-array_assign: array_subscript "=" arith_exp_logic_exp";"
-array_sub: {"entry_sub("," entry_sub)*"}"
-entry_sub: arith_exp_logic_exp|array_sub|struct_sub
-array_init: array_size_qual NAME "=" ("{"entry_sub("," entry_sub)*"}"
+array_decl: "["arith_exp_logic_exp"]"+
+array_subscr: arith_opd("["arith_exp_logic_exp"]")+
+array_ref: "&"array_subscr
+array_assign: array_subscr "=" arith_exp_logic_exp";"
+array_subexp: "{"entry_subexp("," entry_subexp)*"}"
+?entry_subexp: arith_exp_logic_exp|array_subexp|struct_subexp
+array_init: datatype NAME array_decl "=" ("{"entry_subexp("," entry_subexp)*"}"
 // --------------------------------- L_Struct ---------------------------------
-struct_size_qual: "struct" NAME
+struct_spec: "struct" NAME
 struct_attr: NAME"."NAME
 struct_ref: "&"attr
 struct_assign: attr "=" arith_exp_logic_exp";"
-struct_decl_stmt: "struct" NAME "{"(size_qual NAME";")+"}"";"
-struct_sub: "{""."NAME"="entry_sub ("," "."NAME"="entry_sub)*"}"
-struct_init: struct_size_qual NAME "="
-            "{""."NAME"="entry_sub ("," "."NAME"="entry_sub)*"}"
+struct_decl_stmt: "struct" NAME "{"(datatype NAME";")+"}"";"
+struct_subexp: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
+struct_init: struct_spec NAME "="
+            "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
 // --------------------------------- L_If_Else --------------------------------
 if_: "if""("arith_exp_logic_exp")" "{" stmt* "}"
-!if_else: "if""("arith_exp_logic_exp")" "{" stmt* "}" "else" "{" stmt* "}"
-         |"if""("arith_exp_logic_exp")" "{" stmt* "}" "else" stmt
+if_else: "if""("arith_exp_logic_exp")" "{" stmt* "}" ELSE "{" stmt* "}"
+         |"if""("arith_exp_logic_exp")" "{" stmt* "}" ELSE stmt
 ?if_else_stmt: if_|if_else
 // ---------------------------------- L_Loop ----------------------------------
 while_: "while""("arith_exp_logic_exp")" "{" stmt* "}"
@@ -88,15 +93,18 @@ do_while: "do" "{" stmt* "}" "while""("arith_exp_logic_exp")"[";"]
 ?stmt: print_stmt|assign_alloc_stmt|struct_decl_stmt|if_else_stmt|loop_stmt
       |fun_stmt
 // ----------------------------------- L_Fun ----------------------------------
-fun_size_qual: "fun" size_qual
 fun_call: NAME"("[arith_exp_logic_exp("," arith_exp_logic_exp)*]")"
+fun_call_stmt: fun_call
 return_: "return" arith_exp_logic_exp
-?fun_stmt: fun_call|return_
-def_: size_qual NAME"("[size_qual NAME("," size_qual NAME)*]")" "{" stmt* "}"
+?fun_stmt: fun_call_stmt|return_
+def_: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" stmt* "}"
 // ---------------------------------- L_File ----------------------------------
 file: NAME def_*
 // ---------------------------------- L_Block ---------------------------------
+def_: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" block* "}"
 block: NAME":" stmt*
+goto: "goto""("NAME")"
+
 
 %import common.WS
 %ignore WS
