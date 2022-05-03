@@ -316,14 +316,16 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def def_(self, nodes):
-        for (i, child) in enumerate(nodes[2:]):
+        i = 0
+        for (i, child) in enumerate(nodes[3::2]):
             match child:
-                case N.Name(_, _):
-                    i -= 1
+                case N.Name(_):
                     pass
                 case _:
+                    i += -1 + 3
                     break
-            ...
+        else:
+            i += 1 + 3
         return N.FunDef(nodes[0], nodes[1], nodes[2:i], nodes[i:])
 
     # --------------------------------- L_File --------------------------------
