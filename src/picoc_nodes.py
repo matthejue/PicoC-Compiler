@@ -92,6 +92,13 @@ class N:
     class VoidType(ASTNode):
         pass
 
+    # ------------------------------- L_Pointer -------------------------------
+    class PNTR_PLUS(ASTNode):
+        pass
+
+    class PNTR_MINUS(ASTNode):
+        pass
+
     # ------------------------------- L_If_Else -------------------------------
     class Else(ASTNode):
         pass
@@ -150,19 +157,27 @@ class N:
             return super().__repr__()
 
     class Alloc(ASTNode):
-        def __init__(self, type_qual, size_qual, identifier):
+        def __init__(self, type_qual, datatype, pntr_decl, identifier, array_decl):
             self.type_qual = type_qual
-            self.size_qual = size_qual
+            self.datatype = datatype
+            self.pntr_decl = pntr_decl
             self.identifier = identifier
+            self.array_decl = array_decl
 
-        __match_args__ = ("type_qual", "size_qual", "identifier")
+        __match_args__ = (
+            "type_qual",
+            "datatype",
+            "pntr_decl",
+            "identifier",
+            "array_decl",
+        )
 
     # ------------------------------- L_Pointer -------------------------------
-    class PointerType(ASTNode):
-        def __init__(self, size_qual):
-            self.size_qual = size_qual
+    class PntrDecl(ASTNode):
+        def __init__(self, pntr_deg):
+            self.pntr_deg = pntr_deg
 
-        __match_args__ = ("size_qual",)
+        __match_args__ = ("pntr_deg",)
 
     class Ref(ASTNode):
         def __init__(self, location):
@@ -178,19 +193,17 @@ class N:
         __match_args__ = ("location", "offset")
 
     # -------------------------------- L_Array --------------------------------
-    class ArrayType(ASTNode):
-        def __init__(self, size_qual, dims):
-            self.size_qual = size_qual
+    class ArrayDecl(ASTNode):
+        def __init__(self, dims):
             self.dims = dims
 
-        __match_args__ = ("size_qual",)
+        __match_args__ = ("dims",)
 
     class Array(ASTNode):
-        def __init__(self, size_qual, entries):
-            self.size_qual = size_qual
+        def __init__(self, entries):
             self.entries = entries
 
-        __match_args__ = ("size_qual", "entries")
+        __match_args__ = ("datatype", "entries")
 
     class Subscript(ASTNode):
         def __init__(self, identifier, arith_exp_logic_exp):
@@ -200,7 +213,7 @@ class N:
         __match_args__ = ("identifier", "arith_exp_logic_exp")
 
     # -------------------------------- L_Struct -------------------------------
-    class StructType(ASTNode):
+    class StructSpec(ASTNode):
         def __init__(self, identifier):
             self.identifier = identifier
 
@@ -212,7 +225,7 @@ class N:
 
         __match_args__ = ("assignments",)
 
-    class Attribute(ASTNode):
+    class Attr(ASTNode):
         def __init__(self, array_identifier, attribute_identifier):
             self.array_identifier = array_identifier
             self.attribute_identifier = attribute_identifier
@@ -227,62 +240,56 @@ class N:
         __match_args__ = ("struct_identifier", "params")
 
     class Param(ASTNode):
-        def __init__(self, size_qual, identifier):
-            self.size_qual = size_qual
+        def __init__(self, datatype, identifier):
+            self.datatype = datatype
             self.identifier = identifier
 
-        __match_args__ = ("size_qual", "identifier")
+        __match_args__ = ("datatype", "identifier")
 
     # ------------------------------- L_If_Else -------------------------------
     class If(ASTNode):
-        def __init__(self, condition, branch):
+        def __init__(self, condition, branch_stmts):
             self.condition = condition
-            self.branch = branch
+            self.branch_stmts = branch_stmts
 
-        __match_args__ = ("condition", "branch")
+        __match_args__ = ("condition", "branch_stmts")
 
         def __repr__(self):
             return self.to_string_show_node()
 
     class IfElse(ASTNode):
-        def __init__(self, condition, branch1, branch2):
+        def __init__(self, condition, branch1_stmts, branch2_stmts):
             self.condition = condition
-            self.branch1 = branch1
-            self.branch2 = branch2
+            self.branch1_stmts = branch1_stmts
+            self.branch2_stmts = branch2_stmts
 
-        __match_args__ = ("condition", "branch1", "branch2")
+        __match_args__ = ("condition", "branch1_stmts", "branch2_stmts")
 
         def __repr__(self):
             return self.to_string_show_node()
 
     # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
-        def __init__(self, condition, branch):
+        def __init__(self, condition, branch_stmts):
             self.condition = condition
-            self.branch = branch
+            self.branch_stmts = branch_stmts
 
-        __match_args__ = ("condition", "branch")
+        __match_args__ = ("condition", "branch_stmts")
 
         def __repr__(self):
             return self.to_string_show_node()
 
     class DoWhile(ASTNode):
-        def __init__(self, branch, condition):
-            self.branch = branch
+        def __init__(self, condition, branch_stmts):
             self.condition = condition
+            self.branch_stmts = branch_stmts
 
-        __match_args__ = ("condition", "branch")
+        __match_args__ = ("condition", "branch_stmts")
 
         def __repr__(self):
             return self.to_string_show_node()
 
     # --------------------------------- L_Fun ---------------------------------
-    class FunType(ASTNode):
-        def __init__(self, size_qual):
-            self.size_qual = size_qual
-
-        __match_args__ = ("size_qual",)
-
     class Call(ASTNode):
         def __init__(self, functionname, args):
             self.functionname = functionname
@@ -309,13 +316,13 @@ class N:
         __match_args__ = ("call",)
 
     class FunDef(ASTNode):
-        def __init__(self, size_qual, fun_name, params, stmts_blocks):
-            self.size_qual = size_qual
+        def __init__(self, datatype, fun_name, params, stmts_blocks):
+            self.datatype = datatype
             self.fun_name = fun_name
             self.params = params
             self.stmts_blocks = stmts_blocks
 
-        __match_args__ = ("size_qual", "fun_name", "params", "stmts_blocks")
+        __match_args__ = ("datatype", "fun_name", "params", "stmts_blocks")
 
     # --------------------------------- L_File --------------------------------
     class File(ASTNode):
@@ -333,3 +340,9 @@ class N:
             self.stmts = stmsts
 
         __match_args__ = ("blockname", "stmts")
+
+    class Goto(ASTNode):
+        def __init__(self, labelname):
+            self.labelname = labelname
+
+        __match_args__ = ("blockname",)
