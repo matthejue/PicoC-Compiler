@@ -66,7 +66,7 @@ class ASTTransformer(Transformer):
                 return N.GtE(token.value, (token.start_pos, token.end_pos))
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    def PRIM_SIZE_QUAL(self, token: Token):
+    def SIZE_QUAL(self, token: Token):
         match token.value:
             case "int":
                 return N.IntType(token.value, (token.start_pos, token.end_pos))
@@ -101,18 +101,27 @@ class ASTTransformer(Transformer):
         for node in nodes[-2::-1]:
             acc_node = N.UnOp(node, acc_node)
         return acc_node
+        #  if len(nodes) == 1:
+        #      return nodes[0]
+        #  return N.UnOp(nodes[0], nodes[1])
 
     def arith_prec1(self, nodes):
         acc_node = nodes[0]
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
             acc_node = N.BinOp(acc_node, node1, node2)
         return acc_node
+        #  if len(nodes) == 1:
+        #      return nodes[0]
+        #  return N.BinOp(nodes[0], nodes[1], nodes[2])
 
     def arith_prec2(self, nodes):
         acc_node = nodes[0]
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
             acc_node = N.BinOp(acc_node, node1, node2)
         return acc_node
+        #  if len(nodes) == 1:
+        #      return nodes[0]
+        #  return N.BinOp(nodes[0], nodes[1], nodes[2])
 
     def arith_exp(self, nodes):
         return nodes[0]
@@ -182,7 +191,7 @@ class ASTTransformer(Transformer):
 
     # -------------------------------- L_Pointer ------------------------------
     def pntr_decl(self, nodes):
-        return N.PntrDecl(N.Num(len(nodes)))
+        return N.PntrDecl(N.Num(str(len(nodes))))
 
     def pntr_simple(self, nodes):
         return N.Deref(nodes[0], 0)
@@ -301,6 +310,9 @@ class ASTTransformer(Transformer):
     def stmt(self, nodes):
         return nodes[0]
 
+    def stmts(self, nodes):
+        return nodes
+
     # ---------------------------------- L_Fun --------------------------------
     def fun_call(self, nodes):
         return N.Call(nodes[0], nodes[1:])
@@ -314,42 +326,39 @@ class ASTTransformer(Transformer):
     def fun_stmt(self, nodes):
         return nodes[0]
 
+    def params(self, nodes):
+        params = []
+        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
+            params += [N.Param(node1, node2)]
+        return params
+
     def def_(self, nodes):
-        i = 0
-        for (i, child) in enumerate(nodes[3::2]):
-            match child:
-                case N.Name(_):
-                    pass
-                case _:
-                    i += -1 + 3
-                    break
-        else:
-            i += 1 + 3
-        return N.FunDef(nodes[0], nodes[1], nodes[2:i], nodes[i:])
+        return N.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
 
     # --------------------------------- L_File --------------------------------
     def file(self, nodes):
         i = 0
         for (i, node) in enumerate(nodes[1:]):
             match node:
-                case N.FunDef(N.Name("main"), _, _, _):
+                case N.FunDef(_, N.Name("main"), _, _):
                     i += 1
                     break
         else:
-            i += 1
+            pass
             #  raise Errors.NoMainFunctionError(str(nodes[0].value))
-        return N.File(nodes[0], nodes[i : i + 1], nodes[1:i] + nodes[i + 1 :])
+        return N.File(nodes[0], nodes[i], nodes[1:i] + nodes[i + 1 :])
 
 
 #  ----------------------------------------------------------------------------
 #  -                                  Testing                                 -
 #  ----------------------------------------------------------------------------
 with open("./concrete_syntax.lark") as fin:
-    parser = Lark(fin.read(), start="file")
+    parser = Lark(fin.read(), parser="earley", start="file", maybe_placeholders=False)
     dt = parser.parse(
         r"""
         testus
-        char test(){
+        void main(){
+            int var = 12 + 3 +--5 * 4 * 2;
         }
         """
         #  r"""
@@ -363,9 +372,9 @@ with open("./concrete_syntax.lark") as fin:
         #  """
     )
     ast = ASTTransformer().transform(dt)
-    import global_vars
-
-    global_vars.args.verbose = True
+    #  import global_vars
+    #
+    #  global_vars.args.verbose = True
     print(dt.pretty())
     print(dt)
     print(ast)
