@@ -11,13 +11,13 @@ class ASTNode:
     normalized in a list. Normalized Heterogeneous means different Node types
     and all childs normalized in a list"""
 
-    def __init__(self, value=None, position=None):
+    def __init__(self, value=None, position=None, children=[]):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
-        self.children = []
         self.value = value
         self.position = position
+        self.children = children
 
     def update_match_args(self):
         pass

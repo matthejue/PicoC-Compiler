@@ -2,7 +2,6 @@
 
 from lark import Lark, Transformer, Token
 from picoc_nodes import N
-from errors import Errors
 
 
 class ASTTransformer(Transformer):
@@ -330,13 +329,16 @@ class ASTTransformer(Transformer):
 
     # --------------------------------- L_File --------------------------------
     def file(self, nodes):
-        for (i, node) in enumerate(nodes):
+        i = 0
+        for (i, node) in enumerate(nodes[1:]):
             match node:
                 case N.FunDef(N.Name("main"), _, _, _):
+                    i += 1
                     break
         else:
-            raise Errors.NoMainFunctionError(str(nodes[0].value))
-        return N.File(nodes[0], nodes[i], nodes[1:i] + nodes[i + 1 :])
+            i += 1
+            #  raise Errors.NoMainFunctionError(str(nodes[0].value))
+        return N.File(nodes[0], nodes[i : i + 1], nodes[1:i] + nodes[i + 1 :])
 
 
 #  ----------------------------------------------------------------------------
@@ -347,8 +349,8 @@ with open("./concrete_syntax.lark") as fin:
     dt = parser.parse(
         r"""
         testus
-        // char test(){
-        // }
+        char test(){
+        }
         """
         #  r"""
         #  test
@@ -361,6 +363,9 @@ with open("./concrete_syntax.lark") as fin:
         #  """
     )
     ast = ASTTransformer().transform(dt)
+    import global_vars
+
+    global_vars.args.verbose = True
     print(dt.pretty())
     print(dt)
     print(ast)

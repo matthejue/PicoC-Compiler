@@ -101,7 +101,7 @@ def_: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" stmt* "}"
 // ---------------------------------- L_File ----------------------------------
 file: NAME def_*
 // ---------------------------------- L_Block ---------------------------------
-def_: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" block* "}"
+// def_: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" block* "}"
 block: NAME":" stmt*
 goto: "goto""("NAME")"
 
