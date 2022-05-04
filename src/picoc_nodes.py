@@ -81,7 +81,8 @@ class N:
         pass
 
     class Writeable(ASTNode):
-        pass
+        def __init__(self):
+            super().__init__("writeable", tuple())
 
     class IntType(ASTNode):
         pass
@@ -194,6 +195,9 @@ class N:
             self.pntr_deg = pntr_deg
             super().__init__(children=[self.pntr_deg])
 
+        def __repr__(self):
+            return f"*({self.pntr_deg.value})"
+
         __match_args__ = ("pntr_deg",)
 
     class Ref(ASTNode):
@@ -216,6 +220,13 @@ class N:
         def __init__(self, dims):
             self.dims = dims
             super().__init__(children=[self.dims])
+
+        def __repr__(self):
+            if not self.dims:
+                return "[](0)"
+            subscrs = ""
+            for dim in self.dims:
+                subscrs += f"[{dim.value}]"
 
         __match_args__ = ("dims",)
 
