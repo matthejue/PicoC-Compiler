@@ -18,6 +18,10 @@ read-color: _read-color clean
 _read-color:
 	./src/main.py -ctdas -p -D 20 -S 2 -C -v -m ./run/code.picoc
 
+read-debug: _read-debug clean
+_read-debug:
+	./src/main.py -ctdas -p -D 20 -S 2 -v -m -g ./run/code.picoc
+
 shell: _shell clean
 _shell:
 	./src/main.py
@@ -42,6 +46,7 @@ clean:
 
 clean-files:
 	find . -type f -name "*.tokens" -delete
+	find . -type f -name "*.dt" -delete
 	find . -type f -name "*.ast" -delete
 	find . -type f -name "*.csv" -delete
 	find . -type f -wholename "./tests/*.reti" -delete

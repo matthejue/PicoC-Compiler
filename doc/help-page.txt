@@ -3,7 +3,8 @@
 =                                  `Synopsis`                                 =
 ===============================================================================
 
-Usage: compile [-h] [-c] [-t] [-a] [-s] [-p] [-b PROCESS_BEGIN] [-d DISTANCE] [-S SIGHT] [-C] [-v] [infile]
+Usage: picoc_compiler / compile [-h] [-c] [-t] [-d] [-a] [-s] [-p] [-d
+DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
 
 Compiles PicoC Code into RETI Code.
 
@@ -20,29 +21,31 @@ interpreted as string with PicoC Code
 
 -h, --help            show this help message and exit. With the -C option it
 can be colorized.
--c, --concrete_syntax
->                     also print the concrete syntax (content of input file).
-Only works if --print option is active
--t, --tokens          also write the tokenlist
--a, --abstract_syntax
->                     also write the abstract syntax
+-c, --code
+>                     also print the content of the `.picoc` input file that
+gets compiled. Only works if --print option is active
+-t, --tokens          also write the tokenlist into a `.tokens` file
+-d, --derivation-tree
+>                     also write the derivation tree into a `.dt` file
+-a, --abstract_syntax-tree
+>                     also write the abstract syntax tree into a `.ast` file
 -s, --symbol_table    also write the final symbol table into a `.csv` file
 -p, --print           print all file outputs to the terminal. Is always
 activated in the shell. Doesn't have to be activated manually in the shell.
--b, --process_begin PROCESS_BEGIN
->                     where the datasegment starts (default `100`)
-starts (default `200`)
 -d, --distance DISTANCE
 >                     distance of the comments from the instructions for the
 --verbose option. The passed value gets added to the minimum distance of 2
 spaces
--v, --verbose         also show tokentype and position for tokens, write the
-nodetype in front of parenthesis in the abstract syntax tree, add comments to
-the RETI Code
 -S, --sight SIGHT     sets the number of lines visible around a error message
 -C, --color           colorizes the terminal output. Gets ignored in the shell.
 Instead in the shell colors can be toggled via the `color_toggle` command
 (shortcut `ct`)
+-v, --verbose         also show tokentype and position for tokens, write the
+nodetype in front of parenthesis in the abstract syntax tree, add comments to
+the RETI Code
+-g, --debug           starts the debugger in the code
+-m, --show_error_message
+>                     show error message from python
 
 ===============================================================================
 =                                   `PicoC`                                   =
@@ -96,7 +99,7 @@ If you don't want to type the most likely used cli options out every time, you
 can use the `most_used "<code>";` command (shortcut `mu`).
 It's a shortcut for:
 
-`compile -c -t -a -s -p -v -b 100 -e 200 -d 20 -S 2 "<code>";`
+`compile -ctas -p -v -d 20 -S 2 "<code>";`
 
 and shrinks it down to:
 

@@ -170,7 +170,7 @@ class Compiler(cmd2.Cmd):
         :returns: pico_c Code compiled in RETI Assembler
         """
         with open(global_vars.args.infile, encoding="utf-8") as fin:
-            pico_c_in = fin.readlines()
+            pico_c_in = fin.read()
 
         self._compile(pico_c_in)
 
@@ -178,14 +178,18 @@ class Compiler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
-        # remove all empty lines and \n from the code lines in the list and
+        terminal_width = os.get_terminal_size().columns
+
         # add the filename to the start of the code
-        code_without_cr = [f"{basename(global_vars.args.infile)} "] + list(
-            filter(lambda line: line, map(lambda line: line.strip("\n"), code))
+        code = f"{basename(global_vars.args.infile)}\n" + code
+
+        splitted_code = list(
+            filter(lambda line: line, map(lambda line: line.strip(), code.split("\n")))
         )
 
+        print(subheading("Code", terminal_width, "-"))
         if global_vars.args.code and global_vars.args.print:
-            print(code_without_cr)
+            print(splitted_code)
 
         parser = Lark.open(
             "./src/concrete_syntax.lark",
@@ -197,34 +201,37 @@ class Compiler(cmd2.Cmd):
         )
 
         # handle errors
-        error_handler = ErrorHandler(code_without_cr)
+        error_handler = ErrorHandler(splitted_code)
 
-        dt = error_handler.handle(parser.parse, code_without_cr)
+        #  dt = error_handler.handle(parser.parse, code)
+        dt = parser.parse(code)
 
-        # tokens
+        print(subheading("Tokens", terminal_width, "-"))
         if global_vars.args.tokens:
-            error_handler.handle(self._tokens_option, dt, code_without_cr)
+            error_handler.handle(self._tokens_option, dt, code)
 
-        # derivation tree
+        print(subheading("Derivation Tree", terminal_width, "-"))
         if global_vars.args.derivation_tree:
             self._derivation_tree_option(dt)
 
-        # abstract syntax tree
+        print(subheading("Abstract Syntax Tree", terminal_width, "-"))
         ast_transformer = ASTTransformer()
-        ast = error_handler.handle(ast_transformer.transform(dt))
+        ast = error_handler.handle(ast_transformer.transform, dt)
 
         if global_vars.args.abstract_syntax_tree:
             self._abstract_syntax_tree_option(ast)
 
+        print(subheading("Symbol Table", terminal_width, "-"))
         if global_vars.args.symbol_table:
             self._symbol_table_option()
 
+        print(subheading("RETI Code", terminal_width, "-"))
         self._reti_code(ast)
 
     def _tokens_option(self, dt, code):
         if global_vars.args.verbose:
             parser = Lark.open(
-                "./concrete_syntax.lark",
+                "./src/concrete_syntax.lark",
                 lexer="dynamic",
                 keep_all_tokens=True,
                 parser="earley",
@@ -245,7 +252,7 @@ class Compiler(cmd2.Cmd):
 
     def _derivation_tree_option(self, dt):
         if global_vars.args.verbose:
-            dt = dt._pretty()
+            dt = dt.pretty()
 
         if global_vars.args.print:
             print(dt)
@@ -282,13 +289,7 @@ class Compiler(cmd2.Cmd):
                 headers=header,
             )
         )
-
-        output = (
-            Colorizer(output).colorize_symbol_table()
-            if global_vars.args.color
-            else output
-        )
-        print("\n" + output)
+        print(output)
 
     def _write_symbol_table(self):
         output = "name,type,datatype,position,value\n"
@@ -340,3 +341,7 @@ def _remove_path(fname):
 def basename(fname):
     fname = remove_extension(fname)
     return _remove_path(fname)
+
+
+def subheading(heading, terminal_width, symbol):
+    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
