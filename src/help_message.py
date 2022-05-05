@@ -1,6 +1,5 @@
 import os
 import global_vars
-from ast_node import strip_multiline_string
 from colorizer import colorize_help_page
 
 
@@ -34,7 +33,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: picoc_compiler / compile [-h] [-c] [-t] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
+    Usage: picoc_compiler / compile [-h] [-c] [-t] [-d] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
 
     Compiles PicoC Code into RETI Code.
 
@@ -43,11 +42,13 @@ def generate_help_message():
 
     {header("Optional arguments", terminal_width, '~')}
     -h, --help            show this help message and exit. With the -C option it can be colorized.
-    -c, --concrete_syntax
-    >                     also print the concrete syntax (content of input file). Only works if --print option is active
-    -t, --tokens          also write the tokenlist
-    -a, --abstract_syntax
-    >                     also write the abstract syntax
+    -c, --code
+    >                     also print the content of the `.picoc` input file that gets compiled. Only works if --print option is active
+    -t, --tokens          also write the tokenlist into a `.tokens` file
+    -d, --derivation-tree
+    >                     also write the derivation tree into a `.dt` file
+    -a, --abstract_syntax-tree
+    >                     also write the abstract syntax tree into a `.ast` file
     -s, --symbol_table    also write the final symbol table into a `.csv` file
     -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
     -d, --distance DISTANCE
@@ -134,3 +135,17 @@ def generate_help_message():
         terminal_width,
     )
     return colorize_help_page(description) if global_vars.args.color else description
+
+
+def strip_multiline_string(mutline_string):
+    """helper function to make mutlineline string usable on different
+    indent levels
+
+    :grammar: grammar specification
+    :returns: None
+    """
+    mutline_string = "".join(
+        [i.lstrip() + "\n" for i in mutline_string.split("\n")[:-1]]
+    )
+    # every code piece ends with \n, so the last element can always be poped
+    return mutline_string

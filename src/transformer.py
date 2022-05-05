@@ -360,35 +360,34 @@ class ASTTransformer(Transformer):
 #  ----------------------------------------------------------------------------
 #  -                                  Testing                                 -
 #  ----------------------------------------------------------------------------
-with open("./concrete_syntax.lark") as fin:
-    parser = Lark(
-        fin.read(),
-        parser="earley",
-        start="file",
-        maybe_placeholders=False,
-    )
-    dt = parser.parse(
-        r"""
-        testus
-        int main(){
-            int car[2][2][2][2] = {{1, 2}, {3, 4}, {3, 4}, {3, 4}};
-            int bar = **(car[1][2]+3-1);
-        }
-        """
-        #  r"""
-        #  test
-        #  int test(char c, int var){
-        #  print(_fun120 /*-3*/ + 120 * -'c');
-        #  int[] var = {12, 3, 4}; // das ist blöd
-        #  // das ist noch blöder
-        #  var[3] = 10;
-        #  }
-        #  """
-    )
-    ast = ASTTransformer().transform(dt)
-    #  import global_vars
-    #
-    #  global_vars.args.verbose = True
-    print(dt.pretty())
-    print(dt)
-    print(ast)
+#  parser = Lark.open(
+#      "./concrete_syntax.lark",
+#      lexer="dynamic",
+#      #  keep_all_tokens=True,
+#      parser="earley",
+#      start="file",
+#      maybe_placeholders=False,
+#      propagate_positions=True,
+#  )
+#  dt = parser.parse(
+#      r"""
+#      test
+#      int main(){
+#          int car[2][2][2][2] = {{1, 2}, {3, 4}, {3, 4}, {3, 4}};
+#          int bar = **(car[1][2]+3-1);
+#      }
+#      """
+#      #  r"""
+#      #  test
+#      #  int test(char c, int var){
+#      #  print(_fun120 /*-3*/ + 120 * -'c');
+#      #  int[] var = {12, 3, 4}; // das ist blöd
+#      #  // das ist noch blöder
+#      #  var[3] = 10;
+#      #  }
+#      #  """
+#  )
+#  print(list(dt.scan_values(lambda v: isinstance(v, Token))))
+#  print(dt)
+#  print(dt.pretty())
+#  print(ASTTransformer().transform(dt))

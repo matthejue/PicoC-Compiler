@@ -1,45 +1,31 @@
 import global_vars
 import cmd2
-from lexer import Lexer, TT
-from parse_picoc import PicoCParser
 from error_handler import ErrorHandler
-from warning_handler import WarningHandler
 from symbol_table import SymbolTable
-from code_generator import CodeGenerator
-from warning_handler import WarningHandler
 from tabulate import tabulate
 from colormanager import ColorManager as CM
 import os
-from colorizer import Colorizer
 from help_message import generate_help_message
 from ast_node import ASTNode
+from lark import Lark, Token
+from transformer import ASTTransformer
 
 
 class Compiler(cmd2.Cmd):
     cli_args_parser = cmd2.Cmd2ArgumentParser(add_help=False)
     cli_args_parser.add_argument("infile", nargs="?")
-    cli_args_parser.add_argument("-c", "--concrete_syntax", action="store_true")
+    cli_args_parser.add_argument("-c", "--code", action="store_true")
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
-    cli_args_parser.add_argument("-a", "--abstract_syntax", action="store_true")
+    cli_args_parser.add_argument("-d", "--derivation_tree", action="store_true")
+    cli_args_parser.add_argument("-a", "--abstract_syntax_tree", action="store_true")
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
+    cli_args_parser.add_argument("-D", "--distance", type=int, default=0)
     cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-g", "--debug", action="store_true")
     cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
-
-    #  cli_args_parser.add_argument(
-    #      '-O',
-    #      '--optimization_level',
-    #      help="set the optimiziation level of the "
-    #      "compiler (0=save all variables on the "
-    #      "stack, 1=use graph coloring to find the "
-    #      "best assignment of variables to registers, "
-    #      "2=partially interpret expressions) [NOT IMPLEMENTED YET]",
-    #      type=int,
-    #      default=0)
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/settings.conf"
@@ -188,15 +174,6 @@ class Compiler(cmd2.Cmd):
 
         self._compile(pico_c_in)
 
-    def _reset(self, finput):
-        # Singletons have to be reset manually for the shell
-        SymbolTable().__init__()
-        CodeGenerator().__init__()
-        if not WarningHandler(global_vars.args.infile, finput)._instance:
-            WarningHandler(global_vars.args.infile, finput)
-        else:
-            WarningHandler().__init__(global_vars.args.infile, finput)
-
     def _compile(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
@@ -206,68 +183,84 @@ class Compiler(cmd2.Cmd):
         code_without_cr = [f"{basename(global_vars.args.infile)} "] + list(
             filter(lambda line: line, map(lambda line: line.strip("\n"), code))
         )
-        # reset everything to defaults
-        self._reset(code_without_cr)
 
-        if global_vars.args.concrete_syntax and global_vars.args.print:
-            code_without_cr_str = Colorizer(
-                str(code_without_cr)
-            ).colorize_conrete_syntax()
-            print(code_without_cr_str)
+        if global_vars.args.code and global_vars.args.print:
+            print(code_without_cr)
 
-        lexer = Lexer(code_without_cr)
+        parser = Lark.open(
+            "./src/concrete_syntax.lark",
+            lexer="dynamic",
+            parser="earley",
+            start="file",
+            maybe_placeholders=False,
+            propagate_positions=True,
+        )
 
-        # Handle errors and warnings
+        # handle errors
         error_handler = ErrorHandler(code_without_cr)
-        warning_handler = WarningHandler()  # get singleton
 
+        dt = error_handler.handle(parser.parse, code_without_cr)
+
+        # tokens
         if global_vars.args.tokens:
-            error_handler.handle(self._tokens_option, lexer)
-            lexer.__init__(code_without_cr)
+            error_handler.handle(self._tokens_option, dt, code_without_cr)
 
-        # Generate ast
-        grammar = PicoCParser(lexer)
-        error_handler.handle(grammar.parse_picoc)
+        # derivation tree
+        if global_vars.args.derivation_tree:
+            self._derivation_tree_option(dt)
 
-        if global_vars.args.abstract_syntax:
-            self._abstract_syntax_option(grammar)
+        # abstract syntax tree
+        ast_transformer = ASTTransformer()
+        ast = error_handler.handle(ast_transformer.transform(dt))
 
-        ast_node = grammar.reveal_ast()
-        # TODO: new passes
-        #  error_handler.handle(ast_node.visit)
+        if global_vars.args.abstract_syntax_tree:
+            self._abstract_syntax_tree_option(ast)
 
         if global_vars.args.symbol_table:
             self._symbol_table_option()
 
-        # show warnings before reti code gets output
-        warning_handler.show_warnings()
+        self._reti_code(ast)
 
-        #  self._reti_code(ast_node)
+    def _tokens_option(self, dt, code):
+        if global_vars.args.verbose:
+            parser = Lark.open(
+                "./concrete_syntax.lark",
+                lexer="dynamic",
+                keep_all_tokens=True,
+                parser="earley",
+                start="file",
+                maybe_placeholders=False,
+                propagate_positions=True,
+            )
+            dt = parser.parse(code)
 
-    def _tokens_option(self, lexer):
-        tokens = []
-        t = lexer.next_token()
-        while t.type != TT.EOF:
-            tokens += [t]
-            t = lexer.next_token()
+        tokens = list(dt.scan_values(lambda v: isinstance(v, Token)))
 
         if global_vars.args.print:
-            tokens_str = Colorizer(str(tokens)).colorize_tokens()
-            print("\n" + tokens_str)
+            print(tokens)
 
         if global_vars.outbase:
             with open(global_vars.outbase + ".tokens", "w", encoding="utf-8") as fout:
                 fout.write(str(tokens))
 
-    def _abstract_syntax_option(self, grammar: PicoCParser):
+    def _derivation_tree_option(self, dt):
+        if global_vars.args.verbose:
+            dt = dt._pretty()
+
         if global_vars.args.print:
-            ast = str(grammar.reveal_ast())
-            ast = Colorizer(ast).colorize_abstract_syntax()
-            print("\n" + ast)
+            print(dt)
+
+        if global_vars.outbase:
+            with open(global_vars.outbase + ".dt", "w", encoding="utf-8") as fout:
+                fout.write(str(dt))
+
+    def _abstract_syntax_tree_option(self, ast):
+        if global_vars.args.print:
+            print(ast)
 
         if global_vars.outbase:
             with open(global_vars.outbase + ".ast", "w", encoding="utf-8") as fout:
-                fout.write(str(grammar.reveal_ast()))
+                fout.write(str(ast))
 
     def _symbol_table_option(self):
         if global_vars.args.print:
@@ -316,17 +309,12 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _reti_code(self, ast_node: ASTNode):
+    def _reti_code(self, root: ASTNode):
         if global_vars.args.print:
-            code = (
-                Colorizer(str(ast_node.show_generated_code())).colorize_reti_code()
-                if global_vars.args.color
-                else str(abstract_syntax_tree.show_generated_code())
-            )
-            print("\n" + code)
+            pass
         if global_vars.outbase:
             with open(global_vars.outbase + ".reti", "w", encoding="utf-8") as fout:
-                fout.write(str(abstract_syntax_tree.show_generated_code()))
+                pass
 
 
 def remove_extension(fname):
