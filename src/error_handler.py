@@ -14,14 +14,12 @@ class ErrorHandler:
         # list of removed comments to undo the removing later
         self.removed_comments = [(0, 0, "")]
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return str(self.finput)
 
     def handle(self, function, *args):
         try:
-            function(*args)
+            rtrn_val = function(*args)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
@@ -155,6 +153,7 @@ class ErrorHandler:
             error_header = e.description + "\n"
             print("\n" + error_header)
             exit(0)
+        return rtrn_val
 
     def _error_header(self, pos, descirption):
         if not pos:
@@ -171,88 +170,6 @@ class ErrorHandler:
             + CM().RESET_ALL
             + "\n"
         )
-
-    def _find_space_after_previous_token(self, pos):
-        row, col = pos[0], pos[1]
-        self.finput[row] = self._remove_comments(row)
-        while row > 0:
-            old_row = row
-            row, col = self._previous_position(row, col)
-
-            # comments should be overwritten with space
-            if old_row != row:
-                self.finput[row] = self._remove_comments(row)
-                if self.multiline_comment_started == True:
-                    self._store_comment(row, 0, self.finput[row])
-                    self.finput[row] = overwrite(
-                        self.finput[row], " " * len(self.finput[row]), 0
-                    )
-            if self.finput[row][col] not in " \t":
-                break
-        self._undo_removing_commments()
-        return (row, col + 1)
-
-    def _remove_comments(self, row):
-        """checks whether there comes a comment while going back and if yes
-        return the position where the comment starts
-        """
-        line = self.finput[row]
-        col = len(line) - 1
-        while col > 0:
-            if line[col - 1] == "/" and line[col] == "/":
-                col -= 1
-                self._store_comment(row, col, line[col : len(line)])
-                line = overwrite(line, " " * (len(line) - col), col)
-            elif line[col - 1] == "*" and line[col] == "/":
-                col_to = col
-                col -= 2
-                while col > 0:
-                    if line[col - 1] == "/" and line[col] == "*":
-                        col -= 1
-                        self._store_comment(row, col, line[col : col_to + 1])
-                        line = overwrite(line, " " * (col_to - col + 1), col)
-                        break
-                    col -= 1
-                else:
-                    self._store_comment(row, 0, line[0 : col_to + 1])
-                    line = overwrite(line, " " * (col_to + 1), 0)
-                    self.multiline_comment_started = True
-            elif line[col - 1] == "/" and line[col] == "*":
-                col_from = col - 1
-                self._store_comment(row, col_from, line[col_from : len(line)])
-                line = overwrite(line, " " * (len(line) - col_from), col_from)
-                self.multiline_comment_started = False
-            col -= 1
-        return line
-
-    def _store_comment(self, row, col, comment):
-        # The if is only necessary in case _remove_comments already emptied a
-        # */ commment and in turn set multiline_comment_started to True. When
-        # returning from this function The emptied comment would be copied again.
-        if self.removed_comments[-1][0] != row:
-            self.removed_comments += [(row, col, comment)]
-
-    def _undo_removing_commments(
-        self,
-    ):
-        for row, col, comment in self.removed_comments:
-            self.finput[row] = overwrite(self.finput[row], comment, col)
-
-    def _previous_position(self, row, col):
-        # in contrast to the lexer the row and col vars are always kept as
-        # local variables they're only releavnt for the function
-        # _find_space_after_previous_token
-
-        # next column or next row
-        # the first row is for the filename
-        if col > 0:
-            col -= 1
-        elif col == 0 and row > 1:
-            row -= 1
-            col = len(self.finput[row]) - 1
-        elif col == 0 and row == 1:
-            row -= 1
-        return row, col
 
 
 class AnnotationScreen:

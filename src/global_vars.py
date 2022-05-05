@@ -3,9 +3,10 @@ class Args:
         # assigned in the do_most_used function because the filename has to be
         # put at the beginning of the code
         self.infile = "stdin"
-        self.concrete_syntax = True
+        self.code = True
         self.tokens = True
-        self.abstract_syntax = True
+        self.derivation_tree = True
+        self.abstract_syntax_tree = True
         self.symbol_table = True
         self.print = True
         self.distance = 20
