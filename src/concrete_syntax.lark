@@ -52,7 +52,7 @@ const_init: "const" SIZE_QUAL NAME "=" NUM";"
 // --------------------------------- L_Pointer --------------------------------
 !pntr_decl: "*"*
 pntr_simple: arith_opd
-pntr_arith: "("arith_opd"PNTR_PLUS"arith_exp_logic_exp")"|"("arith_opd"PNTR_MINUS"arith_exp_logic_exp")"
+pntr_arith.9: ("("arith_opd PNTR_PLUS arith_exp")"|"("arith_opd PNTR_MINUS arith_exp")")
 ?deref: "*"(pntr_simple|pntr_arith)
 var_ref: "&"NAME
 pntr_ref: "&"deref
