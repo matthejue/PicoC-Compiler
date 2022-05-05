@@ -82,10 +82,6 @@ class ASTTransformer(Transformer):
     def PNTR_MINUS(self, token: Token):
         return N.PNTR_MINUS(token.value, (token.start_pos, token.end_pos))
 
-    # ------------------------------- L_If_Else -------------------------------
-    def ELSE(self, token: Token):
-        return N.Else(token.value, (token.start_pos, token.end_pos))
-
     # -------------------------------------------------------------------------
     # -                                 Parser                                -
     # -------------------------------------------------------------------------
@@ -234,16 +230,21 @@ class ASTTransformer(Transformer):
     def array_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
-    def array_subexp(self, nodes):
-        return N.Array(nodes)
-
     def entry_subexp(self, nodes):
         return nodes[0]
 
+    def array_subexps(self, nodes):
+        return N.Array(nodes)
+
+    def array_decl_req(self, nodes):
+        return N.ArrayDecl(nodes)
+
     def array_init(self, nodes):
         return N.Assign(
-            N.Alloc(N.Writeable(), nodes[0], N.PntrDecl(N.Num(0)), nodes[1], nodes[2]),
-            N.Array(nodes[3:]),
+            N.Alloc(
+                N.Writeable(), nodes[0], N.PntrDecl(N.Num("0")), nodes[1], nodes[2]
+            ),
+            N.Array(nodes[3]),
         )
 
     # -------------------------------- L_Struct -------------------------------
@@ -259,49 +260,47 @@ class ASTTransformer(Transformer):
     def struct_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
-    def struct_decl_stmt(self, nodes):
+    def struct_subtypes(self, nodes):
         params = []
-        for node1, node2 in zip(nodes[1::2], nodes[2::2]):
+        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
             params += [N.Param(node1, node2)]
-        return N.StructDecl(nodes[0], params)
+        return params
 
-    def struct_subexp(self, nodes):
+    def struct_decl_stmt(self, nodes):
+        return N.StructDecl(nodes[0], nodes[1])
+
+    def struct_subexps(self, nodes):
         assigns = []
-        for node1, node2 in zip(nodes[1::2], nodes[2::2]):
+        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
             assigns += [N.Assign(node1, node2)]
         return N.Struct(assigns)
 
     def struct_init(self, nodes):
-        assigns = []
-        for node1, node2 in zip(nodes[2::2], nodes[3::2]):
-            assigns += [N.Assign(node1, node2)]
         return N.Assign(
             N.Alloc(
                 N.Writeable(), nodes[0], N.PntrDecl(N.Num(0)), nodes[1], N.ArrayDecl([])
             ),
-            N.Struct(assigns),
+            nodes[2],
         )
 
     # -------------------------------- L_If_Else ------------------------------
     def if_(self, nodes):
-        return N.If(nodes[0], nodes[1:])
+        return N.If(nodes[0], nodes[1])
 
     def if_else(self, nodes):
-        for (i, node) in enumerate(nodes):
-            match node:
-                case N.Else():
-                    break
-        return N.IfElse(nodes[0], nodes[1:i], nodes[i + 1 :])
+        if len(nodes[2]) == 1:
+            return N.IfElse(nodes[0], nodes[1], [nodes[2]])
+        return N.IfElse(nodes[0], nodes[1], nodes[2])
 
     def if_else_stmt(self, nodes):
         return nodes[0]
 
     # --------------------------------- L_Loop --------------------------------
     def while_(self, nodes):
-        return N.While(nodes[0], nodes[1:])
+        return N.While(nodes[0], nodes[1])
 
     def do_while(self, nodes):
-        return N.DoWhile(nodes[-1], nodes[0:-1])
+        return N.DoWhile(nodes[1], nodes[0])
 
     def loop_stmt(self, nodes):
         return nodes[0]
@@ -314,39 +313,48 @@ class ASTTransformer(Transformer):
         return nodes
 
     # ---------------------------------- L_Fun --------------------------------
+    def fun_call_args(self, nodes):
+        return nodes
+
     def fun_call(self, nodes):
-        return N.Call(nodes[0], nodes[1:])
+        return N.Call(nodes[0], nodes[1])
 
     def fun_call_stmt(self, nodes):
         return N.Exp(nodes[0])
 
-    def return_(self, nodes):
+    def fun_return(self, nodes):
+        if len(nodes) == 0:
+            return N.Return(N.Null())
         return N.Return(nodes[0])
 
     def fun_stmt(self, nodes):
         return nodes[0]
 
-    def params(self, nodes):
+    def fun_params(self, nodes):
         params = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
             params += [N.Param(node1, node2)]
         return params
 
-    def def_(self, nodes):
+    def fun_def(self, nodes):
         return N.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
+
+    def fun_defs(self, nodes):
+        return nodes
 
     # --------------------------------- L_File --------------------------------
     def file(self, nodes):
-        i = 0
-        for (i, node) in enumerate(nodes[1:]):
-            match node:
-                case N.FunDef(_, N.Name("main"), _, _):
-                    i += 1
-                    break
-        else:
-            pass
-            #  raise Errors.NoMainFunctionError(str(nodes[0].value))
-        return N.File(nodes[0], nodes[i], nodes[1:i] + nodes[i + 1 :])
+        return N.File(nodes[0], nodes[1])
+
+    # -------------------------------- L_Block --------------------------------
+    def block(self, nodes):
+        return N.Block(nodes[0], nodes[1])
+
+    def blocks(self, nodes):
+        return nodes
+
+    def goto(self, nodes):
+        return N.GoTo(nodes[0])
 
 
 #  ----------------------------------------------------------------------------
@@ -357,8 +365,9 @@ with open("./concrete_syntax.lark") as fin:
     dt = parser.parse(
         r"""
         testus
-        void main(){
-            int var = 12 + 3 +--5 * 4 * 2;
+        int main(){
+            int car[2][2][2][2] = {{1, 2}, {3, 4}, {3, 4}, {3, 4}};
+            int bar = **(car[1][2]+3-1);
         }
         """
         #  r"""

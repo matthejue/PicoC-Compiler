@@ -31,7 +31,7 @@ class ASTNode:
     def to_string(self):
         if not self.children:
             if not self.value:
-                return f"'{self.__class__.__name__}'"
+                return f"{self.__class__.__name__}()"
             if global_vars.args.verbose:
                 return f"{self.__class__.__name__}('{self.value}')"
             return f"'{self.value}'"
