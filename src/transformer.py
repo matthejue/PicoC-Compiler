@@ -361,7 +361,12 @@ class ASTTransformer(Transformer):
 #  -                                  Testing                                 -
 #  ----------------------------------------------------------------------------
 with open("./concrete_syntax.lark") as fin:
-    parser = Lark(fin.read(), parser="earley", start="file", maybe_placeholders=False)
+    parser = Lark(
+        fin.read(),
+        parser="earley",
+        start="file",
+        maybe_placeholders=False,
+    )
     dt = parser.parse(
         r"""
         testus

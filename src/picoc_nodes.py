@@ -238,6 +238,9 @@ class N:
 
         __match_args__ = ("datatype", "entries")
 
+        def __repr__(self):
+            return self.to_string_show_node()
+
     class Subscript(ASTNode):
         def __init__(self, arith_opd, offset):
             self.arith_opd = arith_opd
@@ -263,6 +266,9 @@ class N:
             super().__init__(children=[self.assignments])
 
         __match_args__ = ("assignments",)
+
+        def __repr__(self):
+            return self.to_string_show_node()
 
     class Attr(ASTNode):
         def __init__(self, array_identifier, attribute_identifier):
