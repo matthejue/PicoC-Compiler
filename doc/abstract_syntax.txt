@@ -46,7 +46,7 @@ stmt ::= While(<exp>, <stmt>*)
        | DoWhile(<exp>, <stmt>*)
 // ----------------------------------- L_Fun ----------------------------------
 fun_decl ::= FunType(<size_qual>)
-exp ::= Call(Name(str), <exp>*)
+exp ::= Call(Name(str), <exp>*) | Null()
 stmt ::= Exp(Call(Name(str), <exp>*))
        | Return(<exp>)
 def ::= FunDef(<size_qual>, Name(str), Param(<size_qual>, Name(str))*, <stmt>*)

@@ -81,8 +81,7 @@ class N:
         pass
 
     class Writeable(ASTNode):
-        def __init__(self):
-            super().__init__("writeable", tuple())
+        pass
 
     class IntType(ASTNode):
         pass
@@ -100,8 +99,8 @@ class N:
     class PNTR_MINUS(ASTNode):
         pass
 
-    # ------------------------------- L_If_Else -------------------------------
-    class Else(ASTNode):
+    # --------------------------------- L_Fun ---------------------------------
+    class Null(ASTNode):
         pass
 
     # -------------------------------------------------------------------------
@@ -196,7 +195,7 @@ class N:
             super().__init__(children=[self.pntr_deg])
 
         def __repr__(self):
-            return f"*({self.pntr_deg.value})"
+            return self.to_string_show_node()
 
         __match_args__ = ("pntr_deg",)
 
@@ -207,11 +206,17 @@ class N:
 
         __match_args__ = ("location",)
 
+        def __repr__(self):
+            return self.to_string_show_node()
+
     class Deref(ASTNode):
         def __init__(self, location, offset):
             self.location = location
             self.offset = offset
             super().__init__(children=[self.location, self.offset])
+
+        def __repr__(self):
+            return self.to_string_show_node()
 
         __match_args__ = ("location", "offset")
 
@@ -222,11 +227,7 @@ class N:
             super().__init__(children=[self.dims])
 
         def __repr__(self):
-            if not self.dims:
-                return "[](0)"
-            subscrs = ""
-            for dim in self.dims:
-                subscrs += f"[{dim.value}]"
+            return self.to_string_show_node()
 
         __match_args__ = ("dims",)
 
@@ -238,12 +239,15 @@ class N:
         __match_args__ = ("datatype", "entries")
 
     class Subscript(ASTNode):
-        def __init__(self, identifier, arith_exp_logic_exp):
-            self.identifier = identifier
-            self.arith_exp_logic_exp = arith_exp_logic_exp
-            super().__init__(children=[self.identifier, self.arith_exp_logic_exp])
+        def __init__(self, arith_opd, offset):
+            self.arith_opd = arith_opd
+            self.offset = offset
+            super().__init__(children=[self.arith_opd, self.offset])
 
-        __match_args__ = ("identifier", "arith_exp_logic_exp")
+        __match_args__ = ("arith_opd", "offset")
+
+        def __repr__(self):
+            return self.to_string_show_node()
 
     # -------------------------------- L_Struct -------------------------------
     class StructSpec(ASTNode):
@@ -378,13 +382,12 @@ class N:
 
     # --------------------------------- L_File --------------------------------
     class File(ASTNode):
-        def __init__(self, filename, main_fun, funs):
+        def __init__(self, filename, funs):
             self.filename = filename
-            self.main_fun = main_fun
             self.funs = funs
-            super().__init__(children=[self.filename, self.main_fun, self.funs])
+            super().__init__(children=[self.filename, self.funs])
 
-        __match_args__ = ("filename", "main_fun", "funs")
+        __match_args__ = ("filename", "funs")
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
@@ -395,7 +398,7 @@ class N:
 
         __match_args__ = ("blockname", "stmts")
 
-    class Goto(ASTNode):
+    class GoTo(ASTNode):
         def __init__(self, labelname):
             self.labelname = labelname
             super().__init__(children=[self.labelname])
