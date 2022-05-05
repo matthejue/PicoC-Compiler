@@ -18,6 +18,8 @@
     ·
     <a href="./doc/help-page.txt">Usage</a>
     ·
+    <a href="https://github.com/matthejue/Bachelorarbeit">Bachelor Thesis</a>
+    ·
     <a href="./src/concrete_syntax.lark/">Concrete Syntax</a>
     ·
     <a href="./doc/abstract_syntax.txt">Abstract Syntax</a>
