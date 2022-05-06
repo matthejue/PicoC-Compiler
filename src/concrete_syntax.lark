@@ -45,25 +45,27 @@ logic_or: logic_and ("||" logic_and)*
 alloc: datatype pntr_decl NAME array_decl
 ?alloc_stmt: alloc";"
 var_assign: NAME "=" arith_exp_logic_exp";"
-?assign_stmt: var_assign|pntr_assign|array_assign|struct_assign
+?assign_stmt: var_assign|deref_assign|subscr_assign|attribute_assign
 init: alloc "=" arith_exp_logic_exp";"
 const_init: "const" SIZE_QUAL NAME "=" NUM";"
 ?assign_alloc_stmt: alloc_stmt|assign_stmt|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
 !pntr_decl: "*"*
-pntr_simple: arith_opd
-pntr_arith.9: ("("arith_opd PNTR_PLUS arith_exp")"|"("arith_opd PNTR_MINUS arith_exp")")
-?deref: "*"(pntr_simple|pntr_arith)
+?deref_opd: NAME|pntr_opd|array_subscr|struct_attr|fun_call
+deref_simple: "*"deref_opd
+deref_arith.9: "*"("("deref_opd PNTR_PLUS arith_exp")"|"("deref_opd PNTR_MINUS arith_exp")")
+?deref: deref_simple|deref_arith
+// if the type of the location is array, then the address of the location is used
 var_ref: "&"NAME
-pntr_ref: "&"deref
-?ref: var_ref|pntr_ref|array_ref|struct_ref
+deref_ref: "&"deref
+?ref: var_ref|deref_ref|subscr_ref|attribute_ref
 ?pntr_opd: deref|ref
-pntr_assign: deref "=" arith_exp_logic_exp";"
+deref_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
 array_decl: ("["NUM"]")*
-array_subscr: arith_opd"["arith_exp_logic_exp"]"
-array_ref: "&"array_subscr
-array_assign: array_subscr "=" arith_exp_logic_exp";"
+array_subscr: deref_opd"["arith_exp_logic_exp"]"
+subscr_ref: "&"array_subscr
+subscr_assign: array_subscr "=" arith_exp_logic_exp";"
 ?entry_subexp: arith_exp_logic_exp|array_subexps|struct_subexps
 array_subexps: "{"entry_subexp("," entry_subexp)*"}"
 array_decl_req: ("["NUM"]")+
@@ -71,8 +73,8 @@ array_init: datatype NAME array_decl_req "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" NAME
 struct_attr: NAME"."NAME
-struct_ref: "&"struct_attr
-struct_assign: struct_attr "=" arith_exp_logic_exp";"
+attribute_ref: "&"struct_attr
+attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_subtypes: (datatype NAME";")+
 struct_decl_stmt: "struct" NAME "{"struct_subtypes"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
