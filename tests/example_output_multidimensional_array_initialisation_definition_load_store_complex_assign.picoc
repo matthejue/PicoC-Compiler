@@ -1,0 +1,17 @@
+// in:3 2 1
+// expected:5 42
+
+void main() {
+  // multidimensional array initialisation
+  int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};
+  // array definition
+  int var2[2];
+  // array store
+  var2[0] = input();
+  // array_load
+  print(var[input()][2 - 1])
+  // array load + store, complex array assign
+  var2[1] = var[input()][2 - 1] * 8;
+  // final result
+  print(var2[0] + var2[1])
+}

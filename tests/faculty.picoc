@@ -2,25 +2,21 @@
 // expected:6 24
 // Author: Christoph Scholl, from the Operating Systems Lecture
 
-int factorial(int n)
-{
+int factorial(int n) {
   int res_f, h;
-  if (n== 1)
-  {
+  if (n== 1) {
     res_f = 1;
   }
-  else
-  {
+  else {
     h = factorial(n-1);
     res_f = n * h;
   };
   return res_f;
-};
+}
 
-void main()
-{
+void main() {
   arg = input();
   print(factorial(arg));
   res = factorial(input());
   print(res);
-};
+}

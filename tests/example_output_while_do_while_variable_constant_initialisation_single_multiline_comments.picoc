@@ -1,0 +1,22 @@
+// in:10 10
+// expected:10 11
+
+void main() {
+  // variable initialisation
+  int var = 0;
+  // constant initialisation
+  const char var_const = 1;  // single line comment
+  /* multi
+  line
+  comment */
+  // while
+  while(var < input()) {
+    var = var + 1;
+  }
+  print(var);
+  // do while
+  do {
+    var = var + var_const;
+  } while(var < input());
+  print(var);
+}
