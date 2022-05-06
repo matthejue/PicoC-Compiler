@@ -2,11 +2,14 @@
 // expected:1
 
 void main() {
+  // complex initialisation
   int var = input() + 1;
+  // variable definition
   char var2;
+  // if, else if, else
   if (var > 100) {
     var2 = 0;
-  } else if (/* Störender Kommentar */ var > 10)
+  } else if (/* inline comment */ var > 10)
     var2 = 1;
   else
     var2 = 2;

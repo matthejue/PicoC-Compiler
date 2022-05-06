@@ -397,9 +397,9 @@ class N:
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
-        def __init__(self, blockname, stmsts):
+        def __init__(self, blockname, stmts):
             self.blockname = blockname
-            self.stmts = stmsts
+            self.stmts = stmts
             super().__init__(children=[self.blockname, self.stmts])
 
         __match_args__ = ("blockname", "stmts")
