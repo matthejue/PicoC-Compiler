@@ -189,10 +189,13 @@ class ASTTransformer(Transformer):
     def pntr_decl(self, nodes):
         return N.PntrDecl(N.Num(str(len(nodes))))
 
-    def pntr_simple(self, nodes):
+    def deref_opd(self, nodes):
+        return nodes[0]
+
+    def deref_simple(self, nodes):
         return N.Deref(nodes[0], 0)
 
-    def pntr_arith(self, nodes):
+    def deref_arith(self, nodes):
         match nodes[1]:
             case N.PNTR_PLUS():
                 return N.Deref(nodes[0], nodes[2])
@@ -205,7 +208,7 @@ class ASTTransformer(Transformer):
     def var_ref(self, nodes):
         return N.Ref(nodes[0])
 
-    def pntr_ref(self, nodes):
+    def deref_ref(self, nodes):
         return N.Ref(nodes[0])
 
     def ref(self, nodes):
@@ -214,7 +217,7 @@ class ASTTransformer(Transformer):
     def pntr_opd(self, nodes):
         return nodes[0]
 
-    def pntr_assign(self, nodes):
+    def deref_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
     # --------------------------------- L_Array -------------------------------
@@ -224,10 +227,10 @@ class ASTTransformer(Transformer):
     def array_subscr(self, nodes):
         return N.Subscript(nodes[0], nodes[1])
 
-    def array_ref(self, nodes):
+    def subscr_ref(self, nodes):
         return N.Ref(nodes[0])
 
-    def array_assign(self, nodes):
+    def subscr_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
     def entry_subexp(self, nodes):
@@ -254,10 +257,10 @@ class ASTTransformer(Transformer):
     def struct_attr(self, nodes):
         return N.Attr(nodes[0], nodes[1])
 
-    def struct_ref(self, nodes):
+    def attribute_ref(self, nodes):
         return N.Ref(nodes[0])
 
-    def struct_assign(self, nodes):
+    def attribute_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
     def struct_subtypes(self, nodes):
