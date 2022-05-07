@@ -72,7 +72,7 @@ subscr_assign: array_subscr "=" arith_exp_logic_exp";"
 array_subexps: "{"entry_subexp("," entry_subexp)*"}"
 array_init_dims: ("["NUM"]")+
 array_init_decl: NAME array_dims
-array_init: datatype array_decl_req "=" array_subexps";"
+array_init: datatype array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" NAME
 struct_attr: NAME"."NAME
