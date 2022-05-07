@@ -1,4 +1,11 @@
+// in:42
+// expected:42
+#include <stdio.h>
+
 void main() {
-  int *pntr;
-  int *ar[2] = {1, 42};
+  int var = input();
+  int *ar[2];
+  *(ar + 1) = &var;
+  // the subtype of the array decides if the deref works
+  printf("\n%d", **(ar + 1));
 }
