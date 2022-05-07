@@ -2,7 +2,12 @@
 // expected:42
 
 void main() {
+  // deref a ref
   int var = input();
-  int car = *&var;
-  print(car);
+  var = *&var;
+  print(var);
+  // ref a deref
+  int *pntr = &var;
+  pntr = &*pntr;
+  print(*pntr);
 }
