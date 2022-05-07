@@ -42,7 +42,7 @@ logic_or: logic_and ("||" logic_and)*
 ?arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
 ?datatype: SIZE_QUAL|struct_spec
-alloc: datatype pntr_decl NAME array_decl
+alloc: datatype pntr_decl
 ?alloc_stmt: alloc";"
 var_assign: NAME "=" arith_exp_logic_exp";"
 ?assign_stmt: var_assign|deref_assign|subscr_assign|attribute_assign
@@ -50,7 +50,8 @@ init: alloc "=" arith_exp_logic_exp";"
 const_init: "const" SIZE_QUAL NAME "=" NUM";"
 ?assign_alloc_stmt: alloc_stmt|assign_stmt|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
-!pntr_decl: "*"*
+!pntr_deg: "*"*
+pntr_decl: pntr_deg array_decl
 ?deref_opd: NAME|pntr_opd|array_subscr|struct_attr|fun_call
 deref_simple: "*"deref_opd
 deref_arith.9: "*"("("deref_opd PNTR_PLUS arith_exp")"|"("deref_opd PNTR_MINUS arith_exp")")
@@ -62,7 +63,8 @@ deref_ref: "&"deref
 ?pntr_opd: deref|ref
 deref_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
-array_decl: ("["NUM"]")*
+array_dims: ("["NUM"]")*
+array_decl: NAME array_dims|"("pntr_decl")" array_dims
 array_subscr: deref_opd"["arith_exp_logic_exp"]"
 subscr_ref: "&"array_subscr
 subscr_assign: array_subscr "=" arith_exp_logic_exp";"
@@ -76,7 +78,7 @@ struct_attr: NAME"."NAME
 attribute_ref: "&"struct_attr
 attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_subtypes: (datatype NAME";")+
-struct_decl_stmt: "struct" NAME "{"struct_subtypes"}"";"
+struct_decl: "struct" NAME "{"struct_subtypes"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
 struct_init: struct_spec NAME "=" struct_subexps
 // --------------------------------- L_If_Else --------------------------------
@@ -89,7 +91,7 @@ do_while: "do" "{" stmts "}" "while""("arith_exp_logic_exp")"[";"]
 ?loop_stmt: while_|do_while
 // ---------------------------------- L_Stmt ----------------------------------
 ?decl_part: assign_alloc_stmt
-?exec_part: print_stmt|assign_stmt|struct_decl_stmt|if_else_stmt|loop_stmt|fun_stmt
+?exec_part: print_stmt|assign_stmt|if_else_stmt|loop_stmt|fun_stmt
 ?stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_call_args: [arith_exp_logic_exp("," arith_exp_logic_exp)*]
@@ -98,10 +100,12 @@ fun_call_stmt: fun_call
 fun_return: "return" [arith_exp_logic_exp]
 ?fun_stmt: fun_call_stmt|fun_return
 fun_params: [datatype NAME("," datatype NAME)*]
+fun_decl: datatype NAME"("fun_params")"";"
 fun_def: datatype NAME"("fun_params")" "{" stmts "}"
-?fun_defs: fun_def*
 // ---------------------------------- L_File ----------------------------------
-file: NAME fun_defs
+?decl_def: struct_decl|fun_decl|fun_def
+?decls_defs: decl_def*
+file: NAME decls_defs
 // ---------------------------------- L_Block ---------------------------------
 // fun_def: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" blocks "}"
 block: NAME":" stmts

@@ -1,0 +1,8 @@
+// in:42
+// expected:42
+
+void main() {
+  int var = input();
+  int car = *&var;
+  print(car);
+}
