@@ -5,11 +5,12 @@
 num_tests=0;
 not_running_through=();
 not_passed=();
-  for test in ./{old_,}tests/*$1*.picoc; do
+  # for test in ./{old_,}tests/*$1*.picoc; do
+  for test in ./tests/*$1*.picoc; do
     echo -e "\n\033[1;37m===============================================================================";
     echo $test;
     echo -e "===============================================================================\033[0;0m";
-    ./src/main.py -ctdas -p -D 20 -S 2 -C -m $2 $test;
+    ./src/main.py -ctdas -p -D 20 -S 2 -m -v -C $2 $test;
     # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -m ${test%.picoc}.reti
 
     if [[ $? != 0 ]]; then

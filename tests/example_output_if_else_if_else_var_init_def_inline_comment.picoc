@@ -15,4 +15,3 @@ void main() {
     var2 = 2;
   print(var2);
 }
-

@@ -1,8 +1,3 @@
-from code_generator import CodeGenerator
-from symbol_table import SymbolTable
-import global_vars
-
-
 class ASTNode:
     """Node of a Normalized Heterogeneous Abstract Syntax Tree (AST), partially
     also has some different Normalized Heterogeneous AST Nodes. A AST holds the
@@ -19,37 +14,31 @@ class ASTNode:
         self.position = position
         self.children = children
 
-    def update_match_args(self):
-        pass
-
     __match_args__ = ("value", "position")
 
-    def __repr__(self):
-        global_vars.show_node = False
-        return self.to_string()
-
-    def to_string(self):
+    def __repr__(self, depth=0):
         if not self.children:
             if not self.value:
-                return f"{self.__class__.__name__}()"
-            if global_vars.args.verbose:
-                return f"{self.__class__.__name__}('{self.value}')"
-            return f"'{self.value}'"
+                return f"\n{' ' * depth}{self.__class__.__name__}"
+            return f"\n{' ' * depth}{self.__class__.__name__}('{self.value}')"
 
         acc = ""
 
-        if global_vars.args.verbose or global_vars.show_node:
-            acc += self.__class__.__name__
+        if depth > 0:
+            acc += f"\n{' ' * depth}{self.__class__.__name__}"
+        else:
+            acc += f"{' ' * depth}{self.__class__.__name__}"
 
-        acc += f"({self.children[0]}"
+        for child in self.children:
+            if isinstance(child, list):  # in case of []
+                if not child:
+                    acc += f"\n{' ' * (depth+2)}[]"
+                    continue
+                acc += f"\n{' ' * (depth + 2)}["
+                for child_child in child:
+                    acc += f"{child_child.__repr__(depth+4)}"
+                acc += f"\n{' ' * (depth + 2)}]"
+                continue
+            acc += f"{child.__repr__(depth+2)}"
 
-        for child in self.children[1:]:
-            acc += f" {child}"
-
-        return acc + ")"
-
-    def to_string_show_node(self):
-        global_vars.show_node = True
-        tmp = self.to_string()
-        global_vars.show_node = False
-        return tmp
+        return acc

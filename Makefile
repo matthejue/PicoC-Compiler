@@ -6,31 +6,31 @@ all: read-color
 install:
 	ln -sr ./src/main.py /usr/local/bin/picoc_compiler
 
-read: _read clean
+read: _read _clean-pycache
 _read:
 	./src/main.py -ctdas -p -D 20 -S 2 -m ./run/code.picoc
 
-read-verbose: _read-verbose clean
+read-verbose: _read-verbose _clean-pycache
 _read-verbose:
-	./src/main.py -ctdas -p -D 20 -S 2 -v -m ./run/code.picoc
+	./src/main.py -ctdas -p -D 20 -S 2 -m -v ./run/code.picoc
 
-read-color: _read-color clean
+read-color: _read-color _clean-pycache
 _read-color:
-	./src/main.py -ctdas -p -D 20 -S 2 -C -v -m ./run/code.picoc
+	./src/main.py -ctdas -p -D 20 -S 2 -m -v -C ./run/code.picoc
 
-read-debug: _read-debug clean
+read-debug: _read-debug _clean-pycache
 _read-debug:
-	./src/main.py -ctdas -p -D 20 -S 2 -v -m -g ./run/code.picoc
+	./src/main.py -ctdas -p -D 20 -S 2 -m -v -g ./run/code.picoc
 
-shell: _shell clean
+shell: _shell _clean-pychache
 _shell:
 	./src/main.py
 
 extract:
 	./extract_input_and_expected.sh
 
-test: _test clean
-test-clean-all: _test clean clean-files
+test: _test _clean-pycache
+test-clean-all: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-g for debugging
@@ -40,11 +40,12 @@ help:
 	./src/main.py -h -C
 	./src/main.py -h > ./doc/help-page.txt
 
-clean:
+clean: _clean-pycache _clean-files
+_clean-pycache:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 
-clean-files:
+_clean-files:
 	find . -type f -name "*.tokens" -delete
 	find . -type f -name "*.dt" -delete
 	find . -type f -name "*.ast" -delete
@@ -56,6 +57,9 @@ clean-files:
 	find . -type f -name "*.out" -delete
 	find . -type f -name "*.out_expected" -delete
 	find . -type f -name "*.reti_state" -delete
+	find . -type f -name "*.c" -delete
+	find . -type f -name "*.c_out" -delete
+	find . -type f -name "*.exec" -delete
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip
