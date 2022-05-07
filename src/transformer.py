@@ -298,22 +298,22 @@ class ASTTransformer(Transformer):
         )
 
     # -------------------------------- L_If_Else ------------------------------
-    def if_(self, nodes):
+    def if_stmt(self, nodes):
         return N.If(nodes[0], nodes[1])
 
-    def if_else(self, nodes):
-        if len(nodes[2]) == 1:
+    def if_else_stmt(self, nodes):
+        if not isinstance(nodes[2], list):
             return N.IfElse(nodes[0], nodes[1], [nodes[2]])
         return N.IfElse(nodes[0], nodes[1], nodes[2])
 
-    def if_else_stmt(self, nodes):
+    def if_if_else_stmt(self, nodes):
         return nodes[0]
 
     # --------------------------------- L_Loop --------------------------------
-    def while_(self, nodes):
+    def while_stmt(self, nodes):
         return N.While(nodes[0], nodes[1])
 
-    def do_while(self, nodes):
+    def do_while_stmt(self, nodes):
         return N.DoWhile(nodes[1], nodes[0])
 
     def loop_stmt(self, nodes):
@@ -326,7 +326,10 @@ class ASTTransformer(Transformer):
     def exec_part(self, nodes):
         return nodes[0]
 
-    def stmts(self, nodes):
+    def exec_stmts(self, nodes):
+        return nodes
+
+    def decl_exec_stmts(self, nodes):
         return nodes
 
     # ---------------------------------- L_Fun --------------------------------

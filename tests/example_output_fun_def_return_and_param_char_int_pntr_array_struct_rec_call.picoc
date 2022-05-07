@@ -11,14 +11,16 @@ void main() {
   // fun_call as statement
   int ar[3] = {1, 2, 3};
   struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};
+  int len;
+  int success;
+  char str[8] = {'s', 'u', 'c', 'c', 'e', 's', 's', 0};
   print_all(3, ar, st_ar);
   print(ar[2]);
   // fun_call as expression
-  int len = 3;
-  int success = print_all_pntr(&len, ar, &st_ar);
+  len = 3;
+  success = print_all_pntr(&len, ar, &st_ar);
   print(ar[2]);
   if (success) {
-    char str[8] = {'s', 'u', 'c', 'c', 'e', 's', 's', '\0'};
     print(str);
   }
 }

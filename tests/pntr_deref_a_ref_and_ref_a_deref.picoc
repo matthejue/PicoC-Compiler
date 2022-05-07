@@ -4,10 +4,11 @@
 void main() {
   // deref a ref
   int var = input();
+  int *pntr;
   var = *&var;
   print(var);
   // ref a deref
-  int *pntr = &var;
+  pntr = &var;
   pntr = &*pntr;
   print(*pntr);
 }

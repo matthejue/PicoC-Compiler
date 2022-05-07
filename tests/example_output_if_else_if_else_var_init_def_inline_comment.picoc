@@ -9,9 +9,9 @@ void main() {
   // if, else if, else
   if (var > 100) {
     var2 = 0;
-  } else if (/* inline comment */ var > 10)
+  } else if (/* inline comment */ var > 10) {
     var2 = 1;
-  else
+  } else
     var2 = 2;
   print(var2);
 }

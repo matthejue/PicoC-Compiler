@@ -11,17 +11,17 @@ void main() {
   int **pntr_on_pntr;  // pointer on pointers
   // reference and dereference operator on variable
   int var = input();
+  int ar[3] = {4, 2, input()};
+  struct array_with_len st_ar = {.ar=ar, .len=3};
   pntr_on_int = &var;
   print(*pntr_on_int);
   // reference operator on a dereference operation
-  int ar[3] = {4, 2, input()};
   pntr_on_int = &*(ar + 1 + 1);
   print(*pntr_on_int);
   // reference operator on a subscript operation
   pntr_on_int = &ar[1 + 1];
   print(*pntr_on_int);
   // reference operator on a attribute operation
-  struct array_with_len st_ar = {.ar=ar, .len=3};
   pntr_on_pntr = &st_ar.ar;
   print(*(*pntr_on_pntr + st_ar.len - 1));
   // reference operator on return value of function call
