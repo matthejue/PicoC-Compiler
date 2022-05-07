@@ -143,9 +143,6 @@ class N:
 
         __match_args__ = ("arith_exp",)
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     # ----------------------------- L_Assign_Alloc ----------------------------
     class Assign(ASTNode):
         def __init__(self, location, arith_exp_logic_exp):
@@ -154,14 +151,6 @@ class N:
             super().__init__(children=[self.location, self.arith_exp_logic_exp])
 
         __match_args__ = ("location", "arith_exp_logic_exp")
-
-        def __repr__(self):
-            if len(self.children) == 2:
-                # for the debugger one uses children, else the debugger is
-                # going to throw a error if __init__ wasn't executed
-                return f"({self.children[0]} = {self.children[1]})"
-
-            return super().__repr__()
 
     class Alloc(ASTNode):
         def __init__(self, type_qual, datatype, pntr_decl):
@@ -189,9 +178,6 @@ class N:
             self.array_decl = array_decl
             super().__init__(children=[self.deg, self.array_decl])
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
         __match_args__ = ("deg", "array_decl")
 
     class Ref(ASTNode):
@@ -201,17 +187,11 @@ class N:
 
         __match_args__ = ("location",)
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     class Deref(ASTNode):
         def __init__(self, location, offset):
             self.location = location
             self.offset = offset
             super().__init__(children=[self.location, self.offset])
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
         __match_args__ = ("location", "offset")
 
@@ -221,9 +201,6 @@ class N:
             self.pntr_decl = pntr_decl
             self.dims = dims
             super().__init__(children=[self.pntr_decl, self.dims])
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
         __match_args__ = (
             "pntr_decl",
@@ -237,9 +214,6 @@ class N:
 
         __match_args__ = ("datatype", "entries")
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     class Subscript(ASTNode):
         def __init__(self, arith_opd, offset):
             self.arith_opd = arith_opd
@@ -247,9 +221,6 @@ class N:
             super().__init__(children=[self.arith_opd, self.offset])
 
         __match_args__ = ("arith_opd", "offset")
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
     # -------------------------------- L_Struct -------------------------------
     class StructSpec(ASTNode):
@@ -265,9 +236,6 @@ class N:
             super().__init__(children=[self.assignments])
 
         __match_args__ = ("assignments",)
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
     class Attr(ASTNode):
         def __init__(self, array_identifier, attribute_identifier):
@@ -304,9 +272,6 @@ class N:
 
         __match_args__ = ("condition", "branch_stmts")
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     class IfElse(ASTNode):
         def __init__(self, condition, branch1_stmts, branch2_stmts):
             self.condition = condition
@@ -318,9 +283,6 @@ class N:
 
         __match_args__ = ("condition", "branch1_stmts", "branch2_stmts")
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
         def __init__(self, condition, branch_stmts):
@@ -330,9 +292,6 @@ class N:
 
         __match_args__ = ("condition", "branch_stmts")
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     class DoWhile(ASTNode):
         def __init__(self, condition, branch_stmts):
             self.condition = condition
@@ -340,9 +299,6 @@ class N:
             super().__init__(children=[self.condition, self.branch_stmts])
 
         __match_args__ = ("condition", "branch_stmts")
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(ASTNode):
@@ -353,18 +309,12 @@ class N:
 
         __match_args__ = ("functionname", "args")
 
-        def __repr__(self):
-            return self.to_string_show_node()
-
     class Return(ASTNode):
         def __init__(self, arith_exp_logic_exp):
             self.arith_exp_logic_exp = arith_exp_logic_exp
             super().__init__(children=[self.arith_exp_logic_exp])
 
         __match_args__ = ("arith_exp_logic_exp",)
-
-        def __repr__(self):
-            return self.to_string_show_node()
 
     class Exp(ASTNode):
         def __init__(self, call):

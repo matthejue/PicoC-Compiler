@@ -87,7 +87,7 @@ class ASTTransformer(Transformer):
     # -------------------------------------------------------------------------
     # --------------------------------- L_Arith -------------------------------
     def input_odp(self, _):
-        return N.Call("input", [])
+        return N.Call(N.Name("input"), [])
 
     def arith_opd(self, nodes):
         return nodes[0]
@@ -123,7 +123,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def print_stmt(self, nodes):
-        return N.Call("print", nodes[0])
+        return N.Call(N.Name("print"), nodes[0])
 
     # --------------------------------- L_Logic -------------------------------
     def to_bool(self, nodes):
@@ -196,7 +196,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def deref_simple(self, nodes):
-        return N.Deref(nodes[0], 0)
+        return N.Deref(nodes[0], N.Num(0))
 
     def deref_arith(self, nodes):
         match nodes[1]:

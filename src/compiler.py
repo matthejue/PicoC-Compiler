@@ -181,15 +181,18 @@ class Compiler(cmd2.Cmd):
         terminal_width = os.get_terminal_size().columns
 
         # add the filename to the start of the code
-        code = f"{basename(global_vars.args.infile)}\n" + code
+        code_with_file = f"{basename(global_vars.args.infile)}\n" + code
 
         splitted_code = list(
-            filter(lambda line: line, map(lambda line: line.strip(), code.split("\n")))
+            filter(
+                lambda line: line,
+                map(lambda line: line.strip(), code_with_file.split("\n")),
+            )
         )
 
-        print(subheading("Code", terminal_width, "-"))
         if global_vars.args.code and global_vars.args.print:
-            print(splitted_code)
+            print(subheading("Code", terminal_width, "-"))
+            print(code)
 
         parser = Lark.open(
             "./src/concrete_syntax.lark",
@@ -203,26 +206,26 @@ class Compiler(cmd2.Cmd):
         # handle errors
         error_handler = ErrorHandler(splitted_code)
 
-        #  dt = error_handler.handle(parser.parse, code)
-        dt = parser.parse(code)
+        dt = error_handler.handle(parser.parse, code_with_file)
+        #  dt = parser.parse(code_with_file)
 
-        print(subheading("Tokens", terminal_width, "-"))
         if global_vars.args.tokens:
-            error_handler.handle(self._tokens_option, dt, code)
+            print(subheading("Tokens", terminal_width, "-"))
+            error_handler.handle(self._tokens_option, dt, code_with_file)
 
-        print(subheading("Derivation Tree", terminal_width, "-"))
         if global_vars.args.derivation_tree:
+            print(subheading("Derivation Tree", terminal_width, "-"))
             self._derivation_tree_option(dt)
 
-        print(subheading("Abstract Syntax Tree", terminal_width, "-"))
         ast_transformer = ASTTransformer()
         ast = error_handler.handle(ast_transformer.transform, dt)
 
         if global_vars.args.abstract_syntax_tree:
+            print(subheading("Abstract Syntax Tree", terminal_width, "-"))
             self._abstract_syntax_tree_option(ast)
 
-        print(subheading("Symbol Table", terminal_width, "-"))
         if global_vars.args.symbol_table:
+            print(subheading("Symbol Table", terminal_width, "-"))
             self._symbol_table_option()
 
         print(subheading("RETI Code", terminal_width, "-"))
@@ -251,11 +254,7 @@ class Compiler(cmd2.Cmd):
                 fout.write(str(tokens))
 
     def _derivation_tree_option(self, dt):
-        if global_vars.args.verbose:
-            dt = dt.pretty()
-
-        if global_vars.args.print:
-            print(dt)
+        print(dt.pretty())
 
         if global_vars.outbase:
             with open(global_vars.outbase + ".dt", "w", encoding="utf-8") as fout:
