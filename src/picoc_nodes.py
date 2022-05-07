@@ -164,19 +164,15 @@ class N:
             return super().__repr__()
 
     class Alloc(ASTNode):
-        def __init__(self, type_qual, datatype, pntr_decl, identifier, array_decl):
+        def __init__(self, type_qual, datatype, pntr_decl):
             self.type_qual = type_qual
             self.datatype = datatype
             self.pntr_decl = pntr_decl
-            self.identifier = identifier
-            self.array_decl = array_decl
             super().__init__(
                 children=[
                     self.type_qual,
                     self.datatype,
                     self.pntr_decl,
-                    self.identifier,
-                    self.array_decl,
                 ]
             )
 
@@ -184,20 +180,19 @@ class N:
             "type_qual",
             "datatype",
             "pntr_decl",
-            "identifier",
-            "array_decl",
         )
 
     # ------------------------------- L_Pointer -------------------------------
     class PntrDecl(ASTNode):
-        def __init__(self, pntr_deg):
-            self.pntr_deg = pntr_deg
-            super().__init__(children=[self.pntr_deg])
+        def __init__(self, deg, array_decl):
+            self.deg = deg
+            self.array_decl = array_decl
+            super().__init__(children=[self.deg, self.array_decl])
 
         def __repr__(self):
             return self.to_string_show_node()
 
-        __match_args__ = ("pntr_deg",)
+        __match_args__ = ("deg", "array_decl")
 
     class Ref(ASTNode):
         def __init__(self, location):
@@ -222,14 +217,18 @@ class N:
 
     # -------------------------------- L_Array --------------------------------
     class ArrayDecl(ASTNode):
-        def __init__(self, dims):
+        def __init__(self, pntr_decl, dims):
+            self.pntr_decl = pntr_decl
             self.dims = dims
-            super().__init__(children=[self.dims])
+            super().__init__(children=[self.pntr_decl, self.dims])
 
         def __repr__(self):
             return self.to_string_show_node()
 
-        __match_args__ = ("dims",)
+        __match_args__ = (
+            "pntr_decl",
+            "dims",
+        )
 
     class Array(ASTNode):
         def __init__(self, entries):
@@ -373,6 +372,15 @@ class N:
             super().__init__(children=[self.call])
 
         __match_args__ = ("call",)
+
+    class FunDecl(ASTNode):
+        def __init__(self, datatype, fun_name, params):
+            self.datatype = datatype
+            self.fun_name = fun_name
+            self.params = params
+            super().__init__(children=[self.datatype, self.fun_name, self.params])
+
+        __match_args__ = ("datatype", "fun_name", "params")
 
     class FunDef(ASTNode):
         def __init__(self, datatype, fun_name, params, stmts_blocks):
