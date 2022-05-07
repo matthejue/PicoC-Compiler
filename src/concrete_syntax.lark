@@ -75,7 +75,7 @@ array_init_decl: NAME array_dims
 array_init: datatype array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" NAME
-struct_attr: NAME"."NAME
+struct_attr: NAME"."NAME|"("pntr_decl")""."NAME
 attribute_ref: "&"struct_attr
 attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_params: (datatype pntr_decl";")+
