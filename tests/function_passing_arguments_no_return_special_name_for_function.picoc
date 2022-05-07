@@ -1,0 +1,12 @@
+// in:21
+// expected:42
+
+void _fun120(char c, int i);
+
+void main(){
+  _fun120('b', input());
+}
+
+void _fun120(char c, int i){
+  print(i * (100 + -c));
+}

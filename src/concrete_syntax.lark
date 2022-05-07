@@ -78,7 +78,7 @@ struct_spec: "struct" NAME
 struct_attr: NAME"."NAME
 attribute_ref: "&"struct_attr
 attribute_assign: struct_attr "=" arith_exp_logic_exp";"
-struct_params: (datatype NAME";")+
+struct_params: (datatype pntr_decl";")+
 struct_decl: "struct" NAME "{"struct_params"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
 struct_init: struct_spec NAME "=" struct_subexps
@@ -100,15 +100,15 @@ fun_call: NAME"("fun_call_args")"
 fun_call_stmt: fun_call
 fun_return: "return" [arith_exp_logic_exp]
 ?fun_stmt: fun_call_stmt|fun_return
-fun_params: [datatype NAME("," datatype NAME)*]
-fun_decl: datatype NAME"("fun_params")"";"
-fun_def: datatype NAME"("fun_params")" "{" stmts "}"
+fun_params: [datatype pntr_decl("," datatype pntr_decl)*]
+fun_decl: SIZE_QUAL NAME"("fun_params")"";"
+fun_def: SIZE_QUAL NAME"("fun_params")" "{" stmts "}"
 // ---------------------------------- L_File ----------------------------------
 ?decl_def: struct_decl|fun_decl|fun_def
 ?decls_defs: decl_def*
 file: NAME decls_defs
 // ---------------------------------- L_Block ---------------------------------
-// fun_def: datatype NAME"("[datatype NAME("," datatype NAME)*]")" "{" blocks "}"
+// fun_def: SIZE_QUAL NAME"("fun_params")" "{" blocks "}"
 block: NAME":" stmts
 ?blocks: block*
 goto: "goto""("NAME")"
