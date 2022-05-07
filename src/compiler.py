@@ -254,7 +254,8 @@ class Compiler(cmd2.Cmd):
                 fout.write(str(tokens))
 
     def _derivation_tree_option(self, dt):
-        print(dt.pretty())
+        if global_vars.args.print:
+            print(dt.pretty())
 
         if global_vars.outbase:
             with open(global_vars.outbase + ".dt", "w", encoding="utf-8") as fout:

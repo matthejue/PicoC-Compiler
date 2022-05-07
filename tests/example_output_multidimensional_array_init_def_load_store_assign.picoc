@@ -9,9 +9,9 @@ void main() {
   // array store
   var2[0] = input();
   // array_load
-  print(var[input()][2 - 1])
+  print(var[input()][2 - 1]);
   // array load + store, complex array assign
   var2[1] = var[input()][2 - 1] * 8;
   // final result
-  print(var2[0] + var2[1])
+  print(var2[0] + var2[1]);
 }

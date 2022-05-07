@@ -3,18 +3,19 @@
 
 void main() {
   int ar[3] = {1, input(), 3};
-  // ---------------------------- assign to pointer ---------------------------
-  // initialize
-  int *ar2 = ar;
   // int ar2[3] = ar; doesn't work in C
+  int *ar2 = ar;
+  int i;
+  int ar_assign[3];
+  int *ar3;
+  // ---------------------------- assign to pointer ---------------------------
   // print array
-  int i = 0;
+  i = 0;
   while (i < 3) {
     print(ar2[i]);
     i = i + 1;
   }
   // define and then assign
-  int *ar3;
   ar3 = ar;
   // print array
   i = 0;
@@ -23,8 +24,6 @@ void main() {
     i = i + 1;
   }
   // ---------------------------- assign with loop ----------------------------
-  // define
-  int ar_assign[3];
   // assign array to array
   i = 0;
   while (i < 3) {

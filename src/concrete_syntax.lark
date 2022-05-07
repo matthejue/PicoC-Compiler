@@ -81,35 +81,36 @@ attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_params: (datatype pntr_decl";")+
 struct_decl: "struct" NAME "{"struct_params"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
-struct_init: struct_spec NAME "=" struct_subexps
+struct_init: struct_spec NAME "=" struct_subexps";"
 // --------------------------------- L_If_Else --------------------------------
-if_: "if""("arith_exp_logic_exp")" "{" stmts "}"
-if_else: "if""("arith_exp_logic_exp")" "{" stmts "}" "else" "{" stmts "}"|"if""("arith_exp_logic_exp")" "{" stmts "}" "else" exec_part
-?if_else_stmt: if_|if_else
+if_stmt: "if""("logic_exp")" "{" exec_stmts "}"
+if_else_stmt: "if""("logic_exp")" "{" exec_stmts "}" "else" "{" exec_stmts "}"|"if""("logic_exp")" "{" exec_stmts "}" "else" exec_part
+?if_if_else_stmt: if_stmt|if_else_stmt
 // ---------------------------------- L_Loop ----------------------------------
-while_: "while""("arith_exp_logic_exp")" "{" stmts "}"
-do_while: "do" "{" stmts "}" "while""("arith_exp_logic_exp")"[";"]
-?loop_stmt: while_|do_while
+while_stmt: "while""("logic_exp")" "{" exec_stmts "}"
+do_while_stmt: "do" "{" exec_stmts "}" "while""("logic_exp")"";"
+?loop_stmt: while_stmt|do_while_stmt
 // ---------------------------------- L_Stmt ----------------------------------
 ?decl_part: assign_alloc_stmt
-?exec_part: print_stmt|assign_stmt|if_else_stmt|loop_stmt|fun_stmt
-?stmts: decl_part* exec_part*
+?exec_part: print_stmt|assign_stmt|if_if_else_stmt|loop_stmt|fun_stmt
+?exec_stmts: exec_part*
+?decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_call_args: [arith_exp_logic_exp("," arith_exp_logic_exp)*]
 fun_call: NAME"("fun_call_args")"
-fun_call_stmt: fun_call
-fun_return: "return" [arith_exp_logic_exp]
+fun_call_stmt: fun_call";"
+fun_return: "return" [arith_exp_logic_exp]";"
 ?fun_stmt: fun_call_stmt|fun_return
 fun_params: [datatype pntr_decl("," datatype pntr_decl)*]
 fun_decl: SIZE_QUAL NAME"("fun_params")"";"
-fun_def: SIZE_QUAL NAME"("fun_params")" "{" stmts "}"
+fun_def: SIZE_QUAL NAME"("fun_params")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 ?decl_def: struct_decl|fun_decl|fun_def
 ?decls_defs: decl_def*
 file: NAME decls_defs
 // ---------------------------------- L_Block ---------------------------------
 // fun_def: SIZE_QUAL NAME"("fun_params")" "{" blocks "}"
-block: NAME":" stmts
+block: NAME":" decl_exec_stmts
 ?blocks: block*
 goto: "goto""("NAME")"
 
