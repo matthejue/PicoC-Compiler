@@ -52,7 +52,7 @@ const_init: "const" SIZE_QUAL NAME "=" NUM";"
 // --------------------------------- L_Pointer --------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl
-?deref_opd: NAME|pntr_opd|array_subscr|struct_attr|fun_call
+?deref_opd: NAME|pntr_opd|array_subscr|struct_attr
 deref_simple: "*"deref_opd
 deref_arith.9: "*"("("deref_opd PNTR_PLUS arith_exp")"|"("deref_opd PNTR_MINUS arith_exp")")
 ?deref: deref_simple|deref_arith
@@ -64,8 +64,9 @@ deref_ref: "&"deref
 deref_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
-array_decl: NAME array_dims|"("pntr_decl")" array_dims
-array_subscr: deref_opd"["arith_exp_logic_exp"]"
+array_decl: NAME array_dims|"("pntr_decl")"array_dims
+?subscr_opd: NAME|array_subscr|struct_attr
+array_subscr: subscr_opd"["arith_exp_logic_exp"]"|"("deref")""["arith_exp_logic_exp"]"
 subscr_ref: "&"array_subscr
 subscr_assign: array_subscr "=" arith_exp_logic_exp";"
 ?entry_subexp: arith_exp_logic_exp|array_subexps|struct_subexps
@@ -75,7 +76,7 @@ array_init_decl: NAME array_dims
 array_init: datatype array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" NAME
-struct_attr: NAME"."NAME|"("pntr_decl")""."NAME
+struct_attr: subscr_opd"."NAME|"("deref")""."NAME
 attribute_ref: "&"struct_attr
 attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_params: (datatype pntr_decl";")+
