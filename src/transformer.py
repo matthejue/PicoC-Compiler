@@ -168,7 +168,7 @@ class ASTTransformer(Transformer):
     def var_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
-    def assign(self, nodes):
+    def assign_stmt(self, nodes):
         return nodes[0]
 
     def init(self, nodes):
@@ -186,8 +186,11 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     # -------------------------------- L_Pointer ------------------------------
+    def pntr_deg(self, nodes):
+        return N.Num(str(len(nodes)))
+
     def pntr_decl(self, nodes):
-        return N.PntrDecl(N.Num(str(len(nodes))))
+        return N.PntrDecl(nodes[0], nodes[1])
 
     def deref_opd(self, nodes):
         return nodes[0]
@@ -221,8 +224,11 @@ class ASTTransformer(Transformer):
         return N.Assign(nodes[0], nodes[1])
 
     # --------------------------------- L_Array -------------------------------
+    def array_dims(self, nodes):
+        return nodes
+
     def array_decl(self, nodes):
-        return N.ArrayDecl(nodes)
+        return N.ArrayDecl(nodes[0], nodes[1])
 
     def array_subscr(self, nodes):
         return N.Subscript(nodes[0], nodes[1])
@@ -239,15 +245,20 @@ class ASTTransformer(Transformer):
     def array_subexps(self, nodes):
         return N.Array(nodes)
 
-    def array_decl_req(self, nodes):
-        return N.ArrayDecl(nodes)
+    def array_init_dims(self, nodes):
+        return nodes
+
+    def array_init_decl(self, nodes):
+        return N.ArrayDecl(nodes[0], nodes[1])
 
     def array_init(self, nodes):
         return N.Assign(
             N.Alloc(
-                N.Writeable(), nodes[0], N.PntrDecl(N.Num("0")), nodes[1], nodes[2]
+                N.Writeable(),
+                nodes[0],
+                N.PntrDecl(N.Num("0"), nodes[1]),
             ),
-            N.Array(nodes[3]),
+            N.Array(nodes[2]),
         )
 
     # -------------------------------- L_Struct -------------------------------
@@ -263,13 +274,13 @@ class ASTTransformer(Transformer):
     def attribute_assign(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
-    def struct_subtypes(self, nodes):
+    def struct_params(self, nodes):
         params = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
             params += [N.Param(node1, node2)]
         return params
 
-    def struct_decl_stmt(self, nodes):
+    def struct_decl(self, nodes):
         return N.StructDecl(nodes[0], nodes[1])
 
     def struct_subexps(self, nodes):
@@ -281,7 +292,7 @@ class ASTTransformer(Transformer):
     def struct_init(self, nodes):
         return N.Assign(
             N.Alloc(
-                N.Writeable(), nodes[0], N.PntrDecl(N.Num(0)), nodes[1], N.ArrayDecl([])
+                N.Writeable(), nodes[0], N.PntrDecl(N.Num(0), N.ArrayDecl(nodes[1], []))
             ),
             nodes[2],
         )
@@ -309,7 +320,10 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     # --------------------------------- L_Stmt --------------------------------
-    def stmt(self, nodes):
+    def decl_part(self, nodes):
+        return nodes[0]
+
+    def exec_part(self, nodes):
         return nodes[0]
 
     def stmts(self, nodes):
@@ -339,13 +353,19 @@ class ASTTransformer(Transformer):
             params += [N.Param(node1, node2)]
         return params
 
+    def fun_decl(self, nodes):
+        return N.FunDecl(nodes[0], nodes[1], nodes[2])
+
     def fun_def(self, nodes):
         return N.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
 
-    def fun_defs(self, nodes):
+    # --------------------------------- L_File --------------------------------
+    def decl_def(self, nodes):
+        return nodes[0]
+
+    def decls_defs(self, nodes):
         return nodes
 
-    # --------------------------------- L_File --------------------------------
     def file(self, nodes):
         return N.File(nodes[0], nodes[1])
 
@@ -358,39 +378,3 @@ class ASTTransformer(Transformer):
 
     def goto(self, nodes):
         return N.GoTo(nodes[0])
-
-
-#  ----------------------------------------------------------------------------
-#  -                                  Testing                                 -
-#  ----------------------------------------------------------------------------
-#  parser = Lark.open(
-#      "./concrete_syntax.lark",
-#      lexer="dynamic",
-#      #  keep_all_tokens=True,
-#      parser="earley",
-#      start="file",
-#      maybe_placeholders=False,
-#      propagate_positions=True,
-#  )
-#  dt = parser.parse(
-#      r"""
-#      test
-#      int main(){
-#          int car[2][2][2][2] = {{1, 2}, {3, 4}, {3, 4}, {3, 4}};
-#          int bar = **(car[1][2]+3-1);
-#      }
-#      """
-#      #  r"""
-#      #  test
-#      #  int test(char c, int var){
-#      #  print(_fun120 /*-3*/ + 120 * -'c');
-#      #  int[] var = {12, 3, 4}; // das ist blöd
-#      #  // das ist noch blöder
-#      #  var[3] = 10;
-#      #  }
-#      #  """
-#  )
-#  print(list(dt.scan_values(lambda v: isinstance(v, Token))))
-#  print(dt)
-#  print(dt.pretty())
-#  print(ASTTransformer().transform(dt))
