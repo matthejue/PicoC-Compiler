@@ -160,7 +160,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def alloc(self, nodes):
-        return N.Alloc(N.Writeable(), nodes[0], nodes[1], nodes[2], nodes[3])
+        return N.Alloc(N.Writeable(), nodes[0], nodes[1])
 
     def alloc_stmt(self, nodes):
         return nodes[0]
@@ -177,7 +177,7 @@ class ASTTransformer(Transformer):
     def const_init(self, nodes):
         return N.Assign(
             N.Alloc(
-                N.Const(), nodes[0], N.PntrDecl(N.Num(0)), nodes[1], N.ArrayDecl([])
+                N.Const(), nodes[0], N.PntrDecl(N.Num(0), N.ArrayDecl(nodes[1], []))
             ),
             nodes[2],
         )
