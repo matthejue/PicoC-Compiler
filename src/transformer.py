@@ -230,6 +230,9 @@ class ASTTransformer(Transformer):
     def array_decl(self, nodes):
         return N.ArrayDecl(nodes[0], nodes[1])
 
+    def subsrc_opd(self, nodes):
+        return nodes[0]
+
     def array_subscr(self, nodes):
         return N.Subscript(nodes[0], nodes[1])
 
