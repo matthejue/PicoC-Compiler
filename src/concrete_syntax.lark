@@ -51,7 +51,7 @@ const_init: "const" SIZE_QUAL NAME "=" NUM";"
 pntr_decl: pntr_deg array_decl
 ?deref_opd: NAME|pntr_opd|array_subscr|struct_attr
 deref_simple: "*"deref_opd
-deref_arith: "*"("("deref_opd DEREF_ARITH arith_exp")"
+deref_arith: "*""("deref_opd DEREF_ARITH arith_exp")"
 ?deref: deref_simple|deref_arith
 // if the type of the location is array, then the address of the location is used
 var_ref: "&"NAME
@@ -63,7 +63,7 @@ deref_assign: deref "=" logic_exp";"
 array_dims: ("["NUM"]")*
 array_decl: NAME array_dims|"("pntr_decl")"array_dims
 ?subscr_opd: NAME|array_subscr|struct_attr
-array_subscr: subscr_opd"["logic_exp"]"|"("deref")""["logic_exp"]"
+array_subscr: subscr_opd"["logic_exp"]"|"("pntr_opd")""["logic_exp"]"
 subscr_ref: "&"array_subscr
 subscr_assign: array_subscr "=" logic_exp";"
 ?entry_subexp: logic_exp|array_subexps|struct_subexps
@@ -81,10 +81,10 @@ struct_decl: "struct" NAME "{"struct_params"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
 struct_init: struct_spec NAME "=" struct_subexps";"
 // --------------------------------- L_If_Else --------------------------------
-to_bool: arith_exp
-?condition: logic_exp|to_bool
+to_bool.9: arith_exp
+?condition: to_bool|logic_exp
 if_stmt: "if""("condition")" "{" exec_stmts "}"
-if_else_stmt: "if""("condition")" "{" exec_stmts "}" "else" "{" exec_stmts "}"|"if""("condition")" "{" exec_stmts "}" "else" exec_part
+if_else_stmt: "if""("condition")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
 ?if_if_else_stmt: if_stmt|if_else_stmt
 // ---------------------------------- L_Loop ----------------------------------
 while_stmt: "while""("condition")" "{" exec_stmts "}"
