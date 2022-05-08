@@ -2,41 +2,56 @@ from sys import exit
 from errors import Errors
 import global_vars
 from colormanager import ColorManager as CM
+from lark.exceptions import (
+    UnexpectedCharacters,
+    UnexpectedToken,
+    UnexpectedEOF,
+    UnexpectedInput,
+)
 
 
 class ErrorHandler:
     """Output a detailed error message"""
 
-    def __init__(self, finput):
-        self.finput = finput
-        # in case there's a multiline inline comment that spreads over more then 2 lines
-        self.multiline_comment_started = False
-        # list of removed comments to undo the removing later
-        self.removed_comments = [(0, 0, "")]
-
-    def __repr__(self):
-        return str(self.finput)
+    def __init__(self, code):
+        self.code = code
+        #  self.splitted_code = list(
+        #      filter(
+        #          lambda line: line,
+        #          map(lambda line: line.strip(), code_with_file.split("\n")),
+        #      )
+        #  )
 
     def handle(self, function, *args):
         try:
             rtrn_val = function(*args)
+        except UnexpectedToken as e:
+            print(e)
+            exit(0)
+        except UnexpectedCharacters as e:
+            print(e)
+            print(e.allowed)
+            exit(0)
+        except UnexpectedEOF as e:
+            print(e)
+            exit(0)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.UnclosedCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.NoApplicableRuleError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.point_at(e.found_pos, e.expected)
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
@@ -44,9 +59,7 @@ class ErrorHandler:
         except Errors.MismatchedTokenError as e:
             error_header = self._error_header(e.found_pos, e.description)
             expected_pos = self._find_space_after_previous_token(e.found_pos)
-            error_screen = AnnotationScreen(
-                self.finput, expected_pos[0], e.found_pos[0]
-            )
+            error_screen = AnnotationScreen(self.code, expected_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             if e.found_pos == expected_pos:
                 pos = expected_pos
@@ -63,14 +76,14 @@ class ErrorHandler:
             exit(0)
         except Errors.UnknownIdentifierError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
             exit(0)
         except Errors.TooLargeLiteralError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
                 None,
@@ -82,14 +95,12 @@ class ErrorHandler:
             exit(0)
         except Errors.RedefinitionError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
                 e.first_pos, f"{CM().MAGENTA}Note{CM().RESET}: Already defined here:"
             )
-            error_screen_2 = AnnotationScreen(
-                self.finput, e.first_pos[0], e.first_pos[0]
-            )
+            error_screen_2 = AnnotationScreen(self.code, e.first_pos[0], e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
@@ -103,15 +114,13 @@ class ErrorHandler:
             exit(0)
         except Errors.ConstReassignmentError as e:
             error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.found_pos[0], e.found_pos[0])
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
                 e.first_pos,
                 f"{CM().MAGENTA}Note{CM().RESET}: Constant identifier was initialised here:",
             )
-            error_screen_2 = AnnotationScreen(
-                self.finput, e.first_pos[0], e.first_pos[0]
-            )
+            error_screen_2 = AnnotationScreen(self.code, e.first_pos[0], e.first_pos[0])
             error_screen_2.mark(e.first_pos, len(e.first))
             error_screen.filter()
             error_screen_2.filter()
@@ -129,14 +138,14 @@ class ErrorHandler:
             exit(0)
         except Errors.MoreThanOneMainFunctionError as e:
             error_header = self._error_header(e.first_pos, e.description)
-            error_screen = AnnotationScreen(self.finput, e.first_pos[0], e.first_pos[0])
+            error_screen = AnnotationScreen(self.code, e.first_pos[0], e.first_pos[0])
             error_screen.mark(e.first_pos, 4)
             note_header = self._error_header(
                 e.second_pos,
                 f"{CM().MAGENTA}Note{CM().RESET}: Second main function defined here:",
             )
             error_screen_2 = AnnotationScreen(
-                self.finput, e.second_pos[0], e.second_pos[0]
+                self.code, e.second_pos[0], e.second_pos[0]
             )
             error_screen_2.mark(e.second_pos, 4)
             error_screen.filter()
@@ -171,23 +180,26 @@ class ErrorHandler:
             + "\n"
         )
 
+    def __repr__(self):
+        return str(self.code)
+
 
 class AnnotationScreen:
-    def __init__(self, finput, row_from, row_to):
+    def __init__(self, code, row_from, row_to):
         # because the filename gets pasted in the first line of file content
         context_from = (
             row_from - global_vars.args.sight
             if row_from - global_vars.args.sight > 0
             else 1
         )
-        self.context_above = finput[context_from:row_from]
+        self.context_above = code[context_from:row_from]
 
         self.screen = []
-        for line in finput[row_from : row_to + 1]:
+        for line in code[row_from : row_to + 1]:
             # len(line)+1 to be able to show expected semicolons
             self.screen += [line, " " * (len(line) + 1), " " * (len(line) + 1)]
 
-        self.context_below = finput[row_to + 1 : row_to + 1 + global_vars.args.sight]
+        self.context_below = code[row_to + 1 : row_to + 1 + global_vars.args.sight]
 
         self.marked_lines = []
         self.row_from = row_from
@@ -210,9 +222,7 @@ class AnnotationScreen:
         )
         self.marked_lines += [3 * rel_row + 1]
 
-    def filter(
-        self,
-    ):
+    def filter(self):
         # -2 da man idx's bei 0 anfängt und man zwischen 0 und 2 usw. sein will
         for i in sorted(
             set(range(0, len(self.screen)))
@@ -225,9 +235,7 @@ class AnnotationScreen:
     def clear(self, row, col):
         self.screen[row] = overwrite(self.screen[row], " " * len(self.screen[row]), col)
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         acc = ""
 
         for line in self.context_above + self.screen + self.context_below:

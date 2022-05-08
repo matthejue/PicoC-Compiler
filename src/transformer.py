@@ -76,11 +76,12 @@ class ASTTransformer(Transformer):
                 return N.VoidType(token.value, (token.start_pos, token.end_pos))
 
     # ------------------------------- L_Pointer -------------------------------
-    def PNTR_PLUS(self, token: Token):
-        return N.PNTR_PLUS(token.value, (token.start_pos, token.end_pos))
-
-    def PNTR_MINUS(self, token: Token):
-        return N.PNTR_MINUS(token.value, (token.start_pos, token.end_pos))
+    def DEREF_ARITH(self, token: Token):
+        match token.value:
+            case "+":
+                return N.PNTR_PLUS(token.value, (token.start_pos, token.end_pos))
+            case "-":
+                return N.PNTR_MINUS(token.value, (token.start_pos, token.end_pos))
 
     # -------------------------------------------------------------------------
     # -                                 Parser                                -
@@ -301,6 +302,12 @@ class ASTTransformer(Transformer):
         )
 
     # -------------------------------- L_If_Else ------------------------------
+    def to_bool(self, nodes):
+        return N.ToBool(nodes[0])
+
+    def condition(self, nodes):
+        return nodes[0]
+
     def if_stmt(self, nodes):
         return N.If(nodes[0], nodes[1])
 

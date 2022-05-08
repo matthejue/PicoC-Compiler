@@ -40,8 +40,8 @@ void print_all(int len_copy, int ar_copy[3], struct array_with_len st_ar_copy) {
 }
 
 int print_all_pntr(int *len_ref, int *ar_ref, struct array_with_len *st_ar_ref) {
-  ar_ref[2] = 3;
   int i = 0;
+  ar_ref[2] = 3;
   while (i < *len_ref) {
     print(ar_ref[i]);
     i = i + 1;

@@ -183,13 +183,6 @@ class Compiler(cmd2.Cmd):
         # add the filename to the start of the code
         code_with_file = f"{basename(global_vars.args.infile)}\n" + code
 
-        splitted_code = list(
-            filter(
-                lambda line: line,
-                map(lambda line: line.strip(), code_with_file.split("\n")),
-            )
-        )
-
         if global_vars.args.code and global_vars.args.print:
             print(subheading("Code", terminal_width, "-"))
             print(code)
@@ -204,10 +197,9 @@ class Compiler(cmd2.Cmd):
         )
 
         # handle errors
-        error_handler = ErrorHandler(splitted_code)
+        error_handler = ErrorHandler(code_with_file)
 
         dt = error_handler.handle(parser.parse, code_with_file)
-        #  dt = parser.parse(code_with_file)
 
         if global_vars.args.tokens:
             print(subheading("Tokens", terminal_width, "-"))
