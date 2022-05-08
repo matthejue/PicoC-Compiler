@@ -25,27 +25,30 @@ DEREF_ARITH: "+"|"-"
 // ----------------------------------------------------------------------------
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
-?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
+?arith_opd: NAME|NUM|CHAR|input_odp|"("arith_exp_logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
 un_opd: UN_OP* arith_opd
 arith_prec1: un_opd (PREC1_OP un_opd)*
 arith_prec2: arith_prec1 (PREC2_OP arith_prec1)*
 ?arith_exp: arith_prec2
 print_stmt: "print""("arith_exp")"";"
 // ---------------------------------- L_Logic ---------------------------------
-logic_atom: arith_exp [RELATION arith_exp]
+to_bool: arith_exp
+?logic_opd: "("logic_exp")"|to_bool
+logic_atom: logic_opd [RELATION logic_opd]
 logic_and: logic_atom ("&&" logic_atom)*
 logic_or: logic_and ("||" logic_and)*
 ?logic_exp: logic_or
+?arith_exp_logic_exp: arith_exp|logic_exp
 // ------------------------------ L_Assign_Alloc ------------------------------
 ?datatype: SIZE_QUAL|struct_spec
 alloc: datatype pntr_decl
 ?alloc_stmt: alloc";"
-var_assign: NAME "=" logic_exp";"
+var_assign: NAME "=" arith_exp_logic_exp";"
 // if the type of NAME is array, a assignment is not possible
 ?assign_stmt: var_assign|deref_assign|subscr_assign|attribute_assign
-init: alloc "=" logic_exp";"
+init: alloc "=" arith_exp_logic_exp";"
 const_init: "const" SIZE_QUAL NAME "=" NUM";"
-?alloc_init_stmt: alloc_stmt|init|const_init|array_init|struct_init
+?assign_alloc_stmt: alloc_stmt|assign_stmt|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl
@@ -58,15 +61,15 @@ var_ref: "&"NAME
 deref_ref: "&"deref
 ?ref: var_ref|deref_ref|subscr_ref|attribute_ref
 ?pntr_opd: deref|ref
-deref_assign: deref "=" logic_exp";"
+deref_assign: deref "=" arith_exp_logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
 array_decl: NAME array_dims|"("pntr_decl")"array_dims
 ?subscr_opd: NAME|array_subscr|struct_attr
-array_subscr: subscr_opd"["logic_exp"]"|"("deref")""["logic_exp"]"
+array_subscr: subscr_opd"["arith_exp_logic_exp"]"|"("deref")""["arith_exp_logic_exp"]"
 subscr_ref: "&"array_subscr
-subscr_assign: array_subscr "=" logic_exp";"
-?entry_subexp: logic_exp|array_subexps|struct_subexps
+subscr_assign: array_subscr "=" arith_exp_logic_exp";"
+?entry_subexp: arith_exp_logic_exp|array_subexps|struct_subexps
 array_subexps: "{"entry_subexp("," entry_subexp)*"}"
 array_init_dims: ("["NUM"]")+
 array_init_decl: NAME array_dims
@@ -75,7 +78,7 @@ array_init: datatype array_init_decl "=" array_subexps";"
 struct_spec: "struct" NAME
 struct_attr: subscr_opd"."NAME|"("deref")""."NAME
 attribute_ref: "&"struct_attr
-attribute_assign: struct_attr "=" logic_exp";"
+attribute_assign: struct_attr "=" arith_exp_logic_exp";"
 struct_params: (datatype pntr_decl";")+
 struct_decl: "struct" NAME "{"struct_params"}"";"
 struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
@@ -91,15 +94,15 @@ while_stmt: "while""("condition")" "{" exec_stmts "}"
 do_while_stmt: "do" "{" exec_stmts "}" "while""("condition")"";"
 ?loop_stmt: while_stmt|do_while_stmt
 // ---------------------------------- L_Stmt ----------------------------------
-?decl_part: alloc_init_stmt
+?decl_part: assign_alloc_stmt
 ?exec_part: print_stmt|assign_stmt|if_if_else_stmt|loop_stmt|fun_stmt
 ?exec_stmts: exec_part*
 ?decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
-fun_call_args: [logic_exp("," logic_exp)*]
+fun_call_args: [arith_exp_logic_exp("," arith_exp_logic_exp)*]
 fun_call: NAME"("fun_call_args")"
 fun_call_stmt: fun_call";"
-fun_return: "return" [logic_exp]";"
+fun_return: "return" [arith_exp_logic_exp]";"
 ?fun_stmt: fun_call_stmt|fun_return
 fun_params: [datatype pntr_decl("," datatype pntr_decl)*]
 fun_decl: SIZE_QUAL NAME"("fun_params")"";"

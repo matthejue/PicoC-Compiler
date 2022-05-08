@@ -20,13 +20,6 @@ class Args:
 # options from command-line arguments
 args = Args()
 
-# for the taste method of the BacktrackingParser
-is_tasting = 0
-
-# for turning the "writing the nodetype in front of the parenthesis" for
-# __repr__ temporarily on and off
-show_node = True
-
 # Name and path for the basename of all output files. If it stays empty this
 # means one is in shell mode
 outbase = ""
