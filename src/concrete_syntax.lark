@@ -45,6 +45,7 @@ logic_or: logic_and ("||" logic_and)*
 alloc: datatype pntr_decl
 ?alloc_stmt: alloc";"
 var_assign: NAME "=" arith_exp_logic_exp";"
+// if the type of NAME is array, a assignment is not possible
 ?assign_stmt: var_assign|deref_assign|subscr_assign|attribute_assign
 init: alloc "=" arith_exp_logic_exp";"
 const_init: "const" SIZE_QUAL NAME "=" NUM";"
