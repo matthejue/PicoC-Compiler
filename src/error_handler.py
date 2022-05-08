@@ -25,16 +25,16 @@ class ErrorHandler:
     def handle(self, function, *args):
         try:
             rtrn_val = function(*args)
-        except UnexpectedToken as e:
-            print(e)
-            exit(0)
-        except UnexpectedCharacters as e:
-            print(e)
-            print(e.allowed)
-            exit(0)
-        except UnexpectedEOF as e:
-            print(e)
-            exit(0)
+        #  except UnexpectedToken as e:
+        #      print(e)
+        #      exit(0)
+        #  except UnexpectedCharacters as e:
+        #      print(e)
+        #      print(e.allowed)
+        #      exit(0)
+        #  except UnexpectedEOF as e:
+        #      print(e)
+        #      exit(0)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
