@@ -1,19 +1,31 @@
 from colormanager import ColorManager as CM
 from lark import Token
+from dataclasses import dataclass
+
+
+@dataclass
+class Pos:
+    line: int
+    column: int
+
+
+@dataclass
+class Range:
+    start_pos: Pos
+    end_pos: Pos
 
 
 class Errors:
     class UnexpectedTokenError(Exception):
-        def __init__(self, expected, found, found_pos):
+        def __init__(self, expected, found: Token, found_range: Range):
             self.description = (
                 f"{CM().YELLOW}UnexpectedToken{CM().RESET}: Expected "
                 f"""{' or '.join(f"'{elem}'" for elem in expected if "ANON" not in elem)}"""
                 f", found '{found}'"
             )
-            #  filter(lambda elem: isinstance(elem, Token), expected)
             self.expected = expected
             self.found = found
-            self.found_pos = found_pos
+            self.found_range = found_range
 
     class UnclosedCharacterError(Exception):
         """If a character has a opening apostrophe but not a closing one"""
