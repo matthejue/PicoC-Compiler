@@ -200,11 +200,11 @@ class Compiler(cmd2.Cmd):
         # handle errors
         error_handler = ErrorHandler(code_with_file)
 
-        dt = error_handler.handle(parser.parse, code_with_file)
-
         if global_vars.args.tokens:
             print(subheading("Tokens", terminal_width, "-"))
-            error_handler.handle(self._tokens_option, dt, code_with_file)
+            error_handler.handle(self._tokens_option, code_with_file)
+
+        dt = error_handler.handle(parser.parse, code_with_file)
 
         if global_vars.args.derivation_tree:
             print(subheading("Derivation Tree", terminal_width, "-"))
@@ -224,21 +224,17 @@ class Compiler(cmd2.Cmd):
         print(subheading("RETI Code", terminal_width, "-"))
         self._reti_code(ast)
 
-    def _tokens_option(self, dt, code):
-        if global_vars.args.verbose:
-            parser = Lark.open(
-                "./src/concrete_syntax.lark",
-                lexer="basic",
-                priority="invert",
-                keep_all_tokens=True,
-                parser="earley",
-                start="file",
-                maybe_placeholders=False,
-                propagate_positions=True,
-            )
-            dt = parser.parse(code)
-
-        tokens = list(dt.scan_values(lambda v: isinstance(v, Token)))
+    def _tokens_option(self, code_with_file):
+        parser = Lark.open(
+            "./src/concrete_syntax.lark",
+            lexer="basic",
+            priority="invert",
+            parser="earley",
+            start="file",
+            maybe_placeholders=False,
+            propagate_positions=True,
+        )
+        tokens = list(parser.lex(code_with_file))
 
         if global_vars.args.print:
             print(tokens)

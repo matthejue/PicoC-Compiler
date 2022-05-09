@@ -1,3 +1,6 @@
+// in:
+// expected:UnexpectedTokenError
+
 void main() {
   int var = 42
 }

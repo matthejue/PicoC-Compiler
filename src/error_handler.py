@@ -7,17 +7,61 @@ from lark.exceptions import (
     UnexpectedToken,
     UnexpectedEOF,
 )
+from lark import Lark, Token
+import compiler
+import os
+import itertools
+
+MAP_TO_TERMINAL = {
+    "NUM": "number",
+    "CHAR": "character",
+    "NAME": "identifier",
+    "NEG": "'~'",
+    "NOT": "'!'",
+    "SUB_MINUS": "'-'",
+    "ADD": "'+'",
+    "MUL": "'*'",
+    "DIV": "'/'",
+    "MOD": "'%'",
+    "OPLUS": "'^'",
+    "AND": "'&'",
+    "OR": "'|'",
+    "EQ": "'=='",
+    "NEQ": "'!='",
+    "LT": "'<'",
+    "LTE": "'<='",
+    "GT": "'>'",
+    "GTE": "'>='",
+    "INT_DT": "'int'",
+    "CHAR_DT": "'char'",
+    "VOID_DT": "'void'",
+    "STRUCT": "'struct'",
+    "IF": "'if'",
+    "ELSE": "'else'",
+    "WHILE": "'while'",
+    "DO": "'do'",
+    # tokennames from https://github.com/lark-parser/lark/blob/86c8ad41c9e5380e30f3b63b894ec0b3cb21a20a/lark/load_grammar.py#L34
+    "DOT": "'.'",
+    "COMMA": "','",
+    "SEMICOLON": "';'",
+    "STAR": "'*'",
+    "LPAR": "'('",
+    "RPAR": "')'",
+    "LBRACE": "'{'",
+    "RBRACE": "'}'",
+    "LSQB": "'['",
+    "RSQB": "']'",
+}
+
+MAX_EXPECTED_TOKENS = 5
 
 
 class ErrorHandler:
     """Output a detailed error message"""
 
     def __init__(self, code_with_file):
+        self.code_with_file = code_with_file
         self.split_code = code_with_file.split("\n")
-        # in case there's a multiline inline comment that spreads over more then 2 lines
-        self.multiline_comment_started = False
-        # list of removed comments to undo the removing later
-        self.removed_comments = [(0, 0, "")]
 
     def handle(self, function, *args):
         try:
@@ -32,8 +76,11 @@ class ErrorHandler:
             #  print("\n" + error_header)
             exit(0)
         except UnexpectedToken as e:
+            self._error_heading()
+            expected_str = set_to_str(e.expected)
+            # -1 because lark starts counting from 1
             e = Errors.UnexpectedTokenError(
-                e.expected,
+                expected_str,
                 e.token.value,
                 Range(
                     Pos(e.token.line - 1, e.token.column - 1),
@@ -41,23 +88,23 @@ class ErrorHandler:
                 ),
             )
             error_header = self._error_header(e.found_range.start_pos, e.description)
-            expected_pos = self._find_space_after_previous_token(
-                (e.found_range.start_pos.line, e.found_range.start_pos.column)
-            )
+            prev_token = self._find_prev_token(e.found_range.start_pos)
+            # -2 because ranges always end with + 1 of the actual position and
+            # because Lark starts counting with 1
+            expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2 + 1)
             error_screen = AnnotationScreen(
                 self.split_code,
-                e.found_range.start_pos.line,
+                expected_pos.line,
                 e.found_range.end_pos.line,
             )
             error_screen.mark(e.found_range.start_pos, len(e.found))
             if e.found_range.start_pos == expected_pos:
-                pos = expected_pos
-                row_from = expected_pos[0]
-                rel_row = pos[0] - row_from
-                error_screen.clear(rel_row + 1, pos[1])
-            error_screen.point_at(Pos(expected_pos[0], expected_pos[1]), "expected")
+                error_screen.clear(1)
+            error_screen.point_at(expected_pos, expected_str)
             error_screen.filter()
-            print("\n" + error_header + str(error_screen))
+            self._write_error_to_file(
+                error_header + str(error_screen) + "\n\n", e.__class__.__name__
+            )
             exit(0)
         except UnexpectedEOF as e:
             exit(0)
@@ -212,6 +259,10 @@ class ErrorHandler:
             exit(0)
         return rtrn_val
 
+    def _error_heading(self):
+        terminal_width = os.get_terminal_size().columns
+        print(compiler.subheading("Error", terminal_width, "-"))
+
     def _error_header(self, pos: Pos, descirption):
         if not pos:
             return CM().BRIGHT + descirption + CM().RESET_ALL + "\n"
@@ -225,88 +276,34 @@ class ErrorHandler:
             + ": "
             + descirption
             + CM().RESET_ALL
-            + "\n"
         )
 
-    def _find_space_after_previous_token(self, pos):
-        row, col = pos[0], pos[1]
-        self.split_code[row] = self._remove_comments(row)
-        while row > 0:
-            old_row = row
-            row, col = self._previous_position(row, col)
+    def _find_prev_token(self, pos: Pos) -> Token:
+        parser = Lark.open(
+            "./src/concrete_syntax.lark",
+            lexer="basic",
+            priority="invert",
+            parser="earley",
+            start="file",
+            maybe_placeholders=False,
+            propagate_positions=True,
+        )
+        tokens = list(parser.lex(self.code_with_file))
 
-            # comments should be overwritten with space
-            if old_row != row:
-                self.split_code[row] = self._remove_comments(row)
-                if self.multiline_comment_started == True:
-                    self._store_comment(row, 0, self.split_code[row])
-                    self.split_code[row] = overwrite(
-                        self.split_code[row], " " * len(self.split_code[row]), 0
-                    )
-            if self.split_code[row][col] not in " \t":
+        # find token with same position
+        for (i, token) in enumerate(tokens):
+            # -1 because Lark starts counting from 1
+            if token.line - 1 == pos.line and token.column - 1 == pos.column:
                 break
-        self._undo_removing_commments()
-        return (row, col + 1)
+        return tokens[i - 1]
 
-    def _remove_comments(self, row):
-        """checks whether there comes a comment while going back and if yes
-        return the position where the comment starts
-        """
-        line = self.split_code[row]
-        col = len(line) - 1
-        while col > 0:
-            if line[col - 1] == "/" and line[col] == "/":
-                col -= 1
-                self._store_comment(row, col, line[col : len(line)])
-                line = overwrite(line, " " * (len(line) - col), col)
-            elif line[col - 1] == "*" and line[col] == "/":
-                col_to = col
-                col -= 2
-                while col > 0:
-                    if line[col - 1] == "/" and line[col] == "*":
-                        col -= 1
-                        self._store_comment(row, col, line[col : col_to + 1])
-                        line = overwrite(line, " " * (col_to - col + 1), col)
-                        break
-                    col -= 1
-                else:
-                    self._store_comment(row, 0, line[0 : col_to + 1])
-                    line = overwrite(line, " " * (col_to + 1), 0)
-                    self.multiline_comment_started = True
-            elif line[col - 1] == "/" and line[col] == "*":
-                col_from = col - 1
-                self._store_comment(row, col_from, line[col_from : len(line)])
-                line = overwrite(line, " " * (len(line) - col_from), col_from)
-                self.multiline_comment_started = False
-            col -= 1
-        return line
-
-    def _store_comment(self, row, col, comment):
-        # The if is only necessary in case _remove_comments already emptied a
-        # */ commment and in turn set multiline_comment_started to True. When
-        # returning from this function The emptied comment would be copied again.
-        if self.removed_comments[-1][0] != row:
-            self.removed_comments += [(row, col, comment)]
-
-    def _undo_removing_commments(self):
-        for row, col, comment in self.removed_comments:
-            self.split_code[row] = overwrite(self.split_code[row], comment, col)
-
-    def _previous_position(self, row, col):
-        # in contrast to the lexer the row and col vars are always kept as
-        # local variables they're only releavnt for the function
-        # _find_space_after_previous_token
-
-        # next column or next row
-        # the first row is for the filename
-        if col > 0:
-            col -= 1
-        elif col == 0 and row > 1:
-            row -= 1
-            col = len(self.split_code[row]) - 1
-        elif col == 0 and row == 1:
-            row -= 1
-        return row, col
+    def _write_error_to_file(self, error_str, error_name):
+        print(error_str)
+        if global_vars.outbase:
+            with open(global_vars.outbase + ".out", "w", encoding="utf-8") as fout:
+                fout.write(error_name + "\n")
+            with open(global_vars.outbase + ".error", "w", encoding="utf-8") as fout:
+                fout.write(error_str)
 
     def __repr__(self):
         return self.split_code
@@ -362,11 +359,11 @@ class AnnotationScreen:
         ):
             del self.screen[i]
 
-    def clear(self, row, col):
-        self.screen[row] = overwrite(self.screen[row], " " * len(self.screen[row]), col)
+    def clear(self, row):
+        self.screen[row] = " " * (len(self.screen[row]) + 1)
 
     def __repr__(self):
-        acc = ""
+        acc = "\n"
 
         for line in self.context_above + self.screen + self.context_below:
             acc += line + "\n"
@@ -381,4 +378,12 @@ def overwrite(old, replace_with, idx, color=""):
         + replace_with
         + (CM().RESET if color else "")
         + old[idx + len(replace_with) :]
+    )
+
+
+def set_to_str(tokenset):
+    return " or ".join(
+        MAP_TO_TERMINAL.get(elem, elem)
+        for elem in itertools.islice(tokenset, MAX_EXPECTED_TOKENS + 1)
+        if "ANON" not in elem
     )

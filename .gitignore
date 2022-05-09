@@ -11,6 +11,7 @@ README.txt
 *.ast
 *.csv
 *.reti
+*.error
 *.reti_tokens
 *.reti_ast
 *.in
