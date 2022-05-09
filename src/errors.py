@@ -1,16 +1,17 @@
 from colormanager import ColorManager as CM
+from lark import Token
 
 
 class Errors:
-    class InvalidCharacterError(Exception):
-        """If there're Token sequences generated from the input that are not
-        permitted by the grammar rules"""
-
-        def __init__(self, found, found_pos):
+    class UnexpectedCharacterError(Exception):
+        def __init__(self, expected, found, found_pos):
             self.description = (
-                f"{CM().YELLOW}InvalidCharacterError{CM().RESET}: '{found}' is not a "
-                "permitted character"
+                f"{CM().YELLOW}UnexpectedCharacter{CM().RESET}: Expected "
+                f"""{' or '.join(f"'{elem}'" for elem in expected if "ANON" not in elem)}"""
+                f", found '{found}'"
             )
+            #  filter(lambda elem: isinstance(elem, Token), expected)
+            self.expected = expected
             self.found = found
             self.found_pos = found_pos
 

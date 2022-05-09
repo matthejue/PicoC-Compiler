@@ -6,7 +6,6 @@ from lark.exceptions import (
     UnexpectedCharacters,
     UnexpectedToken,
     UnexpectedEOF,
-    UnexpectedInput,
 )
 
 
@@ -25,16 +24,21 @@ class ErrorHandler:
     def handle(self, function, *args):
         try:
             rtrn_val = function(*args)
-        #  except UnexpectedToken as e:
-        #      print(e)
-        #      exit(0)
-        #  except UnexpectedCharacters as e:
-        #      print(e)
-        #      print(e.allowed)
-        #      exit(0)
-        #  except UnexpectedEOF as e:
-        #      print(e)
-        #      exit(0)
+        except UnexpectedCharacters as e:
+            #  e = Errors.UnexpectedCharacterError(e.allowed, e.char, (e.line, e.column))
+            #  error_header = self._error_header(e.found_pos, e.description)
+            #  error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
+            #  error_screen.mark(e.found_pos, len(e.found))
+            #  error_screen.filter()
+            #  print("\n" + error_header + str(error_screen))
+            #  print("\n" + error_header)
+            print(e)
+            exit(0)
+        except UnexpectedToken as e:
+            print(e)
+            exit(0)
+        except UnexpectedEOF as e:
+            exit(0)
         except Errors.InvalidCharacterError as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])

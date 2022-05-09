@@ -18,7 +18,8 @@ class ASTTransformer(Transformer):
     def CHAR(self, token: Token):
         return N.Char(token.value, (token.start_pos, token.end_pos))
 
-    def UN_OP(self, token: Token):
+    def un_op(self, token_list: list[Token]):
+        token = token_list[0]
         match token.value:
             case "-":
                 return N.Minus(token.value, (token.start_pos, token.end_pos))
@@ -27,7 +28,8 @@ class ASTTransformer(Transformer):
             case "!":
                 return N.LogicNot(token.value, (token.start_pos, token.end_pos))
 
-    def PREC1_OP(self, token: Token):
+    def prec1_op(self, token_list: list[Token]):
+        token = token_list[0]
         match token.value:
             case "*":
                 return N.Add(token.value, (token.start_pos, token.end_pos))
@@ -36,7 +38,8 @@ class ASTTransformer(Transformer):
             case "%":
                 return N.Mod(token.value, (token.start_pos, token.end_pos))
 
-    def PREC2_OP(self, token: Token):
+    def prec2_op(self, token_list: list[Token]):
+        token = token_list[0]
         match token.value:
             case "+":
                 return N.Add(token.value, (token.start_pos, token.end_pos))
@@ -50,7 +53,8 @@ class ASTTransformer(Transformer):
                 return N.Or(token.value, (token.start_pos, token.end_pos))
 
     # --------------------------------- L_Logic -------------------------------
-    def RELATION(self, token: Token):
+    def relation(self, token_list: list[Token]):
+        token = token_list[0]
         match token.value:
             case "==":
                 return N.Eq(token.value, (token.start_pos, token.end_pos))
@@ -66,7 +70,8 @@ class ASTTransformer(Transformer):
                 return N.GtE(token.value, (token.start_pos, token.end_pos))
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    def SIZE_QUAL(self, token: Token):
+    def prim_dt(self, token_list):
+        token = token_list[0]
         match token.value:
             case "int":
                 return N.IntType(token.value, (token.start_pos, token.end_pos))
@@ -76,7 +81,8 @@ class ASTTransformer(Transformer):
                 return N.VoidType(token.value, (token.start_pos, token.end_pos))
 
     # ------------------------------- L_Pointer -------------------------------
-    def DEREF_ARITH(self, token: Token):
+    def deref_offset_op(self, token_list: list[Token]):
+        token = token_list[0]
         match token.value:
             case "+":
                 return N.PNTR_PLUS(token.value, (token.start_pos, token.end_pos))
@@ -127,12 +133,6 @@ class ASTTransformer(Transformer):
         return N.Call(N.Name("print"), nodes[0])
 
     # --------------------------------- L_Logic -------------------------------
-    def to_bool(self, nodes):
-        return N.ToBool(nodes[0])
-
-    def logic_opd(self, nodes):
-        return nodes[0]
-
     def logic_atom(self, nodes):
         if len(nodes) == 1:
             return nodes[0]
@@ -153,11 +153,8 @@ class ASTTransformer(Transformer):
     def logic_exp(self, nodes):
         return nodes[0]
 
-    def arith_exp_logic_exp(self, nodes):
-        return nodes[0]
-
     # ----------------------------- L_Assign_Alloc ----------------------------
-    def datatype(self, nodes):
+    def size_qual(self, nodes):
         return nodes[0]
 
     def alloc(self, nodes):
@@ -312,8 +309,6 @@ class ASTTransformer(Transformer):
         return N.If(nodes[0], nodes[1])
 
     def if_else_stmt(self, nodes):
-        if not isinstance(nodes[2], list):
-            return N.IfElse(nodes[0], nodes[1], [nodes[2]])
         return N.IfElse(nodes[0], nodes[1], nodes[2])
 
     def if_if_else_stmt(self, nodes):
