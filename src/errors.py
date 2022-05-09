@@ -3,10 +3,10 @@ from lark import Token
 
 
 class Errors:
-    class UnexpectedCharacterError(Exception):
+    class UnexpectedTokenError(Exception):
         def __init__(self, expected, found, found_pos):
             self.description = (
-                f"{CM().YELLOW}UnexpectedCharacter{CM().RESET}: Expected "
+                f"{CM().YELLOW}UnexpectedToken{CM().RESET}: Expected "
                 f"""{' or '.join(f"'{elem}'" for elem in expected if "ANON" not in elem)}"""
                 f", found '{found}'"
             )
