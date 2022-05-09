@@ -1,5 +1,5 @@
 // in:
-// expected:e
+// expected:UnexpectedTokenError
 
 void main() {
   int[] var = 12;

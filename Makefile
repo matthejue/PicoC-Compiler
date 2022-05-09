@@ -46,20 +46,21 @@ _clean-pycache:
 	find . -type d -name "__pycache__" -delete
 
 _clean-files:
-	find . -type f -name "*.tokens" -delete
-	find . -type f -name "*.dt" -delete
-	find . -type f -name "*.ast" -delete
-	find . -type f -name "*.csv" -delete
+	find . -type f -wholename "./tests/*.tokens" -delete
+	find . -type f -wholename "./tests/*.dt" -delete
+	find . -type f -wholename "./tests/*.ast" -delete
+	find . -type f -wholename "./tests/*.csv" -delete
 	find . -type f -wholename "./tests/*.reti" -delete
-	find . -type f -name "*.reti_tokens" -delete
-	find . -type f -name "*.reti_ast" -delete
-	find . -type f -name "*.in" -delete
-	find . -type f -name "*.out" -delete
-	find . -type f -name "*.out_expected" -delete
-	find . -type f -name "*.reti_state" -delete
-	find . -type f -name "*.c" -delete
-	find . -type f -name "*.c_out" -delete
-	find . -type f -name "*.exec" -delete
+	find . -type f -wholename "./tests/*.error" -delete
+	find . -type f -wholename "./tests/*.reti_tokens" -delete
+	find . -type f -wholename "./tests/*.reti_ast" -delete
+	find . -type f -wholename "./tests/*.in" -delete
+	find . -type f -wholename "./tests/*.out" -delete
+	find . -type f -wholename "./tests/*.out_expected" -delete
+	find . -type f -wholename "./tests/*.reti_state" -delete
+	find . -type f -wholename "./tests/*.c" -delete
+	find . -type f -wholename "./tests/*.c_out" -delete
+	find . -type f -wholename "./tests/*.exec" -delete
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

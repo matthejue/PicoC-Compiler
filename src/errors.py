@@ -8,6 +8,9 @@ class Pos:
     line: int
     column: int
 
+    def __eq__(self, other):
+        return self.line == other.line and self.column == other.column
+
 
 @dataclass
 class Range:
@@ -19,8 +22,7 @@ class Errors:
     class UnexpectedTokenError(Exception):
         def __init__(self, expected, found: Token, found_range: Range):
             self.description = (
-                f"{CM().YELLOW}UnexpectedToken{CM().RESET}: Expected "
-                f"""{' or '.join(f"'{elem}'" for elem in expected if "ANON" not in elem)}"""
+                f"{CM().YELLOW}UnexpectedToken{CM().RESET}: Expected e.g. {expected}"
                 f", found '{found}'"
             )
             self.expected = expected
