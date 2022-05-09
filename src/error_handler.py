@@ -35,12 +35,18 @@ MAP_TO_TERMINAL = {
     "INT_DT": "'int'",
     "CHAR_DT": "'char'",
     "VOID_DT": "'void'",
+    "CONST": "'const'",
+    "PRINT": "'print'",
+    "INPUT": "'input'",
     "STRUCT": "'struct'",
     "IF": "'if'",
     "ELSE": "'else'",
     "WHILE": "'while'",
     "DO": "'do'",
-    # tokennames from https://github.com/lark-parser/lark/blob/86c8ad41c9e5380e30f3b63b894ec0b3cb21a20a/lark/load_grammar.py#L34
+    "RETURN": "'return'",
+    # tokennames from https://github.com/lark-parser/lark/blob/86c8ad41c9e5380e
+    # 30f3b63b894ec0b3cb21a20a/lark/load_grammar.py#L34
+    "EQUAL": "'='",
     "DOT": "'.'",
     "COMMA": "','",
     "SEMICOLON": "';'",
@@ -53,12 +59,10 @@ MAP_TO_TERMINAL = {
     "RSQB": "']'",
 }
 
-MAX_EXPECTED_TOKENS = 5
+MAX_PRINT_OUT_TOKENS = 5
 
 
 class ErrorHandler:
-    """Output a detailed error message"""
-
     def __init__(self, code_with_file):
         self.code_with_file = code_with_file
         self.split_code = code_with_file.split("\n")
@@ -67,13 +71,25 @@ class ErrorHandler:
         try:
             rtrn_val = function(*args)
         except UnexpectedCharacters as e:
-            #  e = Errors.UnexpectedCharacterError(e.allowed, e.char, (e.line, e.column))
-            #  error_header = self._error_header(e.found_pos, e.description)
-            #  error_screen = AnnotationScreen(self.split_code, e.found_pos[0], e.found_pos[0])
-            #  error_screen.mark(e.found_pos, len(e.found))
-            #  error_screen.filter()
-            #  print("\n" + error_header + str(error_screen))
-            #  print("\n" + error_header)
+            self._error_heading()
+            prev_token = e.token_history[-1]
+            expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2)
+            expected_str = MAP_TO_TERMINAL.get(prev_token.type, prev_token.type)
+            e = Errors.UnexpectedCharacterError(
+                expected_str,
+                e.char,
+                Pos(e.line - 1, e.column - 1),
+            )
+            error_header = self._error_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(
+                self.split_code,
+                expected_pos.line,
+                e.found_pos.line,
+            )
+            error_screen.mark(e.found_pos, len=1)
+            error_screen.point_at(expected_pos, "context of " + expected_str)
+            error_screen.filter()
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         except UnexpectedToken as e:
             self._error_heading()
@@ -102,7 +118,7 @@ class ErrorHandler:
                 error_screen.clear(1)
             error_screen.point_at(expected_pos, expected_str)
             error_screen.filter()
-            self._write_error_to_file(
+            self._output_error(
                 error_header + str(error_screen) + "\n\n", e.__class__.__name__
             )
             exit(0)
@@ -297,7 +313,7 @@ class ErrorHandler:
                 break
         return tokens[i - 1]
 
-    def _write_error_to_file(self, error_str, error_name):
+    def _output_error(self, error_str, error_name):
         print(error_str)
         if global_vars.outbase:
             with open(global_vars.outbase + ".out", "w", encoding="utf-8") as fout:
@@ -342,10 +358,10 @@ class AnnotationScreen:
         )
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
-    def mark(self, pos: Pos, length):
+    def mark(self, pos: Pos, len: int):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * length, pos.column, CM().BLUE
+            self.screen[3 * rel_row + 1], "~" * len, pos.column, CM().BLUE
         )
         self.marked_lines += [3 * rel_row + 1]
 
@@ -381,9 +397,13 @@ def overwrite(old, replace_with, idx, color=""):
     )
 
 
-def set_to_str(tokenset):
+def set_to_str(tokens: set):
     return " or ".join(
         MAP_TO_TERMINAL.get(elem, elem)
-        for elem in itertools.islice(tokenset, MAX_EXPECTED_TOKENS + 1)
+        for elem in (
+            tokens
+            if global_vars.args.verbose
+            else itertools.islice(tokens, MAX_PRINT_OUT_TOKENS + 1)
+        )
         if "ANON" not in elem
     )

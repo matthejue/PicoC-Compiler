@@ -1,0 +1,6 @@
+// in:
+// expected:UnexpectedCharacterError
+
+void main() {
+  int va@r = 10;
+}
