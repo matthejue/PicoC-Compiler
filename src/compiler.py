@@ -228,7 +228,8 @@ class Compiler(cmd2.Cmd):
         if global_vars.args.verbose:
             parser = Lark.open(
                 "./src/concrete_syntax.lark",
-                lexer="dynamic",
+                lexer="basic",
+                priority="invert",
                 keep_all_tokens=True,
                 parser="earley",
                 start="file",

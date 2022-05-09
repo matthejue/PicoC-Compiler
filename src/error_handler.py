@@ -32,10 +32,14 @@ class ErrorHandler:
             #  error_screen.filter()
             #  print("\n" + error_header + str(error_screen))
             #  print("\n" + error_header)
-            print(e)
             exit(0)
         except UnexpectedToken as e:
-            print(e)
+            e = Errors.UnexpectedTokenError(
+                e.expected, e.token.value, (e.token.line, e.token.column)
+            )
+            error_header = self._error_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(self.code, e.found_pos[0], e.found_pos[0])
+            print("\n" + error_header)
             exit(0)
         except UnexpectedEOF as e:
             exit(0)
