@@ -160,7 +160,7 @@ class BacktrackingParser:
         # Lexer errors should always be reported, else it can happen that only
         # the first taste triggers the lexer error and the next taste can
         # continue without error from the last lexer position
-        except (Errors.UnknownIdentifierError, Errors.UnclosedCharacterError) as e:
+        except (Errors.UnknownIdentifier, Errors.UnclosedCharacterError) as e:
             raise e
         except Exception as e:
             error.val = e

@@ -32,7 +32,7 @@ class FunParser(StmtParser):
     def _check_no_second_main(self):
         self.mains += [self.LT(2)]
         if len(self.mains) > 1:
-            raise Errors.MoreThanOneMainFunctionError(
+            raise Errors.MoreThanOneMainFunction(
                 self.mains[0].position, self.mains[1].position
             )
 
