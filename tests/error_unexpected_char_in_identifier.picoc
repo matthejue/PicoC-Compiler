@@ -1,5 +1,5 @@
 // in:
-// expected:UnexpectedCharacterError
+// expected:UnexpectedCharacter
 
 void main() {
   int va@r = 10;

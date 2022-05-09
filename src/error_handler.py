@@ -75,12 +75,12 @@ class ErrorHandler:
             prev_token = e.token_history[-1]
             expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2)
             expected_str = MAP_TO_TERMINAL.get(prev_token.type, prev_token.type)
-            e = Errors.UnexpectedCharacterError(
+            e = Errors.UnexpectedCharacter(
                 expected_str,
                 e.char,
                 Pos(e.line - 1, e.column - 1),
             )
-            error_header = self._error_header(e.found_pos, e.description)
+            error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
                 self.split_code,
                 expected_pos.line,
@@ -95,7 +95,7 @@ class ErrorHandler:
             self._error_heading()
             expected_str = set_to_str(e.expected)
             # -1 because lark starts counting from 1
-            e = Errors.UnexpectedTokenError(
+            e = Errors.UnexpectedToken(
                 expected_str,
                 e.token.value,
                 Range(
@@ -103,28 +103,42 @@ class ErrorHandler:
                     Pos(e.token.end_line - 1, e.token.end_column - 1),
                 ),
             )
-            error_header = self._error_header(e.found_range.start_pos, e.description)
+            error_header = self._error_header(e.description, e.found_range.start_pos)
             prev_token = self._find_prev_token(e.found_range.start_pos)
             # -2 because ranges always end with + 1 of the actual position and
             # because Lark starts counting with 1
-            expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2 + 1)
+            prev_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2 + 1)
             error_screen = AnnotationScreen(
                 self.split_code,
-                expected_pos.line,
+                prev_pos.line,
                 e.found_range.end_pos.line,
             )
             error_screen.mark(e.found_range.start_pos, len(e.found))
-            if e.found_range.start_pos == expected_pos:
+            if e.found_range.start_pos == prev_pos:
                 error_screen.clear(1)
-            error_screen.point_at(expected_pos, expected_str)
+            error_screen.point_at(prev_pos, expected_str)
             error_screen.filter()
             self._output_error(
                 error_header + str(error_screen) + "\n\n", e.__class__.__name__
             )
             exit(0)
         except UnexpectedEOF as e:
+            self._error_heading()
+            expected_str = set_to_str(set(e.expected))
+            last_token = self._find_last_token()
+            last_pos = Pos(last_token.end_line - 1, last_token.end_column - 2 + 1)
+            e = Errors.UnexpectedEOF(expected_str, last_pos)
+            error_header = self._error_header(e.description, e.last_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, last_pos.line, last_pos.line
+            )
+            error_screen.point_at(e.last_pos, expected_str)
+            error_screen.filter()
+            self._output_error(
+                error_header + str(error_screen) + "\n\n", e.__class__.__name__
+            )
             exit(0)
-        except Errors.InvalidCharacterError as e:
+        except Errors.UnknownIdentifier as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -133,54 +147,7 @@ class ErrorHandler:
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
             exit(0)
-        except Errors.UnclosedCharacterError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.point_at(e.found_pos, e.expected)
-            error_screen.filter()
-            print("\n" + error_header + str(error_screen))
-            exit(0)
-        except Errors.NoApplicableRuleError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.point_at(e.found_pos, e.expected)
-            error_screen.filter()
-            print("\n" + error_header + str(error_screen))
-            exit(0)
-        except Errors.MismatchedTokenError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            expected_pos = self._find_space_after_previous_token(e.found_pos)
-            error_screen = AnnotationScreen(
-                self.split_code, expected_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            if e.found_pos == expected_pos:
-                pos = expected_pos
-                row_from = expected_pos[0]
-                rel_row = pos[0] - row_from
-                error_screen.clear(rel_row + 1, pos[1])
-            error_screen.point_at(expected_pos, e.expected)
-            error_screen.filter()
-            print("\n" + error_header + str(error_screen))
-            exit(0)
-        except Errors.TastingError as e:
-            error_header = self._error_header(None, e.description)
-            print("\n" + error_header)
-            exit(0)
-        except Errors.UnknownIdentifierError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            error_screen.filter()
-            print("\n" + error_header + str(error_screen))
-            exit(0)
-        except Errors.TooLargeLiteralError as e:
+        except Errors.TooLargeLiteral as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -188,36 +155,13 @@ class ErrorHandler:
             error_screen.mark(e.found_pos, len(e.found))
             node_header = self._error_header(
                 None,
-                f"{CM().MAGENTA}Note{CM().RESET}: The max size of a literal for a {e.found_symbol_type} is "
+                f"{CM().MAGENTA}Note{CM().RESET_ALL}: The max size of a literal for a {e.found_symbol_type} is "
                 f"in range '{e.found_from}' to '{e.found_to}'",
             )
             error_screen.filter()
             print("\n" + error_header + str(error_screen) + node_header)
             exit(0)
-        except Errors.RedefinitionError as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(
-                e.first_pos, f"{CM().MAGENTA}Note{CM().RESET}: Already defined here:"
-            )
-            error_screen_2 = AnnotationScreen(
-                self.split_code, e.first_pos[0], e.first_pos[0]
-            )
-            error_screen_2.mark(e.first_pos, len(e.first))
-            error_screen.filter()
-            error_screen_2.filter()
-            print(
-                "\n"
-                + error_header
-                + str(error_screen)
-                + note_header
-                + str(error_screen_2)
-            )
-            exit(0)
-        except Errors.ConstReassignmentError as e:
+        except Errors.Redeclaration as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -225,7 +169,7 @@ class ErrorHandler:
             error_screen.mark(e.found_pos, len(e.found))
             note_header = self._error_header(
                 e.first_pos,
-                f"{CM().MAGENTA}Note{CM().RESET}: Constant identifier was initialised here:",
+                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Already defined here:",
             )
             error_screen_2 = AnnotationScreen(
                 self.split_code, e.first_pos[0], e.first_pos[0]
@@ -241,11 +185,35 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
-        except Errors.NoMainFunctionError as e:
+        except Errors.ConstReassignment as e:
+            error_header = self._error_header(e.found_pos, e.description)
+            error_screen = AnnotationScreen(
+                self.split_code, e.found_pos[0], e.found_pos[0]
+            )
+            error_screen.mark(e.found_pos, len(e.found))
+            note_header = self._error_header(
+                e.first_pos,
+                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Constant identifier was initialised here:",
+            )
+            error_screen_2 = AnnotationScreen(
+                self.split_code, e.first_pos[0], e.first_pos[0]
+            )
+            error_screen_2.mark(e.first_pos, len(e.first))
+            error_screen.filter()
+            error_screen_2.filter()
+            print(
+                "\n"
+                + error_header
+                + str(error_screen)
+                + note_header
+                + str(error_screen_2)
+            )
+            exit(0)
+        except Errors.NoMainFunction as e:
             error_header = e.description + "\n"
             print("\n" + error_header)
             exit(0)
-        except Errors.MoreThanOneMainFunctionError as e:
+        except Errors.MoreThanOneMainFunction as e:
             error_header = self._error_header(e.first_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.first_pos[0], e.first_pos[0]
@@ -253,7 +221,7 @@ class ErrorHandler:
             error_screen.mark(e.first_pos, 4)
             note_header = self._error_header(
                 e.second_pos,
-                f"{CM().MAGENTA}Note{CM().RESET}: Second main function defined here:",
+                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Second main function defined here:",
             )
             error_screen_2 = AnnotationScreen(
                 self.split_code, e.second_pos[0], e.second_pos[0]
@@ -269,19 +237,15 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
-        except Errors.NotImplementedYetError as e:
-            error_header = e.description + "\n"
-            print("\n" + error_header)
-            exit(0)
         return rtrn_val
 
     def _error_heading(self):
         terminal_width = os.get_terminal_size().columns
         print(compiler.subheading("Error", terminal_width, "-"))
 
-    def _error_header(self, pos: Pos, descirption):
+    def _error_header(self, descirption: str, pos=None):
         if not pos:
-            return CM().BRIGHT + descirption + CM().RESET_ALL + "\n"
+            return descirption + "\n"
         return (
             CM().BRIGHT
             + global_vars.args.infile
@@ -312,6 +276,19 @@ class ErrorHandler:
             if token.line - 1 == pos.line and token.column - 1 == pos.column:
                 break
         return tokens[i - 1]
+
+    def _find_last_token(self) -> Token:
+        parser = Lark.open(
+            "./src/concrete_syntax.lark",
+            lexer="basic",
+            priority="invert",
+            parser="earley",
+            start="file",
+            maybe_placeholders=False,
+            propagate_positions=True,
+        )
+        tokens = list(parser.lex(self.code_with_file))
+        return tokens[-1]
 
     def _output_error(self, error_str, error_name):
         print(error_str)
@@ -392,14 +369,14 @@ def overwrite(old, replace_with, idx, color=""):
         old[:idx]
         + color
         + replace_with
-        + (CM().RESET if color else "")
+        + (CM().RESET_ALL if color else "")
         + old[idx + len(replace_with) :]
     )
 
 
 def set_to_str(tokens: set):
     return " or ".join(
-        MAP_TO_TERMINAL.get(elem, elem)
+        CM().RED + MAP_TO_TERMINAL.get(elem, elem) + CM().RESET_ALL
         for elem in (
             tokens
             if global_vars.args.verbose
