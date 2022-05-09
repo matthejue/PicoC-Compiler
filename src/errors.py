@@ -19,8 +19,19 @@ class Range:
 
 
 class Errors:
+    class UnexpectedCharacterError(Exception):
+        def __init__(self, expected: str, found: str, found_pos: Pos):
+            self.description = (
+                f"{CM().YELLOW}UnexpectedCharacter{CM().RESET}: No terminal "
+                f"matches '{found}' in the current lexical context of "
+                f"{expected}"
+            )
+            self.expected = expected
+            self.found = found
+            self.found_pos = found_pos
+
     class UnexpectedTokenError(Exception):
-        def __init__(self, expected, found: Token, found_range: Range):
+        def __init__(self, expected: str, found: Token, found_range: Range):
             self.description = (
                 f"{CM().YELLOW}UnexpectedToken{CM().RESET}: Expected e.g. {expected}"
                 f", found '{found}'"
@@ -28,53 +39,6 @@ class Errors:
             self.expected = expected
             self.found = found
             self.found_range = found_range
-
-    class UnclosedCharacterError(Exception):
-        """If a character has a opening apostrophe but not a closing one"""
-
-        def __init__(self, expected, found, found_pos):
-            self.description = (
-                f"{CM().YELLOW}UnclosedCharacterError{CM().RESET}: Expected {expected},"
-                f" found {found}"
-            )
-            self.expected = expected
-            self.found = found
-            self.found_pos = found_pos
-
-    class NoApplicableRuleError(Exception):
-        """If no rule is applicable in a situation where several undistinguishable
-        alternatives are possible"""
-
-        def __init__(self, expected, found, found_pos):
-            self.description = (
-                f"{CM().YELLOW}NoApplicableRuleError{CM().RESET}: Expected '{expected}'"
-                f", found '{found}'"
-            )
-            self.expected = expected
-            self.found = found
-            self.found_pos = found_pos
-
-    class MismatchedTokenError(Exception):
-        """If Token shouldn't syntactically appear at this position"""
-
-        def __init__(self, expected, found, found_pos):
-            # there can be several expected and these already have single quotes
-            self.description = (
-                f"{CM().YELLOW}MismatchedTokenError{CM().RESET}: Expected '{expected}'"
-                f", found '{found}'"
-            )
-            self.expected = expected
-            self.found = found
-            self.found_pos = found_pos
-
-    class TastingError(Exception):
-        """This error can only appear while tasting and should be raised if a
-        Token appears that can only be part of the other tasting choice"""
-
-        def __init__(
-            self,
-        ):
-            self.description = "This error should never be visible"
 
     class UnknownIdentifierError(Exception):
         """If Token shouldn't syntactically appear at this position"""
