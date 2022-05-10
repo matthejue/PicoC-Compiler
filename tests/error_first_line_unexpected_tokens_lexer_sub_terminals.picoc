@@ -1,0 +1,4 @@
+// in:
+// expected:UnexpectedToken
+
+12 a b A B

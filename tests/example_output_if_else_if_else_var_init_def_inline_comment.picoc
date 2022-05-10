@@ -11,7 +11,9 @@ void main() {
     var2 = 0;
   } else if (/* inline comment */ var > 10) {
     var2 = 1;
-  } else
+  } else if (var) {
     var2 = 2;
+  } else
+    var2 = 3;
   print(var2);
 }

@@ -1,7 +1,6 @@
 // in:
 // expected:UnexpectedCharacter
 
-
 struct point {int x; int y;};
 
 void main() {

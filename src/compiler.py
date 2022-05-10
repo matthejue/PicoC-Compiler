@@ -190,7 +190,7 @@ class Compiler(cmd2.Cmd):
         parser = Lark.open(
             "./src/concrete_syntax.lark",
             lexer="basic",
-            priority="invert",
+            priority="normal",
             parser="earley",
             start="file",
             maybe_placeholders=False,
@@ -228,7 +228,7 @@ class Compiler(cmd2.Cmd):
         parser = Lark.open(
             "./src/concrete_syntax.lark",
             lexer="basic",
-            priority="invert",
+            priority="normal",
             parser="earley",
             start="file",
             maybe_placeholders=False,

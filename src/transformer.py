@@ -9,7 +9,8 @@ class ASTTransformer(Transformer):
     # -                                 Lexer                                 -
     # -------------------------------------------------------------------------
     # --------------------------------- L_Arith -------------------------------
-    def NAME(self, token: Token):
+    def name(self, token_list):
+        token = token_list[0]
         return N.Name(token.value, (token.start_pos, token.end_pos))
 
     def NUM(self, token: Token):

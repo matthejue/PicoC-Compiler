@@ -31,14 +31,14 @@ class Errors:
             self.found_pos = found_pos
 
     class UnexpectedToken(Exception):
-        def __init__(self, expected: str, found: Token, found_range: Range):
+        def __init__(self, expected: str, found: Token, found_pos: Pos):
             self.description = (
                 f"{CM().YELLOW}UnexpectedToken{CM().RESET_ALL}: Expected e.g. {expected}"
                 f", found {CM().BLUE}'{found}'{CM().RESET_ALL}"
             )
             self.expected = expected
             self.found = found
-            self.found_range = found_range
+            self.found_pos = found_pos
 
     class UnexpectedEOF(Exception):
         def __init__(self, expected: str, last_pos: Pos):
