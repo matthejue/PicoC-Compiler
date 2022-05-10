@@ -17,7 +17,7 @@ not_verified=();
   fi
   ((num_tests++));
 done
-./heading_subheadings.py "heading" "Results" "$COLUMNS" "="
+./heading_subheadings.py "heading" "Results" "$1" "="
 echo Verified: $(($num_tests-${#not_verified[@]})) / $num_tests;
 echo Not verified: ${not_verified[*]};
 rm ./a.out
