@@ -181,7 +181,9 @@ class Compiler(cmd2.Cmd):
         terminal_width = os.get_terminal_size().columns
 
         # add the filename to the start of the code
-        code_with_file = f"{basename(global_vars.args.infile)}\n" + code
+        code_with_file = (
+            f"{basename(global_vars.args.infile.replace(' ', '_'))}\n" + code
+        )
 
         if global_vars.args.code and global_vars.args.print:
             print(subheading("Code", terminal_width, "-"))
