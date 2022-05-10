@@ -1,9 +1,10 @@
 // in:41
 // expected:24 42
+#include<stdio.h>
 
 void main() {
   // complex initialisation
-  int var = input() + 1;
+  int var = 41 + 1;
   // variable definition, char datatype
   char var2;
   int i = 1;
@@ -23,7 +24,7 @@ void main() {
       var2 = 24;
     // several if after another
     if (4 + 2 || 0) {
-      print(var2);
+      printf(" %d", var2);
     } else {
       // else with braces
       // empty else
@@ -31,3 +32,4 @@ void main() {
     i = i + 1;
   }
 }
+

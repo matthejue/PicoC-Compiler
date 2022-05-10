@@ -1,14 +1,16 @@
 // in:42
 // expected:42 42
+#include<stdio.h>
 
 void main() {
   // deref a ref
-  int var = input();
+  int var = 42;
   int *pntr;
   var = *&var;
-  print(var);
+  printf(" %d", var);
   // ref a deref
   pntr = &var;
   pntr = &*pntr;
-  print(*pntr);
+  printf(" %d", *pntr);
 }
+

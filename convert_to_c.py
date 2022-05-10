@@ -6,19 +6,22 @@ import os
 
 
 def main():
-    basename = remove_extension(sys.argv[1])
-    with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
-        picoc_input = picoc_file.read()
-    almost_c = picoc_input.replace("print(", 'printf(" %f", ')
-    with open(basename + ".in", "r", encoding="utf-8") as input_file:
-        inputs = reversed(input_file.read().split(" "))
-    while inputs:
-        almost_c = almost_c.replace("input()", next(inputs), 1)
-    almost_c.split("\n").insert(2, "#include<stdio.h>\n")
-    finally_c = almost_c
-    with open(basename + ".c", "r", encoding="utf-8") as c_file:
-        for line in finally_c:
-            c_file.write(line)
+    for filepath in map(
+        lambda file: f"./tests/{file}", os.listdir(os.curdir + "/tests/")
+    ):
+        basename = remove_extension(filepath)
+        with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
+            picoc_input = picoc_file.read()
+        almost_c = picoc_input.replace("print(", 'printf(" %d", ')
+        with open(basename + ".in", "r", encoding="utf-8") as input_file:
+            inputs = input_file.read().replace("\n", "").split(" ")
+        while inputs:
+            almost_c = almost_c.replace("input()", inputs.pop(0), 1)
+        finally_c = almost_c.split("\n")
+        finally_c.insert(2, "#include<stdio.h>")
+        with open(basename + ".c", "w", encoding="utf-8") as c_file:
+            for line in finally_c:
+                c_file.write(line + "\n")
 
 
 def remove_extension(fname):
