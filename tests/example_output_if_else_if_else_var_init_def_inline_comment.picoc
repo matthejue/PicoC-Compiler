@@ -1,19 +1,32 @@
-// in:10
-// expected:1
+// in:41
+// expected:314 42
 
 void main() {
   // complex initialisation
   int var = input() + 1;
   // variable definition
   char var2;
-  // if, else if, else
-  if (var > 100) {
-    var2 = 0;
-  } else if (/* inline comment */ var > 10) {
-    var2 = 1;
-  } else if (var) {
-    var2 = 2;
-  } else
-    var2 = 3;
-  print(var2);
+  int i = 1;
+  // if, else if, else in combinatin with while
+  while (i <= 2)
+    if (var > 100) {
+      var2 = 0;
+    } else if (var > 42 / /* inline comment */ i) {
+      // nested if
+      // if, if else without else
+      if (0 && 1) {
+        var2 = 1;
+      } else if (var + 10) {
+        var2 = 42;
+      }
+    } else
+      var2 = 314;
+    // several if after another
+    if (4 + 2 || 0) {
+      print(var2);
+    } else {
+      // else with braces
+      // empty else
+    }
+    i = i + 1;
 }
