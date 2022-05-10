@@ -1,0 +1,10 @@
+// in:42
+// expected:42
+
+int int_while_if(){
+  print(input());
+}
+
+void main() {
+  int_while_if();
+}

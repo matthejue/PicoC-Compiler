@@ -9,7 +9,8 @@ DIG_WITH_0: "0"|DIG_NO_0
 NUM: "0"|DIG_NO_0 DIG_WITH_0*
 LETTER: "a".."z"|"A".."Z"
 CHAR: "'"LETTER"'"
-NAME.9: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
+name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
+NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
 un_op: SUB_MINUS|NEG|NOT
 SUB_MINUS: "-"
 NEG: "~"
@@ -34,9 +35,12 @@ GT: ">"
 GTE: ">="
 // ------------------------------ L_Assign_Alloc ------------------------------
 prim_dt: INT_DT|CHAR_DT|VOID_DT
-INT_DT: "int"
-CHAR_DT: "char"
-VOID_DT: "void"
+INT_DT.2: "int"
+INT_NAME.3: "int"(LETTER|DIG_WITH_0|"_")+
+CHAR_DT.2: "char"
+CHAR_NAME.3: "char"(LETTER|DIG_WITH_0|"_")+
+VOID_DT.2: "void"
+VOID_NAME.3: "void"(LETTER|DIG_WITH_0|"_")+
 // --------------------------------- L_Pointer --------------------------------
 deref_offset_op: ADD|SUB_MINUS
 // ----------------------------------------------------------------------------
@@ -44,7 +48,7 @@ deref_offset_op: ADD|SUB_MINUS
 // ----------------------------------------------------------------------------
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
-?arith_opd: NAME|NUM|CHAR|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
+?arith_opd: name|NUM|CHAR|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
 un_opd: un_op* arith_opd
 arith_prec1: un_opd (prec1_op un_opd)*
 arith_prec2: arith_prec1 (prec2_op arith_prec1)*
@@ -54,53 +58,53 @@ print_stmt: "print""("arith_exp")"";"
 logic_atom: arith_exp [relation arith_exp]
 logic_and: logic_atom ("&&" logic_atom)*
 logic_or: logic_and ("||" logic_and)*
-?logic_exp: logic_or
+?logic_exp.2: logic_or
 // ------------------------------ L_Assign_Alloc ------------------------------
 ?size_qual: prim_dt|struct_spec
 alloc: size_qual pntr_decl
 ?alloc_stmt: alloc";"
-var_assign: NAME "=" logic_exp";"
-// if the type of NAME is array, a assignment is not possible
+var_assign: name "=" logic_exp";"
+// if the type of name is array, a assignment is not possible
 ?assign_stmt: var_assign|deref_assign|subscr_assign|attribute_assign
 init: alloc "=" logic_exp";"
-const_init: "const" prim_dt NAME "=" NUM";"
+const_init: "const" prim_dt name "=" NUM";"
 ?alloc_init_stmt: alloc_stmt|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl
-?deref_opd: NAME|pntr_opd|array_subscr|struct_attr
+?deref_opd: name|pntr_opd|array_subscr|struct_attr
 deref_simple: "*"deref_opd
 deref_arith: "*""("deref_opd deref_offset_op arith_exp")"
 ?deref: deref_simple|deref_arith
 // if the type of the location is array, then the address of the location is used
-var_ref: "&"NAME
+var_ref: "&"name
 deref_ref: "&"deref
 ?ref: var_ref|deref_ref|subscr_ref|attribute_ref
 ?pntr_opd: deref|ref
 deref_assign: deref "=" logic_exp";"
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
-array_decl: NAME array_dims|"("pntr_decl")"array_dims
-?subscr_opd: NAME|array_subscr|struct_attr
+array_decl: name array_dims|"("pntr_decl")"array_dims
+?subscr_opd: name|array_subscr|struct_attr
 array_subscr: subscr_opd"["logic_exp"]"|"("pntr_opd")""["logic_exp"]"
 subscr_ref: "&"array_subscr
 subscr_assign: array_subscr "=" logic_exp";"
 ?entry_subexp: logic_exp|array_subexps|struct_subexps
 array_subexps: "{"entry_subexp("," entry_subexp)*"}"
 array_init_dims: ("["NUM"]")+
-array_init_decl: NAME array_dims
+array_init_decl: name array_dims
 array_init: size_qual array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
-struct_spec: "struct" NAME
-struct_attr: subscr_opd"."NAME|"("deref")""."NAME
+struct_spec: "struct" name
+struct_attr: subscr_opd"."name|"("deref")""."name
 attribute_ref: "&"struct_attr
 attribute_assign: struct_attr "=" logic_exp";"
 struct_params: (size_qual pntr_decl";")+
-struct_decl: "struct" NAME "{"struct_params"}"";"
-struct_subexps: "{""."NAME"="entry_subexp ("," "."NAME"="entry_subexp)*"}"
-struct_init: struct_spec NAME "=" struct_subexps";"
+struct_decl: "struct" name "{"struct_params"}"";"
+struct_subexps: "{""."name"="entry_subexp ("," "."name"="entry_subexp)*"}"
+struct_init: struct_spec name "=" struct_subexps";"
 // --------------------------------- L_If_Else --------------------------------
-to_bool.9: arith_exp
+to_bool: arith_exp
 ?condition: to_bool|logic_exp
 if_stmt: "if""("condition")" "{" exec_stmts "}"
 if_else_stmt: "if""("condition")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
@@ -116,22 +120,22 @@ do_while_stmt: "do" "{" exec_stmts "}" "while""("condition")"";"
 ?decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_call_args: [logic_exp("," logic_exp)*]
-fun_call: NAME"("fun_call_args")"
+fun_call: name"("fun_call_args")"
 fun_call_stmt: fun_call";"
 fun_return: "return" [logic_exp]";"
 ?fun_stmt: fun_call_stmt|fun_return
 fun_params: [size_qual pntr_decl("," size_qual pntr_decl)*]
-fun_decl: prim_dt NAME"("fun_params")"";"
-fun_def: prim_dt NAME"("fun_params")" "{" decl_exec_stmts "}"
+fun_decl: prim_dt name"("fun_params")"";"
+fun_def: prim_dt name"("fun_params")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 ?decl_def: struct_decl|fun_decl|fun_def
 ?decls_defs: decl_def*
-file: NAME decls_defs
+file: name decls_defs
 // ---------------------------------- L_Block ---------------------------------
-// fun_def: prim_dt NAME"("fun_params")" "{" blocks "}"
-block: NAME":" decl_exec_stmts
+// fun_def: prim_dt name"("fun_params")" "{" blocks "}"
+block: name":" decl_exec_stmts
 ?blocks: block*
-goto: "goto""("NAME")"
+goto: "goto""("name")"
 
 
 %import common.WS

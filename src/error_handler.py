@@ -16,6 +16,9 @@ MAP_TO_TERMINAL = {
     "NUM": "number",
     "CHAR": "character",
     "NAME": "identifier",
+    "INT_NAME": "identifier",
+    "CHAR_NAME": "identifier",
+    "VOID_NAME": "identifier",
     "NEG": "'~'",
     "NOT": "'!'",
     "SUB_MINUS": "'-'",
@@ -98,23 +101,20 @@ class ErrorHandler:
             e = Errors.UnexpectedToken(
                 expected_str,
                 e.token.value,
-                Range(
-                    Pos(e.token.line - 1, e.token.column - 1),
-                    Pos(e.token.end_line - 1, e.token.end_column - 1),
-                ),
+                Pos(e.token.line - 1, e.token.column - 1),
             )
-            error_header = self._error_header(e.description, e.found_range.start_pos)
-            prev_token = self._find_prev_token(e.found_range.start_pos)
+            error_header = self._error_header(e.description, e.found_pos)
+            prev_token = self._find_prev_token(e.found_pos)
             # -2 because ranges always end with + 1 of the actual position and
             # because Lark starts counting with 1
             prev_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2 + 1)
             error_screen = AnnotationScreen(
                 self.split_code,
                 prev_pos.line,
-                e.found_range.end_pos.line,
+                e.found_pos.line,
             )
-            error_screen.mark(e.found_range.start_pos, len(e.found))
-            if e.found_range.start_pos == prev_pos:
+            error_screen.mark(e.found_pos, len(e.found))
+            if e.found_pos == prev_pos:
                 error_screen.clear(1)
             error_screen.point_at(prev_pos, expected_str)
             error_screen.filter()
@@ -124,7 +124,7 @@ class ErrorHandler:
             exit(0)
         except UnexpectedEOF as e:
             self._error_heading()
-            expected_str = set_to_str(set(e.expected))
+            expected_str = set_to_str(e.expected)
             last_token = self._find_last_token()
             last_pos = Pos(last_token.end_line - 1, last_token.end_column - 2 + 1)
             e = Errors.UnexpectedEOF(expected_str, last_pos)
@@ -352,8 +352,8 @@ class AnnotationScreen:
         ):
             del self.screen[i]
 
-    def clear(self, row):
-        self.screen[row] = " " * (len(self.screen[row]) + 1)
+    def clear(self, rel_line):
+        self.screen[rel_line] = " " * (len(self.screen[rel_line]) + 1)
 
     def __repr__(self):
         acc = "\n"
@@ -375,8 +375,9 @@ def overwrite(old, replace_with, idx, color=""):
 
 
 def set_to_str(tokens: set):
+    tokens = set(MAP_TO_TERMINAL.get(elem, elem) for elem in tokens)
     return " or ".join(
-        CM().RED + MAP_TO_TERMINAL.get(elem, elem) + CM().RESET_ALL
+        CM().RED + elem + CM().RESET_ALL
         for elem in (
             tokens
             if global_vars.args.verbose
