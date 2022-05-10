@@ -8,8 +8,8 @@ def heading(heading, terminal_width, symbol):
     print(
         _strip_multiline_string(
             f"""\033[1;37m{symbol * terminal_width}
-    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
-    (1 if (terminal_width - len(heading) - 4) % 2 else 0))}{heading}{' ' *
+    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 4) // 2 +
+    (1 if (terminal_width - len(heading)) % 2 else 0))}{heading}{' ' *
     ((terminal_width - len(heading) - 4) // 2) + ' ' + symbol}
     {symbol * terminal_width}\033[0;0m"""
         )
