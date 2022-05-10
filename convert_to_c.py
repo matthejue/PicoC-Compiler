@@ -2,10 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import global_vars
+import os
 
-with open(glo + ".tokens", "r", encoding="utf-8") as fin:
-    picoc_input = fin.read()
+
+def main():
+    filename = sys.argv[1]
+    with open(remove_extension(filename) + ".picoc", "r", encoding="utf-8") as picoc_file:
+        picoc_input = picoc_file.readlines()
+        almost_c_input = picoc_input.replace("print(", 'printf(" %f", ')
+        with open(remove_extension(filename) + ".picoc", "r", encoding="utf-8") as fin:
+
 
 
 def remove_extension(fname):
@@ -21,5 +27,5 @@ def remove_extension(fname):
     return fname[0:index_of_extension_start]
 
 
-def subheading(heading, terminal_width, symbol):
-    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
+if __name__ == "__main__":
+    main()
