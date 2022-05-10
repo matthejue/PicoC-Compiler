@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 ./extract_input_and_expected.sh
-verification_res=$(./verify_tests.sh)
+verification_res=$(./verify_tests.sh $1)
 
 num_tests=0;
 not_running_through=();
 not_passed=();
   # for test in ./{old_,}tests/*$1*.picoc; do
   for test in ./tests/*$2*.picoc; do
-    ./heading_subheadings_terminal_width.py "heading" "$test" "$1" "="
+    ./heading_subheadings.py "heading" "$test" "$1" "="
     ./src/main.py -ctdas -p -D 20 -S 2 -m -C $3 "$test";
     # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m -v -C ${test%.picoc}.reti
 

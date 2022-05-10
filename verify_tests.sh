@@ -4,7 +4,7 @@
 
 shopt -s extglob
 
-./heading_subheadings_terminal_width.py "heading" "Verification" "$COLUMNS" "="
+./heading_subheadings.py "heading" "Verification" "$1" "="
 num_tests=0;
 not_verified=();
   for test in ./tests/!(error*|exclude*).c; do
@@ -17,7 +17,7 @@ not_verified=();
   fi
   ((num_tests++));
 done
-./heading_subheadings_terminal_width.py "heading" "Results" "$COLUMNS" "="
+./heading_subheadings.py "heading" "Results" "$COLUMNS" "="
 echo Verified: $(($num_tests-${#not_verified[@]})) / $num_tests;
 echo Not verified: ${not_verified[*]};
 rm ./a.out

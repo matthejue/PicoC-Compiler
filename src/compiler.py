@@ -5,6 +5,7 @@ from symbol_table import SymbolTable
 from tabulate import tabulate
 from colormanager import ColorManager as CM
 import os
+import sys
 from help_message import generate_help_message
 from ast_node import ASTNode
 from lark import Lark, Token
@@ -178,7 +179,7 @@ class Compiler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
-        terminal_width = os.get_terminal_size().columns
+        terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
 
         # add the filename to the start of the code
         code_with_file = (

@@ -1,4 +1,5 @@
 import os
+import sys
 import global_vars
 from colorizer import colorize_help_page
 
@@ -26,7 +27,7 @@ def wrap_text(text, terminal_width):
 
 def generate_help_message():
     try:
-        terminal_width = os.get_terminal_size().columns
+        terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
     except OSError:
         terminal_width = 79
     description = wrap_text(

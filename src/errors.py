@@ -12,12 +12,6 @@ class Pos:
         return self.line == other.line and self.column == other.column
 
 
-@dataclass
-class Range:
-    start_pos: Pos
-    end_pos: Pos
-
-
 class Errors:
     class UnexpectedCharacter(Exception):
         def __init__(self, expected: str, found: str, found_pos: Pos):
