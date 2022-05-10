@@ -52,6 +52,8 @@ _clean-files:
 	find . -type f -wholename "./tests/*.csv" -delete
 	find . -type f -wholename "./tests/*.reti" -delete
 	find . -type f -wholename "./tests/*.error" -delete
+	find . -type f -wholename "./tests/*.c" -delete
+	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.reti_tokens" -delete
 	find . -type f -wholename "./tests/*.reti_ast" -delete
 	find . -type f -wholename "./tests/*.in" -delete
