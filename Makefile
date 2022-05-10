@@ -34,12 +34,14 @@ test-clean: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-g for debugging
-	./run_tests.sh ${COLUMNS} $(ARG_BASE) $(ARG2)
+	./export_environment_vars_for_makefile.sh; \
+	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
 
 verify: extract _verify
 verify-clean: extract _verify _clean-files
 _verify:
-	./verify_tests.sh
+	./export_environment_vars_for_makefile.sh; \
+	./verify_tests.sh $${COLUMNS}
 
 help:
 	./src/main.py -h -C

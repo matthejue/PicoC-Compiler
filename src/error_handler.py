@@ -1,5 +1,5 @@
 from sys import exit
-from errors import Errors, Range, Pos
+from errors import Errors, Pos
 import global_vars
 from colormanager import ColorManager as CM
 from lark.exceptions import (
@@ -10,6 +10,7 @@ from lark.exceptions import (
 from lark import Lark, Token
 import compiler
 import os
+import sys
 import itertools
 
 MAP_TO_TERMINAL = {
@@ -240,7 +241,7 @@ class ErrorHandler:
         return rtrn_val
 
     def _error_heading(self):
-        terminal_width = os.get_terminal_size().columns
+        terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
         print(compiler.subheading("Error", terminal_width, "-"))
 
     def _error_header(self, descirption: str, pos=None):
