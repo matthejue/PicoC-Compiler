@@ -34,7 +34,7 @@ test-clean: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-g for debugging
-	./run_tests.sh $(ARG_BASE) $(ARG2)
+	./run_tests.sh ${COLUMNS} $(ARG_BASE) $(ARG2)
 
 verify: extract _verify
 verify-clean: extract _verify _clean-files
