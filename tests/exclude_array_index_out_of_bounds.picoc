@@ -1,0 +1,9 @@
+// in:
+// expected:0
+// only works because in the testenvironment, we can get sure there was no
+// other process before writing to this memory cell
+
+void main() {
+  int ar[3] = {1, 2, 3};
+  print(ar[4]);
+}
