@@ -137,15 +137,13 @@ def generate_help_message():
     return colorize_help_page(description) if global_vars.args.color else description
 
 
-def strip_multiline_string(mutline_string):
+def strip_multiline_string(multiline_str):
     """helper function to make mutlineline string usable on different
     indent levels
 
     :grammar: grammar specification
     :returns: None
     """
-    mutline_string = "".join(
-        [i.lstrip() + "\n" for i in mutline_string.split("\n")[:-1]]
-    )
+    multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
     # every code piece ends with \n, so the last element can always be poped
-    return mutline_string
+    return multiline_str

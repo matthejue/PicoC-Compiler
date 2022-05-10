@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
 ./extract_input_and_expected.sh
+verification_res=$(./verify_tests.sh)
 
 num_tests=0;
 not_running_through=();
 not_passed=();
   # for test in ./{old_,}tests/*$1*.picoc; do
   for test in ./tests/*$1*.picoc; do
-    echo -e "\n\033[1;37m===============================================================================";
-    echo $test;
-    echo -e "===============================================================================\033[0;0m";
+    ./heading_subheadings_terminal_width.py "heading" "$test" "$COLUMNS" "="
     ./src/main.py -ctdas -p -D 20 -S 2 -m -C $2 "$test";
     # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m -v -C ${test%.picoc}.reti
 
@@ -23,10 +22,11 @@ not_passed=();
     fi
     ((num_tests++));
 done;
+echo "$verification_res"
 echo Running through: $(($num_tests-${#not_running_through[@]})) / $num_tests;
+echo Not running through: ${not_running_through[*]};
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests;
-echo Not running through tests: ${not_running_through[*]};
-echo Not passed tests: ${not_passed[*]};
+echo Not passed: ${not_passed[*]};
 
 if [[ ${#not_passed[@]} != 0 ]]; then
     exit 1
