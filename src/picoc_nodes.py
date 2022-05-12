@@ -308,11 +308,11 @@ class N:
         __match_args__ = ("functionname", "args")
 
     class Return(ASTNode):
-        def __init__(self, arith_exp_logic_exp):
-            self.arith_exp_logic_exp = arith_exp_logic_exp
-            super().__init__(children=[self.arith_exp_logic_exp])
+        def __init__(self, logic_exp):
+            self.logic_exp = logic_exp
+            super().__init__(children=[self.logic_exp])
 
-        __match_args__ = ("arith_exp_logic_exp",)
+        __match_args__ = ("logic_exp",)
 
     class Exp(ASTNode):
         def __init__(self, call):

@@ -8,8 +8,9 @@ import os
 import sys
 from help_message import generate_help_message
 from ast_node import ASTNode
-from lark import Lark, Token
+from lark.lark import Lark
 from transformer import ASTTransformer
+from passes import Passes
 
 
 class Compiler(cmd2.Cmd):
@@ -224,8 +225,11 @@ class Compiler(cmd2.Cmd):
             print(subheading("Symbol Table", terminal_width, "-"))
             self._symbol_table_option()
 
-        print(subheading("RETI Code", terminal_width, "-"))
-        self._reti_code(ast)
+        passes = Passes()
+        picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(ast)
+
+        print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
+        self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
@@ -303,12 +307,12 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _reti_code(self, root: ASTNode):
+    def _picoc_mon_to_picoc_blocks_option(self, picoc_mon_to_picoc_block_out: ASTNode):
         if global_vars.args.print:
-            pass
+            print(picoc_mon_to_picoc_block_out)
         if global_vars.outbase:
             with open(global_vars.outbase + ".reti", "w", encoding="utf-8") as fout:
-                pass
+                fout.write(str(picoc_mon_to_picoc_block_out))
 
 
 def remove_extension(fname):

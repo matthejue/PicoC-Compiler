@@ -1,8 +1,9 @@
 from picoc_nodes import N as PN
 from reti_nodes import N as RN
+import operator
 
 
-class PicoCCompiler:
+class Passes:
     def __init__(self):
         self.block_id = 0
         self.stmt_cnt = 0
@@ -19,7 +20,7 @@ class PicoCCompiler:
 
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
-        new_block = PN.Block(label, stmts, PN.Num(str(self.stmt_cnt)))
+        new_block = PN.Block(PN.Name(label), stmts, PN.Num(str(self.stmt_cnt)))
         blocks[label] = new_block
         self.stmt_cnt += len(stmts)
         self.block_id += 1
@@ -27,12 +28,6 @@ class PicoCCompiler:
 
     def _picoc_mon_to_picoc_block_stmt(self, stmt, processed_stmts, blocks):
         match stmt:
-            case PN.Exp(PN.Call(name, exps)):
-                pass
-            case PN.Alloc(type_qual, size_qual, pntr_decl):
-                pass
-            case PN.Assign(location, logic_exp):
-                return
             case PN.If(condition, stmts):
                 goto_after = self._create_block(
                     "if_else_after", processed_stmts, blocks
@@ -105,11 +100,13 @@ class PicoCCompiler:
 
                 return [goto_branch]
             case PN.Return():
-                pass
+                return [stmt]
+            case _:
+                return [stmt] + processed_stmts
 
     def _picoc_mon_to_picoc_block_def(self, fun):
         match fun:
-            case PN.FunDef(size_qual, fun_name, params, stmts):
+            case PN.FunDef(size_qual, PN.Name(fun_name), params, stmts):
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
@@ -119,14 +116,13 @@ class PicoCCompiler:
                 self._create_block(fun_name, processed_stmts, blocks)
                 return PN.FunDef(
                     size_qual,
-                    fun_name,
+                    PN.Name(fun_name),
                     params,
-                    (
-                        block
-                        for block in sorted(
-                            blocks,
+                    list(
+                        sorted(
+                            blocks.values(),
                             key=lambda block: -int(
-                                block.name.value[block.name.value.rindex() + 1 :]
+                                block.label.value[block.label.value.rindex(".") + 1 :]
                             ),
                         )
                     ),

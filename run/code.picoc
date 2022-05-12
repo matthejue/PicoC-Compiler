@@ -1,5 +1,26 @@
-int main(){
-    int car[2][2][2][2] = {{1, 2}, {3, 4}, {3, 4}, {3, 4}};
-    int bar = **(car[1][2]+3-1);
+void function_name()
+{
+
 }
 
+int main(){
+  int i;
+
+  while (i < 4) {
+    i = i + 1;
+    print(i);
+  }
+
+  do {
+    i = i + 1;
+    print(i);
+  } while (i < 4);
+
+  if (i < 4) {
+    i = i + 1;
+    print(i);
+  } else {
+    i = -1;
+    print(i);
+  }
+}
