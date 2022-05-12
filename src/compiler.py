@@ -20,6 +20,9 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-d", "--derivation_tree", action="store_true")
     cli_args_parser.add_argument("-a", "--abstract_syntax_tree", action="store_true")
+    cli_args_parser.add_argument(
+        "-b", "--picoc_mon_to_picoc_blocks", action="store_true"
+    )
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-D", "--distance", type=int, default=0)
@@ -225,11 +228,12 @@ class Compiler(cmd2.Cmd):
             print(subheading("Symbol Table", terminal_width, "-"))
             self._symbol_table_option()
 
-        passes = Passes()
-        picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(ast)
+        if global_vars.args.picoc_mon_to_picoc_blocks:
+            passes = Passes()
+            picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(ast)
 
-        print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
-        self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
+            print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
+            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
