@@ -17,27 +17,13 @@ class PicoCCompiler:
     # =                       PicoC_mon -> PicoC_Blocks                       =
     # =========================================================================
 
-    def _create_block(self, name, stmts, blocks):
-        blockname = f"{name}.{self.block_id}"
-        new_block = PN.Block(blockname, stmts, PN.Num(str(self.stmt_cnt)))
-        blocks[blockname] = new_block
+    def _create_block(self, labelbase, stmts, blocks):
+        label = f"{labelbase}.{self.block_id}"
+        new_block = PN.Block(label, stmts, PN.Num(str(self.stmt_cnt)))
+        blocks[label] = new_block
         self.stmt_cnt += len(stmts)
         self.block_id += 1
-        return PN.GoTo(PN.Name(blockname))
-
-    def _picoc_mon_to_picoc_block_condition_if(
-        self, condition, stmts_if, stmts_else, blocks
-    ):
-        pass
-
-    def _picoc_mon_to_picoc_block_condition_if_else(
-        self, condition, stmts_if, stmts_else, blocks
-    ):
-        match condition:
-            case PN.Atom():
-                goto_if = self._create_block("if", stmts_if, blocks)
-                goto_else = self._create_block("else", stmts_else, blocks)
-                return PN.IfElse(condition, [goto_if], [goto_else])
+        return PN.GoTo(PN.Name(label))
 
     def _picoc_mon_to_picoc_block_stmt(self, stmt, processed_stmts, blocks):
         match stmt:
@@ -48,43 +34,103 @@ class PicoCCompiler:
             case PN.Assign(location, logic_exp):
                 return
             case PN.If(condition, stmts):
-                pass
-            case PN.IfElse(condition, stmts1, stmts2):
                 goto_after = self._create_block(
                     "if_else_after", processed_stmts, blocks
                 )
+
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
                     stmts_if = self._picoc_mon_to_picoc_block_stmt(
                         stmt, stmts_if, blocks
                     )
+                goto_if = self._create_block("if", stmts_if, blocks)
+
+                return [PN.If(condition, [goto_if])]
+            case PN.IfElse(condition, stmts1, stmts2):
+                goto_after = self._create_block(
+                    "if_else_after", processed_stmts, blocks
+                )
+
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
                     stmts_else = self._picoc_mon_to_picoc_block_stmt(
                         stmt, stmts_else, blocks
                     )
-                return self._picoc_mon_to_picoc_block_condition_if_else(
-                    condition, stmts_if, stmts_else, blocks
+                goto_else = self._create_block("else", stmts_else, blocks)
+
+                stmts_if = [goto_after]
+                for stmt in reversed(stmts1):
+                    stmts_if = self._picoc_mon_to_picoc_block_stmt(
+                        stmt, stmts_if, blocks
+                    )
+                goto_if = self._create_block("if", stmts_if, blocks)
+
+                return [PN.IfElse(condition, [goto_if], [goto_else])]
+            case PN.While(condition, stmts):
+                goto_after = self._create_block("while_after", processed_stmts, blocks)
+
+                goto_branch = PN.GoTo(PN.Name("placeholder"))
+                goto_condition_check = PN.GoTo(PN.Name("placeholder"))
+                stmts_while = [goto_condition_check]
+
+                for stmt in reversed(stmts):
+                    stmts_while = self._picoc_mon_to_picoc_block_stmt(
+                        stmt, stmts_while, blocks
+                    )
+                goto_branch.label.value = self._create_block(
+                    "while_branch", stmts_while, blocks
+                ).label.value
+
+                condition_check = [PN.IfElse(condition, goto_branch, goto_after)]
+                goto_condition_check.label.value = self._create_block(
+                    "condition_check", condition_check, blocks
+                ).label.value
+
+                return [goto_condition_check]
+            case PN.DoWhile(condition, stmts):
+                goto_after = self._create_block(
+                    "do_while_after", processed_stmts, blocks
                 )
-            case PN.While():
-                pass
-            case PN.DoWhile():
-                pass
+
+                goto_branch = PN.GoTo(PN.Name("placeholder"))
+                stmts_while = [PN.IfElse(condition, goto_branch, goto_after)]
+
+                for stmt in reversed(stmts):
+                    stmts_while = self._picoc_mon_to_picoc_block_stmt(
+                        stmt, stmts_while, blocks
+                    )
+                goto_branch.label.value = self._create_block(
+                    "do_while_branch", stmts_while, blocks
+                ).label.value
+
+                return [goto_branch]
             case PN.Return():
                 pass
-        return PN.Block()
 
     def _picoc_mon_to_picoc_block_def(self, fun):
         match fun:
             case PN.FunDef(size_qual, fun_name, params, stmts):
                 blocks = dict()
                 processed_stmts = []
-                fun_block = self._create_block(fun_name, processed_stmts, blocks)
                 for stmt in reversed(stmts):
                     processed_stmts = self._picoc_mon_to_picoc_block_stmt(
                         stmt, processed_stmts, blocks
                     )
-                return PN.FunDef(size_qual, fun_name, params, fun_block + blocks)
+                self._create_block(fun_name, processed_stmts, blocks)
+                return PN.FunDef(
+                    size_qual,
+                    fun_name,
+                    params,
+                    (
+                        block
+                        for block in sorted(
+                            blocks,
+                            key=lambda block: -int(
+                                block.name.value[block.name.value.rindex() + 1 :]
+                            ),
+                        )
+                    ),
+                )
 
     def picoc_mon_to_picoc_block(self, file):
         funs_with_blocks = []

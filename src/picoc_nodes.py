@@ -283,20 +283,20 @@ class N:
 
     # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
-        def __init__(self, condition, branch_stmts):
+        def __init__(self, condition, stmts):
             self.condition = condition
-            self.branch_stmts = branch_stmts
-            super().__init__(children=[self.condition, self.branch_stmts])
+            self.stmts = stmts
+            super().__init__(children=[self.condition, self.stmts])
 
-        __match_args__ = ("condition", "branch_stmts")
+        __match_args__ = ("condition", "stmts")
 
     class DoWhile(ASTNode):
-        def __init__(self, condition, branch_stmts):
+        def __init__(self, condition, stmts):
             self.condition = condition
-            self.branch_stmts = branch_stmts
-            super().__init__(children=[self.condition, self.branch_stmts])
+            self.stmts = stmts
+            super().__init__(children=[self.condition, self.stmts])
 
-        __match_args__ = ("condition", "branch_stmts")
+        __match_args__ = ("condition", "stmts")
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(ASTNode):
@@ -353,17 +353,17 @@ class N:
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
-        def __init__(self, name, stmts, stmt_cnt):
-            self.name = name
+        def __init__(self, label, stmts, stmt_cnt):
+            self.label = label
             self.stmts = stmts
             self.stmt_cnt = stmt_cnt
-            super().__init__(children=[self.name, self.stmts, self.stmt_cnt])
+            super().__init__(children=[self.label, self.stmts, self.stmt_cnt])
 
-        __match_args__ = ("name", "stmts", "stmt_cnt")
+        __match_args__ = ("label", "stmts", "stmt_cnt")
 
     class GoTo(ASTNode):
-        def __init__(self, labelname):
-            self.labelname = labelname
-            super().__init__(children=[self.labelname])
+        def __init__(self, label):
+            self.label = label
+            super().__init__(children=[self.label])
 
-        __match_args__ = ("blockname",)
+        __match_args__ = ("label",)
