@@ -108,13 +108,13 @@ class N:
     # -------------------------------------------------------------------------
     # -------------------------------- L_Arith --------------------------------
     class BinOp(ASTNode):
-        def __init__(self, left_exp, op, right_exp):
+        def __init__(self, left_exp, bin_op, right_exp):
             self.left_exp = left_exp
-            self.op = op
+            self.bin_op = bin_op
             self.right_exp = right_exp
-            super().__init__(children=[self.left_exp, self.op, self.right_exp])
+            super().__init__(children=[self.left_exp, self.bin_op, self.right_exp])
 
-        __match_args__ = ("left_exp", "op", "right_exp")
+        __match_args__ = ("left_exp", "bin_op", "right_exp")
 
     class UnOp(ASTNode):
         def __init__(self, un_op, opd):
@@ -126,15 +126,15 @@ class N:
 
     # -------------------------------- L_Logic --------------------------------
     class Atom(ASTNode):
-        def __init__(self, left_logic_opd, relation, right_logic_opd):
-            self.left_logic_opd = left_logic_opd
+        def __init__(self, left_arith_exp, relation, right_arith_exp):
+            self.left_arith_exp = left_arith_exp
             self.relation = relation
-            self.right_logic_opd = right_logic_opd
+            self.right_arith_exp = right_arith_exp
             super().__init__(
-                children=[self.left_logic_opd, self.relation, self.right_logic_opd]
+                children=[self.left_arith_exp, self.relation, self.right_arith_exp]
             )
 
-        __match_args__ = ("left_logic_opd", "relation", "right_logic_opd")
+        __match_args__ = ("left_arith_exp", "relation", "right_arith_exp")
 
     class ToBool(ASTNode):
         def __init__(self, arith_exp):
@@ -188,12 +188,12 @@ class N:
         __match_args__ = ("location",)
 
     class Deref(ASTNode):
-        def __init__(self, location, offset):
+        def __init__(self, location, logic_exp):
             self.location = location
-            self.offset = offset
-            super().__init__(children=[self.location, self.offset])
+            self.logic_exp = logic_exp
+            super().__init__(children=[self.location, self.logic_exp])
 
-        __match_args__ = ("location", "offset")
+        __match_args__ = ("location", "logic_exp")
 
     # -------------------------------- L_Array --------------------------------
     class ArrayDecl(ASTNode):
@@ -208,17 +208,17 @@ class N:
         )
 
     class Array(ASTNode):
-        def __init__(self, entries):
-            self.entries = entries
-            super().__init__(children=[self.entries])
+        def __init__(self, logic_exps):
+            self.logic_exps = logic_exps
+            super().__init__(children=[self.logic_exps])
 
-        __match_args__ = ("datatype", "entries")
+        __match_args__ = ("datatype", "logic_exps")
 
-    class Subscript(ASTNode):
-        def __init__(self, subscr_opd, offset):
+    class Subscr(ASTNode):
+        def __init__(self, subscr_opd, logic_exp):
             self.subscr_opd = subscr_opd
-            self.offset = offset
-            super().__init__(children=[self.subscr_opd, self.offset])
+            self.logic_exp = logic_exp
+            super().__init__(children=[self.subscr_opd, self.logic_exp])
 
         __match_args__ = ("subscr_opd", "offset")
 
@@ -300,12 +300,12 @@ class N:
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(ASTNode):
-        def __init__(self, functionname, args):
-            self.functionname = functionname
-            self.args = args
-            super().__init__(children=[self.functionname, self.args])
+        def __init__(self, name, logic_exps):
+            self.name = name
+            self.logic_exps = logic_exps
+            super().__init__(children=[self.name, self.logic_exps])
 
-        __match_args__ = ("functionname", "args")
+        __match_args__ = ("name", "args")
 
     class Return(ASTNode):
         def __init__(self, logic_exp):

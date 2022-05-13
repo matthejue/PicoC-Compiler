@@ -158,11 +158,11 @@ class ASTTransformer(Transformer):
     def alloc_stmt(self, nodes):
         return nodes[0]
 
-    def var_assign(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
+    def assign_lhs(self, nodes):
+        return nodes[0]
 
     def assign_stmt(self, nodes):
-        return nodes[0]
+        return N.Assign(nodes[0], nodes[1])
 
     def init(self, nodes):
         return N.Assign(nodes[0], nodes[1])
@@ -201,20 +201,14 @@ class ASTTransformer(Transformer):
     def deref(self, nodes):
         return nodes[0]
 
-    def var_ref(self, nodes):
-        return N.Ref(nodes[0])
-
-    def deref_ref(self, nodes):
-        return N.Ref(nodes[0])
+    def ref_opd(self, nodes):
+        return nodes[0]
 
     def ref(self, nodes):
-        return nodes[0]
+        return N.Ref(nodes[0])
 
     def pntr_opd(self, nodes):
         return nodes[0]
-
-    def deref_assign(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
 
     # --------------------------------- L_Array -------------------------------
     def array_dims(self, nodes):
@@ -227,13 +221,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def array_subscr(self, nodes):
-        return N.Subscript(nodes[0], nodes[1])
-
-    def subscr_ref(self, nodes):
-        return N.Ref(nodes[0])
-
-    def subscr_assign(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
+        return N.Subscr(nodes[0], nodes[1])
 
     def entry_subexp(self, nodes):
         return nodes[0]
@@ -263,12 +251,6 @@ class ASTTransformer(Transformer):
 
     def struct_attr(self, nodes):
         return N.Attr(nodes[0], nodes[1])
-
-    def attribute_ref(self, nodes):
-        return N.Ref(nodes[0])
-
-    def attribute_assign(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
 
     def struct_params(self, nodes):
         params = []
