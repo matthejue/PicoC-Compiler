@@ -6,6 +6,7 @@ class Passes:
     def __init__(self):
         self.block_id = 0
         self.name_id = 0
+        self.all_blocks = dict()
 
     # =========================================================================
     # =                           PicoC -> PicoC_mon                          =
@@ -303,6 +304,7 @@ class Passes:
                         stmt, processed_stmts, blocks
                     )
                 self._create_block(fun_name, processed_stmts, blocks)
+                self.all_blocks |= blocks
                 return PN.FunDef(
                     size_qual,
                     name,
@@ -330,9 +332,25 @@ class Passes:
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
-
-    def picoc_block_to_reti_block(self):
+    def _picoc_block_to_reti_block_block(self):
         ...
+
+    def _picoc_block_to_reti_block_def(self, decl_def):
+        match decl_def:
+            case PN.FunDef(size_qual, identifier, params, stmts):
+                pass
+
+    def picoc_block_to_reti_block(self, file: PN.File):
+        match file:
+            case PN.File(name, decls_defs):
+                reti_blocks = []
+                for decl_def in decls_defs:
+                    reti_blocks += [self._picoc_mon_to_picoc_block_def(decl_def)]
+        return PN.File(name, reti_blocks)
+
+    # =========================================================================
+    # =                          RETI_Blocks -> RETI                          =
+    # =========================================================================
 
     def reti_block_to_reti(self):
         ...
