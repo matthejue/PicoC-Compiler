@@ -114,18 +114,12 @@ class ASTTransformer(Transformer):
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
             acc_node = N.BinOp(acc_node, node1, node2)
         return acc_node
-        #  if len(nodes) == 1:
-        #      return nodes[0]
-        #  return N.BinOp(nodes[0], nodes[1], nodes[2])
 
     def arith_prec2(self, nodes):
         acc_node = nodes[0]
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
             acc_node = N.BinOp(acc_node, node1, node2)
         return acc_node
-        #  if len(nodes) == 1:
-        #      return nodes[0]
-        #  return N.BinOp(nodes[0], nodes[1], nodes[2])
 
     def arith_exp(self, nodes):
         return nodes[0]
@@ -181,7 +175,7 @@ class ASTTransformer(Transformer):
             nodes[2],
         )
 
-    def assign_alloc_stmt(self, nodes):
+    def alloc_init_stmt(self, nodes):
         return nodes[0]
 
     # -------------------------------- L_Pointer ------------------------------
@@ -229,7 +223,7 @@ class ASTTransformer(Transformer):
     def array_decl(self, nodes):
         return N.ArrayDecl(nodes[0], nodes[1])
 
-    def subsrc_opd(self, nodes):
+    def subscr_opd(self, nodes):
         return nodes[0]
 
     def array_subscr(self, nodes):
@@ -310,6 +304,8 @@ class ASTTransformer(Transformer):
         return N.If(nodes[0], nodes[1])
 
     def if_else_stmt(self, nodes):
+        if not isinstance(nodes[2], list):
+            return N.IfElse(nodes[0], nodes[1], [nodes[2]])
         return N.IfElse(nodes[0], nodes[1], nodes[2])
 
     def if_if_else_stmt(self, nodes):

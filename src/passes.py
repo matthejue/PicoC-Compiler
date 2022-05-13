@@ -1,12 +1,10 @@
 from picoc_nodes import N as PN
 from reti_nodes import N as RN
-import operator
 
 
 class Passes:
     def __init__(self):
         self.block_id = 0
-        self.stmt_cnt = 0
 
     def picoc_to_picoc_mon_def(self):
         pass
@@ -20,9 +18,8 @@ class Passes:
 
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
-        new_block = PN.Block(PN.Name(label), stmts, PN.Num(str(self.stmt_cnt)))
+        new_block = PN.Block(PN.Name(label), stmts)
         blocks[label] = new_block
-        self.stmt_cnt += len(stmts)
         self.block_id += 1
         return PN.GoTo(PN.Name(label))
 
@@ -34,7 +31,7 @@ class Passes:
                 )
 
                 stmts_if = [goto_after]
-                for stmt in reversed(stmts1):
+                for stmt in reversed(stmts):
                     stmts_if = self._picoc_mon_to_picoc_block_stmt(
                         stmt, stmts_if, blocks
                     )
@@ -104,8 +101,8 @@ class Passes:
             case _:
                 return [stmt] + processed_stmts
 
-    def _picoc_mon_to_picoc_block_def(self, fun):
-        match fun:
+    def _picoc_mon_to_picoc_block_def(self, decl_def):
+        match decl_def:
             case PN.FunDef(size_qual, PN.Name(fun_name), params, stmts):
                 blocks = dict()
                 processed_stmts = []
@@ -127,6 +124,8 @@ class Passes:
                         )
                     ),
                 )
+            case _:
+                return decl_def
 
     def picoc_mon_to_picoc_block(self, file):
         funs_with_blocks = []

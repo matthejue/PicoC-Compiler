@@ -215,12 +215,12 @@ class N:
         __match_args__ = ("datatype", "entries")
 
     class Subscript(ASTNode):
-        def __init__(self, arith_opd, offset):
-            self.arith_opd = arith_opd
+        def __init__(self, subscr_opd, offset):
+            self.subscr_opd = subscr_opd
             self.offset = offset
-            super().__init__(children=[self.arith_opd, self.offset])
+            super().__init__(children=[self.subscr_opd, self.offset])
 
-        __match_args__ = ("arith_opd", "offset")
+        __match_args__ = ("subscr_opd", "offset")
 
     # -------------------------------- L_Struct -------------------------------
     class StructSpec(ASTNode):
@@ -353,13 +353,12 @@ class N:
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
-        def __init__(self, label, stmts, stmt_cnt):
+        def __init__(self, label, stmts):
             self.label = label
             self.stmts = stmts
-            self.stmt_cnt = stmt_cnt
-            super().__init__(children=[self.label, self.stmts, self.stmt_cnt])
+            super().__init__(children=[self.label, self.stmts])
 
-        __match_args__ = ("label", "stmts", "stmt_cnt")
+        __match_args__ = ("label", "stmts")
 
     class GoTo(ASTNode):
         def __init__(self, label):
