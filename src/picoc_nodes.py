@@ -117,41 +117,31 @@ class N:
         __match_args__ = ("left_exp", "bin_op", "right_exp")
 
     class UnOp(ASTNode):
-        def __init__(self, un_op, opd):
+        def __init__(self, un_op, exp):
             self.un_op = un_op
-            self.opd = opd
-            super().__init__(children=[self.un_op, self.opd])
+            self.exp = exp
+            super().__init__(children=[self.un_op, self.exp])
 
-        __match_args__ = ("un_op", "opd")
+        __match_args__ = ("un_op", "exp")
 
     # -------------------------------- L_Logic --------------------------------
     class Atom(ASTNode):
-        def __init__(self, left_arith_exp, relation, right_arith_exp):
-            self.left_arith_exp = left_arith_exp
+        def __init__(self, left_exp, relation, right_exp):
+            self.left_exp = left_exp
             self.relation = relation
-            self.right_arith_exp = right_arith_exp
-            super().__init__(
-                children=[self.left_arith_exp, self.relation, self.right_arith_exp]
-            )
+            self.right_exp = right_exp
+            super().__init__(children=[self.left_exp, self.relation, self.right_exp])
 
-        __match_args__ = ("left_arith_exp", "relation", "right_arith_exp")
+        __match_args__ = ("left_exp", "relation", "right_exp")
 
     class ToBool(ASTNode):
-        def __init__(self, arith_exp):
-            self.arith_exp = arith_exp
-            super().__init__(children=[self.arith_exp])
+        def __init__(self, exp):
+            self.exp = exp
+            super().__init__(children=[self.exp])
 
-        __match_args__ = ("arith_exp",)
+        __match_args__ = ("exp",)
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    class Assign(ASTNode):
-        def __init__(self, location, logic_exp):
-            self.location = location
-            self.logic_exp = logic_exp
-            super().__init__(children=[self.location, self.logic_exp])
-
-        __match_args__ = ("location", "logic_exp")
-
     class Alloc(ASTNode):
         def __init__(self, type_qual, size_qual, pntr_decl):
             self.type_qual = type_qual
@@ -171,6 +161,14 @@ class N:
             "pntr_decl",
         )
 
+    class Assign(ASTNode):
+        def __init__(self, loc, exp):
+            self.loc = loc
+            self.exp = exp
+            super().__init__(children=[self.loc, self.exp])
+
+        __match_args__ = ("loc", "exp")
+
     # ------------------------------- L_Pointer -------------------------------
     class PntrDecl(ASTNode):
         def __init__(self, deg, array_decl):
@@ -181,46 +179,46 @@ class N:
         __match_args__ = ("deg", "array_decl")
 
     class Ref(ASTNode):
-        def __init__(self, location):
-            self.location = location
-            super().__init__(children=[self.location])
+        def __init__(self, ref_loc):
+            self.ref_loc = ref_loc
+            super().__init__(children=[self.ref_loc])
 
-        __match_args__ = ("location",)
+        __match_args__ = ("ref_loc",)
 
     class Deref(ASTNode):
-        def __init__(self, location, logic_exp):
-            self.location = location
-            self.logic_exp = logic_exp
-            super().__init__(children=[self.location, self.logic_exp])
+        def __init__(self, deref_loc, exp):
+            self.deref_loc = deref_loc
+            self.exp = exp
+            super().__init__(children=[self.deref_loc, self.exp])
 
-        __match_args__ = ("location", "logic_exp")
+        __match_args__ = ("deref_loc", "exp")
 
     # -------------------------------- L_Array --------------------------------
     class ArrayDecl(ASTNode):
-        def __init__(self, name_pntr_decl, dims):
-            self.name_pntr_decl = name_pntr_decl
+        def __init__(self, identifier, dims):
+            self.identifier = identifier
             self.dims = dims
-            super().__init__(children=[self.name_pntr_decl, self.dims])
+            super().__init__(children=[self.identifier, self.dims])
 
         __match_args__ = (
-            "pntr_decl",
+            "identifier",
             "dims",
         )
 
     class Array(ASTNode):
-        def __init__(self, logic_exps):
-            self.logic_exps = logic_exps
-            super().__init__(children=[self.logic_exps])
+        def __init__(self, exps):
+            self.exps = exps
+            super().__init__(children=[self.exps])
 
-        __match_args__ = ("datatype", "logic_exps")
+        __match_args__ = ("datatype", "exps")
 
     class Subscr(ASTNode):
-        def __init__(self, subscr_opd, logic_exp):
-            self.subscr_opd = subscr_opd
-            self.logic_exp = logic_exp
-            super().__init__(children=[self.subscr_opd, self.logic_exp])
+        def __init__(self, deref_loc, exp):
+            self.deref_loc = deref_loc
+            self.exp = exp
+            super().__init__(children=[self.deref_loc, self.exp])
 
-        __match_args__ = ("subscr_opd", "offset")
+        __match_args__ = ("deref_loc", "exp")
 
     # -------------------------------- L_Struct -------------------------------
     class StructSpec(ASTNode):
@@ -231,88 +229,86 @@ class N:
         __match_args__ = ("identifier",)
 
     class Struct(ASTNode):
-        def __init__(self, assignments):
-            self.assignments = assignments
-            super().__init__(children=[self.assignments])
+        def __init__(self, assigns):
+            self.assigns = assigns
+            super().__init__(children=[self.assigns])
 
-        __match_args__ = ("assignments",)
+        __match_args__ = ("assigns",)
 
     class Attr(ASTNode):
-        def __init__(self, array_identifier, attribute_identifier):
-            self.array_identifier = array_identifier
-            self.attribute_identifier = attribute_identifier
-            super().__init__(
-                children=[self.array_identifier, self.attribute_identifier]
-            )
+        def __init__(self, ref_loc, attr_identifier):
+            self.ref_loc = ref_loc
+            self.attr_identifier = attr_identifier
+            super().__init__(children=[self.ref_loc, self.attr_identifier])
 
-        __match_args__ = ("array_identifier", "attribute_identifier")
+        __match_args__ = ("ref_loc", "attr_identifier")
 
     class StructDecl(ASTNode):
-        def __init__(self, struct_identifier, params):
-            self.struct_identifier = struct_identifier
+        def __init__(self, identifier, params):
+            self.identifier = identifier
             self.params = params
-            super().__init__(children=[self.struct_identifier, self.params])
+            super().__init__(children=[self.identifier, self.params])
 
-        __match_args__ = ("struct_identifier", "params")
+        __match_args__ = ("identifier", "params")
 
     class Param(ASTNode):
-        def __init__(self, datatype, identifier):
-            self.datatype = datatype
+        def __init__(self, size_qual, identifier):
+            self.size_qual = size_qual
             self.identifier = identifier
-            super().__init__(children=[self.datatype, self.identifier])
+            super().__init__(children=[self.size_qual, self.identifier])
 
-        __match_args__ = ("datatype", "identifier")
+        __match_args__ = ("size_qual", "identifier")
 
     # ------------------------------- L_If_Else -------------------------------
     class If(ASTNode):
-        def __init__(self, condition, stmts):
-            self.condition = condition
+        def __init__(self, exp, stmts):
+            self.exp = exp
             self.stmts = stmts
-            super().__init__(children=[self.condition, self.stmts])
+            super().__init__(children=[self.exp, self.stmts])
 
-        __match_args__ = ("condition", "branch_stmts")
+        __match_args__ = ("exp", "stmts")
 
     class IfElse(ASTNode):
-        def __init__(self, condition, stmts1, stmts2):
-            self.condition = condition
+        def __init__(self, exp, stmts1, stmts2):
+            self.exp = exp
             self.stmts1 = stmts1
             self.stmts2 = stmts2
-            super().__init__(children=[self.condition, self.stmts1, self.stmts2])
+            super().__init__(children=[self.exp, self.stmts1, self.stmts2])
 
-        __match_args__ = ("condition", "stmts1", "stmts2")
+        __match_args__ = ("exp", "stmts1", "stmts2")
 
     # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
-        def __init__(self, condition, stmts):
-            self.condition = condition
+        def __init__(self, exp, stmts):
+            self.exp = exp
             self.stmts = stmts
-            super().__init__(children=[self.condition, self.stmts])
+            super().__init__(children=[self.exp, self.stmts])
 
-        __match_args__ = ("condition", "stmts")
+        __match_args__ = ("exp", "stmts")
 
     class DoWhile(ASTNode):
-        def __init__(self, condition, stmts):
-            self.condition = condition
+        def __init__(self, exp, stmts):
+            self.exp = exp
             self.stmts = stmts
-            super().__init__(children=[self.condition, self.stmts])
+            super().__init__(children=[self.exp, self.stmts])
 
-        __match_args__ = ("condition", "stmts")
+        __match_args__ = ("exp", "stmts")
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(ASTNode):
-        def __init__(self, name, logic_exps):
-            self.name = name
-            self.logic_exps = logic_exps
-            super().__init__(children=[self.name, self.logic_exps])
+        def __init__(self, identifier, exps):
+            self.identifier = identifier
+            self.exps = exps
+            super().__init__(children=[self.identifier, self.exps])
 
-        __match_args__ = ("name", "args")
+        __match_args__ = ("identifier", "exps")
 
     class Return(ASTNode):
-        def __init__(self, logic_exp):
-            self.logic_exp = logic_exp
-            super().__init__(children=[self.logic_exp])
+        def __init__(self, exp):
+            self.exp = exp
+            super().__init__(children=[self.exp])
 
-        __match_args__ = ("logic_exp",)
+        __match_args__ = ("exp",)
 
     class Exp(ASTNode):
         def __init__(self, call):
@@ -322,34 +318,39 @@ class N:
         __match_args__ = ("call",)
 
     class FunDecl(ASTNode):
-        def __init__(self, datatype, fun_name, params):
-            self.datatype = datatype
-            self.fun_name = fun_name
+        def __init__(self, size_qual, identifier, params):
+            self.size_qual = size_qual
+            self.identifier = identifier
             self.params = params
-            super().__init__(children=[self.datatype, self.fun_name, self.params])
+            super().__init__(children=[self.size_qual, self.identifier, self.params])
 
-        __match_args__ = ("datatype", "fun_name", "params")
+        __match_args__ = ("size_qual", "identifier", "params")
 
     class FunDef(ASTNode):
-        def __init__(self, size_qual, fun_name, params, stmts_blocks):
+        def __init__(self, size_qual, identifier, params, stmts_blocks):
             self.size_qual = size_qual
-            self.fun_name = fun_name
+            self.identifier = identifier
             self.params = params
             self.stmts_blocks = stmts_blocks
             super().__init__(
-                children=[self.size_qual, self.fun_name, self.params, self.stmts_blocks]
+                children=[
+                    self.size_qual,
+                    self.identifier,
+                    self.params,
+                    self.stmts_blocks,
+                ]
             )
 
-        __match_args__ = ("size_qual", "fun_name", "params", "stmts_blocks")
+        __match_args__ = ("size_qual", "identifier", "params", "stmts_blocks")
 
     # --------------------------------- L_File --------------------------------
     class File(ASTNode):
-        def __init__(self, name, decls_and_defs):
+        def __init__(self, name, decls_defs):
             self.name = name
-            self.decls_and_defs = decls_and_defs
-            super().__init__(children=[self.name, self.decls_and_defs])
+            self.decls_defs = decls_defs
+            super().__init__(children=[self.name, self.decls_defs])
 
-        __match_args__ = ("name", "decls_and_defs")
+        __match_args__ = ("name", "decls_defs")
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):

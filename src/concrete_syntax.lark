@@ -64,27 +64,26 @@ size_qual: prim_dt|struct_spec
 alloc: size_qual pntr_decl
 alloc_stmt: alloc";"
 // if the type of name is array, a assignment is not possible
-assign_lhs: name|deref|array_subscr|struct_attr
-assign_stmt: assign_lhs "=" logic_exp";"
+assign_stmt: ref_loc "=" logic_exp";"
 init: alloc "=" logic_exp";"
 const_init: "const" prim_dt name "=" NUM";"
 alloc_init_stmt: alloc_stmt|init|const_init|array_init|struct_init
 // --------------------------------- L_Pointer --------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl
-deref_opd: ref|ref_opd
-deref_simple: "*"deref_opd
-deref_arith: "*""("deref_opd deref_offset_op arith_exp")"
+deref_loc: ref|ref_loc
+deref_simple: "*"deref_loc
+deref_arith: "*""("deref_loc deref_offset_op arith_exp")"
 deref: deref_simple|deref_arith
 // if the type of the location is array, then the address of the location is used
-ref_opd: deref|subscr_opd
-ref: "&"ref_opd
+ref_loc: deref|subscr_loc
+ref: "&"ref_loc
 pntr_opd: deref|ref
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
 array_decl: name array_dims|"("pntr_decl")"array_dims
-subscr_opd: name|array_subscr|struct_attr
-array_subscr: subscr_opd"["logic_exp"]"|"("pntr_opd")""["logic_exp"]"
+subscr_loc: name|array_subscr|struct_attr
+array_subscr: subscr_loc"["logic_exp"]"|"("pntr_opd")""["logic_exp"]"
 entry_subexp: logic_exp|array_subexps|struct_subexps
 array_subexps: "{"entry_subexp("," entry_subexp)*"}"
 array_init_dims: ("["NUM"]")+
@@ -92,7 +91,7 @@ array_init_decl: name array_dims
 array_init: size_qual array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" name
-struct_attr: subscr_opd"."name|"("deref")""."name
+struct_attr: subscr_loc"."name|"("deref")""."name
 struct_params: (size_qual pntr_decl";")+
 struct_decl: "struct" name "{"struct_params"}"";"
 struct_subexps: "{""."name"="entry_subexp ("," "."name"="entry_subexp)*"}"

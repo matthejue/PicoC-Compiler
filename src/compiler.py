@@ -20,6 +20,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-d", "--derivation_tree", action="store_true")
     cli_args_parser.add_argument("-a", "--abstract_syntax_tree", action="store_true")
+    cli_args_parser.add_argument("-m", "--picoc_to_picoc_mon", action="store_true")
     cli_args_parser.add_argument(
         "-b", "--picoc_mon_to_picoc_blocks", action="store_true"
     )
@@ -30,7 +31,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-g", "--debug", action="store_true")
-    cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
+    cli_args_parser.add_argument("-M", "--show_error_message", action="store_true")
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/settings.conf"
@@ -224,16 +225,23 @@ class Compiler(cmd2.Cmd):
             print(subheading("Abstract Syntax Tree", terminal_width, "-"))
             self._abstract_syntax_tree_option(ast)
 
+        passes = Passes()
+        picoc_to_picoc_mon_out = passes.picoc_to_picoc_mon(ast)
+        picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(
+            picoc_to_picoc_mon_out
+        )
+
+        if global_vars.args.picoc_mon_to_picoc_blocks:
+            print(subheading("PicoC -> PicoC_mon", terminal_width, "-"))
+            self._picoc_to_picoc_mon_option(picoc_to_picoc_mon_out)
+
+        if global_vars.args.picoc_mon_to_picoc_blocks:
+            print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
+            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
+
         if global_vars.args.symbol_table:
             print(subheading("Symbol Table", terminal_width, "-"))
             self._symbol_table_option()
-
-        if global_vars.args.picoc_mon_to_picoc_blocks:
-            passes = Passes()
-            picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(ast)
-
-            print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
-            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
@@ -311,12 +319,23 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _picoc_mon_to_picoc_blocks_option(self, picoc_mon_to_picoc_block_out: ASTNode):
+    def _picoc_to_picoc_mon_option(self, picoc_to_picoc_mon_out: ASTNode):
         if global_vars.args.print:
-            print(picoc_mon_to_picoc_block_out)
+            print(picoc_to_picoc_mon_out)
         if global_vars.outbase:
-            with open(global_vars.outbase + ".reti", "w", encoding="utf-8") as fout:
-                fout.write(str(picoc_mon_to_picoc_block_out))
+            with open(
+                global_vars.outbase + ".picoc_mon", "w", encoding="utf-8"
+            ) as fout:
+                fout.write(str(picoc_to_picoc_mon_out))
+
+    def _picoc_mon_to_picoc_blocks_option(self, picoc_mon_to_picoc_blocks_out: ASTNode):
+        if global_vars.args.print:
+            print(picoc_mon_to_picoc_blocks_out)
+        if global_vars.outbase:
+            with open(
+                global_vars.outbase + ".picoc_blocks", "w", encoding="utf-8"
+            ) as fout:
+                fout.write(str(picoc_mon_to_picoc_blocks_out))
 
 
 def remove_extension(fname):

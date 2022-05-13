@@ -1,0 +1,25 @@
+File
+  Name('function_name_startswith_keyword')
+  [
+    FunDef
+      IntType('int')
+      Name('int_while_if')
+      []
+      [
+        Call
+          Name('print')
+          Call
+            Name('input')
+            []
+      ]
+    FunDef
+      VoidType('void')
+      Name('main')
+      []
+      [
+        Exp
+          Call
+            Name('int_while_if')
+            []
+      ]
+  ]

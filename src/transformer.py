@@ -158,9 +158,6 @@ class ASTTransformer(Transformer):
     def alloc_stmt(self, nodes):
         return nodes[0]
 
-    def assign_lhs(self, nodes):
-        return nodes[0]
-
     def assign_stmt(self, nodes):
         return N.Assign(nodes[0], nodes[1])
 
@@ -185,7 +182,7 @@ class ASTTransformer(Transformer):
     def pntr_decl(self, nodes):
         return N.PntrDecl(nodes[0], nodes[1])
 
-    def deref_opd(self, nodes):
+    def deref_loc(self, nodes):
         return nodes[0]
 
     def deref_simple(self, nodes):
@@ -201,7 +198,7 @@ class ASTTransformer(Transformer):
     def deref(self, nodes):
         return nodes[0]
 
-    def ref_opd(self, nodes):
+    def ref_loc(self, nodes):
         return nodes[0]
 
     def ref(self, nodes):
@@ -217,7 +214,7 @@ class ASTTransformer(Transformer):
     def array_decl(self, nodes):
         return N.ArrayDecl(nodes[0], nodes[1])
 
-    def subscr_opd(self, nodes):
+    def subscr_loc(self, nodes):
         return nodes[0]
 
     def array_subscr(self, nodes):
