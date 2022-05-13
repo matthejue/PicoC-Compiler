@@ -6,11 +6,68 @@ class Passes:
     def __init__(self):
         self.block_id = 0
 
-    def picoc_to_picoc_mon_def(self):
+    # =========================================================================
+    # =                           PicoC -> PicoC_mon                          =
+    # =========================================================================
+
+    def _make_assigns(self):
         pass
 
-    def _picoc_to_picoc_mon(self):
-        pass
+    def _picoc_to_picoc_mon_exp(self, exp, atomic):
+        match exp:
+            case PN.BinOp(left_exp, bin_op, right_exp):
+                pass
+            case PN.UnOp(un_op, opd):
+                pass
+            case PN.Atom(left_arith_exp, relation, right_arith_exp):
+                pass
+            case PN.ToBool(left_arith_exp):
+                pass
+            case PN.Deref(location, logic_exp):
+                pass
+            case PN.Ref(location):
+                pass
+            case PN.Array(logic_exps):
+                pass
+            case PN.Subscr(subscr_opd, logic_exp):
+                pass
+            case PN.Call(PN.Name(), logic_exps):
+                pass
+            case _:
+                return (exp, [])
+
+    def _picoc_to_picoc_mon_stmt(self, stmt):
+        match stmt:
+            case PN.Assign(location, logic_exp):
+                atom, tmps = self._picoc_to_picoc_mon_exp(stmt, atomic=False)
+            case PN.If(condition, stmts):
+                pass
+            case PN.IfElse(condition, stmts):
+                pass
+            case PN.While(condition, stmts):
+                pass
+            case PN.DoWhile(condition, stmts):
+                pass
+            case PN.Exp(self.call):
+                pass
+            case PN.Return(logic_exp):
+                pass
+
+    def _picoc_to_picoc_mon_def(self, decl_def):
+        match decl_def:
+            case PN.FunDef(size_qual, fun_name, params, stmts):
+                stmts_mon = []
+                for stmt in stmts:
+                    stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
+            case _:
+                return decl_def
+
+    def picoc_to_picoc_mon(self, file: PN.File):
+        match file:
+            case PN.File(name, decls_and_defs):
+                decls_defs_with_blocks = []
+                for decl_def in decls_and_defs:
+                    decls_and_defs += self._picoc_to_picoc_mon_def(decl_def)
 
     # =========================================================================
     # =                       PicoC_mon -> PicoC_Blocks                       =
@@ -127,13 +184,15 @@ class Passes:
             case _:
                 return decl_def
 
-    def picoc_mon_to_picoc_block(self, file):
-        funs_with_blocks = []
+    def picoc_mon_to_picoc_block(self, file: PN.File):
         match file:
-            case PN.File(name, funs):
-                for fun in funs:
-                    funs_with_blocks += [self._picoc_mon_to_picoc_block_def(fun)]
-        return PN.File(name, funs_with_blocks)
+            case PN.File(name, decls_defs):
+                decls_defs_with_blocks = []
+                for decl_def in decls_defs:
+                    decls_defs_with_blocks += [
+                        self._picoc_mon_to_picoc_block_def(decl_def)
+                    ]
+        return PN.File(name, decls_defs_with_blocks)
 
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
