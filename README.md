@@ -18,7 +18,7 @@
     ·
     <a href="./doc/help-page.txt">Usage</a>
     ·
-    Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Latex</a>
+    Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Source</a>
     ·
     <a href="./src/concrete_syntax.lark/">Concrete Syntax</a>
     ·
