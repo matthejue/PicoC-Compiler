@@ -337,7 +337,7 @@ class Passes:
 
     def _picoc_block_to_reti_block_def(self, decl_def):
         match decl_def:
-            case PN.FunDef(size_qual, identifier, params, stmts):
+            case PN.FunDef(size_qual, identifier, params, blocks):
                 pass
 
     def picoc_block_to_reti_block(self, file: PN.File):

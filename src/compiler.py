@@ -7,7 +7,7 @@ from colormanager import ColorManager as CM
 import os
 import sys
 from help_message import generate_help_message
-from ast_node import ASTNode
+from ast_node import PicoCNode
 from lark.lark import Lark
 from transformer import ASTTransformer
 from passes import Passes
@@ -319,7 +319,7 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _picoc_to_picoc_mon_option(self, picoc_to_picoc_mon_out: ASTNode):
+    def _picoc_to_picoc_mon_option(self, picoc_to_picoc_mon_out: PicoCNode):
         if global_vars.args.print:
             print(picoc_to_picoc_mon_out)
         if global_vars.outbase:
@@ -328,7 +328,9 @@ class Compiler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(picoc_to_picoc_mon_out))
 
-    def _picoc_mon_to_picoc_blocks_option(self, picoc_mon_to_picoc_blocks_out: ASTNode):
+    def _picoc_mon_to_picoc_blocks_option(
+        self, picoc_mon_to_picoc_blocks_out: PicoCNode
+    ):
         if global_vars.args.print:
             print(picoc_mon_to_picoc_blocks_out)
         if global_vars.outbase:

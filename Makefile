@@ -57,6 +57,8 @@ _clean-files:
 	find . -type f -wholename "./tests/*.dt" -delete
 	find . -type f -wholename "./tests/*.ast" -delete
 	find . -type f -wholename "./tests/*.csv" -delete
+	find . -type f -wholename "./tests/*.picoc_mon" -delete
+	find . -type f -wholename "./tests/*.picoc_blocks" -delete
 	find . -type f -wholename "./tests/*.reti" -delete
 	find . -type f -wholename "./tests/*.error" -delete
 	find . -type f -wholename "./tests/*.c" -delete

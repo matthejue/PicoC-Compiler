@@ -1,4 +1,4 @@
-from ast_node import ASTNode
+from ast_node import PicoCNode
 
 
 class N:
@@ -8,106 +8,106 @@ class N:
     # =                              Token Nodes                              =
     # =========================================================================
     # -------------------------------- L_Arith --------------------------------
-    class Name(ASTNode):
+    class Name(PicoCNode):
         # shorter then 'Identifier'
         pass
 
-    class Num(ASTNode):
+    class Num(PicoCNode):
         pass
 
-    class Char(ASTNode):
+    class Char(PicoCNode):
         pass
 
-    class Minus(ASTNode):
+    class Minus(PicoCNode):
         pass
 
-    class Not(ASTNode):
+    class Not(PicoCNode):
         pass
 
-    class Add(ASTNode):
+    class Add(PicoCNode):
         pass
 
-    class Sub(ASTNode):
+    class Sub(PicoCNode):
         pass
 
-    class Mul(ASTNode):
+    class Mul(PicoCNode):
         pass
 
-    class Div(ASTNode):
+    class Div(PicoCNode):
         pass
 
-    class Mod(ASTNode):
+    class Mod(PicoCNode):
         pass
 
-    class Oplus(ASTNode):
+    class Oplus(PicoCNode):
         pass
 
-    class And(ASTNode):
+    class And(PicoCNode):
         pass
 
-    class Or(ASTNode):
+    class Or(PicoCNode):
         pass
 
     # -------------------------------- L_Logic --------------------------------
-    class Eq(ASTNode):
+    class Eq(PicoCNode):
         pass
 
-    class NEq(ASTNode):
+    class NEq(PicoCNode):
         pass
 
-    class Lt(ASTNode):
+    class Lt(PicoCNode):
         pass
 
-    class Gt(ASTNode):
+    class Gt(PicoCNode):
         pass
 
-    class LtE(ASTNode):
+    class LtE(PicoCNode):
         pass
 
-    class GtE(ASTNode):
+    class GtE(PicoCNode):
         pass
 
-    class LogicAnd(ASTNode):
+    class LogicAnd(PicoCNode):
         pass
 
-    class LogicOr(ASTNode):
+    class LogicOr(PicoCNode):
         pass
 
-    class LogicNot(ASTNode):
+    class LogicNot(PicoCNode):
         pass
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    class Const(ASTNode):
+    class Const(PicoCNode):
         pass
 
-    class Writeable(ASTNode):
+    class Writeable(PicoCNode):
         pass
 
-    class IntType(ASTNode):
+    class IntType(PicoCNode):
         pass
 
-    class CharType(ASTNode):
+    class CharType(PicoCNode):
         pass
 
-    class VoidType(ASTNode):
+    class VoidType(PicoCNode):
         pass
 
     # ------------------------------- L_Pointer -------------------------------
-    class PNTR_PLUS(ASTNode):
+    class PNTR_PLUS(PicoCNode):
         pass
 
-    class PNTR_MINUS(ASTNode):
+    class PNTR_MINUS(PicoCNode):
         pass
 
     # --------------------------------- L_Fun ---------------------------------
-    class Null(ASTNode):
+    class Null(PicoCNode):
         pass
 
     # =========================================================================
     # =                            Container Nodes                            =
     # =========================================================================
     # -------------------------------- L_Arith --------------------------------
-    class BinOp(ASTNode):
+    class BinOp(PicoCNode):
         def __init__(self, left_exp, bin_op, right_exp):
             self.left_exp = left_exp
             self.bin_op = bin_op
@@ -116,7 +116,7 @@ class N:
 
         __match_args__ = ("left_exp", "bin_op", "right_exp")
 
-    class UnOp(ASTNode):
+    class UnOp(PicoCNode):
         def __init__(self, un_op, exp):
             self.un_op = un_op
             self.exp = exp
@@ -125,7 +125,7 @@ class N:
         __match_args__ = ("un_op", "exp")
 
     # -------------------------------- L_Logic --------------------------------
-    class Atom(ASTNode):
+    class Atom(PicoCNode):
         def __init__(self, left_exp, relation, right_exp):
             self.left_exp = left_exp
             self.relation = relation
@@ -134,7 +134,7 @@ class N:
 
         __match_args__ = ("left_exp", "relation", "right_exp")
 
-    class ToBool(ASTNode):
+    class ToBool(PicoCNode):
         def __init__(self, exp):
             self.exp = exp
             super().__init__(children=[self.exp])
@@ -142,7 +142,7 @@ class N:
         __match_args__ = ("exp",)
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    class Alloc(ASTNode):
+    class Alloc(PicoCNode):
         def __init__(self, type_qual, size_qual, pntr_decl):
             self.type_qual = type_qual
             self.size_qual = size_qual
@@ -161,7 +161,7 @@ class N:
             "pntr_decl",
         )
 
-    class Assign(ASTNode):
+    class Assign(PicoCNode):
         def __init__(self, loc, exp):
             self.loc = loc
             self.exp = exp
@@ -170,7 +170,7 @@ class N:
         __match_args__ = ("loc", "exp")
 
     # ------------------------------- L_Pointer -------------------------------
-    class PntrDecl(ASTNode):
+    class PntrDecl(PicoCNode):
         def __init__(self, deg, array_decl):
             self.deg = deg
             self.array_decl = array_decl
@@ -178,14 +178,14 @@ class N:
 
         __match_args__ = ("deg", "array_decl")
 
-    class Ref(ASTNode):
+    class Ref(PicoCNode):
         def __init__(self, ref_loc):
             self.ref_loc = ref_loc
             super().__init__(children=[self.ref_loc])
 
         __match_args__ = ("ref_loc",)
 
-    class Deref(ASTNode):
+    class Deref(PicoCNode):
         def __init__(self, deref_loc, exp):
             self.deref_loc = deref_loc
             self.exp = exp
@@ -194,7 +194,7 @@ class N:
         __match_args__ = ("deref_loc", "exp")
 
     # -------------------------------- L_Array --------------------------------
-    class ArrayDecl(ASTNode):
+    class ArrayDecl(PicoCNode):
         def __init__(self, identifier, dims):
             self.identifier = identifier
             self.dims = dims
@@ -205,14 +205,14 @@ class N:
             "dims",
         )
 
-    class Array(ASTNode):
+    class Array(PicoCNode):
         def __init__(self, exps):
             self.exps = exps
             super().__init__(children=[self.exps])
 
         __match_args__ = ("datatype", "exps")
 
-    class Subscr(ASTNode):
+    class Subscr(PicoCNode):
         def __init__(self, deref_loc, exp):
             self.deref_loc = deref_loc
             self.exp = exp
@@ -221,21 +221,21 @@ class N:
         __match_args__ = ("deref_loc", "exp")
 
     # -------------------------------- L_Struct -------------------------------
-    class StructSpec(ASTNode):
+    class StructSpec(PicoCNode):
         def __init__(self, identifier):
             self.identifier = identifier
             super().__init__(children=[self.identifier])
 
         __match_args__ = ("identifier",)
 
-    class Struct(ASTNode):
+    class Struct(PicoCNode):
         def __init__(self, assigns):
             self.assigns = assigns
             super().__init__(children=[self.assigns])
 
         __match_args__ = ("assigns",)
 
-    class Attr(ASTNode):
+    class Attr(PicoCNode):
         def __init__(self, ref_loc, attr_identifier):
             self.ref_loc = ref_loc
             self.attr_identifier = attr_identifier
@@ -243,7 +243,7 @@ class N:
 
         __match_args__ = ("ref_loc", "attr_identifier")
 
-    class StructDecl(ASTNode):
+    class StructDecl(PicoCNode):
         def __init__(self, identifier, params):
             self.identifier = identifier
             self.params = params
@@ -251,7 +251,7 @@ class N:
 
         __match_args__ = ("identifier", "params")
 
-    class Param(ASTNode):
+    class Param(PicoCNode):
         def __init__(self, size_qual, identifier):
             self.size_qual = size_qual
             self.identifier = identifier
@@ -260,7 +260,7 @@ class N:
         __match_args__ = ("size_qual", "identifier")
 
     # ------------------------------- L_If_Else -------------------------------
-    class If(ASTNode):
+    class If(PicoCNode):
         def __init__(self, exp, stmts):
             self.exp = exp
             self.stmts = stmts
@@ -268,7 +268,7 @@ class N:
 
         __match_args__ = ("exp", "stmts")
 
-    class IfElse(ASTNode):
+    class IfElse(PicoCNode):
         def __init__(self, exp, stmts1, stmts2):
             self.exp = exp
             self.stmts1 = stmts1
@@ -278,7 +278,7 @@ class N:
         __match_args__ = ("exp", "stmts1", "stmts2")
 
     # --------------------------------- L_Loop --------------------------------
-    class While(ASTNode):
+    class While(PicoCNode):
         def __init__(self, exp, stmts):
             self.exp = exp
             self.stmts = stmts
@@ -286,7 +286,7 @@ class N:
 
         __match_args__ = ("exp", "stmts")
 
-    class DoWhile(ASTNode):
+    class DoWhile(PicoCNode):
         def __init__(self, exp, stmts):
             self.exp = exp
             self.stmts = stmts
@@ -295,7 +295,7 @@ class N:
         __match_args__ = ("exp", "stmts")
 
     # --------------------------------- L_Fun ---------------------------------
-    class Call(ASTNode):
+    class Call(PicoCNode):
         def __init__(self, identifier, exps):
             self.identifier = identifier
             self.exps = exps
@@ -303,21 +303,21 @@ class N:
 
         __match_args__ = ("identifier", "exps")
 
-    class Return(ASTNode):
+    class Return(PicoCNode):
         def __init__(self, exp):
             self.exp = exp
             super().__init__(children=[self.exp])
 
         __match_args__ = ("exp",)
 
-    class Exp(ASTNode):
+    class Exp(PicoCNode):
         def __init__(self, call):
             self.call = call
             super().__init__(children=[self.call])
 
         __match_args__ = ("call",)
 
-    class FunDecl(ASTNode):
+    class FunDecl(PicoCNode):
         def __init__(self, size_qual, identifier, params):
             self.size_qual = size_qual
             self.identifier = identifier
@@ -326,7 +326,7 @@ class N:
 
         __match_args__ = ("size_qual", "identifier", "params")
 
-    class FunDef(ASTNode):
+    class FunDef(PicoCNode):
         def __init__(self, size_qual, identifier, params, stmts_blocks):
             self.size_qual = size_qual
             self.identifier = identifier
@@ -344,7 +344,7 @@ class N:
         __match_args__ = ("size_qual", "identifier", "params", "stmts_blocks")
 
     # --------------------------------- L_File --------------------------------
-    class File(ASTNode):
+    class File(PicoCNode):
         def __init__(self, name, decls_defs):
             self.name = name
             self.decls_defs = decls_defs
@@ -353,15 +353,22 @@ class N:
         __match_args__ = ("name", "decls_defs")
 
     # -------------------------------- L_Block --------------------------------
-    class Block(ASTNode):
+    class Block(PicoCNode):
         def __init__(self, label, stmts):
             self.label = label
             self.stmts = stmts
-            super().__init__(children=[self.label, self.stmts])
+            self.stmts_before = ""
+            self.stmts_after = ""
+            super().__init__(
+                children=[self.label, self.stmts, self.stmts_before, self.stmts_after]
+            )
 
         __match_args__ = ("label", "stmts")
 
-    class GoTo(ASTNode):
+        def add_info(self, info):
+            self.children += N.Num(info)
+
+    class GoTo(PicoCNode):
         def __init__(self, label):
             self.label = label
             super().__init__(children=[self.label])
