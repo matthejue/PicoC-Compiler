@@ -10,6 +10,8 @@ README.txt
 *.dt
 *.ast
 *.csv
+*.picoc_mon
+*.picoc_blocks
 *.reti
 *.error
 *.c

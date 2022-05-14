@@ -1,16 +1,16 @@
 import global_vars
-from ast_node import ASTNode
+from ast_node import PicoCNode
 
 
 class ASTBuilder:
     """Provides methods for ast construction"""
 
     def __init__(self):
-        self.root: ASTNode = None
-        self.current_node: ASTNode = None
+        self.root: PicoCNode = None
+        self.current_node: PicoCNode = None
         self.return_nodes = {}
 
-    def CN(self) -> ASTNode:
+    def CN(self) -> PicoCNode:
         """Current node
 
         :returns: Node
