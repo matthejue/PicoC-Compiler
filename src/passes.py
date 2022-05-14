@@ -333,15 +333,35 @@ class Passes:
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
+    def _picoc_block_to_reti_block_loc(self, loc):
+        match loc:
+            case PN.Name(name):
+                return [
+                    RN.Instr(RN.Subi(), [RN.Sp(), RN.Num("1")]),
+                    RN.Instr(RN.Loadi(), [RN.Acc(), RN.Num(val)]),
+                    RN.Instr(RN.Storein(), [RN.Sp(), RN.Acc(), RN.Num("1")]),
+                ]
+            case PN.Num(val):
+                return [
+                    RN.Instr(RN.Subi(), [RN.Sp(), RN.Num("1")]),
+                    RN.Instr(RN.Loadi(), [RN.Acc(), RN.Num(val)]),
+                    RN.Instr(RN.Storein(), [RN.Sp(), RN.Acc(), RN.Num("1")]),
+                ]
+
+    def _picoc_block_to_reti_block_exp(self, exp):
+        match exp:
+            case PN.BinOp(left_exp, bin_op, right_exp):
+                return []
+
     def _picoc_block_to_reti_block_stmt(self, stmt):
         match stmt:
-            case PN.Assign(ref_loc, PN.BinOp(left_atom, PN.Add(), right_atom)):
-                pass
             case PN.Exp(PN.Call(PN.Name("print"), exp)):
                 pass
             case PN.Alloc(type_qual, size_qual, pntr_decl):
                 pass
-            case PN.Assign(ref_loc, PN.):
+            case PN.Assign(
+                ref_loc,
+            ):
                 pass
             case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), exp):
                 pass
