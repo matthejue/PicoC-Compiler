@@ -9,6 +9,7 @@ class Args:
         self.abstract_syntax_tree = True
         self.picoc_to_picoc_mon = True
         self.picoc_mon_to_picoc_blocks = True
+        self.picoc_blocks_to_reti_blocks = True
         self.symbol_table = True
         self.print = True
         self.distance = 20
