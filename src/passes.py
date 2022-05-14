@@ -6,6 +6,7 @@ class Passes:
     def __init__(self):
         self.block_id = 0
         self.name_id = 0
+        self.stmt_cnt = 0
         self.all_blocks = dict()
 
     # =========================================================================
@@ -332,21 +333,64 @@ class Passes:
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
-    def _picoc_block_to_reti_block_block(self):
-        ...
+    def _picoc_block_to_reti_block_stmt(self, stmt):
+        match stmt:
+            case PN.Assign(ref_loc, PN.BinOp(left_atom, PN.Add(), right_atom)):
+                pass
+            case PN.Exp(PN.Call(PN.Name("print"), exp)):
+                pass
+            case PN.Alloc(type_qual, size_qual, pntr_decl):
+                pass
+            case PN.Assign(ref_loc, PN.):
+                pass
+            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), exp):
+                pass
+            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(exps)):
+                pass
+            case PN.Assign(
+                PN.Alloc(type_qual, size_qual, pntr_decl), PN.Struct(assigns)
+            ):
+                pass
+            case PN.If(exp, stmts):
+                pass
+            case PN.IfElse(exp, stmts1, stmts2):
+                pass
+            case PN.While(exp, stmts):
+                pass
+            case PN.DoWhile(exp, stmts):
+                pass
+            case PN.Exp(PN.Call(identifier, exps)):
+                pass
+            case PN.Return(exp):
+                pass
 
     def _picoc_block_to_reti_block_def(self, decl_def):
         match decl_def:
-            case PN.FunDef(size_qual, identifier, params, blocks):
-                pass
+            case PN.FunDef(_, _, _, blocks):
+                for block in blocks:
+                    match block:
+                        case PN.Block(_, stmts):
+                            reti_instrs = []
+                            for stmt in stmts:
+                                reti_instrs += self._picoc_block_to_reti_block_stmt(
+                                    stmt
+                                )
+                            block.stmts = reti_instrs
+                            block.stmts_after = f"stmts after: {self.stmt_cnt}"
+                            self.stmt_cnt += len(reti_instrs)
+                return blocks
+            case PN.FunDecl():
+                return []
+            case PN.StructDecl():
+                return []
 
     def picoc_block_to_reti_block(self, file: PN.File):
         match file:
             case PN.File(name, decls_defs):
                 reti_blocks = []
                 for decl_def in decls_defs:
-                    reti_blocks += [self._picoc_mon_to_picoc_block_def(decl_def)]
-        return PN.File(name, reti_blocks)
+                    reti_blocks += self._picoc_mon_to_picoc_block_def(decl_def)
+        return RN.Program(name, reti_blocks)
 
     # =========================================================================
     # =                          RETI_Blocks -> RETI                          =

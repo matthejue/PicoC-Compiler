@@ -24,6 +24,9 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument(
         "-b", "--picoc_mon_to_picoc_blocks", action="store_true"
     )
+    cli_args_parser.add_argument(
+        "-B", "--picoc_blocks_to_reti_blocks", action="store_true"
+    )
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-D", "--distance", type=int, default=0)
@@ -237,6 +240,10 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.picoc_mon_to_picoc_blocks:
             print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
+            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
+
+        if global_vars.args.picoc_blocks_to_reti_blocks:
+            print(subheading("PicoC_Blocks -> RETI_Blocks", terminal_width, "-"))
             self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
 
         if global_vars.args.symbol_table:
