@@ -9,7 +9,7 @@ not_passed=();
   # for test in ./{old_,}tests/*$1*.picoc; do
   for test in ./tests/*$2*.picoc; do
     ./heading_subheadings.py "heading" "$test" "$1" "="
-    ./src/main.py -ctdambs -p -D 20 -S 2 -M -C $3 "$test";
+    ./src/main.py -ctdambBs -p -D 20 -S 2 -M -C $3 "$test";
     # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m -v -C ${test%.picoc}.reti
 
     if [[ $? != 0 ]]; then

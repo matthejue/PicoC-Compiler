@@ -2,6 +2,7 @@ from picoc_nodes import N as PN
 from reti_nodes import N as RN
 from errors import Errors
 from symbol_table import SymbolTable, Symbol
+from error_handler import args_to_str
 
 
 class Passes:
@@ -317,7 +318,7 @@ class Passes:
                         sorted(
                             blocks.values(),
                             key=lambda block: -int(
-                                block.label.value[block.label.value.rindex(".") + 1 :]
+                                block.label.val[block.label.val.rindex(".") + 1 :]
                             ),
                         )
                     ),
@@ -336,11 +337,11 @@ class Passes:
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
-    def _bug_in_compiler_error(self):
+    def _bug_in_compiler_error(self, *args):
         import inspect
 
         # return name of caller of this function
-        raise Errors.BugInCompiler(inspect.stack()[1][3])
+        raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
 
     def _picoc_blocks_to_reti_blocks_loc(self, loc):
         match loc:
@@ -361,7 +362,7 @@ class Passes:
                     ),
                 ]
             case _:
-                self._bug_in_compiler_error()
+                self._bug_in_compiler_error(loc)
 
     def _picoc_blocks_to_reti_blocks_exp(self, exp):
         match exp:
@@ -389,7 +390,7 @@ class Passes:
                     case PN.Or():
                         op = RN.Or()
                     case _:
-                        self._bug_in_compiler_error()
+                        self._bug_in_compiler_error(exp)
                 return reti_instrs + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("2")]
@@ -410,9 +411,9 @@ class Passes:
                         self.symbol_table.define(symbol)
                         return []
                     case _:
-                        self._bug_in_compiler_error()
+                        self._bug_in_compiler_error(exp)
             case _:
-                self._bug_in_compiler_error()
+                self._bug_in_compiler_error(exp)
 
     def _picoc_blocks_to_reti_blocks_stmt(self, stmt):
         match stmt:
@@ -422,7 +423,7 @@ class Passes:
                 return self._picoc_blocks_to_reti_blocks_exp(alloc)
             case PN.Assign(assign_lhs, exp):
                 reti_instrs = []
-                self._picoc_blocks_to_reti_blocks_exp(assign_lhs)
+                self._picoc_blocks_to_reti_blocks_loc(assign_lhs)
                 reti_instrs += self._picoc_blocks_to_reti_blocks_exp(exp)
                 match assign_lhs:
                     # TODO: der zweite Case muss nach Visitor verändert werden
@@ -455,13 +456,9 @@ class Passes:
                                 # TODO: ConstReassignment schreiben
                                 raise Errors.ConstReassignment(name, pos, pos2)
                             case _:
-                                import inspect
-
-                                raise Errors.BugInCompiler(inspect.stack()[0][3])
+                                self._bug_in_compiler_error(exp)
                     case _:
-                        import inspect
-
-                        raise Errors.BugInCompiler(inspect.stack()[0][3])
+                        self._bug_in_compiler_error(exp)
             case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(exps)):
                 pass
             case PN.Assign(

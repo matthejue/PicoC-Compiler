@@ -12,6 +12,7 @@ README.txt
 *.csv
 *.picoc_mon
 *.picoc_blocks
+*.reti_blocks
 *.reti
 *.error
 *.c
