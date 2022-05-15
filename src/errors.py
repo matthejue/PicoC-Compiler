@@ -75,14 +75,13 @@ class Errors:
             self.first_pos = first_pos
 
     class ConstReassignment(Exception):
-        def __init__(self, found, found_pos, first, first_pos):
+        def __init__(self, found, found_pos, first_pos):
             self.description = (
                 f"{CM().YELLOW}ConstReassignmentError{CM().RESET_ALL}: Can't reassign a new "
                 f"value to named constant '{found}'"
             )
             self.found = found
             self.found_pos = found_pos
-            self.first = first
             self.first_pos = first_pos
 
     class NoMainFunction(Exception):
@@ -102,3 +101,12 @@ class Errors:
             )
             self.first_pos = first_pos
             self.second_pos = second_pos
+
+    class BugInCompiler(Exception):
+        def __init__(self, fun_name):
+            self.description = (
+                "{CM().YELLOW}BugInCompiler{CM().RESET_ALL}: Error in function "
+                f"'{fun_name}'. This error should not be possible, but it "
+                "occured. Please report this issue under "
+                "https://github.com/matthejue/PicoC-Compiler/issues/new/choose"
+            )

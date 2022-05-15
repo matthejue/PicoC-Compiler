@@ -14,9 +14,10 @@ exp ::= Atom(<exp>, <relation>, <exp>)
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_qual ::= Const() | Writeable()
 size_qual ::= IntType() | CharType() | VoidType() | <struct_spec>
-stmt ::= Alloc(<type_qual>, <size_qual>, <pntr_decl>)
-       | Assign(<ref_loc>, <exp>)
-       | Assign(Alloc(<type_qual>, <size_qual>, <pntr_decl>), <exp>)
+assign_lhs ::= Alloc(<type_qual>, <size_qual>, <pntr_decl>) | <ref_loc>
+exp_stmts ::= Alloc(<type_qual>, <size_qual>, <pntr_decl>)
+stmt ::= Exp(<exp_stmts>)
+       | Assign(<assign_lhs>, <exp>)
 // --------------------------------- L_Pointer --------------------------------
 pntr_decl ::= PntrDecl(Num(str), <array_decl>)
 deref_loc ::= Ref(<ref_loc>)|<ref_loc>
@@ -29,11 +30,11 @@ exp ::= Deref(<deref_loc>, <exp>)
 // ---------------------------------- L_Array ---------------------------------
 array_decl ::= ArrayDecl(Name(str), Num(str)*) | ArrayDecl(<pntr_decl>, Num(str)*)
 exp ::= Subscr(<deref_loc>, <exp>)
-stmt ::= Assign(Alloc(<type_qual>, <size_qual>, <pntr_decl>), Array(<exp>+))
+stmt ::= Assign(Alloc(Writeable(), <size_qual>, PntrDecl(Num("0"), ArrayDecl(Name(str), Num(str)+))), Array(<exp>+))
 // --------------------------------- L_Struct ---------------------------------
 struct_spec ::= StructSpec(Name(str))
 exp ::= Attr(<ref_loc>, Name(str))
-stmt ::= Assign(Alloc(<type_qual>, <size_qual>, <pntr_decl>), Struct(Assign(Name(str), <exp>)+))
+stmt ::= Assign(Alloc(Writeable(), StructSpec(Name(str)), PntrDecl(Num("0"), ArrayDecl(Name(str), []))), Struct(Assign(Name(str), <exp>)+))
 decl_def ::= StructDecl(Name(str), Param(<size_qual>, Name(str))+)
 // --------------------------------- L_If_Else --------------------------------
 stmt ::= If(<exp>, <stmt>*)
@@ -44,8 +45,8 @@ stmt ::= While(<exp>, <stmt>*)
 // ----------------------------------- L_Fun ----------------------------------
 fun_decl ::= FunType(<size_qual>)
 exp ::= Call(Name(str), <exp>*) | Null()
-stmt ::= Exp(Call(Name(str), <exp>*))
-       | Return(<exp>)
+exp_stmts ::= Call(Name(str), <exp>*)
+stmt ::= Return(<exp>)
 decl_def ::= FunDecl(<size_qual>, Name(str), Param(<size_qual>, Name(str))*)
            | FunDef(<size_qual>, Name(str), Param(<size_qual>, Name(str))*, <stmt>*)
 // ---------------------------------- L_File ----------------------------------

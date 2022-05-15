@@ -11,10 +11,9 @@ LETTER: "a".."z"|"A".."Z"
 CHAR: "'"LETTER"'"
 name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
 NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
-un_op: SUB_MINUS|NEG|NOT
+un_op: SUB_MINUS|NOT|LOGIC_NOT
 SUB_MINUS: "-"
-NEG: "~"
-NOT: "!"
+NOT: "~"
 prec1_op: MUL|DIV|MOD
 MUL: "*"
 DIV: "/"
@@ -25,7 +24,7 @@ OPLUS: "^"
 AND: "&"
 OR: "|"
 // ---------------------------------- L_Logic ---------------------------------
-// ! is new but gets added under L_Arith
+LOGIC_NOT: "!"
 relation: EQ|NEQ|LT|LTE|GT|GTE
 EQ: "=="
 NEQ: "!="

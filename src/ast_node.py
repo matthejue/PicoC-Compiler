@@ -1,21 +1,21 @@
 class ASTNode:
-    def __init__(self, value=None, position=(-1, -1), children=[]):
+    def __init__(self, val=None, pos=(-1, -1), children=[]):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
-        self.value = value
-        self.position = position
+        self.val = val
+        self.pos = pos
         self.children = children
 
-    __match_args__ = ("value", "position")
+    __match_args__ = ("val", "pos")
 
 
 class PicoCNode(ASTNode):
     def __repr__(self, depth=0):
         if not self.children:
-            if not self.value:
+            if not self.val:
                 return f"\n{' ' * depth}{self.__class__.__name__}"
-            return f"\n{' ' * depth}{self.__class__.__name__}('{self.value}')"
+            return f"\n{' ' * depth}{self.__class__.__name__}('{self.val}')"
 
         acc = ""
 

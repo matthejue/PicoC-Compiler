@@ -162,12 +162,12 @@ class N:
         )
 
     class Assign(PicoCNode):
-        def __init__(self, loc, exp):
-            self.loc = loc
+        def __init__(self, assign_lhs, exp):
+            self.assign_lhs = assign_lhs
             self.exp = exp
-            super().__init__(children=[self.loc, self.exp])
+            super().__init__(children=[self.assign_lhs, self.exp])
 
-        __match_args__ = ("loc", "exp")
+        __match_args__ = ("assign_lhs", "exp")
 
     # ------------------------------- L_Pointer -------------------------------
     class PntrDecl(PicoCNode):
@@ -311,11 +311,11 @@ class N:
         __match_args__ = ("exp",)
 
     class Exp(PicoCNode):
-        def __init__(self, call):
-            self.call = call
-            super().__init__(children=[self.call])
+        def __init__(self, call_alloc):
+            self.call_alloc = call_alloc
+            super().__init__(children=[self.call_alloc])
 
-        __match_args__ = ("call",)
+        __match_args__ = ("call_alloc",)
 
     class FunDecl(PicoCNode):
         def __init__(self, size_qual, identifier, params):
@@ -354,16 +354,21 @@ class N:
 
     # -------------------------------- L_Block --------------------------------
     class Block(PicoCNode):
-        def __init__(self, label, stmts):
+        def __init__(self, label, stmts_instrs):
             self.label = label
-            self.stmts = stmts
-            self.stmts_before = ""
-            self.stmts_after = ""
+            self.stmts_instrs = stmts_instrs
+            self.instrs_before = ""
+            self.instrs_after = ""
             super().__init__(
-                children=[self.label, self.stmts, self.stmts_before, self.stmts_after]
+                children=[
+                    self.label,
+                    self.stmts_instrs,
+                    self.instrs_before,
+                    self.instrs_after,
+                ]
             )
 
-        __match_args__ = ("label", "stmts")
+        __match_args__ = ("label", "stmts_instrs")
 
         def add_info(self, info):
             self.children += N.Num(info)

@@ -4,9 +4,9 @@ import global_vars
 class N:
     """Nodes"""
 
-    # -------------------------------------------------------------------------
-    # -                            Container Nodes                            -
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # =                            Container Nodes                            =
+    # =========================================================================
     # -------------------------------- Program --------------------------------
     class Program:
         def __init__(self, programname, instrs):
@@ -85,32 +85,9 @@ class N:
 
         __match_args__ = ("comment",)
 
-    # --------------------------------- Block ---------------------------------
-    class Block:
-        def __init__(self, labelname, instrs):
-            self.labelname = labelname
-            self.instrs = instrs
-
-        def __repr__(self):
-            instrs_str = f"\n\n{self.labelname}:"
-            for instr in self.instrs:
-                instrs_str += f"{instr}"
-            return instrs_str
-
-        __match_args__ = ("labelname", "instrs")
-
-    class Goto:
-        def __init__(self, labelname):
-            self.labelname = labelname
-
-        def __repr__(self):
-            return "Goto {self.labelname}"
-
-        __match_args__ = ("labelname",)
-
-    # -------------------------------------------------------------------------
-    # -                              Token Nodes                              -
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # =                              Token Nodes                              =
+    # =========================================================================
     # ------------------- Identifier, Immediate and Register ------------------
     class Name:
         # shorter then 'Identifier'

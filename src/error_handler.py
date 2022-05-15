@@ -119,9 +119,7 @@ class ErrorHandler:
                 error_screen.clear(1)
             error_screen.point_at(prev_pos, expected_str)
             error_screen.filter()
-            self._output_error(
-                error_header + str(error_screen) + "\n\n", e.__class__.__name__
-            )
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         except UnexpectedEOF as e:
             self._error_heading()
@@ -135,9 +133,7 @@ class ErrorHandler:
             )
             error_screen.point_at(e.last_pos, expected_str)
             error_screen.filter()
-            self._output_error(
-                error_header + str(error_screen) + "\n\n", e.__class__.__name__
-            )
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         except Errors.UnknownIdentifier as e:
             error_header = self._error_header(e.found_pos, e.description)
@@ -238,15 +234,19 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
+        except Errors.BugInCompiler as e:
+            error_header = self._error_header(e.description)
+            self._output_error(error_header, e.__class__.__name__)
+            exit()
         return rtrn_val
 
     def _error_heading(self):
         terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
         print(compiler.subheading("Error", terminal_width, "-"))
 
-    def _error_header(self, descirption: str, pos=None):
+    def _error_header(self, description: str, pos=None):
         if not pos:
-            return descirption + "\n"
+            return description
         return (
             CM().BRIGHT
             + global_vars.args.infile
@@ -255,7 +255,7 @@ class ErrorHandler:
             + ":"
             + str(pos.column)
             + ": "
-            + descirption
+            + description
             + CM().RESET_ALL
         )
 

@@ -1,13 +1,21 @@
 from picoc_nodes import N as PN
 from reti_nodes import N as RN
+from errors import Errors
+from symbol_table import SymbolTable, Symbol
 
 
 class Passes:
     def __init__(self):
-        self.block_id = 0
+        # PicoC -> PicoC_mon
         self.name_id = 0
-        self.stmt_cnt = 0
+        # PicoC_mon -> PicoC_Blocks
+        self.block_id = 0
         self.all_blocks = dict()
+        # PicoC_Blocks -> RETI_Blocks
+        self.instrs_cnt = 0
+        self.current_scope = "global"
+        self.current_address = 0
+        self.symbol_table = SymbolTable()
 
     # =========================================================================
     # =                           PicoC -> PicoC_mon                          =
@@ -115,13 +123,8 @@ class Passes:
     def _picoc_to_picoc_mon_stmt(self, stmt):
         match stmt:
             case PN.Assign(loc, exp):
-                atom1, tmps1 = self._picoc_to_picoc_mon_exp(loc, atomic=False)
-                atom2, tmps2 = self._picoc_to_picoc_mon_exp(exp, atomic=False)
-                return (
-                    self._make_assigns(tmps1)
-                    + self._make_assigns(tmps2)
-                    + [PN.Assign(atom1, atom2)]
-                )
+                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
+                return self._make_assigns(tmps) + [PN.Assign(loc, atom)]
             case PN.Assign(
                 PN.Alloc(type_qual, size_qual, pntr_decl), PN.Struct(assigns)
             ):
@@ -217,7 +220,7 @@ class Passes:
         self.block_id += 1
         return PN.GoTo(PN.Name(label))
 
-    def _picoc_mon_to_picoc_block_stmt(self, stmt, processed_stmts, blocks):
+    def _picoc_mon_to_picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
         match stmt:
             case PN.If(exp, stmts):
                 goto_after = self._create_block(
@@ -226,7 +229,7 @@ class Passes:
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts):
-                    stmts_if = self._picoc_mon_to_picoc_block_stmt(
+                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_if, blocks
                     )
                 goto_if = self._create_block("if", stmts_if, blocks)
@@ -239,14 +242,14 @@ class Passes:
 
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
-                    stmts_else = self._picoc_mon_to_picoc_block_stmt(
+                    stmts_else = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_else, blocks
                     )
                 goto_else = self._create_block("else", stmts_else, blocks)
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
-                    stmts_if = self._picoc_mon_to_picoc_block_stmt(
+                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_if, blocks
                     )
                 goto_if = self._create_block("if", stmts_if, blocks)
@@ -260,7 +263,7 @@ class Passes:
                 stmts_while = [goto_condition_check]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_mon_to_picoc_block_stmt(
+                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
                 goto_branch.label.value = self._create_block(
@@ -282,7 +285,7 @@ class Passes:
                 stmts_while = [PN.IfElse(exp, goto_branch, goto_after)]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_mon_to_picoc_block_stmt(
+                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
                 goto_branch.label.value = self._create_block(
@@ -295,13 +298,13 @@ class Passes:
             case _:
                 return [stmt] + processed_stmts
 
-    def _picoc_mon_to_picoc_block_def(self, decl_def):
+    def _picoc_mon_to_picoc_blocks_def(self, decl_def):
         match decl_def:
             case PN.FunDef(size_qual, PN.Name(fun_name) as name, params, stmts):
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
-                    processed_stmts = self._picoc_mon_to_picoc_block_stmt(
+                    processed_stmts = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, processed_stmts, blocks
                     )
                 self._create_block(fun_name, processed_stmts, blocks)
@@ -322,54 +325,150 @@ class Passes:
             case _:
                 return decl_def
 
-    def picoc_mon_to_picoc_block(self, file: PN.File):
+    def picoc_mon_to_picoc_blocks(self, file: PN.File):
         match file:
             case PN.File(name, decls_defs):
                 decls_defs_blocks = []
                 for decl_def in decls_defs:
-                    decls_defs_blocks += [self._picoc_mon_to_picoc_block_def(decl_def)]
+                    decls_defs_blocks += [self._picoc_mon_to_picoc_blocks_def(decl_def)]
         return PN.File(name, decls_defs_blocks)
 
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
-    def _picoc_block_to_reti_block_loc(self, loc):
+    def _bug_in_compiler_error(self):
+        import inspect
+
+        # return name of caller of this function
+        raise Errors.BugInCompiler(inspect.stack()[1][3])
+
+    def _picoc_blocks_to_reti_blocks_loc(self, loc):
         match loc:
-            case PN.Name(name):
+            case PN.Name(val):
                 return [
-                    RN.Instr(RN.Subi(), [RN.Sp(), RN.Num("1")]),
-                    RN.Instr(RN.Loadi(), [RN.Acc(), RN.Num(val)]),
-                    RN.Instr(RN.Storein(), [RN.Sp(), RN.Acc(), RN.Num("1")]),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                    RN.Instr(RN.Load(), [RN.Reg(RN.Acc()), RN.Num(val)]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("1")]
+                    ),
                 ]
             case PN.Num(val):
                 return [
-                    RN.Instr(RN.Subi(), [RN.Sp(), RN.Num("1")]),
-                    RN.Instr(RN.Loadi(), [RN.Acc(), RN.Num(val)]),
-                    RN.Instr(RN.Storein(), [RN.Sp(), RN.Acc(), RN.Num("1")]),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Num(val)]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("1")]
+                    ),
                 ]
+            case _:
+                self._bug_in_compiler_error()
 
-    def _picoc_block_to_reti_block_exp(self, exp):
+    def _picoc_blocks_to_reti_blocks_exp(self, exp):
         match exp:
             case PN.BinOp(left_exp, bin_op, right_exp):
-                return []
+                reti_instrs = []
+                # _picoc_blocks_to_reti_blocks_loc because after the PicoC ->
+                # PicoC_mon Pass there's all assigns are atomic
+                reti_instrs += self._picoc_blocks_to_reti_blocks_loc(left_exp)
+                reti_instrs += self._picoc_blocks_to_reti_blocks_loc(right_exp)
+                match bin_op:
+                    case PN.Add():
+                        op = RN.Add()
+                    case PN.Sub():
+                        op = RN.Sub()
+                    case PN.Mul():
+                        op = RN.Mult()
+                    case PN.Div():
+                        op = RN.Div()
+                    case PN.Mod():
+                        op = RN.Mod()
+                    case PN.Oplus():
+                        op = RN.Oplus()
+                    case PN.And():
+                        op = RN.And()
+                    case PN.Or():
+                        op = RN.Or()
+                    case _:
+                        self._bug_in_compiler_error()
+                return reti_instrs + [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("2")]
+                    ),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Num("1")]
+                    ),
+                    RN.Instr(op, [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("2")]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                ]
+            case PN.Alloc(type_qual, size_qual, pntr_decl):
+                match pntr_decl:
+                    case PN.PntrDecl(PN.Num(), PN.ArrayDecl(PN.Name(name, pos), [])):
+                        symbol = Symbol(type_qual, size_qual, name, "-", pos)
+                        self.symbol_table.define(symbol)
+                        return []
+                    case _:
+                        self._bug_in_compiler_error()
+            case _:
+                self._bug_in_compiler_error()
 
-    def _picoc_block_to_reti_block_stmt(self, stmt):
+    def _picoc_blocks_to_reti_blocks_stmt(self, stmt):
         match stmt:
             case PN.Exp(PN.Call(PN.Name("print"), exp)):
                 pass
-            case PN.Alloc(type_qual, size_qual, pntr_decl):
-                pass
-            case PN.Assign(
-                ref_loc,
-            ):
-                pass
-            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), exp):
-                pass
+            case PN.Exp(alloc):
+                return self._picoc_blocks_to_reti_blocks_exp(alloc)
+            case PN.Assign(assign_lhs, exp):
+                reti_instrs = []
+                self._picoc_blocks_to_reti_blocks_exp(assign_lhs)
+                reti_instrs += self._picoc_blocks_to_reti_blocks_exp(exp)
+                match assign_lhs:
+                    # TODO: der zweite Case muss nach Visitor verändert werden
+                    case (
+                        PN.Name(name, pos)
+                        | PN.Alloc(
+                            _, _, PN.PntrDecl(_, PN.ArrayDecl(PN.Name(name, pos), _))
+                        )
+                    ):
+                        symbol = self.symbol_table.resolve(name)
+                        match symbol:
+                            case Symbol("writable", "int", _, val, _):
+                                return reti_instrs + [
+                                    RN.Instr(
+                                        RN.Loadin(), [RN.Sp(), RN.Acc(), RN.Num("1")]
+                                    ),
+                                    RN.Instr(RN.Addi(), [RN.Sp(), RN.Num(1)]),
+                                    RN.Instr(RN.Store(), [RN.Acc(), RN.Num(val)]),
+                                ]
+                            case Symbol("writable", "char", _, val, _):
+                                # TODO: implicit cast code
+                                return reti_instrs + [
+                                    RN.Instr(
+                                        RN.Loadin(), [RN.Sp(), RN.Acc(), RN.Num("1")]
+                                    ),
+                                    RN.Instr(RN.Addi(), [RN.Sp(), RN.Num(1)]),
+                                    RN.Instr(RN.Store(), [RN.Acc(), RN.Num(val)]),
+                                ]
+                            case Symbol("const", _, _, _, pos2):
+                                # TODO: ConstReassignment schreiben
+                                raise Errors.ConstReassignment(name, pos, pos2)
+                            case _:
+                                import inspect
+
+                                raise Errors.BugInCompiler(inspect.stack()[0][3])
+                    case _:
+                        import inspect
+
+                        raise Errors.BugInCompiler(inspect.stack()[0][3])
             case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(exps)):
                 pass
             case PN.Assign(
                 PN.Alloc(type_qual, size_qual, pntr_decl), PN.Struct(assigns)
             ):
+                pass
+            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), exp):
                 pass
             case PN.If(exp, stmts):
                 pass
@@ -383,33 +482,43 @@ class Passes:
                 pass
             case PN.Return(exp):
                 pass
+            case PN.GoTo(label):
+                pass
+            case _:
+                self._bug_in_compiler_error()
 
-    def _picoc_block_to_reti_block_def(self, decl_def):
+    def _picoc_blocks_to_reti_blocks_def(self, decl_def):
         match decl_def:
-            case PN.FunDef(_, _, _, blocks):
+            case PN.FunDef(_, PN.Name(identifier), _, blocks):
+                self.current_scope = identifier
+                self.current_address = 0
                 for block in blocks:
                     match block:
                         case PN.Block(_, stmts):
                             reti_instrs = []
                             for stmt in stmts:
-                                reti_instrs += self._picoc_block_to_reti_block_stmt(
+                                reti_instrs += self._picoc_blocks_to_reti_blocks_stmt(
                                     stmt
                                 )
-                            block.stmts = reti_instrs
-                            block.stmts_after = f"stmts after: {self.stmt_cnt}"
-                            self.stmt_cnt += len(reti_instrs)
+                            block.stmts_instrs = reti_instrs
+                            block.instrs_after = (
+                                f"instructions after: {self.instrs_cnt}"
+                            )
+                            self.instrs_cnt += len(reti_instrs)
                 return blocks
             case PN.FunDecl():
                 return []
             case PN.StructDecl():
                 return []
+            case _:
+                self._bug_in_compiler_error()
 
-    def picoc_block_to_reti_block(self, file: PN.File):
+    def picoc_blocks_to_reti_blocks(self, file: PN.File):
         match file:
             case PN.File(name, decls_defs):
                 reti_blocks = []
                 for decl_def in decls_defs:
-                    reti_blocks += self._picoc_mon_to_picoc_block_def(decl_def)
+                    reti_blocks += self._picoc_blocks_to_reti_blocks_def(decl_def)
         return RN.Program(name, reti_blocks)
 
     # =========================================================================
