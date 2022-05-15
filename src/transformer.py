@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
-from lark import Lark, Transformer, Token
+from lark.visitors import Transformer
+from lark.lexer import Token
 from picoc_nodes import N
 
 
 class ASTTransformer(Transformer):
-    # -------------------------------------------------------------------------
-    # -                                 Lexer                                 -
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # =                                 Lexer                                 =
+    # =========================================================================
     # --------------------------------- L_Arith -------------------------------
     def name(self, token_list):
         token = token_list[0]
@@ -90,9 +91,9 @@ class ASTTransformer(Transformer):
             case "-":
                 return N.PNTR_MINUS(token.value, (token.start_pos, token.end_pos))
 
-    # -------------------------------------------------------------------------
-    # -                                 Parser                                -
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # =                                 Parser                                =
+    # =========================================================================
     # --------------------------------- L_Arith -------------------------------
     def input_odp(self, _):
         return N.Call(N.Name("input"), [])
@@ -156,7 +157,7 @@ class ASTTransformer(Transformer):
         return N.Alloc(N.Writeable(), nodes[0], nodes[1])
 
     def alloc_stmt(self, nodes):
-        return nodes[0]
+        return N.Exp(nodes[0])
 
     def assign_stmt(self, nodes):
         return N.Assign(nodes[0], nodes[1])
@@ -267,7 +268,9 @@ class ASTTransformer(Transformer):
     def struct_init(self, nodes):
         return N.Assign(
             N.Alloc(
-                N.Writeable(), nodes[0], N.PntrDecl(N.Num(0), N.ArrayDecl(nodes[1], []))
+                N.Writeable(),
+                nodes[0],
+                N.PntrDecl(N.Num("0"), N.ArrayDecl(nodes[1], [])),
             ),
             nodes[2],
         )

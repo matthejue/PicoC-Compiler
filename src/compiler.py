@@ -229,22 +229,23 @@ class Compiler(cmd2.Cmd):
             self._abstract_syntax_tree_option(ast)
 
         passes = Passes()
-        picoc_to_picoc_mon_out = passes.picoc_to_picoc_mon(ast)
-        picoc_mon_to_picoc_block_out = passes.picoc_mon_to_picoc_block(
-            picoc_to_picoc_mon_out
+        picoc_mon = error_handler.handle(passes.picoc_to_picoc_mon, ast)
+        picoc_blocks = error_handler.handle(passes.picoc_mon_to_picoc_blocks, picoc_mon)
+        reti_blocks = error_handler.handle(
+            passes.picoc_blocks_to_reti_blocks, picoc_blocks
         )
 
         if global_vars.args.picoc_mon_to_picoc_blocks:
             print(subheading("PicoC -> PicoC_mon", terminal_width, "-"))
-            self._picoc_to_picoc_mon_option(picoc_to_picoc_mon_out)
+            self._picoc_to_picoc_mon_option(picoc_mon)
 
         if global_vars.args.picoc_mon_to_picoc_blocks:
             print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
-            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
+            self._picoc_mon_to_picoc_blocks_option(picoc_blocks)
 
         if global_vars.args.picoc_blocks_to_reti_blocks:
             print(subheading("PicoC_Blocks -> RETI_Blocks", terminal_width, "-"))
-            self._picoc_mon_to_picoc_blocks_option(picoc_mon_to_picoc_block_out)
+            self._picoc_blocks_to_reti_blocks_option(reti_blocks)
 
         if global_vars.args.symbol_table:
             print(subheading("Symbol Table", terminal_width, "-"))
@@ -326,25 +327,32 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
             fout.write(output)
 
-    def _picoc_to_picoc_mon_option(self, picoc_to_picoc_mon_out: PicoCNode):
+    def _picoc_to_picoc_mon_option(self, picoc_mon: PicoCNode):
         if global_vars.args.print:
-            print(picoc_to_picoc_mon_out)
+            print(picoc_mon)
         if global_vars.outbase:
             with open(
                 global_vars.outbase + ".picoc_mon", "w", encoding="utf-8"
             ) as fout:
-                fout.write(str(picoc_to_picoc_mon_out))
+                fout.write(str(picoc_mon))
 
-    def _picoc_mon_to_picoc_blocks_option(
-        self, picoc_mon_to_picoc_blocks_out: PicoCNode
-    ):
+    def _picoc_mon_to_picoc_blocks_option(self, picoc_blocks: PicoCNode):
         if global_vars.args.print:
-            print(picoc_mon_to_picoc_blocks_out)
+            print(picoc_blocks)
         if global_vars.outbase:
             with open(
                 global_vars.outbase + ".picoc_blocks", "w", encoding="utf-8"
             ) as fout:
-                fout.write(str(picoc_mon_to_picoc_blocks_out))
+                fout.write(str(picoc_blocks))
+
+    def _picoc_blocks_to_reti_blocks_option(self, reti_blocks):
+        if global_vars.args.print:
+            print(reti_blocks)
+        if global_vars.outbase:
+            with open(
+                global_vars.outbase + ".reti_blocks", "w", encoding="utf-8"
+            ) as fout:
+                fout.write(str(reti_blocks))
 
 
 def remove_extension(fname):

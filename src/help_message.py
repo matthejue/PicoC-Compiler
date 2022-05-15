@@ -130,7 +130,7 @@ def generate_help_message():
     If you want to pipe the shell output to a OS level command, use the pipe operator `|`, e.g. `help | wc`.
 
     {heading("Misc", terminal_width, '=')}
-    If you discover any bugs I would be very grateful if you could report it via email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
+    If you discover any bugs, please report them under https://github.com/matthejue/PicoC-Compiler/issues/new/choose, thank you ^_^
     """
         ),
         terminal_width,
