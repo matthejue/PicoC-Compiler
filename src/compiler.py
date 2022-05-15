@@ -230,18 +230,20 @@ class Compiler(cmd2.Cmd):
 
         passes = Passes()
         picoc_mon = error_handler.handle(passes.picoc_to_picoc_mon, ast)
-        picoc_blocks = error_handler.handle(passes.picoc_mon_to_picoc_blocks, picoc_mon)
-        reti_blocks = error_handler.handle(
-            passes.picoc_blocks_to_reti_blocks, picoc_blocks
-        )
 
         if global_vars.args.picoc_mon_to_picoc_blocks:
             print(subheading("PicoC -> PicoC_mon", terminal_width, "-"))
             self._picoc_to_picoc_mon_option(picoc_mon)
 
+        picoc_blocks = error_handler.handle(passes.picoc_mon_to_picoc_blocks, picoc_mon)
+
         if global_vars.args.picoc_mon_to_picoc_blocks:
             print(subheading("PicoC_mon -> PicoC_Blocks", terminal_width, "-"))
             self._picoc_mon_to_picoc_blocks_option(picoc_blocks)
+
+        reti_blocks = error_handler.handle(
+            passes.picoc_blocks_to_reti_blocks, picoc_blocks
+        )
 
         if global_vars.args.picoc_blocks_to_reti_blocks:
             print(subheading("PicoC_Blocks -> RETI_Blocks", terminal_width, "-"))

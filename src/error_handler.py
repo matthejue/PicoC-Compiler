@@ -235,6 +235,7 @@ class ErrorHandler:
             )
             exit(0)
         except Errors.BugInCompiler as e:
+            self._error_heading()
             error_header = self._error_header(e.description)
             self._output_error(error_header, e.__class__.__name__)
             exit()
@@ -246,7 +247,7 @@ class ErrorHandler:
 
     def _error_header(self, description: str, pos=None):
         if not pos:
-            return description
+            return CM().BRIGHT + description + CM().RESET_ALL
         return (
             CM().BRIGHT
             + global_vars.args.infile
@@ -386,3 +387,13 @@ def set_to_str(tokens: set):
         )
         if "ANON" not in elem
     )
+
+
+def args_to_str(args: list):
+    if args:
+        return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
+            f"{CM().BLUE}'" + str(arg).replace("\n", "") + f"'{CM().RESET_ALL}"
+            for arg in args
+        )
+    else:
+        return "no arguments"

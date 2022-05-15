@@ -11,14 +11,15 @@ File
       Name('main')
       []
       [
-        Alloc
-          Writeable
-          IntType('int')
-          PntrDecl
-            Num('0')
-            ArrayDecl
-              Name('i')
-              []
+        Exp
+          Alloc
+            Writeable
+            IntType('int')
+            PntrDecl
+              Num('0')
+              ArrayDecl
+                Name('i')
+                []
         Assign
           Name('tmp.1')
           BinOp
