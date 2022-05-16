@@ -356,7 +356,7 @@ class ASTTransformer(Transformer):
     def file(self, nodes):
         return N.File(nodes[0], nodes[1])
 
-    # -------------------------------- L_Block --------------------------------
+    # -------------------------------- L_Blocks -------------------------------
     def block(self, nodes):
         return N.Block(nodes[0], nodes[1])
 

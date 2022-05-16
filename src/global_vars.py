@@ -6,13 +6,15 @@ class Args:
         self.code = True
         self.tokens = True
         self.derivation_tree = True
+        self.derivation_tree_simplified = True
         self.abstract_syntax_tree = True
         self.picoc_to_picoc_mon = True
         self.picoc_mon_to_picoc_blocks = True
         self.picoc_blocks_to_reti_blocks = True
+        self.reti_blocks_to_reti = True
         self.symbol_table = True
         self.print = True
-        self.distance = 20
+        self.gap = 20
         self.sight = 2
         self.color = True
         self.verbose = False

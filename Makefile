@@ -8,19 +8,19 @@ install:
 
 read: _read _clean-pycache
 _read:
-	./src/main.py -ctdambBs -p -D 20 -S 2 -M ./run/code.picoc
+	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M ./run/code.picoc
 
 read-verbose: _read-verbose _clean-pycache
 _read-verbose:
-	./src/main.py -ctdambBs -p -D 20 -S 2 -M -v ./run/code.picoc
+	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v ./run/code.picoc
 
 read-color: _read-color _clean-pycache
 _read-color:
-	./src/main.py -ctdambBs -p -D 20 -S 2 -M -v -C ./run/code.picoc
+	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v -C ./run/code.picoc
 
 read-debug: _read-debug _clean-pycache
 _read-debug:
-	./src/main.py -ctdambBs -p -D 20 -S 2 -M -v -g ./run/code.picoc
+	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v -g ./run/code.picoc
 
 shell: _shell _clean-pychache
 _shell:
