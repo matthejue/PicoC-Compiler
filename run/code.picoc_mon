@@ -14,12 +14,12 @@ File
         Exp
           Alloc
             Writeable
-            IntType('int')
             PntrDecl
               Num('0')
               ArrayDecl
-                Name('i')
+                IntType('int')
                 []
+            Name('i')
         Assign
           Name('tmp.1')
           BinOp
