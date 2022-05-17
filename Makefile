@@ -55,6 +55,7 @@ _clean-pycache:
 _clean-files:
 	find . -type f -wholename "./tests/*.tokens" -delete
 	find . -type f -wholename "./tests/*.dt" -delete
+	find . -type f -wholename "./tests/*.dt_simplified" -delete
 	find . -type f -wholename "./tests/*.ast" -delete
 	find . -type f -wholename "./tests/*.csv" -delete
 	find . -type f -wholename "./tests/*.picoc_mon" -delete
