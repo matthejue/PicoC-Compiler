@@ -9,8 +9,8 @@ class N:
     # =========================================================================
     # -------------------------------- Program --------------------------------
     class Program:
-        def __init__(self, programname, instrs):
-            self.programname = programname
+        def __init__(self, name, instrs):
+            self.name = name
             self.instrs = instrs
 
         def __repr__(self):
@@ -19,71 +19,71 @@ class N:
                 instrs_str += f"{instr}"
             return instrs_str
 
-        __match_args__ = ("programname", "instrs")
+        __match_args__ = ("name", "instrs")
 
     # ------------------------- Load / Store / Compute ------------------------
     class Instr:
-        def __init__(self, instr, args):
-            self.instr = instr
+        def __init__(self, op, args):
+            self.op = op
             self.args = args
 
         def __repr__(self):
-            instr_str = f"\n{self.instr}"
+            instr_str = f"\n{self.op}"
             for arg in self.args:
                 instr_str += f" {arg}"
             return instr_str
 
-        __match_args__ = ("instr", "args")
+        __match_args__ = ("op", "args")
 
     # --------------------------- Jump Instructions ---------------------------
     class Jump:
-        def __init__(self, rel, offset):
+        def __init__(self, rel, num):
             self.rel = rel
-            self.offset = offset
+            self.num = num
 
         def __repr__(self):
-            return f"\nJUMP{self.rel} {self.offset}"
+            return f"\nJUMP{self.rel} {self.num}"
 
-        __match_args__ = ("rel", "offset")
+        __match_args__ = ("rel", "num")
 
     class Int:
-        def __init__(self, isr):
-            self.isr = isr
+        def __init__(self, num):
+            self.num = num
 
         def __repr__(self):
-            return f"\nINT {self.isr}"
+            return f"\nINT {self.num}"
 
-        __match_args__ = ("isr",)
+        __match_args__ = ("num",)
 
     # ---------------------------- Input and Print ----------------------------
     class Call:
-        def __init__(self, procedurename, reg):
-            self.procedurename = procedurename
+        def __init__(self, name, reg):
+            self.name = name
             self.reg = reg
 
         def __repr__(self):
-            return f"\nCALL {self.procedurename} {self.reg}"
+            return f"\nCALL {self.name} {self.reg}"
 
-        __match_args__ = ("procedurename", "reg")
+        __match_args__ = ("name", "reg")
 
     # -------------------------------- Comment --------------------------------
     class SingleLineComment:
-        def __init__(self, comment):
-            self.comment = comment
+        def __init__(self, val):
+            self.val = val
 
         def __repr__(self):
-            return f"\n# {self.comment}"
+            return f"\n# {self.val}"
 
-        __match_args__ = ("comment",)
+        __match_args__ = ("val",)
 
     class InlineComment:
-        def __init__(self, comment):
-            self.comment = comment
+        def __init__(self, val):
+            self.val = val
 
         def __repr__(self):
-            return f'{" " * global_vars.args.distance}  # {self.comment}'
+            return f'{" " * global_vars.args.distance}  # {self.val}'
 
-        __match_args__ = ("comment",)
+        __match_args__ = ("val",)
 
     # =========================================================================
     # =                              Token Nodes                              =
@@ -91,23 +91,23 @@ class N:
     # ------------------- Identifier, Immediate and Register ------------------
     class Name:
         # shorter then 'Identifier'
-        def __init__(self, value):
-            self.value = value
+        def __init__(self, val):
+            self.val = val
 
         def __repr__(self):
-            return self.value
+            return self.val
 
-        __match_args__ = ("value",)
+        __match_args__ = ("val",)
 
     class Num:
         # shorter then 'Immediate'
-        def __init__(self, value):
-            self.value = value
+        def __init__(self, val):
+            self.val = val
 
         def __repr__(self):
-            return self.value
+            return self.val
 
-        __match_args__ = ("value",)
+        __match_args__ = ("val",)
 
     class Reg:
         def __init__(self, reg):

@@ -267,14 +267,14 @@ class Passes:
                     stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
-                goto_branch.label.value = self._create_block(
+                goto_branch.name.value = self._create_block(
                     "while_branch", stmts_while, blocks
-                ).label.value
+                ).name.val
 
                 condition_check = [PN.IfElse(exp, goto_branch, goto_after)]
-                goto_condition_check.label.value = self._create_block(
+                goto_condition_check.name.val = self._create_block(
                     "condition_check", condition_check, blocks
-                ).label.value
+                ).name.val
 
                 return [goto_condition_check]
             case PN.DoWhile(exp, stmts):
@@ -289,9 +289,9 @@ class Passes:
                     stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
-                goto_branch.label.value = self._create_block(
+                goto_branch.name.value = self._create_block(
                     "do_while_branch", stmts_while, blocks
-                ).label.value
+                ).name.value
 
                 return [goto_branch]
             case PN.Return():
@@ -318,7 +318,7 @@ class Passes:
                         sorted(
                             blocks.values(),
                             key=lambda block: -int(
-                                block.label.val[block.label.val.rindex(".") + 1 :]
+                                block.name.val[block.name.val.rindex(".") + 1 :]
                             ),
                         )
                     ),
@@ -479,7 +479,7 @@ class Passes:
                 pass
             case PN.Return(exp):
                 pass
-            case PN.GoTo(label):
+            case PN.GoTo(name):
                 pass
             case _:
                 self._bug_in_compiler_error()

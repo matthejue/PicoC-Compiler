@@ -87,9 +87,9 @@ class ASTTransformer(Transformer):
         token = token_list[0]
         match token.value:
             case "+":
-                return N.PNTR_PLUS(token.value, (token.start_pos, token.end_pos))
+                return N.Add(token.value, (token.start_pos, token.end_pos))
             case "-":
-                return N.PNTR_MINUS(token.value, (token.start_pos, token.end_pos))
+                return N.Sub(token.value, (token.start_pos, token.end_pos))
 
     # =========================================================================
     # =                                 Parser                                =
@@ -167,9 +167,7 @@ class ASTTransformer(Transformer):
 
     def const_init(self, nodes):
         return N.Assign(
-            N.Alloc(
-                N.Const(), nodes[0], N.PntrDecl(N.Num(0), N.ArrayDecl(nodes[1], []))
-            ),
+            N.Alloc(N.Const(), nodes[0], nodes[1]),
             nodes[2],
         )
 
@@ -181,7 +179,11 @@ class ASTTransformer(Transformer):
         return N.Num(str(len(nodes)))
 
     def pntr_decl(self, nodes):
-        return N.PntrDecl(nodes[0], nodes[1])
+        match nodes[0]:
+            case N.Num("0"):
+                return nodes[1]
+            case _:
+                return N.PntrDecl(nodes[0], nodes[1])
 
     def deref_loc(self, nodes):
         return nodes[0]
@@ -191,9 +193,9 @@ class ASTTransformer(Transformer):
 
     def deref_arith(self, nodes):
         match nodes[1]:
-            case N.PNTR_PLUS():
+            case N.Add():
                 return N.Deref(nodes[0], nodes[2])
-            case N.PNTR_MINUS():
+            case N.Sub():
                 return N.Deref(nodes[0], N.UnOp(N.Minus(), nodes[2]))
 
     def deref(self, nodes):
@@ -213,7 +215,11 @@ class ASTTransformer(Transformer):
         return nodes
 
     def array_decl(self, nodes):
-        return N.ArrayDecl(nodes[0], nodes[1])
+        match nodes[0]:
+            case []:
+                return nodes[1]
+            case _:
+                return N.ArrayDecl(nodes[0], nodes[1])
 
     def subscr_loc(self, nodes):
         return nodes[0]
@@ -238,9 +244,9 @@ class ASTTransformer(Transformer):
             N.Alloc(
                 N.Writeable(),
                 nodes[0],
-                N.PntrDecl(N.Num("0"), nodes[1]),
+                nodes[1],
             ),
-            N.Array(nodes[2]),
+            nodes[2],
         )
 
     # -------------------------------- L_Struct -------------------------------

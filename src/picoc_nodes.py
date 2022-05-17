@@ -92,15 +92,8 @@ class N:
     class VoidType(PicoCNode):
         pass
 
-    # ------------------------------- L_Pointer -------------------------------
-    class PNTR_PLUS(PicoCNode):
-        pass
-
-    class PNTR_MINUS(PicoCNode):
-        pass
-
-    # --------------------------------- L_Fun ---------------------------------
-    class Null(PicoCNode):
+    # --------------------------- L_Assign_Alloc_mon --------------------------
+    class Stack(PicoCNode):
         pass
 
     # =========================================================================
@@ -143,22 +136,22 @@ class N:
 
     # ----------------------------- L_Assign_Alloc ----------------------------
     class Alloc(PicoCNode):
-        def __init__(self, type_qual, datatype, identifier):
+        def __init__(self, type_qual, datatype, name):
             self.type_qual = type_qual
             self.datatype = datatype
-            self.identifier = identifier
+            self.name = name
             super().__init__(
                 children=[
                     self.type_qual,
                     self.datatype,
-                    self.identifier,
+                    self.name,
                 ]
             )
 
         __match_args__ = (
             "type_qual",
             "datatype",
-            "identifier",
+            "name",
         )
 
     class Assign(PicoCNode):
@@ -178,12 +171,12 @@ class N:
 
     # ------------------------------- L_Pointer -------------------------------
     class PntrDecl(PicoCNode):
-        def __init__(self, deg, datatype):
-            self.deg = deg
+        def __init__(self, num, datatype):
+            self.num = num
             self.datatype = datatype
-            super().__init__(children=[self.deg, self.datatype])
+            super().__init__(children=[self.num, self.datatype])
 
-        __match_args__ = ("deg", "datatype")
+        __match_args__ = ("num", "datatype")
 
     class Ref(PicoCNode):
         def __init__(self, ref_loc):
@@ -202,13 +195,13 @@ class N:
 
     # -------------------------------- L_Array --------------------------------
     class ArrayDecl(PicoCNode):
-        def __init__(self, dims, datatype):
-            self.dims = dims
+        def __init__(self, nums, datatype):
+            self.nums = nums
             self.datatype = datatype
-            super().__init__(children=[self.dims, self.datatype])
+            super().__init__(children=[self.nums, self.datatype])
 
         __match_args__ = (
-            "dims",
+            "nums",
             "datatype",
         )
 
@@ -229,11 +222,19 @@ class N:
 
     # -------------------------------- L_Struct -------------------------------
     class StructSpec(PicoCNode):
-        def __init__(self, identifier):
-            self.identifier = identifier
-            super().__init__(children=[self.identifier])
+        def __init__(self, name):
+            self.name = name
+            super().__init__(children=[self.name])
 
-        __match_args__ = ("identifier",)
+        __match_args__ = ("name",)
+
+    class Attr(PicoCNode):
+        def __init__(self, ref_loc, name):
+            self.ref_loc = ref_loc
+            self.name = name
+            super().__init__(children=[self.ref_loc, self.name])
+
+        __match_args__ = ("ref_loc", "name")
 
     class Struct(PicoCNode):
         def __init__(self, assigns):
@@ -242,29 +243,21 @@ class N:
 
         __match_args__ = ("assigns",)
 
-    class Attr(PicoCNode):
-        def __init__(self, ref_loc, attr_identifier):
-            self.ref_loc = ref_loc
-            self.attr_identifier = attr_identifier
-            super().__init__(children=[self.ref_loc, self.attr_identifier])
-
-        __match_args__ = ("ref_loc", "attr_identifier")
-
     class StructDecl(PicoCNode):
-        def __init__(self, identifier, params):
-            self.identifier = identifier
+        def __init__(self, name, params):
+            self.name = name
             self.params = params
-            super().__init__(children=[self.identifier, self.params])
+            super().__init__(children=[self.name, self.params])
 
-        __match_args__ = ("identifier", "params")
+        __match_args__ = ("name", "params")
 
     class Param(PicoCNode):
-        def __init__(self, datatype, identifier):
+        def __init__(self, datatype, name):
             self.datatype = datatype
-            self.identifier = identifier
-            super().__init__(children=[self.datatype, self.identifier])
+            self.name = name
+            super().__init__(children=[self.datatype, self.name])
 
-        __match_args__ = ("datatype", "identifier")
+        __match_args__ = ("datatype", "name")
 
     # ------------------------------- L_If_Else -------------------------------
     class If(PicoCNode):
@@ -303,12 +296,12 @@ class N:
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(PicoCNode):
-        def __init__(self, identifier, exps):
-            self.identifier = identifier
+        def __init__(self, name, exps):
+            self.name = name
             self.exps = exps
-            super().__init__(children=[self.identifier, self.exps])
+            super().__init__(children=[self.name, self.exps])
 
-        __match_args__ = ("identifier", "exps")
+        __match_args__ = ("name", "exps")
 
     class Return(PicoCNode):
         def __init__(self, exp):
@@ -318,30 +311,30 @@ class N:
         __match_args__ = ("exp",)
 
     class FunDecl(PicoCNode):
-        def __init__(self, datatype, identifier, params):
+        def __init__(self, datatype, name, params):
             self.datatype = datatype
-            self.identifier = identifier
+            self.name = name
             self.params = params
-            super().__init__(children=[self.datatype, self.identifier, self.params])
+            super().__init__(children=[self.datatype, self.name, self.params])
 
-        __match_args__ = ("datatype", "identifier", "params")
+        __match_args__ = ("datatype", "name", "params")
 
     class FunDef(PicoCNode):
-        def __init__(self, datatype, identifier, params, stmts_blocks):
+        def __init__(self, datatype, name, params, stmts_blocks):
             self.datatype = datatype
-            self.identifier = identifier
+            self.name = name
             self.params = params
             self.stmts_blocks = stmts_blocks
             super().__init__(
                 children=[
                     self.datatype,
-                    self.identifier,
+                    self.name,
                     self.params,
                     self.stmts_blocks,
                 ]
             )
 
-        __match_args__ = ("datatype", "identifier", "params", "stmts_blocks")
+        __match_args__ = ("datatype", "name", "params", "stmts_blocks")
 
     # --------------------------------- L_File --------------------------------
     class File(PicoCNode):
@@ -354,28 +347,25 @@ class N:
 
     # -------------------------------- L_Block --------------------------------
     class Block(PicoCNode):
-        def __init__(self, label, stmts_instrs):
-            self.label = label
+        def __init__(self, name, stmts_instrs):
+            self.name = name
             self.stmts_instrs = stmts_instrs
             self.instrs_before = ""
             self.instrs_after = ""
             super().__init__(
                 children=[
-                    self.label,
+                    self.name,
                     self.stmts_instrs,
                     self.instrs_before,
                     self.instrs_after,
                 ]
             )
 
-        __match_args__ = ("label", "stmts_instrs")
-
-        def add_info(self, info):
-            self.children += N.Num(info)
+        __match_args__ = ("name", "stmts_instrs")
 
     class GoTo(PicoCNode):
-        def __init__(self, label):
-            self.label = label
-            super().__init__(children=[self.label])
+        def __init__(self, name):
+            self.name = name
+            super().__init__(children=[self.name])
 
-        __match_args__ = ("label",)
+        __match_args__ = ("name",)
