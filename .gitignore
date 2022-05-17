@@ -8,6 +8,7 @@ pico_c_compiler.spec
 README.txt
 *.tokens
 *.dt
+*.dt_simplified
 *.ast
 *.csv
 *.picoc_mon
