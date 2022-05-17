@@ -7,8 +7,6 @@ from error_handler import args_to_str
 
 class Passes:
     def __init__(self):
-        # PicoC -> PicoC_mon
-        self.name_id = 0
         # PicoC_mon -> PicoC_Blocks
         self.block_id = 0
         self.all_blocks = dict()
@@ -18,187 +16,163 @@ class Passes:
         self.current_address = 0
         self.symbol_table = SymbolTable()
 
+    def _bug_in_compiler_error(self, *args):
+        import inspect
+
+        # return name of caller of this function
+        raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
+
     # =========================================================================
     # =                           PicoC -> PicoC_mon                          =
     # =========================================================================
 
-    def _generate_name(self, name: str) -> PN.Name:
-        self.name_id += 1
-        return PN.Name(f"{name}.{self.name_id}")
-
-    def _make_assigns(self, tmps):
-        return [PN.Assign(lhs, rhs) for lhs, rhs in tmps]
-
-    def _picoc_to_picoc_mon_exp(self, exp, atomic):
+    def _picoc_to_picoc_mon_exp(self, exp):
         match exp:
+            case PN.Name():
+                pass
+            case PN.Num():
+                pass
+            case PN.Char():
+                pass
             case PN.BinOp(left_exp, bin_op, right_exp):
-                atom1, tmps1 = self._picoc_to_picoc_mon_exp(left_exp, atomic=True)
-                atom2, tmps2 = self._picoc_to_picoc_mon_exp(right_exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps1 + tmps2 + [(new_tmp, PN.BinOp(atom1, bin_op, atom2))],
-                    )
-                return (PN.BinOp(atom1, bin_op, atom2), tmps1 + tmps2)
+                exps1_mon = self._picoc_to_picoc_mon_exp(left_exp)
+                exps2_mon = self._picoc_to_picoc_mon_exp(right_exp)
+                return (
+                    exps1_mon
+                    + exps2_mon
+                    + [
+                        PN.Exp(
+                            PN.BinOp(
+                                PN.Stack(PN.Num("1")), bin_op, PN.Stack(PN.Num("2"))
+                            )
+                        )
+                    ]
+                )
             case PN.UnOp(un_op, exp):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps + [(new_tmp, PN.UnOp(un_op, atom))],
-                    )
-                return (PN.UnOp(un_op, atom), tmps)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Exp(PN.UnOp(un_op, PN.Stack(PN.Num("1"))))]
             case PN.Atom(left_exp, relation, right_exp):
-                atom1, tmps1 = self._picoc_to_picoc_mon_exp(left_exp, atomic=True)
-                atom2, tmps2 = self._picoc_to_picoc_mon_exp(right_exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps1 + tmps2 + [(new_tmp, PN.Atom(atom1, relation, atom2))],
-                    )
-                return (PN.Atom(atom1, relation, atom2), tmps1 + tmps2)
+                exps1_mon = self._picoc_to_picoc_mon_exp(left_exp)
+                exps2_mon = self._picoc_to_picoc_mon_exp(right_exp)
+                return (
+                    exps1_mon
+                    + exps2_mon
+                    + [
+                        PN.Exp(
+                            PN.Atom(
+                                PN.Stack(PN.Num("1")), relation, PN.Stack(PN.Num("2"))
+                            )
+                        )
+                    ]
+                )
             case PN.ToBool(exp):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (new_tmp, tmps + [(new_tmp, PN.ToBool(atom))])
-                return (PN.ToBool(atom), tmps)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Exp(PN.Stack(PN.Num("1")))]
             case PN.Deref(deref_loc, exp):
-                atom1, tmps1 = self._picoc_to_picoc_mon_exp(deref_loc, atomic=True)
-                atom2, tmps2 = self._picoc_to_picoc_mon_exp(exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps1 + tmps2 + [(new_tmp, PN.Deref(atom1, atom2))],
-                    )
-                return (PN.Deref(atom1, atom2), tmps1 + tmps2)
+                exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
+                exps2_mon = self._picoc_to_picoc_mon_exp(exp)
+                return (
+                    exps1_mon
+                    + exps2_mon
+                    + [PN.Deref(PN.Stack(PN.Num("1")), PN.Stack(PN.Num("2")))]
+                )
             case PN.Ref(ref_loc):
-                atom, tmps = self._picoc_to_picoc_mon_exp(ref_loc, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps + [(new_tmp, PN.Ref(atom))],
-                    )
-                return (PN.Ref(atom), tmps)
+                exps_mon = self._picoc_to_picoc_mon_exp(ref_loc)
+                return exps_mon + [PN.Ref(PN.Stack(PN.Num("1")))]
             case PN.Subscr(deref_loc, exp):
-                atom1, tmps1 = self._picoc_to_picoc_mon_exp(deref_loc, atomic=True)
-                atom2, tmps2 = self._picoc_to_picoc_mon_exp(exp, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps1 + tmps2 + [(new_tmp, PN.Subscr(atom1, atom2))],
-                    )
-                return (PN.Subscr(atom1, atom2), tmps1 + tmps2)
-            case PN.Attr(ref_loc, attr_identifier):
-                atom, tmps = self._picoc_to_picoc_mon_exp(ref_loc, atomic=True)
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps + [(new_tmp, PN.Attr(atom, attr_identifier))],
-                    )
-                return (PN.Attr(atom, attr_identifier), tmps)
-            case PN.Call(identifier, exps):
-                atoms, tmps = [], []
-                atom_tmps = []
+                exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
+                exps2_mon = self._picoc_to_picoc_mon_exp(exp)
+                return (
+                    exps1_mon
+                    + exps2_mon
+                    + [PN.Subscr(PN.Stack(PN.Num("1")), PN.Stack(PN.Num("2")))]
+                )
+            case PN.Attr(ref_loc, name):
+                exps_mon = self._picoc_to_picoc_mon_exp(ref_loc)
+                return exps_mon + [PN.Attr(PN.Stack(PN.Num("1")), name)]
+            case PN.Call(name, exps):
+                exps_mon = []
                 for exp in exps:
-                    atom_tmps += self._picoc_to_picoc_mon_exp(exp, atomic=True)
-                    atoms += [atom_tmps[0]]
-                    tmps += atom_tmps[1]
-                if atomic:
-                    new_tmp = self._generate_name("tmp")
-                    return (
-                        new_tmp,
-                        tmps + [(new_tmp, PN.Call(identifier, atoms))],
-                    )
-                return (PN.Call(identifier, atoms), tmps)
+                    exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Call(name, PN.Stack(PN.Num("1")))]
             case _:
-                return (exp, [])
+                return [exp]
 
     def _picoc_to_picoc_mon_stmt(self, stmt):
         match stmt:
-            case PN.Assign(loc, exp):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
-                return self._make_assigns(tmps) + [PN.Assign(loc, atom)]
-            case PN.Assign(
-                PN.Alloc(type_qual, size_qual, pntr_decl), PN.Struct(assigns)
-            ):
-                atoms, tmps = [], []
+            case PN.Assign(assign_lhs, exp):
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Assign(assign_lhs, PN.Stack(PN.Num("1")))]
+            case PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Struct(assigns)):
+                exps_mon = []
                 assigns_mon = []
-                for assign in assigns:
+                for i, assign in enumerate(assigns):
                     match assign:
-                        case PN.Assign(attr, exp):
-                            atom_tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
-                            tmps += atom_tmps[1]
-                            assigns_mon += [PN.Assign(attr, atom_tmps[0])]
-                return self._make_assigns(tmps) + [
+                        case PN.Assign(assign_lhs, exp):
+                            exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                            assigns_mon += [
+                                PN.Assign(assign_lhs, PN.Stack(PN.Num(i + 1)))
+                            ]
+                return exps_mon + [
                     PN.Assign(
-                        PN.Alloc(type_qual, size_qual, pntr_decl),
+                        PN.Alloc(type_qual, datatype, name),
                         PN.Struct(assigns_mon),
                     )
                 ]
-            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(exps)):
-                atoms, tmps = [], []
-                for exp in exps:
-                    atom_tmps = self._picoc_to_picoc_mon_stmt(exp)
-                    atoms += [atom_tmps[0]]
-                    tmps += atom_tmps[1]
-                return self._make_assigns(tmps) + [
-                    PN.Assign(
-                        PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(atoms)
-                    )
+            case PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Array(exps)):
+                exps_mon = []
+                stack_locs = []
+                for i, exp in enumerate(exps):
+                    exps_mon = self._picoc_to_picoc_mon_stmt(exp)
+                    stack_locs += [PN.Stack(PN.Num(str(i + 1)))]
+                return exps_mon + [
+                    PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Array(stack_locs))
                 ]
             case PN.If(exp, stmts):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
                 stmts_mon = []
                 for stmt in stmts:
                     stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
-                return self._make_assigns(tmps) + [PN.If(atom, stmts_mon)]
+                return exps_mon + [PN.If(PN.Stack(PN.Num("1")), stmts_mon)]
             case PN.IfElse(exp, stmts1, stmts2):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
                 stmts1_mon = []
                 for stmt1 in stmts1:
                     stmts1_mon += self._picoc_to_picoc_mon_stmt(stmt1)
                 stmts2_mon = []
                 for stmt2 in stmts2:
                     stmts2_mon += self._picoc_to_picoc_mon_stmt(stmt2)
-                return self._make_assigns(tmps) + [
-                    PN.IfElse(atom, stmts1_mon, stmts2_mon)
+                return exps_mon + [
+                    PN.IfElse(PN.Stack(PN.Num("1")), stmts1_mon, stmts2_mon)
                 ]
             case PN.While(exp, stmts):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
                 stmts_mon = []
                 for stmt in stmts:
                     stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
-                return self._make_assigns(tmps) + [PN.While(atom, stmts_mon)]
+                return exps_mon + [PN.While(PN.Stack(PN.Num("1")), stmts_mon)]
             case PN.DoWhile(exp, stmts):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
                 stmts_mon = []
                 for stmt in stmts:
                     stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
-                return self._make_assigns(tmps) + [PN.DoWhile(atom, stmts_mon)]
-            case PN.Exp(call):
-                atom, tmps = self._picoc_to_picoc_mon_exp(call, atomic=False)
-                return self._make_assigns(tmps) + [PN.Exp(atom)]
+                return exps_mon + [PN.DoWhile(PN.Stack(PN.Num("1")), stmts_mon)]
+            case PN.Exp(alloc_call):
+                exps_mon = self._picoc_to_picoc_mon_exp(alloc_call)
+                return exps_mon + [PN.Exp(PN.Stack(PN.Num("1")))]
             case PN.Return(exp):
-                atom, tmps = self._picoc_to_picoc_mon_exp(exp, atomic=False)
-                return self._make_assigns(tmps) + [PN.Return(atom)]
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Return(PN.Stack(PN.Num("1")))]
             case _:
-                return [stmt]
+                self._bug_in_compiler_error(stmt)
 
     def _picoc_to_picoc_mon_def(self, decl_def):
         match decl_def:
-            case PN.FunDef(size_qual, identifier, params, stmts):
+            case PN.FunDef(datatype, name, params, stmts):
                 stmts_mon = []
                 for stmt in stmts:
                     stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
-                return PN.FunDef(size_qual, identifier, params, stmts_mon)
+                return PN.FunDef(datatype, name, params, stmts_mon)
             case _:
                 return decl_def
 
@@ -301,7 +275,7 @@ class Passes:
 
     def _picoc_mon_to_picoc_blocks_def(self, decl_def):
         match decl_def:
-            case PN.FunDef(size_qual, PN.Name(fun_name) as name, params, stmts):
+            case PN.FunDef(datatype, PN.Name(fun_name) as name, params, stmts):
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
@@ -311,7 +285,7 @@ class Passes:
                 self._create_block(fun_name, processed_stmts, blocks)
                 self.all_blocks |= blocks
                 return PN.FunDef(
-                    size_qual,
+                    datatype,
                     name,
                     params,
                     list(
@@ -337,12 +311,6 @@ class Passes:
     # =========================================================================
     # =                      PicoC_Blocks -> RETI_Blocks                      =
     # =========================================================================
-    def _bug_in_compiler_error(self, *args):
-        import inspect
-
-        # return name of caller of this function
-        raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
-
     def _picoc_blocks_to_reti_blocks_loc(self, loc):
         match loc:
             case PN.Name(val):
@@ -366,12 +334,8 @@ class Passes:
 
     def _picoc_blocks_to_reti_blocks_exp(self, exp):
         match exp:
-            case PN.BinOp(left_exp, bin_op, right_exp):
+            case PN.BinOp(PN.Stack(num1), bin_op, PN.Stack(num2)):
                 reti_instrs = []
-                # _picoc_blocks_to_reti_blocks_loc because after the PicoC ->
-                # PicoC_mon Pass there's all assigns are atomic
-                reti_instrs += self._picoc_blocks_to_reti_blocks_loc(left_exp)
-                reti_instrs += self._picoc_blocks_to_reti_blocks_loc(right_exp)
                 match bin_op:
                     case PN.Add():
                         op = RN.Add()
@@ -404,10 +368,10 @@ class Passes:
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
                 ]
-            case PN.Alloc(type_qual, size_qual, pntr_decl):
+            case PN.Alloc(type_qual, datatype, pntr_decl):
                 match pntr_decl:
                     case PN.PntrDecl(PN.Num(), PN.ArrayDecl(PN.Name(name, pos), [])):
-                        symbol = Symbol(type_qual, size_qual, name, "-", pos)
+                        symbol = Symbol(type_qual, datatype, name, "-", pos)
                         self.symbol_table.define(symbol)
                         return []
                     case _:
@@ -459,13 +423,13 @@ class Passes:
                                 self._bug_in_compiler_error(exp)
                     case _:
                         self._bug_in_compiler_error(exp)
-            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), PN.Array(exps)):
+            case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
                 pass
             case PN.Assign(
-                PN.Alloc(type_qual, size_qual, pntr_decl), PN.Struct(assigns)
+                PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
             ):
                 pass
-            case PN.Assign(PN.Alloc(type_qual, size_qual, pntr_decl), exp):
+            case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), exp):
                 pass
             case PN.If(exp, stmts):
                 pass

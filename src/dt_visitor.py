@@ -16,13 +16,6 @@ class DTVisitor(Visitor):
         tree.children[1] = deepest_tree.children[1]
         deepest_tree.children[1] = size_qual
 
-    def const_init(self, tree: Tree):
-        deepest_tree = self._return_deepest_tree(tree.children[1])
-        size_qual = tree.children[1]
-        tree.children[1] = tree.children[2]
-        tree.children[2] = deepest_tree.children[1]
-        deepest_tree.children[1] = size_qual
-
     def array_decl(self, tree: Tree):
         left_tree = tree.children[0]
         tree.children[0] = tree.children[1]

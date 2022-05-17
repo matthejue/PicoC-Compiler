@@ -92,10 +92,6 @@ class N:
     class VoidType(PicoCNode):
         pass
 
-    # --------------------------- L_Assign_Alloc_mon --------------------------
-    class Stack(PicoCNode):
-        pass
-
     # =========================================================================
     # =                            Container Nodes                            =
     # =========================================================================
@@ -168,6 +164,13 @@ class N:
             super().__init__(children=[self.exp])
 
         __match_args__ = ("exp",)
+
+    class Stack(PicoCNode):
+        def __init__(self, num):
+            self.num = num
+            super().__init__(children=[self.num])
+
+        __match_args__ = ("num",)
 
     # ------------------------------- L_Pointer -------------------------------
     class PntrDecl(PicoCNode):
