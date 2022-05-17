@@ -1,0 +1,7 @@
+// in:42
+// expected:42
+
+void main() {
+  int ar[2] = {1, input()};
+  print(*(ar + (1 && 0 + 1)));
+}

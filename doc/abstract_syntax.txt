@@ -31,13 +31,13 @@ ref_loc ::= Name(str)
 exp ::= Deref(<deref_loc>, <exp>)
       | Ref(<ref_loc>)
 ----------------------------------- L_Array -----------------------------------
-datatype ::= ArrayDecl(Num(str)*, <datatype>)
+datatype ::= ArrayDecl(Num(str)+, <datatype>)
 exp ::= Subscr(<deref_loc>, <exp>)
 stmt ::= Assign(Alloc(Writeable(), ArrayDecl(Num(str)+, <datatype>), Name(str)), Array(<exp>+))
 ----------------------------------- L_Struct ----------------------------------
 datatype ::= StructSpec(Name(str))
 exp ::= Attr(<ref_loc>, Name(str))
-stmt ::= Assign(Alloc(Writeable(), StructSpec(<datatype>), Name(str))), Struct(Assign(Name(str), <exp>)+))
+stmt ::= Assign(Alloc(Writeable(), StructSpec(Name(str)), Name(str)), Struct(Assign(Name(str), <exp>)+))
 decl_def ::= StructDecl(Name(str), Param(<datatype>, Name(str))+)
 ---------------------------------- L_If_Else ----------------------------------
 stmt ::= If(<exp>, <stmt>*)
@@ -46,7 +46,7 @@ stmt ::= If(<exp>, <stmt>*)
 stmt ::= While(<exp>, <stmt>*)
        | DoWhile(<exp>, <stmt>*)
 ------------------------------------ L_Fun ------------------------------------
-exp ::= Call(Name(str), <exp>*) | Null()
+exp ::= Call(Name(str), <exp>*)
 exp_stmts ::= Call(Name(str), <exp>*)
 stmt ::= Return(<exp>)
 decl_def ::= FunDecl(<datatype>, Name(str), Param(<datatype>, Name(str))*)
@@ -56,35 +56,38 @@ file ::= File(Name(str), <decl_def>*)
 ===============================================================================
 =                                 L_PicoC_mon                                 =
 ===============================================================================
------------------------------- L_Assign_Alloc_mon -----------------------------
+-------------------------------- L_Assign_Alloc -------------------------------
 exp ::= Stack(Num(str))
 stmt ::= Exp(<exp>)
 ===============================================================================
 =                                L_PicoC_Blocks                               =
 ===============================================================================
------------------------------------ L_Blocks ----------------------------------
-stmt ::= Goto(Name(str))
-block ::= Block(Name(str), <stmt>*)
+------------------------------------ L_Fun ------------------------------------
 decl_def ::= FunDef(<datatype>, Name(str), Param(<datatype>, Name(str))*, <block>*)
+----------------------------------- L_Blocks ----------------------------------
+block ::= Block(Name(str), <stmt>*)
+stmt ::= Goto(Name(str))
 ===============================================================================
 =                                L_RETI_Blocks                                =
 ===============================================================================
------------------------------------ L_Blocks ----------------------------------
+---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
+----------------------------------- L_Blocks ----------------------------------
 block ::= Block(Name(str), <instr>*)
 instr ::= Goto(Name(str))
 ===============================================================================
 =                                    L_RETI                                   =
 ===============================================================================
 ---------------------------------- L_Program ----------------------------------
-reg ::= Reg('ACC') | Reg('IN1') | Reg('IN2') | Reg('PC') | Reg('SP')
-      | Reg('BAF') | Reg('CS') | Reg('DS')
-arg ::= <reg> | Num(val)
+reg ::= ACC() | IN1() | IN2() | PC() | SP()
+      | BAF() | CS() | DS()
+arg ::= Reg(<reg>) | Num(str)
 rel ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE() | Always() | NOp()
 op ::= Add() | Addi() | Sub() | Subi() | Mult() | Multi() | Div() | Divi()
-      | Mod() | Modi() | Oplus() | Oplusi() | Or() | Ori() | And() | Andi()
-op ::= Load() | Loadin() | Loadi()
-op ::= Store() | Storein() | Move()
-instr ::= Instr(<op>, <arg>+) | Jump(<rel>, Num(val)) | Int(Num(val)) |, RTI()
+     | Mod() | Modi() | Oplus() | Oplusi() | Or() | Ori() | And() | Andi()
+     | Load() | Loadin() | Loadi()
+     | Store() | Storein() | Move()
+instr ::= Instr(<op>, <arg>+) | Jump(<rel>, Num(str)) | Int(Num(str)) |, RTI()
         | Call(Name('print'), <reg>) | Call(Name('input'), <reg>)
+        | SingleLineComment(str) | InlineComment(str)
 program ::= Program(Name(str), <instr>*)
