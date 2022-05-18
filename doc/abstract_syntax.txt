@@ -19,8 +19,8 @@ type_qual ::= Const() | Writeable()
 datatype ::= IntType() | CharType() | VoidType()
 assign_lhs ::= Alloc(<type_qual>, <dataype>, Name(str)) | <ref_loc>
 exp_stmts ::= Alloc(<type_qual>, <dataype>, Name(str))
-stmt ::= Exp(<exp_stmts>)
-       | Assign(<assign_lhs>, <exp>)
+stmt ::= Assign(<assign_lhs>, <exp>)
+       | Exp(<exp_stmts>)
 ---------------------------------- L_Pointer ----------------------------------
 datatype ::= PntrDecl(Num(str), <datatype>)
 deref_loc ::= Ref(<ref_loc>)|<ref_loc>

@@ -1,15 +1,6 @@
 from colormanager import ColorManager as CM
-from lark import Token
-from dataclasses import dataclass
-
-
-@dataclass
-class Pos:
-    line: int
-    column: int
-
-    def __eq__(self, other):
-        return self.line == other.line and self.column == other.column
+from lark.lexer import Token
+from global_vars import Pos
 
 
 class Errors:
@@ -46,7 +37,7 @@ class Errors:
     class UnknownIdentifier(Exception):
         """If Token shouldn't syntactically appear at this position"""
 
-        def __init__(self, found, found_pos):
+        def __init__(self, found: str, found_pos: Pos):
             self.description = (
                 f"{CM().YELLOW}UnknownIdentifierError{CM().RESET_ALL}: Identifier "
                 f"'{found}' wasn't declared yet"

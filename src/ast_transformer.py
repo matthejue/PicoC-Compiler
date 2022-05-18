@@ -3,6 +3,7 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
 from picoc_nodes import N
+from global_vars import Range, Pos
 
 
 class ASTTransformer(Transformer):
@@ -12,84 +13,225 @@ class ASTTransformer(Transformer):
     # --------------------------------- L_Arith -------------------------------
     def name(self, token_list):
         token = token_list[0]
-        return N.Name(token.value, (token.start_pos, token.end_pos))
+        return N.Name(
+            token.value,
+            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
+        )
 
     def NUM(self, token: Token):
-        return N.Num(token.value, (token.start_pos, token.end_pos))
+        return N.Num(
+            token.value,
+            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
+        )
 
     def CHAR(self, token: Token):
-        return N.Char(token.value, (token.start_pos, token.end_pos))
+        return N.Char(
+            token.value,
+            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
+        )
 
     def un_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "-":
-                return N.Minus(token.value, (token.start_pos, token.end_pos))
+                return N.Minus(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "~":
-                return N.Not(token.value, (token.start_pos, token.end_pos))
+                return N.Not(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "!":
-                return N.LogicNot(token.value, (token.start_pos, token.end_pos))
+                return N.LogicNot(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     def prec1_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "*":
-                return N.Add(token.value, (token.start_pos, token.end_pos))
+                return N.Add(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "/":
-                return N.Div(token.value, (token.start_pos, token.end_pos))
+                return N.Div(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "%":
-                return N.Mod(token.value, (token.start_pos, token.end_pos))
+                return N.Mod(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     def prec2_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "+":
-                return N.Add(token.value, (token.start_pos, token.end_pos))
+                return N.Add(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "-":
-                return N.Sub(token.value, (token.start_pos, token.end_pos))
+                return N.Sub(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "^":
-                return N.Oplus(token.value, (token.start_pos, token.end_pos))
+                return N.Oplus(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "&":
-                return N.And(token.value, (token.start_pos, token.end_pos))
+                return N.And(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "|":
-                return N.Or(token.value, (token.start_pos, token.end_pos))
+                return N.Or(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     # --------------------------------- L_Logic -------------------------------
     def relation(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "==":
-                return N.Eq(token.value, (token.start_pos, token.end_pos))
+                return N.Eq(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "!=":
-                return N.NEq(token.value, (token.start_pos, token.end_pos))
+                return N.NEq(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "<":
-                return N.Lt(token.value, (token.start_pos, token.end_pos))
+                return N.Lt(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "<=":
-                return N.LtE(token.value, (token.start_pos, token.end_pos))
+                return N.LtE(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case ">":
-                return N.Gt(token.value, (token.start_pos, token.end_pos))
+                return N.Gt(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case ">=":
-                return N.GtE(token.value, (token.start_pos, token.end_pos))
+                return N.GtE(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     # ----------------------------- L_Assign_Alloc ----------------------------
     def prim_dt(self, token_list):
         token = token_list[0]
         match token.value:
             case "int":
-                return N.IntType(token.value, (token.start_pos, token.end_pos))
+                return N.IntType(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "char":
-                return N.CharType(token.value, (token.start_pos, token.end_pos))
+                return N.CharType(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "void":
-                return N.VoidType(token.value, (token.start_pos, token.end_pos))
+                return N.VoidType(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     # ------------------------------- L_Pointer -------------------------------
     def deref_offset_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "+":
-                return N.Add(token.value, (token.start_pos, token.end_pos))
+                return N.Add(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
             case "-":
-                return N.Sub(token.value, (token.start_pos, token.end_pos))
+                return N.Sub(
+                    token.value,
+                    Range(
+                        Pos(token.line, token.column),
+                        Pos(token.end_line, token.end_column),
+                    ),
+                )
 
     # =========================================================================
     # =                                 Parser                                =
@@ -189,7 +331,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def deref_simple(self, nodes):
-        return N.Deref(nodes[0], N.Num(0))
+        return N.Deref(nodes[0], N.Num("0"))
 
     def deref_arith(self, nodes):
         match nodes[1]:

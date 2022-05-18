@@ -1,0 +1,8 @@
+// in:42
+// expected:42
+
+void main() {
+  int ar[2][2] = {{1, 2}, {3, 4}};
+  *(*(ar + 2) + 1) = input();
+  print(ar[2][1]);
+}
