@@ -1,10 +1,13 @@
+from global_vars import Range, Pos
+
+
 class ASTNode:
-    def __init__(self, val=None, pos=(-1, -1), children=[]):
+    def __init__(self, val="", rng=Range(Pos(-1, -1), Pos(-1, 1)), children=[]):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
-        self.val = val
-        self.pos = pos
+        self.val: str = val
+        self.rng: Range = rng
         self.children = children
 
     __match_args__ = ("val", "pos")

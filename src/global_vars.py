@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 class Args:
     def __init__(self):
         # assigned in the do_most_used function because the filename has to be
@@ -34,3 +37,18 @@ outbase = ""
 RANGE_OF_CHAR = (-128, 127)
 RANGE_OF_PARAMETER = (-2097152, 2097151)
 RANGE_OF_INT = (-2147483648, 2147483647)
+
+
+@dataclass
+class Pos:
+    line: int
+    column: int
+
+    def __eq__(self, other):
+        return self.line == other.line and self.column == other.column
+
+
+@dataclass
+class Range:
+    start_pos: Pos
+    end_pos: Pos

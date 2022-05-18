@@ -1,5 +1,6 @@
 from sys import exit
-from errors import Errors, Pos
+from errors import Errors
+from global_vars import Pos
 import global_vars
 from colormanager import ColorManager as CM
 from lark.exceptions import (
@@ -7,7 +8,8 @@ from lark.exceptions import (
     UnexpectedToken,
     UnexpectedEOF,
 )
-from lark import Lark, Token
+from lark.lexer import Token
+from lark.lark import Lark
 import compiler
 import os
 import sys
