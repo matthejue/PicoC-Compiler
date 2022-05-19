@@ -1,0 +1,15 @@
+// in:42
+// expected:7 42
+
+struct compl_dt {int waste_space; int (*ar[1][2])[2];};
+
+void main() {
+  int ar1[2] = {1, 2};
+  int ar2[2] = {3, 4};
+  int ar3[2] = {5, 6};
+  int ar4[2] = {7, 8};
+  struct compl_dt compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}};
+  (*compl_datastructure[1][0].ar[0][1])[1] = input();
+  print((*compl_datastructure[1][0].ar[0][1])[0]);
+  print((*compl_datastructure[1][0].ar[0][1])[1]);
+}
