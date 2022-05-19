@@ -23,8 +23,70 @@ class Passes:
         raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
 
     # =========================================================================
-    # =                           PicoC -> PicoC_mon                          =
+    # =                           PicoC -> PicoC_Mon                          =
     # =========================================================================
+
+    def _flatten_datatype(self, datatype):
+        datatypes = []
+        current_datatype = datatype
+        while True:
+            match current_datatype:
+                case (PN.IntType() | PN.CharType() | PN.StructSpec()):
+                    datatypes[0:0] = [current_datatype]
+                    break
+                case PN.PntrDecl(PN.Num(val), datatype):
+                    datatypes[0:0] = [PN.PntrHelpConst() for _ in range(int(val))]
+                    current_datatype = datatype
+                case PN.ArrayDecl(nums, datatype):
+                    datatypes[0:0] = [PN.ArrayHelpConst(num.val) for num in nums]
+                    current_datatype = datatype
+                case _:
+                    self._bug_in_compiler_error()
+        return datatypes
+
+    def _picoc_to_picoc_mon_ref(self, ref_loc, help_consts):
+        match ref_loc:
+            # ---------------------------- L_Arith ----------------------------
+            case PN.Name(val):
+                symbol = self.symbol_table.resolve(val)
+                match symbol:
+                    case Symbol(_, datatype):
+                        datatype_seq = self._flatten_datatype(datatype)
+                match datatype_seq[0]:
+                    case (PN.IntType() | PN.CharType()):
+                        help_const_acc = 1
+                    case PN.StructSpec(PN.Name(name)):
+                        self.symbol_table.resolve(name)
+                        help_const_acc = 1
+                    case _:
+                        self._bug_in_compiler_error()
+                for help_const, datatype in zip(help_consts, datatype_seq):
+                    pass
+            # ---------------------- L_Pointer + L_Array ----------------------
+            case (PN.Deref(deref_loc, exp)) as ref_loc:
+                help_const = PN.PntrHelpConst()
+                refs_mon = self._picoc_to_picoc_mon_ref(
+                    deref_loc, help_consts + [help_const]
+                )
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc, help_const))]
+            # ---------------------------- L_Array ----------------------------
+            case (PN.Subscr(deref_loc, exp)) as ref_loc:
+                help_const = PN.ArrayHelpConst("-1")
+                refs_mon = self._picoc_to_picoc_mon_ref(
+                    deref_loc, help_consts + [help_const]
+                )
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc, help_const))]
+            # ---------------------------- L_Struct ---------------------------
+            case PN.Attr(ref_loc, name) as ref_loc2:
+                help_const = PN.HelpConst(name)
+                refs_mon = self._picoc_to_picoc_mon_ref(
+                    ref_loc, help_consts + [help_const]
+                )
+                return refs_mon + [PN.Exp(PN.Ref(ref_loc2, help_const))]
+            case _:
+                self._bug_in_compiler_error(ref_loc)
 
     def _picoc_to_picoc_mon_exp(self, exp):
         match exp:
@@ -71,6 +133,7 @@ class Passes:
             case PN.Alloc():
                 return [PN.Exp(exp)]
             # --------------------------- L_Pointer ---------------------------
+            # TODO
             case PN.Deref(deref_loc, exp):
                 exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
                 exps2_mon = self._picoc_to_picoc_mon_exp(exp)
@@ -81,10 +144,15 @@ class Passes:
                 )
             case PN.Ref(PN.Name() as ref_loc):
                 return [PN.Exp(PN.Ref(ref_loc))]
-            case PN.Ref(ref_loc):
-                # ref_loc = Deref, Subscript, Attribute
-                exps_mon = self._picoc_to_picoc_mon_exp(ref_loc)
-                return exps_mon + [PN.Exp(PN.Ref(PN.Stack(PN.Num("1"))))]
+            case PN.Ref(
+                (PN.Deref(deref_loc, exp) | PN.Subscr(deref_loc, exp) as ref_loc)
+            ):
+                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [])
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc))]
+            case PN.Ref(PN.Attr(ref_loc, name) as ref_loc2):
+                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [])
+                return refs_mon + [PN.Exp(PN.Ref(ref_loc2))]
             # ---------------------------- L_Array ----------------------------
             case PN.Subscr(deref_loc, exp):
                 exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
@@ -209,27 +277,9 @@ class Passes:
         return PN.File(name, decls_defs_mon)
 
     # =========================================================================
-    # =                        PicoC_mon -> PicoC_addr                        =
+    # =                       PicoC_Mon -> PicoC_Blocks                       =
     # =========================================================================
 
-    def _picoc_addr_to_picoc_blocks_stmt(self, stmt):
-        match stmt:
-            case pattern:
-                pass
-            # ---------------------------- L_Arith ----------------------------
-            # ---------------------------- L_Logic ----------------------------
-            # ------------------------- L_Assign_Alloc ------------------------
-            # --------------------------- L_Pointer ---------------------------
-            # ---------------------------- L_Array ----------------------------
-            # ---------------------------- L_Struct ---------------------------
-            # --------------------------- L_If_Else ---------------------------
-            # ----------------------------- L_Loop ----------------------------
-            # ----------------------------- L_Fun -----------------------------
-            # ----------------------------- L_File ----------------------------
-
-    # =========================================================================
-    # =                       PicoC_addr -> PicoC_Blocks                      =
-    # =========================================================================
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
         new_block = PN.Block(PN.Name(label), stmts)
@@ -237,7 +287,7 @@ class Passes:
         self.block_id += 1
         return PN.GoTo(PN.Name(label))
 
-    def _picoc_addr_to_picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
+    def _picoc_mon_to_picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
         match stmt:
             # --------------------------- L_If_Else ---------------------------
             case PN.If(exp, stmts):
@@ -247,7 +297,7 @@ class Passes:
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts):
-                    stmts_if = self._picoc_addr_to_picoc_blocks_stmt(
+                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_if, blocks
                     )
                 goto_if = self._create_block("if", stmts_if, blocks)
@@ -260,14 +310,14 @@ class Passes:
 
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
-                    stmts_else = self._picoc_addr_to_picoc_blocks_stmt(
+                    stmts_else = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_else, blocks
                     )
                 goto_else = self._create_block("else", stmts_else, blocks)
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
-                    stmts_if = self._picoc_addr_to_picoc_blocks_stmt(
+                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_if, blocks
                     )
                 goto_if = self._create_block("if", stmts_if, blocks)
@@ -282,7 +332,7 @@ class Passes:
                 stmts_while = [goto_condition_check]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_addr_to_picoc_blocks_stmt(
+                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
                 goto_branch.name.val = self._create_block(
@@ -304,7 +354,7 @@ class Passes:
                 stmts_while = [PN.IfElse(exp, goto_branch, goto_after)]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_addr_to_picoc_blocks_stmt(
+                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
                         stmt, stmts_while, blocks
                     )
                 goto_branch.name.val = self._create_block(

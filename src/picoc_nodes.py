@@ -92,6 +92,18 @@ class N:
     class VoidType(PicoCNode):
         pass
 
+    # ------------------------------- L_Pointer -------------------------------
+    class PntrHelpConst(PicoCNode):
+        pass
+
+    # -------------------------------- L_Array --------------------------------
+    class ArrayHelpConst(PicoCNode):
+        pass
+
+    # -------------------------------- L_Struct -------------------------------
+    class StructHelpConst(PicoCNode):
+        pass
+
     # =========================================================================
     # =                            Container Nodes                            =
     # =========================================================================
@@ -182,11 +194,14 @@ class N:
         __match_args__ = ("num", "datatype")
 
     class Ref(PicoCNode):
-        def __init__(self, ref_loc):
+        def __init__(self, ref_loc, help_const=None):
+            if help_const is None:
+                help_const = N.HelpConst("-1")
             self.ref_loc = ref_loc
-            super().__init__(children=[self.ref_loc])
+            self.help_const = help_const
+            super().__init__(children=[self.ref_loc, self.help_const])
 
-        __match_args__ = ("ref_loc",)
+        __match_args__ = ("ref_loc", "help_const")
 
     class Deref(PicoCNode):
         def __init__(self, deref_loc, exp):
