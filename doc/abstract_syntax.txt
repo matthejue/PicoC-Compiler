@@ -10,9 +10,9 @@ exp ::= Name(str) | Num(str) | Char(str)
 stmt ::= Exp(Call(Name('print'), <exp>))
 ----------------------------------- L_Logic -----------------------------------
 un_op ::= LogicNot()
-relation ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
+rel ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
 bin_op ::= LogicAnd() | LogicOr()
-exp ::= Atom(<exp>, <relation>, <exp>)
+exp ::= Atom(<exp>, <rel>, <exp>)
       | ToBool(<exp>)
 -------------------------------- L_Assign_Alloc -------------------------------
 type_qual ::= Const() | Writeable()
@@ -59,15 +59,15 @@ file ::= File(Name(str), <decl_def>*)
 -------------------------------- L_Assign_Alloc -------------------------------
 exp ::= Stack(Num(str)) | Ref(<ref_loc>, <datatype>)
 stmt ::= Exp(<exp>)
--------------------------------- L_SymbolTable --------------------------------
+-------------------------------- L_Symbol_Table -------------------------------
 symbol_table ::= SymbolTable(<symbol>)
 symbol ::= Symbol(<type_qual>, <datatype>, <name>, <val>, <pos>, <size>)
 type_qual ::= Empty()
 datatype ::= BuiltIn() | SelfDefined()
 name ::= Name(str)
-val ::= Num(str)
-pos ::= Pos(Num(str), Num(str))
-size ::= Num(str)
+val ::= Num(str) | Empty()
+pos ::= Pos(Num(str), Num(str)) | Empty()
+size ::= Num(str) | Empty()
 ===============================================================================
 =                                 PicoC_Blocks                                =
 ===============================================================================

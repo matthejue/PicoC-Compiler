@@ -1,7 +1,7 @@
 from picoc_nodes import N as PN
 from reti_nodes import N as RN
 from errors import Errors
-from symbol_table import SymbolTable, Symbol
+from symbol_table import ST
 from error_handler import args_to_str
 
 
@@ -14,7 +14,7 @@ class Passes:
         self.instrs_cnt = 0
         self.current_scope = "global"
         self.current_address = 0
-        self.symbol_table = SymbolTable()
+        self.symbol_table = ST.SymbolTable()
 
     def _bug_in_compiler_error(self, *args):
         import inspect
@@ -22,6 +22,12 @@ class Passes:
         # return name of caller of this function
         raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
 
+    # =========================================================================
+    # =                         PicoC -> PicoC_Shrink                         =
+    # =========================================================================
+    # =========================================================================
+    # =                       PicoC_Shrink -> PicoC_Mon                       =
+    # =========================================================================
     # =========================================================================
     # =                           PicoC -> PicoC_Mon                          =
     # =========================================================================
@@ -32,7 +38,7 @@ class Passes:
             case PN.Name(val):
                 symbol = self.symbol_table.resolve(val)
                 match symbol:
-                    case Symbol(_, datatype):
+                    case ST.Symbol(_, datatype):
                         current_datatype = datatype
                     case _:
                         self._bug_in_compiler_error()
@@ -65,7 +71,7 @@ class Passes:
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
                                     self._bug_in_compiler_error()
                             match symbol:
-                                case Symbol(_, datatype):
+                                case ST.Symbol(_, datatype):
                                     current_datatype = datatype
                                 case _:
                                     self._bug_in_compiler_error()
@@ -415,91 +421,139 @@ class Passes:
 
     def _picoc_blocks_to_reti_blocks_stmt(self, stmt):
         match stmt:
+            # ---------------------------- L_Logic ----------------------------
+            case PN.Exp(
+                PN.BinOp(
+                    PN.Stack(PN.Num(val1)),
+                    (PN.LogicAnd() | PN.LogicOr()) as bin_lop,
+                    PN.Stack(PN.Num(val2)),
+                )
+            ):
+                match bin_lop:
+                    case PN.LogicAnd:
+                        lop = RN.And()
+                    case PN.LogicOr:
+                        lop = RN.Or()
+                    case _:
+                        self._bug_in_compiler_error(bin_lop)
+                return [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
+                    ),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val2)]
+                    ),
+                    RN.Instr(lop, [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("2")]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                ]
+            case PN.UnOp(PN.LogicNot, PN.Stack(PN.Num(val))):
+                return [
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val)]
+                    ),
+                    RN.Instr(RN.Oplus(), [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
+                    ),
+                ]
             # ---------------------------- L_Arith ----------------------------
-            case PN.Exp(PN.Name(val, rng)):
+            case PN.Exp(PN.Name(val, pos)):
                 reti_instrs = [
-                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
                 try:
                     symbol = self.symbol_table.resolve(val)
                 except KeyError:
-                    raise Errors.UnknownIdentifier(val, rng.start_pos)
+                    raise Errors.UnknownIdentifier(val, pos)
                 match symbol:
-                    case Symbol(PN.Writeable(), _, _, PN.Num(val)):
+                    # TODO: anpassen an Nutzung von DS um nur Relativadressen zu nutzen
+                    case ST.Symbol(PN.Writeable(), _, _, PN.Num(val)):
                         reti_instrs += [
-                            RN.Instr(RN.Load(), [RN.Reg(RN.Acc()), RN.Num(val)]),
+                            RN.Instr(RN.Load(), [RN.Reg(RN.Acc()), RN.Im(val)]),
                         ]
-                    case Symbol(PN.Const(), _, _, val):
+                    case ST.Symbol(PN.Const(), _, _, PN.Num(val)):
                         reti_instrs += [
-                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Num(val)]),
+                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
                         ]
                     case _:
                         self._bug_in_compiler_error(symbol)
 
                 return reti_instrs + [
                     RN.Instr(
-                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("1")]
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     ),
                 ]
             case (PN.Exp(PN.Num(val) as datatype) | PN.Exp(PN.Char(val) as datatype)):
                 reti_instrs = [
-                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
                 match datatype:
                     case PN.Num():
                         reti_instrs += [
-                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Num(val)])
+                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)])
                         ]
                     case PN.Char():
                         reti_instrs += [
                             RN.Instr(
-                                RN.Loadi(), [RN.Reg(RN.Acc()), RN.Num(str(ord(val)))]
+                                RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(str(ord(val)))]
                             )
                         ]
                 return reti_instrs + [
                     RN.Instr(
-                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("1")]
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     ),
                 ]
-            case PN.BinOp(PN.Stack(num1), bin_op, PN.Stack(num2)):
-                match bin_op:
+            case PN.Exp(
+                PN.BinOp(PN.Stack(PN.Num(val1)), bin_aop, PN.Stack(PN.Num(val2)))
+            ):
+                match bin_aop:
                     case PN.Add():
-                        op = RN.Add()
+                        aop = RN.Add()
                     case PN.Sub():
-                        op = RN.Sub()
+                        aop = RN.Sub()
                     case PN.Mul():
-                        op = RN.Mult()
+                        aop = RN.Mult()
                     case PN.Div():
-                        op = RN.Div()
+                        aop = RN.Div()
                     case PN.Mod():
-                        op = RN.Mod()
+                        aop = RN.Mod()
                     case PN.Oplus():
-                        op = RN.Oplus()
+                        aop = RN.Oplus()
                     case PN.And():
-                        op = RN.And()
+                        aop = RN.And()
                     case PN.Or():
-                        op = RN.Or()
+                        aop = RN.Or()
                     case _:
-                        self._bug_in_compiler_error(bin_op)
+                        self._bug_in_compiler_error(bin_aop)
                 return [
-                    RN.Instr(RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), num1]),
-                    RN.Instr(RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), num2]),
-                    RN.Instr(op, [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
                     RN.Instr(
-                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("2")]
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
                     ),
-                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Num("1")]),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val2)]
+                    ),
+                    RN.Instr(aop, [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("2")]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
-            case PN.UnOp(un_op, PN.Stack(num)):
+            case PN.UnOp(un_op, PN.Stack(PN.Num(val))):
                 reti_instrs = [
-                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Num("0")]),
-                    RN.Instr(RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), num]),
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("0")]),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val)]
+                    ),
                     RN.Instr(RN.Sub(), [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
                 ]
                 match un_op:
                     case PN.Not():
                         reti_instrs += [
-                            RN.Instr(RN.Subi(), [RN.Reg(RN.Acc()), RN.Num("1")])
+                            RN.Instr(RN.Subi(), [RN.Reg(RN.Acc()), RN.Im("1")])
                         ]
                     case PN.Minus():
                         pass
@@ -507,85 +561,141 @@ class Passes:
                         self._bug_in_compiler_error(un_op)
                 return reti_instrs + [
                     RN.Instr(
-                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Num("1")]
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     )
                 ]
-            case PN.Exp(PN.Call(PN.Name("print"), exp)):
-                pass
+            case PN.Exp(PN.Call(PN.Name("input"), [PN.Stack(PN.Num(val))])):
+                return [
+                    RN.Call(RN.Name("input"), RN.Reg(RN.Acc())),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
+                    ),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                ]
+            case PN.Exp(PN.Call(PN.Name("print"), [PN.Stack(PN.Num(val))])):
+                return [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                    RN.Call(RN.Name("print"), RN.Reg(RN.Acc())),
+                ]
             # ---------------------------- L_Logic ----------------------------
+            case PN.Exp(PN.ToBool(PN.Stack(val))):
+                return [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
+                    ),
+                    RN.Jump(RN.Eq(), RN.Im("3")),
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
+                    ),
+                ]
+            case PN.Exp(PN.Atom(PN.Stack(PN.Num(val1)), rel, PN.Stack(PN.Num(val2)))):
+                match rel:
+                    case PN.Eq:
+                        rel = RN.Eq()
+                    case PN.NEq:
+                        rel = RN.NEq()
+                    case PN.Lt:
+                        rel = RN.Lt()
+                    case PN.LtE:
+                        rel = RN.LtE()
+                    case PN.Gt:
+                        rel = RN.Gt()
+                    case PN.GtE:
+                        rel = RN.GtE()
+                    case _:
+                        self._bug_in_compiler_error(rel)
+                return [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
+                    ),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val2)]
+                    ),
+                    RN.Instr(RN.Sub(), [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]),
+                    RN.Jump(rel, RN.Im("3")),
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("0")]),
+                    RN.Jump(RN.Always(), RN.Im("2")),
+                    RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("2")]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                ]
             # ------------------------- L_Assign_Alloc ------------------------
             case PN.Exp(PN.Alloc(type_qual, datatype, name)):
                 match name:
-                    case PN.Name(val, rng):
-                        symbol = Symbol(type_qual, datatype, name, "-", rng.start_pos)
+                    case PN.Name(val, pos):
+                        symbol = ST.Symbol(
+                            type_qual,
+                            datatype,
+                            name,
+                            ST.Empty(),
+                            ST.Pos(PN.Num(pos.line), PN.Num(pos.column)),
+                        )
                         self.symbol_table.define(symbol)
                 return []
-            case PN.Assign(assign_lhs, exp):
-                reti_instrs = []
-                self._picoc_blocks_to_reti_blocks_loc(assign_lhs)
-                reti_instrs += self._picoc_blocks_to_reti_blocks_exp(exp)
-                match assign_lhs:
-                    # TODO: der zweite Case muss nach Visitor verändert werden
-                    case (
-                        PN.Name(name, pos)
-                        | PN.Alloc(
-                            _, _, PN.PntrDecl(_, PN.ArrayDecl(PN.Name(name, pos), _))
-                        )
-                    ):
-                        symbol = self.symbol_table.resolve(name)
-                        match symbol:
-                            case Symbol("writable", "int", _, val, _):
-                                return reti_instrs + [
-                                    RN.Instr(
-                                        RN.Loadin(), [RN.Sp(), RN.Acc(), RN.Num("1")]
-                                    ),
-                                    RN.Instr(RN.Addi(), [RN.Sp(), RN.Num(1)]),
-                                    RN.Instr(RN.Store(), [RN.Acc(), RN.Num(val)]),
-                                ]
-                            case Symbol("writable", "char", _, val, _):
-                                # TODO: implicit cast code
-                                return reti_instrs + [
-                                    RN.Instr(
-                                        RN.Loadin(), [RN.Sp(), RN.Acc(), RN.Num("1")]
-                                    ),
-                                    RN.Instr(RN.Addi(), [RN.Sp(), RN.Num(1)]),
-                                    RN.Instr(RN.Store(), [RN.Acc(), RN.Num(val)]),
-                                ]
-                            case Symbol("const", _, _, _, pos2):
-                                # TODO: ConstReassignment schreiben
-                                raise Errors.ConstReassignment(name, pos, pos2)
-                            case _:
-                                self._bug_in_compiler_error(exp)
+            case PN.Assign(PN.Name(val), PN.Stack(PN.Num(val2))):
+                symbol = self.symbol_table.resolve(val)
+                match symbol:
+                    case ST.Symbol(_, _, _, PN.Num(val1)):
+                        return [
+                            RN.Instr(
+                                RN.Loadin(),
+                                [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val2)],
+                            ),
+                            RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                            RN.Instr(
+                                RN.Store(),
+                                [RN.Reg(RN.Acc()), RN.Im(val1)],
+                            ),
+                        ]
                     case _:
-                        self._bug_in_compiler_error(exp)
-            # --------------------------- L_Pointer ---------------------------
-            # ---------------------------- L_Array ----------------------------
-            case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
-                pass
-            # ---------------------------- L_Struct ---------------------------
-            case PN.Assign(
-                PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
-            ):
-                pass
-            case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), exp):
-                pass
-            # --------------------------- L_If_Else ---------------------------
-            case PN.If(exp, stmts):
-                pass
-            case PN.IfElse(exp, stmts1, stmts2):
-                pass
-            # ----------------------------- L_Loop ----------------------------
-            case PN.While(exp, stmts):
-                pass
-            case PN.DoWhile(exp, stmts):
-                pass
-            # ----------------------------- L_Fun -----------------------------
-            case PN.Exp(PN.Call(identifier, exps)):
-                pass
-            case PN.Return(exp):
-                pass
-            case PN.GoTo(name):
-                pass
+                        self._bug_in_compiler_error()
+            case PN.Assign(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2))):
+                return [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)]
+                    ),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val2)]
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("2")]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.In1()), RN.Reg(RN.Acc()), RN.Im("0")]
+                    ),
+                ]
+            #  # --------------------------- L_Pointer ---------------------------
+            #  # ---------------------------- L_Array ----------------------------
+            #  case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
+            #      pass
+            #  # ---------------------------- L_Struct ---------------------------
+            #  case PN.Assign(
+            #      PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
+            #  ):
+            #      pass
+            #  case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), exp):
+            #      pass
+            #  # --------------------------- L_If_Else ---------------------------
+            #  case PN.If(exp, stmts):
+            #      pass
+            #  case PN.IfElse(exp, stmts1, stmts2):
+            #      pass
+            #  # ----------------------------- L_Loop ----------------------------
+            #  case PN.While(exp, stmts):
+            #      pass
+            #  case PN.DoWhile(exp, stmts):
+            #      pass
+            #  # ----------------------------- L_Fun -----------------------------
+            #  case PN.Exp(PN.Call(identifier, exps)):
+            #      pass
+            #  case PN.Return(exp):
+            #      pass
+            #  case PN.GoTo(name):
+            #      pass
             case _:
                 self._bug_in_compiler_error(stmt)
 

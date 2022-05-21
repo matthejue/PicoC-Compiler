@@ -115,13 +115,13 @@ class N:
 
     # -------------------------------- L_Logic --------------------------------
     class Atom(ASTNode):
-        def __init__(self, left_exp, relation, right_exp):
+        def __init__(self, left_exp, rel, right_exp):
             self.left_exp = left_exp
-            self.relation = relation
+            self.rel = rel
             self.right_exp = right_exp
-            super().__init__(children=[self.left_exp, self.relation, self.right_exp])
+            super().__init__(children=[self.left_exp, self.rel, self.right_exp])
 
-        __match_args__ = ("left_exp", "relation", "right_exp")
+        __match_args__ = ("left_exp", "rel", "right_exp")
 
     class ToBool(ASTNode):
         def __init__(self, exp):

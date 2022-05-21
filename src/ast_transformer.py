@@ -1,9 +1,7 @@
-#!/usr/bin/python
-
 from lark.visitors import Transformer
 from lark.lexer import Token
 from picoc_nodes import N
-from global_vars import Range, Pos
+from global_vars import Pos
 
 
 class ASTTransformer(Transformer):
@@ -13,22 +11,13 @@ class ASTTransformer(Transformer):
     # --------------------------------- L_Arith -------------------------------
     def name(self, token_list):
         token = token_list[0]
-        return N.Name(
-            token.value,
-            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
-        )
+        return N.Name(token.value, Pos(token.line, token.column))
 
     def NUM(self, token: Token):
-        return N.Num(
-            token.value,
-            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
-        )
+        return N.Num(token.value, Pos(token.line, token.column))
 
     def CHAR(self, token: Token):
-        return N.Char(
-            token.value,
-            Range(Pos(token.line, token.column), Pos(token.end_line, token.end_column)),
-        )
+        return N.Char(token.value, Pos(token.line, token.column))
 
     def un_op(self, token_list: list[Token]):
         token = token_list[0]
@@ -36,26 +25,17 @@ class ASTTransformer(Transformer):
             case "-":
                 return N.Minus(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "~":
                 return N.Not(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "!":
                 return N.LogicNot(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     def prec1_op(self, token_list: list[Token]):
@@ -64,26 +44,17 @@ class ASTTransformer(Transformer):
             case "*":
                 return N.Add(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "/":
                 return N.Div(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "%":
                 return N.Mod(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     def prec2_op(self, token_list: list[Token]):
@@ -92,42 +63,27 @@ class ASTTransformer(Transformer):
             case "+":
                 return N.Add(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "-":
                 return N.Sub(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "^":
                 return N.Oplus(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "&":
                 return N.And(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "|":
                 return N.Or(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     # --------------------------------- L_Logic -------------------------------
@@ -137,50 +93,32 @@ class ASTTransformer(Transformer):
             case "==":
                 return N.Eq(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "!=":
                 return N.NEq(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "<":
                 return N.Lt(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "<=":
                 return N.LtE(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case ">":
                 return N.Gt(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case ">=":
                 return N.GtE(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     # ----------------------------- L_Assign_Alloc ----------------------------
@@ -190,26 +128,17 @@ class ASTTransformer(Transformer):
             case "int":
                 return N.IntType(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "char":
                 return N.CharType(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "void":
                 return N.VoidType(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     # ------------------------------- L_Pointer -------------------------------
@@ -219,18 +148,12 @@ class ASTTransformer(Transformer):
             case "+":
                 return N.Add(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
             case "-":
                 return N.Sub(
                     token.value,
-                    Range(
-                        Pos(token.line, token.column),
-                        Pos(token.end_line, token.end_column),
-                    ),
+                    Pos(token.line, token.column),
                 )
 
     # =========================================================================
