@@ -41,7 +41,7 @@ class Passes:
                     case ST.Symbol(_, datatype):
                         current_datatype = datatype
                     case _:
-                        self._bug_in_compiler_error()
+                        self._bug_in_compiler_error(symbol)
                 while prev_refs:
                     match current_datatype:
                         case (PN.CharType() | PN.IntType()):
@@ -69,14 +69,15 @@ class Passes:
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
-                                    self._bug_in_compiler_error()
+                                    self._bug_in_compiler_error(ref)
                             match symbol:
                                 case ST.Symbol(_, datatype):
                                     current_datatype = datatype
                                 case _:
-                                    self._bug_in_compiler_error()
+                                    self._bug_in_compiler_error(symbol)
                         case _:
-                            self._bug_in_compiler_error()
+                            self._bug_in_compiler_error(current_datatype)
+                return [PN.Exp(PN.Ref(ref_loc))]
             # --------------------------- L_Pointer ---------------------------
             # TODO: remove after implementing shrink pass
             case PN.Deref(deref_loc, exp):
@@ -122,7 +123,7 @@ class Passes:
                 exps_mon = self._picoc_to_picoc_mon_exp(exp)
                 return exps_mon + [PN.Exp(PN.UnOp(un_op, PN.Stack(PN.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
-            case PN.Atom(left_exp, relation, right_exp):
+            case PN.Atom(left_exp, rel, right_exp):
                 exps1_mon = self._picoc_to_picoc_mon_exp(left_exp)
                 exps2_mon = self._picoc_to_picoc_mon_exp(right_exp)
                 return (
@@ -130,9 +131,7 @@ class Passes:
                     + exps2_mon
                     + [
                         PN.Exp(
-                            PN.Atom(
-                                PN.Stack(PN.Num("2")), relation, PN.Stack(PN.Num("1"))
-                            )
+                            PN.Atom(PN.Stack(PN.Num("2")), rel, PN.Stack(PN.Num("1")))
                         )
                     ]
                 )
@@ -143,46 +142,35 @@ class Passes:
             case PN.Alloc():
                 return [PN.Exp(exp)]
             # --------------------------- L_Pointer ---------------------------
-            # TODO
-            case PN.Deref(deref_loc, exp):
-                exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
-                exps2_mon = self._picoc_to_picoc_mon_exp(exp)
-                return (
-                    exps1_mon
-                    + exps2_mon
-                    + [PN.Exp(PN.Deref(PN.Stack(PN.Num("2")), PN.Stack(PN.Num("1"))))]
-                )
-            case PN.Ref(PN.Name() as ref_loc):
-                return [PN.Exp(PN.Ref(ref_loc))]
-            case PN.Ref(
-                (PN.Deref(deref_loc, exp) | PN.Subscr(deref_loc, exp) as ref_loc)
-            ):
-                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [])
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc))]
-            case PN.Ref(PN.Attr(ref_loc, name) as ref_loc2):
-                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [])
-                return refs_mon + [PN.Exp(PN.Ref(ref_loc2))]
+            # TODO: remove after Shrink Pass is implemented
+            case PN.Deref(deref_loc, exp2):
+                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                return refs_mon + [PN.Exp(PN.Deref(PN.Stack(PN.Num("1")), exp2))]
+            case PN.Ref(PN.Name()):
+                return [PN.Exp(exp)]
+            # TODO: remove after Shrink Pass is implemented
+            case PN.Ref((PN.Deref(deref_loc, exp2) | PN.Subscr(deref_loc, exp2))):
+                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [exp])
+                exps_mon = self._picoc_to_picoc_mon_exp(exp2)
+                return refs_mon + exps_mon + [PN.Exp(exp)]
+            case PN.Ref(PN.Attr(ref_loc, _)):
+                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [exp])
+                return refs_mon + [PN.Exp(exp)]
             # ---------------------------- L_Array ----------------------------
-            case PN.Subscr(deref_loc, exp):
-                exps1_mon = self._picoc_to_picoc_mon_exp(deref_loc)
-                exps2_mon = self._picoc_to_picoc_mon_exp(exp)
-                return (
-                    exps1_mon
-                    + exps2_mon
-                    + [PN.Exp(PN.Subscr(PN.Stack(PN.Num("2")), PN.Stack(PN.Num("1"))))]
-                )
+            case PN.Subscr(deref_loc, exp2):
+                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                return refs_mon + [PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), exp2))]
             # ---------------------------- L_Struct ---------------------------
             case PN.Attr(ref_loc, name):
-                exps_mon = self._picoc_to_picoc_mon_exp(ref_loc)
-                return exps_mon + [PN.Exp(PN.Attr(PN.Stack(PN.Num("1")), name))]
+                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                return refs_mon + [PN.Exp(PN.Attr(PN.Stack(PN.Num("1")), name))]
             # ----------------------------- L_Fun -----------------------------
             case PN.Call(name, exps):
                 exps_mon = []
                 stack_locs = []
                 for i, exp in enumerate(exps):
                     exps_mon += self._picoc_to_picoc_mon_exp(exp)
-                    stack_locs += [PN.Stack(PN.Num(str(i + 1)))]
+                    stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
                 return exps_mon + [PN.Exp(PN.Call(name, stack_locs))]
             case _:
                 self._bug_in_compiler_error(exp)
@@ -190,44 +178,46 @@ class Passes:
     def _picoc_to_picoc_mon_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
-            case PN.Assign(PN.Alloc(type_qual, datatype, name) as alloc, exp):
+            case PN.Assign(PN.Name() as name, exp):
+                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                return exps_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
+            case PN.Assign(PN.Alloc(_, _, PN.Name() as name) as alloc, exp):
                 exps1_mon = self._picoc_to_picoc_mon_exp(exp)
                 exps2_mon = self._picoc_to_picoc_mon_exp(alloc)
                 return exps1_mon + exps2_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
             case PN.Assign(ref_loc, exp):
+                # Deref, Subscript, Attribute
                 exps_mon = self._picoc_to_picoc_mon_exp(exp)
-                return exps_mon + [PN.Assign(ref_loc, PN.Stack(PN.Num("1")))]
+                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [])
+                return (
+                    exps_mon
+                    + refs_mon
+                    + [PN.Assign(PN.Stack(PN.Num("1")), PN.Stack(PN.Num("2")))]
+                )
             # --------------------- L_Assign_Alloc + L_Fun --------------------
             case PN.Exp(alloc_call):
                 exps_mon = self._picoc_to_picoc_mon_exp(alloc_call)
                 return exps_mon
             # ---------------------------- L_Array ----------------------------
-            case PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Array(exps)):
+            case PN.Assign(PN.Alloc(_, _, _) as alloc, PN.Array(exps)):
                 exps_mon = []
                 stack_locs = []
                 for i, exp in enumerate(exps):
-                    exps_mon = self._picoc_to_picoc_mon_stmt(exp)
-                    stack_locs += [PN.Stack(PN.Num(str(i + 1)))]
-                return exps_mon + [
-                    PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Array(stack_locs))
-                ]
+                    exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                    stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
+                return exps_mon + [PN.Assign(alloc, PN.Array(stack_locs))]
             # ---------------------------- L_Struct ---------------------------
-            case PN.Assign(PN.Alloc(type_qual, datatype, name), PN.Struct(assigns)):
+            case PN.Assign(PN.Alloc(_, _, _) as alloc, PN.Struct(assigns)):
                 exps_mon = []
                 assigns_mon = []
                 for i, assign in enumerate(assigns):
                     match assign:
                         case PN.Assign(assign_lhs, exp):
                             exps_mon += self._picoc_to_picoc_mon_exp(exp)
-                            assigns_mon += [
+                            assigns_mon[0:0] = [
                                 PN.Assign(assign_lhs, PN.Stack(PN.Num(i + 1)))
                             ]
-                return exps_mon + [
-                    PN.Assign(
-                        PN.Alloc(type_qual, datatype, name),
-                        PN.Struct(assigns_mon),
-                    )
-                ]
+                return exps_mon + [PN.Assign(alloc, PN.Struct(assigns_mon))]
             # --------------------------- L_If_Else ---------------------------
             case PN.If(exp, stmts):
                 exps_mon = self._picoc_to_picoc_mon_exp(exp)
@@ -449,7 +439,7 @@ class Passes:
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
-            case PN.UnOp(PN.LogicNot, PN.Stack(PN.Num(val))):
+            case PN.Exp(PN.UnOp(PN.LogicNot, PN.Stack(PN.Num(val)))):
                 return [
                     RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
                     RN.Instr(
@@ -542,7 +532,7 @@ class Passes:
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
-            case PN.UnOp(un_op, PN.Stack(PN.Num(val))):
+            case PN.Exp(PN.UnOp(un_op, PN.Stack(PN.Num(val)))):
                 reti_instrs = [
                     RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("0")]),
                     RN.Instr(
@@ -668,34 +658,92 @@ class Passes:
                         RN.Storein(), [RN.Reg(RN.In1()), RN.Reg(RN.Acc()), RN.Im("0")]
                     ),
                 ]
-            #  # --------------------------- L_Pointer ---------------------------
-            #  # ---------------------------- L_Array ----------------------------
-            #  case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
-            #      pass
-            #  # ---------------------------- L_Struct ---------------------------
-            #  case PN.Assign(
-            #      PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
-            #  ):
-            #      pass
-            #  case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), exp):
-            #      pass
-            #  # --------------------------- L_If_Else ---------------------------
-            #  case PN.If(exp, stmts):
-            #      pass
-            #  case PN.IfElse(exp, stmts1, stmts2):
-            #      pass
-            #  # ----------------------------- L_Loop ----------------------------
-            #  case PN.While(exp, stmts):
-            #      pass
-            #  case PN.DoWhile(exp, stmts):
-            #      pass
-            #  # ----------------------------- L_Fun -----------------------------
-            #  case PN.Exp(PN.Call(identifier, exps)):
-            #      pass
-            #  case PN.Return(exp):
-            #      pass
-            #  case PN.GoTo(name):
-            #      pass
+            # --------------------------- L_Pointer ---------------------------
+            case PN.Exp(PN.Deref(deref_loc, exp)):
+                reti_instrs = []
+            case PN.Exp(PN.Ref(PN.Name(val), datatype)):
+                symbol = self.symbol_table.resolve(val)
+                match symbol:
+                    case ST.Symbol(_, _, _, PN.Num(val)):
+                        return [
+                            RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
+                            RN.Instr(
+                                RN.Storein(),
+                                [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")],
+                            ),
+                        ]
+                    case _:
+                        self._bug_in_compiler_error(symbol)
+            case PN.Exp(
+                PN.Ref(
+                    (
+                        PN.Subscr(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2)))
+                        | PN.Deref(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2)))
+                    ),
+                    datatype,
+                )
+            ):
+                match datatype:
+                    case PN.ArrayDecl(nums, _):
+                        reti_instrs = [
+                            RN.Instr(
+                                RN.Loadin(),
+                                [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)],
+                            )
+                        ]
+                    case PN.PntrDecl():
+                        reti_instrs = [
+                            RN.Instr(
+                                RN.Loadin(),
+                                [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val1)],
+                            ),
+                            RN.Instr(
+                                RN.Loadin(),
+                                [RN.Reg(RN.In2()), RN.Reg(RN.In1()), RN.Im("0")],
+                            ),
+                        ]
+                    case _:
+                        self._bug_in_compiler_error(datatype)
+                return reti_instrs + [
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val2)]
+                    ),
+                    RN.Instr(RN.Mul(), [RN.Reg(RN.Acc()), RN.Reg(RN.In1())])
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")]
+                    ),
+                ]
+            case PN.Exp(PN.Ref((PN.Attr(ref_loc, name)), datatype)):
+                match datatype:
+                    case pattern:
+                        pass
+            # ---------------------------- L_Array ----------------------------
+            case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
+                pass
+            # ---------------------------- L_Struct ---------------------------
+            case PN.Assign(
+                PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
+            ):
+                pass
+            # --------------------------- L_If_Else ---------------------------
+            case PN.If(exp, stmts):
+                pass
+            case PN.IfElse(exp, stmts1, stmts2):
+                pass
+            # ----------------------------- L_Loop ----------------------------
+            case PN.While(exp, stmts):
+                pass
+            case PN.DoWhile(exp, stmts):
+                pass
+            # ----------------------------- L_Fun -----------------------------
+            case PN.Exp(PN.Call(identifier, exps)):
+                pass
+            case PN.Return(exp):
+                pass
+            case PN.GoTo(name):
+                pass
             case _:
                 self._bug_in_compiler_error(stmt)
 

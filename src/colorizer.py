@@ -41,10 +41,6 @@ class Colorizer:
         OPTIONAL = 25
 
     def __init__(self, cinput):
-        """
-        :lc: lookahead character
-        :c: character
-        """
         self.cinput = cinput
         self.idx = 0
         self.c = cinput[self.idx]
@@ -348,10 +344,6 @@ class Colorizer:
         self.idx += len(color)
 
     def next_char(self):
-        """go to the next character, detect if "end of file" is reached
-
-        :returns: None
-        """
         # next index
         self.idx += 1
 
