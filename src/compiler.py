@@ -34,7 +34,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-r", "--reti_blocks_to_reti", action="store_true")
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-G", "--Gap", type=int, default=0)
+    cli_args_parser.add_argument("-G", "--gap", type=int, default=0)
     cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
@@ -263,7 +263,7 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.symbol_table:
             print(subheading("Symbol Table", terminal_width, "-"))
-            self._symbol_table_option()
+            self._symbol_table_option(passes.symbol_table)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
@@ -344,46 +344,47 @@ class Compiler(cmd2.Cmd):
             with open(global_vars.outbase + ".reti", "w", encoding="utf-8") as fout:
                 fout.write(str(reti))
 
-    def _symbol_table_option(self):
+    def _symbol_table_option(self, symbol_table_ast):
         if global_vars.args.print:
-            self._print_symbol_table()
+            print(symbol_table_ast)
 
         if global_vars.outbase:
-            self._write_symbol_table()
+            with open(global_vars.outbase + ".st", "w", encoding="utf-8") as fout:
+                fout.write(str(symbol_table_ast))
 
-    def _print_symbol_table(self):
-        header = ["name", "type", "datatype", "position", "value"]
-        symbols = SymbolTable().symbols
-
-        output = str(
-            tabulate(
-                [
-                    (k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
-                    for k, v in symbols.items()
-                ],
-                headers=header,
-            )
-        )
-        print(output)
-
-    def _write_symbol_table(self):
-        output = "name,type,datatype,position,value\n"
-        symbols = SymbolTable().symbols
-        for name in symbols.keys():
-            position = (
-                f"({symbols[name].position[0]}:{symbols[name].position[1]})"
-                if symbols[name].position != "/"
-                else "/"
-            )
-            output += (
-                f"{name},"
-                f"{symbols[name].get_type()},"
-                f"{symbols[name].datatype},"
-                f"{position},"
-                f"{symbols[name].value}\n"
-            )
-        with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
-            fout.write(output)
+    #  def _print_symbol_table(self):
+    #      header = ["name", "type", "datatype", "position", "value"]
+    #      symbols = SymbolTable().symbols
+    #
+    #      output = str(
+    #          tabulate(
+    #              [
+    #                  (k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
+    #                  for k, v in symbols.items()
+    #              ],
+    #              headers=header,
+    #          )
+    #      )
+    #      print(output)
+    #
+    #  def _write_symbol_table(self):
+    #      output = "name,type,datatype,position,value\n"
+    #      symbols = SymbolTable().symbols
+    #      for name in symbols.keys():
+    #          position = (
+    #              f"({symbols[name].position[0]}:{symbols[name].position[1]})"
+    #              if symbols[name].position != "/"
+    #              else "/"
+    #          )
+    #          output += (
+    #              f"{name},"
+    #              f"{symbols[name].get_type()},"
+    #              f"{symbols[name].datatype},"
+    #              f"{position},"
+    #              f"{symbols[name].value}\n"
+    #          )
+    #      with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
+    #          fout.write(output)
 
 
 def remove_extension(fname):

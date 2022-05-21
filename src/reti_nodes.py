@@ -81,7 +81,7 @@ class N:
             self.val = val
 
         def __repr__(self):
-            return f'{" " * global_vars.args.distance}  # {self.val}'
+            return f'{" " * global_vars.args.gap}  # {self.val}'
 
         __match_args__ = ("val",)
 
@@ -99,8 +99,7 @@ class N:
 
         __match_args__ = ("val",)
 
-    class Num:
-        # shorter then 'Immediate'
+    class Im:
         def __init__(self, val):
             self.val = val
 
