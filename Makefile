@@ -37,10 +37,13 @@ _test:
 	./export_environment_vars_for_makefile.sh; \
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
 
-verify: extract _verify
-verify-clean: extract _verify _clean-files
+
+convert:  extract
+	./convert_to_c.py
+
+verify: extract convert _verify
+verify-clean: extract convert _verify _clean-files
 _verify:
-	./export_environment_vars_for_makefile.sh; \
 	./verify_tests.sh $${COLUMNS}
 
 help:

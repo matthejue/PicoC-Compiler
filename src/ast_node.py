@@ -12,8 +12,6 @@ class ASTNode:
 
     __match_args__ = ("val", "pos")
 
-
-class PicoCNode(ASTNode):
     def __repr__(self, depth=0):
         if not self.children:
             if not self.val:

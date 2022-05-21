@@ -1,0 +1,8 @@
+// in:42
+// expected:UnexpectedToken
+
+void main() {
+  int var = input();
+  int **pntr = &&var;
+  print(**pntr);
+}

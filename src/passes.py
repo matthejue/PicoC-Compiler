@@ -26,65 +26,69 @@ class Passes:
     # =                           PicoC -> PicoC_Mon                          =
     # =========================================================================
 
-    def _flatten_datatype(self, datatype):
-        datatypes = []
-        current_datatype = datatype
-        while True:
-            match current_datatype:
-                case (PN.IntType() | PN.CharType() | PN.StructSpec()):
-                    datatypes[0:0] = [current_datatype]
-                    break
-                case PN.PntrDecl(PN.Num(val), datatype):
-                    datatypes[0:0] = [PN.PntrHelpConst() for _ in range(int(val))]
-                    current_datatype = datatype
-                case PN.ArrayDecl(nums, datatype):
-                    datatypes[0:0] = [PN.ArrayHelpConst(num.val) for num in nums]
-                    current_datatype = datatype
-                case _:
-                    self._bug_in_compiler_error()
-        return datatypes
-
-    def _picoc_to_picoc_mon_ref(self, ref_loc, help_consts):
+    def _picoc_to_picoc_mon_ref(self, ref_loc, prev_refs):
         match ref_loc:
             # ---------------------------- L_Arith ----------------------------
             case PN.Name(val):
                 symbol = self.symbol_table.resolve(val)
                 match symbol:
                     case Symbol(_, datatype):
-                        datatype_seq = self._flatten_datatype(datatype)
-                match datatype_seq[0]:
-                    case (PN.IntType() | PN.CharType()):
-                        help_const_acc = 1
-                    case PN.StructSpec(PN.Name(name)):
-                        self.symbol_table.resolve(name)
-                        help_const_acc = 1
+                        current_datatype = datatype
                     case _:
                         self._bug_in_compiler_error()
-                for help_const, datatype in zip(help_consts, datatype_seq):
-                    pass
-            # ---------------------- L_Pointer + L_Array ----------------------
-            case (PN.Deref(deref_loc, exp)) as ref_loc:
-                help_const = PN.PntrHelpConst()
-                refs_mon = self._picoc_to_picoc_mon_ref(
-                    deref_loc, help_consts + [help_const]
-                )
+                while prev_refs:
+                    match current_datatype:
+                        case (PN.CharType() | PN.IntType()):
+                            ref = prev_refs.pop()
+                            ref.datatype = current_datatype
+                            break
+                        case PN.PntrDecl(PN.Num(val), datatype):
+                            if int(val) == 0:
+                                current_datatype = datatype
+                            current_datatype.num.val = int(val) - 1
+                            ref = prev_refs.pop()
+                            ref.datatype = current_datatype
+                        case PN.ArrayDecl(nums, datatype):
+                            if len(nums) == 0:
+                                current_datatype = datatype
+                            current_datatype.nums = nums[1:]
+                            ref = prev_refs.pop()
+                            ref.datatype = current_datatype
+                        case PN.StructSpec(PN.Name(val)):
+                            ref = prev_refs.pop()
+                            ref.datatype = current_datatype
+                            match ref:
+                                case PN.Ref(PN.Attr(ref_loc, PN.Name(val2))):
+                                    symbol = self.symbol_table.resolve(f"{val2}@{val}")
+                                case _:
+                                    # TODO: here belongs a proper error message
+                                    # nachsehen, ob [] auf Structvariable anwendbar ist
+                                    self._bug_in_compiler_error()
+                            match symbol:
+                                case Symbol(_, datatype):
+                                    current_datatype = datatype
+                                case _:
+                                    self._bug_in_compiler_error()
+                        case _:
+                            self._bug_in_compiler_error()
+            # --------------------------- L_Pointer ---------------------------
+            # TODO: remove after implementing shrink pass
+            case PN.Deref(deref_loc, exp):
+                ref = PN.Ref(ref_loc)
+                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [ref] + prev_refs)
                 exps_mon = self._picoc_to_picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc, help_const))]
+                return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Array ----------------------------
-            case (PN.Subscr(deref_loc, exp)) as ref_loc:
-                help_const = PN.ArrayHelpConst("-1")
-                refs_mon = self._picoc_to_picoc_mon_ref(
-                    deref_loc, help_consts + [help_const]
-                )
+            case PN.Subscr(deref_loc, exp):
+                ref = PN.Ref(ref_loc)
+                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [ref] + prev_refs)
                 exps_mon = self._picoc_to_picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [PN.Exp(PN.Ref(ref_loc, help_const))]
+                return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
-            case PN.Attr(ref_loc, name) as ref_loc2:
-                help_const = PN.HelpConst(name)
-                refs_mon = self._picoc_to_picoc_mon_ref(
-                    ref_loc, help_consts + [help_const]
-                )
-                return refs_mon + [PN.Exp(PN.Ref(ref_loc2, help_const))]
+            case PN.Attr(ref_loc2, _):
+                ref = PN.Ref(ref_loc)
+                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc2, [ref] + prev_refs)
+                return refs_mon + [PN.Exp(ref)]
             case _:
                 self._bug_in_compiler_error(ref_loc)
 
@@ -421,7 +425,7 @@ class Passes:
                 except KeyError:
                     raise Errors.UnknownIdentifier(val, rng.start_pos)
                 match symbol:
-                    case Symbol(PN.Writeable(), _, _, val):
+                    case Symbol(PN.Writeable(), _, _, PN.Num(val)):
                         reti_instrs += [
                             RN.Instr(RN.Load(), [RN.Reg(RN.Acc()), RN.Num(val)]),
                         ]
