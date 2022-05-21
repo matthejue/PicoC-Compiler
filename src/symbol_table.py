@@ -1,45 +1,56 @@
-class Symbol:
-    def __init__(self, type_qual="-", datatype="-", name="-", val="-", pos="-"):
-        self.type_qual = type_qual
-        self.datatype = datatype
-        self.name = name
-        self.val = val
-        self.pos = pos
+from ast_node import ASTNode
 
-    __match_args__ = ("type_qual", "datatype", "name", "val", "pos")
+# ------------------------------- L_SymbolTable ------------------------------
+class ST:
+    class Empty(ASTNode):
+        pass
 
-    def __repr__(self):
-        if self.datatype != "-":
-            return (
-                "<"
-                + self.type_qual
-                + ":"
-                + self.datatype
-                + ":"
-                + self.name
-                + ":"
-                + self.val
-                + ":"
-                + self.pos
-                + ">"
-            )
-        return self.name
+    class Symbol(ASTNode):
+        def __init__(
+            self, type_qual=Empty(), datatype="-", name="-", val="-", pos="-", size="-"
+        ):
+            self.type_qual = type_qual
+            self.datatype = datatype
+            self.name = name
+            self.val = val
+            self.pos = pos
+            self.size = size
 
+        __match_args__ = ("type_qual", "datatype", "name", "val", "pos", "size")
 
-class SymbolTable:
-    def __init__(self):
-        self.symbols = dict()
-        self._init_type_sytem()
+        def __repr__(self):
+            if self.datatype != "-":
+                return (
+                    "<"
+                    + self.type_qual
+                    + ":"
+                    + self.datatype
+                    + ":"
+                    + self.name
+                    + ":"
+                    + self.val
+                    + ":"
+                    + self.pos
+                    + ":"
+                    + self.size
+                    + ">"
+                )
+            return self.name
 
-    def _init_type_sytem(self):
-        self.define(Symbol(type_qual="BuiltIn", name="char"))
-        self.define(Symbol(type_qual="BuiltIn", name="int"))
+    class SymbolTable(ASTNode):
+        def __init__(self):
+            self.symbols = dict()
+            self._init_type_sytem()
 
-    def define(self, symbol: Symbol):
-        self.symbols[symbol.name] = symbol
+        def _init_type_sytem(self):
+            self.define(ST.Symbol(type_qual="BuiltIn", name="char"))
+            self.define(ST.Symbol(type_qual="BuiltIn", name="int"))
 
-    def resolve(self, name) -> Symbol:
-        return self.symbols[name]
+        def define(self, symbol: Symbol):
+            self.symbols[symbol.name.val] = symbol
 
-    def __repr__(self):
-        return str(self.symbols)
+        def resolve(self, name) -> Symbol:
+            return self.symbols[name]
+
+        def __repr__(self):
+            return str(self.symbols)

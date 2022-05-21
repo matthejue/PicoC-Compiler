@@ -1,0 +1,10 @@
+// in:42
+// expected:42
+
+void main() {
+  int var = input();
+  int *pntr1 = &var;
+  int **pntr2 = &pntr1;
+  print(*pntr1);
+  print(**pntr2);
+}

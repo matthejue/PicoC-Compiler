@@ -7,7 +7,7 @@ from colormanager import ColorManager as CM
 import os
 import sys
 from help_message import generate_help_message
-from ast_node import PicoCNode
+from ast_node import ASTNode
 from lark.lark import Lark
 from dt_visitor import DTVisitor
 from ast_transformer import ASTTransformer
@@ -20,7 +20,9 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-c", "--code", action="store_true")
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-d", "--derivation_tree", action="store_true")
-    cli_args_parser.add_argument("-D", "--derivation_tree_simplified", action="store_true")
+    cli_args_parser.add_argument(
+        "-D", "--derivation_tree_simplified", action="store_true"
+    )
     cli_args_parser.add_argument("-a", "--abstract_syntax_tree", action="store_true")
     cli_args_parser.add_argument("-m", "--picoc_to_picoc_mon", action="store_true")
     cli_args_parser.add_argument(
@@ -29,9 +31,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument(
         "-B", "--picoc_blocks_to_reti_blocks", action="store_true"
     )
-    cli_args_parser.add_argument(
-        "-r", "--reti_blocks_to_reti", action="store_true"
-    )
+    cli_args_parser.add_argument("-r", "--reti_blocks_to_reti", action="store_true")
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-G", "--Gap", type=int, default=0)
@@ -297,7 +297,9 @@ class Compiler(cmd2.Cmd):
             print(dt_simplified.pretty())
 
         if global_vars.outbase:
-            with open(global_vars.outbase + ".dt_simplified", "w", encoding="utf-8") as fout:
+            with open(
+                global_vars.outbase + ".dt_simplified", "w", encoding="utf-8"
+            ) as fout:
                 fout.write(str(dt_simplified))
 
     def _abstract_syntax_tree_option(self, ast):
@@ -308,8 +310,7 @@ class Compiler(cmd2.Cmd):
             with open(global_vars.outbase + ".ast", "w", encoding="utf-8") as fout:
                 fout.write(str(ast))
 
-
-    def _picoc_to_picoc_mon_option(self, picoc_mon: PicoCNode):
+    def _picoc_to_picoc_mon_option(self, picoc_mon: ASTNode):
         if global_vars.args.print:
             print(picoc_mon)
         if global_vars.outbase:
@@ -318,7 +319,7 @@ class Compiler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(picoc_mon))
 
-    def _picoc_mon_to_picoc_blocks_option(self, picoc_blocks: PicoCNode):
+    def _picoc_mon_to_picoc_blocks_option(self, picoc_blocks: ASTNode):
         if global_vars.args.print:
             print(picoc_blocks)
         if global_vars.outbase:
@@ -340,9 +341,7 @@ class Compiler(cmd2.Cmd):
         if global_vars.args.print:
             print(reti)
         if global_vars.outbase:
-            with open(
-                global_vars.outbase + ".reti", "w", encoding="utf-8"
-            ) as fout:
+            with open(global_vars.outbase + ".reti", "w", encoding="utf-8") as fout:
                 fout.write(str(reti))
 
     def _symbol_table_option(self):

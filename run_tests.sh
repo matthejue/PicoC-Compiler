@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 ./extract_input_and_expected.sh
+./convert_to_c.py
 verification_res=$(./verify_tests.sh $1)
 
 num_tests=0;

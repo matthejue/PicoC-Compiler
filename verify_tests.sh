@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-./convert_to_c.py
-
 shopt -s extglob
 
 ./heading_subheadings.py "heading" "Verification" "$1" "="
