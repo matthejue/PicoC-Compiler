@@ -24,10 +24,10 @@ class Compiler(cmd2.Cmd):
         "-D", "--derivation_tree_simplified", action="store_true"
     )
     cli_args_parser.add_argument("-a", "--abstract_syntax_tree", action="store_true")
-    cli_args_parser.add_argument("-m", "--picoc_to_picoc_mon", action="store_true")
     cli_args_parser.add_argument(
         "-b", "--picoc_mon_to_picoc_blocks", action="store_true"
     )
+    cli_args_parser.add_argument("-m", "--picoc_to_picoc_mon", action="store_true")
     cli_args_parser.add_argument(
         "-B", "--picoc_blocks_to_reti_blocks", action="store_true"
     )
@@ -35,7 +35,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser.add_argument("-s", "--symbol_table", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-G", "--gap", type=int, default=0)
-    cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
+    cli_args_parser.add_argument("-l", "--lines", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-g", "--debug", action="store_true")

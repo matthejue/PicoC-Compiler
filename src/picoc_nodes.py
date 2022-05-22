@@ -265,38 +265,38 @@ class N:
 
     # ------------------------------- L_If_Else -------------------------------
     class If(ASTNode):
-        def __init__(self, exp, stmts):
+        def __init__(self, exp, stmts_goto):
             self.exp = exp
-            self.stmts = stmts
-            super().__init__(children=[self.exp, self.stmts])
+            self.stmts_goto = stmts_goto
+            super().__init__(children=[self.exp, self.stmts_goto])
 
-        __match_args__ = ("exp", "stmts")
+        __match_args__ = ("exp", "stmts_goto")
 
     class IfElse(ASTNode):
-        def __init__(self, exp, stmts1, stmts2):
+        def __init__(self, exp, stmts_goto1, stmts_goto2):
             self.exp = exp
-            self.stmts1 = stmts1
-            self.stmts2 = stmts2
-            super().__init__(children=[self.exp, self.stmts1, self.stmts2])
+            self.stmts_goto1 = stmts_goto1
+            self.stmts_goto2 = stmts_goto2
+            super().__init__(children=[self.exp, self.stmts_goto1, self.stmts_goto2])
 
-        __match_args__ = ("exp", "stmts1", "stmts2")
+        __match_args__ = ("exp", "stmts_goto1", "stmts_goto2")
 
     # --------------------------------- L_Loop --------------------------------
     class While(ASTNode):
-        def __init__(self, exp, stmts):
+        def __init__(self, exp, stmts_goto):
             self.exp = exp
-            self.stmts = stmts
-            super().__init__(children=[self.exp, self.stmts])
+            self.stmts_goto = stmts_goto
+            super().__init__(children=[self.exp, self.stmts_goto])
 
-        __match_args__ = ("exp", "stmts")
+        __match_args__ = ("exp", "stmts_goto")
 
     class DoWhile(ASTNode):
-        def __init__(self, exp, stmts):
+        def __init__(self, exp, stmts_goto):
             self.exp = exp
-            self.stmts = stmts
-            super().__init__(children=[self.exp, self.stmts])
+            self.stmts_goto = stmts_goto
+            super().__init__(children=[self.exp, self.stmts_goto])
 
-        __match_args__ = ("exp", "stmts")
+        __match_args__ = ("exp", "stmts_goto")
 
     # --------------------------------- L_Fun ---------------------------------
     class Call(ASTNode):
