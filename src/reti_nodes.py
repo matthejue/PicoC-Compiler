@@ -1,34 +1,37 @@
 import global_vars
+from ast_node import ASTNode
 
 
-class N:
+class N(ASTNode):
     """Nodes"""
 
     # =========================================================================
     # =                            Container Nodes                            =
     # =========================================================================
     # -------------------------------- Program --------------------------------
-    class Program:
-        def __init__(self, name, instrs):
+    class Program(ASTNode):
+        def __init__(self, name, instrs_blocks):
             self.name = name
-            self.instrs = instrs
+            self.instrs_blocks = instrs_blocks
 
         def __repr__(self):
-            instrs_str = ""
-            for instr in self.instrs:
-                instrs_str += f"{instr}"
-            return instrs_str
+            if not global_vars.path:
+                return super().__repr__()
+            instrs_blocks_str = ""
+            for instr_block in self.instrs_blocks:
+                instrs_blocks_str += f"\n{instr_block}"
+            return instrs_blocks_str
 
-        __match_args__ = ("name", "instrs")
+        __match_args__ = ("name", "instrs_blocks")
 
     # ------------------------- Load / Store / Compute ------------------------
-    class Instr:
+    class Instr(ASTNode):
         def __init__(self, op, args):
             self.op = op
             self.args = args
 
-        def __repr__(self):
-            instr_str = f"\n{self.op}"
+        def __repr__(self, depth=0):
+            instr_str = f"\n{' ' * depth}{self.op}"
             for arg in self.args:
                 instr_str += f" {arg}"
             return instr_str
@@ -36,51 +39,51 @@ class N:
         __match_args__ = ("op", "args")
 
     # --------------------------- Jump Instructions ---------------------------
-    class Jump:
+    class Jump(ASTNode):
         def __init__(self, rel, num):
             self.rel = rel
             self.num = num
 
-        def __repr__(self):
-            return f"\nJUMP{self.rel} {self.num}"
+        def __repr__(self, depth=0):
+            return f"\n{' ' * depth}JUMP{self.rel} {self.num}"
 
         __match_args__ = ("rel", "num")
 
-    class Int:
+    class Int(ASTNode):
         def __init__(self, num):
             self.num = num
 
-        def __repr__(self):
-            return f"\nINT {self.num}"
+        def __repr__(self, depth=0):
+            return f"\n{' ' * depth}INT {self.num}"
 
         __match_args__ = ("num",)
 
     # ---------------------------- Input and Print ----------------------------
-    class Call:
+    class Call(ASTNode):
         def __init__(self, name, reg):
             self.name = name
             self.reg = reg
 
-        def __repr__(self):
-            return f"\nCALL {self.name} {self.reg}"
+        def __repr__(self, depth=0):
+            return f"\n{' ' * depth}CALL {self.name} {self.reg}"
 
         __match_args__ = ("name", "reg")
 
     # -------------------------------- Comment --------------------------------
-    class SingleLineComment:
+    class SingleLineComment(ASTNode):
         def __init__(self, val):
             self.val = val
 
-        def __repr__(self):
-            return f"\n# {self.val}"
+        def __repr__(self, depth=0):
+            return f"\n{' ' * depth}# {self.val}"
 
         __match_args__ = ("val",)
 
-    class InlineComment:
+    class InlineComment(ASTNode):
         def __init__(self, val):
             self.val = val
 
-        def __repr__(self):
+        def __repr__(self, depth=0):
             return f'{" " * global_vars.args.gap}  # {self.val}'
 
         __match_args__ = ("val",)
@@ -89,7 +92,7 @@ class N:
     # =                              Token Nodes                              =
     # =========================================================================
     # ------------------- Identifier, Immediate and Register ------------------
-    class Name:
+    class Name(ASTNode):
         # shorter then 'Identifier'
         def __init__(self, val):
             self.val = val
@@ -99,7 +102,7 @@ class N:
 
         __match_args__ = ("val",)
 
-    class Im:
+    class Im(ASTNode):
         def __init__(self, val):
             self.val = val
 
@@ -108,7 +111,7 @@ class N:
 
         __match_args__ = ("val",)
 
-    class Reg:
+    class Reg(ASTNode):
         def __init__(self, reg):
             self.reg = reg
 
@@ -118,160 +121,160 @@ class N:
         __match_args__ = ("reg",)
 
     # ----------------------- Compute Memory / Register -----------------------
-    class Add:
+    class Add(ASTNode):
         def __repr__(self):
             return "ADD"
 
-    class Sub:
+    class Sub(ASTNode):
         def __repr__(self):
             return "SUB"
 
-    class Mult:
+    class Mult(ASTNode):
         def __repr__(self):
             return "MULT"
 
-    class Div:
+    class Div(ASTNode):
         def __repr__(self):
             return "DIV"
 
-    class Mod:
+    class Mod(ASTNode):
         def __repr__(self):
             return "MOD"
 
-    class Oplus:
+    class Oplus(ASTNode):
         def __repr__(self):
             return "OPLUS"
 
-    class Or:
+    class Or(ASTNode):
         def __repr__(self):
             return "OR"
 
-    class And:
+    class And(ASTNode):
         def __repr__(self):
             return "AND"
 
     # --------------------- Compute Immediate Instructions --------------------
-    class Addi:
+    class Addi(ASTNode):
         def __repr__(self):
             return "ADDI"
 
-    class Subi:
+    class Subi(ASTNode):
         def __repr__(self):
             return "SUBI"
 
-    class Multi:
+    class Multi(ASTNode):
         def __repr__(self):
             return "MULTI"
 
-    class Divi:
+    class Divi(ASTNode):
         def __repr__(self):
             return "DIVI"
 
-    class Modi:
+    class Modi(ASTNode):
         def __repr__(self):
             return "MODI"
 
-    class Oplusi:
+    class Oplusi(ASTNode):
         def __repr__(self):
             return "OPLUSI"
 
-    class Ori:
+    class Ori(ASTNode):
         def __repr__(self):
             return "ORI"
 
-    class Andi:
+    class Andi(ASTNode):
         def __repr__(self):
             return "ANDI"
 
     # --------------------------- Load Instructions ---------------------------
-    class Load:
+    class Load(ASTNode):
         def __repr__(self):
             return "LOAD"
 
-    class Loadin:
+    class Loadin(ASTNode):
         def __repr__(self):
             return "LOADIN"
 
-    class Loadi:
+    class Loadi(ASTNode):
         def __repr__(self):
             return "LOADI"
 
     # --------------------------- Store Instructions --------------------------
-    class Store:
+    class Store(ASTNode):
         def __repr__(self):
             return "STORE"
 
-    class Storein:
+    class Storein(ASTNode):
         def __repr__(self):
             return "STOREIN"
 
-    class Move:
+    class Move(ASTNode):
         def __repr__(self):
             return "MOVE"
 
     # ------------------------------- Relations -------------------------------
-    class Lt:
+    class Lt(ASTNode):
         def __repr__(self):
             return "<"
 
-    class LtE:
+    class LtE(ASTNode):
         def __repr__(self):
             return "<="
 
-    class Gt:
+    class Gt(ASTNode):
         def __repr__(self):
             return ">"
 
-    class GtE:
+    class GtE(ASTNode):
         def __repr__(self):
             return ">="
 
-    class Eq:
+    class Eq(ASTNode):
         def __repr__(self):
             return "=="
 
-    class NEq:
+    class NEq(ASTNode):
         def __repr__(self):
             return "!="
 
-    class Always:
+    class Always(ASTNode):
         def __repr__(self):
             return ""
 
-    class NOp:
+    class NOp(ASTNode):
         def __repr__(self):
             return "_NOP"
 
     # --------------------------- Jump Instructions ---------------------------
-    class Rti:
+    class Rti(ASTNode):
         def __repr__(self):
             return "RTI"
 
     # ------------------------------- Registers -------------------------------
-    class Acc:
+    class Acc(ASTNode):
         def __repr__(self):
             return "ACC"
 
-    class In1:
+    class In1(ASTNode):
         def __repr__(self):
             return "IN1"
 
-    class In2:
+    class In2(ASTNode):
         def __repr__(self):
             return "IN2"
 
-    class Sp:
+    class Sp(ASTNode):
         def __repr__(self):
             return "SP"
 
-    class Baf:
+    class Baf(ASTNode):
         def __repr__(self):
             return "BAF"
 
-    class Cs:
+    class Cs(ASTNode):
         def __repr__(self):
             return "CS"
 
-    class Ds:
+    class Ds(ASTNode):
         def __repr__(self):
             return "DS"

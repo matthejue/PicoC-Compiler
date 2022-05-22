@@ -2,41 +2,39 @@ from picoc_nodes import N as PN
 from reti_nodes import N as RN
 from errors import Errors
 from symbol_table import ST
-from error_handler import args_to_str
+from global_funs import bug_in_compiler_error, remove_extension
 
 
 class Passes:
     def __init__(self):
-        # PicoC_mon -> PicoC_Blocks
+        # PicoC_Blocks
         self.block_id = 0
         self.all_blocks = dict()
-        # PicoC_Blocks -> RETI_Blocks
+        # RETI_Blocks
         self.instrs_cnt = 0
         self.current_scope = "global"
-        self.current_address = 0
+        self.rel_global_addr = 0
+        self.rel_fun_addr = 0
         self.symbol_table = ST.SymbolTable()
 
-    def _bug_in_compiler_error(self, *args):
-        import inspect
-
-        # return name of caller of this function
-        raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
-
     # =========================================================================
-    # =                         PicoC -> PicoC_Shrink                         =
+    # =                              PicoC_Shrink                             =
     # =========================================================================
     # =========================================================================
-    # =                      PicoC_Shrink -> PicoC_Blocks                     =
+    # =                              PicoC_Blocks                             =
     # =========================================================================
 
-    def _create_block(self, labelbase, stmts, blocks):
-        label = f"{labelbase}.{self.block_id}"
+    def _create_block(self, labelbase, stmts, blocks, is_fun=False):
+        if is_fun:
+            label = labelbase
+        else:
+            label = f"{labelbase}.{self.block_id}"
         new_block = PN.Block(PN.Name(label), stmts)
         blocks[label] = new_block
         self.block_id += 1
         return PN.GoTo(PN.Name(label))
 
-    def _picoc_mon_to_picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
+    def _picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
         match stmt:
             # --------------------------- L_If_Else ---------------------------
             case PN.If(exp, stmts):
@@ -46,9 +44,7 @@ class Passes:
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts):
-                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
-                        stmt, stmts_if, blocks
-                    )
+                    stmts_if = self._picoc_blocks_stmt(stmt, stmts_if, blocks)
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return [PN.IfElse(exp, [goto_if], [goto_after])]
@@ -59,16 +55,12 @@ class Passes:
 
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
-                    stmts_else = self._picoc_mon_to_picoc_blocks_stmt(
-                        stmt, stmts_else, blocks
-                    )
+                    stmts_else = self._picoc_blocks_stmt(stmt, stmts_else, blocks)
                 goto_else = self._create_block("else", stmts_else, blocks)
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
-                    stmts_if = self._picoc_mon_to_picoc_blocks_stmt(
-                        stmt, stmts_if, blocks
-                    )
+                    stmts_if = self._picoc_blocks_stmt(stmt, stmts_if, blocks)
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return [PN.IfElse(exp, [goto_if], [goto_else])]
@@ -81,9 +73,7 @@ class Passes:
                 stmts_while = [goto_condition_check]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
-                        stmt, stmts_while, blocks
-                    )
+                    stmts_while = self._picoc_blocks_stmt(stmt, stmts_while, blocks)
                 goto_branch.name.val = self._create_block(
                     "while_branch", stmts_while, blocks
                 ).name.val
@@ -103,9 +93,7 @@ class Passes:
                 stmts_while = [PN.IfElse(exp, goto_branch, goto_after)]
 
                 for stmt in reversed(stmts):
-                    stmts_while = self._picoc_mon_to_picoc_blocks_stmt(
-                        stmt, stmts_while, blocks
-                    )
+                    stmts_while = self._picoc_blocks_stmt(stmt, stmts_while, blocks)
                 goto_branch.name.val = self._create_block(
                     "do_while_branch", stmts_while, blocks
                 ).name.val
@@ -117,48 +105,52 @@ class Passes:
             case _:
                 return [stmt] + processed_stmts
 
-    def _picoc_mon_to_picoc_blocks_def(self, decl_def):
+    def _picoc_blocks_def(self, decl_def):
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
             case PN.FunDef(datatype, PN.Name(fun_name) as name, params, stmts):
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
-                    processed_stmts = self._picoc_mon_to_picoc_blocks_stmt(
+                    processed_stmts = self._picoc_blocks_stmt(
                         stmt, processed_stmts, blocks
                     )
-                self._create_block(fun_name, processed_stmts, blocks)
+                self._create_block(fun_name, processed_stmts, blocks, is_fun=True)
                 self.all_blocks |= blocks
-                return PN.FunDef(
-                    datatype,
-                    name,
-                    params,
-                    list(
-                        sorted(
-                            blocks.values(),
-                            key=lambda block: -int(
-                                block.name.val[block.name.val.rindex(".") + 1 :]
-                            ),
-                        )
-                    ),
-                )
+                return [
+                    PN.FunDef(
+                        datatype,
+                        name,
+                        params,
+                        list(
+                            sorted(
+                                blocks.values(),
+                                key=lambda block: -int(
+                                    block.name.val[block.name.val.rindex(".") + 1 :]
+                                ),
+                            )
+                        ),
+                    )
+                ]
+            case (PN.FunDecl() | PN.StructDecl()):
+                return [decl_def]
             case _:
-                return decl_def
+                bug_in_compiler_error(decl_def)
 
-    def picoc_mon_to_picoc_blocks(self, file: PN.File):
+    def picoc_blocks(self, file: PN.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case PN.File(name, decls_defs):
                 decls_defs_blocks = []
                 for decl_def in decls_defs:
-                    decls_defs_blocks += [self._picoc_mon_to_picoc_blocks_def(decl_def)]
-        return PN.File(name + ".picoc_blcoks", decls_defs_blocks)
+                    decls_defs_blocks += self._picoc_blocks_def(decl_def)
+        return PN.File(remove_extension(name) + ".picoc_blocks", decls_defs_blocks)
 
     # =========================================================================
-    # =                       PicoC_Blocks -> PicoC_Mon                       =
+    # =                               PicoC_Mon                               =
     # =========================================================================
 
-    def _picoc_to_picoc_mon_ref(self, ref_loc, prev_refs):
+    def _picoc_mon_ref(self, ref_loc, prev_refs):
         match ref_loc:
             # ---------------------------- L_Arith ----------------------------
             case PN.Name(val):
@@ -167,7 +159,7 @@ class Passes:
                     case ST.Symbol(_, datatype):
                         current_datatype = datatype
                     case _:
-                        self._bug_in_compiler_error(symbol)
+                        bug_in_compiler_error(symbol)
                 while prev_refs:
                     match current_datatype:
                         case (PN.CharType() | PN.IntType()):
@@ -195,45 +187,45 @@ class Passes:
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
-                                    self._bug_in_compiler_error(ref)
+                                    bug_in_compiler_error(ref)
                             match symbol:
                                 case ST.Symbol(_, datatype):
                                     current_datatype = datatype
                                 case _:
-                                    self._bug_in_compiler_error(symbol)
+                                    bug_in_compiler_error(symbol)
                         case _:
-                            self._bug_in_compiler_error(current_datatype)
+                            bug_in_compiler_error(current_datatype)
                 return [PN.Exp(PN.Ref(ref_loc))]
             # --------------------------- L_Pointer ---------------------------
             # TODO: remove after implementing shrink pass
             case PN.Deref(deref_loc, exp):
                 ref = PN.Ref(ref_loc)
-                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [ref] + prev_refs)
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
+                exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Array ----------------------------
             case PN.Subscr(deref_loc, exp):
                 ref = PN.Ref(ref_loc)
-                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [ref] + prev_refs)
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
+                exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
             case PN.Attr(ref_loc2, _):
                 ref = PN.Ref(ref_loc)
-                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc2, [ref] + prev_refs)
+                refs_mon = self._picoc_mon_ref(ref_loc2, [ref] + prev_refs)
                 return refs_mon + [PN.Exp(ref)]
             case _:
-                self._bug_in_compiler_error(ref_loc)
+                bug_in_compiler_error(ref_loc)
 
-    def _picoc_to_picoc_mon_exp(self, exp):
+    def _picoc_mon_exp(self, exp):
         match exp:
             # ---------------------------- L_Arith ----------------------------
             case (PN.Name() | PN.Num() | PN.Char()):
                 return [PN.Exp(exp)]
             # ----------------------- L_Arith + L_Logic -----------------------
             case PN.BinOp(left_exp, bin_op, right_exp):
-                exps1_mon = self._picoc_to_picoc_mon_exp(left_exp)
-                exps2_mon = self._picoc_to_picoc_mon_exp(right_exp)
+                exps1_mon = self._picoc_mon_exp(left_exp)
+                exps2_mon = self._picoc_mon_exp(right_exp)
                 return (
                     exps1_mon
                     + exps2_mon
@@ -246,12 +238,12 @@ class Passes:
                     ]
                 )
             case PN.UnOp(un_op, exp):
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [PN.Exp(PN.UnOp(un_op, PN.Stack(PN.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
             case PN.Atom(left_exp, rel, right_exp):
-                exps1_mon = self._picoc_to_picoc_mon_exp(left_exp)
-                exps2_mon = self._picoc_to_picoc_mon_exp(right_exp)
+                exps1_mon = self._picoc_mon_exp(left_exp)
+                exps2_mon = self._picoc_mon_exp(right_exp)
                 return (
                     exps1_mon
                     + exps2_mon
@@ -262,59 +254,86 @@ class Passes:
                     ]
                 )
             case PN.ToBool(exp):
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [PN.Exp(PN.ToBool(PN.Stack(PN.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
-            case PN.Alloc():
-                return [PN.Exp(exp)]
+            case PN.Alloc(type_qual, datatype, PN.Name(val, pos)):
+                var_name = val
+                match var_name:
+                    case "main":
+                        size = self._datatype_size(datatype)
+                        symbol = ST.Symbol(
+                            type_qual,
+                            datatype,
+                            PN.Name(f"{var_name}@{self.current_scope}"),
+                            PN.Num(str(self.rel_global_addr)),
+                            pos,
+                            PN.Num(str(size)),
+                        )
+                        self.symbol_table.define(symbol)
+                        self.rel_global_addr += 1
+                    case _:
+                        size = self._datatype_size(datatype)
+                        symbol = ST.Symbol(
+                            type_qual,
+                            datatype,
+                            PN.Name(f"{var_name}@{self.current_scope}"),
+                            PN.Num(str(self.rel_fun_addr)),
+                            pos,
+                            PN.Num(str(size)),
+                        )
+                        self.symbol_table.define(symbol)
+                        self.rel_fun_addr += 1
+                # Alloc isn't needed anymore after being evaluated
+                return []
             # --------------------------- L_Pointer ---------------------------
             # TODO: remove after Shrink Pass is implemented
             case PN.Deref(deref_loc, exp2):
-                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                refs_mon = self._picoc_mon_ref(exp, [])
                 return refs_mon + [PN.Exp(PN.Deref(PN.Stack(PN.Num("1")), exp2))]
             case PN.Ref(PN.Name()):
                 return [PN.Exp(exp)]
             # TODO: remove after Shrink Pass is implemented
             case PN.Ref((PN.Deref(deref_loc, exp2) | PN.Subscr(deref_loc, exp2))):
-                refs_mon = self._picoc_to_picoc_mon_ref(deref_loc, [exp])
-                exps_mon = self._picoc_to_picoc_mon_exp(exp2)
+                refs_mon = self._picoc_mon_ref(deref_loc, [exp])
+                exps_mon = self._picoc_mon_exp(exp2)
                 return refs_mon + exps_mon + [PN.Exp(exp)]
             case PN.Ref(PN.Attr(ref_loc, _)):
-                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [exp])
+                refs_mon = self._picoc_mon_ref(ref_loc, [exp])
                 return refs_mon + [PN.Exp(exp)]
             # ---------------------------- L_Array ----------------------------
             case PN.Subscr(deref_loc, exp2):
-                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                refs_mon = self._picoc_mon_ref(exp, [])
                 return refs_mon + [PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), exp2))]
             # ---------------------------- L_Struct ---------------------------
             case PN.Attr(ref_loc, name):
-                refs_mon = self._picoc_to_picoc_mon_ref(exp, [])
+                refs_mon = self._picoc_mon_ref(exp, [])
                 return refs_mon + [PN.Exp(PN.Attr(PN.Stack(PN.Num("1")), name))]
             # ----------------------------- L_Fun -----------------------------
             case PN.Call(name, exps):
                 exps_mon = []
                 stack_locs = []
                 for i, exp in enumerate(exps):
-                    exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                    exps_mon += self._picoc_mon_exp(exp)
                     stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
                 return exps_mon + [PN.Exp(PN.Call(name, stack_locs))]
             case _:
-                self._bug_in_compiler_error(exp)
+                bug_in_compiler_error(exp)
 
-    def _picoc_to_picoc_mon_stmt(self, stmt):
+    def _picoc_mon_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
             case PN.Assign(PN.Name() as name, exp):
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
             case PN.Assign(PN.Alloc(_, _, PN.Name() as name) as alloc, exp):
-                exps1_mon = self._picoc_to_picoc_mon_exp(exp)
-                exps2_mon = self._picoc_to_picoc_mon_exp(alloc)
+                exps1_mon = self._picoc_mon_exp(exp)
+                exps2_mon = self._picoc_mon_exp(alloc)
                 return exps1_mon + exps2_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
             case PN.Assign(ref_loc, exp):
                 # Deref, Subscript, Attribute
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
-                refs_mon = self._picoc_to_picoc_mon_ref(ref_loc, [])
+                exps_mon = self._picoc_mon_exp(exp)
+                refs_mon = self._picoc_mon_ref(ref_loc, [])
                 return (
                     exps_mon
                     + refs_mon
@@ -322,14 +341,14 @@ class Passes:
                 )
             # --------------------- L_Assign_Alloc + L_Fun --------------------
             case PN.Exp(alloc_call):
-                exps_mon = self._picoc_to_picoc_mon_exp(alloc_call)
+                exps_mon = self._picoc_mon_exp(alloc_call)
                 return exps_mon
             # ---------------------------- L_Array ----------------------------
             case PN.Assign(PN.Alloc(_, _, _) as alloc, PN.Array(exps)):
                 exps_mon = []
                 stack_locs = []
                 for i, exp in enumerate(exps):
-                    exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                    exps_mon += self._picoc_mon_exp(exp)
                     stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
                 return exps_mon + [PN.Assign(alloc, PN.Array(stack_locs))]
             # ---------------------------- L_Struct ---------------------------
@@ -339,67 +358,102 @@ class Passes:
                 for i, assign in enumerate(assigns):
                     match assign:
                         case PN.Assign(assign_lhs, exp):
-                            exps_mon += self._picoc_to_picoc_mon_exp(exp)
+                            exps_mon += self._picoc_mon_exp(exp)
                             assigns_mon[0:0] = [
                                 PN.Assign(assign_lhs, PN.Stack(PN.Num(i + 1)))
                             ]
                 return exps_mon + [PN.Assign(alloc, PN.Struct(assigns_mon))]
             # ----------------------- L_If_Else + L_Loop ----------------------
             case PN.IfElse(exp, stmts1, stmts2):
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 stmts1_mon = []
                 for stmt1 in stmts1:
-                    stmts1_mon += self._picoc_to_picoc_mon_stmt(stmt1)
+                    stmts1_mon += self._picoc_mon_stmt(stmt1)
                 stmts2_mon = []
                 for stmt2 in stmts2:
-                    stmts2_mon += self._picoc_to_picoc_mon_stmt(stmt2)
+                    stmts2_mon += self._picoc_mon_stmt(stmt2)
                 return exps_mon + [
                     PN.IfElse(PN.Stack(PN.Num("1")), stmts1_mon, stmts2_mon)
                 ]
             # ----------------------------- L_Fun -----------------------------
             case PN.Return(exp):
-                exps_mon = self._picoc_to_picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [PN.Return(PN.Stack(PN.Num("1")))]
             case _:
-                self._bug_in_compiler_error(stmt)
+                bug_in_compiler_error(stmt)
 
-    def _picoc_to_picoc_mon_def(self, decl_def):
+    def _picoc_mon_def(self, decl_def):
         match decl_def:
             # ------------------------ L_Fun + L_Blocks -----------------------
-            case PN.FunDef(datatype, name, params, blocks):
+            case PN.FunDef(datatype, PN.Name(val) as name, params, blocks):
+                self.current_scope = val
+                self.rel_fun_addr = 0
                 blocks_mon = []
                 for block in blocks:
                     match block:
                         case PN.Block(_, stmts):
                             stmts_mon = []
                             for stmt in stmts:
-                                stmts_mon += self._picoc_to_picoc_mon_stmt(stmt)
-                            block.stmts = stmts_mon
+                                stmts_mon += self._picoc_mon_stmt(stmt)
+                            block.stmts_instrs = stmts_mon
                             blocks_mon += [block]
                         case _:
-                            self._bug_in_compiler_error(block)
-                return PN.FunDef(datatype, name, params, blocks_mon)
-            case (PN.FunDecl() | PN.StructDecl()):
-                return decl_def
+                            bug_in_compiler_error(block)
+                return [PN.FunDef(datatype, name, params, blocks_mon)]
+            case PN.FunDecl():
+                # Function declaration isn't needed anymore after being evaluated
+                return []
+            case PN.StructDecl(PN.Name(val1, pos1), params):
+                struct_name = val1
+                attrs = []
+                struct_size = 1
+                for param in params:
+                    match param:
+                        case PN.Param(datatype, PN.Name(val2, pos2)):
+                            attr_size = self._datatype_size(datatype)
+                            attr_name = val2
+                            symbol = ST.Symbol(
+                                ST.Empty(),
+                                datatype,
+                                PN.Name(f"{attr_name}@{struct_name}"),
+                                pos2,
+                                PN.Num(str(attr_size)),
+                            )
+                            self.symbol_table.define(symbol)
+                            attrs += [PN.Name(f"{attr_name}@{struct_name}")]
+                            struct_size += attr_size
+                        case _:
+                            bug_in_compiler_error(param)
+                symbol = ST.Symbol(
+                    ST.Empty(),
+                    ST.SelfDeclared(),
+                    PN.Name(struct_name),
+                    attrs,
+                    pos1,
+                    PN.Num(str(struct_size)),
+                )
+                self.symbol_table.define(symbol)
+                # Struct declaration isn't needed anymore after being evaluated
+                return []
             case _:
-                self._bug_in_compiler_error(decl_def)
+                bug_in_compiler_error(decl_def)
 
-    def picoc_to_picoc_mon(self, file: PN.File):
+    def picoc_mon(self, file: PN.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case PN.File(name, decls_defs):
                 decls_defs_mon = []
                 for decl_def in decls_defs:
-                    decls_defs_mon += [self._picoc_to_picoc_mon_def(decl_def)]
+                    decls_defs_mon += self._picoc_mon_def(decl_def)
             case _:
-                self._bug_in_compiler_error(file)
-        return PN.File(name, decls_defs_mon)
+                bug_in_compiler_error(file)
+        return PN.File(remove_extension(name) + ".picoc_mon", decls_defs_mon)
 
     # =========================================================================
-    # =                      PicoC_Blocks -> RETI_Blocks                      =
+    # =                              RETI_Blocks                              =
     # =========================================================================
 
-    def _find_out_help_const_base(self, datatype):
+    def _datatype_size(self, datatype):
         match datatype:
             case (PN.IntType() | PN.CharType()):
                 help_const = 1
@@ -409,12 +463,12 @@ class Passes:
                     case ST.Symbol(_, _, _, _, _, PN.Num(val)):
                         help_const = int(val)
                     case _:
-                        self._bug_in_compiler_error(symbol)
+                        bug_in_compiler_error(symbol)
             case _:
-                self._bug_in_compiler_error(datatype)
+                bug_in_compiler_error(datatype)
         return help_const
 
-    def _picoc_blocks_to_reti_blocks_stmt(self, stmt):
+    def _reti_blocks_stmt(self, stmt):
         match stmt:
             # ---------------------------- L_Logic ----------------------------
             case PN.Exp(
@@ -430,7 +484,7 @@ class Passes:
                     case PN.LogicOr:
                         lop = RN.Or()
                     case _:
-                        self._bug_in_compiler_error(bin_lop)
+                        bug_in_compiler_error(bin_lop)
                 return [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
@@ -475,7 +529,7 @@ class Passes:
                             RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
                         ]
                     case _:
-                        self._bug_in_compiler_error(symbol)
+                        bug_in_compiler_error(symbol)
 
                 return reti_instrs + [
                     RN.Instr(
@@ -523,7 +577,7 @@ class Passes:
                     case PN.Or():
                         aop = RN.Or()
                     case _:
-                        self._bug_in_compiler_error(bin_aop)
+                        bug_in_compiler_error(bin_aop)
                 return [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
@@ -553,7 +607,7 @@ class Passes:
                     case PN.Minus():
                         pass
                     case _:
-                        self._bug_in_compiler_error(un_op)
+                        bug_in_compiler_error(un_op)
                 return reti_instrs + [
                     RN.Instr(
                         RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
@@ -602,7 +656,7 @@ class Passes:
                     case PN.GtE:
                         rel = RN.GtE()
                     case _:
-                        self._bug_in_compiler_error(rel)
+                        bug_in_compiler_error(rel)
                 return [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
@@ -621,18 +675,6 @@ class Passes:
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
-            case PN.Exp(PN.Alloc(type_qual, datatype, name)):
-                match name:
-                    case PN.Name(val, pos):
-                        symbol = ST.Symbol(
-                            type_qual,
-                            datatype,
-                            name,
-                            ST.Empty(),
-                            ST.Pos(PN.Num(pos.line), PN.Num(pos.column)),
-                        )
-                        self.symbol_table.define(symbol)
-                return []
             case PN.Assign(PN.Name(val), PN.Stack(PN.Num(val2))):
                 symbol = self.symbol_table.resolve(val)
                 match symbol:
@@ -649,7 +691,7 @@ class Passes:
                             ),
                         ]
                     case _:
-                        self._bug_in_compiler_error()
+                        bug_in_compiler_error()
             case PN.Assign(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2))):
                 return [
                     RN.Instr(
@@ -679,7 +721,7 @@ class Passes:
                             ),
                         ]
                     case _:
-                        self._bug_in_compiler_error(symbol)
+                        bug_in_compiler_error(symbol)
             case PN.Exp(
                 PN.Ref(
                     (
@@ -691,13 +733,13 @@ class Passes:
             ):
                 match datatype:
                     case PN.ArrayDecl(nums, datatype2):
-                        help_const = self._find_out_help_const_base(datatype2)
+                        help_const = self._datatype_size(datatype2)
                         for num in nums:
                             match num:
                                 case PN.Num(val3):
                                     help_const *= int(val3)
                                 case _:
-                                    self._bug_in_compiler_error(num)
+                                    bug_in_compiler_error(num)
                         reti_instrs = [
                             RN.Instr(
                                 RN.Loadin(),
@@ -713,7 +755,7 @@ class Passes:
                             RN.Instr(RN.Add(), [RN.Reg(RN.In1()), RN.Reg(RN.In2())]),
                         ]
                     case PN.PntrDecl(_, datatype2):
-                        help_const = self._find_out_help_const_base(datatype2)
+                        help_const = self._datatype_size(datatype2)
                         reti_instrs = [
                             RN.Instr(
                                 RN.Loadin(),
@@ -729,7 +771,7 @@ class Passes:
                             RN.Instr(RN.Add(), [RN.Reg(RN.In1()), RN.Reg(RN.In2())]),
                         ]
                     case _:
-                        self._bug_in_compiler_error(datatype)
+                        bug_in_compiler_error(datatype)
                 return reti_instrs + [
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                     RN.Instr(
@@ -758,11 +800,11 @@ class Passes:
                                             attr_size = val4
                                             rel_pos_in_struct += int(attr_size)
                                 else:
-                                    self._bug_in_compiler_error(attr)
+                                    bug_in_compiler_error(attr)
                             case _:
-                                self._bug_in_compiler_error(symbol)
+                                bug_in_compiler_error(symbol)
                     case _:
-                        self._bug_in_compiler_error(datatype)
+                        bug_in_compiler_error(datatype)
                 return [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")]
@@ -796,52 +838,49 @@ class Passes:
             #  case PN.Return(exp):
             #      pass
             case PN.GoTo(name):
-                return RN.GoTo(name)
+                return stmt
             case _:
-                self._bug_in_compiler_error(stmt)
+                bug_in_compiler_error(stmt)
 
-    def _picoc_blocks_to_reti_blocks_def(self, decl_def):
+    def _reti_blocks_def(self, decl_def):
         match decl_def:
             # ------------------------ L_Fun + L_Blocks -----------------------
-            case PN.FunDef(_, PN.Name(identifier), _, blocks):
-                self.current_scope = identifier
-                self.current_address = 0
+            case PN.FunDef(_, PN.Name(val), _, blocks):
+                self.current_scope = val
                 for block in blocks:
                     match block:
                         case PN.Block(_, stmts):
                             reti_instrs = []
                             for stmt in stmts:
-                                reti_instrs += self._picoc_blocks_to_reti_blocks_stmt(
-                                    stmt
-                                )
+                                reti_instrs += self._reti_blocks_stmt(stmt)
+                            # TODO: move to last RETI Pass start
                             block.stmts_instrs = reti_instrs
                             block.instrs_after = (
                                 f"instructions after: {self.instrs_cnt}"
                             )
                             self.instrs_cnt += len(reti_instrs)
+                            # TODO: move to last RETI Pass end
+                        case _:
+                            bug_in_compiler_error(block)
                 return blocks
-            case PN.FunDecl():
-                return []
-            case PN.StructDecl():
-                return []
             case _:
-                self._bug_in_compiler_error(decl_def)
+                bug_in_compiler_error(decl_def)
 
-    def picoc_blocks_to_reti_blocks(self, file: PN.File):
+    def reti_blocks(self, file: PN.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case PN.File(name, decls_defs):
                 reti_blocks = []
                 for decl_def in decls_defs:
-                    reti_blocks += self._picoc_blocks_to_reti_blocks_def(decl_def)
+                    reti_blocks += self._reti_blocks_def(decl_def)
             case _:
-                self._bug_in_compiler_error(file)
-        return RN.Program(name, reti_blocks)
+                bug_in_compiler_error(file)
+        return RN.Program(remove_extension(name) + ".reti_blocks", reti_blocks)
 
     # =========================================================================
-    # =                      RETI_Blocks -> RETI_Patched                      =
+    # =                               RETI_Patch                              =
     # =========================================================================
 
     # =========================================================================
-    # =                          RETI_PATCHED -> RETI                         =
+    # =                                  RETI                                 =
     # =========================================================================

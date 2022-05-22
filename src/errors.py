@@ -1,6 +1,6 @@
 from colormanager import ColorManager as CM
 from lark.lexer import Token
-from global_vars import Pos
+from global_classes import Pos
 
 
 class Errors:
