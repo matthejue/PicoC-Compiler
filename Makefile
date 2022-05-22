@@ -8,19 +8,19 @@ install:
 
 read: _read _clean-pycache
 _read:
-	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) ./run/code.picoc
 
 read-verbose: _read-verbose _clean-pycache
 _read-verbose:
-	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) -v ./run/code.picoc
 
 read-color: _read-color _clean-pycache
 _read-color:
-	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v -C ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) -C ./run/code.picoc
 
 read-debug: _read-debug _clean-pycache
 _read-debug:
-	./src/main.py -ctdDambBrs -p -G 20 -S 2 -M -v -g ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) -g ./run/code.picoc
 
 shell: _shell _clean-pychache
 _shell:
@@ -60,10 +60,13 @@ _clean-files:
 	find . -type f -wholename "./tests/*.dt" -delete
 	find . -type f -wholename "./tests/*.dt_simplified" -delete
 	find . -type f -wholename "./tests/*.ast" -delete
-	find . -type f -wholename "./tests/*.csv" -delete
-	find . -type f -wholename "./tests/*.picoc_mon" -delete
+	find . -type f -wholename "./tests/*.st_mon" -delete
+	find . -type f -wholename "./tests/*.st" -delete
+	find . -type f -wholename "./tests/*.picoc_shrink" -delete
 	find . -type f -wholename "./tests/*.picoc_blocks" -delete
+	find . -type f -wholename "./tests/*.picoc_mon" -delete
 	find . -type f -wholename "./tests/*.reti_blocks" -delete
+	find . -type f -wholename "./tests/*.reti_patch" -delete
 	find . -type f -wholename "./tests/*.reti" -delete
 	find . -type f -wholename "./tests/*.error" -delete
 	find . -type f -wholename "./tests/*.c" -delete

@@ -10,10 +10,13 @@ README.txt
 *.dt
 *.dt_simplified
 *.ast
-*.csv
-*.picoc_mon
+*.st_mon
+*.st
+*.picoc_shrink
 *.picoc_blocks
+*.picoc_mon
 *.reti_blocks
+*.reti_patch
 *.reti
 *.error
 *.c
