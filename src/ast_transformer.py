@@ -1,7 +1,8 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
 from picoc_nodes import N
-from global_vars import Pos
+from global_classes import Pos
+import global_vars
 
 
 class ASTTransformer(Transformer):
@@ -425,6 +426,7 @@ class ASTTransformer(Transformer):
         return nodes
 
     def file(self, nodes):
+        nodes[0].val = global_vars.path + nodes[0].val + ".ast"
         return N.File(nodes[0], nodes[1])
 
     # -------------------------------- L_Blocks -------------------------------

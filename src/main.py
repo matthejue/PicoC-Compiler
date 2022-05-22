@@ -2,7 +2,8 @@
 
 import sys
 import global_vars
-from compiler import Compiler, remove_extension
+from compiler import Compiler
+from global_funs import only_keep_path, basename
 from colorama import init
 from colormanager import ColorManager as CM
 from help_message import generate_help_message
@@ -25,7 +26,8 @@ def main():
     else:
         CM().color_off()
 
-    global_vars.outbase = remove_extension(global_vars.args.infile)
+    global_vars.path = only_keep_path(global_vars.args.infile)
+    global_vars.basename = basename(global_vars.args.infile)
 
     try:
         compiler.read_and_write_file()

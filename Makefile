@@ -16,11 +16,11 @@ _read-verbose:
 
 read-color: _read-color _clean-pycache
 _read-color:
-	./src/main.py $(cat ./most_used_opts.txt) -C ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) -c ./run/code.picoc
 
 read-debug: _read-debug _clean-pycache
 _read-debug:
-	./src/main.py $(cat ./most_used_opts.txt) -g ./run/code.picoc
+	./src/main.py $(cat ./most_used_opts.txt) -d ./run/code.picoc
 
 shell: _shell _clean-pychache
 _shell:
@@ -58,7 +58,7 @@ _clean-pycache:
 _clean-files:
 	find . -type f -wholename "./tests/*.tokens" -delete
 	find . -type f -wholename "./tests/*.dt" -delete
-	find . -type f -wholename "./tests/*.dt_simplified" -delete
+	find . -type f -wholename "./tests/*.dt_simple" -delete
 	find . -type f -wholename "./tests/*.ast" -delete
 	find . -type f -wholename "./tests/*.st_mon" -delete
 	find . -type f -wholename "./tests/*.st" -delete

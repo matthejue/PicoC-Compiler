@@ -1,4 +1,4 @@
-from global_vars import Pos
+from global_classes import Pos
 
 
 class ASTNode:

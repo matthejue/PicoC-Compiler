@@ -8,7 +8,7 @@ pico_c_compiler.spec
 README.txt
 *.tokens
 *.dt
-*.dt_simplified
+*.dt_simple
 *.ast
 *.st_mon
 *.st

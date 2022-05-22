@@ -1,4 +1,5 @@
 from ast_node import ASTNode
+import global_vars
 
 
 class N:
@@ -348,6 +349,14 @@ class N:
             super().__init__(children=[self.name, self.decls_defs])
 
         __match_args__ = ("name", "decls_defs")
+
+        def __repr__(self):
+            if not global_vars.path:
+                return super().__repr__()
+            decls_defs_str = ""
+            for decl_def in self.decls_defs:
+                decls_defs_str += f"\n{decl_def}"
+            return decls_defs_str
 
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):

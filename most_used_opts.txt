@@ -1,1 +1,1 @@
--ctdDaSbmBPrs -p -G 20 -l 2 -M
+-i -p -g 20 -l 2 -m

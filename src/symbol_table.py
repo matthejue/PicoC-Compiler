@@ -9,7 +9,7 @@ class ST:
     class BuiltIn(ASTNode):
         pass
 
-    class SelfDefined(ASTNode):
+    class SelfDeclared(ASTNode):
         pass
 
     class Pos(ASTNode):

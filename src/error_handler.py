@@ -1,8 +1,9 @@
 from sys import exit
 from errors import Errors
-from global_vars import Pos
+from global_classes import Pos
 import global_vars
 from colormanager import ColorManager as CM
+from global_funs import overwrite, set_to_str
 from lark.exceptions import (
     UnexpectedCharacters,
     UnexpectedToken,
@@ -13,59 +14,6 @@ from lark.lark import Lark
 import compiler
 import os
 import sys
-import itertools
-
-MAP_TO_TERMINAL = {
-    "NUM": "number",
-    "CHAR": "character",
-    "NAME": "identifier",
-    "INT_NAME": "identifier",
-    "CHAR_NAME": "identifier",
-    "VOID_NAME": "identifier",
-    "NEG": "'~'",
-    "NOT": "'!'",
-    "SUB_MINUS": "'-'",
-    "ADD": "'+'",
-    "MUL": "'*'",
-    "DIV": "'/'",
-    "MOD": "'%'",
-    "OPLUS": "'^'",
-    "AND": "'&'",
-    "OR": "'|'",
-    "EQ": "'=='",
-    "NEQ": "'!='",
-    "LT": "'<'",
-    "LTE": "'<='",
-    "GT": "'>'",
-    "GTE": "'>='",
-    "INT_DT": "'int'",
-    "CHAR_DT": "'char'",
-    "VOID_DT": "'void'",
-    "CONST": "'const'",
-    "PRINT": "'print'",
-    "INPUT": "'input'",
-    "STRUCT": "'struct'",
-    "IF": "'if'",
-    "ELSE": "'else'",
-    "WHILE": "'while'",
-    "DO": "'do'",
-    "RETURN": "'return'",
-    # tokennames from https://github.com/lark-parser/lark/blob/86c8ad41c9e5380e
-    # 30f3b63b894ec0b3cb21a20a/lark/load_grammar.py#L34
-    "EQUAL": "'='",
-    "DOT": "'.'",
-    "COMMA": "','",
-    "SEMICOLON": "';'",
-    "STAR": "'*'",
-    "LPAR": "'('",
-    "RPAR": "')'",
-    "LBRACE": "'{'",
-    "RBRACE": "'}'",
-    "LSQB": "'['",
-    "RSQB": "']'",
-}
-
-MAX_PRINT_OUT_TOKENS = 5
 
 
 class ErrorHandler:
@@ -80,7 +28,9 @@ class ErrorHandler:
             self._error_heading()
             prev_token = e.token_history[-1]
             expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2)
-            expected_str = MAP_TO_TERMINAL.get(prev_token.type, prev_token.type)
+            expected_str = global_vars.MAP_NAME_TO_SYMBOL.get(
+                prev_token.type, prev_token.type
+            )
             e = Errors.UnexpectedCharacter(
                 expected_str,
                 e.char,
@@ -296,10 +246,10 @@ class ErrorHandler:
 
     def _output_error(self, error_str, error_name):
         print(error_str)
-        if global_vars.outbase:
-            with open(global_vars.outbase + ".out", "w", encoding="utf-8") as fout:
+        if global_vars.path:
+            with open(global_vars.path + ".out", "w", encoding="utf-8") as fout:
                 fout.write(error_name + "\n")
-            with open(global_vars.outbase + ".error", "w", encoding="utf-8") as fout:
+            with open(global_vars.path + ".error", "w", encoding="utf-8") as fout:
                 fout.write(error_str)
 
     def __repr__(self):
@@ -366,36 +316,3 @@ class AnnotationScreen:
             acc += line + "\n"
 
         return acc
-
-
-def overwrite(old, replace_with, idx, color=""):
-    return (
-        old[:idx]
-        + color
-        + replace_with
-        + (CM().RESET_ALL if color else "")
-        + old[idx + len(replace_with) :]
-    )
-
-
-def set_to_str(tokens: set):
-    tokens = set(MAP_TO_TERMINAL.get(elem, elem) for elem in tokens)
-    return " or ".join(
-        CM().RED + elem + CM().RESET_ALL
-        for elem in (
-            tokens
-            if global_vars.args.verbose
-            else itertools.islice(tokens, MAX_PRINT_OUT_TOKENS + 1)
-        )
-        if "ANON" not in elem
-    )
-
-
-def args_to_str(args: list):
-    if args:
-        return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
-            f"{CM().BLUE}'" + str(arg).replace("\n", "") + f"'{CM().RESET_ALL}"
-            for arg in args
-        )
-    else:
-        return "no arguments"
