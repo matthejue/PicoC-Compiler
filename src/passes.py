@@ -259,31 +259,30 @@ class Passes:
             # ------------------------- L_Assign_Alloc ------------------------
             case PN.Alloc(type_qual, datatype, PN.Name(val, pos)):
                 var_name = val
+                size = self._datatype_size(datatype)
                 match var_name:
                     case "main":
-                        size = self._datatype_size(datatype)
                         symbol = ST.Symbol(
                             type_qual,
                             datatype,
                             PN.Name(f"{var_name}@{self.current_scope}"),
                             PN.Num(str(self.rel_global_addr)),
-                            pos,
+                            ST.Pos(PN.Num(str(pos.line)), PN.Num(str(pos.column))),
                             PN.Num(str(size)),
                         )
                         self.symbol_table.define(symbol)
-                        self.rel_global_addr += 1
+                        self.rel_global_addr += size
                     case _:
-                        size = self._datatype_size(datatype)
                         symbol = ST.Symbol(
                             type_qual,
                             datatype,
                             PN.Name(f"{var_name}@{self.current_scope}"),
                             PN.Num(str(self.rel_fun_addr)),
-                            pos,
+                            ST.Pos(PN.Num(str(pos.line)), PN.Num(str(pos.column))),
                             PN.Num(str(size)),
                         )
                         self.symbol_table.define(symbol)
-                        self.rel_fun_addr += 1
+                        self.rel_fun_addr += size
                 # Alloc isn't needed anymore after being evaluated
                 return []
             # --------------------------- L_Pointer ---------------------------
@@ -406,17 +405,19 @@ class Passes:
             case PN.StructDecl(PN.Name(val1, pos1), params):
                 struct_name = val1
                 attrs = []
-                struct_size = 1
+                struct_size = 0
                 for param in params:
                     match param:
                         case PN.Param(datatype, PN.Name(val2, pos2)):
-                            attr_size = self._datatype_size(datatype)
                             attr_name = val2
+                            attr_size = self._datatype_size(datatype)
                             symbol = ST.Symbol(
                                 ST.Empty(),
                                 datatype,
                                 PN.Name(f"{attr_name}@{struct_name}"),
-                                pos2,
+                                ST.Pos(
+                                    PN.Num(str(pos2.line)), PN.Num(str(pos2.column))
+                                ),
                                 PN.Num(str(attr_size)),
                             )
                             self.symbol_table.define(symbol)
@@ -429,7 +430,7 @@ class Passes:
                     ST.SelfDeclared(),
                     PN.Name(struct_name),
                     attrs,
-                    pos1,
+                    ST.Pos(PN.Num(str(pos1.line)), PN.Num(str(pos1.column))),
                     PN.Num(str(struct_size)),
                 )
                 self.symbol_table.define(symbol)
