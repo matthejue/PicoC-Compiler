@@ -9,8 +9,8 @@ import os
 import sys
 from help_message import generate_help_message
 from lark.lark import Lark
-from dt_visitor import DTVisitor
-from ast_transformer import ASTTransformer
+from dt_visitor_picoc import DTVisitorPicoC
+from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
 from global_funs import basename, subheading, bug_in_compiler_error
 
@@ -19,6 +19,7 @@ class Compiler(cmd2.Cmd):
     cli_args_parser = cmd2.Cmd2ArgumentParser(add_help=False)
     cli_args_parser.add_argument("infile", nargs="?")
     cli_args_parser.add_argument("-i", "--intermediate_stages", action="store_true")
+    cli_args_parser.add_argument("-e", "--execute", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-g", "--gap", type=int, default=20)
     cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
@@ -193,7 +194,7 @@ class Compiler(cmd2.Cmd):
             )
 
         parser = Lark.open(
-            "./src/concrete_syntax.lark",
+            "./src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",
@@ -215,15 +216,15 @@ class Compiler(cmd2.Cmd):
             print(subheading("Derivation Tree", terminal_width, "-"))
             self._derivation_tree_option(dt)
 
-        dt_visitor = DTVisitor()
-        error_handler.handle(dt_visitor.visit, dt)
+        dt_visitor_picoc = DTVisitorPicoC()
+        error_handler.handle(dt_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree Simple", terminal_width, "-"))
             self._derivation_tree_simplified_option(dt)
 
-        ast_transformer = ASTTransformer()
-        ast = error_handler.handle(ast_transformer.transform, dt)
+        ast_transformer_picoc = ASTTransformerPicoC()
+        ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Abstract Syntax Tree", terminal_width, "-"))
@@ -267,7 +268,7 @@ class Compiler(cmd2.Cmd):
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
-            "./src/concrete_syntax.lark",
+            "./src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",

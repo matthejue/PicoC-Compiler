@@ -214,7 +214,7 @@ class ErrorHandler:
 
     def _find_prev_token(self, pos: Pos) -> Token:
         parser = Lark.open(
-            "./src/concrete_syntax.lark",
+            "./src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="invert",
             parser="earley",
@@ -233,7 +233,7 @@ class ErrorHandler:
 
     def _find_last_token(self) -> Token:
         parser = Lark.open(
-            "./src/concrete_syntax.lark",
+            "./src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="invert",
             parser="earley",

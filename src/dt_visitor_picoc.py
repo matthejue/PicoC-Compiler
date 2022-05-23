@@ -2,7 +2,7 @@ from lark.visitors import Visitor
 from lark import Tree
 
 
-class DTVisitor(Visitor):
+class DTVisitorPicoC(Visitor):
     def _return_deepest_tree(self, tree: Tree):
         current_tree = tree
         while current_tree.children[1].data.value != "name":
