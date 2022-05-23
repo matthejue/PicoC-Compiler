@@ -29,8 +29,11 @@ def set_to_str(tokens: set):
 
 def args_to_str(args: list):
     if args:
+        global_vars.args.verbose = True
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
-            f"{CM().BLUE}'" + str(arg).replace("\n", "") + f"'{CM().RESET_ALL}"
+            f"{CM().BLUE}'"
+            + "".join(list(map(lambda line: line.lstrip(), str(arg).split("\n"))))
+            + f"'{CM().RESET_ALL}"
             for arg in args
         )
     else:

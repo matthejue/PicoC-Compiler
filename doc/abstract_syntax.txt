@@ -21,7 +21,7 @@ assign_lhs ::= Alloc(<type_qual>, <dataype>, Name(str)) | <ref_loc>
 exp_stmts ::= Alloc(<type_qual>, <dataype>, Name(str))
 stmt ::= Assign(<assign_lhs>, <exp>)
        | Exp(<exp_stmts>)
----------------------------------- L_Pointer ----------------------------------
+------------------------------------ L_Pntr -----------------------------------
 datatype ::= PntrDecl(Num(str), <datatype>)
 deref_loc ::= Ref(<ref_loc>)|<ref_loc>
 ref_loc ::= Name(str)

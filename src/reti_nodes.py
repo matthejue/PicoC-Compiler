@@ -1,5 +1,6 @@
 import global_vars
 from ast_node import ASTNode
+from picoc_nodes import N as PN
 
 
 class N(ASTNode):
@@ -13,14 +14,19 @@ class N(ASTNode):
         def __init__(self, name, instrs_blocks):
             self.name = name
             self.instrs_blocks = instrs_blocks
+            super().__init__(children=[self.name, self.instrs_blocks])
 
         def __repr__(self):
-            if not global_vars.path:
-                return super().__repr__()
-            instrs_blocks_str = ""
-            for instr_block in self.instrs_blocks:
-                instrs_blocks_str += f"\n{instr_block}"
-            return instrs_blocks_str
+            if not self.instrs_blocks:
+                return ""
+            match self.instrs_blocks[0]:
+                case PN.Block():
+                    return super().__repr__()
+                case _:
+                    instrs_str = str(self.instrs_blocks[0]).replace("\n", "")
+                    for instr in self.instrs_blocks[1:]:
+                        instrs_str += f"{instr}"
+                    return instrs_str
 
         __match_args__ = ("name", "instrs_blocks")
 
@@ -34,7 +40,7 @@ class N(ASTNode):
             instr_str = f"\n{' ' * depth}{self.op}"
             for arg in self.args:
                 instr_str += f" {arg}"
-            return instr_str
+            return f"{instr_str};"
 
         __match_args__ = ("op", "args")
 
@@ -45,7 +51,7 @@ class N(ASTNode):
             self.num = num
 
         def __repr__(self, depth=0):
-            return f"\n{' ' * depth}JUMP{self.rel} {self.num}"
+            return f"\n{' ' * depth}JUMP{self.rel} {self.num};"
 
         __match_args__ = ("rel", "num")
 
@@ -54,7 +60,7 @@ class N(ASTNode):
             self.num = num
 
         def __repr__(self, depth=0):
-            return f"\n{' ' * depth}INT {self.num}"
+            return f"\n{' ' * depth}INT {self.num};"
 
         __match_args__ = ("num",)
 
@@ -65,7 +71,7 @@ class N(ASTNode):
             self.reg = reg
 
         def __repr__(self, depth=0):
-            return f"\n{' ' * depth}CALL {self.name} {self.reg}"
+            return f"\n{' ' * depth}CALL {self.name} {self.reg};"
 
         __match_args__ = ("name", "reg")
 

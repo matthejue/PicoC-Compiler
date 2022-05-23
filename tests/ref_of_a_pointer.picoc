@@ -1,5 +1,5 @@
 // in:42
-// expected:42
+// expected:42 42
 
 void main() {
   int var = input();

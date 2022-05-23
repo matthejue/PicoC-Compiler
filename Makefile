@@ -1,26 +1,38 @@
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
-all: read-color
+all: compile-color
 
 install:
 	ln -sr ./src/main.py /usr/local/bin/picoc_compiler
 
-read: _read _clean-pycache
-_read:
-	./src/main.py $(cat ./most_used_opts.txt) ./run/code.picoc
+compile: _compile _clean-pycache
+_compile:
+	./src/main.py $$(cat ./most_used_compile_opts.txt) ./run/code.picoc
 
-read-verbose: _read-verbose _clean-pycache
-_read-verbose:
-	./src/main.py $(cat ./most_used_opts.txt) -v ./run/code.picoc
+compile-verbose: _compile-verbose _clean-pycache
+_compile-verbose:
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -v ./run/code.picoc
 
-read-color: _read-color _clean-pycache
-_read-color:
-	./src/main.py $(cat ./most_used_opts.txt) -c ./run/code.picoc
+compile-color: _compile-color _clean-pycache
+_compile-color:
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -c ./run/code.picoc
 
-read-debug: _read-debug _clean-pycache
-_read-debug:
-	./src/main.py $(cat ./most_used_opts.txt) -d ./run/code.picoc
+compile-debug: _compile-debug _clean-pycache
+_compile-debug:
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -d ./run/code.picoc
+
+interpret: _compile _interpret _clean-pycache
+_interpret:
+	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) ./run/code.reti
+
+interpret-verbose: _compile-verbose _interpret-verbose _clean-pycache
+_interpret-verbose:
+	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) -v ./run/code.reti
+
+interpret-color: _compile-color _interpret-color _clean-pycache
+_interpret-color:
+	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) -C ./run/code.reti
 
 shell: _shell _clean-pychache
 _shell:
@@ -33,7 +45,7 @@ test: _test _clean-pycache
 test-clean: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
-	# ARG2=-g for debugging
+	# ARG2=-d for debugging
 	./export_environment_vars_for_makefile.sh; \
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
 

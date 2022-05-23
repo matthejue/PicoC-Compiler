@@ -16,6 +16,7 @@ class ST:
         def __init__(self, line, column):
             self.line = line
             self.column = column
+            super().__init__(children=[self.line, self.column])
 
     class Symbol(ASTNode):
         def __init__(
@@ -23,23 +24,44 @@ class ST:
             type_qual=None,
             datatype=None,
             name=None,
-            val=None,
+            val_addr=None,
             pos=None,
             size=None,
         ):
             self.type_qual = type_qual if type_qual else ST.Empty()
             self.datatype = datatype if datatype else ST.Empty()
             self.name = name if name else ST.Empty()
-            self.val = val if val else ST.Empty()
+            self.val_addr = val_addr if val_addr else ST.Empty()
             self.pos = pos if pos else ST.Empty()
             self.size = size if size else ST.Empty()
+            super().__init__(
+                children=[
+                    self.type_qual,
+                    self.datatype,
+                    self.name,
+                    self.val_addr,
+                    self.pos,
+                    self.size,
+                ]
+            )
 
-        __match_args__ = ("type_qual", "datatype", "name", "val", "pos", "size")
+        __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos", "size")
+
+        def __repr__(self, depth=0):
+            acc = f"\n{' ' * depth}{self.__class__.__name__}{{"
+            acc += f"\n{' ' * (depth+2)}type_qual: {self.children[0].__repr__(depth+2+11).lstrip()}"
+            acc += f"\n{' ' * (depth+2)}datatype:  {self.children[1].__repr__(depth+2+11).lstrip()}"
+            acc += f"\n{' ' * (depth+2)}name:      {self.children[2].__repr__(depth+2+11).lstrip()}"
+            acc += f"\n{' ' * (depth+2)}val:       {self.children[3].__repr__(depth+2+11).lstrip()}"
+            acc += f"\n{' ' * (depth+2)}pos:       {self.children[4].__repr__(depth+2+11).lstrip()}"
+            acc += f"\n{' ' * (depth+2)}size:      {self.children[5].__repr__(depth+2+11).lstrip()}"
+            return acc + f"\n{' ' * depth}}}"
 
     class SymbolTable(ASTNode):
         def __init__(self):
             self.symbols = dict()
             self._init_type_sytem()
+            super().__init__(children=[self.symbols])
 
         def _init_type_sytem(self):
             self.define(ST.Symbol(datatype=ST.BuiltIn(), name=N.Name("char")))

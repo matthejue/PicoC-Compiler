@@ -10,8 +10,8 @@ not_passed=();
   # for test in ./{old_,}tests/*$1*.picoc; do
   for test in ./tests/*$2*.picoc; do
     ./heading_subheadings.py "heading" "$test" "$1" "="
-    ./src/main.py $(cat ./most_used_opts.txt) -C $3 "$test";
-    # ./RETI-Interpreter/src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m -v -C ${test%.picoc}.reti
+    ./src/main.py $(cat ./most_used_compile_opts.txt) -c $3 "$test";
+    ./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) -v -C ${test%.picoc}.reti
 
     if [[ $? != 0 ]]; then
       not_running_through+=("$test");
