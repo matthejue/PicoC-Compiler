@@ -154,7 +154,8 @@ class Passes:
         match ref_loc:
             # ---------------------------- L_Arith ----------------------------
             case PN.Name(val):
-                symbol = self.symbol_table.resolve(val)
+                var_name = val
+                symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
                 match symbol:
                     case ST.Symbol(_, datatype):
                         current_datatype = datatype
@@ -178,12 +179,16 @@ class Passes:
                             current_datatype.nums = nums[1:]
                             ref = prev_refs.pop()
                             ref.datatype = current_datatype
-                        case PN.StructSpec(PN.Name(val)):
+                        case PN.StructSpec(PN.Name(val1)):
+                            struct_name = val1
                             ref = prev_refs.pop()
                             ref.datatype = current_datatype
                             match ref:
                                 case PN.Ref(PN.Attr(ref_loc, PN.Name(val2))):
-                                    symbol = self.symbol_table.resolve(f"{val2}@{val}")
+                                    attr_name = val2
+                                    symbol = self.symbol_table.resolve(
+                                        f"{attr_name}@{struct_name}"
+                                    )
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
@@ -198,20 +203,20 @@ class Passes:
                 return [PN.Exp(PN.Ref(ref_loc))]
             # --------------------------- L_Pointer ---------------------------
             # TODO: remove after implementing shrink pass
-            case PN.Deref(deref_loc, exp):
-                ref = PN.Ref(ref_loc)
-                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
-                exps_mon = self._picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [PN.Exp(ref)]
+            #  case PN.Deref(deref_loc, exp):
+            #      ref = PN.Ref(ref_loc)
+            #      refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
+            #      exps_mon = self._picoc_mon_exp(exp)
+            #      return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Array ----------------------------
             case PN.Subscr(deref_loc, exp):
-                ref = PN.Ref(ref_loc)
+                ref = PN.Ref(PN.Subscr(PN.Stack(PN.Num("2")), PN.Stack(PN.Num("1"))))
                 refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
                 exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [PN.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
-            case PN.Attr(ref_loc2, _):
-                ref = PN.Ref(ref_loc)
+            case PN.Attr(ref_loc2, name):
+                ref = PN.Ref(PN.Attr(PN.Stack(PN.Num("1")), name))
                 refs_mon = self._picoc_mon_ref(ref_loc2, [ref] + prev_refs)
                 return refs_mon + [PN.Exp(ref)]
             case _:
@@ -259,6 +264,7 @@ class Passes:
             # ------------------------- L_Assign_Alloc ------------------------
             case PN.Alloc(type_qual, datatype, PN.Name(val, pos)):
                 var_name = val
+                # TODO: Fall für Array einbauen!!!!
                 size = self._datatype_size(datatype)
                 match var_name:
                     case "main":
@@ -286,28 +292,16 @@ class Passes:
                 # Alloc isn't needed anymore after being evaluated
                 return []
             # --------------------------- L_Pointer ---------------------------
-            # TODO: remove after Shrink Pass is implemented
-            case PN.Deref(deref_loc, exp2):
-                refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [PN.Exp(PN.Deref(PN.Stack(PN.Num("1")), exp2))]
             case PN.Ref(PN.Name()):
                 return [PN.Exp(exp)]
+            # TODO: remove Deref after Shrink Pass is implemented
+            case PN.Ref((PN.Subscr() | PN.Attr() | PN.Deref()) as ref_loc):
+                return self._picoc_mon_ref(ref_loc, [])
+            # ----------------- L_Pointer + L_Array + L_Struct ----------------
             # TODO: remove after Shrink Pass is implemented
-            case PN.Ref((PN.Deref(deref_loc, exp2) | PN.Subscr(deref_loc, exp2))):
-                refs_mon = self._picoc_mon_ref(deref_loc, [exp])
-                exps_mon = self._picoc_mon_exp(exp2)
-                return refs_mon + exps_mon + [PN.Exp(exp)]
-            case PN.Ref(PN.Attr(ref_loc, _)):
-                refs_mon = self._picoc_mon_ref(ref_loc, [exp])
-                return refs_mon + [PN.Exp(exp)]
-            # ---------------------------- L_Array ----------------------------
-            case PN.Subscr(deref_loc, exp2):
+            case (PN.Subscr() | PN.Attr() | PN.Deref()):
                 refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), exp2))]
-            # ---------------------------- L_Struct ---------------------------
-            case PN.Attr(ref_loc, name):
-                refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [PN.Exp(PN.Attr(PN.Stack(PN.Num("1")), name))]
+                return refs_mon + [PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), RN.Im("0")))]
             # ----------------------------- L_Fun -----------------------------
             case PN.Call(name, exps):
                 exps_mon = []
@@ -456,18 +450,26 @@ class Passes:
 
     def _datatype_size(self, datatype):
         match datatype:
-            case (PN.IntType() | PN.CharType()):
-                help_const = 1
+            case (PN.IntType() | PN.CharType() | PN.PntrDecl()):
+                return 1
             case PN.StructSpec(PN.Name(val)):
                 symbol = self.symbol_table.resolve(val)
                 match symbol:
                     case ST.Symbol(_, _, _, _, _, PN.Num(val)):
-                        help_const = int(val)
+                        return int(val)
                     case _:
                         bug_in_compiler_error(symbol)
+            case PN.ArrayDecl(nums, datatype2):
+                size = self._datatype_size(datatype2)
+                for num in nums:
+                    match num:
+                        case PN.Name(val):
+                            size *= val
+                        case _:
+                            bug_in_compiler_error(num)
+                return size
             case _:
                 bug_in_compiler_error(datatype)
-        return help_const
 
     def _reti_blocks_stmt(self, stmt):
         match stmt:
@@ -516,7 +518,7 @@ class Passes:
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
                 try:
-                    symbol = self.symbol_table.resolve(val)
+                    symbol = self.symbol_table.resolve(f"{val}@{self.current_scope}")
                 except KeyError:
                     raise Errors.UnknownIdentifier(val, pos)
                 match symbol:
@@ -676,10 +678,10 @@ class Passes:
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
-            case PN.Assign(PN.Name(val), PN.Stack(PN.Num(val2))):
-                symbol = self.symbol_table.resolve(val)
+            case PN.Assign(PN.Name(val1), PN.Stack(PN.Num(val2))):
+                symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
                 match symbol:
-                    case ST.Symbol(_, _, _, PN.Num(val1)):
+                    case ST.Symbol(_, _, _, PN.Num(val3)):
                         return [
                             RN.Instr(
                                 RN.Loadin(),
@@ -688,11 +690,11 @@ class Passes:
                             RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                             RN.Instr(
                                 RN.Store(),
-                                [RN.Reg(RN.Acc()), RN.Im(val1)],
+                                [RN.Reg(RN.Acc()), RN.Im(val3)],
                             ),
                         ]
                     case _:
-                        bug_in_compiler_error()
+                        bug_in_compiler_error(symbol)
             case PN.Assign(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2))):
                 return [
                     RN.Instr(
@@ -707,15 +709,13 @@ class Passes:
                     ),
                 ]
             # --------------------------- L_Pointer ---------------------------
-            case PN.Exp(PN.Deref(deref_loc, exp)):
-                reti_instrs = []
-            case PN.Exp(PN.Ref(PN.Name(val), datatype)):
-                symbol = self.symbol_table.resolve(val)
+            case PN.Exp(PN.Ref(PN.Name(val1))):
+                symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
                 match symbol:
-                    case ST.Symbol(_, _, _, PN.Num(val)):
+                    case ST.Symbol(_, _, _, PN.Num(val2)):
                         return [
                             RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
-                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
+                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val2)]),
                             RN.Instr(
                                 RN.Storein(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")],
@@ -723,6 +723,7 @@ class Passes:
                         ]
                     case _:
                         bug_in_compiler_error(symbol)
+            # TODO: remove after implementing Shrink Pass
             case PN.Exp(
                 PN.Ref(
                     (
@@ -767,6 +768,10 @@ class Passes:
                                 [RN.Reg(RN.In2()), RN.Reg(RN.In1()), RN.Im("0")],
                             ),
                             RN.Instr(
+                                RN.Loadin(),
+                                [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val2)],
+                            ),
+                            RN.Instr(
                                 RN.Multi(), [RN.Reg(RN.In2()), RN.Im(str(help_const))]
                             ),
                             RN.Instr(RN.Add(), [RN.Reg(RN.In1()), RN.Reg(RN.In2())]),
@@ -783,42 +788,67 @@ class Passes:
                 PN.Ref(PN.Attr(PN.Stack(PN.Num(val1)), PN.Name(val2)), datatype)
             ):
                 attr_name = val2
+                rel_pos_in_struct = 0
                 match datatype:
                     case PN.StructSpec(PN.Name(val3)):
                         # determine relative pos in struct
                         struct_name = val3
                         symbol = self.symbol_table.resolve(struct_name)
+                        # TODO: try error and error message
                         match symbol:
                             case ST.Symbol(_, _, _, val4):
-                                attrs = val4
-                                rel_pos_in_struct = 0
-                                for attr in attrs:
-                                    if attr == attr_name:
+                                attr_ids = val4
+                                for attr_id in attr_ids:
+                                    if attr_id.val == f"{attr_name}@{struct_name}":
                                         break
-                                    symbol = self.symbol_table.resolve(attr)
+                                    symbol = self.symbol_table.resolve(attr_id.val)
                                     match symbol:
                                         case ST.Symbol(_, _, _, _, _, PN.Num(val4)):
                                             attr_size = val4
                                             rel_pos_in_struct += int(attr_size)
+                                        case _:
+                                            bug_in_compiler_error(symbol)
                                 else:
-                                    bug_in_compiler_error(attr)
+                                    # TODO: fitting error message if struct doesn't have this attribute
+                                    bug_in_compiler_error(attr_ids)
                             case _:
                                 bug_in_compiler_error(symbol)
                     case _:
+                        # TODO: fitting error message if datatypes not fitting
                         bug_in_compiler_error(datatype)
                 return [
                     RN.Instr(
-                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")]
+                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)]
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.In1()), RN.Im(rel_pos_in_struct)]),
                     RN.Instr(
                         RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")]
                     ),
                 ]
-            # ---------------------------- L_Array ----------------------------
+            # TODO: remove after implementing Shrink Pass
+            #  case PN.Exp(PN.Deref(deref_loc, exp)):
+            #      reti_instrs = []
+            # ----------------- L_Pointer + L_Array + L_Struct ----------------
+            case PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), PN.Num("0"))):
+                return [
+                    RN.Instr(
+                        RN.Loadin(),
+                        [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")],
+                    ),
+                    RN.Instr(
+                        RN.Loadin(), [RN.Reg(RN.In1()), RN.Reg(RN.Acc()), RN.Im("0")]
+                    ),
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                    RN.Instr(
+                        RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
+                    ),
+                ]
             #  case PN.Assign(PN.Alloc(type_qual, datatype, pntr_decl), PN.Array(exps)):
             #      pass
             # ---------------------------- L_Struct ---------------------------
+            # TODO: remove after implementing Shrink Pass
+            #  case PN.Exp(PN.Attr(ref_loc, name)):
+            #  pass
             #  case PN.Assign(
             #      PN.Alloc(type_qual, datatype, pntr_decl), PN.Struct(assigns)
             #  ):
@@ -838,7 +868,7 @@ class Passes:
             #      pass
             #  case PN.Return(exp):
             #      pass
-            case PN.GoTo(name):
+            case PN.GoTo():
                 return stmt
             case _:
                 bug_in_compiler_error(stmt)
@@ -851,15 +881,15 @@ class Passes:
                 for block in blocks:
                     match block:
                         case PN.Block(_, stmts):
-                            reti_instrs = []
+                            instrs = []
                             for stmt in stmts:
-                                reti_instrs += self._reti_blocks_stmt(stmt)
+                                instrs += self._reti_blocks_stmt(stmt)
                             # TODO: move to last RETI Pass start
-                            block.stmts_instrs = reti_instrs
+                            block.stmts_instrs = instrs
                             block.instrs_after = (
                                 f"instructions after: {self.instrs_cnt}"
                             )
-                            self.instrs_cnt += len(reti_instrs)
+                            self.instrs_cnt += len(instrs)
                             # TODO: move to last RETI Pass end
                         case _:
                             bug_in_compiler_error(block)
@@ -885,3 +915,50 @@ class Passes:
     # =========================================================================
     # =                                  RETI                                 =
     # =========================================================================
+    def _determine_distance(self, current_block, other_block, idx):
+        if other_block.instrs_before < current_block.instrs_before:
+            return current_block.instrs_before - other_block.instrs_before + idx
+        elif other_block.instrs_before == current_block.instrs_before:
+            return idx
+        else:  # current_block.instrs_before < other_block.instrs_before:
+            return (
+                other_block.instrs_before
+                - current_block.instrs_before
+                + (len(current_block.stmts_instrs) - idx)
+            )
+
+    def _reti_instr(self, instr, idx, current_block):
+        match instr:
+            case PN.GoTo(PN.Name(val)):
+                other_block = self.all_blocks[val]
+                distance = self._determine_distance(current_block, other_block, idx)
+                if distance == 1:
+                    return []
+                return [RN.Jump(RN.Always(), RN.Im(str(distance)))]
+            case RN.Jump(RN.Eq(), PN.GoTo(PN.Name(val))):
+                other_block = self.all_blocks[val]
+                distance = self._determine_distance(current_block, other_block, idx)
+                return [RN.Jump(RN.Eq(), RN.Im(str(distance)))]
+            case _:
+                return [instr]
+
+    def _reti_block(self, block: PN.Block):
+        match block:
+            case PN.Block(_, instrs):
+                instrs = []
+                for i, instr in enumerate(instrs):
+                    instrs += self._reti_instr(instr, i, block)
+                return instrs
+            case _:
+                bug_in_compiler_error(block)
+
+    def reti(self, program: RN.Program):
+        match program:
+            # ----------------------------- L_File ----------------------------
+            case RN.Program(name, blocks):
+                instrs = []
+                for block in blocks:
+                    instrs += self._reti_block(block)
+            case _:
+                bug_in_compiler_error(program)
+        return RN.Program(remove_extension(name) + ".reti", instrs)
