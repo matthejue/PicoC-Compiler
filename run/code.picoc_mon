@@ -1,78 +1,56 @@
-File(
-  Name('./run/code.picoc_mon')
+File
+  Name './run/code.picoc_mon'
   [
-    FunDef(
-      IntType('int'), 
-      Name('main')
+    FunDef
+      IntType 'int', 
+      Name 'main'
       []
       [
-        Block(
-          Name('main.0')
+        Block
+          Name 'main.0'
           [
-            Exp(
-              Num('1')
-            )
-            Exp(
-              Num('2')
-            )
-            Exp(
-              Num('3')
-            )
-            Exp(
-              BinOp(
-                Stack(
-                  Num('2')
-                ), 
-                Add('*'), 
-                Stack(
-                  Num('1')
-                )
-              )
-            )
-            Exp(
-              BinOp(
-                Stack(
-                  Num('2')
-                ), 
-                Sub('-'), 
-                Stack(
-                  Num('1')
-                )
-              )
-            )
-            Assign(
-              Name('i'), 
-              Stack(
-                Num('1')
-              )
-            )
-            Exp(
-              Name('i')
-            )
-            Exp(
-              Call(
-                Name('print')
+            Exp
+              Num '1'
+            Exp
+              Num '2'
+            Exp
+              Num '3'
+            Exp
+              BinOp
+                Stack
+                  Num '2', 
+                Add '*', 
+                Stack
+                  Num '1'
+            Exp
+              BinOp
+                Stack
+                  Num '2', 
+                Sub '-', 
+                Stack
+                  Num '1'
+            Assign
+              Name 'i', 
+              Stack
+                Num '1'
+            Exp
+              Name 'i'
+            Exp
+              Call
+                Name 'print'
                 [
-                  Stack(
-                    Num('1')
-                  )
+                  Stack
+                    Num '1'
                 ]
-              )
-            )
           ]
-        )
       ]
-    )
-    FunDef(
-      VoidType('void'), 
-      Name('function_name')
+    FunDef
+      VoidType 'void', 
+      Name 'function_name'
       []
       [
-        Block(
-          Name('function_name.1')
+        Block
+          Name 'function_name.1'
           []
-        )
       ]
-    )
   ]
-)
