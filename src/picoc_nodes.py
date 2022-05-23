@@ -173,7 +173,7 @@ class N:
 
         __match_args__ = ("num",)
 
-    # ------------------------------- L_Pointer -------------------------------
+    # --------------------------------- L_Pntr --------------------------------
     class PntrDecl(ASTNode):
         def __init__(self, num, datatype):
             self.num = num
@@ -350,31 +350,21 @@ class N:
 
         __match_args__ = ("name", "decls_defs")
 
-        def __repr__(self):
-            if not global_vars.path:
-                return super().__repr__()
-            decls_defs_str = ""
-            for decl_def in self.decls_defs:
-                decls_defs_str += f"\n{decl_def}"
-            return decls_defs_str
-
     # -------------------------------- L_Block --------------------------------
     class Block(ASTNode):
         def __init__(self, name, stmts_instrs):
             self.name = name
             self.stmts_instrs = stmts_instrs
             self.instrs_before = ""
-            self.instrs_after = ""
             super().__init__(
                 children=[
                     self.name,
                     self.stmts_instrs,
                     self.instrs_before,
-                    self.instrs_after,
                 ]
             )
 
-        __match_args__ = ("name", "stmts_instrs", "instrs_before", "instrs_after")
+        __match_args__ = ("name", "stmts_instrs", "instrs_before")
 
     class GoTo(ASTNode):
         def __init__(self, name):

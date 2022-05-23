@@ -187,7 +187,10 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", terminal_width, "-"))
-            print(code)
+            print(
+                f"// {basename(global_vars.args.infile.replace(' ', '_'))}.picoc:\n"
+                + code
+            )
 
         parser = Lark.open(
             "./src/concrete_syntax.lark",
@@ -216,7 +219,7 @@ class Compiler(cmd2.Cmd):
         error_handler.handle(dt_visitor.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Derivation Tree Simplified", terminal_width, "-"))
+            print(subheading("Derivation Tree Simple", terminal_width, "-"))
             self._derivation_tree_simplified_option(dt)
 
         ast_transformer = ASTTransformer()
@@ -244,7 +247,8 @@ class Compiler(cmd2.Cmd):
             self._picoc_mon_option(picoc_mon)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Symbol Table Mon", terminal_width, "-"))
+            print(subheading("Symbol Table", terminal_width, "-"))
+            self._symbol_table_option(passes.symbol_table)
 
         reti_blocks = error_handler.handle(passes.reti_blocks, picoc_mon)
 
@@ -253,14 +257,13 @@ class Compiler(cmd2.Cmd):
             self._reti_blocks_option(reti_blocks)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Symbol Table", terminal_width, "-"))
-            self._symbol_table_option(passes.symbol_table)
-
-        if global_vars.args.intermediate_stages:
             print(subheading("RETI Patch", terminal_width, "-"))
+
+        reti = error_handler.handle(passes.reti, reti_blocks)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI", terminal_width, "-"))
+            self._reti_option(reti)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
@@ -320,10 +323,11 @@ class Compiler(cmd2.Cmd):
     def _picoc_blocks_option(self, picoc_blocks: PN.File):
         if global_vars.args.print:
             print(picoc_blocks)
+
         if global_vars.path:
             match picoc_blocks:
                 case PN.File(PN.Name(val)):
-                    with open(global_vars.path + val, "w", encoding="utf-8") as fout:
+                    with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_blocks))
                 case _:
                     bug_in_compiler_error(picoc_blocks)
@@ -331,10 +335,11 @@ class Compiler(cmd2.Cmd):
     def _picoc_mon_option(self, picoc_mon: PN.File):
         if global_vars.args.print:
             print(picoc_mon)
+
         if global_vars.path:
             match picoc_mon:
                 case PN.File(PN.Name(val)):
-                    with open(global_vars.path + val, "w", encoding="utf-8") as fout:
+                    with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_mon))
                 case _:
                     bug_in_compiler_error(picoc_mon)
@@ -354,10 +359,11 @@ class Compiler(cmd2.Cmd):
     def _reti_blocks_option(self, reti_blocks: RN.Program):
         if global_vars.args.print:
             print(reti_blocks)
+
         if global_vars.path:
             match reti_blocks:
-                case RN.Program(RN.Name(val)):
-                    with open(global_vars.path + val, "w", encoding="utf-8") as fout:
+                case PN.File(PN.Name(val)):
+                    with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_blocks))
                 case _:
                     bug_in_compiler_error(reti_blocks)
@@ -375,10 +381,11 @@ class Compiler(cmd2.Cmd):
     def _reti_patch_option(self, reti_patch: RN.Program):
         if global_vars.args.print:
             print(reti_patch)
+
         if global_vars.path:
             match reti_patch:
                 case RN.Program(RN.Name(val)):
-                    with open(global_vars.path + val, "w", encoding="utf-8") as fout:
+                    with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
                     bug_in_compiler_error(reti_patch)
@@ -386,10 +393,11 @@ class Compiler(cmd2.Cmd):
     def _reti_option(self, reti: RN.Program):
         if global_vars.args.print:
             print(reti)
+
         if global_vars.path:
             match reti:
                 case RN.Program(RN.Name(val)):
-                    with open(global_vars.path + val, "w", encoding="utf-8") as fout:
+                    with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti))
                 case _:
                     bug_in_compiler_error(reti)

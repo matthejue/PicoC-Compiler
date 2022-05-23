@@ -142,7 +142,7 @@ class ASTTransformer(Transformer):
                     Pos(token.line, token.column),
                 )
 
-    # ------------------------------- L_Pointer -------------------------------
+    # --------------------------------- L_Pntr --------------------------------
     def deref_offset_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
@@ -192,7 +192,7 @@ class ASTTransformer(Transformer):
         return nodes[0]
 
     def print_stmt(self, nodes):
-        return N.Call(N.Name("print"), nodes[0])
+        return N.Exp(N.Call(N.Name("print"), [nodes[0]]))
 
     # --------------------------------- L_Logic -------------------------------
     def logic_atom(self, nodes):
@@ -240,7 +240,7 @@ class ASTTransformer(Transformer):
     def alloc_init_stmt(self, nodes):
         return nodes[0]
 
-    # -------------------------------- L_Pointer ------------------------------
+    # --------------------------------- L_Pntr --------------------------------
     def pntr_deg(self, nodes):
         return N.Num(str(len(nodes)))
 

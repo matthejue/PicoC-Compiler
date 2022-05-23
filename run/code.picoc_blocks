@@ -1,50 +1,52 @@
-File
-  Name('code')
+File(
+  Name('./run/code.picoc_blocks')
   [
-    FunDef
-      VoidType('void')
-      Name('function_name')
-      []
-      [
-        Block
-          Name('function_name.0')
-          []
-      ]
-    FunDef
-      IntType('int')
+    FunDef(
+      IntType('int'), 
       Name('main')
       []
       [
-        Block
-          Name('main.1')
+        Block(
+          Name('main.0')
           [
-            Exp
-              Alloc
-                Writeable
-                PntrDecl
-                  Num('0')
-                  ArrayDecl
-                    IntType('int')
-                    []
+            Assign(
+              Alloc(
+                Writeable(), 
+                IntType('int'), 
                 Name('i')
-            Assign
-              Name('tmp.1')
-              BinOp
-                Name('i')
-                Add('+')
-                Num('1')
-            Assign
-              Name('tmp.2')
-              BinOp
-                Num('2')
-                Add('*')
-                Num('3')
-            Assign
-              Name('i')
-              BinOp
-                Name('tmp.1')
-                Sub('-')
-                Name('tmp.2')
+              ), 
+              BinOp(
+                Num('1'), 
+                Sub('-'), 
+                BinOp(
+                  Num('2'), 
+                  Add('*'), 
+                  Num('3')
+                )
+              )
+            )
+            Exp(
+              Call(
+                Name('print')
+                [
+                  Name('i')
+                ]
+              )
+            )
           ]
+        )
       ]
+    )
+    FunDef(
+      VoidType('void'), 
+      Name('function_name')
+      []
+      [
+        Block(
+          Name('function_name.1')
+          []
+        )
+      ]
+    )
   ]
+)

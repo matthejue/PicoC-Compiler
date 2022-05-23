@@ -40,7 +40,7 @@ CHAR_DT.2: "char"
 CHAR_NAME.3: "char"(LETTER|DIG_WITH_0|"_")+
 VOID_DT.2: "void"
 VOID_NAME.3: "void"(LETTER|DIG_WITH_0|"_")+
-// --------------------------------- L_Pointer --------------------------------
+// ---------------------------------- L_Pntr ----------------------------------
 deref_offset_op: ADD|SUB_MINUS
 // ============================================================================
 // =                                  Parser                                  =
@@ -67,7 +67,7 @@ assign_stmt: ref_loc "=" logic_exp";"
 init: alloc "=" logic_exp";"
 const_init: "const" prim_dt name "=" NUM";"
 alloc_init_stmt: alloc_stmt|init|const_init|array_init|struct_init
-// --------------------------------- L_Pointer --------------------------------
+// ---------------------------------- L_Pntr ----------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl
 deref_loc: ref|ref_loc
