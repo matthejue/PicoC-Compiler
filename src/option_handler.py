@@ -3,7 +3,7 @@ import cmd2
 from error_handler import ErrorHandler
 from symbol_table import ST
 from picoc_nodes import N as PN
-from reti_nodes import N as N
+from reti_nodes import N as RN
 from colormanager import ColorManager as CM
 import os
 import sys
@@ -383,25 +383,25 @@ class OptionHandler(cmd2.Cmd):
                 case _:
                     bug_in_compiler_error(reti_blocks)
 
-    def _reti_patch_option(self, reti_patch: N.Program):
+    def _reti_patch_option(self, reti_patch: RN.Program):
         if global_vars.args.print:
             print(reti_patch)
 
         if global_vars.path:
             match reti_patch:
-                case N.Program(N.Name(val)):
+                case RN.Program(RN.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
                     bug_in_compiler_error(reti_patch)
 
-    def _reti_option(self, reti: N.Program):
+    def _reti_option(self, reti: RN.Program):
         if global_vars.args.print:
             print(reti)
 
         if global_vars.path:
             match reti:
-                case N.Program(N.Name(val)):
+                case RN.Program(RN.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti))
                 case _:

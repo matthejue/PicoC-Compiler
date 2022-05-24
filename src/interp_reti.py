@@ -248,26 +248,12 @@ class RETIInterpreter:
                     i = reti.reg_get("PC") - global_vars.args.process_begin - 2**31
                     next_instruction = instrs[i] if i < len(instrs) and i >= 0 else None
                     if not next_instruction:
+                        self._conclude(program, reti)
                         break
-                        # raise Errors.JumpedOutOfProgrammError() or LostTrack
+                        # TODO: raise Errors.JumpedOutOfProgrammError() or LostTrack?
                     match next_instruction:
                         case N.Jump(N.Always(), N.Im("0")):
-                            if (
-                                global_vars.args.intermediate_stages
-                                and not global_vars.args.verbose
-                            ):
-                                self._reti_state_option(reti)
-                            # needs a newline at the end, else it differs from .out_expected
-                            match program:
-                                case N.Program(N.Name(val)):
-                                    with open(
-                                        global_vars.path + val + ".out",
-                                        "a",
-                                        encoding="utf-8",
-                                    ) as fout:
-                                        fout.write("\n")
-                                case _:
-                                    bug_in_compiler_error(program)
+                            self._conclude(program, reti)
                             break
                         case _:
                             reti.save_last_instruction()
@@ -277,6 +263,21 @@ class RETIInterpreter:
                                 and global_vars.args.verbose
                             ):
                                 self._reti_state_option(reti)
+
+    def _conclude(self, program, reti):
+        if global_vars.args.intermediate_stages and not global_vars.args.verbose:
+            self._reti_state_option(reti)
+        # needs a newline at the end, else it differs from .out_expected
+        match program:
+            case N.Program(N.Name(val)):
+                with open(
+                    remove_extension(val) + ".out",
+                    "a",
+                    encoding="utf-8",
+                ) as fout:
+                    fout.write("\n")
+            case _:
+                bug_in_compiler_error(program)
 
     def _reti_state_option(self, reti_state):
         reti_state.idx.val = str(int(reti_state.idx.val) + 1)
@@ -321,7 +322,15 @@ class RETIInterpreter:
                         remove_extension(val) + ".in", "r", encoding="utf-8"
                     ) as fin:
                         self.test_input = list(
-                            reversed([int(line) for line in fin.readline().split(" ")])
+                            reversed(
+                                [
+                                    int(line)
+                                    for line in fin.readline()
+                                    .replace("\n", "")
+                                    .split(" ")
+                                    if line
+                                ]
+                            )
                         )
             case _:
                 bug_in_compiler_error(program)
