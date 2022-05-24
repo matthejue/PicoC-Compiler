@@ -7,7 +7,8 @@ class ASTNode:
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
-        self.val: str = val
+        # necesary for reti nodes and the symbol table
+        self.val: str = val if val else self.__class__.__name__.upper()
         self.pos: Pos = pos
         self.children = children
 
@@ -22,9 +23,9 @@ class ASTNode:
         acc = ""
 
         if depth > 0:
-            acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ''}"
+            acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
         else:
-            acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ''}"
+            acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
 
         for i, child in enumerate(self.children):
             if isinstance(child, list):

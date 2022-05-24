@@ -2,7 +2,7 @@
 
 import sys
 import global_vars
-from compiler import Compiler
+from option_handler import OptionHandler
 from global_funs import only_keep_path, basename
 from colorama import init
 from colormanager import ColorManager as CM
@@ -16,7 +16,7 @@ def main():
 
     init(strip=False)
 
-    compiler = Compiler()
+    compiler = OptionHandler()
 
     if not global_vars.args.infile:
         sys.exit(compiler.cmdloop())

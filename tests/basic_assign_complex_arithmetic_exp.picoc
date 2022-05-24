@@ -1,0 +1,7 @@
+// in:
+// expected:1
+
+int main(){
+  int i = 1 - 2 * 3 + 6;
+  print(i);
+}

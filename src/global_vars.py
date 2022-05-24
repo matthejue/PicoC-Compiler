@@ -1,11 +1,20 @@
+from reti_nodes import N
+
+
 class Args:
     def __init__(self):
-        # assigned in the do_most_used function because the filename has to be
-        # put at the beginning of the code
+        # --------------------------- PicoC_Compiler --------------------------
         self.infile = "stdin"
+        # -------------------------- RETI_Interpreter -------------------------
+        self.run = True
+        self.process_begin = 8
+        self.datasegment_size = 32
+        self.eprom_size = 8
+        self.uart_size = 4
+        self.sram_size = 0
+        # ----------------- PicoC_Compiler + RETI_Interpreter -----------------
         self.intermediate_stages = True
         self.print = True
-        self.gap = 20
         self.lines = 2
         self.show_error_message = False
         self.verbose = False
@@ -78,3 +87,25 @@ MAP_NAME_TO_SYMBOL = {
 }
 
 MAX_PRINT_OUT_TOKENS = 5
+
+COMPUTE_INSTRUCTION = [
+    N.Add,
+    N.Sub,
+    N.Mult,
+    N.Div,
+    N.Mod,
+    N.Oplus,
+    N.Or,
+    N.And,
+]
+
+COMPUTE_IMMEDIATE_INSTRUCTION = [
+    N.Addi,
+    N.Subi,
+    N.Multi,
+    N.Divi,
+    N.Modi,
+    N.Oplusi,
+    N.Ori,
+    N.Andi,
+]

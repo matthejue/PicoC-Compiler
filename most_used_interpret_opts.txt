@@ -1,1 +1,1 @@
--ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m
+-R -B 8 -D 32 -E 8 -U 4 -S 0 -i -p -l 2 -m

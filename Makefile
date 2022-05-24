@@ -22,17 +22,21 @@ compile-debug: _compile-debug _clean-pycache
 _compile-debug:
 	./src/main.py $$(cat ./most_used_compile_opts.txt) -d ./run/code.picoc
 
-interpret: _compile _interpret _clean-pycache
+interpret: _interpret _clean-pycache
 _interpret:
-	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) ./run/code.reti
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) ./run/code.picoc
 
-interpret-verbose: _compile-verbose _interpret-verbose _clean-pycache
+interpret-verbose: _interpret-verbose _clean-pycache
 _interpret-verbose:
-	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) -v ./run/code.reti
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -v ./run/code.picoc
 
-interpret-color: _compile-color _interpret-color _clean-pycache
+interpret-color: _interpret-color _clean-pycache
 _interpret-color:
-	./RETI-Interpreter/src/main.py $$(cat ./most_used_interpret_opts.txt) -C ./run/code.reti
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -c ./run/code.picoc
+
+interpret-debug: _interpret-debug _clean-pycache
+_interpret-debug:
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -d ./run/code.picoc
 
 shell: _shell _clean-pychache
 _shell:

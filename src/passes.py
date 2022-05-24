@@ -535,14 +535,35 @@ class Passes:
                 ]
                 try:
                     symbol = self.symbol_table.resolve(f"{val}@{self.current_scope}")
+                    choosen_scope = self.current_scope
                 except KeyError:
-                    raise Errors.UnknownIdentifier(val, pos)
+                    try:
+                        symbol = self.symbol_table.resolve(f"{val}@global")
+                        choosen_scope = "global"
+                    except KeyError:
+                        raise Errors.UnknownIdentifier(val, pos)
                 match symbol:
                     # TODO: anpassen an Nutzung von DS um nur Relativadressen zu nutzen
                     case ST.Symbol(PN.Writeable(), _, _, PN.Num(val)):
-                        reti_instrs += [
-                            RN.Instr(RN.Load(), [RN.Reg(RN.Acc()), RN.Im(val)]),
-                        ]
+                        match choosen_scope:
+                            case ("main" | "global"):
+                                reti_instrs += [
+                                    RN.Instr(
+                                        RN.Loadin(),
+                                        [RN.Reg(RN.Ds()), RN.Reg(RN.Acc()), RN.Im(val)],
+                                    )
+                                ]
+                            case _:
+                                reti_instrs += [
+                                    RN.Instr(
+                                        RN.Loadin(),
+                                        [
+                                            RN.Reg(RN.Baf()),
+                                            RN.Reg(RN.Acc()),
+                                            RN.Im(str(-(2 + int(val)))),
+                                        ],
+                                    )
+                                ]
                     case ST.Symbol(PN.Const(), _, _, PN.Num(val)):
                         reti_instrs += [
                             RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
@@ -634,7 +655,7 @@ class Passes:
                 ]
             case PN.Exp(PN.Call(PN.Name("input"), [PN.Stack(PN.Num(val))])):
                 return self._single_line_comment(stmt) + [
-                    RN.Call(RN.Name("input"), RN.Reg(RN.Acc())),
+                    RN.Call(RN.Name("INPUT"), RN.Reg(RN.Acc())),
                     RN.Instr(
                         RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
                     ),
@@ -646,7 +667,7 @@ class Passes:
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
-                    RN.Call(RN.Name("print"), RN.Reg(RN.Acc())),
+                    RN.Call(RN.Name("PRINT"), RN.Reg(RN.Acc())),
                 ]
             # ---------------------------- L_Logic ----------------------------
             case PN.Exp(PN.ToBool(PN.Stack(val))):
@@ -705,8 +726,8 @@ class Passes:
                             ),
                             RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                             RN.Instr(
-                                RN.Store(),
-                                [RN.Reg(RN.Acc()), RN.Im(val3)],
+                                RN.Storein(),
+                                [RN.Reg(RN.Ds()), RN.Reg(RN.Acc()), RN.Im(val3)],
                             ),
                         ]
                     case _:
@@ -725,20 +746,52 @@ class Passes:
                     ),
                 ]
             # ----------------------------- L_Pntr ----------------------------
-            case PN.Exp(PN.Ref(PN.Name(val1))):
-                symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
+            case PN.Exp(PN.Ref(PN.Name(val1, pos))):
+                reti_instrs = self._single_line_comment(stmt) + [
+                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")])
+                ]
+                try:
+                    symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
+                    choosen_scope = self.current_scope
+                except KeyError:
+                    try:
+                        symbol = self.symbol_table.resolve(f"{val1}@global")
+                        choosen_scope = "global"
+                    except KeyError:
+                        raise Errors.UnknownIdentifier(val1, pos)
                 match symbol:
                     case ST.Symbol(_, _, _, PN.Num(val2)):
-                        return self._single_line_comment(stmt) + [
-                            RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
-                            RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val2)]),
-                            RN.Instr(
-                                RN.Storein(),
-                                [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")],
-                            ),
-                        ]
+                        match choosen_scope:
+                            case ("main", "global"):
+                                reti_instrs += [
+                                    RN.Instr(
+                                        RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val2)]
+                                    ),
+                                    RN.Instr(
+                                        RN.Add(), [RN.Reg(RN.Acc()), RN.Reg(RN.Ds())]
+                                    ),
+                                ]
+                            case _:
+                                reti_instrs += [
+                                    RN.Instr(
+                                        RN.Move(), [RN.Reg(RN.Baf()), RN.Reg(RN.Acc())]
+                                    ),
+                                    RN.Instr(
+                                        RN.Loadi(), [RN.Reg(RN.In2()), RN.Im(val2)]
+                                    ),
+                                    RN.Instr(
+                                        RN.Sub(), [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]
+                                    ),
+                                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("2")]),
+                                ]
                     case _:
                         bug_in_compiler_error(symbol)
+                return reti_instrs + [
+                    RN.Instr(
+                        RN.Storein(),
+                        [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")],
+                    )
+                ]
             # TODO: remove after implementing Shrink Pass
             case PN.Exp(
                 PN.Ref(
@@ -854,7 +907,6 @@ class Passes:
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.In1()), RN.Reg(RN.Acc()), RN.Im("0")]
                     ),
-                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                     RN.Instr(
                         RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     ),

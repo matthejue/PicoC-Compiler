@@ -11,7 +11,7 @@ from lark.exceptions import (
 )
 from lark.lexer import Token
 from lark.lark import Lark
-import compiler
+from global_funs import subheading
 import os
 import sys
 
@@ -195,7 +195,7 @@ class ErrorHandler:
 
     def _error_heading(self):
         terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
-        print(compiler.subheading("Error", terminal_width, "-"))
+        print(subheading("Error", terminal_width, "-"))
 
     def _error_header(self, description: str, pos=None):
         if not pos:

@@ -3,7 +3,7 @@ import cmd2
 from error_handler import ErrorHandler
 from symbol_table import ST
 from picoc_nodes import N as PN
-from reti_nodes import N as RN
+from reti_nodes import N as N
 from colormanager import ColorManager as CM
 import os
 import sys
@@ -13,15 +13,23 @@ from dt_visitor_picoc import DTVisitorPicoC
 from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
 from global_funs import basename, subheading, bug_in_compiler_error
+from interp_reti import RETIInterpreter
 
 
-class Compiler(cmd2.Cmd):
+class OptionHandler(cmd2.Cmd):
     cli_args_parser = cmd2.Cmd2ArgumentParser(add_help=False)
+    # ----------------------------- PicoC_Compiler ----------------------------
     cli_args_parser.add_argument("infile", nargs="?")
+    # ---------------------------- RETI_Interpreter ---------------------------
+    cli_args_parser.add_argument("-R", "--run", action="store_true")
+    cli_args_parser.add_argument("-B", "--process_begin", type=int, default=8)
+    cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
+    cli_args_parser.add_argument("-E", "--eprom_size", type=int, default=8)
+    cli_args_parser.add_argument("-U", "--uart_size", type=int, default=4)
+    cli_args_parser.add_argument("-S", "--sram_size", type=int, default=0)
+    # ------------------- PicoC_Compiler + RETI_Interpreter -------------------
     cli_args_parser.add_argument("-i", "--intermediate_stages", action="store_true")
-    cli_args_parser.add_argument("-e", "--execute", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-g", "--gap", type=int, default=20)
     cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
@@ -151,7 +159,7 @@ class Compiler(cmd2.Cmd):
         global_vars.args.print = True
 
         try:
-            self._compile(["void main() {"] + code.split("\n") + ["}"])
+            self._compl(["void main() {"] + code.split("\n") + ["}"])
         except Exception as e:
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
@@ -173,9 +181,9 @@ class Compiler(cmd2.Cmd):
         with open(global_vars.args.infile, encoding="utf-8") as fin:
             pico_c_in = fin.read()
 
-        self._compile(pico_c_in)
+        self._compl(pico_c_in)
 
-    def _compile(self, code):
+    def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
@@ -214,21 +222,21 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree", terminal_width, "-"))
-            self._derivation_tree_option(dt)
+            self._dt_option(dt)
 
         dt_visitor_picoc = DTVisitorPicoC()
         error_handler.handle(dt_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree Simple", terminal_width, "-"))
-            self._derivation_tree_simplified_option(dt)
+            self._dt_simple_option(dt)
 
         ast_transformer_picoc = ASTTransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Abstract Syntax Tree", terminal_width, "-"))
-            self._abstract_syntax_tree_option(ast)
+            self._ast_option(ast)
 
         passes = Passes()
 
@@ -249,7 +257,7 @@ class Compiler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages:
             print(subheading("Symbol Table", terminal_width, "-"))
-            self._symbol_table_option(passes.symbol_table)
+            self._st_option(passes.symbol_table)
 
         reti_blocks = error_handler.handle(passes.reti_blocks, picoc_mon)
 
@@ -265,6 +273,11 @@ class Compiler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             print(subheading("RETI", terminal_width, "-"))
             self._reti_option(reti)
+
+        if global_vars.args.run:
+            print(subheading("RETI Run", terminal_width, "-"))
+            reti_interp = RETIInterpreter()
+            error_handler.handle(reti_interp.interp_reti, reti)
 
     def _tokens_option(self, code_with_file):
         parser = Lark.open(
@@ -289,7 +302,7 @@ class Compiler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(tokens))
 
-    def _derivation_tree_option(self, dt):
+    def _dt_option(self, dt):
         if global_vars.args.print:
             print(dt.pretty())
 
@@ -299,7 +312,7 @@ class Compiler(cmd2.Cmd):
             ) as fout:
                 fout.write(dt.pretty())
 
-    def _derivation_tree_simplified_option(self, dt_simplified):
+    def _dt_simple_option(self, dt_simplified):
         if global_vars.args.print:
             print(dt_simplified.pretty())
 
@@ -311,7 +324,7 @@ class Compiler(cmd2.Cmd):
             ) as fout:
                 fout.write(dt_simplified.pretty())
 
-    def _abstract_syntax_tree_option(self, ast: PN.File):
+    def _ast_option(self, ast: PN.File):
         if global_vars.args.print:
             print(ast)
 
@@ -334,6 +347,7 @@ class Compiler(cmd2.Cmd):
                     bug_in_compiler_error(picoc_blocks)
 
     def _picoc_mon_option(self, picoc_mon: PN.File):
+
         if global_vars.args.print:
             print(picoc_mon)
 
@@ -345,19 +359,19 @@ class Compiler(cmd2.Cmd):
                 case _:
                     bug_in_compiler_error(picoc_mon)
 
-    def _symbol_table_mon_option(self, symbol_table: ST.SymbolTable):
+    def _st_option(self, symbol_table: ST.SymbolTable):
         if global_vars.args.print:
             print(symbol_table)
 
         if global_vars.path:
             with open(
-                global_vars.path + global_vars.basename + ".st_mon",
+                global_vars.path + global_vars.basename + ".st",
                 "w",
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(symbol_table))
 
-    def _reti_blocks_option(self, reti_blocks: RN.Program):
+    def _reti_blocks_option(self, reti_blocks: PN.File):
         if global_vars.args.print:
             print(reti_blocks)
 
@@ -369,71 +383,26 @@ class Compiler(cmd2.Cmd):
                 case _:
                     bug_in_compiler_error(reti_blocks)
 
-    def _symbol_table_option(self, symbol_table: ST.SymbolTable):
-        if global_vars.args.print:
-            print(symbol_table)
-
-        if global_vars.path:
-            with open(
-                global_vars.path + global_vars.basename + ".st", "w", encoding="utf-8"
-            ) as fout:
-                fout.write(str(symbol_table))
-
-    def _reti_patch_option(self, reti_patch: RN.Program):
+    def _reti_patch_option(self, reti_patch: N.Program):
         if global_vars.args.print:
             print(reti_patch)
 
         if global_vars.path:
             match reti_patch:
-                case RN.Program(RN.Name(val)):
+                case N.Program(N.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
                     bug_in_compiler_error(reti_patch)
 
-    def _reti_option(self, reti: RN.Program):
+    def _reti_option(self, reti: N.Program):
         if global_vars.args.print:
             print(reti)
 
         if global_vars.path:
             match reti:
-                case RN.Program(RN.Name(val)):
+                case N.Program(N.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti))
                 case _:
                     bug_in_compiler_error(reti)
-
-    # from tabulate import tabulate
-    #  def _print_symbol_table(self):
-    #      header = ["name", "type", "datatype", "position", "value"]
-    #      symbols = ST.SymbolTable().symbols
-    #
-    #      output = str(
-    #          tabulate(
-    #              [
-    #                  (k, v.get_type(), str(v.datatype), str(v.position), str(v.value))
-    #                  for k, v in symbols.items()
-    #              ],
-    #              headers=header,
-    #          )
-    #      )
-    #      print(output)
-    #
-    #  def _write_symbol_table(self):
-    #      output = "name,type,datatype,position,value\n"
-    #      symbols = ST.SymbolTable().symbols
-    #      for name in symbols.keys():
-    #          position = (
-    #              f"({symbols[name].position[0]}:{symbols[name].position[1]})"
-    #              if symbols[name].position != "/"
-    #              else "/"
-    #          )
-    #          output += (
-    #              f"{name},"
-    #              f"{symbols[name].get_type()},"
-    #              f"{symbols[name].datatype},"
-    #              f"{position},"
-    #              f"{symbols[name].value}\n"
-    #          )
-    #      with open(global_vars.outbase + ".csv", "w", encoding="utf-8") as fout:
-    #          fout.write(output)
