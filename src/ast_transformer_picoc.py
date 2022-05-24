@@ -43,7 +43,7 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "*":
-                return N.Add(
+                return N.Mul(
                     token.value,
                     Pos(token.line, token.column),
                 )
