@@ -29,6 +29,8 @@ def set_to_str(tokens: set):
 
 def args_to_str(args: list):
     if args:
+        # this function only gets called in case of an error, so the verbose
+        # option doesn't have to be reset, because execution ends anyways
         global_vars.args.verbose = True
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
             f"{CM().BLUE}'"

@@ -11,24 +11,24 @@ class N(ASTNode):
     # =========================================================================
     # -------------------------------- Program --------------------------------
     class Program(ASTNode):
-        def __init__(self, name, instrs_blocks):
+        def __init__(self, name, instrs):
             self.name = name
-            self.instrs_blocks = instrs_blocks
-            super().__init__(children=[self.name, self.instrs_blocks])
+            self.instrs = instrs
+            super().__init__(children=[self.name, self.instrs])
 
         def __repr__(self):
-            if not self.instrs_blocks:
+            if not self.instrs:
                 return ""
-            match self.instrs_blocks[0]:
+            match self.instrs[0]:
                 case PN.Block():
                     return super().__repr__()
                 case _:
-                    instrs_str = str(self.instrs_blocks[0]).replace("\n", "")
-                    for instr in self.instrs_blocks[1:]:
+                    instrs_str = str(self.instrs[0]).replace("\n", "")
+                    for instr in self.instrs[1:]:
                         instrs_str += f"{instr}"
                     return instrs_str
 
-        __match_args__ = ("name", "instrs_blocks")
+        __match_args__ = ("name", "instrs")
 
     # ------------------------- Load / Store / Compute ------------------------
     class Instr(ASTNode):
@@ -85,15 +85,6 @@ class N(ASTNode):
 
         __match_args__ = ("val",)
 
-    class InlineComment(ASTNode):
-        def __init__(self, val):
-            self.val = val
-
-        def __repr__(self, depth=0):
-            return f'{" " * global_vars.args.gap}  # {self.val}'
-
-        __match_args__ = ("val",)
-
     # =========================================================================
     # =                              Token Nodes                              =
     # =========================================================================
@@ -118,13 +109,13 @@ class N(ASTNode):
         __match_args__ = ("val",)
 
     class Reg(ASTNode):
-        def __init__(self, reg):
-            self.reg = reg
+        def __init__(self, val):
+            self.val = val
 
         def __repr__(self):
-            return f"{self.reg}"
+            return f"{self.val}"
 
-        __match_args__ = ("reg",)
+        __match_args__ = ("val",)
 
     # ----------------------- Compute Memory / Register -----------------------
     class Add(ASTNode):
@@ -257,9 +248,9 @@ class N(ASTNode):
             return "RTI"
 
     # ------------------------------- Registers -------------------------------
-    class Acc(ASTNode):
+    class Pc(ASTNode):
         def __repr__(self):
-            return "ACC"
+            return "PC"
 
     class In1(ASTNode):
         def __repr__(self):
@@ -268,6 +259,10 @@ class N(ASTNode):
     class In2(ASTNode):
         def __repr__(self):
             return "IN2"
+
+    class Acc(ASTNode):
+        def __repr__(self):
+            return "ACC"
 
     class Sp(ASTNode):
         def __repr__(self):

@@ -4,9 +4,7 @@ from colorama import Style, Fore
 class _ColorManager:
     _instance = None
 
-    def color_off(
-        self,
-    ):
+    def color_off(self):
         self.BLACK = (
             self.RED
         ) = (
