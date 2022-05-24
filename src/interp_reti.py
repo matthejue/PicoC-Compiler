@@ -10,8 +10,8 @@ class RETIInterpreter:
     def __init__(self):
         # when the <outabse>.out file gets written for the first time it should
         # overwrite everything else
-        self.first_write_out = True
-        self.first_write_reti_state = True
+        self.first_out = True
+        self.first_reti_state = True
         self.test_input = []
 
     def _jump_condition(self, condition, offset, reti: RETI):
@@ -209,16 +209,16 @@ class RETIInterpreter:
                 reti.reg_set("SP", reti.reg_get("SP") + 1)
             case N.Call(N.Name("PRINT"), N.Reg(reg)):
                 if global_vars.args.print:
-                    print("\nOutput:\n\t" + str(reti.reg_get(reg.val)))
+                    print("Output:\n\t" + str(reti.reg_get(reg.val)))
                 if global_vars.path:
-                    if self.first_write_out:
+                    if self.first_out:
                         with open(
                             global_vars.path + global_vars.basename + ".out",
                             "w",
                             encoding="utf-8",
                         ) as fout:
                             fout.write(str(reti.reg_get(reg.val)))
-                        self.first_write_out = False
+                        self.first_out = False
                     else:
                         with open(
                             global_vars.path + global_vars.basename + ".out",
@@ -266,7 +266,15 @@ class RETIInterpreter:
 
     def _conclude(self, program, reti):
         if global_vars.args.intermediate_stages and not global_vars.args.verbose:
-            self._reti_state_option(reti)
+            match program:
+                case N.Program(_, instrs):
+                    match instrs[-1]:
+                        case N.Call(N.Name("PRINT")):
+                            # in case of an print call as last instruction, the
+                            # reti state was already printed
+                            pass
+                        case _:
+                            self._reti_state_option(reti)
         # needs a newline at the end, else it differs from .out_expected
         match program:
             case N.Program(N.Name(val)):
@@ -282,23 +290,23 @@ class RETIInterpreter:
     def _reti_state_option(self, reti_state):
         reti_state.idx.val = str(int(reti_state.idx.val) + 1)
         if global_vars.args.print:
-            print("\n" + str(reti_state))
+            print(reti_state)
         if global_vars.path:
-            if self.first_write_reti_state:
+            if self.first_reti_state:
                 with open(
-                    global_vars.path + global_vars.basename + ".reti_state",
+                    global_vars.path + global_vars.basename + ".reti_states",
                     "w",
                     encoding="utf-8",
                 ) as fout:
                     fout.write(str(reti_state))
-                self.first_write_reti_state = False
+                self.first_reti_state = False
             else:
                 with open(
-                    global_vars.path + global_vars.basename + ".reti_state",
+                    global_vars.path + global_vars.basename + ".reti_states",
                     "a",
                     encoding="utf-8",
                 ) as fout:
-                    fout.write("\n\n" + str(reti_state))
+                    fout.write("\n" + str(reti_state))
 
     def _preconfigs(self, program, reti):
         match program:
