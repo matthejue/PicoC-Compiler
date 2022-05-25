@@ -1,10 +1,10 @@
 from reti_nodes import N
+from picoc_nodes import N as PN
 from reti import RETI
 import global_vars
 from global_funs import bug_in_compiler_error, remove_extension
 import os
 from errors import Errors
-from global_classes import SingleLineComment
 
 
 class RETIInterpreter:
@@ -350,7 +350,8 @@ class RETIInterpreter:
                 # filter out comments
                 program.instrs = list(
                     filter(
-                        lambda instr: not isinstance(instr, SingleLineComment), instrs
+                        lambda instr: not isinstance(instr, PN.SingleLineComment),
+                        instrs,
                     )
                 )
                 reti = RETI(program.instrs)

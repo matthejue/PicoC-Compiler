@@ -4,7 +4,6 @@ from errors import Errors
 from symbol_table import ST
 from global_funs import bug_in_compiler_error, remove_extension
 import global_vars
-from global_classes import SingleLineComment
 
 
 class Passes:
@@ -505,9 +504,9 @@ class Passes:
         if not global_vars.args.verbose:
             return []
         return [
-            SingleLineComment(
-                "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n")))),
+            PN.SingleLineComment(
                 "#",
+                "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n")))),
             )
         ]
 
@@ -983,9 +982,7 @@ class Passes:
                     # this has to be done in this pass, because the reti_blocks
                     # pass sometimes needs to access this attribute from a block
                     # where it hasn't yet beeen determined
-                    block.instrs_before = SingleLineComment(
-                        self.instrs_cnt, "// instructions before: "
-                    )
+                    block.instrs_before = PN.Num(str(self.instrs_cnt))
                     block.visible += [block.instrs_before]
                     self.instrs_cnt += len(block.stmts_instrs)
                 return blocks
@@ -1013,14 +1010,18 @@ class Passes:
     # =                                  RETI                                 =
     # =========================================================================
     def _determine_distance(self, current_block, other_block, idx):
-        if other_block.instrs_before.val < current_block.instrs_before.val:
-            return current_block.instrs_before.val - other_block.instrs_before.val + idx
-        elif other_block.instrs_before.val == current_block.instrs_before.val:
-            return idx
-        else:  # current_block.instrs_before.val < other_block.instrs_before.val:
+        if int(other_block.instrs_before.val) < int(current_block.instrs_before.val):
             return (
-                other_block.instrs_before.val
-                - current_block.instrs_before.val
+                int(current_block.instrs_before.val)
+                - int(other_block.instrs_before.val)
+                + idx
+            )
+        elif int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
+            return idx
+        else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
+            return (
+                int(other_block.instrs_before.val)
+                - int(current_block.instrs_before.val)
                 + (len(current_block.stmts_instrs) - idx)
             )
 
