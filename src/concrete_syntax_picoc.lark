@@ -57,7 +57,7 @@ print_stmt: "print""("arith_exp")"";"
 logic_atom: arith_exp [relation arith_exp]
 logic_and: logic_atom ("&&" logic_atom)*
 logic_or: logic_and ("||" logic_and)*
-logic_exp.2: logic_or
+logic_exp: logic_or
 // ------------------------------ L_Assign_Alloc ------------------------------
 size_qual: prim_dt|struct_spec
 alloc: size_qual pntr_decl

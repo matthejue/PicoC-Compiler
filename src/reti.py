@@ -104,7 +104,7 @@ class RETI(ASTNode):
 class EPROM(ASTNode):
     def __init__(self):
         self.cells = {i: N.Im("0") for i in range(global_vars.args.eprom_size)}
-        super().__init__(children=[self.cells])
+        super().__init__(visible=[self.cells])
 
     def __repr__(self):
         acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
@@ -123,7 +123,7 @@ class EPROM(ASTNode):
 class UART(ASTNode):
     def __init__(self):
         self.cells = {i: N.Im("0") for i in range(global_vars.args.uart_size)}
-        super().__init__(children=[self.cells])
+        super().__init__(visible=[self.cells])
 
     def __repr__(self):
         acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"

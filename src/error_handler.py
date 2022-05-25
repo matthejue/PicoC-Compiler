@@ -260,8 +260,8 @@ class AnnotationScreen:
     def __init__(self, code, row_from, row_to):
         # because the filename gets pasted in the first line of file content
         context_from = (
-            row_from - global_vars.args.sight
-            if row_from - global_vars.args.sight > 0
+            row_from - global_vars.args.lines
+            if row_from - global_vars.args.lines > 0
             else 1
         )
         self.context_above = code[context_from:row_from]
@@ -272,7 +272,7 @@ class AnnotationScreen:
             self.screen += [line, " " * (len(line) + 1), " " * (len(line) + 1)]
 
         self.context_below = code[
-            row_to + 1 : row_to + 1 + (global_vars.args.sight + 1)
+            row_to + 1 : row_to + 1 + (global_vars.args.lines + 1)
         ]
 
         self.marked_lines = []

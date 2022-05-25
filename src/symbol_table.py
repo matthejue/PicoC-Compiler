@@ -17,7 +17,7 @@ class ST:
         def __init__(self, line, column):
             self.line = line
             self.column = column
-            super().__init__(children=[self.line, self.column])
+            super().__init__(visible=[self.line, self.column])
 
     class Symbol(ASTNode):
         def __init__(
@@ -69,7 +69,7 @@ class ST:
         def __init__(self):
             self.symbols = dict()
             self._init_type_sytem()
-            super().__init__(children=[self.symbols])
+            super().__init__(visible=[self.symbols])
 
         def _init_type_sytem(self):
             self.define(ST.Symbol(datatype=ST.BuiltIn(), name=N.Name("char")))
