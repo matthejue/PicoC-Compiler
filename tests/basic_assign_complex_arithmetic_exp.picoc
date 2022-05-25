@@ -1,7 +1,7 @@
-// in:
-// expected:1
+// in:41
+// expected:42
 
 int main(){
   int i = 1 - 2 * 3 + 6;
-  print(i);
+  print(i + input());
 }

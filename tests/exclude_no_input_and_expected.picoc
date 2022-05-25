@@ -1,0 +1,6 @@
+// in:
+// expected:
+
+void main() {
+  const char i = 42;
+}

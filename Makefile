@@ -50,9 +50,8 @@ test-clean: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-d for debugging
-	./export_environment_vars_for_makefile.sh; \
+	-./export_environment_vars_for_makefile.sh; \
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
-
 
 convert:  extract
 	./convert_to_c.py
@@ -92,7 +91,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.in" -delete
 	find . -type f -wholename "./tests/*.out" -delete
 	find . -type f -wholename "./tests/*.out_expected" -delete
-	find . -type f -wholename "./tests/*.reti_state" -delete
+	find . -type f -wholename "./tests/*.reti_states" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.exec" -delete

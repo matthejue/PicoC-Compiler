@@ -26,4 +26,4 @@ README.txt
 *.in
 *.out
 *.out_expected
-*.reti_state
+*.reti_states

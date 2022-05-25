@@ -14,7 +14,7 @@ class N(ASTNode):
         def __init__(self, name, instrs):
             self.name = name
             self.instrs = instrs
-            super().__init__(children=[self.name, self.instrs])
+            super().__init__(visible=[self.name, self.instrs])
 
         def __repr__(self):
             if not self.instrs:
@@ -74,16 +74,6 @@ class N(ASTNode):
             return f"\n{' ' * depth}CALL {self.name} {self.reg};"
 
         __match_args__ = ("name", "reg")
-
-    # -------------------------------- Comment --------------------------------
-    class SingleLineComment(ASTNode):
-        def __init__(self, val):
-            self.val = val
-
-        def __repr__(self, depth=0):
-            return f"\n{' ' * depth}# {self.val}"
-
-        __match_args__ = ("val",)
 
     # =========================================================================
     # =                              Token Nodes                              =

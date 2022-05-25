@@ -4,6 +4,7 @@ import global_vars
 from global_funs import bug_in_compiler_error, remove_extension
 import os
 from errors import Errors
+from global_classes import SingleLineComment
 
 
 class RETIInterpreter:
@@ -60,7 +61,7 @@ class RETIInterpreter:
                     case _:
                         bug_in_compiler_error(memory_type)
             case N.Reg(reg):
-                reti.reg_set(reg.val, source)
+                reti.reg_set(str(reg), source)
             # right_databus
             case int():
                 # TODO: signextension
@@ -93,7 +94,7 @@ class RETIInterpreter:
                         bug_in_compiler_error(memory_type)
 
             case N.Reg(reg):
-                return reti.reg_get(reg.val)
+                return reti.reg_get(str(reg))
             # right databus
             case int():
                 memory_type = source >> 30
@@ -209,7 +210,7 @@ class RETIInterpreter:
                 reti.reg_set("SP", reti.reg_get("SP") + 1)
             case N.Call(N.Name("PRINT"), N.Reg(reg)):
                 if global_vars.args.print:
-                    print("Output:\n\t" + str(reti.reg_get(reg.val)))
+                    print("Output:\n\t" + str(reti.reg_get(str(reg))))
                 if global_vars.path:
                     if self.first_out:
                         with open(
@@ -217,7 +218,7 @@ class RETIInterpreter:
                             "w",
                             encoding="utf-8",
                         ) as fout:
-                            fout.write(str(reti.reg_get(reg.val)))
+                            fout.write(str(reti.reg_get(str(reg))))
                         self.first_out = False
                     else:
                         with open(
@@ -225,7 +226,7 @@ class RETIInterpreter:
                             "a",
                             encoding="utf-8",
                         ) as fout:
-                            fout.write(" " + str(reti.reg_get(reg.val)))
+                            fout.write(" " + str(reti.reg_get(str(reg))))
                 if (
                     global_vars.args.intermediate_stages
                     and not global_vars.args.verbose
@@ -234,9 +235,9 @@ class RETIInterpreter:
                 reti.reg_increase("PC")
             case N.Call(N.Name("INPUT"), N.Reg(reg)):
                 if self.test_input:
-                    reti.reg_set(reg.val, self.test_input.pop())
+                    reti.reg_set(str(reg), self.test_input.pop())
                 else:
-                    reti.reg_set(reg.val, int(input()))
+                    reti.reg_set(str(reg), int(input()))
                 reti.reg_increase("PC")
             case _:
                 bug_in_compiler_error(instr)
@@ -349,7 +350,7 @@ class RETIInterpreter:
                 # filter out comments
                 program.instrs = list(
                     filter(
-                        lambda instr: not isinstance(instr, N.SingleLineComment), instrs
+                        lambda instr: not isinstance(instr, SingleLineComment), instrs
                     )
                 )
                 reti = RETI(program.instrs)
