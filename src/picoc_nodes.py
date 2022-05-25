@@ -370,3 +370,14 @@ class N:
             super().__init__(visible=[self.name])
 
         __match_args__ = ("name",)
+
+    # ------------------------------- L_Comment -------------------------------
+    class SingleLineComment:
+        def __init__(self, prefix, comment):
+            self.comment = comment
+            self.prefix = prefix
+
+        def __repr__(self, depth=0):
+            return f"\n{' ' * depth}{self.prefix} {self.comment}"
+
+        __match__ = ("prefix", "comment")

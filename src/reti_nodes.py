@@ -1,6 +1,6 @@
-import global_vars
 from ast_node import ASTNode
 from picoc_nodes import N as PN
+from global_funs import bug_in_compiler_error
 
 
 class N(ASTNode):
@@ -46,14 +46,23 @@ class N(ASTNode):
 
     # --------------------------- Jump Instructions ---------------------------
     class Jump(ASTNode):
-        def __init__(self, rel, num):
+        def __init__(self, rel, im_goto):
             self.rel = rel
-            self.num = num
+            self.im_goto = im_goto
 
         def __repr__(self, depth=0):
-            return f"\n{' ' * depth}JUMP{self.rel} {self.num};"
+            match self.im_goto:
+                case N.Im():
+                    return f"\n{' ' * depth}JUMP{self.rel} {self.im_goto};"
+                case PN.GoTo():
+                    return (
+                        f"\n{' ' * depth}JUMP{self.rel} "
+                        + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
+                    )
+                case _:
+                    bug_in_compiler_error(self.im_goto)
 
-        __match_args__ = ("rel", "num")
+        __match_args__ = ("rel", "im_goto")
 
     class Int(ASTNode):
         def __init__(self, num):

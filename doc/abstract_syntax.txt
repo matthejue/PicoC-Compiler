@@ -8,6 +8,7 @@ exp ::= Name(str) | Num(str) | Char(str)
       | BinOp(<exp>, <bin_op>, <exp>)
       | UnOp(<un_op>, <exp>) | Call(Name('input'), None)
 stmt ::= Exp(Call(Name('print'), <exp>))
+       | SingleLineComment(str, str)
 ----------------------------------- L_Logic -----------------------------------
 un_op ::= LogicNot()
 rel ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
@@ -86,7 +87,7 @@ size ::= Num(str) | Empty()
 ---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
 ----------------------------------- L_Blocks ----------------------------------
-block ::= Block(Name(str), <instr>*, // instrs_before, // instrs_after)
+block ::= Block(Name(str), <instr>*, Num(str))
 instr ::= Goto(Name(str))
 ===============================================================================
 =                                  RETI_Patch                                 =
@@ -104,5 +105,5 @@ op ::= Add() | Addi() | Sub() | Subi() | Mult() | Multi() | Div() | Divi()
      | Store() | Storein() | Move()
 instr ::= Instr(<op>, <arg>+) | Jump(<rel>, Num(str)) | Int(Num(str)) |, RTI()
         | Call(Name('print'), <reg>) | Call(Name('input'), <reg>)
-        | SingleLineComment(str) | InlineComment(str)
+        | SingleLineComment(str, str)
 program ::= Program(Name(str), <instr>*)
