@@ -101,3 +101,12 @@ class Errors:
                 "not be possible, but it occured. Please report this issue under "
                 f"{CM().RED}https://github.com/matthejue/PicoC-Compiler/issues/new/choose{CM().RESET_ALL}"
             )
+
+    class BugInInterpreter(Exception):
+        def __init__(self, fun_name, args):
+            self.description = (
+                f"{CM().YELLOW}BugInInterpreter{CM().RESET_ALL}: Error in function "
+                f"{CM().BLUE}'{fun_name}'{CM().RESET_ALL} with {args}. This error should "
+                "not be possible, but it occured. Please report this issue under "
+                f"{CM().RED}https://github.com/matthejue/PicoC-Compiler/issues/new/choose{CM().RESET_ALL}"
+            )

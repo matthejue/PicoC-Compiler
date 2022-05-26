@@ -2,7 +2,7 @@ from picoc_nodes import N as PN
 from reti_nodes import N as RN
 from errors import Errors
 from symbol_table import ST
-from global_funs import bug_in_compiler_error, remove_extension
+from global_funs import bug_in_compiler, remove_extension, filter_out_comments
 import global_vars
 
 
@@ -26,9 +26,26 @@ class Passes:
     # =                              PicoC_Blocks                             =
     # =========================================================================
 
+    def _single_line_comment_picoc(self, stmt):
+        if not global_vars.args.verbose:
+            return []
+        visibl_emptied_lists = list(
+            map(lambda node: [] if isinstance(node, list) else node, stmt.visible)
+        )
+        stmt.visible = visibl_emptied_lists
+        return [
+            PN.SingleLineComment(
+                "//",
+                "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n")))),
+            )
+        ]
+
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
-        new_block = PN.Block(PN.Name(label), stmts)
+        new_block = PN.Block(
+            PN.Name(label),
+            self._single_line_comment_picoc(PN.Block(PN.Name(label), [])) + stmts,
+        )
         blocks[label] = new_block
         self.block_id += 1
         return PN.GoTo(PN.Name(label))
@@ -42,11 +59,13 @@ class Passes:
                 )
 
                 stmts_if = [goto_after]
-                for stmt in reversed(stmts):
-                    stmts_if = self._picoc_blocks_stmt(stmt, stmts_if, blocks)
+                for sub_stmt in reversed(stmts):
+                    stmts_if = self._picoc_blocks_stmt(sub_stmt, stmts_if, blocks)
                 goto_if = self._create_block("if", stmts_if, blocks)
 
-                return [PN.IfElse(exp, [goto_if], [goto_after])]
+                return self._single_line_comment_picoc(stmt) + [
+                    PN.IfElse(exp, [goto_if], [goto_after])
+                ]
             case PN.IfElse(exp, stmts1, stmts2):
                 goto_after = self._create_block(
                     "if_else_after", processed_stmts, blocks
@@ -62,7 +81,9 @@ class Passes:
                     stmts_if = self._picoc_blocks_stmt(stmt, stmts_if, blocks)
                 goto_if = self._create_block("if", stmts_if, blocks)
 
-                return [PN.IfElse(exp, [goto_if], [goto_else])]
+                return self._single_line_comment_picoc(stmt) + [
+                    PN.IfElse(exp, [goto_if], [goto_else])
+                ]
             # ----------------------------- L_Loop ----------------------------
             case PN.While(exp, stmts):
                 goto_after = self._create_block("while_after", processed_stmts, blocks)
@@ -71,8 +92,8 @@ class Passes:
                 goto_condition_check = PN.GoTo(PN.Name("placeholder"))
                 stmts_while = [goto_condition_check]
 
-                for stmt in reversed(stmts):
-                    stmts_while = self._picoc_blocks_stmt(stmt, stmts_while, blocks)
+                for sub_stmt in reversed(stmts):
+                    stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
                 goto_branch.name.val = self._create_block(
                     "while_branch", stmts_while, blocks
                 ).name.val
@@ -82,7 +103,7 @@ class Passes:
                     "condition_check", condition_check, blocks
                 ).name.val
 
-                return [goto_condition_check]
+                return self._single_line_comment_picoc(stmt) + [goto_condition_check]
             case PN.DoWhile(exp, stmts):
                 goto_after = self._create_block(
                     "do_while_after", processed_stmts, blocks
@@ -91,13 +112,13 @@ class Passes:
                 goto_branch = PN.GoTo(PN.Name("placeholder"))
                 stmts_while = [PN.IfElse(exp, [goto_branch], [goto_after])]
 
-                for stmt in reversed(stmts):
-                    stmts_while = self._picoc_blocks_stmt(stmt, stmts_while, blocks)
+                for sub_stmt in reversed(stmts):
+                    stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
                 goto_branch.name.val = self._create_block(
                     "do_while_branch", stmts_while, blocks
                 ).name.val
 
-                return [goto_branch]
+                return self._single_line_comment_picoc(stmt) + [goto_branch]
             # ----------------------------- L_Fun -----------------------------
             case PN.Return():
                 return [stmt]
@@ -135,7 +156,7 @@ class Passes:
             case (PN.FunDecl() | PN.StructDecl()):
                 return [decl_def]
             case _:
-                bug_in_compiler_error(decl_def)
+                bug_in_compiler(decl_def)
 
     def picoc_blocks(self, file: PN.File):
         match file:
@@ -148,7 +169,7 @@ class Passes:
                     PN.Name(remove_extension(val) + ".picoc_blocks"), decls_defs_blocks
                 )
             case _:
-                bug_in_compiler_error(file)
+                bug_in_compiler(file)
 
     # =========================================================================
     # =                               PicoC_Mon                               =
@@ -165,7 +186,7 @@ class Passes:
                     case ST.Symbol(_, _, _, _, _, PN.Num(val)):
                         return int(val)
                     case _:
-                        bug_in_compiler_error(symbol)
+                        bug_in_compiler(symbol)
             # ---------------------------- L_Array ----------------------------
             case PN.ArrayDecl(nums, datatype2):
                 size = self._datatype_size(datatype2)
@@ -174,10 +195,10 @@ class Passes:
                         case PN.Name(val):
                             size *= val
                         case _:
-                            bug_in_compiler_error(num)
+                            bug_in_compiler(num)
                 return size
             case _:
-                bug_in_compiler_error(datatype)
+                bug_in_compiler(datatype)
 
     def _picoc_mon_ref(self, ref_loc, prev_refs):
         match ref_loc:
@@ -189,7 +210,7 @@ class Passes:
                     case ST.Symbol(_, datatype):
                         current_datatype = datatype
                     case _:
-                        bug_in_compiler_error(symbol)
+                        bug_in_compiler(symbol)
                 while prev_refs:
                     match current_datatype:
                         case (PN.CharType() | PN.IntType()):
@@ -225,14 +246,14 @@ class Passes:
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
-                                    bug_in_compiler_error(ref)
+                                    bug_in_compiler(ref)
                             match symbol:
                                 case ST.Symbol(_, datatype):
                                     current_datatype = datatype
                                 case _:
-                                    bug_in_compiler_error(symbol)
+                                    bug_in_compiler(symbol)
                         case _:
-                            bug_in_compiler_error(current_datatype)
+                            bug_in_compiler(current_datatype)
                 return [PN.Exp(PN.Ref(ref_loc))]
             # ----------------------------- L_Pntr ----------------------------
             # TODO: remove after implementing shrink pass
@@ -253,7 +274,7 @@ class Passes:
                 refs_mon = self._picoc_mon_ref(ref_loc2, [ref] + prev_refs)
                 return refs_mon + [PN.Exp(ref)]
             case _:
-                bug_in_compiler_error(ref_loc)
+                bug_in_compiler(ref_loc)
 
     def _picoc_mon_exp(self, exp):
         match exp:
@@ -343,14 +364,18 @@ class Passes:
                     stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
                 return exps_mon + [PN.Exp(PN.Call(name, stack_locs))]
             case _:
-                bug_in_compiler_error(exp)
+                bug_in_compiler(exp)
 
     def _picoc_mon_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
             case PN.Assign(PN.Name() as name, exp):
                 exps_mon = self._picoc_mon_exp(exp)
-                return exps_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [PN.Assign(name, PN.Stack(PN.Num("1")))]
+                )
             case PN.Assign(
                 PN.Alloc(PN.Const() as type_qual, datatype, PN.Name(val1, pos)), num
             ):
@@ -365,24 +390,30 @@ class Passes:
                 )
                 self.symbol_table.define(symbol)
                 # Alloc isn't needed anymore after being evaluated
-                return []
+                return self._single_line_comment_picoc(stmt) + []
             case PN.Assign(PN.Alloc(_, _, PN.Name() as name) as alloc, exp):
                 exps1_mon = self._picoc_mon_exp(exp)
                 exps2_mon = self._picoc_mon_exp(alloc)
-                return exps1_mon + exps2_mon + [PN.Assign(name, PN.Stack(PN.Num("1")))]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps1_mon
+                    + exps2_mon
+                    + [PN.Assign(name, PN.Stack(PN.Num("1")))]
+                )
             case PN.Assign(ref_loc, exp):
                 # Deref, Subscript, Attribute
                 exps_mon = self._picoc_mon_exp(exp)
                 refs_mon = self._picoc_mon_ref(ref_loc, [])
                 return (
-                    exps_mon
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
                     + refs_mon
                     + [PN.Assign(PN.Stack(PN.Num("1")), PN.Stack(PN.Num("2")))]
                 )
             # --------------------- L_Assign_Alloc + L_Fun --------------------
             case PN.Exp(alloc_call):
                 exps_mon = self._picoc_mon_exp(alloc_call)
-                return exps_mon
+                return self._single_line_comment_picoc(stmt) + exps_mon
             # ---------------------------- L_Array ----------------------------
             case PN.Assign(PN.Alloc(_, _, _) as alloc, PN.Array(exps)):
                 exps_mon = []
@@ -390,7 +421,11 @@ class Passes:
                 for i, exp in enumerate(exps):
                     exps_mon += self._picoc_mon_exp(exp)
                     stack_locs[0:0] = [PN.Stack(PN.Num(str(i + 1)))]
-                return exps_mon + [PN.Assign(alloc, PN.Array(stack_locs))]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [PN.Assign(alloc, PN.Array(stack_locs))]
+                )
             # ---------------------------- L_Struct ---------------------------
             case PN.Assign(PN.Alloc(_, _, _) as alloc, PN.Struct(assigns)):
                 exps_mon = []
@@ -402,7 +437,11 @@ class Passes:
                             assigns_mon[0:0] = [
                                 PN.Assign(assign_lhs, PN.Stack(PN.Num(i + 1)))
                             ]
-                return exps_mon + [PN.Assign(alloc, PN.Struct(assigns_mon))]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [PN.Assign(alloc, PN.Struct(assigns_mon))]
+                )
             # ----------------------- L_If_Else + L_Loop ----------------------
             case PN.IfElse(exp, stmts1, stmts2):
                 exps_mon = self._picoc_mon_exp(exp)
@@ -412,18 +451,27 @@ class Passes:
                 stmts2_mon = []
                 for stmt2 in stmts2:
                     stmts2_mon += self._picoc_mon_stmt(stmt2)
-                return exps_mon + [
-                    PN.IfElse(PN.Stack(PN.Num("1")), stmts1_mon, stmts2_mon)
-                ]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [PN.IfElse(PN.Stack(PN.Num("1")), stmts1_mon, stmts2_mon)]
+                )
             # ----------------------------- L_Fun -----------------------------
             case PN.Return(exp):
                 exps_mon = self._picoc_mon_exp(exp)
-                return exps_mon + [PN.Return(PN.Stack(PN.Num("1")))]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [PN.Return(PN.Stack(PN.Num("1")))]
+                )
             # ---------------------------- L_Block ----------------------------
             case PN.GoTo():
                 return [stmt]
+            # --------------------------- L_Comment ---------------------------
+            case PN.SingleLineComment():
+                return [stmt]
             case _:
-                bug_in_compiler_error(stmt)
+                bug_in_compiler(stmt)
 
     def _picoc_mon_def(self, decl_def):
         match decl_def:
@@ -441,7 +489,7 @@ class Passes:
                             block.stmts_instrs[:] = stmts_mon
                             blocks_mon += [block]
                         case _:
-                            bug_in_compiler_error(block)
+                            bug_in_compiler(block)
                 return [PN.FunDef(datatype, name, params, blocks_mon)]
             case PN.FunDecl():
                 # Function declaration isn't needed anymore after being evaluated
@@ -468,7 +516,7 @@ class Passes:
                             attrs += [PN.Name(f"{attr_name}@{struct_name}")]
                             struct_size += attr_size
                         case _:
-                            bug_in_compiler_error(param)
+                            bug_in_compiler(param)
                 symbol = ST.Symbol(
                     ST.Empty(),
                     ST.SelfDeclared(),
@@ -481,7 +529,7 @@ class Passes:
                 # Struct declaration isn't needed anymore after being evaluated
                 return []
             case _:
-                bug_in_compiler_error(decl_def)
+                bug_in_compiler(decl_def)
 
     def picoc_mon(self, file: PN.File):
         match file:
@@ -494,13 +542,13 @@ class Passes:
                     PN.Name(remove_extension(val) + ".picoc_mon"), decls_defs_mon
                 )
             case _:
-                bug_in_compiler_error(file)
+                bug_in_compiler(file)
 
     # =========================================================================
     # =                              RETI_Blocks                              =
     # =========================================================================
 
-    def _single_line_comment(self, stmt):
+    def _single_line_comment_reti(self, stmt):
         if not global_vars.args.verbose:
             return []
         return [
@@ -526,8 +574,8 @@ class Passes:
                     case PN.LogicOr:
                         lop = RN.Or()
                     case _:
-                        bug_in_compiler_error(bin_lop)
-                return self._single_line_comment(stmt) + [
+                        bug_in_compiler(bin_lop)
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
                     ),
@@ -541,7 +589,7 @@ class Passes:
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
             case PN.Exp(PN.UnOp(PN.LogicNot, PN.Stack(PN.Num(val)))):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val)]
@@ -553,7 +601,7 @@ class Passes:
                 ]
             # ---------------------------- L_Arith ----------------------------
             case PN.Exp(PN.Name(val, pos)):
-                reti_instrs = self._single_line_comment(stmt) + [
+                reti_instrs = self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
                 try:
@@ -592,7 +640,7 @@ class Passes:
                             RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im(val)]),
                         ]
                     case _:
-                        bug_in_compiler_error(symbol)
+                        bug_in_compiler(symbol)
 
                 return reti_instrs + [
                     RN.Instr(
@@ -600,7 +648,7 @@ class Passes:
                     ),
                 ]
             case (PN.Exp(PN.Num(val) as datatype) | PN.Exp(PN.Char(val) as datatype)):
-                reti_instrs = self._single_line_comment(stmt) + [
+                reti_instrs = self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")])
                 ]
                 match datatype:
@@ -640,8 +688,8 @@ class Passes:
                     case PN.Or():
                         aop = RN.Or()
                     case _:
-                        bug_in_compiler_error(bin_aop)
-                return self._single_line_comment(stmt) + [
+                        bug_in_compiler(bin_aop)
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
                     ),
@@ -655,7 +703,7 @@ class Passes:
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
             case PN.Exp(PN.UnOp(un_op, PN.Stack(PN.Num(val)))):
-                reti_instrs = self._single_line_comment(stmt) + [
+                reti_instrs = self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("0")]),
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val)]
@@ -670,14 +718,14 @@ class Passes:
                     case PN.Minus():
                         pass
                     case _:
-                        bug_in_compiler_error(un_op)
+                        bug_in_compiler(un_op)
                 return reti_instrs + [
                     RN.Instr(
                         RN.Storein(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     )
                 ]
             case PN.Exp(PN.Call(PN.Name("input"), [])):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Call(RN.Name("INPUT"), RN.Reg(RN.Acc())),
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                     RN.Instr(
@@ -685,7 +733,7 @@ class Passes:
                     ),
                 ]
             case PN.Exp(PN.Call(PN.Name("print"), [PN.Stack(PN.Num(val))])):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
                     ),
@@ -694,7 +742,7 @@ class Passes:
                 ]
             # ---------------------------- L_Logic ----------------------------
             case PN.Exp(PN.ToBool(PN.Stack(val))):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
                     ),
@@ -719,8 +767,8 @@ class Passes:
                     case PN.GtE():
                         rel = RN.GtE()
                     case _:
-                        bug_in_compiler_error(rel)
-                return self._single_line_comment(stmt) + [
+                        bug_in_compiler(rel)
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val1)]
                     ),
@@ -742,7 +790,7 @@ class Passes:
                 symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
                 match symbol:
                     case ST.Symbol(_, _, _, PN.Num(val3)):
-                        return self._single_line_comment(stmt) + [
+                        return self._single_line_comment_reti(stmt) + [
                             RN.Instr(
                                 RN.Loadin(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val2)],
@@ -754,9 +802,9 @@ class Passes:
                             ),
                         ]
                     case _:
-                        bug_in_compiler_error(symbol)
+                        bug_in_compiler(symbol)
             case PN.Assign(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2))):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)]
                     ),
@@ -770,7 +818,7 @@ class Passes:
                 ]
             # ----------------------------- L_Pntr ----------------------------
             case PN.Exp(PN.Ref(PN.Name(val1, pos))):
-                reti_instrs = self._single_line_comment(stmt) + [
+                reti_instrs = self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")])
                 ]
                 try:
@@ -808,7 +856,7 @@ class Passes:
                                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("2")]),
                                 ]
                     case _:
-                        bug_in_compiler_error(symbol)
+                        bug_in_compiler(symbol)
                 return reti_instrs + [
                     RN.Instr(
                         RN.Storein(),
@@ -833,8 +881,8 @@ class Passes:
                                 case PN.Num(val3):
                                     help_const *= int(val3)
                                 case _:
-                                    bug_in_compiler_error(num)
-                        reti_instrs = self._single_line_comment(stmt) + [
+                                    bug_in_compiler(num)
+                        reti_instrs = self._single_line_comment_reti(stmt) + [
                             RN.Instr(
                                 RN.Loadin(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)],
@@ -850,7 +898,7 @@ class Passes:
                         ]
                     case PN.PntrDecl(_, datatype2):
                         help_const = self._datatype_size(datatype2)
-                        reti_instrs = self._single_line_comment(stmt) + [
+                        reti_instrs = self._single_line_comment_reti(stmt) + [
                             RN.Instr(
                                 RN.Loadin(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val1)],
@@ -869,7 +917,7 @@ class Passes:
                             RN.Instr(RN.Add(), [RN.Reg(RN.In1()), RN.Reg(RN.In2())]),
                         ]
                     case _:
-                        bug_in_compiler_error(datatype)
+                        bug_in_compiler(datatype)
                 return reti_instrs + [
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                     RN.Instr(
@@ -899,16 +947,16 @@ class Passes:
                                             attr_size = val4
                                             rel_pos_in_struct += int(attr_size)
                                         case _:
-                                            bug_in_compiler_error(symbol)
+                                            bug_in_compiler(symbol)
                                 else:
                                     # TODO: fitting error message if struct doesn't have this attribute
-                                    bug_in_compiler_error(attr_ids)
+                                    bug_in_compiler(attr_ids)
                             case _:
-                                bug_in_compiler_error(symbol)
+                                bug_in_compiler(symbol)
                     case _:
                         # TODO: fitting error message if datatypes not fitting
-                        bug_in_compiler_error(datatype)
-                return self._single_line_comment(stmt) + [
+                        bug_in_compiler(datatype)
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)]
                     ),
@@ -922,7 +970,7 @@ class Passes:
             #      reti_instrs = []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case PN.Exp(PN.Subscr(PN.Stack(PN.Num("1")), PN.Num("0"))):
-                return self._single_line_comment(stmt) + [
+                return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(),
                         [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im("1")],
@@ -946,14 +994,18 @@ class Passes:
             #      pass
             # ----------------------- L_If_Else + L_Loop ----------------------
             case PN.IfElse(PN.Stack(PN.Num(val)), [goto1], [goto2]):
-                return self._single_line_comment(stmt) + [
-                    RN.Instr(
-                        RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
-                    ),
-                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
-                    RN.Jump(RN.Eq(), goto2),
-                    goto1,
-                ]
+                return (
+                    self._single_line_comment_reti(stmt)
+                    + [
+                        RN.Instr(
+                            RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val)]
+                        ),
+                        RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                        RN.Jump(RN.Eq(), goto2),
+                    ]
+                    + self._single_line_comment_reti(goto1)
+                    + [goto1]
+                )
             # ----------------------------- L_Fun -----------------------------
             #  case PN.Exp(PN.Call(identifier, exps)):
             #      pass
@@ -961,9 +1013,16 @@ class Passes:
             #      pass
             # ---------------------------- L_Blocks ---------------------------
             case PN.GoTo():
-                return self._single_line_comment(stmt) + [stmt]
+                return self._single_line_comment_reti(stmt) + [stmt]
+            # --------------------------- L_Comment ---------------------------
+            case PN.SingleLineComment(prefix, content):
+                match prefix:
+                    case "//":
+                        return [PN.SingleLineComment("# //", content)]
+                    case _:
+                        bug_in_compiler(prefix)
             case _:
-                bug_in_compiler_error(stmt)
+                bug_in_compiler(stmt)
 
     def _reti_blocks_def(self, decl_def):
         match decl_def:
@@ -978,16 +1037,18 @@ class Passes:
                                 instrs += self._reti_blocks_stmt(stmt)
                             block.stmts_instrs[:] = instrs
                         case _:
-                            bug_in_compiler_error(block)
+                            bug_in_compiler(block)
                     # this has to be done in this pass, because the reti_blocks
                     # pass sometimes needs to access this attribute from a block
                     # where it hasn't yet beeen determined
                     block.instrs_before = PN.Num(str(self.instrs_cnt))
                     block.visible += [block.instrs_before]
-                    self.instrs_cnt += len(block.stmts_instrs)
+                    self.instrs_cnt += len(
+                        list(filter_out_comments(block.stmts_instrs))
+                    )
                 return blocks
             case _:
-                bug_in_compiler_error(decl_def)
+                bug_in_compiler(decl_def)
 
     def reti_blocks(self, file: PN.File):
         match file:
@@ -1000,18 +1061,21 @@ class Passes:
                     PN.Name(remove_extension(val) + ".reti_blocks"), reti_blocks
                 )
             case _:
-                bug_in_compiler_error(file)
+                bug_in_compiler(file)
 
     # =========================================================================
     # =                               RETI_Patch                              =
     # =========================================================================
+    # - deal with large immediates
+    # - deal with goto directly to next block
+    # - deal with division by 0
 
     # =========================================================================
     # =                                  RETI                                 =
     # =========================================================================
     def _determine_distance(self, current_block, other_block, idx):
         if int(other_block.instrs_before.val) < int(current_block.instrs_before.val):
-            return (
+            return -(
                 int(current_block.instrs_before.val)
                 - int(other_block.instrs_before.val)
                 + idx
@@ -1019,10 +1083,13 @@ class Passes:
         elif int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
             return idx
         else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
+            num_instrs_current_block = len(
+                list(filter_out_comments(current_block.stmts_instrs))
+            )
             return (
                 int(other_block.instrs_before.val)
-                - int(current_block.instrs_before.val)
-                + (len(current_block.stmts_instrs) - idx)
+                - (int(current_block.instrs_before.val) + num_instrs_current_block)
+                + (num_instrs_current_block - idx)
             )
 
     def _reti_instr(self, instr, idx, current_block):
@@ -1030,13 +1097,13 @@ class Passes:
             case PN.GoTo(PN.Name(val)):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                if distance == 1:
-                    return []
                 return [RN.Jump(RN.Always(), RN.Im(str(distance)))]
             case RN.Jump(RN.Eq(), PN.GoTo(PN.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                return [RN.Jump(RN.Eq(), RN.Im(str(distance)))]
+                return self._single_line_comment_reti(instr) + [
+                    RN.Jump(RN.Eq(), RN.Im(str(distance)))
+                ]
             case _:
                 return [instr]
 
@@ -1044,11 +1111,17 @@ class Passes:
         match block:
             case PN.Block(_, instrs):
                 instrs_block_free = []
-                for i, instr in enumerate(instrs):
-                    instrs_block_free += self._reti_instr(instr, i, block)
+                idx = 0
+                for instr in instrs:
+                    instrs_block_free += self._reti_instr(instr, idx, block)
+                    match instr:
+                        case PN.SingleLineComment():
+                            pass
+                        case _:
+                            idx += 1
                 return instrs_block_free
             case _:
-                bug_in_compiler_error(block)
+                bug_in_compiler(block)
 
     def reti(self, file: PN.File):
         match file:
@@ -1059,4 +1132,4 @@ class Passes:
                     instrs += self._reti_block(block)
                 return RN.Program(RN.Name(remove_extension(val) + ".reti"), instrs)
             case _:
-                bug_in_compiler_error(file)
+                bug_in_compiler(file)

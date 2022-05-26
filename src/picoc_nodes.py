@@ -373,11 +373,11 @@ class N:
 
     # ------------------------------- L_Comment -------------------------------
     class SingleLineComment:
-        def __init__(self, prefix, comment):
-            self.comment = comment
+        def __init__(self, prefix, content):
             self.prefix = prefix
+            self.content = content
 
         def __repr__(self, depth=0):
-            return f"\n{' ' * depth}{self.prefix} {self.comment}"
+            return f"\n{' ' * depth}{self.prefix} {self.content}"
 
-        __match__ = ("prefix", "comment")
+        __match_args__ = ("prefix", "content")

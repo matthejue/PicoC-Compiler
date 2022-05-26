@@ -2,6 +2,7 @@ from colormanager import ColorManager as CM
 from errors import Errors
 import itertools
 import global_vars
+from picoc_nodes import N as PN
 
 
 def overwrite(old, replace_with, idx, color=""):
@@ -42,11 +43,18 @@ def args_to_str(args: list):
         return "no arguments"
 
 
-def bug_in_compiler_error(*args):
+def bug_in_compiler(*args):
     import inspect
 
     # return name of caller of this function
     raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
+
+
+def bug_in_interpreter(*args):
+    import inspect
+
+    # return name of caller of this function
+    raise Errors.BugInInterpreter(inspect.stack()[1][3], args_to_str(args))
 
 
 def remove_extension(fname):
@@ -78,3 +86,12 @@ def only_keep_path(fname):
 
 def subheading(heading, terminal_width, symbol):
     return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
+
+
+def filter_out_comments(instrs):
+    if not global_vars.args.verbose:
+        return instrs
+    return filter(
+        lambda instr: not isinstance(instr, PN.SingleLineComment),
+        instrs,
+    )

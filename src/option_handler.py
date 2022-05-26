@@ -12,7 +12,7 @@ from lark.lark import Lark
 from dt_visitor_picoc import DTVisitorPicoC
 from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
-from global_funs import basename, subheading, bug_in_compiler_error
+from global_funs import basename, subheading, bug_in_compiler
 from interp_reti import RETIInterpreter
 
 
@@ -344,7 +344,7 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_blocks))
                 case _:
-                    bug_in_compiler_error(picoc_blocks)
+                    bug_in_compiler(picoc_blocks)
 
     def _picoc_mon_option(self, picoc_mon: PN.File):
 
@@ -357,7 +357,7 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_mon))
                 case _:
-                    bug_in_compiler_error(picoc_mon)
+                    bug_in_compiler(picoc_mon)
 
     def _st_option(self, symbol_table: ST.SymbolTable):
         if global_vars.args.print:
@@ -381,7 +381,7 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_blocks))
                 case _:
-                    bug_in_compiler_error(reti_blocks)
+                    bug_in_compiler(reti_blocks)
 
     def _reti_patch_option(self, reti_patch: RN.Program):
         if global_vars.args.print:
@@ -393,7 +393,7 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
-                    bug_in_compiler_error(reti_patch)
+                    bug_in_compiler(reti_patch)
 
     def _reti_option(self, reti: RN.Program):
         if global_vars.args.print:
@@ -405,4 +405,4 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti))
                 case _:
-                    bug_in_compiler_error(reti)
+                    bug_in_compiler(reti)

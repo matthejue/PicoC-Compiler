@@ -1,6 +1,6 @@
 from ast_node import ASTNode
 from picoc_nodes import N as PN
-from global_funs import bug_in_compiler_error
+from global_funs import bug_in_compiler
 
 
 class N(ASTNode):
@@ -57,10 +57,18 @@ class N(ASTNode):
                 case PN.GoTo():
                     return (
                         f"\n{' ' * depth}JUMP{self.rel} "
+                        #  + "".join(
+                        #      list(
+                        #          map(
+                        #              lambda line: line.lstrip(),
+                        #              str(self.im_goto).split("\n"),
+                        #          )
+                        #      )
+                        #  )
                         + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
                     )
                 case _:
-                    bug_in_compiler_error(self.im_goto)
+                    bug_in_compiler(self.im_goto)
 
         __match_args__ = ("rel", "im_goto")
 

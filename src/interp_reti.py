@@ -1,10 +1,13 @@
 from reti_nodes import N
-from picoc_nodes import N as PN
 from reti import RETI
 import global_vars
-from global_funs import bug_in_compiler_error, remove_extension
+from global_funs import (
+    bug_in_interpreter,
+    remove_extension,
+    filter_out_comments,
+)
 import os
-from errors import Errors
+from ctypes import c_int32, c_uint32
 
 
 class RETIInterpreter:
@@ -24,27 +27,26 @@ class RETIInterpreter:
     def _op(self, opd1, op, opd2):
         match op:
             case (N.Add() | N.Addi()):
-                # sigextension
-                return (opd1 + opd2) % 2**32
+                return c_int32(c_int32(opd1).value + c_int32(opd2).value).value
             case (N.Sub() | N.Subi()):
-                return (opd1 - opd2) % 2**32
+                return c_int32(c_int32(opd1).value - c_int32(opd2).value).value
             case (N.Mult() | N.Multi()):
-                return (opd1 * opd2) % 2**32
+                return c_int32(c_int32(opd1).value * c_int32(opd2).value).value
             case (N.Div() | N.Divi()):
-                return (opd1 // opd2) % 2**32
+                return c_int32(c_int32(opd1).value // c_int32(opd2).value).value
             case (N.Mod() | N.Modi()):
-                return (opd1 % opd2) % 2**32
+                return c_int32(c_int32(opd1).value % c_int32(opd2).value).value
             case (N.Oplus() | N.Oplusi()):
-                # signextension mit 0en
-                return (opd1 ^ opd2) % 2**32
+                return c_uint32(c_uint32(opd1).value ^ c_uint32(opd2).value).value
             case (N.Or() | N.Ori()):
-                return (opd1 | opd2) % 2**32
+                return c_uint32(c_uint32(opd1).value | c_uint32(opd2).value).value
             case (N.And() | N.Andi()):
-                return (opd1 & opd2) % 2**32
+                return c_uint32(c_uint32(opd1).value & c_uint32(opd2).value).value
             case _:
-                bug_in_compiler_error(op)
+                bug_in_interpreter(op)
 
-    def _memory_store(self, destination, source, reti) -> int:
+    def _memory_store(self, destination, source, reti: RETI) -> int:
+        source = c_uint32(source).value
         match destination:
             # addressbus
             case N.Im(val):
@@ -59,12 +61,12 @@ class RETIInterpreter:
                     case (0b10 | 0b11):
                         reti.sram_set(abs(int(val)) + higher_bits, source)
                     case _:
-                        bug_in_compiler_error(memory_type)
+                        bug_in_interpreter(memory_type)
             case N.Reg(reg):
                 reti.reg_set(str(reg), source)
             # right_databus
             case int():
-                # TODO: signextension
+                destination = c_uint32(destination).value
                 memory_type = destination >> 30
                 match memory_type:
                     case 0b00:
@@ -75,7 +77,9 @@ class RETIInterpreter:
                     case (0b10 | 0b11):
                         reti.sram_set(((destination << 2) % 2**32) >> 2, source)
                     case _:
-                        bug_in_compiler_error(memory_type)
+                        bug_in_interpreter(memory_type)
+            case _:
+                bug_in_interpreter(destination)
 
     def _memory_load(self, source, reti) -> int:
         match source:
@@ -91,12 +95,13 @@ class RETIInterpreter:
                     case (0b10 | 0b11):
                         return reti.sram_get(abs(int(val)) + higher_bits)
                     case _:
-                        bug_in_compiler_error(memory_type)
+                        bug_in_interpreter(memory_type)
 
             case N.Reg(reg):
                 return reti.reg_get(str(reg))
             # right databus
             case int():
+                source = c_uint32(source).value
                 memory_type = source >> 30
                 match memory_type:
                     case 0b00:
@@ -106,10 +111,9 @@ class RETIInterpreter:
                     case (0b10 | 0b11):
                         return reti.sram_get(((source << 2) % 2**32) >> 2)
                     case _:
-                        bug_in_compiler_error(memory_type)
+                        bug_in_interpreter(memory_type)
             case _:
-                #  raise TODO: sich hier was überlegen
-                ...
+                bug_in_interpreter(destination)
 
     def _instr(self, instr, reti: RETI):
         match instr:
@@ -130,7 +134,6 @@ class RETIInterpreter:
             case N.Instr(operation, [N.Reg() as destination, N.Im(val)]) if type(
                 operation
             ) in global_vars.COMPUTE_IMMEDIATE_INSTRUCTION:
-                # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
                 self._memory_store(
                     destination,
                     self._op(self._memory_load(destination, reti), operation, int(val)),
@@ -154,7 +157,6 @@ class RETIInterpreter:
                 )
                 reti.reg_increase("PC")
             case N.Instr(N.Loadi(), [N.Reg() as destination, N.Im(val)]):
-                # TODO: Signextension?
                 self._memory_store(
                     destination,
                     int(val),
@@ -180,23 +182,35 @@ class RETIInterpreter:
             case N.Jump(rel, N.Im(val)):
                 match rel:
                     case N.Lt():
-                        self._jump_condition(0 < reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value < 0, int(val), reti
+                        )
                     case N.LtE():
-                        self._jump_condition(0 <= reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value <= 0, int(val), reti
+                        )
                     case N.Gt():
-                        self._jump_condition(0 > reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value > 0, int(val), reti
+                        )
                     case N.GtE():
-                        self._jump_condition(0 >= reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value >= 0, int(val), reti
+                        )
                     case N.Eq():
-                        self._jump_condition(0 == reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value == 0, int(val), reti
+                        )
                     case N.NEq():
-                        self._jump_condition(0 != reti.reg_get("ACC"), int(val), reti)
+                        self._jump_condition(
+                            c_int32(reti.reg_get("ACC")).value != 0, int(val), reti
+                        )
                     case N.Always():
                         self._jump_condition(True, int(val), reti)
                     case N.NOp():
                         self._jump_condition(False, int(val), reti)
                     case _:
-                        bug_in_compiler_error(rel)
+                        bug_in_interpreter(rel)
             case N.Int(N.Im(val)):
                 # save PC to stack
                 reti.sram_set(reti.reg_get("SP"), reti.reg_get("PC"))
@@ -240,7 +254,7 @@ class RETIInterpreter:
                     reti.reg_set(str(reg), int(input()))
                 reti.reg_increase("PC")
             case _:
-                bug_in_compiler_error(instr)
+                bug_in_interpreter(instr)
 
     def _instrs(self, program: N.Program, reti: RETI):
         match program:
@@ -286,7 +300,7 @@ class RETIInterpreter:
                 ) as fout:
                     fout.write("\n")
             case _:
-                bug_in_compiler_error(program)
+                bug_in_interpreter(program)
 
     def _reti_state_option(self, reti_state):
         reti_state.idx.val = str(int(reti_state.idx.val) + 1)
@@ -342,20 +356,15 @@ class RETIInterpreter:
                             )
                         )
             case _:
-                bug_in_compiler_error(program)
+                bug_in_interpreter(program)
 
     def interp_reti(self, program: N.Program):
         match program:
             case N.Program(_, instrs):
                 # filter out comments
-                program.instrs = list(
-                    filter(
-                        lambda instr: not isinstance(instr, PN.SingleLineComment),
-                        instrs,
-                    )
-                )
+                program.instrs = list(filter_out_comments(instrs))
                 reti = RETI(program.instrs)
             case _:
-                bug_in_compiler_error(program)
+                bug_in_interpreter(program)
         self._preconfigs(program, reti)
         self._instrs(program, reti)
