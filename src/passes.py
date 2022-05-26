@@ -741,7 +741,7 @@ class Passes:
                     RN.Call(RN.Name("PRINT"), RN.Reg(RN.Acc())),
                 ]
             # ---------------------------- L_Logic ----------------------------
-            case PN.Exp(PN.ToBool(PN.Stack(val))):
+            case PN.Exp(PN.ToBool(PN.Stack(PN.Num(val)))):
                 return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im("1")]
