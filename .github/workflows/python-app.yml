@@ -30,4 +30,4 @@ jobs:
         if [ -f "${GITHUB_WORKSPACE}/requirements.txt" ]; then pip install -r "${GITHUB_WORKSPACE}/requirements.txt"; fi
     - name: Test with Shellscript
       run: |
-        "${GITHUB_WORKSPACE}/run_tests.sh" "79"
+        "${GITHUB_WORKSPACE}/run_tests.sh" "79" "basic"
