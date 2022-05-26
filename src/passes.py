@@ -569,9 +569,9 @@ class Passes:
                 )
             ):
                 match bin_lop:
-                    case PN.LogicAnd:
+                    case PN.LogicAnd():
                         lop = RN.And()
-                    case PN.LogicOr:
+                    case PN.LogicOr():
                         lop = RN.Or()
                     case _:
                         bug_in_compiler(bin_lop)
@@ -1081,7 +1081,7 @@ class Passes:
                 + idx
             )
         elif int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
-            return idx
+            return -idx
         else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
             num_instrs_current_block = len(
                 list(filter_out_comments(current_block.stmts_instrs))
@@ -1127,9 +1127,11 @@ class Passes:
         match file:
             # ----------------------------- L_File ----------------------------
             case PN.File(PN.Name(val), blocks):
-                instrs = []
+                instrs_block_free = []
                 for block in blocks:
-                    instrs += self._reti_block(block)
-                return RN.Program(RN.Name(remove_extension(val) + ".reti"), instrs)
+                    instrs_block_free += self._reti_block(block)
+                return RN.Program(
+                    RN.Name(remove_extension(val) + ".reti"), instrs_block_free
+                )
             case _:
                 bug_in_compiler(file)
