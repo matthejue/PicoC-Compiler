@@ -202,14 +202,14 @@ class ASTTransformerPicoC(Transformer):
 
     def logic_and(self, nodes):
         acc_node = nodes[0]
-        for node1, node2 in zip(nodes[1::2], nodes[2::2]):
-            acc_node = N.BinOp(acc_node, node1, node2)
+        for node in nodes[1:]:
+            acc_node = N.BinOp(acc_node, N.LogicAnd(), node)
         return acc_node
 
     def logic_or(self, nodes):
         acc_node = nodes[0]
-        for node1, node2 in zip(nodes[1::2], nodes[2::2]):
-            acc_node = N.BinOp(acc_node, node1, node2)
+        for node in nodes[1:]:
+            acc_node = N.BinOp(acc_node, N.LogicOr(), node)
         return acc_node
 
     def logic_exp(self, nodes):

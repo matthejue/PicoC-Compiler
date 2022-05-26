@@ -1,0 +1,10 @@
+// in:-42
+// expected:42
+
+void main() {
+  const int min = 0;
+  int i = input();
+  do {
+    print(-i);
+  } while (i > min);
+}

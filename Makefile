@@ -59,6 +59,7 @@ convert:  extract
 verify: extract convert _verify
 verify-clean: extract convert _verify _clean-files
 _verify:
+	./export_environment_vars_for_makefile.sh; \
 	./verify_tests.sh $${COLUMNS}
 
 help:

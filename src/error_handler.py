@@ -190,7 +190,12 @@ class ErrorHandler:
             self._error_heading()
             error_header = self._error_header(e.description)
             self._output_error(error_header, e.__class__.__name__)
-            exit()
+            exit(0)
+        except Errors.BugInInterpreter as e:
+            self._error_heading()
+            error_header = self._error_header(e.description)
+            self._output_error(error_header, e.__class__.__name__)
+            exit(0)
         return rtrn_val
 
     def _error_heading(self):
