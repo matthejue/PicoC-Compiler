@@ -87,7 +87,7 @@ size ::= Num(str) | Empty()
 ---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
 ----------------------------------- L_Blocks ----------------------------------
-block ::= Block(Name(str), <instr>*, Num(str))
+block ::= Block(Name(str), <instr>*, Num(str), Num(str))
 instr ::= Goto(Name(str))
 ===============================================================================
 =                                  RETI_Patch                                 =

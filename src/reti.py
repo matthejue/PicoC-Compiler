@@ -1,7 +1,7 @@
 import global_vars
 from ast_node import ASTNode
 from reti_nodes import N
-from global_funs import bug_in_compiler_error
+from global_funs import bug_in_compiler
 
 
 class RETI(ASTNode):
@@ -172,30 +172,3 @@ class SRAM(ASTNode):
             )
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.verbose else "")
-
-
-#  if __name__ == "__main__":
-#      global_vars.args.verbose = True
-#      reti = RETI(
-#          [
-#              N.Instr(N.Loadin(), [N.Reg(N.Sp()), N.Reg(N.Acc()), N.Im("2")]),
-#              N.Instr(N.Loadin(), [N.Reg(N.Sp()), N.Reg(N.In2()), N.Im("1")]),
-#          ]
-#      )
-#      reti.reg_set("Pc", 2**31 + global_vars.args.process_begin)
-#      print(
-#          reti.reg_get("Pc"),
-#      )
-#      print(reti.reg_get("PC_Simple"))
-#      reti.save_last_instruction()
-#      reti.eprom_set(4, 42)
-#      print(reti.eprom_get(4))
-#      reti.sram_set(4, 42)
-#      print(reti.sram_get(4))
-#      reti.uart_set(3, 42)
-#      print(reti.uart_get(3))
-#      reti.reg_increase("PC")
-#      print(reti)
-#      reti.save_last_instruction()
-#      reti.reg_increase("PC")
-#      print(reti)
