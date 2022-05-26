@@ -45,7 +45,7 @@ class RETIInterpreter:
             case _:
                 bug_in_interpreter(op)
 
-    def _memory_store(self, destination, source, reti: RETI) -> int:
+    def _memory_store(self, destination, source, reti: RETI):
         source = c_uint32(source).value
         match destination:
             # addressbus
@@ -113,7 +113,7 @@ class RETIInterpreter:
                     case _:
                         bug_in_interpreter(memory_type)
             case _:
-                bug_in_interpreter(destination)
+                bug_in_interpreter(source)
 
     def _instr(self, instr, reti: RETI):
         match instr:
