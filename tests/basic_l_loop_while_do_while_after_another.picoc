@@ -1,0 +1,13 @@
+void main() {
+  char bool = 0;
+  int i = input();
+  do {
+    i = i + 1;
+  } while ( || bool);
+  if (1) {
+    bool = 1;
+  }
+  while ( && bool) {
+    i = i + 1;
+  }
+}
