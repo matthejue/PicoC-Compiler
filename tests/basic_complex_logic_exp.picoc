@@ -2,10 +2,9 @@
 // expected:42
 
 void main() {
-  int var = input();
-  int bool1 = -42 || -(10 - var || 0) + 1 && var || (var < 10 && 1);
-  int bool2 = -42 && -(11 - var || 0) + 1 || !var || (var == 10 && 1);
-  if (bool1 && bool2) {
+  int var = 10;
+  int bool = 0 || 1 && var || (var < 10 && 1);
+  if (bool) {
     print(42);
   }
 }

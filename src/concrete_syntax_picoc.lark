@@ -74,7 +74,6 @@ deref_loc: ref|ref_loc
 deref_simple: "*"deref_loc
 deref_arith: "*""("deref_loc deref_offset_op arith_exp")"
 deref: deref_simple|deref_arith
-// if the type of the location is array, then the address of the location is used
 ref_loc: deref|subscr_loc
 ref: "&"ref_loc
 pntr_opd: deref|ref
@@ -96,14 +95,12 @@ struct_decl: "struct" name "{"struct_params"}"";"
 struct_subexps: "{""."name"="entry_subexp ("," "."name"="entry_subexp)*"}"
 struct_init: struct_spec name "=" struct_subexps";"
 // --------------------------------- L_If_Else --------------------------------
-to_bool: arith_exp
-condition: to_bool|logic_exp
-if_stmt: "if""("condition")" "{" exec_stmts "}"
-if_else_stmt: "if""("condition")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
+if_stmt: "if""("logic_exp")" "{" exec_stmts "}"
+if_else_stmt: "if""("logic_exp")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
 if_if_else_stmt: if_stmt|if_else_stmt
 // ---------------------------------- L_Loop ----------------------------------
-while_stmt: "while""("condition")" "{" exec_stmts "}"
-do_while_stmt: "do" "{" exec_stmts "}" "while""("condition")"";"
+while_stmt: "while""("logic_exp")" "{" exec_stmts "}"
+do_while_stmt: "do" "{" exec_stmts "}" "while""("logic_exp")"";"
 loop_stmt: while_stmt|do_while_stmt
 // ---------------------------------- L_Stmt ----------------------------------
 decl_part: alloc_init_stmt
