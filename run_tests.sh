@@ -8,7 +8,7 @@ num_tests=0;
 not_running_through=();
 not_passed=();
   # for test in ./{old_,}tests/*$1*.picoc; do
-  for test in ./tests/{basic,advanced}*$2*.picoc; do
+  for test in ./tests/*$2*.picoc; do
     ./heading_subheadings.py "heading" "$test" "$1" "="
     ./src/main.py $(cat ./most_used_interpret_opts.txt) -c $3 "$test";
 
