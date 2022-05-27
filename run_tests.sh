@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 
-./extract_input_and_expected.sh
-./convert_to_c.py
-verification_res=$(./verify_tests.sh $1)
+./extract_input_and_expected.sh $2
+./convert_to_c.py $2
+verification_res=$(./verify_tests.sh $1 $2)
 
 num_tests=0;
 not_running_through=();
 not_passed=();
-  # for test in ./{old_,}tests/*$1*.picoc; do
-  for test in ./tests/*$2*.picoc; do
+
+if [[ $2 == "all" ]]; then
+  paths=(./tests/*.picoc)
+elif [[ -n "$2" ]]; then
+  paths=(./tests/$2*.picoc)
+else
+  paths=(./tests/{basic,advanced}*.picoc)
+fi
+
+for test in "${paths[@]}"; do
     ./heading_subheadings.py "heading" "$test" "$1" "="
     ./src/main.py $(cat ./most_used_interpret_opts.txt) -c $3 "$test";
 

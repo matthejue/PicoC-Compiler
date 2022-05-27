@@ -6,8 +6,20 @@ import os
 
 
 def main():
+    pattern = (
+        ["basic", "advanced"]
+        if len(sys.argv) == 1
+        else ["basic", "advanced", "hard"]
+        if sys.argv[1] == "all"
+        else [sys.argv[1]]
+    )
+
     for filepath in map(
-        lambda file: f"./tests/{file}", os.listdir(os.curdir + "/tests/")
+        lambda file: f"./tests/{file}",
+        filter(
+            lambda file: any([ptrn in file for ptrn in pattern]),
+            os.listdir(os.curdir + "/tests/"),
+        ),
     ):
         basename = remove_extension(filepath)
         with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
