@@ -2,6 +2,7 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 from picoc_nodes import N
 from global_classes import Pos
+from global_funs import bug_in_compiler
 import global_vars
 
 
@@ -168,7 +169,13 @@ class ASTTransformerPicoC(Transformer):
         return nodes[0]
 
     def un_opd(self, nodes):
-        acc_node = nodes[-1]
+        if len(nodes) == 1:
+            return nodes[0]
+        match nodes[-2]:
+            case N.LogicNot():
+                acc_node = self._insert_to_bool(nodes[-1])
+            case _:
+                acc_node = nodes[-1]
         for node in nodes[-2::-1]:
             acc_node = N.UnOp(node, acc_node)
         return acc_node
@@ -200,16 +207,44 @@ class ASTTransformerPicoC(Transformer):
             return nodes[0]
         return N.Atom(nodes[0], nodes[1], nodes[2])
 
+    def _insert_to_bool(self, node):
+        match node:
+            # exclude all possible logic nodes
+            case N.BinOp(_, N.LogicAnd(), _):
+                return node
+            case N.BinOp(_, N.LogicOr(), _):
+                return node
+            case N.Atom():
+                return node
+            case N.UnOp(N.LogicNot(), _):
+                return node
+            case N.BinOp():
+                return N.ToBool(node)
+            case N.UnOp():
+                return N.ToBool(node)
+            case N.Num():
+                return N.ToBool(node)
+            case N.Name():
+                return N.ToBool(node)
+            case N.Char():
+                return N.ToBool(node)
+            case _:
+                bug_in_compiler(node)
+
     def logic_and(self, nodes):
-        acc_node = nodes[0]
+        if len(nodes) == 1:
+            return nodes[0]
+        acc_node = self._insert_to_bool(nodes[0])
         for node in nodes[1:]:
-            acc_node = N.BinOp(acc_node, N.LogicAnd(), node)
+            acc_node = N.BinOp(acc_node, N.LogicAnd(), self._insert_to_bool(node))
         return acc_node
 
     def logic_or(self, nodes):
-        acc_node = nodes[0]
+        if len(nodes) == 1:
+            return nodes[0]
+        acc_node = self._insert_to_bool(nodes[0])
         for node in nodes[1:]:
-            acc_node = N.BinOp(acc_node, N.LogicOr(), node)
+            acc_node = N.BinOp(acc_node, N.LogicOr(), self._insert_to_bool(node))
         return acc_node
 
     def logic_exp(self, nodes):
@@ -348,12 +383,6 @@ class ASTTransformerPicoC(Transformer):
         )
 
     # -------------------------------- L_If_Else ------------------------------
-    def to_bool(self, nodes):
-        return N.ToBool(nodes[0])
-
-    def condition(self, nodes):
-        return nodes[0]
-
     def if_stmt(self, nodes):
         return N.If(nodes[0], nodes[1])
 
