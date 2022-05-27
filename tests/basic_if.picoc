@@ -1,0 +1,13 @@
+// in:11
+// expected:42
+
+void main() {
+  int var = input();
+  if (var > 10) {
+    print(42);
+  }
+
+  if (var == 10) {
+    print(42);
+  }
+}

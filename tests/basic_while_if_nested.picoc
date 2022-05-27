@@ -1,0 +1,21 @@
+// in:10
+// expected:2 4 6 10
+
+void main() {
+  const int level1 = 2;
+  const int level2 = 4;
+  const int level3 = 6;
+  int max_level = input();
+  int i = 0;
+  while (i < max_level) {
+    if (i == level1) {
+      print(i);
+    } else if (i == level2) {
+      print(i);
+    } else if (i == level3) {
+      print(i);
+    }
+    i = i + 1;
+  }
+  print(i);
+}

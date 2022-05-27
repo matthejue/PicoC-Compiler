@@ -588,7 +588,7 @@ class Passes:
                     ),
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
-            case PN.Exp(PN.UnOp(PN.LogicNot, PN.Stack(PN.Num(val)))):
+            case PN.Exp(PN.UnOp(PN.LogicNot(), PN.Stack(PN.Num(val)))):
                 return self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Loadi(), [RN.Reg(RN.Acc()), RN.Im("1")]),
                     RN.Instr(
