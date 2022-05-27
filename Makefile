@@ -43,7 +43,7 @@ _shell:
 	./src/main.py
 
 extract:
-	./extract_input_and_expected.sh
+	./extract_input_and_expected.sh $(ARG_BASE)
 
 test: _test _clean-pycache
 test-clean: _test clean
@@ -54,13 +54,13 @@ _test:
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
 
 convert:  extract
-	./convert_to_c.py
+	./convert_to_c.py $(ARG_BASE)
 
 verify: extract convert _verify
 verify-clean: extract convert _verify _clean-files
 _verify:
 	./export_environment_vars_for_makefile.sh; \
-	./verify_tests.sh $${COLUMNS}
+	./verify_tests.sh $${COLUMNS} $(ARG_BASE)
 
 help:
 	./src/main.py -h -C

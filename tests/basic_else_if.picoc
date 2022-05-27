@@ -4,17 +4,47 @@
 void main() {
   int var;
   int i = 0;
-  while (i < 4) {
-    var = input();
-    if (var < 10) {
-      print(0);
-    } else if (var >= 10 && var < 20) {
-      print(10);
-    } else if (var >= 20 && var < 30) {
-      print(20);
-    } else {  // var >= 30
-      print(30);
-    }
-    i = i + 1;
+  var = input();
+  if (var < 10) {
+    print(0);
+  } else if (var >= 10 && var < 20) {
+    print(10);
+  } else if (var >= 20 && var < 30) {
+    print(20);
+  } else {  // var >= 30
+    print(30);
+  }
+
+  var = input();
+  if (var < 10) {
+    print(0);
+  } else if (var >= 10 && var < 20) {
+    print(10);
+  } else if (var >= 20 && var < 30) {
+    print(20);
+  } else {  // var >= 30
+    print(30);
+  }
+
+  var = input();
+  if (var < 10) {
+    print(0);
+  } else if (var >= 10 && var < 20) {
+    print(10);
+  } else if (var >= 20 && var < 30) {
+    print(20);
+  } else {  // var >= 30
+    print(30);
+  }
+
+  var = input();
+  if (var < 10) {
+    print(0);
+  } else if (var >= 10 && var < 20) {
+    print(10);
+  } else if (var >= 20 && var < 30) {
+    print(20);
+  } else {  // var >= 30
+    print(30);
   }
 }
