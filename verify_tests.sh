@@ -5,7 +5,17 @@ shopt -s extglob
 ./heading_subheadings.py "heading" "Verification" "$1" "="
 num_tests=0;
 not_verified=();
-  for test in ./tests/!(error*|exclude*).c; do
+
+if [[ $2 == "all" ]]; then
+  # paths=(./tests/!(error*|exclude*).c)
+  paths+=(./tests/{basic,advanced,hard}*.c)
+elif [[ -n "$2" ]]; then
+  paths=(./tests/$2*.c)
+else
+  paths+=(./tests/{basic,advanced}*.c)
+fi
+
+for test in "${paths[@]}"; do
   echo $test
   gcc -Wno-incompatible-pointer-types $test
   ./a.out | sed -e 's/^ //' | sed 's/$/\n/' > "${test%.c}.c_out"
