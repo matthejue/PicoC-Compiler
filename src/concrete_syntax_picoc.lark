@@ -7,9 +7,10 @@ COMMENT: "//" /[^\n]*/|"/*" /(.|\n)*?/ "*/"
 DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 DIG_WITH_0: "0"|DIG_NO_0
 NUM: "0"|DIG_NO_0 DIG_WITH_0*
-LETTER: "a".."z"|"A".."Z"
-CHAR: LETTER
+ASCII_CHAR: " ".."~"
+CHAR: "'"ASCII_CHAR"'"
 name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
+LETTER: "a".."z"|"A".."Z"
 NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
 un_op: SUB_MINUS|NOT|LOGIC_NOT
 SUB_MINUS: "-"
@@ -47,7 +48,7 @@ deref_offset_op: ADD|SUB_MINUS
 // ============================================================================
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
-arith_opd: name|NUM|"'"CHAR"'"|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
+arith_opd: name|NUM|CHAR|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
 un_opd: un_op* arith_opd
 arith_prec1: un_opd (prec1_op un_opd)*
 arith_prec2: arith_prec1 (prec2_op arith_prec1)*

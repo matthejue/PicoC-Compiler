@@ -19,7 +19,7 @@ class ASTTransformerPicoC(Transformer):
         return N.Num(token.value, Pos(token.line, token.column))
 
     def CHAR(self, token: Token):
-        return N.Char(token.value, Pos(token.line, token.column))
+        return N.Char(token.value[1:-1], Pos(token.line, token.column))
 
     def un_op(self, token_list: list[Token]):
         token = token_list[0]
