@@ -20,21 +20,19 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser = cmd2.Cmd2ArgumentParser(add_help=False)
     # ----------------------------- PicoC_Compiler ----------------------------
     cli_args_parser.add_argument("infile", nargs="?")
-    # ---------------------------- RETI_Interpreter ---------------------------
-    cli_args_parser.add_argument("-R", "--run", action="store_true")
-    cli_args_parser.add_argument("-B", "--process_begin", type=int, default=8)
-    cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
-    cli_args_parser.add_argument("-E", "--eprom_size", type=int, default=8)
-    cli_args_parser.add_argument("-U", "--uart_size", type=int, default=4)
-    cli_args_parser.add_argument("-S", "--sram_size", type=int, default=0)
     # ------------------- PicoC_Compiler + RETI_Interpreter -------------------
     cli_args_parser.add_argument("-i", "--intermediate_stages", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
-    cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-c", "--color", action="store_true")
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
+    # ---------------------------- RETI_Interpreter ---------------------------
+    cli_args_parser.add_argument("-R", "--run", action="store_true")
+    cli_args_parser.add_argument("-B", "--process_begin", type=int, default=8)
+    cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
+    cli_args_parser.add_argument("-U", "--uart_size", type=int, default=4)
+    cli_args_parser.add_argument("-S", "--sram_size", type=int, default=0)
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/settings.conf"
@@ -158,18 +156,10 @@ class OptionHandler(cmd2.Cmd):
         # printing is always turned on in shell
         global_vars.args.print = True
 
-        try:
-            self._compl(["void main() {"] + code.split("\n") + ["}"])
-        except Exception as e:
-            print(
-                f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
-            )
-            if global_vars.args.show_error_message:
-                raise e
-        else:
-            print(
-                f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
-            )
+        self._compl(["void main() {"] + code.split("\n") + ["}"])
+        print(
+            f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+        )
 
     def do_help(self, _):
         print(generate_help_message())

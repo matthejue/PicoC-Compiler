@@ -3,6 +3,7 @@ from errors import Errors
 import itertools
 import global_vars
 from picoc_nodes import N as PN
+import os
 
 
 def overwrite(old, replace_with, idx, color=""):
@@ -34,13 +35,15 @@ def args_to_str(args: list):
         # option doesn't have to be reset, because execution ends anyways
         global_vars.args.verbose = True
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
-            f"{CM().BLUE}'"
-            + "".join(list(map(lambda line: line.lstrip(), str(arg).split("\n"))))
-            + f"'{CM().RESET_ALL}"
+            f"{CM().BLUE}'" + convert_to_single_line(arg) + f"'{CM().RESET_ALL}"
             for arg in args
         )
     else:
         return "no arguments"
+
+
+def convert_to_single_line(stmt):
+    return "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
 
 
 def bug_in_compiler(*args):
@@ -95,3 +98,25 @@ def filter_out_comments(instrs):
         lambda instr: not isinstance(instr, PN.SingleLineComment),
         instrs,
     )
+
+
+def strip_multiline_string(multiline_str):
+    """helper function to make mutlineline string usable on different
+    indent levels
+
+    :grammar: grammar specification
+    :returns: None
+    """
+    multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
+    # every code piece ends with \n, so the last element can always be poped
+    return multiline_str
+
+
+def get_most_used_opts():
+    with open(
+        os.path.expanduser("~") + "/.config/pico_c_compiler/most.json",
+        "r",
+        encoding="utf-8",
+    ) as fout:
+        most_used_opts = fout.read()
+    return most_used_opts

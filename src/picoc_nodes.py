@@ -184,7 +184,7 @@ class N:
     class Ref(ASTNode):
         def __init__(self, ref_loc):
             self.ref_loc = ref_loc
-            self.datatype = None
+            self.datatype: ASTNode
             super().__init__(visible=[self.ref_loc])
 
         __match_args__ = ("ref_loc", "datatype")
@@ -354,7 +354,8 @@ class N:
         def __init__(self, name, stmts_instrs):
             self.name = name
             self.stmts_instrs = stmts_instrs
-            self.instrs_before = None
+            self.instrs_before: N.Num
+            self.num_instrs: N.Num
             super().__init__(
                 visible=[
                     self.name,
@@ -362,7 +363,7 @@ class N:
                 ]
             )
 
-        __match_args__ = ("name", "stmts_instrs", "instrs_before")
+        __match_args__ = ("name", "stmts_instrs", "instrs_before", "num_instrs")
 
     class GoTo(ASTNode):
         def __init__(self, name):

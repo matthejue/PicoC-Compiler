@@ -5,21 +5,19 @@ class Args:
     def __init__(self):
         # --------------------------- PicoC_Compiler --------------------------
         self.infile = "stdin"
-        # -------------------------- RETI_Interpreter -------------------------
-        self.run = True
-        self.process_begin = 8
-        self.datasegment_size = 32
-        self.eprom_size = 8
-        self.uart_size = 4
-        self.sram_size = 0
         # ----------------- PicoC_Compiler + RETI_Interpreter -----------------
         self.intermediate_stages = True
         self.print = True
         self.lines = 2
-        self.show_error_message = False
         self.verbose = False
         self.color = True
         self.debug = False
+        # -------------------------- RETI_Interpreter -------------------------
+        self.run = True
+        self.process_begin = 8
+        self.datasegment_size = 32
+        self.uart_size = 4
+        self.sram_size = 0
 
 
 # options from command-line arguments
@@ -29,6 +27,9 @@ args = Args()
 # means one is in shell mode
 path = ""
 basename = ""
+
+# eprom_size is fixed as the start program has a certain size
+eprom_size = 0
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.

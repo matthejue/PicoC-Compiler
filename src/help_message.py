@@ -2,6 +2,7 @@ import os
 import sys
 import global_vars
 from colorizer import colorize_help_page
+from global_funs import strip_multiline_string
 
 
 def heading(heading, terminal_width, symbol):
@@ -39,37 +40,43 @@ def generate_help_message():
     Compiles PicoC Code into RETI Code.
 
     {heading("Positional arguments", terminal_width, '~')}
-      infile                input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
+    infile
+    > input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
 
-    {heading("Optional arguments", terminal_width, '~')}
-    -h, --help            show this help message and exit. With the -C option it can be colorized.
-    -c, --code
-    >                     also print the content of the `.picoc` input file that gets compiled. Only works if --print option is active
-    -t, --tokens          also write the tokenlist into a `.tokens` file
-    -d, --derivation-tree
-    >                     also write the derivation tree into a `.dt` file
-    -a, --abstract_syntax-tree
-    >                     also write the abstract syntax tree into a `.ast` file
-    -s, --symbol_table    also write the final symbol table into a `.csv` file
-    -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
-    -d, --distance DISTANCE
-    >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
-    -S, --sight SIGHT     sets the number of lines visible around a error message
-    -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
-    -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
-    -g, --debug           starts the debugger in the code
-    -m, --show_error_message
-    >                     show error message from python
+    {heading("Main optional arguments", terminal_width, '~')}
+    -i, --intermediate-stages
+    >  shows intermediate stages of compilation, inter alia tokens, derivation trees, abstract syntax trees which implies the abstract syntax trees after the different passes. If the --verbose option is activated, the nodes of the abstract syntax trees get extra parenthesis
+    -p, --print
+    >  prints all file outputs to the terminal. Is always activated in the shell
+    -l, --lines LINES
+    >  sets the number of lines visible around a error message
+    -v, --verbose
+    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the following RETI instructions. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages
+    -c, --color
+    >  colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
+    -d, --debug
+    >  starts the pudb debugger at a point before the derivation tree and abstract syntax tree generation and before all passes
+    -h, --help
+    >  show this help message and exit. With the -c option it can be colorized
+
+    {heading("Interpreter specific optional arguments", terminal_width, '~')}
+    -R, --run
+    > executes the RETI Instructions after generating them. If the --verbose option is activated, the state of the RETI can be watched after every instruction
+    -B, --process_begin
+    >  sets the address where the process and the codesegment begin, respectively
+    -D, --datasegment_size
+    >  sets the size of the the datasegment. This has to be set carefully, because if the value is set to low, the section for global static data and the stack might collide
+    -U, --uart_size
+    >  sets the size of the uart
+    -S, --sram_size
+    >  sets the size of the sram. If the generated RETI-instructions and --datasegment_size take up more space in the sram then given by the --sram-size option, then the sram size will be set to --process-begin + #RETI-instructions + --datasegment-size
 
     {heading("PicoC", terminal_width, '=')}
-    PicoC is a subset of C including the datatypes int and char, if, else if and else statements, while and do while loops, arithmetic expressions, including the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^` and unary operators `-`, `~`, logic expressions, including comparison relations `==`, `!=`, `<`, `>`, `<=`, `>=` and logical connectives `!`, `&&`, `||` and assignments with the assignment operator `=`.
-    The code can be commented with single line comments (`//`) and multiline comments (`/*` and `*/`).
+    PicoC is a subset of C including the primitive datatypes int, char and void, the derived datatypes array, struct and pointer, if / else statements (including the combination of if and else, if else), while and do while statements, arithmetic expressions, build with the help of the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^` and unary operators `-`, `~`, logic expressions, build with the help of comparison relations `==`, `!=`, `<`, `>`, `<=`, `>=` and logical connectives `!`, `&&`, `||` and assignments build with the assignment operator `=`.
 
-    All statements have to be enclosed in a
+    Statements have to be enclosed within functions that can call eath other and among this functions, there has to be a 'main' function that marks the start of the execution of the sequence of statements within the functions or rather the execution of RETI instructions that get compiled out of this RETI statements. Statements can contain other statements like e.g. if / else and while / do while or expressions like e.g. assignments have on their right handside.
 
-    `void main() {{ /* your program */ }}`
-
-    function.
+    The code can be commented with single line (`//`) and multiline comments (`/*` and `*/`).
 
     {heading("Shell", terminal_width, '=')}
     If called without arguments, a shell is going to open.
@@ -88,6 +95,7 @@ def generate_help_message():
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
+    # TODO: update
     `compile -ctas -p -v -d 20 -S 2 "<code>";`
 
     and shrinks it down to:
@@ -136,15 +144,3 @@ def generate_help_message():
         terminal_width,
     )
     return colorize_help_page(description) if global_vars.args.color else description
-
-
-def strip_multiline_string(multiline_str):
-    """helper function to make mutlineline string usable on different
-    indent levels
-
-    :grammar: grammar specification
-    :returns: None
-    """
-    multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
-    # every code piece ends with \n, so the last element can always be poped
-    return multiline_str

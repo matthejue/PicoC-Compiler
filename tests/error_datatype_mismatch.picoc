@@ -1,0 +1,9 @@
+// in:
+// expected:DatatypeMismatch
+
+struct strct {int attr1; int attr2;};
+
+void main() {
+  struct strct var = {.attr1=4, .attr2=2};
+  print(var[0]);
+}

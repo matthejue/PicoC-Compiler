@@ -1,6 +1,7 @@
 from ast_node import ASTNode
 from picoc_nodes import N
 import global_vars
+from global_funs import convert_to_single_line
 
 # ------------------------------- L_Symbol_Table ------------------------------
 class ST:
@@ -43,24 +44,12 @@ class ST:
             global_vars.args.verbose = True
             acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
             acc += "\n    {"
-            acc += "\n      type qualifier:   " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.type_qual).split("\n")))
-            )
-            acc += "\n      datatype:         " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.datatype).split("\n")))
-            )
-            acc += "\n      name:             " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.name).split("\n")))
-            )
-            acc += "\n      value or address: " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.val_addr).split("\n")))
-            )
-            acc += "\n      position:         " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.pos2).split("\n")))
-            )
-            acc += "\n      size:             " + "".join(
-                list(map(lambda line: line.lstrip(), str(self.size).split("\n")))
-            )
+            acc += "\n      type qualifier:   " + convert_to_single_line(self.type_qual)
+            acc += "\n      datatype:         " + convert_to_single_line(self.datatype)
+            acc += "\n      name:             " + convert_to_single_line(self.name)
+            acc += "\n      value or address: " + convert_to_single_line(self.val_addr)
+            acc += "\n      position:         " + convert_to_single_line(self.pos2)
+            acc += "\n      size:             " + convert_to_single_line(self.size)
             global_vars.args.verbose = tmp
             acc += "\n    }"
             return acc + ("\n  )" if global_vars.args.verbose else "")
