@@ -1,9 +1,11 @@
+# SHELL := /bin/bash
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
 all: compile-color
 
 install:
+	pip install -r ./requirements.txt
 	@sudo -- sh -c '[[ ! -f /usr/local/bin/picoc_compiler ]] && ln -sr ./src/main.py /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully installed || echo compiler /usr/local/bin/picoc_compiler is already installed'
 	@[[ ! -d ~/.config/picoc_compiler ]] && mkdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler created || echo config folder ~/.config/picoc_compiler does already exist
 	@[[ ! -f ~/.config/picoc_compiler/history.json ]] && touch ~/.config/picoc_compiler/history.json && echo config file ~/.config/picoc_compiler/history.json created || echo config file ~/.config/picoc_compiler/history.json does already exist
@@ -12,6 +14,7 @@ install:
 	@[[ ! -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && ln -sr ./most_used_interpret_opts.txt ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-usecreated erpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt created || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt does already exist
 
 uninstall:
+	pip uninstall -r ./requirements.txt
 	@sudo -- sh -c '[[ -f /usr/local/bin/picoc_compiler ]] && rm /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully uninstalled || echo compiler /usr/local/bin/picoc_compiler is already uninstalled'
 	@[[ -f ~/.config/picoc_compiler/history.json ]] && rm ~/.config/picoc_compiler/history.json && echo file ~/.config/picoc_compiler/history.json was deleted || echo config file ~/.config/picoc_compiler/history.json is already deleted
 	@[[ -f ~/.config/picoc_compiler/settings.conf.json ]] && rm ~/.config/picoc_compiler/settings.conf.json && echo file ~/.config/picoc_compiler/settings.conf.json was deleted || echo settings file ~/.config/picoc_compiler/settings.conf.json is already deleted
