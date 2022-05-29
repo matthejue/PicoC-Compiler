@@ -35,8 +35,6 @@ class Errors:
             self.last_pos = last_pos
 
     class UnknownIdentifier(Exception):
-        """If Token shouldn't syntactically appear at this position"""
-
         def __init__(self, found: str, found_pos: Pos):
             self.description = (
                 f"{CM().YELLOW}UnknownIdentifierError{CM().RESET_ALL}: Identifier "
@@ -46,9 +44,6 @@ class Errors:
             self.found_pos = found_pos
 
     class TooLargeLiteral(Exception):
-        """If the literal assigned to a variable is too large for the datatype of
-        the variable"""
-
         def __init__(self, found, found_pos, found_symbol_type, found_from, found_to):
             self.description = f"{CM().YELLOW}TooLargeLiteralError{CM().RESET_ALL}: Literal '{found}' is too large"
             self.found = found
@@ -66,18 +61,16 @@ class Errors:
             self.first_pos = first_pos
 
     class ConstReassignment(Exception):
-        def __init__(self, found, found_pos, first_pos):
+        def __init__(self, const_name, const_pos, first_pos):
             self.description = (
                 f"{CM().YELLOW}ConstReassignmentError{CM().RESET_ALL}: Can't reassign a new "
-                f"value to named constant '{found}'"
+                f"value to named constant '{const_name}'"
             )
-            self.found = found
-            self.found_pos = found_pos
+            self.const_name = const_name
+            self.const_pos = const_pos
             self.first_pos = first_pos
 
     class NoMainFunction(Exception):
-        """If there's no main function within the given file"""
-
         def __init__(self, fname):
             self.description = (
                 f"{CM().YELLOW}NoMainFunctionError{CM().RESET_ALL}: There's no main function"
@@ -92,6 +85,43 @@ class Errors:
             )
             self.first_pos = first_pos
             self.second_pos = second_pos
+
+    class UnknownAttribute(Exception):
+        def __init__(self, attribute_name, attribute_pos, struct_name):
+            self.description = (
+                f"{CM().YELLOW}UnknownAttribute{CM().RESET_ALL}: "
+                f"Struct {CM().BLUE}'{struct_name}'{CM().RESET_ALL} "
+                f"doesn't have a attribute {CM().RED}'attribute_name'{CM().RESET_ALL}"
+            )
+            self.attribute_name = attribute_name
+            self.attribute_pos = attribute_pos
+            self.struct_name = struct_name
+
+    class ConstRef(Exception):
+        def __init__(self, const_name, const_pos):
+            self.description = (
+                f"{CM().YELLOW}ConstRef{CM().RESET_ALL}: Can't apply the "
+                "reference / address-of operator to constant "
+                f"{CM().RED}'{const_name}'{CM().RESET_ALL}"
+            )
+            self.const_name = const_name
+            self.const_pos = const_pos
+
+    class DatatypeMismatch(Exception):
+        def __init__(
+            self,
+            context_datatype,
+            op_pos,
+            op_datatype,
+        ):
+            self.description = (
+                f"""{CM().YELLOW}DatatypeMismatch{CM().RESET_ALL}: Datatype
+                {CM().RED}'{}'{CM().RESET_ALL} isn't matching in the present
+                context. Expected
+                {CM().BLUE}'{expected_datatype}'{CM().RESET_ALL}"""
+
+            )
+            context_datatype
 
     class BugInCompiler(Exception):
         def __init__(self, fun_name, args):

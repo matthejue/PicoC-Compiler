@@ -32,13 +32,7 @@ def main():
     try:
         compiler.read_and_write_file()
     except FileNotFoundError:
-        print("File does not exist\n")
-    except Exception as e:
-        print(
-            f"\n{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
-        )
-        if global_vars.args.show_error_message:
-            raise e
+        print("File does not exist")
     else:
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"

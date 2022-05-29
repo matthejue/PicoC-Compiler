@@ -7,9 +7,9 @@ import os
 
 def main():
     pattern = (
-        ["basic", "advanced"]
+        ["basic", "advanced", "example"]
         if len(sys.argv) == 1
-        else ["basic", "advanced", "hard"]
+        else ["basic", "advanced", "example", "hard"]
         if sys.argv[1] == "all"
         else [sys.argv[1]]
     )

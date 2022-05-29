@@ -13,7 +13,7 @@ if [[ $2 == "all" ]]; then
 elif [[ -n "$2" ]]; then
   paths=(./tests/$2*.picoc)
 else
-  paths=(./tests/{basic,advanced}*.picoc)
+  paths=(./tests/{basic,advanced,example,error}*.picoc)
 fi
 
 for test in "${paths[@]}"; do

@@ -103,7 +103,7 @@ class RETI(ASTNode):
 
 class EPROM(ASTNode):
     def __init__(self):
-        self.cells = {i: N.Im("0") for i in range(global_vars.args.eprom_size)}
+        self.cells = {i: N.Im("0") for i in range(global_vars.eprom_size)}
         super().__init__(visible=[self.cells])
 
     def __repr__(self):

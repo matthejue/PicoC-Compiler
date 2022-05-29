@@ -2,7 +2,8 @@ from picoc_nodes import N as PN
 from reti_nodes import N as RN
 from errors import Errors
 from symbol_table import ST
-from global_funs import bug_in_compiler, remove_extension, filter_out_comments
+from global_funs import bug_in_compiler, remove_extension, filter_out_comments, convert_to_single_line
+from global_classes import Pos
 import global_vars
 
 
@@ -36,7 +37,7 @@ class Passes:
         return [
             PN.SingleLineComment(
                 "//",
-                "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n")))),
+                convert_to_single_line(stmt)
             )
         ]
 
@@ -554,7 +555,7 @@ class Passes:
         return [
             PN.SingleLineComment(
                 "#",
-                "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n")))),
+                convert_to_single_line(stmt),
             )
         ]
 
@@ -608,6 +609,7 @@ class Passes:
                     symbol = self.symbol_table.resolve(f"{val}@{self.current_scope}")
                     choosen_scope = self.current_scope
                 except KeyError:
+                    # TODO: remove in case global variables won't be implemented
                     try:
                         symbol = self.symbol_table.resolve(f"{val}@global")
                         choosen_scope = "global"
@@ -786,21 +788,68 @@ class Passes:
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
-            case PN.Assign(PN.Name(val1), PN.Stack(PN.Num(val2))):
-                symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
+            case PN.Assign(PN.Name(val1, pos1), PN.Stack(PN.Num(val2))):
+                reti_instrs = self._single_line_comment_reti(stmt) + [
+                    RN.Instr(
+                        RN.Loadin(),
+                        [
+                            RN.Reg(RN.Sp()),
+                            RN.Reg(RN.Acc()),
+                            RN.Im(val2),
+                        ],
+                    ),
+                    RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
+                ]
+                try:
+                    symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
+                    choosen_scope = self.current_scope
+                except KeyError:
+                    # TODO: remove in case global variables won't be implemented
+                    try:
+                        symbol = self.symbol_table.resolve(f"{val1}@global")
+                        choosen_scope = "global"
+                    except KeyError:
+                        raise Errors.UnknownIdentifier(val1, pos1)
+                # TODO: remove in case global variables won't be implemented
                 match symbol:
-                    case ST.Symbol(_, _, _, PN.Num(val3)):
-                        return self._single_line_comment_reti(stmt) + [
-                            RN.Instr(
-                                RN.Loadin(),
-                                [RN.Reg(RN.Sp()), RN.Reg(RN.Acc()), RN.Im(val2)],
-                            ),
-                            RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
-                            RN.Instr(
-                                RN.Storein(),
-                                [RN.Reg(RN.Ds()), RN.Reg(RN.Acc()), RN.Im(val3)],
-                            ),
-                        ]
+                    case ST.Symbol(PN.Writeable(), _, _, PN.Num(val3)):
+                        match choosen_scope:
+                            case ("main" | "global"):
+                                return reti_instrs + [
+                                    RN.Instr(
+                                        RN.Storein(),
+                                        [
+                                            RN.Reg(RN.Ds()),
+                                            RN.Reg(RN.Acc()),
+                                            RN.Im(val3),
+                                        ],
+                                    ),
+                                ]
+                            case _:
+                                return reti_instrs + [
+                                    RN.Instr(
+                                        RN.Storein(),
+                                        [
+                                            RN.Reg(RN.Baf()),
+                                            RN.Reg(RN.Acc()),
+                                            RN.Im(str(-(2 + int(val3)))),
+                                        ],
+                                    ),
+                                ]
+                    case ST.Symbol(
+                        PN.Const(),
+                        _,
+                        _,
+                        _,
+                        ST.Pos(PN.Num(line), PN.Num(column)),
+                    ):
+                        const_name = val1
+                        const_pos = pos1
+                        raise Errors.ConstReassignment(
+                            const_name,
+                            const_pos,
+                            Pos(int(line), int(column)),
+                        )
                     case _:
                         bug_in_compiler(symbol)
             case PN.Assign(PN.Stack(PN.Num(val1)), PN.Stack(PN.Num(val2))):
@@ -817,7 +866,7 @@ class Passes:
                     ),
                 ]
             # ----------------------------- L_Pntr ----------------------------
-            case PN.Exp(PN.Ref(PN.Name(val1, pos))):
+            case PN.Exp(PN.Ref(PN.Name(val1, pos1))):
                 reti_instrs = self._single_line_comment_reti(stmt) + [
                     RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("1")])
                 ]
@@ -829,9 +878,9 @@ class Passes:
                         symbol = self.symbol_table.resolve(f"{val1}@global")
                         choosen_scope = "global"
                     except KeyError:
-                        raise Errors.UnknownIdentifier(val1, pos)
+                        raise Errors.UnknownIdentifier(val1, pos1)
                 match symbol:
-                    case ST.Symbol(_, _, _, PN.Num(val2)):
+                    case ST.Symbol(PN.Writeable(), _, _, PN.Num(val2)):
                         match choosen_scope:
                             case ("main", "global"):
                                 reti_instrs += [
@@ -853,8 +902,10 @@ class Passes:
                                     RN.Instr(
                                         RN.Sub(), [RN.Reg(RN.Acc()), RN.Reg(RN.In2())]
                                     ),
-                                    RN.Instr(RN.Subi(), [RN.Reg(RN.Sp()), RN.Im("2")]),
+                                    RN.Instr(RN.Subi(), [RN.Reg(RN.Acc()), RN.Im("2")]),
                                 ]
+                    case ST.Symbol(PN.Const()):
+                        raise Errors.ConstRef(val1, pos1)
                     case _:
                         bug_in_compiler(symbol)
                 return reti_instrs + [
@@ -873,6 +924,7 @@ class Passes:
                     datatype,
                 )
             ):
+                reti_instrs = self._single_line_comment_reti(stmt)
                 match datatype:
                     case PN.ArrayDecl(nums, datatype2):
                         help_const = self._datatype_size(datatype2)
@@ -882,7 +934,7 @@ class Passes:
                                     help_const *= int(val3)
                                 case _:
                                     bug_in_compiler(num)
-                        reti_instrs = self._single_line_comment_reti(stmt) + [
+                        reti_instrs += [
                             RN.Instr(
                                 RN.Loadin(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)],
@@ -898,7 +950,7 @@ class Passes:
                         ]
                     case PN.PntrDecl(_, datatype2):
                         help_const = self._datatype_size(datatype2)
-                        reti_instrs = self._single_line_comment_reti(stmt) + [
+                        reti_instrs += [
                             RN.Instr(
                                 RN.Loadin(),
                                 [RN.Reg(RN.Sp()), RN.Reg(RN.In2()), RN.Im(val1)],
@@ -916,8 +968,15 @@ class Passes:
                             ),
                             RN.Instr(RN.Add(), [RN.Reg(RN.In1()), RN.Reg(RN.In2())]),
                         ]
+                    case PN.StructSpec(PN.Name(val)):
+                        raise Errors.DatatypeMismatch(val, pos, f"struct {val}", "array or pointer")
+                    case PN.PntrDecl():
+                        pass
+                    case PN.IntType():
+                        raise Errors.DatatypeMismatch(, , "int", "array or pointer")
+                    case PN.CharType():
+                        pass
                     case _:
-                        bug_in_compiler(datatype)
                 return reti_instrs + [
                     RN.Instr(RN.Addi(), [RN.Reg(RN.Sp()), RN.Im("1")]),
                     RN.Instr(
@@ -925,7 +984,7 @@ class Passes:
                     ),
                 ]
             case PN.Exp(
-                PN.Ref(PN.Attr(PN.Stack(PN.Num(val1)), PN.Name(val2)), datatype)
+                PN.Ref(PN.Attr(PN.Stack(PN.Num(val1)), PN.Name(val2, pos2)), datatype)
             ):
                 attr_name = val2
                 rel_pos_in_struct = 0
@@ -949,13 +1008,14 @@ class Passes:
                                         case _:
                                             bug_in_compiler(symbol)
                                 else:
-                                    # TODO: fitting error message if struct doesn't have this attribute
-                                    bug_in_compiler(attr_ids)
+                                    attr_pos = pos2
+                                    raise Errors.UnknownAttribute(
+                                        attr_name, attr_pos, struct_name
+                                    )
                             case _:
                                 bug_in_compiler(symbol)
                     case _:
-                        # TODO: fitting error message if datatypes not fitting
-                        bug_in_compiler(datatype)
+                        raise Errors.DatatypeMismatch()
                 return self._single_line_comment_reti(stmt) + [
                     RN.Instr(
                         RN.Loadin(), [RN.Reg(RN.Sp()), RN.Reg(RN.In1()), RN.Im(val1)]
@@ -1041,11 +1101,13 @@ class Passes:
                     # this has to be done in this pass, because the reti_blocks
                     # pass sometimes needs to access this attribute from a block
                     # where it hasn't yet beeen determined
+                    # TODO: Move this into the patch_instructions pass, because
+                    # in this pass goto(next_block_name) gets removed
                     block.instrs_before = PN.Num(str(self.instrs_cnt))
-                    block.visible += [block.instrs_before]
-                    self.instrs_cnt += len(
-                        list(filter_out_comments(block.stmts_instrs))
-                    )
+                    num_instrs = len(list(filter_out_comments(block.stmts_instrs)))
+                    block.num_instrs = PN.Num(str(num_instrs))
+                    block.visible += [block.instrs_before, block.num_instrs]
+                    self.instrs_cnt += num_instrs
                 return blocks
             case _:
                 bug_in_compiler(decl_def)
@@ -1083,13 +1145,13 @@ class Passes:
         elif int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
             return -idx
         else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
-            num_instrs_current_block = len(
-                list(filter_out_comments(current_block.stmts_instrs))
-            )
             return (
                 int(other_block.instrs_before.val)
-                - (int(current_block.instrs_before.val) + num_instrs_current_block)
-                + (num_instrs_current_block - idx)
+                - (
+                    int(current_block.instrs_before.val)
+                    + int(current_block.num_instrs.val)
+                )
+                + (int(current_block.num_instrs.val) - idx)
             )
 
     def _reti_instr(self, instr, idx, current_block):

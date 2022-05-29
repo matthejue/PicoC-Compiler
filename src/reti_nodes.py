@@ -57,14 +57,6 @@ class N(ASTNode):
                 case PN.GoTo():
                     return (
                         f"\n{' ' * depth}JUMP{self.rel} "
-                        #  + "".join(
-                        #      list(
-                        #          map(
-                        #              lambda line: line.lstrip(),
-                        #              str(self.im_goto).split("\n"),
-                        #          )
-                        #      )
-                        #  )
                         + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
                     )
                 case _:

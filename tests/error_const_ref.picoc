@@ -1,0 +1,7 @@
+// in:
+// expected:ConstRef
+
+void main() {
+  const int const_val = 42;
+  print(*const_val);
+}
