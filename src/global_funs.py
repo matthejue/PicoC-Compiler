@@ -113,16 +113,6 @@ def strip_multiline_string(multiline_str):
     return multiline_str
 
 
-def get_most_used_compile_opts():
-    with open(
-        f"{os.path.dirname(sys.argv[0])}/../most_used_compile_opts.txt",
-        "r",
-        encoding="utf-8",
-    ) as fin:
-        most_used_opts = fin.read()
-    return most_used_opts
-
-
 def get_most_used_interpret_opts():
     with open(
         f"{os.path.dirname(sys.argv[0])}/../most_used_interpret_opts.txt",

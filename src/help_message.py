@@ -4,7 +4,6 @@ import global_vars
 from colorizer import colorize_help_page
 from global_funs import (
     strip_multiline_string,
-    get_most_used_compile_opts,
     get_most_used_interpret_opts,
 )
 
@@ -45,7 +44,7 @@ def generate_help_message():
 
     {heading("Positional arguments", terminal_width, '~')}
     infile
-    > input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
+    >  input file with PicoC Code. In the shell this is interpreted as string with PicoC Code
 
     {heading("Main optional arguments", terminal_width, '~')}
     -i, --intermediate-stages
@@ -55,7 +54,7 @@ def generate_help_message():
     -l, --lines LINES
     >  sets the number of lines visible around a error message
     -v, --verbose
-    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the following RETI instructions. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages
+    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the following RETI instructions. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages. Shows error data used for error messages in the abstract syntax trees.
     -c, --color
     >  colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
     -d, --debug

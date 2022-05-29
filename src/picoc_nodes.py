@@ -218,9 +218,10 @@ class Ref(ASTNode):
     def __init__(self, ref_loc):
         self.ref_loc = ref_loc
         self.datatype: ASTNode
+        self.error_data: list
         super().__init__(visible=[self.ref_loc])
 
-    __match_args__ = ("ref_loc", "datatype")
+    __match_args__ = ("ref_loc", "datatype", "error_data")
 
 
 class Deref(ASTNode):
@@ -406,8 +407,8 @@ class Block(ASTNode):
     def __init__(self, name, stmts_instrs):
         self.name = name
         self.stmts_instrs = stmts_instrs
-        self.instrs_before: N.Num
-        self.num_instrs: N.Num
+        self.instrs_before: Num
+        self.num_instrs: Num
         super().__init__(
             visible=[
                 self.name,
