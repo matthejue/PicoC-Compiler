@@ -2,7 +2,7 @@
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
-all: compile-color
+all: interpret-color
 
 install:
 	pip install -r ./requirements.txt
