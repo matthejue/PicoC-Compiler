@@ -1,8 +1,9 @@
 from colormanager import ColorManager as CM
-from errors import Errors
+import errors
 import itertools
 import global_vars
-from picoc_nodes import N as PN
+import picoc_nodes as pn
+import sys
 import os
 
 
@@ -50,14 +51,14 @@ def bug_in_compiler(*args):
     import inspect
 
     # return name of caller of this function
-    raise Errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
+    raise errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
 
 
 def bug_in_interpreter(*args):
     import inspect
 
     # return name of caller of this function
-    raise Errors.BugInInterpreter(inspect.stack()[1][3], args_to_str(args))
+    raise errors.BugInInterpreter(inspect.stack()[1][3], args_to_str(args))
 
 
 def remove_extension(fname):
@@ -95,7 +96,7 @@ def filter_out_comments(instrs):
     if not global_vars.args.verbose:
         return instrs
     return filter(
-        lambda instr: not isinstance(instr, PN.SingleLineComment),
+        lambda instr: not isinstance(instr, pn.SingleLineComment),
         instrs,
     )
 
@@ -112,11 +113,21 @@ def strip_multiline_string(multiline_str):
     return multiline_str
 
 
-def get_most_used_opts():
+def get_most_used_compile_opts():
     with open(
-        os.path.expanduser("~") + "/.config/pico_c_compiler/most.json",
+        f"{os.path.dirname(sys.argv[0])}/../most_used_compile_opts.txt",
         "r",
         encoding="utf-8",
-    ) as fout:
-        most_used_opts = fout.read()
+    ) as fin:
+        most_used_opts = fin.read()
+    return most_used_opts
+
+
+def get_most_used_interpret_opts():
+    with open(
+        f"{os.path.dirname(sys.argv[0])}/../most_used_interpret_opts.txt",
+        "r",
+        encoding="utf-8",
+    ) as fin:
+        most_used_opts = fin.read()
     return most_used_opts

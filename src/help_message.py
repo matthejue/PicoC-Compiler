@@ -2,7 +2,11 @@ import os
 import sys
 import global_vars
 from colorizer import colorize_help_page
-from global_funs import strip_multiline_string
+from global_funs import (
+    strip_multiline_string,
+    get_most_used_compile_opts,
+    get_most_used_interpret_opts,
+)
 
 
 def heading(heading, terminal_width, symbol):
@@ -35,7 +39,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {heading("Synopsis", terminal_width, '=')}
-    Usage: picoc_compiler / compile [-h] [-c] [-t] [-d] [-a] [-s] [-p] [-d DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
+    Usage: picoc_compiler / compile [-i] [-p] [-l LINES] [-v] [-c] [-d] [-h] [-R] [-B PROCESS_BEGIN] [-D DATASEGMENT_SIZE] [-U UART_SIZE] [-S SRAM_SIZE] [infile]
 
     Compiles PicoC Code into RETI Code.
 
@@ -95,8 +99,7 @@ def generate_help_message():
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
-    # TODO: update
-    `compile -ctas -p -v -d 20 -S 2 "<code>";`
+    `compile {get_most_used_interpret_opts()} "<code>";`
 
     and shrinks it down to:
 

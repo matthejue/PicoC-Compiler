@@ -1,5 +1,5 @@
 from sys import exit
-from errors import Errors
+import errors
 from global_classes import Pos
 import global_vars
 from colormanager import ColorManager as CM
@@ -31,7 +31,7 @@ class ErrorHandler:
             expected_str = global_vars.MAP_NAME_TO_SYMBOL.get(
                 prev_token.type, prev_token.type
             )
-            e = Errors.UnexpectedCharacter(
+            e = errors.UnexpectedCharacter(
                 expected_str,
                 e.char,
                 Pos(e.line - 1, e.column - 1),
@@ -51,7 +51,7 @@ class ErrorHandler:
             self._error_heading()
             expected_str = set_to_str(e.expected)
             # -1 because lark starts counting from 1
-            e = Errors.UnexpectedToken(
+            e = errors.UnexpectedToken(
                 expected_str,
                 e.token.value,
                 Pos(e.token.line - 1, e.token.column - 1),
@@ -78,7 +78,7 @@ class ErrorHandler:
             expected_str = set_to_str(e.expected)
             last_token = self._find_last_token()
             last_pos = Pos(last_token.end_line - 1, last_token.end_column - 2 + 1)
-            e = Errors.UnexpectedEOF(expected_str, last_pos)
+            e = errors.UnexpectedEOF(expected_str, last_pos)
             error_header = self._error_header(e.description, e.last_pos)
             error_screen = AnnotationScreen(
                 self.split_code, last_pos.line, last_pos.line
@@ -87,7 +87,7 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
-        except Errors.UnknownIdentifier as e:
+        except errors.UnknownIdentifier as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -96,7 +96,7 @@ class ErrorHandler:
             error_screen.filter()
             print("\n" + error_header + str(error_screen))
             exit(0)
-        except Errors.TooLargeLiteral as e:
+        except errors.TooLargeLiteral as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -110,7 +110,7 @@ class ErrorHandler:
             error_screen.filter()
             print("\n" + error_header + str(error_screen) + node_header)
             exit(0)
-        except Errors.Redeclaration as e:
+        except errors.Redeclaration as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -134,7 +134,7 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
-        except Errors.ConstReassignment as e:
+        except errors.ConstReassignment as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -158,11 +158,11 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
-        except Errors.NoMainFunction as e:
+        except errors.NoMainFunction as e:
             error_header = e.description + "\n"
             print("\n" + error_header)
             exit(0)
-        except Errors.MoreThanOneMainFunction as e:
+        except errors.MoreThanOneMainFunction as e:
             error_header = self._error_header(e.first_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.first_pos[0], e.first_pos[0]
@@ -186,12 +186,12 @@ class ErrorHandler:
                 + str(error_screen_2)
             )
             exit(0)
-        except Errors.BugInCompiler as e:
+        except errors.BugInCompiler as e:
             self._error_heading()
             error_header = self._error_header(e.description)
             self._output_error(error_header, e.__class__.__name__)
             exit(0)
-        except Errors.BugInInterpreter as e:
+        except errors.BugInInterpreter as e:
             self._error_heading()
             error_header = self._error_header(e.description)
             self._output_error(error_header, e.__class__.__name__)

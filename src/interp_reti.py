@@ -1,4 +1,4 @@
-from reti_nodes import N
+import reti_nodes as rn
 from reti import RETI
 import global_vars
 from global_funs import (
@@ -26,21 +26,21 @@ class RETIInterpreter:
 
     def _op(self, opd1, op, opd2):
         match op:
-            case (N.Add() | N.Addi()):
+            case (rn.Add() | rn.Addi()):
                 return c_int32(c_int32(opd1).value + c_int32(opd2).value).value
-            case (N.Sub() | N.Subi()):
+            case (rn.Sub() | rn.Subi()):
                 return c_int32(c_int32(opd1).value - c_int32(opd2).value).value
-            case (N.Mult() | N.Multi()):
+            case (rn.Mult() | rn.Multi()):
                 return c_int32(c_int32(opd1).value * c_int32(opd2).value).value
-            case (N.Div() | N.Divi()):
+            case (rn.Div() | rn.Divi()):
                 return c_int32(c_int32(opd1).value // c_int32(opd2).value).value
-            case (N.Mod() | N.Modi()):
+            case (rn.Mod() | rn.Modi()):
                 return c_int32(c_int32(opd1).value % c_int32(opd2).value).value
-            case (N.Oplus() | N.Oplusi()):
+            case (rn.Oplus() | rn.Oplusi()):
                 return c_uint32(c_uint32(opd1).value ^ c_uint32(opd2).value).value
-            case (N.Or() | N.Ori()):
+            case (rn.Or() | rn.Ori()):
                 return c_uint32(c_uint32(opd1).value | c_uint32(opd2).value).value
-            case (N.And() | N.Andi()):
+            case (rn.And() | rn.Andi()):
                 return c_uint32(c_uint32(opd1).value & c_uint32(opd2).value).value
             case _:
                 bug_in_interpreter(op)
@@ -49,7 +49,7 @@ class RETIInterpreter:
         source = c_uint32(source).value
         match destination:
             # addressbus
-            case N.Im(val):
+            case rn.Im(val):
                 higher_bits = (reti.reg_get("DS") >> 22) % 0b100000000 << 22
                 memory_type = reti.reg_get("DS") >> 30
                 match memory_type:
@@ -62,7 +62,7 @@ class RETIInterpreter:
                         reti.sram_set(abs(int(val)) + higher_bits, source)
                     case _:
                         bug_in_interpreter(memory_type)
-            case N.Reg(reg):
+            case rn.Reg(reg):
                 reti.reg_set(str(reg), source)
             # right_databus
             case int():
@@ -84,7 +84,7 @@ class RETIInterpreter:
     def _memory_load(self, source, reti) -> int:
         match source:
             # addressbus
-            case N.Im(val):
+            case rn.Im(val):
                 higher_bits = (reti.reg_get("DS") >> 22) % 0b100000000 << 22
                 memory_type = reti.reg_get("DS") >> 30
                 match memory_type:
@@ -97,7 +97,7 @@ class RETIInterpreter:
                     case _:
                         bug_in_interpreter(memory_type)
 
-            case N.Reg(reg):
+            case rn.Reg(reg):
                 return reti.reg_get(str(reg))
             # right databus
             case int():
@@ -117,9 +117,9 @@ class RETIInterpreter:
 
     def _instr(self, instr, reti: RETI):
         match instr:
-            case N.Instr(
+            case rn.Instr(
                 operation,
-                [N.Reg() as destination, (N.Im() | N.Reg()) as source],
+                [rn.Reg() as destination, (rn.Im() | rn.Reg()) as source],
             ) if type(operation) in global_vars.COMPUTE_INSTRUCTION:
                 self._memory_store(
                     destination,
@@ -131,7 +131,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.reg_increase("PC")
-            case N.Instr(operation, [N.Reg() as destination, N.Im(val)]) if type(
+            case rn.Instr(operation, [rn.Reg() as destination, rn.Im(val)]) if type(
                 operation
             ) in global_vars.COMPUTE_IMMEDIATE_INSTRUCTION:
                 self._memory_store(
@@ -140,12 +140,12 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.reg_increase("PC")
-            case N.Instr(N.Load(), [N.Reg() as destination, N.Im() as source]):
+            case rn.Instr(rn.Load(), [rn.Reg() as destination, rn.Im() as source]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.reg_increase("PC")
-            case N.Instr(
-                N.Loadin(),
-                [N.Reg() as reg_source, N.Reg() as destination, N.Im(val)],
+            case rn.Instr(
+                rn.Loadin(),
+                [rn.Reg() as reg_source, rn.Reg() as destination, rn.Im(val)],
             ):
                 self._memory_store(
                     destination,
@@ -156,19 +156,19 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.reg_increase("PC")
-            case N.Instr(N.Loadi(), [N.Reg() as destination, N.Im(val)]):
+            case rn.Instr(rn.Loadi(), [rn.Reg() as destination, rn.Im(val)]):
                 self._memory_store(
                     destination,
                     int(val),
                     reti,
                 )
                 reti.reg_increase("PC")
-            case N.Instr(N.Store(), [N.Reg() as source, N.Im() as destination]):
+            case rn.Instr(rn.Store(), [rn.Reg() as source, rn.Im() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.reg_increase("PC")
-            case N.Instr(
-                N.Storein(),
-                [N.Reg() as destination, N.Reg() as reg_source, N.Im(val)],
+            case rn.Instr(
+                rn.Storein(),
+                [rn.Reg() as destination, rn.Reg() as reg_source, rn.Im(val)],
             ):
                 self._memory_store(
                     (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
@@ -176,53 +176,53 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.reg_increase("PC")
-            case N.Instr(N.Move(), [N.Reg() as source, N.Reg() as destination]):
+            case rn.Instr(rn.Move(), [rn.Reg() as source, rn.Reg() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.reg_increase("PC")
-            case N.Jump(rel, N.Im(val)):
+            case rn.Jump(rel, rn.Im(val)):
                 match rel:
-                    case N.Lt():
+                    case rn.Lt():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value < 0, int(val), reti
                         )
-                    case N.LtE():
+                    case rn.LtE():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value <= 0, int(val), reti
                         )
-                    case N.Gt():
+                    case rn.Gt():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value > 0, int(val), reti
                         )
-                    case N.GtE():
+                    case rn.GtE():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value >= 0, int(val), reti
                         )
-                    case N.Eq():
+                    case rn.Eq():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value == 0, int(val), reti
                         )
-                    case N.NEq():
+                    case rn.NEq():
                         self._jump_condition(
                             c_int32(reti.reg_get("ACC")).value != 0, int(val), reti
                         )
-                    case N.Always():
+                    case rn.Always():
                         self._jump_condition(True, int(val), reti)
-                    case N.NOp():
+                    case rn.NOp():
                         self._jump_condition(False, int(val), reti)
                     case _:
                         bug_in_interpreter(rel)
-            case N.Int(N.Im(val)):
+            case rn.Int(rn.Im(val)):
                 # save PC to stack
                 reti.sram_set(reti.reg_get("SP"), reti.reg_get("PC"))
                 reti.reg_set("SP", reti.reg_get("SP") - 1)
                 # jump to start address of isr
                 reti.reg_set("PC", reti.sram_get(abs(int(val))))
-            case N.Rti():
+            case rn.Rti():
                 # restore PC
                 reti.reg_set("PC", reti.sram_get(reti.reg_get("SP") + 1))
                 # delete PC from stack
                 reti.reg_set("SP", reti.reg_get("SP") + 1)
-            case N.Call(N.Name("PRINT"), N.Reg(reg)):
+            case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
                 if global_vars.args.print:
                     print("Output:\n\t" + str(reti.reg_get(str(reg))))
                 if global_vars.path:
@@ -247,7 +247,7 @@ class RETIInterpreter:
                 ):
                     self._reti_state_option(reti)
                 reti.reg_increase("PC")
-            case N.Call(N.Name("INPUT"), N.Reg(reg)):
+            case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
                 if self.test_input:
                     reti.reg_set(str(reg), self.test_input.pop())
                 else:
@@ -256,18 +256,18 @@ class RETIInterpreter:
             case _:
                 bug_in_interpreter(instr)
 
-    def _instrs(self, program: N.Program, reti: RETI):
+    def _instrs(self, program: rn.Program, reti: RETI):
         match program:
-            case N.Program(_, instrs):
+            case rn.Program(_, instrs):
                 while True:
                     i = reti.reg_get("PC") - global_vars.args.process_begin - 2**31
                     next_instruction = instrs[i] if i < len(instrs) and i >= 0 else None
                     if not next_instruction:
                         self._conclude(program, reti)
                         break
-                        # TODO: raise Errors.JumpedOutOfProgrammError() or LostTrack?
+                        # TODO: raise errors.JumpedOutOfProgrammError() or LostTrack?
                     match next_instruction:
-                        case N.Jump(N.Always(), N.Im("0")):
+                        case rn.Jump(rn.Always(), rn.Im("0")):
                             self._conclude(program, reti)
                             break
                         case _:
@@ -282,9 +282,9 @@ class RETIInterpreter:
     def _conclude(self, program, reti):
         if global_vars.args.intermediate_stages and not global_vars.args.verbose:
             match program:
-                case N.Program(_, instrs):
+                case rn.Program(_, instrs):
                     match instrs[-1]:
-                        case N.Call(N.Name("PRINT")):
+                        case rn.Call(rn.Name("PRINT")):
                             # in case of an print call as last instruction, the
                             # reti state was already printed
                             pass
@@ -292,7 +292,7 @@ class RETIInterpreter:
                             self._reti_state_option(reti)
         # needs a newline at the end, else it differs from .out_expected
         match program:
-            case N.Program(N.Name(val)):
+            case rn.Program(rn.Name(val)):
                 with open(
                     remove_extension(val) + ".out",
                     "a",
@@ -325,7 +325,7 @@ class RETIInterpreter:
 
     def _preconfigs(self, program, reti):
         match program:
-            case N.Program(N.Name(val), instrs):
+            case rn.Program(rn.Name(val), instrs):
                 reti.reg_set("CS", global_vars.args.process_begin + 2**31)
                 reti.reg_set("PC", global_vars.args.process_begin + 2**31)
                 reti.reg_set(
@@ -358,9 +358,9 @@ class RETIInterpreter:
             case _:
                 bug_in_interpreter(program)
 
-    def interp_reti(self, program: N.Program):
+    def interp_reti(self, program: rn.Program):
         match program:
-            case N.Program(_, instrs):
+            case rn.Program(_, instrs):
                 # filter out comments
                 program.instrs = list(filter_out_comments(instrs))
                 reti = RETI(program.instrs)
