@@ -1,4 +1,4 @@
-from reti_nodes import N
+import reti_nodes as rn
 
 
 class Args:
@@ -90,23 +90,23 @@ MAP_NAME_TO_SYMBOL = {
 MAX_PRINT_OUT_TOKENS = 5
 
 COMPUTE_INSTRUCTION = [
-    N.Add,
-    N.Sub,
-    N.Mult,
-    N.Div,
-    N.Mod,
-    N.Oplus,
-    N.Or,
-    N.And,
+    rn.Add,
+    rn.Sub,
+    rn.Mult,
+    rn.Div,
+    rn.Mod,
+    rn.Oplus,
+    rn.Or,
+    rn.And,
 ]
 
 COMPUTE_IMMEDIATE_INSTRUCTION = [
-    N.Addi,
-    N.Subi,
-    N.Multi,
-    N.Divi,
-    N.Modi,
-    N.Oplusi,
-    N.Ori,
-    N.Andi,
+    rn.Addi,
+    rn.Subi,
+    rn.Multi,
+    rn.Divi,
+    rn.Modi,
+    rn.Oplusi,
+    rn.Ori,
+    rn.Andi,
 ]

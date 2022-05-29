@@ -1,9 +1,9 @@
 import global_vars
 import cmd2
 from error_handler import ErrorHandler
-from symbol_table import ST
-from picoc_nodes import N as PN
-from reti_nodes import N as RN
+import symbol_table as st
+import picoc_nodes as pn
+import reti_nodes as rn
 from colormanager import ColorManager as CM
 import os
 import sys
@@ -314,42 +314,42 @@ class OptionHandler(cmd2.Cmd):
             ) as fout:
                 fout.write(dt_simplified.pretty())
 
-    def _ast_option(self, ast: PN.File):
+    def _ast_option(self, ast: pn.File):
         if global_vars.args.print:
             print(ast)
 
         if global_vars.path:
             match ast:
-                case PN.File(PN.Name(val)):
+                case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
 
-    def _picoc_blocks_option(self, picoc_blocks: PN.File):
+    def _picoc_blocks_option(self, picoc_blocks: pn.File):
         if global_vars.args.print:
             print(picoc_blocks)
 
         if global_vars.path:
             match picoc_blocks:
-                case PN.File(PN.Name(val)):
+                case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_blocks))
                 case _:
                     bug_in_compiler(picoc_blocks)
 
-    def _picoc_mon_option(self, picoc_mon: PN.File):
+    def _picoc_mon_option(self, picoc_mon: pn.File):
 
         if global_vars.args.print:
             print(picoc_mon)
 
         if global_vars.path:
             match picoc_mon:
-                case PN.File(PN.Name(val)):
+                case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(picoc_mon))
                 case _:
                     bug_in_compiler(picoc_mon)
 
-    def _st_option(self, symbol_table: ST.SymbolTable):
+    def _st_option(self, symbol_table: st.SymbolTable):
         if global_vars.args.print:
             print(symbol_table)
 
@@ -361,37 +361,37 @@ class OptionHandler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(symbol_table))
 
-    def _reti_blocks_option(self, reti_blocks: PN.File):
+    def _reti_blocks_option(self, reti_blocks: pn.File):
         if global_vars.args.print:
             print(reti_blocks)
 
         if global_vars.path:
             match reti_blocks:
-                case PN.File(PN.Name(val)):
+                case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_blocks))
                 case _:
                     bug_in_compiler(reti_blocks)
 
-    def _reti_patch_option(self, reti_patch: RN.Program):
+    def _reti_patch_option(self, reti_patch: rn.Program):
         if global_vars.args.print:
             print(reti_patch)
 
         if global_vars.path:
             match reti_patch:
-                case RN.Program(RN.Name(val)):
+                case rn.Program(rn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
                     bug_in_compiler(reti_patch)
 
-    def _reti_option(self, reti: RN.Program):
+    def _reti_option(self, reti: rn.Program):
         if global_vars.args.print:
             print(reti)
 
         if global_vars.path:
             match reti:
-                case RN.Program(RN.Name(val)):
+                case rn.Program(rn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti))
                 case _:

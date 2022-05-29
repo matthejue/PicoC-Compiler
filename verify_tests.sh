@@ -10,7 +10,7 @@ if [[ $2 == "all" ]]; then
   # paths=(./tests/!(error*|exclude*).c)
   paths+=(./tests/{basic,advanced,example,hard}*.c)
 elif [[ -n "$2" ]]; then
-  paths=(./tests/$2*.c)
+  paths=(./tests/*$2*.c)
 else
   paths+=(./tests/{basic,advanced,example}*.c)
 fi

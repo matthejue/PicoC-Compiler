@@ -1,6 +1,6 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
-from picoc_nodes import N
+import picoc_nodes as pn
 from global_classes import Pos
 from global_funs import bug_in_compiler
 import global_vars
@@ -13,29 +13,29 @@ class ASTTransformerPicoC(Transformer):
     # --------------------------------- L_Arith -------------------------------
     def name(self, token_list):
         token = token_list[0]
-        return N.Name(token.value, Pos(token.line, token.column))
+        return pn.Name(token.value, Pos(token.line, token.column))
 
     def NUM(self, token: Token):
-        return N.Num(token.value, Pos(token.line, token.column))
+        return pn.Num(token.value, Pos(token.line, token.column))
 
     def CHAR(self, token: Token):
-        return N.Char(token.value[1:-1], Pos(token.line, token.column))
+        return pn.Char(token.value[1:-1], Pos(token.line, token.column))
 
     def un_op(self, token_list: list[Token]):
         token = token_list[0]
         match token.value:
             case "-":
-                return N.Minus(
+                return pn.Minus(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "~":
-                return N.Not(
+                return pn.Not(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "!":
-                return N.LogicNot(
+                return pn.LogicNot(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -44,17 +44,17 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "*":
-                return N.Mul(
+                return pn.Mul(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "/":
-                return N.Div(
+                return pn.Div(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "%":
-                return N.Mod(
+                return pn.Mod(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -63,27 +63,27 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "+":
-                return N.Add(
+                return pn.Add(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "-":
-                return N.Sub(
+                return pn.Sub(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "^":
-                return N.Oplus(
+                return pn.Oplus(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "&":
-                return N.And(
+                return pn.And(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "|":
-                return N.Or(
+                return pn.Or(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -93,32 +93,32 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "==":
-                return N.Eq(
+                return pn.Eq(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "!=":
-                return N.NEq(
+                return pn.NEq(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "<":
-                return N.Lt(
+                return pn.Lt(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "<=":
-                return N.LtE(
+                return pn.LtE(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case ">":
-                return N.Gt(
+                return pn.Gt(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case ">=":
-                return N.GtE(
+                return pn.GtE(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -128,17 +128,17 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "int":
-                return N.IntType(
+                return pn.IntType(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "char":
-                return N.CharType(
+                return pn.CharType(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "void":
-                return N.VoidType(
+                return pn.VoidType(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -148,12 +148,12 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         match token.value:
             case "+":
-                return N.Add(
+                return pn.Add(
                     token.value,
                     Pos(token.line, token.column),
                 )
             case "-":
-                return N.Sub(
+                return pn.Sub(
                     token.value,
                     Pos(token.line, token.column),
                 )
@@ -163,7 +163,7 @@ class ASTTransformerPicoC(Transformer):
     # =========================================================================
     # --------------------------------- L_Arith -------------------------------
     def input_odp(self, _):
-        return N.Call(N.Name("input"), [])
+        return pn.Call(pn.Name("input"), [])
 
     def arith_opd(self, nodes):
         return nodes[0]
@@ -172,62 +172,62 @@ class ASTTransformerPicoC(Transformer):
         if len(nodes) == 1:
             return nodes[0]
         match nodes[-2]:
-            case N.LogicNot():
+            case pn.LogicNot():
                 acc_node = self._insert_to_bool(nodes[-1])
             case _:
                 acc_node = nodes[-1]
         for node in nodes[-2::-1]:
-            acc_node = N.UnOp(node, acc_node)
+            acc_node = pn.UnOp(node, acc_node)
         return acc_node
         #  if len(nodes) == 1:
         #      return nodes[0]
-        #  return N.UnOp(nodes[0], nodes[1])
+        #  return pn.UnOp(nodes[0], nodes[1])
 
     def arith_prec1(self, nodes):
         acc_node = nodes[0]
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
-            acc_node = N.BinOp(acc_node, node1, node2)
+            acc_node = pn.BinOp(acc_node, node1, node2)
         return acc_node
 
     def arith_prec2(self, nodes):
         acc_node = nodes[0]
         for node1, node2 in zip(nodes[1::2], nodes[2::2]):
-            acc_node = N.BinOp(acc_node, node1, node2)
+            acc_node = pn.BinOp(acc_node, node1, node2)
         return acc_node
 
     def arith_exp(self, nodes):
         return nodes[0]
 
     def print_stmt(self, nodes):
-        return N.Exp(N.Call(N.Name("print"), [nodes[0]]))
+        return pn.Exp(pn.Call(pn.Name("print"), [nodes[0]]))
 
     # --------------------------------- L_Logic -------------------------------
     def logic_atom(self, nodes):
         if len(nodes) == 1:
             return nodes[0]
-        return N.Atom(nodes[0], nodes[1], nodes[2])
+        return pn.Atom(nodes[0], nodes[1], nodes[2])
 
     def _insert_to_bool(self, node):
         match node:
             # exclude all possible logic nodes
-            case N.BinOp(_, N.LogicAnd(), _):
+            case pn.BinOp(_, pn.LogicAnd(), _):
                 return node
-            case N.BinOp(_, N.LogicOr(), _):
+            case pn.BinOp(_, pn.LogicOr(), _):
                 return node
-            case N.Atom():
+            case pn.Atom():
                 return node
-            case N.UnOp(N.LogicNot(), _):
+            case pn.UnOp(pn.LogicNot(), _):
                 return node
-            case N.BinOp():
-                return N.ToBool(node)
-            case N.UnOp():
-                return N.ToBool(node)
-            case N.Num():
-                return N.ToBool(node)
-            case N.Name():
-                return N.ToBool(node)
-            case N.Char():
-                return N.ToBool(node)
+            case pn.BinOp():
+                return pn.ToBool(node)
+            case pn.UnOp():
+                return pn.ToBool(node)
+            case pn.Num():
+                return pn.ToBool(node)
+            case pn.Name():
+                return pn.ToBool(node)
+            case pn.Char():
+                return pn.ToBool(node)
             case _:
                 bug_in_compiler(node)
 
@@ -236,7 +236,7 @@ class ASTTransformerPicoC(Transformer):
             return nodes[0]
         acc_node = self._insert_to_bool(nodes[0])
         for node in nodes[1:]:
-            acc_node = N.BinOp(acc_node, N.LogicAnd(), self._insert_to_bool(node))
+            acc_node = pn.BinOp(acc_node, pn.LogicAnd(), self._insert_to_bool(node))
         return acc_node
 
     def logic_or(self, nodes):
@@ -244,7 +244,7 @@ class ASTTransformerPicoC(Transformer):
             return nodes[0]
         acc_node = self._insert_to_bool(nodes[0])
         for node in nodes[1:]:
-            acc_node = N.BinOp(acc_node, N.LogicOr(), self._insert_to_bool(node))
+            acc_node = pn.BinOp(acc_node, pn.LogicOr(), self._insert_to_bool(node))
         return acc_node
 
     def logic_exp(self, nodes):
@@ -255,20 +255,20 @@ class ASTTransformerPicoC(Transformer):
         return nodes[0]
 
     def alloc(self, nodes):
-        return N.Alloc(N.Writeable(), nodes[0], nodes[1])
+        return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
 
     def alloc_stmt(self, nodes):
-        return N.Exp(nodes[0])
+        return pn.Exp(nodes[0])
 
     def assign_stmt(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
+        return pn.Assign(nodes[0], nodes[1])
 
     def init(self, nodes):
-        return N.Assign(nodes[0], nodes[1])
+        return pn.Assign(nodes[0], nodes[1])
 
     def const_init(self, nodes):
-        return N.Assign(
-            N.Alloc(N.Const(), nodes[0], nodes[1]),
+        return pn.Assign(
+            pn.Alloc(pn.Const(), nodes[0], nodes[1]),
             nodes[2],
         )
 
@@ -277,27 +277,27 @@ class ASTTransformerPicoC(Transformer):
 
     # --------------------------------- L_Pntr --------------------------------
     def pntr_deg(self, nodes):
-        return N.Num(str(len(nodes)))
+        return pn.Num(str(len(nodes)))
 
     def pntr_decl(self, nodes):
         match nodes[0]:
-            case N.Num("0"):
+            case pn.Num("0"):
                 return nodes[1]
             case _:
-                return N.PntrDecl(nodes[0], nodes[1])
+                return pn.PntrDecl(nodes[0], nodes[1])
 
     def deref_loc(self, nodes):
         return nodes[0]
 
     def deref_simple(self, nodes):
-        return N.Deref(nodes[0], N.Num("0"))
+        return pn.Deref(nodes[0], pn.Num("0"))
 
     def deref_arith(self, nodes):
         match nodes[1]:
-            case N.Add():
-                return N.Deref(nodes[0], nodes[2])
-            case N.Sub():
-                return N.Deref(nodes[0], N.UnOp(N.Minus(), nodes[2]))
+            case pn.Add():
+                return pn.Deref(nodes[0], nodes[2])
+            case pn.Sub():
+                return pn.Deref(nodes[0], pn.UnOp(pn.Minus(), nodes[2]))
 
     def deref(self, nodes):
         return nodes[0]
@@ -306,7 +306,7 @@ class ASTTransformerPicoC(Transformer):
         return nodes[0]
 
     def ref(self, nodes):
-        return N.Ref(nodes[0])
+        return pn.Ref(nodes[0])
 
     def pntr_opd(self, nodes):
         return nodes[0]
@@ -320,30 +320,30 @@ class ASTTransformerPicoC(Transformer):
             case []:
                 return nodes[1]
             case _:
-                return N.ArrayDecl(nodes[0], nodes[1])
+                return pn.ArrayDecl(nodes[0], nodes[1])
 
     def subscr_loc(self, nodes):
         return nodes[0]
 
     def array_subscr(self, nodes):
-        return N.Subscr(nodes[0], nodes[1])
+        return pn.Subscr(nodes[0], nodes[1])
 
     def entry_subexp(self, nodes):
         return nodes[0]
 
     def array_subexps(self, nodes):
-        return N.Array(nodes)
+        return pn.Array(nodes)
 
     def array_init_dims(self, nodes):
         return nodes
 
     def array_init_decl(self, nodes):
-        return N.ArrayDecl(nodes[0], nodes[1])
+        return pn.ArrayDecl(nodes[0], nodes[1])
 
     def array_init(self, nodes):
-        return N.Assign(
-            N.Alloc(
-                N.Writeable(),
+        return pn.Assign(
+            pn.Alloc(
+                pn.Writeable(),
                 nodes[0],
                 nodes[1],
             ),
@@ -352,54 +352,54 @@ class ASTTransformerPicoC(Transformer):
 
     # -------------------------------- L_Struct -------------------------------
     def struct_spec(self, nodes):
-        return N.StructSpec(nodes[0])
+        return pn.StructSpec(nodes[0])
 
     def struct_attr(self, nodes):
-        return N.Attr(nodes[0], nodes[1])
+        return pn.Attr(nodes[0], nodes[1])
 
     def struct_params(self, nodes):
         params = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            params += [N.Param(node1, node2)]
+            params += [pn.Param(node1, node2)]
         return params
 
     def struct_decl(self, nodes):
-        return N.StructDecl(nodes[0], nodes[1])
+        return pn.StructDecl(nodes[0], nodes[1])
 
     def struct_subexps(self, nodes):
         assigns = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            assigns += [N.Assign(node1, node2)]
-        return N.Struct(assigns)
+            assigns += [pn.Assign(node1, node2)]
+        return pn.Struct(assigns)
 
     def struct_init(self, nodes):
-        return N.Assign(
-            N.Alloc(
-                N.Writeable(),
+        return pn.Assign(
+            pn.Alloc(
+                pn.Writeable(),
                 nodes[0],
-                N.PntrDecl(N.Num("0"), N.ArrayDecl(nodes[1], [])),
+                pn.PntrDecl(pn.Num("0"), pn.ArrayDecl(nodes[1], [])),
             ),
             nodes[2],
         )
 
     # -------------------------------- L_If_Else ------------------------------
     def if_stmt(self, nodes):
-        return N.If(nodes[0], nodes[1])
+        return pn.If(nodes[0], nodes[1])
 
     def if_else_stmt(self, nodes):
         if not isinstance(nodes[2], list):
-            return N.IfElse(nodes[0], nodes[1], [nodes[2]])
-        return N.IfElse(nodes[0], nodes[1], nodes[2])
+            return pn.IfElse(nodes[0], nodes[1], [nodes[2]])
+        return pn.IfElse(nodes[0], nodes[1], nodes[2])
 
     def if_if_else_stmt(self, nodes):
         return nodes[0]
 
     # --------------------------------- L_Loop --------------------------------
     def while_stmt(self, nodes):
-        return N.While(nodes[0], nodes[1])
+        return pn.While(nodes[0], nodes[1])
 
     def do_while_stmt(self, nodes):
-        return N.DoWhile(nodes[1], nodes[0])
+        return pn.DoWhile(nodes[1], nodes[0])
 
     def loop_stmt(self, nodes):
         return nodes[0]
@@ -422,15 +422,15 @@ class ASTTransformerPicoC(Transformer):
         return nodes
 
     def fun_call(self, nodes):
-        return N.Call(nodes[0], nodes[1])
+        return pn.Call(nodes[0], nodes[1])
 
     def fun_call_stmt(self, nodes):
-        return N.Exp(nodes[0])
+        return pn.Exp(nodes[0])
 
     def fun_return(self, nodes):
         if len(nodes) == 0:
-            return N.Return(N.Null())
-        return N.Return(nodes[0])
+            return pn.Return(pn.Null())
+        return pn.Return(nodes[0])
 
     def fun_stmt(self, nodes):
         return nodes[0]
@@ -438,14 +438,14 @@ class ASTTransformerPicoC(Transformer):
     def fun_params(self, nodes):
         params = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            params += [N.Param(node1, node2)]
+            params += [pn.Param(node1, node2)]
         return params
 
     def fun_decl(self, nodes):
-        return N.FunDecl(nodes[0], nodes[1], nodes[2])
+        return pn.FunDecl(nodes[0], nodes[1], nodes[2])
 
     def fun_def(self, nodes):
-        return N.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
+        return pn.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
 
     # --------------------------------- L_File --------------------------------
     def decl_def(self, nodes):
@@ -456,14 +456,14 @@ class ASTTransformerPicoC(Transformer):
 
     def file(self, nodes):
         nodes[0].val = global_vars.path + nodes[0].val + ".ast"
-        return N.File(nodes[0], nodes[1])
+        return pn.File(nodes[0], nodes[1])
 
     # -------------------------------- L_Blocks -------------------------------
     def block(self, nodes):
-        return N.Block(nodes[0], nodes[1])
+        return pn.Block(nodes[0], nodes[1])
 
     def blocks(self, nodes):
         return nodes
 
     def goto(self, nodes):
-        return N.GoTo(nodes[0])
+        return pn.GoTo(nodes[0])

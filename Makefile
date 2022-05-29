@@ -1,4 +1,3 @@
-SHELL := /bin/bash
 ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
 .PHONY: all test clean
 
@@ -77,7 +76,7 @@ _verify:
 	./verify_tests.sh $${COLUMNS} $(ARG_BASE)
 
 help:
-	./src/main.py -h -C
+	./src/main.py -h -c
 	./src/main.py -h > ./doc/help-page.txt
 
 clean: _clean-pycache _clean-files

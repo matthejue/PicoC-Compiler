@@ -40,7 +40,7 @@ def main():
 
 
 def _deal_with_help_page():
-    if set(["-C", "--color"]).intersection(sys.argv):
+    if set(["-c", "--color"]).intersection(sys.argv):
         global_vars.args.color = True
         CM().color_on()
     else:

@@ -5,22 +5,37 @@ import sys
 import os
 
 
-def main():
-    pattern = (
-        ["basic", "advanced", "example"]
-        if len(sys.argv) == 1
-        else ["basic", "advanced", "example", "hard"]
-        if sys.argv[1] == "all"
-        else [sys.argv[1]]
-    )
+def find_all_paths(pattern, from_start):
+    if from_start:
+        return map(
+            lambda file: f"./tests/{file}",
+            filter(
+                lambda file: any([file.startswith(ptrn) for ptrn in pattern]),
+                os.listdir(os.curdir + "/tests/"),
+            ),
+        )
+    else:
+        return map(
+            lambda file: f"./tests/{file}",
+            filter(
+                lambda file: any([ptrn in file for ptrn in pattern]),
+                os.listdir(os.curdir + "/tests/"),
+            ),
+        )
 
-    for filepath in map(
-        lambda file: f"./tests/{file}",
-        filter(
-            lambda file: any([ptrn in file for ptrn in pattern]),
-            os.listdir(os.curdir + "/tests/"),
-        ),
-    ):
+
+def main():
+    if len(sys.argv) == 1:
+        pattern = ["basic", "advanced", "example"]
+        paths = find_all_paths(pattern, from_start=True)
+    elif sys.argv[1] == "all":
+        pattern = ["basic", "advanced", "example", "hard"]
+        paths = find_all_paths(pattern, from_start=True)
+    else:
+        pattern = [sys.argv[1]]
+        paths = find_all_paths(pattern, from_start=False)
+
+    for filepath in paths:
         basename = remove_extension(filepath)
         with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
             picoc_input = picoc_file.read()

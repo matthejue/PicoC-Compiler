@@ -1,28 +1,27 @@
 import global_vars
 from ast_node import ASTNode
-from reti_nodes import N
-from global_funs import bug_in_compiler
+import reti_nodes as rn
 
 
 class RETI(ASTNode):
     def __init__(self, instrs):
-        self.idx = N.Im("0")
+        self.idx = rn.Im("0")
         self.regs = {
-            "ACC": N.Im("0"),
-            "IN1": N.Im("0"),
-            "IN2": N.Im("0"),
-            "PC": N.Im("0"),
-            "PC_SIMPLE": N.Im("0"),
-            "SP": N.Im("0"),
-            "SP_SIMPLE": N.Im("0"),
-            "BAF": N.Im("0"),
-            "BAF_SIMPLE": N.Im("0"),
-            "CS": N.Im("0"),
-            "CS_SIMPLE": N.Im("0"),
-            "DS": N.Im("0"),
-            "DS_SIMPLE": N.Im("0"),
+            "ACC": rn.Im("0"),
+            "IN1": rn.Im("0"),
+            "IN2": rn.Im("0"),
+            "PC": rn.Im("0"),
+            "PC_SIMPLE": rn.Im("0"),
+            "SP": rn.Im("0"),
+            "SP_SIMPLE": rn.Im("0"),
+            "BAF": rn.Im("0"),
+            "BAF_SIMPLE": rn.Im("0"),
+            "CS": rn.Im("0"),
+            "CS_SIMPLE": rn.Im("0"),
+            "DS": rn.Im("0"),
+            "DS_SIMPLE": rn.Im("0"),
         }
-        self.last_instr = N.Instr(N.Move(), [N.Reg(N.Acc()), N.Reg(N.Pc())])
+        self.last_instr = rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())])
         self.sram = SRAM(instrs)
         self.uart = UART()
         self.eprom = EPROM()
@@ -52,7 +51,7 @@ class RETI(ASTNode):
     def sram_get(self, addr):
         cell_content = self.sram.cells[addr]
         match cell_content:
-            case N.Im(val):
+            case rn.Im(val):
                 return int(val)
             case _:
                 return cell_content
@@ -103,7 +102,7 @@ class RETI(ASTNode):
 
 class EPROM(ASTNode):
     def __init__(self):
-        self.cells = {i: N.Im("0") for i in range(global_vars.eprom_size)}
+        self.cells = {i: rn.Im("0") for i in range(global_vars.eprom_size)}
         super().__init__(visible=[self.cells])
 
     def __repr__(self):
@@ -122,7 +121,7 @@ class EPROM(ASTNode):
 
 class UART(ASTNode):
     def __init__(self):
-        self.cells = {i: N.Im("0") for i in range(global_vars.args.uart_size)}
+        self.cells = {i: rn.Im("0") for i in range(global_vars.args.uart_size)}
         super().__init__(visible=[self.cells])
 
     def __repr__(self):
@@ -153,7 +152,7 @@ class SRAM(ASTNode):
             i: (
                 self.instrs[i - global_vars.args.process_begin]
                 if i >= start and i <= end
-                else N.Im("0")
+                else rn.Im("0")
             )
             for i in range(max(global_vars.args.sram_size, min_sram_size))
         }
