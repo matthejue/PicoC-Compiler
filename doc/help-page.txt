@@ -122,7 +122,7 @@ If you don't want to type the most likely used cli options out every time, you
 can use the `most_used "<code>";` command (shortcut `mu`).
 It's a shortcut for:
 
-`compile -R -B 8 -D 32 -E 8 -U 4 -S 0 -i -p -l 2 -m
+`compile -R -B 8 -D 32 -U 4 -S 0 -i -p -l 2
 "<code>";`
 
 and shrinks it down to:
