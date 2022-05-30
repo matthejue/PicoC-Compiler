@@ -1,0 +1,6 @@
+// in:
+// expected:UnknownIdentifier
+
+void main() {
+  int var = 42 + unknown_identifier;
+}

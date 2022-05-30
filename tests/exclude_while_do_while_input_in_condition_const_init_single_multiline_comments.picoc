@@ -1,5 +1,5 @@
 // in:24 12 6 3 10 5
-// expected: 3 6
+// expected:3 5
 
 void main() {
   // variable initialisation

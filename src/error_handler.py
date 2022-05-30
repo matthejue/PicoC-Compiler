@@ -87,7 +87,7 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
-        except errors.UnknownIdentifier as e:
+        except (errors.UnknownIdentifier, errors.ConstAssign, errors.ConstRef) as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
@@ -111,13 +111,31 @@ class ErrorHandler:
             error_screen_2 = AnnotationScreen(
                 self.split_code, e.first_pos.line, e.first_pos.line
             )
-            error_screen_2.mark(e.first_pos, len(e.first))
+            error_screen_2.mark(e.first_pos, len(e.found))
             error_screen.filter()
             error_screen_2.filter()
             self._output_error(
                 error_header + str(error_screen) + note_header + str(error_screen_2),
                 e.__class__.__name__,
             )
+            exit(0)
+        except errors.DatatypeMismatch as e:
+            self._error_heading()
+            error_header = self._error_header(e.description, e.var_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.var_pos.line, e.var_pos.line
+            )
+            error_screen.mark_consider_colors(e.var_pos, len(e.var_name))
+            if e.var_pos == e.expected_pos:
+                error_screen.clear(1)
+                error_screen.color_offset = 0
+            error_screen.point_at(
+                e.expected_pos,
+                f"expected '{e.expected_datatype}', found '{e.var_context_datatype}'",
+            )
+            self.color_offset = 0
+            error_screen.filter()
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         except errors.TooLargeLiteral as e:
             error_header = self._error_header(e.found_pos, e.description)
@@ -132,30 +150,6 @@ class ErrorHandler:
             )
             error_screen.filter()
             print("\n" + error_header + str(error_screen) + node_header)
-            exit(0)
-        except errors.ConstAssign as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(
-                e.first_pos,
-                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Constant identifier was initialised here:",
-            )
-            error_screen_2 = AnnotationScreen(
-                self.split_code, e.first_pos[0], e.first_pos[0]
-            )
-            error_screen_2.mark(e.first_pos, len(e.first))
-            error_screen.filter()
-            error_screen_2.filter()
-            print(
-                "\n"
-                + error_header
-                + str(error_screen)
-                + note_header
-                + str(error_screen_2)
-            )
             exit(0)
         except errors.NoMainFunction as e:
             error_header = e.description + "\n"
@@ -291,22 +285,39 @@ class AnnotationScreen:
         self.row_from = row_from
         self.row_to = row_to
 
+        # if a line was e.g. marked before with colors, the color ansi escape
+        # sequences take up extra space that has to be consideres when drawing
+        # afterwards
+        self.color_offset = 0
+
     def point_at(self, pos: Pos, word):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "^", pos.column, CM().RED
+            self.screen[3 * rel_row + 1], "^", pos.column + self.color_offset, CM().RED
         )
         self.screen[3 * rel_row + 2] = overwrite(
             self.screen[3 * rel_row + 2], word, pos.column, CM().RED
         )
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
-    def mark(self, pos: Pos, len: int):
+    def mark(self, pos: Pos, width: int):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * len, pos.column, CM().RED
+            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().RED
         )
         self.marked_lines += [3 * rel_row + 1]
+
+    def mark_consider_colors(self, pos: Pos, width: int):
+        rel_row = pos.line - self.row_from
+
+        len_line_before = len(self.screen[3 * rel_row + 1])
+
+        self.screen[3 * rel_row + 1] = overwrite(
+            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().RED
+        )
+        self.marked_lines += [3 * rel_row + 1]
+
+        self.color_offset = len(self.screen[3 * rel_row + 1]) - len_line_before
 
     def filter(self):
         # -2 da man idx's bei 0 anfängt und man zwischen 0 und 2 usw. sein will
