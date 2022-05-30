@@ -1,0 +1,7 @@
+// in:
+// expected:Redefinition
+
+void main() {
+  int var = 42;
+  int var = 41;
+}

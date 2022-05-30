@@ -1,0 +1,7 @@
+// in:
+// expected:Redeclaration
+
+void main() {
+  const int var = 42;
+  const int var = 41;
+}

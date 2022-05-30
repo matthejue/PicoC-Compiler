@@ -1,0 +1,7 @@
+// in:
+// expected:Redeclaration
+
+struct redeclared_struct {int attr1; char attr2;};
+struct redeclared_struct {char attr0; int attr1;};
+
+void main() {}

@@ -20,7 +20,7 @@ def overwrite(old, replace_with, idx, color=""):
 def set_to_str(tokens: set):
     tokens = set(global_vars.MAP_NAME_TO_SYMBOL.get(elem, elem) for elem in tokens)
     return " or ".join(
-        CM().RED + elem + CM().RESET_ALL
+        CM().BLUE + elem + CM().RESET_ALL
         for elem in (
             tokens
             if global_vars.args.verbose
@@ -111,6 +111,27 @@ def strip_multiline_string(multiline_str):
     multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
     # every code piece ends with \n, so the last element can always be poped
     return multiline_str
+
+
+def heading(heading, terminal_width, symbol):
+    return f"""{symbol * terminal_width}
+    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
+    (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
+    ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
+    {symbol * terminal_width}
+    """
+
+
+def wrap_text(text, terminal_width):
+    lines = text.split("\n")
+    for l_idx, line in enumerate(lines):
+        if len(line) > terminal_width:
+            for idx in range(terminal_width, -1, -1):
+                if line[idx] == " ":
+                    lines.insert(l_idx + 1, line[idx + 1 :])
+                    lines[l_idx] = line[:idx]
+                    break
+    return "\n".join(lines)
 
 
 def get_most_used_interpret_opts():

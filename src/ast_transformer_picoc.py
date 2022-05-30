@@ -13,13 +13,13 @@ class ASTTransformerPicoC(Transformer):
     # --------------------------------- L_Arith -------------------------------
     def name(self, token_list):
         token = token_list[0]
-        return pn.Name(token.value, Pos(token.line, token.column))
+        return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
     def NUM(self, token: Token):
-        return pn.Num(token.value, Pos(token.line, token.column))
+        return pn.Num(token.value, Pos(token.line - 1, token.column - 1))
 
     def CHAR(self, token: Token):
-        return pn.Char(token.value[1:-1], Pos(token.line, token.column))
+        return pn.Char(token.value[1:-1], Pos(token.line - 1, token.column - 1))
 
     def un_op(self, token_list: list[Token]):
         token = token_list[0]
@@ -27,17 +27,17 @@ class ASTTransformerPicoC(Transformer):
             case "-":
                 return pn.Minus(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "~":
                 return pn.Not(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "!":
                 return pn.LogicNot(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     def prec1_op(self, token_list: list[Token]):
@@ -46,17 +46,17 @@ class ASTTransformerPicoC(Transformer):
             case "*":
                 return pn.Mul(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "/":
                 return pn.Div(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "%":
                 return pn.Mod(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     def prec2_op(self, token_list: list[Token]):
@@ -65,27 +65,27 @@ class ASTTransformerPicoC(Transformer):
             case "+":
                 return pn.Add(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "-":
                 return pn.Sub(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "^":
                 return pn.Oplus(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "&":
                 return pn.And(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "|":
                 return pn.Or(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     # --------------------------------- L_Logic -------------------------------
@@ -95,32 +95,32 @@ class ASTTransformerPicoC(Transformer):
             case "==":
                 return pn.Eq(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "!=":
                 return pn.NEq(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "<":
                 return pn.Lt(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "<=":
                 return pn.LtE(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case ">":
                 return pn.Gt(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case ">=":
                 return pn.GtE(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     # ----------------------------- L_Assign_Alloc ----------------------------
@@ -130,17 +130,17 @@ class ASTTransformerPicoC(Transformer):
             case "int":
                 return pn.IntType(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "char":
                 return pn.CharType(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "void":
                 return pn.VoidType(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     # --------------------------------- L_Pntr --------------------------------
@@ -150,12 +150,12 @@ class ASTTransformerPicoC(Transformer):
             case "+":
                 return pn.Add(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
             case "-":
                 return pn.Sub(
                     token.value,
-                    Pos(token.line, token.column),
+                    Pos(token.line - 1, token.column - 1),
                 )
 
     # =========================================================================
