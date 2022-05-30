@@ -283,7 +283,7 @@ class RETIInterpreter:
         if global_vars.args.intermediate_stages and not global_vars.args.verbose:
             match program:
                 case rn.Program(_, instrs):
-                    match instrs[-1]:
+                    match instrs[-1] if len(instrs) > 0 else None:
                         case rn.Call(rn.Name("PRINT")):
                             # in case of an print call as last instruction, the
                             # reti state was already printed

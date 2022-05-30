@@ -22,6 +22,8 @@ class Pos(ASTNode):
         self.column = column
         super().__init__(visible=[self.line, self.column])
 
+    __match_args__ = ("line", "column")
+
 
 class Symbol(ASTNode):
     def __init__(
@@ -40,7 +42,7 @@ class Symbol(ASTNode):
         self.pos2 = pos if pos else Empty()
         self.size = size if size else Empty()
 
-    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos", "size")
+    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos2", "size")
 
     def __repr__(self, depth=0):
         tmp = global_vars.args.verbose
@@ -67,6 +69,9 @@ class SymbolTable(ASTNode):
     def _init_type_sytem(self):
         self.define(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
         self.define(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
+
+    def exists(self, name):
+        return self.symbols.get(name)
 
     def define(self, symbol):
         self.symbols[symbol.name.val] = symbol

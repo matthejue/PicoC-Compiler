@@ -6,27 +6,7 @@ from global_funs import (
     strip_multiline_string,
     get_most_used_interpret_opts,
 )
-
-
-def heading(heading, terminal_width, symbol):
-    return f"""{symbol * terminal_width}
-    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
-    (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
-    ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
-    {symbol * terminal_width}
-    """
-
-
-def wrap_text(text, terminal_width):
-    lines = text.split("\n")
-    for l_idx, line in enumerate(lines):
-        if len(line) > terminal_width:
-            for idx in range(terminal_width, -1, -1):
-                if line[idx] == " ":
-                    lines.insert(l_idx + 1, line[idx + 1 :])
-                    lines[l_idx] = line[:idx]
-                    break
-    return "\n".join(lines)
+from global_funs import heading, wrap_text
 
 
 def generate_help_message():

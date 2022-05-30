@@ -88,13 +88,36 @@ class ErrorHandler:
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         except errors.UnknownIdentifier as e:
-            error_header = self._error_header(e.found_pos, e.description)
+            self._error_heading()
+            error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
+                self.split_code, e.found_pos.line, e.found_pos.line
             )
             error_screen.mark(e.found_pos, len(e.found))
             error_screen.filter()
-            print("\n" + error_header + str(error_screen))
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
+            exit(0)
+        except (errors.Redefinition, errors.Redeclaration) as e:
+            self._error_heading()
+            error_header = self._error_header(e.description, e.found_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.found_pos.line, e.found_pos.line
+            )
+            error_screen.mark(e.found_pos, len(e.found))
+            note_header = self._error_header(
+                e.description2,
+                e.first_pos,
+            )
+            error_screen_2 = AnnotationScreen(
+                self.split_code, e.first_pos.line, e.first_pos.line
+            )
+            error_screen_2.mark(e.first_pos, len(e.first))
+            error_screen.filter()
+            error_screen_2.filter()
+            self._output_error(
+                error_header + str(error_screen) + note_header + str(error_screen_2),
+                e.__class__.__name__,
+            )
             exit(0)
         except errors.TooLargeLiteral as e:
             error_header = self._error_header(e.found_pos, e.description)
@@ -110,31 +133,7 @@ class ErrorHandler:
             error_screen.filter()
             print("\n" + error_header + str(error_screen) + node_header)
             exit(0)
-        except errors.Redeclaration as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            note_header = self._error_header(
-                e.first_pos,
-                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Already defined here:",
-            )
-            error_screen_2 = AnnotationScreen(
-                self.split_code, e.first_pos[0], e.first_pos[0]
-            )
-            error_screen_2.mark(e.first_pos, len(e.first))
-            error_screen.filter()
-            error_screen_2.filter()
-            print(
-                "\n"
-                + error_header
-                + str(error_screen)
-                + note_header
-                + str(error_screen_2)
-            )
-            exit(0)
-        except errors.ConstReassignment as e:
+        except errors.ConstAssign as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos[0], e.found_pos[0]
@@ -203,18 +202,20 @@ class ErrorHandler:
         print(subheading("Error", terminal_width, "-"))
 
     def _error_header(self, description: str, pos=None):
+        # description has to contain a CM().RESET_ALL somewhere
         if not pos:
-            return CM().BRIGHT + description + CM().RESET_ALL
+            return CM().BRIGHT + global_vars.args.infile + ": " + description
         return (
             CM().BRIGHT
+            + CM().WHITE
             + global_vars.args.infile
             + ":"
+            + CM().MAGENTA
             + str(pos.line)
             + ":"
             + str(pos.column)
             + ": "
             + description
-            + CM().RESET_ALL
         )
 
     def _find_prev_token(self, pos: Pos) -> Token:
@@ -252,9 +253,15 @@ class ErrorHandler:
     def _output_error(self, error_str, error_name):
         print(error_str)
         if global_vars.path:
-            with open(global_vars.path + ".out", "w", encoding="utf-8") as fout:
+            with open(
+                global_vars.path + global_vars.basename + ".out", "w", encoding="utf-8"
+            ) as fout:
                 fout.write(error_name + "\n")
-            with open(global_vars.path + ".error", "w", encoding="utf-8") as fout:
+            with open(
+                global_vars.path + global_vars.basename + ".error",
+                "w",
+                encoding="utf-8",
+            ) as fout:
                 fout.write(error_str)
 
     def __repr__(self):
@@ -297,7 +304,7 @@ class AnnotationScreen:
     def mark(self, pos: Pos, len: int):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * len, pos.column, CM().BLUE
+            self.screen[3 * rel_row + 1], "~" * len, pos.column, CM().RED
         )
         self.marked_lines += [3 * rel_row + 1]
 
@@ -320,4 +327,4 @@ class AnnotationScreen:
         for line in self.context_above + self.screen + self.context_below:
             acc += line + "\n"
 
-        return acc
+        return acc[:-1]

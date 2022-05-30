@@ -1,0 +1,10 @@
+// in:
+// expected:Redefinition
+
+void main() {
+}
+
+void fun() {
+  int var = 42;
+  int var = 41;
+}

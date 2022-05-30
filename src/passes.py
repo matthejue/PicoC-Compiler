@@ -202,11 +202,11 @@ class Passes:
             case _:
                 bug_in_compiler(datatype)
 
-    def _add_datatype_and_error_data(self, ref, datatype_data, error_data: list):
-        ref.datatype = datatype_data
-        ref.error_data[0:0] = error_data
+    def _add_datatype_and_error_data(self, ref, datatype, error_var_name):
+        ref.datatype = datatype
+        ref.error_var_name = error_var_name
         ref.children += [ref.datatype] + (
-            [ref.error_data] if global_vars.args.verbose else []
+            [ref.error_var_name] if global_vars.args.verbose else []
         )
 
     def _picoc_mon_ref(self, ref_loc, prev_refs):
@@ -225,15 +225,15 @@ class Passes:
                         case (pn.CharType() | pn.IntType()):
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
-                                datatype_data=current_datatype,
-                                error_data=[name],
+                                datatype=current_datatype,
+                                error_var_name=name,
                             )
                             break
                         case pn.PntrDecl(pn.Num(val), datatype):
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
-                                datatype_data=copy.deepcopy(current_datatype),
-                                error_data=[name],
+                                datatype=copy.deepcopy(current_datatype),
+                                error_var_name=name,
                             )
                             if int(val) == 0:
                                 current_datatype = datatype
@@ -241,8 +241,8 @@ class Passes:
                         case pn.ArrayDecl(nums, datatype):
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
-                                datatype_data=copy.deepcopy(current_datatype),
-                                error_data=[name],
+                                datatype=copy.deepcopy(current_datatype),
+                                error_var_name=name,
                             )
                             if len(nums) == 0:
                                 current_datatype = datatype
@@ -252,8 +252,8 @@ class Passes:
                             ref = prev_refs.pop()
                             self._add_datatype_and_error_data(
                                 ref,
-                                datatype_data=current_datatype,
-                                error_data=[name],
+                                datatype=current_datatype,
+                                error_var_name=name,
                             )
                             match ref:
                                 case pn.Ref(pn.Attr(ref_loc, pn.Name(val2))):
@@ -283,14 +283,12 @@ class Passes:
             # ---------------------------- L_Array ----------------------------
             case pn.Subscr(deref_loc, exp):
                 ref = pn.Ref(pn.Subscr(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))
-                ref.error_data = [exp]
                 refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
                 exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [pn.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref_loc2, name):
                 ref = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))
-                ref.error_data = [name]
                 refs_mon = self._picoc_mon_ref(ref_loc2, [ref] + prev_refs)
                 return refs_mon + [pn.Exp(ref)]
             case _:
@@ -336,28 +334,72 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Alloc(type_qual, datatype, pn.Name(val, pos)):
-                var_name = val
+            case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1)):
+                var_name = val1
                 size = self._datatype_size(datatype)
                 match self.current_scope:
                     case "main":
+                        if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
+                            symbol = self.symbol_table.resolve(
+                                f"{var_name}@{self.current_scope}"
+                            )
+                            match symbol:
+                                case st.Symbol(
+                                    _,
+                                    _,
+                                    pn.Name(val_first),
+                                    _,
+                                    st.Pos(
+                                        pn.Num(pos_first_line), pn.Num(pos_first_column)
+                                    ),
+                                ):
+                                    raise errors.Redefinition(
+                                        val1,
+                                        pos1,
+                                        val_first[: val_first.rfind("@")],
+                                        Pos(int(pos_first_line), int(pos_first_column)),
+                                    )
+                                case _:
+                                    bug_in_compiler(symbol)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_global_addr)),
-                            st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column))),
+                            st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
                             pn.Num(str(size)),
                         )
                         self.symbol_table.define(symbol)
                         self.rel_global_addr += size
                     case _:
+                        if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
+                            symbol = self.symbol_table.resolve(
+                                f"{var_name}@{self.current_scope}"
+                            )
+                            match symbol:
+                                case st.Symbol(
+                                    _,
+                                    _,
+                                    pn.Name(val_first),
+                                    _,
+                                    st.Pos(
+                                        pn.Num(pos_first_line), pn.Num(pos_first_column)
+                                    ),
+                                ):
+                                    raise errors.Redefinition(
+                                        val1,
+                                        pos1,
+                                        val_first[: val_first.rfind("@")],
+                                        Pos(int(pos_first_line), int(pos_first_column)),
+                                    )
+                                case _:
+                                    bug_in_compiler(symbol)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_fun_addr)),
-                            st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column))),
+                            st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
                             pn.Num(str(size)),
                         )
                         self.symbol_table.define(symbol)
@@ -397,27 +439,46 @@ class Passes:
                     + [pn.Assign(name, pn.Stack(pn.Num("1")))]
                 )
             case pn.Assign(
-                pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1, pos)), num
+                pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1, pos1)), num
             ):
                 var_name = val1
+                if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
+                    symbol = self.symbol_table.resolve(
+                        f"{var_name}@{self.current_scope}"
+                    )
+                    match symbol:
+                        case st.Symbol(
+                            _,
+                            _,
+                            pn.Name(val_first),
+                            _,
+                            st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
+                        ):
+                            raise errors.Redeclaration(
+                                val1,
+                                pos1,
+                                val_first[: val_first.rfind("@")],
+                                Pos(int(pos_first_line), int(pos_first_column)),
+                            )
+                        case _:
+                            bug_in_compiler(symbol)
                 symbol = st.Symbol(
                     type_qual,
                     datatype,
                     pn.Name(f"{var_name}@{self.current_scope}"),
                     num,
-                    st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column))),
+                    st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
                     st.Empty(),
                 )
                 self.symbol_table.define(symbol)
                 # Alloc isn't needed anymore after being evaluated
                 return self._single_line_comment_picoc(stmt) + []
             case pn.Assign(pn.Alloc(_, _, pn.Name() as name) as alloc, exp):
-                exps1_mon = self._picoc_mon_exp(exp)
-                exps2_mon = self._picoc_mon_exp(alloc)
+                exps_mon = self._picoc_mon_exp(exp)
+                self._picoc_mon_exp(alloc)
                 return (
                     self._single_line_comment_picoc(stmt)
-                    + exps1_mon
-                    + exps2_mon
+                    + exps_mon
                     + [pn.Assign(name, pn.Stack(pn.Num("1")))]
                 )
             case pn.Assign(ref_loc, exp):
@@ -518,6 +579,24 @@ class Passes:
                 struct_name = val1
                 attrs = []
                 struct_size = 0
+                if self.symbol_table.exists(struct_name):
+                    symbol = self.symbol_table.resolve(struct_name)
+                    match symbol:
+                        case st.Symbol(
+                            _,
+                            _,
+                            pn.Name(val_first),
+                            _,
+                            st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
+                        ):
+                            raise errors.Redeclaration(
+                                val1,
+                                pos1,
+                                val_first,
+                                Pos(int(pos_first_line), int(pos_first_column)),
+                            )
+                        case _:
+                            bug_in_compiler(symbol)
                 for param in params:
                     match param:
                         case pn.Param(datatype, pn.Name(val2, pos2)):
@@ -864,7 +943,7 @@ class Passes:
                     ):
                         const_name = val1
                         const_pos = pos1
-                        raise errors.ConstReassignment(
+                        raise errors.ConstAssign(
                             const_name,
                             const_pos,
                             Pos(int(line), int(column)),
@@ -941,14 +1020,14 @@ class Passes:
                         | pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2)))
                     ),
                     datatype,
-                    error_data,
+                    error_var_name,
                 )
             ):
                 reti_instrs = self._single_line_comment_reti(stmt)
                 match datatype:
                     case pn.ArrayDecl(nums, datatype2):
                         help_const = self._datatype_size(datatype2)
-                        for num in nums:
+                        for num in nums[1:]:
                             match num:
                                 case pn.Num(val3):
                                     help_const *= int(val3)
@@ -989,72 +1068,46 @@ class Passes:
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
                     case _:
-                        match error_data:
-                            case (
-                                [
-                                    pn.Name(val1),
-                                    st.Pos(pn.Num(val2), pn.Num(val3)),
-                                    st.Pos(pn.Num(val4), pn.Num(val5)),
-                                ]
-                            ):
+                        match error_var_name:
+                            case pn.Name(val1, st.Pos(pn.Num(val2), pn.Num(val3))):
                                 var_name = val1
                                 var_pos_line = val2
                                 var_pos_column = val3
-                                exp_pos_line = val4
-                                exp_pos_column = val5
                                 match datatype:
                                     case pn.StructSpec(pn.Name(val)):
                                         raise errors.DatatypeMismatch(
-                                            "struct",
                                             var_name,
-                                            Range(
-                                                Pos(
-                                                    int(var_pos_line),
-                                                    int(var_pos_column),
-                                                ),
-                                                Pos(
-                                                    int(exp_pos_line),
-                                                    int(exp_pos_column),
-                                                ),
+                                            "struct",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
                                             ),
                                             "array or pointer",
                                         )
                                     case pn.IntType():
                                         raise errors.DatatypeMismatch(
-                                            "int",
                                             var_name,
-                                            Range(
-                                                Pos(
-                                                    int(var_pos_line),
-                                                    int(var_pos_column),
-                                                ),
-                                                Pos(
-                                                    int(exp_pos_line),
-                                                    int(exp_pos_column),
-                                                ),
+                                            "int",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
                                             ),
                                             "array or pointer",
                                         )
                                     case pn.CharType():
                                         raise errors.DatatypeMismatch(
-                                            "char",
                                             var_name,
-                                            Range(
-                                                Pos(
-                                                    int(var_pos_line),
-                                                    int(var_pos_column),
-                                                ),
-                                                Pos(
-                                                    int(exp_pos_line),
-                                                    int(exp_pos_column),
-                                                ),
+                                            "char",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
                                             ),
                                             "array or pointer",
                                         )
                                     case _:
                                         bug_in_compiler(datatype)
                             case _:
-                                bug_in_compiler(error_data)
+                                bug_in_compiler(error_var_name)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(
@@ -1062,7 +1115,11 @@ class Passes:
                     ),
                 ]
             case pn.Exp(
-                pn.Ref(pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2, pos2)), datatype)
+                pn.Ref(
+                    pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2, pos2)),
+                    datatype,
+                    error_var_name,
+                )
             ):
                 attr_name = val2
                 rel_pos_in_struct = 0
@@ -1093,7 +1150,56 @@ class Passes:
                             case _:
                                 bug_in_compiler(symbol)
                     case _:
-                        raise errors.DatatypeMismatch()
+                        match error_var_name:
+                            case pn.Name(val1, st.Pos(pn.Num(val2), pn.Num(val3))):
+                                var_name = val1
+                                var_pos_line = val2
+                                var_pos_column = val3
+                                match datatype:
+                                    case pn.ArrayDecl(pn.Name(val)):
+                                        raise errors.DatatypeMismatch(
+                                            var_name,
+                                            "array",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
+                                            ),
+                                            "struct",
+                                        )
+                                    case pn.PntrDecl(pn.Name(val)):
+                                        raise errors.DatatypeMismatch(
+                                            var_name,
+                                            "pointer",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
+                                            ),
+                                            "struct",
+                                        )
+                                    case pn.IntType():
+                                        raise errors.DatatypeMismatch(
+                                            var_name,
+                                            "int",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
+                                            ),
+                                            "struct",
+                                        )
+                                    case pn.CharType():
+                                        raise errors.DatatypeMismatch(
+                                            var_name,
+                                            "char",
+                                            Pos(
+                                                int(var_pos_line),
+                                                int(var_pos_column),
+                                            ),
+                                            "struct",
+                                        )
+                                    case _:
+                                        bug_in_compiler(datatype)
+                            case _:
+                                bug_in_compiler(error_var_name)
                 return self._single_line_comment_reti(stmt) + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
