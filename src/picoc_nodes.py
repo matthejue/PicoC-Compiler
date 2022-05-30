@@ -218,7 +218,7 @@ class Ref(ASTNode):
     def __init__(self, ref_loc):
         self.ref_loc = ref_loc
         self.datatype: ASTNode
-        self.error_var_name: ASTNode
+        self.error_data: list
         super().__init__(visible=[self.ref_loc])
 
     __match_args__ = ("ref_loc", "datatype", "error_data")

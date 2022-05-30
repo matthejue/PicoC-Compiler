@@ -1,0 +1,7 @@
+// in:
+// expected:DatatypeMismatch
+
+void main() {
+  int var = 42;
+  print(*var);
+}

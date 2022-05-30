@@ -34,31 +34,35 @@ class UnknownIdentifier(Exception):
 
 
 class Redefinition(Exception):
-    def __init__(self, found, found_pos, first, first_pos):
+    def __init__(self, found, found_pos, first_pos):
         self.description = f"{CM().YELLOW}Redefinition:{CM().RESET_ALL} Redefinition of {CM().RED}'{found}'{CM().RESET}"
         self.found = found
         self.found_pos = found_pos
         self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already defined here:"
-        self.first = first
         self.first_pos = first_pos
 
 
 class Redeclaration(Exception):
-    def __init__(self, found, found_pos, first, first_pos):
+    def __init__(self, found, found_pos, first_pos):
         self.description = f"{CM().YELLOW}Redeclaration:{CM().RESET_ALL} Redeclaration of {CM().RED}'{found}'{CM().RESET}"
         self.found = found
         self.found_pos = found_pos
         self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already declared here:"
-        self.first = first
         self.first_pos = first_pos
 
 
 class ConstAssign(Exception):
-    def __init__(self, const_name, const_pos, first_pos):
-        self.description = f"{CM().YELLOW}ConstReassignment:{CM().RESET_ALL} Can't reassign a new value to named constant '{const_name}'"
-        self.const_name = const_name
-        self.const_pos = const_pos
-        self.first_pos = first_pos
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstAssign:{CM().RESET_ALL} Can't assign a new value to named constant {CM().RED}'{found}'{CM().RESET}"
+        self.found = found
+        self.found_pos = found_pos
+
+
+class ConstRef(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}"
+        self.found = found
+        self.found_pos = found_pos
 
 
 class UnknownAttribute(Exception):
@@ -70,19 +74,15 @@ class UnknownAttribute(Exception):
 
 
 class DatatypeMismatch(Exception):
-    def __init__(self, var_name, var_context_datatype, var_pos, expected_datatype):
+    def __init__(
+        self, var_name, var_context_datatype, var_pos, expected_pos, expected_datatype
+    ):
         self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Datatype {CM().RED}{var_context_datatype}{CM().RESET} of variable {CM().RED}{var_name}{CM().RESET} isn't matching in the present context. Expected {CM().BLUE}{expected_datatype}{CM().RESET}"
         self.var_name = var_name
         self.var_context_datatype = var_context_datatype
         self.var_pos = var_pos
+        self.expected_pos = expected_pos
         self.expected_datatype = expected_datatype
-
-
-class ConstRef(Exception):
-    def __init__(self, const_name, const_pos):
-        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to constant {CM().RED}'{const_name}'{CM().RESET}"
-        self.const_name = const_name
-        self.const_pos = const_pos
 
 
 # TODO
