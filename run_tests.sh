@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+./space_replacer.py
 ./extract_input_and_expected.sh $2
 ./convert_to_c.py $2
 verification_res=$(./verify_tests.sh $1 $2)
@@ -13,7 +14,7 @@ if [[ $2 == "all" ]]; then
 elif [[ -n "$2" ]]; then
   paths=(./tests/*$2*.picoc)
 else
-  paths=(./tests/{basic,advanced,example,error}*.picoc)
+  paths=(./tests/{basic,advanced,example,error,exclude}*.picoc)
 fi
 
 for test in "${paths[@]}"; do
@@ -35,6 +36,8 @@ echo Running through: $(($num_tests-${#not_running_through[@]})) / $num_tests;
 echo Not running through: ${not_running_through[*]};
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests;
 echo Not passed: ${not_passed[*]};
+
+./space_inserter.py
 
 if [[ ${#not_passed[@]} != 0 ]]; then
     exit 1

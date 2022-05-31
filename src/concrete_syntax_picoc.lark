@@ -7,9 +7,11 @@ COMMENT: "//" /[^\n]*/|"/*" /(.|\n)*?/ "*/"
 DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 DIG_WITH_0: "0"|DIG_NO_0
 NUM: "0"|DIG_NO_0 DIG_WITH_0*
-ASCII_CHAR: " ".."~"
-CHAR: "'"ASCII_CHAR"'"
+ASCII_PARTIAL_CHAR: "!".."-"|"/".."~"
+ASCII_FULL_CHAR: ASCII_PARTIAL_CHAR|" "|"."
+CHAR: "'"ASCII_FULL_CHAR"'"
 name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
+FILENAME: (ASCII_PARTIAL_CHAR|" ")*"."ASCII_PARTIAL_CHAR*
 LETTER: "a".."z"|"A".."Z"
 NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
 un_op: SUB_MINUS|NOT|LOGIC_NOT
@@ -120,7 +122,7 @@ fun_def: prim_dt name"("fun_params")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 decl_def: struct_decl|fun_decl|fun_def
 decls_defs: decl_def*
-file: name decls_defs
+file: FILENAME decls_defs
 // ---------------------------------- L_Block ---------------------------------
 // fun_def: prim_dt name"("fun_params")" "{" blocks "}"
 block: name":" decl_exec_stmts
