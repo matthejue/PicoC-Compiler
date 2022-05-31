@@ -7,9 +7,9 @@ COMMENT: "//" /[^\n]*/|"/*" /(.|\n)*?/ "*/"
 DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 DIG_WITH_0: "0"|DIG_NO_0
 NUM: "0"|DIG_NO_0 DIG_WITH_0*
-ASCII_FULL: " ".."~"
-CHAR: "'"ASCII_FULL"'"
-FILENAME: ASCII_FULL+".picoc"
+ASCII_CHAR: " ".."~"
+CHAR: "'"ASCII_CHAR"'"
+FILENAME: ASCII_CHAR+".picoc"
 name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
 LETTER: "a".."z"|"A".."Z"
 NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
