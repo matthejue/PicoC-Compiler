@@ -15,6 +15,10 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
+    def FILENAME(self, token_list):
+        token = token_list[0]
+        return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
+
     def NUM(self, token: Token):
         return pn.Num(token.value, Pos(token.line - 1, token.column - 1))
 

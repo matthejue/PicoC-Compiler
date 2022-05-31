@@ -62,7 +62,7 @@ def bug_in_interpreter(*args):
 
 
 def remove_extension(fname):
-    # if there's no '.' rindex raises a exception, rfind returns -1
+    # if there's no '.' rindex raises a exception, find returns -1
     index_of_extension_start = fname.rfind(".")
     if index_of_extension_start == -1:
         return fname
