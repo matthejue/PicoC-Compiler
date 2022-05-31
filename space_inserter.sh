@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import os, re
+import os
 
 
 def remove_extension(fname):
@@ -31,9 +31,9 @@ def only_keep_path(fname):
     return fname[: index_of_path_end + 1]
 
 
-PATTERN = r"_no_spaces\.picoc"
+PATTERN = r"_no_spaces.picoc"
 
-filenames = [f for f in os.listdir("./tests") if re.search(PATTERN, f)]
+filenames = [f for f in os.listdir("./tests") if f.endswith(PATTERN)]
 
 for filename in filenames:
     filename_copy = filename.replace("_", " ")
