@@ -2,8 +2,7 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
 from global_classes import Pos
-from global_funs import bug_in_compiler
-import global_vars
+from global_funs import bug_in_compiler, remove_extension
 
 
 class ASTTransformerPicoC(Transformer):
@@ -15,8 +14,7 @@ class ASTTransformerPicoC(Transformer):
         token = token_list[0]
         return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
-    def FILENAME(self, token_list):
-        token = token_list[0]
+    def FILENAME(self, token: Token):
         return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
     def NUM(self, token: Token):
@@ -459,7 +457,7 @@ class ASTTransformerPicoC(Transformer):
         return nodes
 
     def file(self, nodes):
-        nodes[0].val = global_vars.path + nodes[0].val + ".ast"
+        nodes[0].val = remove_extension(nodes[0].val) + ".ast"
         return pn.File(nodes[0], nodes[1])
 
     # -------------------------------- L_Blocks -------------------------------

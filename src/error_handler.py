@@ -42,7 +42,7 @@ class ErrorHandler:
                 expected_pos.line,
                 e.found_pos.line,
             )
-            error_screen.mark(e.found_pos, len=1)
+            error_screen.mark(e.found_pos, width=1)
             error_screen.point_at(expected_pos, "context of " + expected_str)
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)

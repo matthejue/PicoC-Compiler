@@ -1,8 +1,22 @@
 from lark.visitors import Visitor
-from lark import Tree
+from lark.tree import Tree
+from lark.lexer import Token
+from global_funs import remove_extension
 
 
 class DTVisitorPicoC(Visitor):
+    def file(self, tree: Tree):
+        tree.children[0] = Token(
+            tree.children[0].type,
+            remove_extension(tree.children[0].value) + ".dt",
+            tree.children[0].line,
+            tree.children[0].column,
+            tree.children[0].end_line,
+            tree.children[0].end_column,
+        )
+
+
+class DTSimpleVisitorPicoC(Visitor):
     def _return_deepest_tree(self, tree: Tree):
         current_tree = tree
         while current_tree.children[1].data.value != "name":
@@ -34,3 +48,13 @@ class DTVisitorPicoC(Visitor):
         tree.children[0] = tree.children[1]
         tree.children[1] = deepest_tree.children[1]
         deepest_tree.children[1] = size_qual
+
+    def file(self, tree: Tree):
+        tree.children[0] = Token(
+            tree.children[0].type,
+            remove_extension(tree.children[0].value) + ".dt_simple",
+            tree.children[0].line,
+            tree.children[0].column,
+            tree.children[0].end_line,
+            tree.children[0].end_column,
+        )

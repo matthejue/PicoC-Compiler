@@ -9,10 +9,10 @@ import os
 import sys
 from help_message import generate_help_message
 from lark.lark import Lark
-from dt_visitor_picoc import DTVisitorPicoC
+from dt_visitor_picoc import DTVisitorPicoC, DTSimpleVisitorPicoC
 from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
-from global_funs import basename, subheading, bug_in_compiler
+from global_funs import remove_extension, subheading, bug_in_compiler
 from interp_reti import RETIInterpreter
 
 
@@ -180,16 +180,11 @@ class OptionHandler(cmd2.Cmd):
         terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
 
         # add the filename to the start of the code
-        code_with_file = (
-            f"{basename(global_vars.args.infile.replace(' ', '_'))}\n" + code
-        )
+        code_with_file = f"{global_vars.args.infile}\n" + code
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", terminal_width, "-"))
-            print(
-                f"// {basename(global_vars.args.infile.replace(' ', '_'))}.picoc:\n"
-                + code
-            )
+            print(f"// {global_vars.args.infile}:\n" + code)
 
         parser = Lark.open(
             "./src/concrete_syntax_picoc.lark",
@@ -210,12 +205,15 @@ class OptionHandler(cmd2.Cmd):
 
         dt = error_handler.handle(parser.parse, code_with_file)
 
+        dt_visitor_picoc = DTVisitorPicoC()
+        error_handler.handle(dt_visitor_picoc.visit, dt)
+
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree", terminal_width, "-"))
             self._dt_option(dt)
 
-        dt_visitor_picoc = DTVisitorPicoC()
-        error_handler.handle(dt_visitor_picoc.visit, dt)
+        dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
+        error_handler.handle(dt_simple_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree Simple", terminal_width, "-"))
@@ -286,7 +284,7 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.path:
             with open(
-                global_vars.path + global_vars.basename + ".tokens",
+                remove_extension(tokens[0].value) + ".tokens",
                 "w",
                 encoding="utf-8",
             ) as fout:
@@ -297,22 +295,20 @@ class OptionHandler(cmd2.Cmd):
             print(dt.pretty())
 
         if global_vars.path:
-            with open(
-                global_vars.path + global_vars.basename + ".dt", "w", encoding="utf-8"
-            ) as fout:
+            with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _dt_simple_option(self, dt_simplified):
+    def _dt_simple_option(self, dt_simple):
         if global_vars.args.print:
-            print(dt_simplified.pretty())
+            print(dt_simple.pretty())
 
         if global_vars.path:
             with open(
-                global_vars.path + global_vars.basename + ".dt_simple",
+                dt_simple.children[0].value,
                 "w",
                 encoding="utf-8",
             ) as fout:
-                fout.write(dt_simplified.pretty())
+                fout.write(dt_simple.pretty())
 
     def _ast_option(self, ast: pn.File):
         if global_vars.args.print:
