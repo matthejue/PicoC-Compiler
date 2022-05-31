@@ -318,6 +318,38 @@ class Passes:
             case _:
                 bug_in_compiler(ref_loc)
 
+    def _check_datatype_mismatch(self, datatype, exp):
+        # TODO: drüber nachdenken, was ist, wenn
+        # eine Funktion einen Pointer oder Struct
+        # returnt
+        match (datatype, exp):
+            case (pn.StructSpec() | pn.Struct):
+                pass
+            case (pn.ArrayDecl() | pn.Array()):
+                pass
+            case (pn.PntrDecl() | pn.Ref()):
+                pass
+            # TODO: remove after shrink pass is implemented
+            case (
+                (pn.IntType() | pn.CharType()),
+                (
+                    pn.Name()
+                    | pn.Num()
+                    | pn.Char()
+                    | pn.BinOp()
+                    | pn.UnOp()
+                    | pn.Atom()
+                    | pn.Deref()
+                    | pn.Subscr()
+                    | pn.Attr()
+                    | pn.Call()
+                ),
+            ):
+                pass
+            case _:
+                # TODO:
+                raise errors.DatatypeMismatch(datatype, exp)
+
     def _picoc_mon_exp(self, exp):
         match exp:
             # ---------------------------- L_Arith ----------------------------
@@ -434,6 +466,49 @@ class Passes:
             # TODO: remove Deref after Shrink Pass is implemented
             case pn.Ref((pn.Subscr() | pn.Attr() | pn.Deref()) as ref_loc):
                 return self._picoc_mon_ref(ref_loc, [])
+            # ---------------------------- L_Array ----------------------------
+            case pn.Array(exps, datatype):
+                exps_mon = []
+                for exp in exps:
+                    self._check_datatype_mismatch(datatype, exp)
+                    exps_mon = self._picoc_mon_exp(exp)
+                return exps_mon
+            # ---------------------------- L_Struct ---------------------------
+            case pn.Struct(assigns, datatype):
+                match datatype:
+                    case pn.StructSpec(pn.Name(val1)):
+                        struct_name = val1
+                    case _:
+                        bug_in_compiler(datatype)
+                symbol = self.symbol_table.resolve(f"{struct_name}")
+                match symbol:
+                    case st.Symbol(_, _, _, val2):
+                        attr_ids = val2
+                    case _:
+                        bug_in_compiler(symbol)
+                for assign in assigns:
+                    match assign:
+                        case pn.Assign(pn.Name(val3), exp):
+                            attr_name = val3
+                            attr_ids.remove(f"{attr_name}@{struct_name}")
+                            symbol = self.symbol_table.resolve(
+                                f"{attr_name}@{struct_name}"
+                            )
+                            match symbol:
+                                case st.Symbol(_, datatype2):
+                                    self._check_datatype_mismatch(datatype2, exp)
+                                    exp.datatype = datatype2
+                                    exp.visible += [exp.datatype]
+                                case _:
+                                    bug_in_compiler(symbol)
+                            exps_mon = self._picoc_mon_exp(exp)
+                        case _:
+                            bug_in_compiler(assign)
+                if attr_ids:
+                    # TODO: Error implementieren oder alternativ alle diese
+                    # values mit 0 initialisieren
+                    raise errors.StructInitAttrsMissing(attr_ids, exp)
+                return exps_mon
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             # TODO: remove after Shrink Pass is implemented
             case (pn.Subscr() | pn.Attr() | pn.Deref()):
@@ -519,32 +594,27 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(alloc_call)
                 return self._single_line_comment_picoc(stmt) + exps_mon
             # ---------------------------- L_Array ----------------------------
-            case pn.Assign(pn.Alloc(_, _, _) as alloc, pn.Array(exps)):
-                exps_mon = []
-                stack_locs = []
-                for i, exp in enumerate(exps):
-                    exps_mon += self._picoc_mon_exp(exp)
-                    stack_locs[0:0] = [pn.Stack(pn.Num(str(i + 1)))]
+            case pn.Assign(pn.Alloc(_, datatype, name) as alloc, pn.Array(_) as array):
+                array.datatype = datatype
+                array.visible += [array.datatype]
+                exps_mon = self._picoc_mon_exp(array)
+                self._picoc_mon_exp(alloc)
                 return (
                     self._single_line_comment_picoc(stmt)
                     + exps_mon
-                    + [pn.Assign(alloc, pn.Array(stack_locs))]
+                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
                 )
             # ---------------------------- L_Struct ---------------------------
-            case pn.Assign(pn.Alloc(_, _, _) as alloc, pn.Struct(assigns)):
-                exps_mon = []
-                assigns_mon = []
-                for i, assign in enumerate(assigns):
-                    match assign:
-                        case pn.Assign(assign_lhs, exp):
-                            exps_mon += self._picoc_mon_exp(exp)
-                            assigns_mon[0:0] = [
-                                pn.Assign(assign_lhs, pn.Stack(pn.Num(i + 1)))
-                            ]
+            case pn.Assign(
+                pn.Alloc(_, datatype, name) as alloc, pn.Struct(_) as struct
+            ):
+                struct.datatype = datatype
+                struct.visible += [struct.datatype]
+                exps_mon = self._picoc_mon_exp(struct)
                 return (
                     self._single_line_comment_picoc(stmt)
                     + exps_mon
-                    + [pn.Assign(alloc, pn.Struct(assigns_mon))]
+                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
                 )
             # ----------------------- L_If_Else + L_Loop ----------------------
             case pn.IfElse(exp, stmts1, stmts2):
@@ -1280,10 +1350,29 @@ class Passes:
                     + [goto1]
                 )
             # ----------------------------- L_Fun -----------------------------
-            #  case pn.Exp(pn.Call(identifier, exps)):
-            #      pass
-            #  case pn.Return(exp):
-            #      pass
+            # TODO:
+            #  case pn.Exp(pn.Call(name, exps)):
+            #      return self._single_line_comment_reti(stmt) + [
+            #          rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
+            #          rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
+            #          rn.Instr(
+            #              rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")]
+            #          ),
+            #          rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("1")]),
+            #          rn.Instr(
+            #              rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")]
+            #          ),
+            #      ]
+            case pn.Return(pn.Stack(pn.Num(val))):
+                return self._single_line_comment_reti(stmt) + [
+                    rn.Instr(
+                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
+                    ),
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                    rn.Instr(
+                        rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
+                    ),
+                ]
             # ---------------------------- L_Blocks ---------------------------
             case pn.GoTo():
                 return self._single_line_comment_reti(stmt) + [stmt]

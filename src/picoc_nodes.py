@@ -180,12 +180,12 @@ class Alloc(ASTNode):
 
 
 class Assign(ASTNode):
-    def __init__(self, assign_lhs, exp):
-        self.assign_lhs = assign_lhs
+    def __init__(self, lhs, exp):
+        self.lhs = lhs
         self.exp = exp
-        super().__init__(visible=[self.assign_lhs, self.exp])
+        super().__init__(visible=[self.lhs, self.exp])
 
-    __match_args__ = ("assign_lhs", "exp")
+    __match_args__ = ("lhs", "exp")
 
 
 class Exp(ASTNode):
@@ -249,9 +249,10 @@ class ArrayDecl(ASTNode):
 class Array(ASTNode):
     def __init__(self, exps):
         self.exps = exps
+        self.datatype: ASTNode
         super().__init__(visible=[self.exps])
 
-    __match_args__ = ("datatype", "exps")
+    __match_args__ = ("exps", "datatype")
 
 
 class Subscr(ASTNode):
@@ -284,9 +285,10 @@ class Attr(ASTNode):
 class Struct(ASTNode):
     def __init__(self, assigns):
         self.assigns = assigns
+        self.datatype: ASTNode
         super().__init__(visible=[self.assigns])
 
-    __match_args__ = ("assigns",)
+    __match_args__ = ("assigns", "datatype")
 
 
 class StructDecl(ASTNode):
