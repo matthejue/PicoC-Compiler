@@ -93,7 +93,13 @@ class RETI(ASTNode):
         ]:
             acc += f"\n    {reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
         acc += "\n  }"
-        acc += str(self.sram)
+        acc += self.sram.__repr__(
+            self.reg_get("PC_SIMPLE"),
+            self.reg_get("SP_SIMPLE"),
+            self.reg_get("BAF_SIMPLE"),
+            self.reg_get("CS_SIMPLE"),
+            self.reg_get("DS_SIMPLE"),
+        )
         acc += str(self.uart)
         acc += str(self.eprom)
         acc += "\n)" if global_vars.args.verbose else ""
@@ -157,7 +163,7 @@ class SRAM(ASTNode):
             for i in range(max(global_vars.args.sram_size, min_sram_size))
         }
 
-    def __repr__(self):
+    def __repr__(self, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr):
         acc = f"\n  {self.__class__.__name__}" + (
             "(" if global_vars.args.verbose else " "
         )
@@ -168,6 +174,11 @@ class SRAM(ASTNode):
                 + ("%06i " % addr)
                 + ("(%010i): " % (addr + 2**31))
                 + str(self.cells[addr]).lstrip()
+                + (" <- PC" if addr == pc_addr else "")
+                + (" <- SP" if addr == sp_addr else "")
+                + (" <- BAF" if addr == baf_addr else "")
+                + (" <- CS" if addr == cs_addr else "")
+                + (" <- DS" if addr == ds_addr else "")
             )
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.verbose else "")
