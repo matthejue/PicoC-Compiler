@@ -237,6 +237,44 @@ class Passes:
             [ref.error_data] if global_vars.args.verbose else []
         )
 
+    def _add_datatype_to_exp(self, datatype, exp):
+        # TODO: drüber nachdenken, was ist, wenn
+        # eine Funktion einen Pointer oder Struct
+        # returnt
+        match (datatype, exp):
+            # ---------------------------- L_Array ----------------------------
+            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Struct()):
+                match datatype2:
+                    case pn.StructSpec():
+                        exp.datatype = datatype2
+                    case _:
+                        bug_in_compiler(datatype2)
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl(_), pn.Array()):
+                datatype.nums.pop(0)
+                exp.datatype = datatype
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Ref()):
+                match datatype2:
+                    case pn.PntrDecl(pn.Num(val), datatype3):
+                        if int(val) > 1:
+                            datatype2.num.val = str(int(val) - 1)
+                            exp.datatype = datatype2
+                        else:
+                            exp.datatype = datatype3
+                    case _:
+                        bug_in_compiler(datatype2)
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl([pn.Num()], datatype), _):
+                pass
+            # ---------------------------- L_Struct ---------------------------
+            case (pn.StructSpec() | pn.Struct()):
+                exp.datatype = datatype
+                exp.visible += [exp.datatype]
+            case _:
+                # TODO:
+                raise errors.DatatypeMismatch(datatype, exp)
+
     def _picoc_mon_ref(self, ref_loc, prev_refs):
         match ref_loc:
             # ---------------------------- L_Arith ----------------------------
@@ -317,43 +355,6 @@ class Passes:
                 return refs_mon + [pn.Exp(ref)]
             case _:
                 bug_in_compiler(ref_loc)
-
-    def _add_datatype_to_exp(self, datatype, exp):
-        # TODO: drüber nachdenken, was ist, wenn
-        # eine Funktion einen Pointer oder Struct
-        # returnt
-        match (datatype, exp):
-            # ---------------------------- L_Array ----------------------------
-            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Struct()):
-                match datatype2:
-                    case pn.StructSpec():
-                        exp.datatype = datatype2
-                    case _:
-                        bug_in_compiler(datatype2)
-                exp.visible += [exp.datatype]
-            case (pn.ArrayDecl(nums), pn.Array()):
-                exp.datatype.nums = nums[1:]
-                exp.visible += [exp.datatype]
-            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Ref()):
-                match datatype2:
-                    case pn.PntrDecl(pn.Num(val), datatype3):
-                        if int(val) > 1:
-                            datatype2.num.val = str(int(val) - 1)
-                            exp.datatype = datatype2
-                        else:
-                            exp.datatype = datatype3
-                    case _:
-                        bug_in_compiler(datatype2)
-                exp.visible += [exp.datatype]
-            case (pn.ArrayDecl([pn.Num()], datatype), _):
-                pass
-            # ---------------------------- L_Struct ---------------------------
-            case (pn.StructSpec() | pn.Struct()):
-                exp.datatype = datatype
-                exp.visible += [exp.datatype]
-            case _:
-                # TODO:
-                raise errors.DatatypeMismatch(datatype, exp)
 
     def _picoc_mon_exp(self, exp):
         match exp:
@@ -481,7 +482,7 @@ class Passes:
                     case _:
                         bug_in_compiler(datatype)
                 for exp in exps:
-                    self._add_datatype_to_exp(datatype, exp)
+                    self._add_datatype_to_exp(copy.deepcopy(datatype), exp)
                     exps_mon += self._picoc_mon_exp(exp)
                 return exps_mon
             # ---------------------------- L_Struct ---------------------------

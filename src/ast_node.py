@@ -34,8 +34,8 @@ class ASTNode:
                     acc += f"\n{' ' * (depth+2)}[]"
                     continue
                 acc += f"\n{' ' * (depth + 2)}["
-                for list_child in child:
-                    acc += f"{list_child.__repr__(depth+4)}"
+                for i, list_child in enumerate(child):
+                    acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
                 acc += f"\n{' ' * (depth + 2)}]"
                 continue
             elif isinstance(child, dict):
@@ -44,8 +44,8 @@ class ASTNode:
                     acc += f"\n{' ' * (depth+2)}[]"
                     continue
                 acc += f"\n{' ' * (depth + 2)}["
-                for dict_child in dict_children:
-                    acc += f"{dict_child.__repr__(depth+4)}"
+                for i, dict_child in enumerate(dict_children):
+                    acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
                 acc += f"\n{' ' * (depth + 2)}]"
                 continue
 

@@ -38,7 +38,7 @@ class Instr(ASTNode):
         instr_str = f"\n{' ' * depth}{self.op}"
         for arg in self.args:
             instr_str += f" {arg}"
-        return f"{instr_str};"
+        return f"{instr_str}{'' if depth > 0 else ';'}"
 
     __match_args__ = ("op", "args")
 
