@@ -69,6 +69,7 @@ stmt ::= Goto(Name(str))
 =                                  PicoC_Mon                                  =
 ===============================================================================
 -------------------------------- L_Assign_Alloc -------------------------------
+ref_loc ::= Memory(Num(str))
 exp ::= Stack(Num(str)) | Ref(<ref_loc>, <datatype>)
 stmt ::= Exp(<exp>)
 # TODO: ausschreiben mit Stack()

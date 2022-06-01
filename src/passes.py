@@ -194,8 +194,8 @@ class Passes:
                 size = self._datatype_size(datatype2)
                 for num in nums:
                     match num:
-                        case pn.Name(val):
-                            size *= val
+                        case pn.Num(val):
+                            size *= int(val)
                         case _:
                             bug_in_compiler(num)
                 return size
@@ -318,34 +318,39 @@ class Passes:
             case _:
                 bug_in_compiler(ref_loc)
 
-    def _check_datatype_mismatch(self, datatype, exp):
+    def _add_datatype_to_exp(self, datatype, exp):
         # TODO: drüber nachdenken, was ist, wenn
         # eine Funktion einen Pointer oder Struct
         # returnt
         match (datatype, exp):
-            case (pn.StructSpec() | pn.Struct):
+            # ---------------------------- L_Array ----------------------------
+            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Struct()):
+                match datatype2:
+                    case pn.StructSpec():
+                        exp.datatype = datatype2
+                    case _:
+                        bug_in_compiler(datatype2)
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl(nums), pn.Array()):
+                exp.datatype.nums = nums[1:]
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl([pn.Num()], datatype2), pn.Ref()):
+                match datatype2:
+                    case pn.PntrDecl(pn.Num(val), datatype3):
+                        if int(val) > 1:
+                            datatype2.num.val = str(int(val) - 1)
+                            exp.datatype = datatype2
+                        else:
+                            exp.datatype = datatype3
+                    case _:
+                        bug_in_compiler(datatype2)
+                exp.visible += [exp.datatype]
+            case (pn.ArrayDecl([pn.Num()], datatype), _):
                 pass
-            case (pn.ArrayDecl() | pn.Array()):
-                pass
-            case (pn.PntrDecl() | pn.Ref()):
-                pass
-            # TODO: remove after shrink pass is implemented
-            case (
-                (pn.IntType() | pn.CharType()),
-                (
-                    pn.Name()
-                    | pn.Num()
-                    | pn.Char()
-                    | pn.BinOp()
-                    | pn.UnOp()
-                    | pn.Atom()
-                    | pn.Deref()
-                    | pn.Subscr()
-                    | pn.Attr()
-                    | pn.Call()
-                ),
-            ):
-                pass
+            # ---------------------------- L_Struct ---------------------------
+            case (pn.StructSpec() | pn.Struct()):
+                exp.datatype = datatype
+                exp.visible += [exp.datatype]
             case _:
                 # TODO:
                 raise errors.DatatypeMismatch(datatype, exp)
@@ -469,12 +474,19 @@ class Passes:
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps, datatype):
                 exps_mon = []
+                match datatype:
+                    case pn.ArrayDecl(nums, _):
+                        if int(nums[0].val) != len(exps):
+                            raise errors.ArrayInitNotEnoughDims()
+                    case _:
+                        bug_in_compiler(datatype)
                 for exp in exps:
-                    self._check_datatype_mismatch(datatype, exp)
-                    exps_mon = self._picoc_mon_exp(exp)
+                    self._add_datatype_to_exp(datatype, exp)
+                    exps_mon += self._picoc_mon_exp(exp)
                 return exps_mon
             # ---------------------------- L_Struct ---------------------------
             case pn.Struct(assigns, datatype):
+                exps_mon = []
                 match datatype:
                     case pn.StructSpec(pn.Name(val1)):
                         struct_name = val1
@@ -496,12 +508,10 @@ class Passes:
                             )
                             match symbol:
                                 case st.Symbol(_, datatype2):
-                                    self._check_datatype_mismatch(datatype2, exp)
-                                    exp.datatype = datatype2
-                                    exp.visible += [exp.datatype]
+                                    self._add_datatype_to_exp(datatype2, exp)
                                 case _:
                                     bug_in_compiler(symbol)
-                            exps_mon = self._picoc_mon_exp(exp)
+                            exps_mon += self._picoc_mon_exp(exp)
                         case _:
                             bug_in_compiler(assign)
                 if attr_ids:
@@ -529,6 +539,41 @@ class Passes:
 
     def _picoc_mon_stmt(self, stmt):
         match stmt:
+            # ---------------------------- L_Array ----------------------------
+            case pn.Assign(
+                pn.Alloc(_, datatype, pn.Name(val) as name) as alloc,
+                pn.Array(_) as array,
+            ):
+                array.datatype = datatype
+                array.visible += [array.datatype]
+                exps_mon = self._picoc_mon_exp(array)
+                self._picoc_mon_exp(alloc)
+                symbol = self.symbol_table.resolve(f"{val}@{self.current_scope}")
+                match symbol:
+                    case st.Symbol(_, _, _, pn.Num(val1), _, pn.Num(val2)):
+                        return (
+                            self._single_line_comment_picoc(stmt)
+                            + exps_mon
+                            + [
+                                pn.Assign(
+                                    pn.Memory(pn.Num(val1)), pn.Stack(pn.Num(val2))
+                                )
+                            ]
+                        )
+                    case _:
+                        bug_in_compiler(symbol)
+            # ---------------------------- L_Struct ---------------------------
+            case pn.Assign(
+                pn.Alloc(_, datatype, name) as alloc, pn.Struct(_) as struct
+            ):
+                struct.datatype = datatype
+                struct.visible += [struct.datatype]
+                exps_mon = self._picoc_mon_exp(struct)
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
+                )
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Name() as name, exp):
                 exps_mon = self._picoc_mon_exp(exp)
@@ -593,29 +638,6 @@ class Passes:
             case pn.Exp(alloc_call):
                 exps_mon = self._picoc_mon_exp(alloc_call)
                 return self._single_line_comment_picoc(stmt) + exps_mon
-            # ---------------------------- L_Array ----------------------------
-            case pn.Assign(pn.Alloc(_, datatype, name) as alloc, pn.Array(_) as array):
-                array.datatype = datatype
-                array.visible += [array.datatype]
-                exps_mon = self._picoc_mon_exp(array)
-                self._picoc_mon_exp(alloc)
-                return (
-                    self._single_line_comment_picoc(stmt)
-                    + exps_mon
-                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
-                )
-            # ---------------------------- L_Struct ---------------------------
-            case pn.Assign(
-                pn.Alloc(_, datatype, name) as alloc, pn.Struct(_) as struct
-            ):
-                struct.datatype = datatype
-                struct.visible += [struct.datatype]
-                exps_mon = self._picoc_mon_exp(struct)
-                return (
-                    self._single_line_comment_picoc(stmt)
-                    + exps_mon
-                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
-                )
             # ----------------------- L_If_Else + L_Loop ----------------------
             case pn.IfElse(exp, stmts1, stmts2):
                 exps_mon = self._picoc_mon_exp(exp)
@@ -1325,8 +1347,57 @@ class Passes:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
                     ),
                 ]
-            #  case pn.Assign(pn.Alloc(type_qual, datatype, pntr_decl), pn.Array(exps)):
-            #      pass
+            case pn.Assign(
+                pn.Memory(pn.Num(val1)) as mem, pn.Stack(pn.Num(val2)) as st
+            ):
+                reti_instrs = []
+                stack_offset = val2
+                # TODO: remove in case global won't be implemented
+                while True:
+                    match (mem, st):
+                        case (_, pn.Stack(pn.Num("0"))):
+                            break
+                        case (pn.Memory(pn.Num(val1)), pn.Stack(pn.Num(val2))):
+                            reti_instrs += self._single_line_comment_reti(stmt) + [
+                                rn.Instr(
+                                    rn.Loadin(),
+                                    [
+                                        rn.Reg(rn.Sp()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(val2),
+                                    ],
+                                )
+                            ]
+                            match self.current_scope:
+                                case ("main" | "global"):
+                                    reti_instrs += [
+                                        rn.Instr(
+                                            rn.Storein(),
+                                            [
+                                                rn.Reg(rn.Ds()),
+                                                rn.Reg(rn.Acc()),
+                                                rn.Im(val1),
+                                            ],
+                                        ),
+                                    ]
+                                case _:
+                                    reti_instrs += [
+                                        rn.Instr(
+                                            rn.Storein(),
+                                            [
+                                                rn.Reg(rn.Baf()),
+                                                rn.Reg(rn.Acc()),
+                                                rn.Im(str(-(2 + int(val2)))),
+                                            ],
+                                        ),
+                                    ]
+                        case _:
+                            bug_in_compiler(mem, st)
+                    mem.num.val = str(int(mem.num.val) + 1)
+                    st.num.val = str(int(st.num.val) - 1)
+                return reti_instrs + [
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
+                ]
             # ---------------------------- L_Struct ---------------------------
             # TODO: remove after implementing Shrink Pass
             #  case pn.Exp(pn.Attr(ref_loc, name)):
