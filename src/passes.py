@@ -1349,13 +1349,13 @@ class Passes:
                     ),
                 ]
             case pn.Assign(
-                pn.Memory(pn.Num(val1)) as mem, pn.Stack(pn.Num(val2)) as st
+                pn.Memory(pn.Num(val1)) as mem, pn.Stack(pn.Num(val2)) as sta
             ):
                 reti_instrs = []
                 stack_offset = val2
                 # TODO: remove in case global won't be implemented
                 while True:
-                    match (mem, st):
+                    match (mem, sta):
                         case (_, pn.Stack(pn.Num("0"))):
                             break
                         case (pn.Memory(pn.Num(val1)), pn.Stack(pn.Num(val2))):
@@ -1393,9 +1393,9 @@ class Passes:
                                         ),
                                     ]
                         case _:
-                            bug_in_compiler(mem, st)
+                            bug_in_compiler(mem, sta)
                     mem.num.val = str(int(mem.num.val) + 1)
-                    st.num.val = str(int(st.num.val) - 1)
+                    sta.num.val = str(int(sta.num.val) - 1)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
