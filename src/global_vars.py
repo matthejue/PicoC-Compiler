@@ -29,9 +29,6 @@ args = Args()
 path = ""
 basename = ""
 
-# eprom_size is fixed as the start program has a certain size
-eprom_size = 0
-
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
 RANGE_OF_CHAR = (-128, 127)
