@@ -112,13 +112,13 @@ class Im(ASTNode):
 
 
 class Reg(ASTNode):
-    def __init__(self, val):
-        self.val = val
+    def __init__(self, reg):
+        self.reg = reg
 
     def __repr__(self):
-        return f"{self.val}"
+        return f"{self.reg}"
 
-    __match_args__ = ("val",)
+    __match_args__ = ("reg",)
 
 
 # ----------------------- Compute Memory / Register -----------------------

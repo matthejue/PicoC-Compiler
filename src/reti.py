@@ -6,6 +6,17 @@ import os
 
 class RETI(ASTNode):
     def __init__(self, instrs):
+        # if a '<basename>.datasegment_size' file exists, the value should be
+        # taken from there
+        if os.path.isfile(
+            global_vars.path + global_vars.basename + ".datasegment_size"
+        ):
+            with open(
+                global_vars.path + global_vars.basename + ".datasegment_size",
+                "r",
+                encoding="utf-8",
+            ) as fin:
+                global_vars.args.datasegment_size = int(fin.read())
         self.idx = rn.Im("0")
         self.regs = {
             "ACC": rn.Im("0"),
@@ -22,10 +33,10 @@ class RETI(ASTNode):
             "DS": rn.Im("0"),
             "DS_SIMPLE": rn.Im("0"),
         }
-        self.last_instr = rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())])
         self.sram = SRAM(instrs)
         self.uart = UART()
-        self.eprom = EPROM()
+        self.eprom = EPROM(len(instrs))
+        self.last_instr = None
 
     def reg_get(self, reg):
         return int(self.regs[reg.upper()].val)
@@ -46,8 +57,18 @@ class RETI(ASTNode):
     def reg_increase(self, reg, offset=1):
         self.reg_set(reg, self.reg_get(reg) + offset)
 
+    def do_nothing(self):
+        pass
+
     def save_last_instruction(self):
-        self.last_instr = self.sram_get(self.reg_get("PC_Simple"))
+        addr = self.reg_get("PC")
+        self.last_instr = (
+            self.sram_get(addr - 2**31)
+            if addr >= 2**31
+            else self.uart_get(addr - 2**30)
+            if addr >= 2**30
+            else self.eprom_get(addr)
+        )
 
     def sram_get(self, addr):
         cell_content = self.sram.cells[addr]
@@ -67,7 +88,7 @@ class RETI(ASTNode):
         self.uart.cells[addr].val = str(val)
 
     def eprom_get(self, addr):
-        return int(self.eprom.cells[addr].val)
+        return self.eprom.cells[addr]
 
     def eprom_set(self, addr, val):
         self.eprom.cells[addr].val = str(val)
@@ -94,34 +115,80 @@ class RETI(ASTNode):
         ]:
             acc += f"\n    {reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
         acc += "\n  }"
+        acc_addr = self.reg_get("ACC")
+        in1_addr = self.reg_get("IN1")
+        in2_addr = self.reg_get("IN2")
+        pc_addr = self.reg_get("PC")
+        sp_addr = self.reg_get("SP")
+        baf_addr = self.reg_get("BAF")
+        cs_addr = self.reg_get("CS")
+        ds_addr = self.reg_get("DS")
         acc += self.sram.__repr__(
-            self.reg_get("PC_SIMPLE"),
-            self.reg_get("SP_SIMPLE"),
-            self.reg_get("BAF_SIMPLE"),
-            self.reg_get("CS_SIMPLE"),
-            self.reg_get("DS_SIMPLE"),
+            acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
         )
-        acc += str(self.uart)
-        acc += str(self.eprom)
+        acc += self.uart.__repr__(
+            acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
+        )
+        acc += self.eprom.__repr__(
+            acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
+        )
         acc += "\n)" if global_vars.args.double_verbose else ""
         return acc
 
 
 class EPROM(ASTNode):
-    def __init__(self):
-        self.cells = {i: rn.Im("0") for i in range(global_vars.eprom_size)}
+    def __init__(self, len_instrs):
+        self.cells = {
+            0: rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(str(-(2**31)))]),
+            1: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Sp())]),
+            2: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
+            3: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Ds())]),
+            4: rn.Instr(
+                rn.Addi(),
+                [
+                    rn.Reg(rn.Sp()),
+                    rn.Im(
+                        str(
+                            global_vars.args.process_begin
+                            + len_instrs
+                            + global_vars.args.datasegment_size
+                            - 1
+                        )
+                    ),
+                ],
+            ),
+            5: rn.Instr(
+                rn.Addi(),
+                [rn.Reg(rn.Cs()), rn.Im(str(global_vars.args.process_begin))],
+            ),
+            6: rn.Instr(
+                rn.Addi(),
+                [
+                    rn.Reg(rn.Ds()),
+                    rn.Im(str(global_vars.args.process_begin + len_instrs)),
+                ],
+            ),
+            7: rn.Instr(rn.Move(), [rn.Reg(rn.Cs()), rn.Reg(rn.Pc())]),
+        }
         super().__init__(visible=[self.cells])
 
-    def __repr__(self):
+    def __repr__(
+        self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
+    ):
         acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n    {"
-        for addr in range(len(self.cells)):
-            acc += (
-                "\n      "
-                + ("%06i " % addr)
-                + ("(%010i): " % addr)
-                + str(self.cells[addr])
-            )
+        acc += print_cells(
+            self.cells,
+            0,
+            acc_addr,
+            in1_addr,
+            in2_addr,
+            pc_addr,
+            sp_addr,
+            baf_addr,
+            cs_addr,
+            ds_addr,
+        )
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
@@ -131,67 +198,92 @@ class UART(ASTNode):
         self.cells = {i: rn.Im("0") for i in range(global_vars.args.uart_size)}
         super().__init__(visible=[self.cells])
 
-    def __repr__(self):
+    def __repr__(
+        self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
+    ):
         acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n    {"
-        for addr in range(len(self.cells)):
-            acc += (
-                "\n      "
-                + ("%06i " % addr)
-                + ("(%010i): " % (addr + 2**30))
-                + str(self.cells[addr])
-            )
+        acc += print_cells(
+            self.cells,
+            2**30,
+            acc_addr,
+            in1_addr,
+            in2_addr,
+            pc_addr,
+            sp_addr,
+            baf_addr,
+            cs_addr,
+            ds_addr,
+        )
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 class SRAM(ASTNode):
     def __init__(self, instrs):
-        self.instrs = instrs
         start = global_vars.args.process_begin
-        end = global_vars.args.process_begin + len(self.instrs) - 1
-        # if a '<basename>.datasegment_size' file exists, the value should be
-        # taken from there
-        if os.path.isfile(
-            global_vars.path + global_vars.basename + ".datasegment_size"
-        ):
-            with open(
-                global_vars.path + global_vars.basename + ".datasegment_size",
-                "r",
-                encoding="utf-8",
-            ) as fin:
-                global_vars.args.datasegment_size = int(fin.read())
+        end = global_vars.args.process_begin + len(instrs) - 1
         min_sram_size = (
             global_vars.args.process_begin
             + len(instrs)
             + global_vars.args.datasegment_size
         )
-
         self.cells = {
             i: (
-                self.instrs[i - global_vars.args.process_begin]
+                instrs[i - global_vars.args.process_begin]
                 if i >= start and i <= end
                 else rn.Im("0")
             )
             for i in range(max(global_vars.args.sram_size, min_sram_size))
         }
 
-    def __repr__(self, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr):
-        acc = f"\n  {self.__class__.__name__}" + (
-            "(" if global_vars.args.double_verbose else " "
-        )
+    def __repr__(
+        self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
+    ):
+        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n    {"
-        for addr in range(len(self.cells)):
-            acc += (
-                "\n      "
-                + ("%06i " % addr)
-                + ("(%010i): " % (addr + 2**31))
-                + str(self.cells[addr]).lstrip()
-                + (" <- PC" if addr == pc_addr else "")
-                + (" <- SP" if addr == sp_addr else "")
-                + (" <- BAF" if addr == baf_addr else "")
-                + (" <- CS" if addr == cs_addr else "")
-                + (" <- DS" if addr == ds_addr else "")
-            )
+        acc += print_cells(
+            self.cells,
+            2**31,
+            acc_addr,
+            in1_addr,
+            in2_addr,
+            pc_addr,
+            sp_addr,
+            baf_addr,
+            cs_addr,
+            ds_addr,
+        )
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.double_verbose else "")
+
+
+def print_cells(
+    cells,
+    constant,
+    acc_addr,
+    in1_addr,
+    in2_addr,
+    pc_addr,
+    sp_addr,
+    baf_addr,
+    cs_addr,
+    ds_addr,
+):
+    acc = ""
+    for addr in range(len(cells)):
+        acc += (
+            "\n      "
+            + ("%06i " % addr)
+            + ("(%010i): " % (addr + constant))
+            + str(cells[addr]).lstrip()
+            + (" <- ACC" if addr == acc_addr - constant else "")
+            + (" <- IN1" if addr == in1_addr - constant else "")
+            + (" <- IN2" if addr == in2_addr - constant else "")
+            + (" <- PC" if addr == pc_addr - constant else "")
+            + (" <- SP" if addr == sp_addr - constant else "")
+            + (" <- BAF" if addr == baf_addr - constant else "")
+            + (" <- CS" if addr == cs_addr - constant else "")
+            + (" <- DS" if addr == ds_addr - constant else "")
+        )
+    return acc

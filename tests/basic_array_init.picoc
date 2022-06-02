@@ -1,6 +1,5 @@
 // in:3 5 2
 // expected:3 5 2
-// datasegment:64
 
 void main() {
   // 1 dim array

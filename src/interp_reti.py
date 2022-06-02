@@ -130,7 +130,9 @@ class RETIInterpreter:
                     ),
                     reti,
                 )
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Instr(operation, [rn.Reg() as destination, rn.Im(val)]) if type(
                 operation
             ) in global_vars.COMPUTE_IMMEDIATE_INSTRUCTION:
@@ -139,7 +141,9 @@ class RETIInterpreter:
                     self._op(self._memory_load(destination, reti), operation, int(val)),
                     reti,
                 )
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Instr(rn.Load(), [rn.Reg() as destination, rn.Im() as source]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.reg_increase("PC")
@@ -162,7 +166,9 @@ class RETIInterpreter:
                     int(val),
                     reti,
                 )
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Instr(rn.Store(), [rn.Reg() as source, rn.Im() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.reg_increase("PC")
@@ -178,7 +184,9 @@ class RETIInterpreter:
                 reti.reg_increase("PC")
             case rn.Instr(rn.Move(), [rn.Reg() as source, rn.Reg() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Jump(rel, rn.Im(val)):
                 match rel:
                     case rn.Lt():
@@ -257,67 +265,66 @@ class RETIInterpreter:
             case _:
                 bug_in_interpreter(instr)
 
-    def _instrs(self, program: rn.Program, reti: RETI):
-        match program:
-            case rn.Program(_, instrs):
-                while True:
-                    i = reti.reg_get("PC") - global_vars.args.process_begin - 2**31
-                    next_instruction = instrs[i] if i < len(instrs) and i >= 0 else None
-                    if not next_instruction:
-                        self._conclude(program, reti)
-                        break
-                        # TODO: raise errors.JumpedOutOfProgrammError() or LostTrack?
-                    match next_instruction:
-                        case rn.Jump(rn.Always(), rn.Im("0")):
-                            self._conclude(program, reti)
-                            break
-                        case _:
-                            reti.save_last_instruction()
-                            self._instr(next_instruction, reti)
-                            if (
-                                global_vars.args.intermediate_stages
-                                and global_vars.args.double_verbose
-                            ):
-                                self._reti_state_option(reti)
+    def _instrs(self, reti: RETI):
+        while True:
+            addr = reti.reg_get("PC")
+            if addr > 2**31:
+                i = addr - 2**31
+                next_instruction = reti.sram_get(i)
+            elif addr >= 2**30:
+                i = addr - 2**31
+                next_instruction = reti.uart_get(i)
+            else:  # addr < 2**30
+                i = addr
+                next_instruction = reti.eprom_get(i)
+            match next_instruction:
+                case rn.Jump(rn.Always(), rn.Im("0")):
+                    self._conclude(reti)
+                    break
+                case int():
+                    self._conclude(reti)
+                    break
+                case _:
+                    reti.save_last_instruction()
+                    self._instr(next_instruction, reti)
+                    if (
+                        global_vars.args.intermediate_stages
+                        and global_vars.args.double_verbose
+                    ):
+                        self._reti_state_option(reti)
 
-    def _conclude(self, program, reti):
+    def _conclude(self, reti: RETI):
         if global_vars.args.intermediate_stages and not global_vars.args.double_verbose:
             if not global_vars.args.verbose:
                 self._reti_state_option(reti)
             # in case of an print call as last instruction with the --verbose
             # option, the reti state was already printed
-            match program:
-                case rn.Program(_, instrs):
-                    match instrs[-1] if len(instrs) > 0 else None:
-                        case rn.Call(rn.Name("PRINT")):
-                            pass
-                        case _:
-                            self._reti_state_option(reti)
+            match reti.sram_get(reti.reg_get("PC") - 2**31):
+                case rn.Call(rn.Name("PRINT")):
+                    pass
+                case _:
+                    self._reti_state_option(reti)
         # needs a newline at the end, else it differs from .out_expected
-        match program:
-            case rn.Program(rn.Name(val)):
-                file_not_empty = True
-                if os.path.isfile(remove_extension(val) + ".out"):
-                    with open(
-                        remove_extension(val) + ".out", "r", encoding="utf-8"
-                    ) as fin:
-                        file_not_empty = fin.read().replace("\n", "")
-                if file_not_empty:
-                    with open(
-                        remove_extension(val) + ".out",
-                        "a",
-                        encoding="utf-8",
-                    ) as fout:
-                        fout.write("\n")
-                else:
-                    with open(
-                        remove_extension(val) + ".out",
-                        "w",
-                        encoding="utf-8",
-                    ) as fout:
-                        fout.write("\n")
-            case _:
-                bug_in_interpreter(program)
+        file_not_empty = True
+        if os.path.isfile(global_vars.path + global_vars.basename + ".out"):
+            with open(
+                global_vars.path + global_vars.basename + ".out", "r", encoding="utf-8"
+            ) as fin:
+                file_not_empty = fin.read().replace("\n", "")
+        if file_not_empty:
+            with open(
+                global_vars.path + global_vars.basename + ".out",
+                "a",
+                encoding="utf-8",
+            ) as fout:
+                fout.write("\n")
+        else:
+            with open(
+                global_vars.path + global_vars.basename + ".out",
+                "w",
+                encoding="utf-8",
+            ) as fout:
+                fout.write("\n")
 
     def _reti_state_option(self, reti_state):
         reti_state.idx.val = str(int(reti_state.idx.val) + 1)
@@ -340,23 +347,9 @@ class RETIInterpreter:
                 ) as fout:
                     fout.write("\n" + str(reti_state))
 
-    def _preconfigs(self, program, reti):
+    def _preconfigs(self, program):
         match program:
-            case rn.Program(rn.Name(val), instrs):
-                reti.reg_set("CS", global_vars.args.process_begin + 2**31)
-                reti.reg_set("PC", global_vars.args.process_begin + 2**31)
-                reti.reg_set(
-                    "DS",
-                    global_vars.args.process_begin + len(instrs) + 2**31,
-                )
-                reti.reg_set(
-                    "SP",
-                    global_vars.args.process_begin
-                    + len(instrs)
-                    + global_vars.args.datasegment_size
-                    + 2**31
-                    - 1,
-                )
+            case rn.Program(rn.Name(val)):
                 if os.path.isfile(remove_extension(val) + ".in"):
                     with open(
                         remove_extension(val) + ".in", "r", encoding="utf-8"
@@ -379,9 +372,8 @@ class RETIInterpreter:
         match program:
             case rn.Program(_, instrs):
                 # filter out comments
-                program.instrs = list(filter_out_comments(instrs))
-                reti = RETI(program.instrs)
+                reti = RETI(list(filter_out_comments(instrs)))
             case _:
                 bug_in_interpreter(program)
-        self._preconfigs(program, reti)
-        self._instrs(program, reti)
+        self._preconfigs(program)
+        self._instrs(reti)
