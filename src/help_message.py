@@ -18,7 +18,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {heading("Synopsis", terminal_width, '=')}
-    Usage: picoc_compiler / compile [-i] [-p] [-l LINES] [-v] [-c] [-d] [-h] [-R] [-B PROCESS_BEGIN] [-D DATASEGMENT_SIZE] [-U UART_SIZE] [-S SRAM_SIZE] [infile]
+    Usage: picoc_compiler / compile [-i] [-p] [-l LINES] [-v[v]] [-c] [-d] [-h] [-R] [-B PROCESS_BEGIN] [-D DATASEGMENT_SIZE] [infile]
 
     Compiles PicoC Code into RETI Code.
 
