@@ -17,8 +17,6 @@ class Args:
         self.run = True
         self.process_begin = 8
         self.datasegment_size = 32
-        self.uart_size = 4
-        self.sram_size = 0
 
 
 # options from command-line arguments
@@ -28,6 +26,8 @@ args = Args()
 # means one is in shell mode
 path = ""
 basename = ""
+
+uart_size = 4
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.

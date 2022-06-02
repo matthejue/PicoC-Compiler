@@ -195,7 +195,7 @@ class EPROM(ASTNode):
 
 class UART(ASTNode):
     def __init__(self):
-        self.cells = {i: rn.Im("0") for i in range(global_vars.args.uart_size)}
+        self.cells = {i: rn.Im("0") for i in range(global_vars.uart_size)}
         super().__init__(visible=[self.cells])
 
     def __repr__(
@@ -234,7 +234,7 @@ class SRAM(ASTNode):
                 if i >= start and i <= end
                 else rn.Im("0")
             )
-            for i in range(max(global_vars.args.sram_size, min_sram_size))
+            for i in range(min_sram_size)
         }
 
     def __repr__(

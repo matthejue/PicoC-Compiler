@@ -51,10 +51,6 @@ def generate_help_message():
     >  sets the address where the process and the codesegment begin, respectively
     -D, --datasegment_size
     >  sets the size of the the datasegment. This has to be set carefully, because if the value is set to low, the section for global static data and the stack might collide
-    -U, --uart_size
-    >  sets the size of the uart
-    -S, --sram_size
-    >  sets the size of the sram. If the generated RETI-instructions and --datasegment_size take up more space in the sram then given by the --sram-size option, then the sram size will be set to --process-begin + #RETI-instructions + --datasegment-size
 
     {heading("PicoC", terminal_width, '=')}
     PicoC is a subset of C including the primitive datatypes int, char and void, the derived datatypes array, struct and pointer, if / else statements (including the combination of if and else, if else), while and do while statements, arithmetic expressions, build with the help of the binary operators `+`, `-`, `*`, `/`, `%`, `&`, `|`, `^` and unary operators `-`, `~`, logic expressions, build with the help of comparison relations `==`, `!=`, `<`, `>`, `<=`, `>=` and logical connectives `!`, `&&`, `||` and assignments build with the assignment operator `=`.
