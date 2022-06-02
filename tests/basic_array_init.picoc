@@ -1,0 +1,16 @@
+// in:3 5 2
+// expected:3 5 2
+// datasegment:64
+
+void main() {
+  // 1 dim array
+  int ar1[3] = {1, 2, input()};
+  // 2 dim array
+  int ar2[3][2] = {{1, 2}, {3, 4}, {input(), 6}};
+  // 3 dim array
+  int ar3[1][2][3] = {{{1, input(), 3}, {4, 5, 6}}};
+
+  print(ar1[2]);
+  print(ar2[2][0]);
+  print(ar3[0][0][1]);
+}

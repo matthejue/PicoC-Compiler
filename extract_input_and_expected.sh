@@ -11,4 +11,8 @@ fi
 for test in "${paths[@]}"; do
   sed -n '1p' "$test" | sed -e 's/^\/\/ in://' > "${test%.picoc}.in"
   sed -n '2p' "$test" | sed -e 's/^\/\/ expected://' > "${test%.picoc}.out_expected"
+  line3=$(sed -n '3p' "$test")
+  if [[ "$line3" == *datasegment* ]]; then
+    sed -n '3p' "$test" | sed -e 's/^\/\/ datasegment://' > "${test%.picoc}.datasegment_size"
+  fi
 done

@@ -28,13 +28,15 @@ def generate_help_message():
 
     {heading("Main optional arguments", terminal_width, '~')}
     -i, --intermediate-stages
-    >  shows intermediate stages of compilation, inter alia tokens, derivation trees, abstract syntax trees which implies the abstract syntax trees after the different passes. If the --verbose option is activated, the nodes of the abstract syntax trees get extra parenthesis
+    >  shows intermediate stages of compilation, inter alia tokens, derivation trees, abstract syntax trees which implies the abstract syntax trees after the different passes. If the --double_verbose option is activated, the nodes of the abstract syntax trees get extra parenthesis
     -p, --print
     >  prints all file outputs to the terminal. Is always activated in the shell
     -l, --lines LINES
     >  sets the number of lines visible around a error message
     -v, --verbose
-    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the following RETI instructions. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages. Shows error data used for error messages in the abstract syntax trees.
+    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the RETI instructions following after it. If the --run option is activated, it show the state of the RETI after each print call
+    -vv, --double_verbose
+    >  has the same effects as --verbose, but adds extra effects on top of --verbose. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages. Shows error data and datatype data in the abstract syntax tree that is used for error messages and required for the compilation process, respectively
     -c, --color
     >  colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
     -d, --debug
@@ -44,7 +46,7 @@ def generate_help_message():
 
     {heading("Interpreter specific optional arguments", terminal_width, '~')}
     -R, --run
-    > executes the RETI Instructions after generating them. If the --verbose option is activated, the state of the RETI can be watched after every instruction
+    >  executes the RETI Instructions after generating them. If the --double_verbose option is activated, the state of the RETI can be watched after every instruction, with the --verbose option it can be watched after each print call and otherwise it can be watched after the last instruction
     -B, --process_begin
     >  sets the address where the process and the codesegment begin, respectively
     -D, --datasegment_size

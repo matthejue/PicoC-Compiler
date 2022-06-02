@@ -23,7 +23,7 @@ def set_to_str(tokens: set):
         CM().BLUE + elem + CM().RESET_ALL
         for elem in (
             tokens
-            if global_vars.args.verbose
+            if global_vars.args.double_verbose
             else itertools.islice(tokens, global_vars.MAX_PRINT_OUT_TOKENS + 1)
         )
         if "ANON" not in elem
@@ -34,7 +34,7 @@ def args_to_str(args: list):
     if args:
         # this function only gets called in case of an error, so the verbose
         # option doesn't have to be reset, because execution ends anyways
-        global_vars.args.verbose = True
+        global_vars.args.double_verbose = True
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
             f"{CM().BLUE}'" + convert_to_single_line(arg) + f"'{CM().RESET_ALL}"
             for arg in args
@@ -93,7 +93,7 @@ def subheading(heading, terminal_width, symbol):
 
 
 def filter_out_comments(instrs):
-    if not global_vars.args.verbose:
+    if not (global_vars.args.verbose or global_vars.args.double_verbose):
         return instrs
     return filter(
         lambda instr: not isinstance(instr, pn.SingleLineComment),

@@ -10,6 +10,7 @@ class Args:
         self.print = True
         self.lines = 2
         self.verbose = False
+        self.double_verbose = False
         self.color = True
         self.debug = False
         # -------------------------- RETI_Interpreter -------------------------

@@ -359,11 +359,8 @@ class ASTTransformerPicoC(Transformer):
     def struct_attr(self, nodes):
         return pn.Attr(nodes[0], nodes[1])
 
-    def struct_params(self, nodes):
-        params = []
-        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            params += [pn.Param(node1, node2)]
-        return params
+    def struct_allocs(self, nodes):
+        return nodes
 
     def struct_decl(self, nodes):
         return pn.StructDecl(nodes[0], nodes[1])
@@ -431,17 +428,14 @@ class ASTTransformerPicoC(Transformer):
 
     def fun_return(self, nodes):
         if len(nodes) == 0:
-            return pn.Return(pn.Null())
+            return pn.Return()
         return pn.Return(nodes[0])
 
     def fun_stmt(self, nodes):
         return nodes[0]
 
-    def fun_params(self, nodes):
-        params = []
-        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            params += [pn.Param(node1, node2)]
-        return params
+    def fun_allocs(self, nodes):
+        return nodes
 
     def fun_decl(self, nodes):
         return pn.FunDecl(nodes[0], nodes[1], nodes[2])

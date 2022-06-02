@@ -243,7 +243,8 @@ class RETIInterpreter:
                             fout.write(" " + str(reti.reg_get(str(reg))))
                 if (
                     global_vars.args.intermediate_stages
-                    and not global_vars.args.verbose
+                    and global_vars.args.verbose
+                    and not global_vars.args.double_verbose
                 ):
                     self._reti_state_option(reti)
                 reti.reg_increase("PC")
@@ -275,18 +276,20 @@ class RETIInterpreter:
                             self._instr(next_instruction, reti)
                             if (
                                 global_vars.args.intermediate_stages
-                                and global_vars.args.verbose
+                                and global_vars.args.double_verbose
                             ):
                                 self._reti_state_option(reti)
 
     def _conclude(self, program, reti):
-        if global_vars.args.intermediate_stages and not global_vars.args.verbose:
+        if global_vars.args.intermediate_stages and not global_vars.args.double_verbose:
+            if not global_vars.args.verbose:
+                self._reti_state_option(reti)
+            # in case of an print call as last instruction with the --verbose
+            # option, the reti state was already printed
             match program:
                 case rn.Program(_, instrs):
                     match instrs[-1] if len(instrs) > 0 else None:
                         case rn.Call(rn.Name("PRINT")):
-                            # in case of an print call as last instruction, the
-                            # reti state was already printed
                             pass
                         case _:
                             self._reti_state_option(reti)

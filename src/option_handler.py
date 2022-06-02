@@ -25,6 +25,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-p", "--print", action="store_true")
     cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
+    cli_args_parser.add_argument("-vv", "--double_verbose", action="store_true")
     cli_args_parser.add_argument("-c", "--color", action="store_true")
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
