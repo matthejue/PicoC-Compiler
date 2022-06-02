@@ -2,6 +2,7 @@ import global_vars
 from ast_node import ASTNode
 import reti_nodes as rn
 import os
+from ctypes import c_uint32
 
 
 class RETI(ASTNode):
@@ -20,8 +21,11 @@ class RETI(ASTNode):
         self.idx = rn.Im("0")
         self.regs = {
             "ACC": rn.Im("0"),
+            "ACC_SIMPLE": rn.Im("0"),
             "IN1": rn.Im("0"),
+            "IN1_SIMPLE": rn.Im("0"),
             "IN2": rn.Im("0"),
+            "IN2_SIMPLE": rn.Im("0"),
             "PC": rn.Im("0"),
             "PC_SIMPLE": rn.Im("0"),
             "SP": rn.Im("0"),
@@ -42,17 +46,23 @@ class RETI(ASTNode):
         return int(self.regs[reg.upper()].val)
 
     def reg_set(self, reg, val):
-        if reg.upper() == "PC":
-            self.regs["PC_SIMPLE"].val = str(val - 2**31)
-        if reg.upper() == "SP":
-            self.regs["SP_SIMPLE"].val = str(val - 2**31)
-        if reg.upper() == "BAF":
-            self.regs["BAF_SIMPLE"].val = str(val - 2**31)
-        if reg.upper() == "CS":
-            self.regs["CS_SIMPLE"].val = str(val - 2**31)
-        if reg.upper() == "DS":
-            self.regs["DS_SIMPLE"].val = str(val - 2**31)
         self.regs[reg.upper()].val = str(val)
+        if reg.upper() == "ACC":
+            self.regs["ACC_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "IN1":
+            self.regs["IN1_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "IN2":
+            self.regs["IN2_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "PC":
+            self.regs["PC_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "SP":
+            self.regs["SP_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "BAF":
+            self.regs["BAF_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "CS":
+            self.regs["CS_SIMPLE"].val = str(val % 2**30)
+        if reg.upper() == "DS":
+            self.regs["DS_SIMPLE"].val = str(val % 2**30)
 
     def reg_increase(self, reg, offset=1):
         self.reg_set(reg, self.reg_get(reg) + offset)
@@ -98,21 +108,7 @@ class RETI(ASTNode):
         acc += "\n  {"
         acc += f"\n    index:       {self.idx}"
         acc += f"\n    instruction: " + str(self.last_instr).lstrip()
-        for reg in [
-            "ACC",
-            "IN1",
-            "IN2",
-            "PC",
-            "PC_SIMPLE",
-            "SP",
-            "SP_SIMPLE",
-            "BAF",
-            "BAF_SIMPLE",
-            "CS",
-            "CS_SIMPLE",
-            "DS",
-            "DS_SIMPLE",
-        ]:
+        for reg in self.regs.keys():
             acc += f"\n    {reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
         acc += "\n  }"
         acc_addr = self.reg_get("ACC")

@@ -1121,7 +1121,7 @@ class Passes:
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, pn.Num(val2)):
                         match choosen_scope:
-                            case ("main", "global"):
+                            case ("main" | "global"):
                                 reti_instrs += [
                                     rn.Instr(
                                         rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val2)]
@@ -1405,7 +1405,7 @@ class Passes:
                                 )
                             ]
                             match self.current_scope:
-                                case ("main" | "global"):
+                                case "main":
                                     reti_instrs += [
                                         rn.Instr(
                                             rn.Storein(),
