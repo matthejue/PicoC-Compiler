@@ -154,7 +154,7 @@ class RETIInterpreter:
                 self._memory_store(
                     destination,
                     self._memory_load(
-                        (abs(self._memory_load(reg_source, reti)) + int(val)) % 2**32,
+                        self._memory_load(reg_source, reti) + int(val),
                         reti,
                     ),
                     reti,
@@ -177,7 +177,7 @@ class RETIInterpreter:
                 [rn.Reg() as destination, rn.Reg() as reg_source, rn.Im(val)],
             ):
                 self._memory_store(
-                    (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
+                    self._memory_load(destination, reti) + int(val),
                     self._memory_load(reg_source, reti),
                     reti,
                 )
@@ -224,7 +224,7 @@ class RETIInterpreter:
                 reti.sram_set(reti.reg_get("SP"), reti.reg_get("PC"))
                 reti.reg_set("SP", reti.reg_get("SP") - 1)
                 # jump to start address of isr
-                reti.reg_set("PC", reti.sram_get(abs(int(val))))
+                reti.reg_set("PC", self._memory_load(int(val) + 2**31, reti))
             case rn.Rti():
                 # restore PC
                 reti.reg_set("PC", reti.sram_get(reti.reg_get("SP") + 1))
