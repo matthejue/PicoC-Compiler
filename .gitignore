@@ -26,4 +26,5 @@ README.txt
 *.in
 *.out
 *.out_expected
+*.datasegment_size
 *.reti_states

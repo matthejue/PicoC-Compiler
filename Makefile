@@ -28,7 +28,7 @@ _compile:
 
 compile-verbose: _compile-verbose _clean-pycache
 _compile-verbose:
-	./src/main.py $$(cat ./most_used_compile_opts.txt) -v ./run/code.picoc
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -vv ./run/code.picoc
 
 compile-color: _compile-color _clean-pycache
 _compile-color:
@@ -44,7 +44,7 @@ _interpret:
 
 interpret-verbose: _interpret-verbose _clean-pycache
 _interpret-verbose:
-	./src/main.py $$(cat ./most_used_interpret_opts.txt) -v ./run/code.picoc
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -vv ./run/code.picoc
 
 interpret-color: _interpret-color _clean-pycache
 _interpret-color:
@@ -110,6 +110,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.in" -delete
 	find . -type f -wholename "./tests/*.out" -delete
 	find . -type f -wholename "./tests/*.out_expected" -delete
+	find . -type f -wholename "./tests/*.datasegment_size" -delete
 	find . -type f -wholename "./tests/*.reti_states" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete

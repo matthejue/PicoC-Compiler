@@ -1,4 +1,5 @@
 from ast_node import ASTNode
+import symbol_table as st
 
 
 # =========================================================================
@@ -8,6 +9,9 @@ from ast_node import ASTNode
 class Name(ASTNode):
     # shorter then 'Identifier'
     pass
+
+    def __eq__(self, other):
+        return self.val == other.val
 
 
 class Num(ASTNode):
@@ -300,21 +304,12 @@ class Struct(ASTNode):
 
 
 class StructDecl(ASTNode):
-    def __init__(self, name, params):
+    def __init__(self, name, allocs):
         self.name = name
-        self.params = params
-        super().__init__(visible=[self.name, self.params])
+        self.allocs = allocs
+        super().__init__(visible=[self.name, self.allocs])
 
-    __match_args__ = ("name", "params")
-
-
-class Param(ASTNode):
-    def __init__(self, datatype, name):
-        self.datatype = datatype
-        self.name = name
-        super().__init__(visible=[self.datatype, self.name])
-
-    __match_args__ = ("datatype", "name")
+    __match_args__ = ("name", "allocs")
 
 
 # ------------------------------- L_If_Else -------------------------------
@@ -367,7 +362,7 @@ class Call(ASTNode):
 
 
 class Return(ASTNode):
-    def __init__(self, exp):
+    def __init__(self, exp=st.Empty()):
         self.exp = exp
         super().__init__(visible=[self.exp])
 
@@ -375,31 +370,31 @@ class Return(ASTNode):
 
 
 class FunDecl(ASTNode):
-    def __init__(self, datatype, name, params):
+    def __init__(self, datatype, name, allocs):
         self.datatype = datatype
         self.name = name
-        self.params = params
-        super().__init__(visible=[self.datatype, self.name, self.params])
+        self.allocs = allocs
+        super().__init__(visible=[self.datatype, self.name, self.allocs])
 
-    __match_args__ = ("datatype", "name", "params")
+    __match_args__ = ("datatype", "name", "allocs")
 
 
 class FunDef(ASTNode):
-    def __init__(self, datatype, name, params, stmts_blocks):
+    def __init__(self, datatype, name, allocs, stmts_blocks):
         self.datatype = datatype
         self.name = name
-        self.params = params
+        self.allocs = allocs
         self.stmts_blocks = stmts_blocks
         super().__init__(
             visible=[
                 self.datatype,
                 self.name,
-                self.params,
+                self.allocs,
                 self.stmts_blocks,
             ]
         )
 
-    __match_args__ = ("datatype", "name", "params", "stmts_blocks")
+    __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
 
 # --------------------------------- L_File --------------------------------

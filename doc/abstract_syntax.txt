@@ -39,7 +39,7 @@ stmt ::= Assign(Alloc(Writeable(), ArrayDecl(Num(str)+, <datatype>), Name(str)),
 datatype ::= StructSpec(Name(str))
 exp ::= Attr(<ref_loc>, Name(str))
 stmt ::= Assign(Alloc(Writeable(), StructSpec(Name(str)), Name(str)), Struct(Assign(Name(str), <exp>)+))
-decl_def ::= StructDecl(Name(str), Param(<datatype>, Name(str))+)
+decl_def ::= StructDecl(Name(str), Alloc(Writeable(), <datatype>, Name(str))+)
 ---------------------------------- L_If_Else ----------------------------------
 stmt ::= If(<exp>, <stmt>*)
        | IfElse(<exp>, <stmt>*, <stmt>*)
@@ -50,8 +50,8 @@ stmt ::= While(<exp>, <stmt>*)
 exp ::= Call(Name(str), <exp>*)
 exp_stmts ::= Call(Name(str), <exp>*)
 stmt ::= Return(<exp>)
-decl_def ::= FunDecl(<datatype>, Name(str), Param(<datatype>, Name(str))*)
-           | FunDef(<datatype>, Name(str), Param(<datatype>, Name(str))*, <stmt>*)
+decl_def ::= FunDecl(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(str))*)
+           | FunDef(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(str))*, <stmt>*)
 ------------------------------------ L_File -----------------------------------
 file ::= File(Name(str), <decl_def>*)
 ===============================================================================
@@ -61,7 +61,7 @@ file ::= File(Name(str), <decl_def>*)
 =                                 PicoC_Blocks                                =
 ===============================================================================
 ------------------------------------ L_Fun ------------------------------------
-decl_def ::= FunDef(<datatype>, Name(str), Param(<datatype>, Name(str))*, <block>*)
+decl_def ::= FunDef(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(str))*, <block>*)
 ----------------------------------- L_Blocks ----------------------------------
 block ::= Block(Name(str), <stmt>*)
 stmt ::= Goto(Name(str))
@@ -70,8 +70,11 @@ stmt ::= Goto(Name(str))
 ===============================================================================
 -------------------------------- L_Assign_Alloc -------------------------------
 ref_loc ::= Memory(Num(str))
-exp ::= Stack(Num(str)) | Ref(<ref_loc>, <datatype>)
+error_data ::= <exp> | Pos(Num(str), Num(str))
+exp ::= Stack(Num(str)) | Ref(<ref_loc>, <datatype>, <error_data>)
 stmt ::= Exp(<exp>)
+       | Assign(Alloc(Writeable(), StructSpec(Name(str)), Name(str)), Struct(Assign(Name(str), <exp>)+, <datatype>))
+       | Assign(Alloc(Writeable(), ArrayDecl(Num(str)+, <datatype>), Name(str)), Array(<exp>+, <datatype>))
 # TODO: ausschreiben mit Stack()
 -------------------------------- L_Symbol_Table -------------------------------
 symbol_table ::= SymbolTable(<symbol>)
@@ -88,7 +91,9 @@ size ::= Num(str) | Empty()
 ---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
 ----------------------------------- L_Blocks ----------------------------------
-block ::= Block(Name(str), <instr>*, Num(str), Num(str))
+instrs_before = Num(str)
+num_instrs = Num(str)
+block ::= Block(Name(str), <instr>*, <instrs_before>, <num_instrs>)
 instr ::= Goto(Name(str))
 ===============================================================================
 =                                  RETI_Patch                                 =

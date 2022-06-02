@@ -1,6 +1,7 @@
 import global_vars
 from ast_node import ASTNode
 import reti_nodes as rn
+import os
 
 
 class RETI(ASTNode):
@@ -102,7 +103,7 @@ class RETI(ASTNode):
         )
         acc += str(self.uart)
         acc += str(self.eprom)
-        acc += "\n)" if global_vars.args.verbose else ""
+        acc += "\n)" if global_vars.args.double_verbose else ""
         return acc
 
 
@@ -112,7 +113,7 @@ class EPROM(ASTNode):
         super().__init__(visible=[self.cells])
 
     def __repr__(self):
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
+        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n    {"
         for addr in range(len(self.cells)):
             acc += (
@@ -122,7 +123,7 @@ class EPROM(ASTNode):
                 + str(self.cells[addr])
             )
         acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.verbose else "")
+        return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 class UART(ASTNode):
@@ -131,7 +132,7 @@ class UART(ASTNode):
         super().__init__(visible=[self.cells])
 
     def __repr__(self):
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
+        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n    {"
         for addr in range(len(self.cells)):
             acc += (
@@ -141,7 +142,7 @@ class UART(ASTNode):
                 + str(self.cells[addr])
             )
         acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.verbose else "")
+        return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 class SRAM(ASTNode):
@@ -149,11 +150,23 @@ class SRAM(ASTNode):
         self.instrs = instrs
         start = global_vars.args.process_begin
         end = global_vars.args.process_begin + len(self.instrs) - 1
+        # if a '<basename>.datasegment_size' file exists, the value should be
+        # taken from there
+        if os.path.isfile(
+            global_vars.path + global_vars.basename + ".datasegment_size"
+        ):
+            with open(
+                global_vars.path + global_vars.basename + ".datasegment_size",
+                "r",
+                encoding="utf-8",
+            ) as fin:
+                global_vars.args.datasegment_size = int(fin.read())
         min_sram_size = (
             global_vars.args.process_begin
             + len(instrs)
             + global_vars.args.datasegment_size
         )
+
         self.cells = {
             i: (
                 self.instrs[i - global_vars.args.process_begin]
@@ -165,7 +178,7 @@ class SRAM(ASTNode):
 
     def __repr__(self, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr):
         acc = f"\n  {self.__class__.__name__}" + (
-            "(" if global_vars.args.verbose else " "
+            "(" if global_vars.args.double_verbose else " "
         )
         acc += "\n    {"
         for addr in range(len(self.cells)):
@@ -181,4 +194,4 @@ class SRAM(ASTNode):
                 + (" <- DS" if addr == ds_addr else "")
             )
         acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.verbose else "")
+        return acc + ("\n  )" if global_vars.args.double_verbose else "")

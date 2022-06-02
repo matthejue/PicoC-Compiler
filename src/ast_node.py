@@ -18,15 +18,15 @@ class ASTNode:
     def __repr__(self, depth=0):
         if not self.visible:
             if not self.val:
-                return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.verbose else ''}"
-            return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}'{self.val}'{')' if global_vars.args.verbose else ''}"
+                return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"
+            return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}'{self.val}'{')' if global_vars.args.double_verbose else ''}"
 
         acc = ""
 
         if depth > 0:
-            acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
+            acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         else:
-            acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.verbose else ' '}"
+            acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
 
         for i, child in enumerate(self.visible):
             if isinstance(child, list):
@@ -51,4 +51,4 @@ class ASTNode:
 
             acc += f"{', ' if i > 0 else ''}{child.__repr__(depth+2)}"
 
-        return acc + (f"\n{' ' * depth})" if global_vars.args.verbose else "")
+        return acc + (f"\n{' ' * depth})" if global_vars.args.double_verbose else "")

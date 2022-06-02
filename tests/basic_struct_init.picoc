@@ -1,0 +1,5 @@
+struct str {int attr1; char attr2[3];};
+
+void main() {
+  statement
+}

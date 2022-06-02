@@ -92,8 +92,8 @@ array_init: size_qual array_init_decl "=" array_subexps";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" name
 struct_attr: subscr_loc"."name|"("deref")""."name
-struct_params: (size_qual pntr_decl";")+
-struct_decl: "struct" name "{"struct_params"}"";"
+struct_allocs: (alloc";")+
+struct_decl: "struct" name "{"struct_allocs"}"";"
 struct_subexps: "{""."name"="entry_subexp ("," "."name"="entry_subexp)*"}"
 struct_init: struct_spec name "=" struct_subexps";"
 // --------------------------------- L_If_Else --------------------------------
@@ -115,15 +115,15 @@ fun_call: name"("fun_call_args")"
 fun_call_stmt: fun_call";"
 fun_return: "return" [logic_exp]";"
 fun_stmt: fun_call_stmt|fun_return
-fun_params: [size_qual pntr_decl("," size_qual pntr_decl)*]
-fun_decl: prim_dt name"("fun_params")"";"
-fun_def: prim_dt name"("fun_params")" "{" decl_exec_stmts "}"
+fun_allocs: [alloc("," alloc)*]
+fun_decl: prim_dt name"("fun_allocs")"";"
+fun_def: prim_dt name"("fun_allocs")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 decl_def: struct_decl|fun_decl|fun_def
 decls_defs: decl_def*
 file: FILENAME decls_defs
 // ---------------------------------- L_Block ---------------------------------
-// fun_def: prim_dt name"("fun_params")" "{" blocks "}"
+// fun_def: prim_dt name"("fun_allocs")" "{" blocks "}"
 block: name":" decl_exec_stmts
 blocks: block*
 goto: "goto""("name")"

@@ -1,6 +1,0 @@
-// in:
-// expected:
-
-void main() {
-  int ar[3] = {1, 2, 3};
-}

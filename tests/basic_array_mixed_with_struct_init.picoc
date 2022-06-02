@@ -1,0 +1,8 @@
+// in:
+// expected:
+
+struct str {int attr1; char attr2[3];};
+
+void main() {
+  struct str ar[2][2] = {{{.attr1=12, .attr2={1, 2, 3}}, {.attr1=45, .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, 8, 9}}, {.attr1=1011, .attr2={10, 11, 12}}}};
+}
