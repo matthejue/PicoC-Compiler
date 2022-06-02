@@ -296,12 +296,26 @@ class RETIInterpreter:
         # needs a newline at the end, else it differs from .out_expected
         match program:
             case rn.Program(rn.Name(val)):
-                with open(
-                    remove_extension(val) + ".out",
-                    "a",
-                    encoding="utf-8",
-                ) as fout:
-                    fout.write("\n")
+                file_not_empty = True
+                if os.path.isfile(remove_extension(val) + ".out"):
+                    with open(
+                        remove_extension(val) + ".out", "r", encoding="utf-8"
+                    ) as fin:
+                        file_not_empty = fin.read().replace("\n", "")
+                if file_not_empty:
+                    with open(
+                        remove_extension(val) + ".out",
+                        "a",
+                        encoding="utf-8",
+                    ) as fout:
+                        fout.write("\n")
+                else:
+                    with open(
+                        remove_extension(val) + ".out",
+                        "w",
+                        encoding="utf-8",
+                    ) as fout:
+                        fout.write("\n")
             case _:
                 bug_in_interpreter(program)
 
