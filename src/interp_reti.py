@@ -146,7 +146,9 @@ class RETIInterpreter:
                 ) != "PC" else reti.do_nothing()
             case rn.Instr(rn.Load(), [rn.Reg() as destination, rn.Im() as source]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Instr(
                 rn.Loadin(),
                 [rn.Reg() as reg_source, rn.Reg() as destination, rn.Im(val)],
@@ -159,7 +161,9 @@ class RETIInterpreter:
                     ),
                     reti,
                 )
-                reti.reg_increase("PC")
+                reti.reg_increase("PC") if str(
+                    destination.reg
+                ) != "PC" else reti.do_nothing()
             case rn.Instr(rn.Loadi(), [rn.Reg() as destination, rn.Im(val)]):
                 self._memory_store(
                     destination,
