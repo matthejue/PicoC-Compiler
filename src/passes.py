@@ -308,6 +308,7 @@ class Passes:
             # ------------------------ L_Pntr + L_Array -----------------------
             # TODO: remove after implementing shrink pass
             case (pn.Deref(deref_loc, exp) | pn.Subscr(deref_loc, exp)):
+                #  __import__("pudb").set_trace()
                 ref = pn.Ref(pn.Subscr(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))
                 # for e.g. Deref(deref_loc, Num("0")) for the position
                 # Pos(-1, -1) gets saved
@@ -1164,6 +1165,7 @@ class Passes:
                     error_data,
                 )
             ):
+                #  __import__("pudb").set_trace()
                 reti_instrs = self._single_line_comment_reti(stmt)
                 match datatype:
                     case pn.ArrayDecl(nums, datatype2):
@@ -1370,11 +1372,11 @@ class Passes:
             #  case pn.Exp(pn.Deref(deref_loc, exp)):
             #      reti_instrs = []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Subscr(pn.Stack(pn.Num("1")), pn.Num("0"))):
+            case pn.Exp(pn.Subscr(pn.Stack(pn.Num(val1)), pn.Num("0"))):
                 return self._single_line_comment_reti(stmt) + [
                     rn.Instr(
                         rn.Loadin(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
+                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)],
                     ),
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.In1()), rn.Reg(rn.Acc()), rn.Im("0")]

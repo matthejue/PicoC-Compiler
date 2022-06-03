@@ -55,11 +55,23 @@ class RETIInterpreter:
                 match memory_type:
                     case 0b00:
                         # error, eprom is readonly
-                        reti.eprom_set(abs(int(val)) + higher_bits, source)
+                        reti.eprom_set(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits,
+                            source,
+                        )
                     case 0b01:
-                        reti.uart_set(abs(int(val)) + higher_bits, source)
+                        reti.uart_set(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits,
+                            source,
+                        )
                     case (0b10 | 0b11):
-                        reti.sram_set(abs(int(val)) + higher_bits, source)
+                        reti.sram_set(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits,
+                            source,
+                        )
                     case _:
                         bug_in_interpreter(memory_type)
             case rn.Reg(reg):
@@ -89,11 +101,20 @@ class RETIInterpreter:
                 memory_type = reti.reg_get("DS") >> 30
                 match memory_type:
                     case 0b00:
-                        return reti.eprom_get(abs(int(val)) + higher_bits)
+                        return reti.eprom_get(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits
+                        )
                     case 0b01:
-                        return reti.uart_get(abs(int(val)) + higher_bits)
+                        return reti.uart_get(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits
+                        )
                     case (0b10 | 0b11):
-                        return reti.sram_get(abs(int(val)) + higher_bits)
+                        return reti.sram_get(
+                            c_uint32(int(val)).value % 0b1000000_00000000_00000000
+                            + higher_bits
+                        )
                     case _:
                         bug_in_interpreter(memory_type)
 
@@ -167,7 +188,7 @@ class RETIInterpreter:
             case rn.Instr(rn.Loadi(), [rn.Reg() as destination, rn.Im(val)]):
                 self._memory_store(
                     destination,
-                    int(val),
+                    c_uint32(int(val)).value % 0b1000000_00000000_00000000,
                     reti,
                 )
                 reti.reg_increase("PC") if str(
@@ -223,20 +244,22 @@ class RETIInterpreter:
                         self._jump_condition(False, int(val), reti)
                     case _:
                         bug_in_interpreter(rel)
-            case rn.Int(rn.Im(val)):
-                # save PC to stack
-                reti.sram_set(reti.reg_get("SP"), reti.reg_get("PC"))
-                reti.reg_set("SP", reti.reg_get("SP") - 1)
-                # jump to start address of isr
-                reti.reg_set("PC", self._memory_load(int(val) + 2**31, reti))
-            case rn.Rti():
-                # restore PC
-                reti.reg_set("PC", reti.sram_get(reti.reg_get("SP") + 1))
-                # delete PC from stack
-                reti.reg_set("SP", reti.reg_get("SP") + 1)
+            #  case rn.Int(rn.Im(val)):
+            #      # save PC to stack
+            #      reti.sram_set(reti.reg_get("SP"), c_uint32(reti.reg_get("PC")).value)
+            #      reti.reg_set("SP", c_uint32(reti.reg_get("SP")).value - 1)
+            #      # jump to start address of isr
+            #      reti.reg_set("PC", self._memory_load(int(val) + 2**31, reti))
+            #  case rn.Rti():
+            #      # restore PC
+            #      reti.reg_set(
+            #          "PC", reti.sram_get(c_uint32(reti.reg_get("SP")).value + 1)
+            #      )
+            #      # delete PC from stack
+            #      reti.reg_set("SP", c_uint32(reti.reg_get("SP")).value + 1)
             case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
                 if global_vars.args.print:
-                    print("Output:\n\t" + str(reti.reg_get(str(reg))))
+                    print("Output:\n\t" + str(c_int32(reti.reg_get(str(reg))).value))
                 if global_vars.path:
                     if self.first_out:
                         with open(
@@ -244,7 +267,7 @@ class RETIInterpreter:
                             "w",
                             encoding="utf-8",
                         ) as fout:
-                            fout.write(str(reti.reg_get(str(reg))))
+                            fout.write(str(c_int32(reti.reg_get(str(reg))).value))
                         self.first_out = False
                     else:
                         with open(
@@ -252,7 +275,7 @@ class RETIInterpreter:
                             "a",
                             encoding="utf-8",
                         ) as fout:
-                            fout.write(" " + str(reti.reg_get(str(reg))))
+                            fout.write(" " + str(c_int32(reti.reg_get(str(reg))).value))
                 if (
                     global_vars.args.intermediate_stages
                     and global_vars.args.verbose
@@ -262,9 +285,9 @@ class RETIInterpreter:
                 reti.reg_increase("PC")
             case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
                 if self.test_input:
-                    reti.reg_set(str(reg), self.test_input.pop())
+                    reti.reg_set(str(reg), c_uint32(self.test_input.pop()).value)
                 else:
-                    reti.reg_set(str(reg), int(input()))
+                    reti.reg_set(str(reg), c_uint32(int(input())).value)
                 reti.reg_increase("PC")
             case _:
                 bug_in_interpreter(instr)

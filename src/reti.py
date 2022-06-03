@@ -2,7 +2,6 @@ import global_vars
 from ast_node import ASTNode
 import reti_nodes as rn
 import os
-from ctypes import c_uint32
 
 
 class RETI(ASTNode):
@@ -135,10 +134,10 @@ class RETI(ASTNode):
 class EPROM(ASTNode):
     def __init__(self, len_instrs):
         self.cells = {
-            0: rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(str(-(2**31)))]),
-            1: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Sp())]),
-            2: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
-            3: rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Ds())]),
+            0: rn.Instr(rn.Loadi(), [rn.Reg(rn.Ds()), rn.Im(str(-(2**21)))]),
+            1: rn.Instr(rn.Multi(), [rn.Reg(rn.Ds()), rn.Im(str(2**10))]),
+            2: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Sp())]),
+            3: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Cs())]),
             4: rn.Instr(
                 rn.Addi(),
                 [
