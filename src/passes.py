@@ -315,9 +315,9 @@ class Passes:
                 ref.error_data = (
                     [self._get_leftmost_pos(exp)] if exp.pos != Pos(-1, -1) else []
                 )
-                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
                 exps_mon = self._picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [pn.Exp(ref)]
+                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
+                return exps_mon + refs_mon + [pn.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref_loc2, pn.Name(_, pos) as name):
                 ref = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))

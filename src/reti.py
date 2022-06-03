@@ -270,7 +270,7 @@ def print_cells(
         acc += (
             "\n      "
             + ("%06i " % addr)
-            + ("(%010i): " % (addr + constant))
+            #  + ("(%010i): " % (addr + constant))
             + str(cells[addr]).lstrip()
             + (" <- ACC" if addr == acc_addr - constant else "")
             + (" <- IN1" if addr == in1_addr - constant else "")

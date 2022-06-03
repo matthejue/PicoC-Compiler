@@ -24,35 +24,35 @@ uninstall:
 
 compile: _compile _clean-pycache
 _compile:
-	./src/main.py $$(cat ./most_used_compile_opts.txt) ./run/code.picoc
+	./src/main.py $$(cat ./most_used_compile_opts.txt) ./run/*.picoc
 
 compile-verbose: _compile-verbose _clean-pycache
 _compile-verbose:
-	./src/main.py $$(cat ./most_used_compile_opts.txt) -vv ./run/code.picoc
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -vv ./run/*.picoc
 
 compile-color: _compile-color _clean-pycache
 _compile-color:
-	./src/main.py $$(cat ./most_used_compile_opts.txt) -c ./run/code.picoc
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -c ./run/*.picoc
 
 compile-debug: _compile-debug _clean-pycache
 _compile-debug:
-	./src/main.py $$(cat ./most_used_compile_opts.txt) -d ./run/code.picoc
+	./src/main.py $$(cat ./most_used_compile_opts.txt) -d ./run/*.picoc
 
 interpret: _interpret _clean-pycache
 _interpret:
-	./src/main.py $$(cat ./most_used_interpret_opts.txt) ./run/code.picoc
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) ./run/*.picoc
 
 interpret-verbose: _interpret-verbose _clean-pycache
 _interpret-verbose:
-	./src/main.py $$(cat ./most_used_interpret_opts.txt) -vv ./run/code.picoc
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -vv ./run/*.picoc
 
 interpret-color: _interpret-color _clean-pycache
 _interpret-color:
-	./src/main.py $$(cat ./most_used_interpret_opts.txt) -c ./run/code.picoc
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -c ./run/*.picoc
 
 interpret-debug: _interpret-debug _clean-pycache
 _interpret-debug:
-	./src/main.py $$(cat ./most_used_interpret_opts.txt) -d ./run/code.picoc
+	./src/main.py $$(cat ./most_used_interpret_opts.txt) -d ./run/*.picoc
 
 shell: _shell _clean-pychache
 _shell:
@@ -68,6 +68,11 @@ _test:
 	# ARG2=-d for debugging
 	-./export_environment_vars_for_makefile.sh; \
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
+
+test-show:
+	-./export_environment_vars_for_makefile.sh; \
+	./run_tests.sh $${COLUMNS} $(ARG_BASE) -vv;
+	nvim ./tests/*$(ARG_BASE)*.reti_states -c 'se so=0 | 115 | norm zt' -c 'vs | 77 | norm zt' -c 'vs | 39 | norm zt' -c 'vs | 0 | norm zt' -c 'windo se scb!' -c 'windo se nonu' -c 'windo se nornu' -c 'wincmd h | wincmd h | wincmd h'
 
 convert:  extract
 	./convert_to_c.py $(ARG_BASE)
