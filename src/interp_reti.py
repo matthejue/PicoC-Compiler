@@ -326,7 +326,7 @@ class RETIInterpreter:
                 self._reti_state_option(reti)
             # in case of an print call as last instruction with the --verbose
             # option, the reti state was already printed
-            match reti.sram_get(reti.reg_get("PC") - 2**31):
+            match reti.sram_get(reti.reg_get("PC") - 2**31 - 1):
                 case rn.Call(rn.Name("PRINT")):
                     pass
                 case _:
