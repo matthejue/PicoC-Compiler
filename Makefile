@@ -8,18 +8,20 @@ install:
 	pip install -r ./requirements.txt
 	@sudo -- sh -c '[[ ! -f /usr/local/bin/picoc_compiler ]] && ln -sr ./src/main.py /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully installed || echo compiler /usr/local/bin/picoc_compiler is already installed'
 	@[[ ! -d ~/.config/picoc_compiler ]] && mkdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler created || echo config folder ~/.config/picoc_compiler does already exist
-	@[[ ! -f ~/.config/picoc_compiler/history.json ]] && touch ~/.config/picoc_compiler/history.json && echo config file ~/.config/picoc_compiler/history.json created || echo config file ~/.config/picoc_compiler/history.json does already exist
+	@[[ ! -f ~/.config/picoc_compiler/history.json ]] && touch ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json created || echo history file ~/.config/picoc_compiler/history.json does already exist
 	@[[ ! -f ~/.config/picoc_compiler/settings.conf.json ]] && touch ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json created || echo settings file ~/.config/picoc_compiler/settings.conf.json does already exist
-	@[[ ! -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && ln -sr ./most_used_compile_opts.txt ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-usecreated ions file ~/.config/picoc_compiler/most_used_compile_opts.txt created || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt does already exist
-	@[[ ! -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && ln -sr ./most_used_interpret_opts.txt ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-usecreated erpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt created || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt does already exist
+	@[[ ! -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && ln -sr ./interpr_showcase.vim ~/.config/picoc_compiler/interpr_showcase.vim && echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim created || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim does already exist
+	@[[ ! -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && ln -sr ./most_used_compile_opts.txt ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt created || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt does already exist
+	@[[ ! -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && ln -sr ./most_used_interpret_opts.txt ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt created || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt does already exist
 
 uninstall:
 	pip uninstall -r ./requirements.txt
 	@sudo -- sh -c '[[ -f /usr/local/bin/picoc_compiler ]] && rm /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully uninstalled || echo compiler /usr/local/bin/picoc_compiler is already uninstalled'
-	@[[ -f ~/.config/picoc_compiler/history.json ]] && rm ~/.config/picoc_compiler/history.json && echo file ~/.config/picoc_compiler/history.json was deleted || echo config file ~/.config/picoc_compiler/history.json is already deleted
-	@[[ -f ~/.config/picoc_compiler/settings.conf.json ]] && rm ~/.config/picoc_compiler/settings.conf.json && echo file ~/.config/picoc_compiler/settings.conf.json was deleted || echo settings file ~/.config/picoc_compiler/settings.conf.json is already deleted
-	@[[ -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_compile_opts.txt && echo file ~/.config/picoc_compiler/most_used_compile_opts.txt was deleted || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt is already deleted
-	@[[ -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo file ~/.config/picoc_compiler/most_used_interpret_opts.txt was deleted || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt is already deleted
+	@[[ -f ~/.config/picoc_compiler/history.json ]] && rm ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json was deleted || echo history file ~/.config/picoc_compiler/history.json is already deleted
+	@[[ -f ~/.config/picoc_compiler/settings.conf.json ]] && rm ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json was deleted || echo settings file ~/.config/picoc_compiler/settings.conf.json is already deleted
+	@[[ -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && rm ~/.config/picoc_compiler/interpr_showcase.vim && echo interpter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim was deleted || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim is already deleted
+	@[[ -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt was deleted || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt is already deleted
+	@[[ -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpert-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt was deleted || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt is already deleted
 	@[[ -d ~/.config/picoc_compiler ]] && rmdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler was deleted || echo config folder ~/.config/picoc_compiler is already deleted
 
 compile: _compile _clean-pycache
@@ -76,7 +78,7 @@ test-show:
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
 	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
-	nvim ./tests/*$(ARG_BASE)*.reti_states -u ~/.config/picoc_compiler/init.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(ARG_BASE)*.reti_states -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
 
 convert:  extract
 	./convert_to_c.py $(ARG_BASE)
