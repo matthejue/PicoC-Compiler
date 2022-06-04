@@ -374,30 +374,28 @@ class Passes:
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1)):
                 var_name = val1
+                if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
+                    symbol = self.symbol_table.resolve(
+                        f"{var_name}@{self.current_scope}"
+                    )
+                    match symbol:
+                        case st.Symbol(
+                            _,
+                            _,
+                            pn.Name(_),
+                            _,
+                            st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
+                        ):
+                            raise errors.Redefinition(
+                                val1,
+                                pos1,
+                                Pos(int(pos_first_line), int(pos_first_column)),
+                            )
+                        case _:
+                            bug_in_compiler(symbol)
                 size = self._datatype_size(datatype)
                 match self.current_scope:
                     case "main":
-                        if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
-                            symbol = self.symbol_table.resolve(
-                                f"{var_name}@{self.current_scope}"
-                            )
-                            match symbol:
-                                case st.Symbol(
-                                    _,
-                                    _,
-                                    pn.Name(_),
-                                    _,
-                                    st.Pos(
-                                        pn.Num(pos_first_line), pn.Num(pos_first_column)
-                                    ),
-                                ):
-                                    raise errors.Redefinition(
-                                        val1,
-                                        pos1,
-                                        Pos(int(pos_first_line), int(pos_first_column)),
-                                    )
-                                case _:
-                                    bug_in_compiler(symbol)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
@@ -409,27 +407,6 @@ class Passes:
                         self.symbol_table.define(symbol)
                         self.rel_global_addr += size
                     case _:
-                        if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
-                            symbol = self.symbol_table.resolve(
-                                f"{var_name}@{self.current_scope}"
-                            )
-                            match symbol:
-                                case st.Symbol(
-                                    _,
-                                    _,
-                                    pn.Name(),
-                                    _,
-                                    st.Pos(
-                                        pn.Num(pos_first_line), pn.Num(pos_first_column)
-                                    ),
-                                ):
-                                    raise errors.Redefinition(
-                                        val1,
-                                        pos1,
-                                        Pos(int(pos_first_line), int(pos_first_column)),
-                                    )
-                                case _:
-                                    bug_in_compiler(symbol)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
@@ -494,7 +471,8 @@ class Passes:
                     case pn.StructSpec(pn.Name(val1)):
                         struct_name = val1
                     case _:
-                        bug_in_compiler(datatype)
+                        # TODO
+                        raise errors.DatatypeMismatch()
                 symbol = self.symbol_table.resolve(f"{struct_name}")
                 match symbol:
                     case st.Symbol(_, _, _, val2):
@@ -505,6 +483,8 @@ class Passes:
                     match assign:
                         case pn.Assign(pn.Name(val3), exp):
                             attr_name = val3
+                            # Fehlermeldung, wenn dieses Attribut garnihct existiert
+                            # raise errors.UnknownAttributeError
                             attr_ids.remove(pn.Name(f"{attr_name}@{struct_name}"))
                             symbol = self.symbol_table.resolve(
                                 f"{attr_name}@{struct_name}"
@@ -527,6 +507,7 @@ class Passes:
                                                 if global_vars.args.double_verbose
                                                 else []
                                             )
+                                        # TODO: spezielle Behandlung bei CharType
                                         case ((pn.IntType() | pn.CharType()), _):
                                             pass
                                         case _:
@@ -562,45 +543,31 @@ class Passes:
 
     def _picoc_mon_stmt(self, stmt):
         match stmt:
-            # ---------------------------- L_Array ----------------------------
+            # ----------------------- L_Array + L_Struct ----------------------
             case pn.Assign(
-                pn.Alloc(_, datatype, pn.Name(val) as name) as alloc,
-                pn.Array(_) as array,
+                pn.Alloc(_, datatype, pn.Name(val1) as name) as alloc,
+                (pn.Array(_) | pn.Struct(_)) as array_struct,
             ):
-                array.datatype = datatype
-                array.visible += (
-                    [array.datatype] if global_vars.args.double_verbose else []
+                array_struct.datatype = datatype
+                array_struct.visible += (
+                    [array_struct.datatype] if global_vars.args.double_verbose else []
                 )
-                exps_mon = self._picoc_mon_exp(array)
+                exps_mon = self._picoc_mon_exp(array_struct)
                 self._picoc_mon_exp(alloc)
-                symbol = self.symbol_table.resolve(f"{val}@{self.current_scope}")
+                symbol = self.symbol_table.resolve(f"{val1}@{self.current_scope}")
                 match symbol:
-                    case st.Symbol(_, _, _, pn.Num(val1), _, pn.Num(val2)):
+                    case st.Symbol(_, _, _, pn.Num(val2), _, pn.Num(val3)):
                         return (
                             self._single_line_comment_picoc(stmt)
                             + exps_mon
                             + [
                                 pn.Assign(
-                                    pn.Memory(pn.Num(val1)), pn.Stack(pn.Num(val2))
+                                    pn.Memory(pn.Num(val2)), pn.Stack(pn.Num(val3))
                                 )
                             ]
                         )
                     case _:
                         bug_in_compiler(symbol)
-            # ---------------------------- L_Struct ---------------------------
-            case pn.Assign(
-                pn.Alloc(_, datatype, name) as alloc, pn.Struct(_) as struct
-            ):
-                struct.datatype = datatype
-                struct.visible += (
-                    [struct.datatype] if global_vars.args.double_verbose else []
-                )
-                exps_mon = self._picoc_mon_exp(struct)
-                return (
-                    self._single_line_comment_picoc(stmt)
-                    + exps_mon
-                    + [pn.Assign(name, pn.Stack(pn.Num("1")))]
-                )
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Name() as name, exp):
                 exps_mon = self._picoc_mon_exp(exp)

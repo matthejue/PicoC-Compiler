@@ -1,6 +1,13 @@
-struct str1 {int attr1; char attr2[3];};
-struct str2 {int attr1; struct str1 attr2[3];};
+// in:2 42
+// expected:21 2 42
+
+struct str1 {int attr1[3]; int attr2;};
+struct str2 {int attr1; struct str1 attr2;};
 
 void main() {
+  struct str2 some_str = {.attr1=21, .attr2={.attr1={1, input(), 3}, .attr2=input()}};
 
+  print(some_str.attr1);
+  print(some_str.attr2.attr1[1]);
+  print(some_str.attr2.attr2);
 }

@@ -376,7 +376,7 @@ class ASTTransformerPicoC(Transformer):
             pn.Alloc(
                 pn.Writeable(),
                 nodes[0],
-                pn.PntrDecl(pn.Num("0"), pn.ArrayDecl(nodes[1], [])),
+                nodes[1],
             ),
             nodes[2],
         )
