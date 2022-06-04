@@ -234,7 +234,7 @@ class Passes:
                 case _:
                     bug_in_compiler(exp)
 
-    def _add_datatype_and_error_data(self, ref, datatype, error_data):
+    def _add_datatype_and_error_data(self, ref, datatype, error_data: list):
         ref.datatype = datatype
         ref.error_data[0:0] = error_data
         ref.visible += ([ref.datatype] if global_vars.args.double_verbose else []) + (
@@ -249,7 +249,7 @@ class Passes:
                 symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
                 match symbol:
                     case st.Symbol(_, datatype):
-                        current_datatype = datatype
+                        current_datatype = copy.deepcopy(datatype)
                     case _:
                         bug_in_compiler(symbol)
                 while prev_refs:
@@ -271,13 +271,17 @@ class Passes:
                                 current_datatype = datatype
                             current_datatype.num.val = int(val) - 1
                         case pn.ArrayDecl(nums, datatype):
+                            if len(nums) == 0:
+                                # TODO: man sollte die Information,
+                                # dass am Ende nen CharType dranhängt auch
+                                # gesondert betrachten und bei Ref(Name) was dranhängen
+                                current_datatype = datatype
+                                continue
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
                             )
-                            if len(nums) == 0:
-                                current_datatype = datatype
                             current_datatype.nums.pop(0)
                         case pn.StructSpec(pn.Name(val1)):
                             struct_name = val1
@@ -288,7 +292,7 @@ class Passes:
                                 error_data=[name],
                             )
                             match ref:
-                                case pn.Ref(pn.Attr(ref_loc, pn.Name(val2))):
+                                case pn.Ref(pn.Attr(_, pn.Name(val2))):
                                     attr_name = val2
                                     symbol = self.symbol_table.resolve(
                                         f"{attr_name}@{struct_name}"
@@ -299,7 +303,7 @@ class Passes:
                                     bug_in_compiler(ref)
                             match symbol:
                                 case st.Symbol(_, datatype):
-                                    current_datatype = datatype
+                                    current_datatype = copy.deepcopy(datatype)
                                 case _:
                                     bug_in_compiler(symbol)
                         case _:
@@ -308,7 +312,6 @@ class Passes:
             # ------------------------ L_Pntr + L_Array -----------------------
             # TODO: remove after implementing shrink pass
             case (pn.Deref(deref_loc, exp) | pn.Subscr(deref_loc, exp)):
-                #  __import__("pudb").set_trace()
                 ref = pn.Ref(pn.Subscr(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))
                 # for e.g. Deref(deref_loc, Num("0")) for the position
                 # Pos(-1, -1) gets saved
@@ -1165,7 +1168,6 @@ class Passes:
                     error_data,
                 )
             ):
-                #  __import__("pudb").set_trace()
                 reti_instrs = self._single_line_comment_reti(stmt)
                 match datatype:
                     case pn.ArrayDecl(nums, datatype2):
