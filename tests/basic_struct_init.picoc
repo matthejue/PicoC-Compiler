@@ -1,5 +1,6 @@
-struct str {int attr1; char attr2[3];};
+struct str1 {int attr1; char attr2[3];};
+struct str2 {int attr1; struct str1 attr2[3];};
 
 void main() {
-  statement
+
 }

@@ -28,3 +28,4 @@ README.txt
 *.out_expected
 *.datasegment_size
 *.reti_states
+*.cast
