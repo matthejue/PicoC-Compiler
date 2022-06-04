@@ -72,11 +72,11 @@ _test:
 test-show:
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) -vv;\
-	LINE_NUM1=$$(expr $${LINES} + 1 - 3);\
-	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 6);\
-	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 9);\
-	echo -e "$${LINES}\n$${LINE_NUM3}\n$${LINE_NUM2}\n$${LINE_NUM1}\nhalo" > data.txt;\
-	nvim ./tests/*$(ARG_BASE)*.reti_states -c "se so=0 | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "windo se nonu" -c "windo se nornu" -c "wincmd h | wincmd h | wincmd h | se nocursorcolumn | se nocursorline"
+	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
+	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
+	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
+	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
+	nvim ./tests/*$(ARG_BASE)*.reti_states -u ~/.config/picoc_compiler/init.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
 
 convert:  extract
 	./convert_to_c.py $(ARG_BASE)

@@ -103,13 +103,13 @@ class RETI(ASTNode):
         self.eprom.cells[addr].val = str(val)
 
     def __repr__(self):
-        acc = f"{self.__class__.__name__}("
-        acc += "\n  {"
-        acc += f"\n    index:       {self.idx}"
-        acc += f"\n    instruction: " + str(self.last_instr).lstrip()
+        #  acc = f"{self.__class__.__name__}("
+        #  acc = "{"
+        acc = ("\n" if int(self.idx.val) > 1 else "") + f"index:       {self.idx}"
+        acc += f"\ninstruction: " + str(self.last_instr).lstrip()
         for reg in self.regs.keys():
-            acc += f"\n    {reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
-        acc += "\n  }"
+            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+        #  acc += "\n}"
         acc_addr = self.reg_get("ACC")
         in1_addr = self.reg_get("IN1")
         in2_addr = self.reg_get("IN2")
@@ -127,7 +127,7 @@ class RETI(ASTNode):
         acc += self.eprom.__repr__(
             acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
         )
-        acc += "\n)" if global_vars.args.double_verbose else ""
+        #  acc += "\n)" if global_vars.args.double_verbose else ""
         return acc
 
 
@@ -170,8 +170,8 @@ class EPROM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += "\n    {"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        # acc += "\n{"
         acc += print_cells(
             self.cells,
             0,
@@ -184,8 +184,8 @@ class EPROM(ASTNode):
             cs_addr,
             ds_addr,
         )
-        acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.double_verbose else "")
+        return acc  # + "\n}"
+        #  return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 class UART(ASTNode):
@@ -196,8 +196,8 @@ class UART(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += "\n    {"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        #  acc += "\n{"
         acc += print_cells(
             self.cells,
             2**30,
@@ -210,8 +210,8 @@ class UART(ASTNode):
             cs_addr,
             ds_addr,
         )
-        acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.double_verbose else "")
+        return acc  # + "\n  }"
+        #  return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 class SRAM(ASTNode):
@@ -235,8 +235,8 @@ class SRAM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += "\n    {"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        #  acc += "\n{"
         acc += print_cells(
             self.cells,
             2**31,
@@ -249,8 +249,8 @@ class SRAM(ASTNode):
             cs_addr,
             ds_addr,
         )
-        acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.double_verbose else "")
+        return acc  # + "\n}"
+        #  return acc + ("\n  )" if global_vars.args.double_verbose else "")
 
 
 def print_cells(
@@ -268,8 +268,8 @@ def print_cells(
     acc = ""
     for addr in range(len(cells)):
         acc += (
-            "\n      "
-            + ("%06i " % addr)
+            "\n  "
+            + ("%05i " % addr)
             #  + ("(%010i): " % (addr + constant))
             + str(cells[addr]).lstrip()
             + (" <- ACC" if addr == acc_addr - constant else "")
