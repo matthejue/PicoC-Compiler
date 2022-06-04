@@ -1365,7 +1365,9 @@ class Passes:
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
                     ),
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.In1()), rn.Im(rel_pos_in_struct)]),
+                    rn.Instr(
+                        rn.Addi(), [rn.Reg(rn.In1()), rn.Im(str(rel_pos_in_struct))]
+                    ),
                     rn.Instr(
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")]
                     ),
