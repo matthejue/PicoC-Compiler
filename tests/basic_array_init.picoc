@@ -3,11 +3,11 @@
 
 void main() {
   // 1 dim array
-  int ar1[3] = {1, 2, input()};
+  int ar1[3] = {0+1, 2, input()};
   // 2 dim array
-  int ar2[3][2] = {{1, 2}, {3, 4}, {input(), 6}};
+  int ar2[3][2] = {{1, 1+1}, {3, 4}, {input(), 3+3}};
   // 3 dim array
-  int ar3[1][2][3] = {{{1, input(), 3}, {4, 5, 6}}};
+  int ar3[1][2][3] = {{{1, input(), 3}, {4, 2+5, 6}}};
 
   print(ar1[2]);
   print(ar2[2][0]);
