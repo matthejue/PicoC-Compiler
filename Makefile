@@ -70,9 +70,13 @@ _test:
 	./run_tests.sh $${COLUMNS} $(ARG_BASE) $(ARG2);
 
 test-show:
-	-./export_environment_vars_for_makefile.sh; \
-	./run_tests.sh $${COLUMNS} $(ARG_BASE) -vv;
-	nvim ./tests/*$(ARG_BASE)*.reti_states -c 'se so=0 | 115 | norm zt' -c 'vs | 77 | norm zt' -c 'vs | 39 | norm zt' -c 'vs | 0 | norm zt' -c 'windo se scb!' -c 'windo se nonu' -c 'windo se nornu' -c 'wincmd h | wincmd h | wincmd h'
+	-./export_environment_vars_for_makefile.sh;\
+	./run_tests.sh $${COLUMNS} $(ARG_BASE) -vv;\
+	LINE_NUM1=$$(expr $${LINES} + 1 - 3);\
+	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 6);\
+	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 9);\
+	echo -e "$${LINES}\n$${LINE_NUM3}\n$${LINE_NUM2}\n$${LINE_NUM1}\nhalo" > data.txt;\
+	nvim ./tests/*$(ARG_BASE)*.reti_states -c "se so=0 | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "windo se nonu" -c "windo se nornu" -c "wincmd h | wincmd h | wincmd h | se nocursorcolumn | se nocursorline"
 
 convert:  extract
 	./convert_to_c.py $(ARG_BASE)
@@ -119,7 +123,6 @@ _clean-files:
 	find . -type f -wholename "./tests/*.reti_states" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete
-	find . -type f -wholename "./tests/*.exec" -delete
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

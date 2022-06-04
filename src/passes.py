@@ -278,7 +278,7 @@ class Passes:
                             )
                             if len(nums) == 0:
                                 current_datatype = datatype
-                            current_datatype.nums = nums[1:]
+                            current_datatype.nums.pop(0)
                         case pn.StructSpec(pn.Name(val1)):
                             struct_name = val1
                             ref = prev_refs.pop()
@@ -315,16 +315,16 @@ class Passes:
                 ref.error_data = (
                     [self._get_leftmost_pos(exp)] if exp.pos != Pos(-1, -1) else []
                 )
+                refs_mon = self._picoc_mon_ref(deref_loc, prev_refs + [ref])
                 exps_mon = self._picoc_mon_exp(exp)
-                refs_mon = self._picoc_mon_ref(deref_loc, [ref] + prev_refs)
-                return exps_mon + refs_mon + [pn.Exp(ref)]
+                return refs_mon + exps_mon + [pn.Exp(ref)]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref_loc2, pn.Name(_, pos) as name):
                 ref = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))
                 ref.error_data = [
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
-                refs_mon = self._picoc_mon_ref(ref_loc2, [ref] + prev_refs)
+                refs_mon = self._picoc_mon_ref(ref_loc2, prev_refs + [ref])
                 return refs_mon + [pn.Exp(ref)]
             case _:
                 bug_in_compiler(ref_loc)
