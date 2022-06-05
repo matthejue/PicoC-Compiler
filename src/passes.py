@@ -70,7 +70,7 @@ class Passes:
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment_picoc(stmt) + [
-                    pn.IfElse(exp, [goto_if], [goto_after])
+                    pn.IfElse(exp, goto_if, goto_after)
                 ]
             case pn.IfElse(exp, stmts1, stmts2):
                 goto_after = self._create_block(
@@ -88,7 +88,7 @@ class Passes:
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment_picoc(stmt) + [
-                    pn.IfElse(exp, [goto_if], [goto_else])
+                    pn.IfElse(exp, goto_if, goto_else)
                 ]
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
@@ -104,7 +104,7 @@ class Passes:
                     "while_branch", stmts_while, blocks
                 ).name.val
 
-                condition_check = [pn.IfElse(exp, [goto_branch], [goto_after])]
+                condition_check = [pn.IfElse(exp, goto_branch, goto_after)]
                 goto_condition_check.name.val = self._create_block(
                     "condition_check", condition_check, blocks
                 ).name.val
@@ -116,7 +116,7 @@ class Passes:
                 )
 
                 goto_branch = pn.GoTo(pn.Name("placeholder"))
-                stmts_while = [pn.IfElse(exp, [goto_branch], [goto_after])]
+                stmts_while = [pn.IfElse(exp, goto_branch, goto_after)]
 
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
@@ -128,6 +128,16 @@ class Passes:
             # ----------------------------- L_Fun -----------------------------
             case pn.Return():
                 return [stmt]
+            case pn.Call(pn.Name(val), exps):
+                goto_after = self._create_block(
+                    f"{val}_after",
+                    [pn.RemoveStackframe()] + processed_stmts,
+                    blocks,
+                )
+                return [
+                    pn.NewStackframe(pn.Num("placeholder"), goto_after)
+                    + pn.Call(st.Empty(), exps)
+                ]
             case _:
                 return [stmt] + processed_stmts
 
@@ -337,6 +347,11 @@ class Passes:
             # ---------------------------- L_Arith ----------------------------
             case (pn.Name() | pn.Num() | pn.Char()):
                 return [pn.Exp(exp)]
+            case pn.Call(pn.Name("print") as name, [exp]):
+                exp_mon = self._picoc_mon_exp(exp)
+                return exp_mon + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
+            case pn.Call(pn.Name("input"), []):
+                return [pn.Exp(exp)]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp):
                 exps1_mon = self._picoc_mon_exp(left_exp)
@@ -531,13 +546,14 @@ class Passes:
                     pn.Exp(pn.Subscr(pn.Stack(pn.Num("1")), pn.Num("0")))
                 ]
             # ----------------------------- L_Fun -----------------------------
-            case pn.Call(name, exps):
+            case pn.Call(pn.Name(val), exps):
                 exps_mon = []
-                stack_locs = []
-                for i, exp in enumerate(exps):
+                for exp in enumerate(exps):
                     exps_mon += self._picoc_mon_exp(exp)
-                    stack_locs[0:0] = [pn.Stack(pn.Num(str(i + 1)))]
-                return exps_mon + [pn.Exp(pn.Call(name, stack_locs))]
+                return exps_mon + [
+                    pn.Assign(pn.Memory(), pn.Stack(pn.Num()))
+                    + pn.GoTo(pn.Name(self.funs[val]))
+                ]
             case _:
                 bug_in_compiler(exp)
 
@@ -633,18 +649,12 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(alloc_call)
                 return self._single_line_comment_picoc(stmt) + exps_mon
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(exp, stmts1, stmts2):
+            case pn.IfElse(exp, goto1, goto2):
                 exps_mon = self._picoc_mon_exp(exp)
-                stmts1_mon = []
-                for stmt1 in stmts1:
-                    stmts1_mon += self._picoc_mon_stmt(stmt1)
-                stmts2_mon = []
-                for stmt2 in stmts2:
-                    stmts2_mon += self._picoc_mon_stmt(stmt2)
                 return (
                     self._single_line_comment_picoc(stmt)
                     + exps_mon
-                    + [pn.IfElse(pn.Stack(pn.Num("1")), stmts1_mon, stmts2_mon)]
+                    + [pn.IfElse(pn.Stack(pn.Num("1")), goto1, goto2)]
                 )
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(exp):
@@ -654,8 +664,14 @@ class Passes:
                     + exps_mon
                     + [pn.Return(pn.Stack(pn.Num("1")))]
                 )
+            case pn.NewStackframe():
+                return [stmt]
+            case pn.RemoveStackframe():
+                return [stmt]
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo():
+                # to not have to put in the work to add the Exp everyhwere in
+                # the previous pass
                 return [stmt]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment():
@@ -749,6 +765,22 @@ class Passes:
                 return pn.File(
                     pn.Name(remove_extension(val) + ".picoc_mon"), decls_defs_mon
                 )
+            case _:
+                bug_in_compiler(file)
+
+    # =========================================================================
+    # =                               PicoC_Fun                               =
+    # =========================================================================
+    def _picoc_no_fun_def(self):
+        pass
+
+    def picoc_no_fun(self, file: pn.File):
+        match file:
+            case pn.File(name, blocks):
+                bock
+                for block in blocks:
+                    self._picoc_blocks_def(block)
+
             case _:
                 bug_in_compiler(file)
 
@@ -1416,7 +1448,7 @@ class Passes:
             #  ):
             #      pass
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(pn.Stack(pn.Num(val)), [goto1], [goto2]):
+            case pn.IfElse(pn.Stack(pn.Num(val)), goto1, goto2):
                 return (
                     self._single_line_comment_reti(stmt)
                     + [
@@ -1427,22 +1459,31 @@ class Passes:
                         rn.Jump(rn.Eq(), goto2),
                     ]
                     + self._single_line_comment_reti(goto1)
-                    + [goto1]
+                    + [pn.Exp(goto1)]
                 )
             # ----------------------------- L_Fun -----------------------------
-            # TODO:
-            #  case pn.Exp(pn.Call(name, exps)):
-            #      return self._single_line_comment_reti(stmt) + [
-            #          rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
-            #          rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
-            #          rn.Instr(
-            #              rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")]
-            #          ),
-            #          rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("1")]),
-            #          rn.Instr(
-            #              rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")]
-            #          ),
-            #      ]
+            case pn.NewStackframe(pn.Num(val1), pn.GoTo() as goto):
+                return self._single_line_comment_reti(stmt) + [
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)]),
+                    rn.Instr(
+                        rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")]
+                    ),
+                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), goto]),
+                    rn.Instr(
+                        rn.Storein(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")]
+                    ),
+                ]
+            case pn.RemoveStackframe():
+                return self._single_line_comment_reti(stmt) + [
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.In1()]),
+                    rn.Instr(
+                        rn.Loadin(), [rn.Reg(rn.In1()), rn.Reg(rn.Baf()), rn.Im("0")]
+                    ),
+                    # TODO: come later back here
+                    rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Sp()]),
+                ]
             case pn.Return(pn.Stack(pn.Num(val))):
                 return self._single_line_comment_reti(stmt) + [
                     rn.Instr(
@@ -1455,7 +1496,7 @@ class Passes:
                 ]
             # ---------------------------- L_Blocks ---------------------------
             case pn.GoTo():
-                return self._single_line_comment_reti(stmt) + [stmt]
+                return self._single_line_comment_reti(pn.Exp(stmt)) + [pn.Exp(stmt)]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment(prefix, content):
                 match prefix:
@@ -1517,6 +1558,17 @@ class Passes:
     # - deal with large immediates
     # - deal with goto directly to next block
     # - deal with division by 0
+    #  def reti_patch(self, file: pn.File):
+    #      match file:
+    #          case pn.File(pn.Name(val), blocks):
+    #              patched_blocks = []
+    #              for block in blocks:
+    #                  patched_blocks += self._reti_patch_blocks(block)
+    #              return pn.File(
+    #                  pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
+    #              )
+    #          case _:
+    #              bug_in_compiler(file)
 
     # =========================================================================
     # =                                  RETI                                 =
@@ -1542,7 +1594,7 @@ class Passes:
 
     def _reti_instr(self, instr, idx, current_block):
         match instr:
-            case pn.GoTo(pn.Name(val)):
+            case pn.Exp(pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
                 return [rn.Jump(rn.Always(), rn.Im(str(distance)))]

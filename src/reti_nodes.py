@@ -37,7 +37,11 @@ class Instr(ASTNode):
     def __repr__(self, depth=0):
         instr_str = f"\n{' ' * depth}{self.op}"
         for arg in self.args:
-            instr_str += f" {arg}"
+            match arg:
+                case pn.GoTo():
+                    instr_str += f" {arg.__repr__(depth + 1 + len(instr_str))}".lstrip()
+                case _:
+                    instr_str += f" {arg}"
         return f"{instr_str}{'' if depth > 0 else ';'}"
 
     __match_args__ = ("op", "args")

@@ -397,14 +397,26 @@ class FunDef(ASTNode):
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
 
+class NewStackframe(ASTNode):
+    def __init__(self, size_stackframe, goto_after_call):
+        self.size_stackframe = size_stackframe
+        self.goto_after_call = goto_after_call
+
+    __match_args__ = ("size_stackframe", "goto_after_call")
+
+
+class RemoveStackframe(ASTNode):
+    pass
+
+
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):
-    def __init__(self, name, decls_defs):
+    def __init__(self, name, decls_defs_blocks):
         self.name = name
-        self.decls_defs = decls_defs
-        super().__init__(visible=[self.name, self.decls_defs])
+        self.decls_defs_blocks = decls_defs_blocks
+        super().__init__(visible=[self.name, self.decls_defs_blocks])
 
-    __match_args__ = ("name", "decls_defs")
+    __match_args__ = ("name", "decls_defs_blocks")
 
 
 # -------------------------------- L_Block --------------------------------

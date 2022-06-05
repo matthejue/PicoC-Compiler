@@ -7,8 +7,8 @@ bin_op ::= Add() | Sub() | Mul() | Div() | Mod() | Oplus() | And() | Or()
 exp ::= Name(str) | Num(str) | Char(str)
       | BinOp(<exp>, <bin_op>, <exp>)
       | UnOp(<un_op>, <exp>) | Call(Name('input'), None)
-stmt ::= Exp(Call(Name('print'), <exp>))
-       | SingleLineComment(str, str)
+exp_stmts ::= Alloc(<type_qual>, <dataype>, Name(str)) | Call(Name('print'), <exp>)
+stmt ::= SingleLineComment(str, str)
 ----------------------------------- L_Logic -----------------------------------
 un_op ::= LogicNot()
 rel ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
@@ -64,7 +64,7 @@ file ::= File(Name(str), <decl_def>*)
 decl_def ::= FunDef(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(str))*, <block>*)
 ----------------------------------- L_Blocks ----------------------------------
 block ::= Block(Name(str), <stmt>*)
-stmt ::= Goto(Name(str))
+stmt ::= Goto(Name(str)) | NewStackframe(Num(), Goto(str)) | RemoveStackframe()
 ===============================================================================
 =                                  PicoC_Mon                                  =
 ===============================================================================
@@ -90,6 +90,7 @@ size ::= Num(str) | Empty()
 ===============================================================================
 ---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
+exp_stmts ::= Goto(str)
 ----------------------------------- L_Blocks ----------------------------------
 instrs_before = Num(str)
 num_instrs = Num(str)
