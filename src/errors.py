@@ -110,6 +110,30 @@ class MoreThanOneMainFunction(Exception):
         self.second_pos = second_pos
 
 
+class PrototypeMismatch(Exception):
+    def __init__(
+        self,
+        def_name,
+        def_pos,
+        def_param_name,
+        def_param_datatype,
+        def_param_pos,
+        decl_pos,
+        decl_param_name,
+        decl_param_datatype,
+        decl_param_pos,
+    ):
+        self.def_name = def_name
+        self.def_pos = def_pos
+        self.def_param_name = def_param_name
+        self.def_param_datatype = def_param_datatype
+        self.def_param_pos = def_param_pos
+        self.decl_pos = decl_pos
+        self.decl_param_name = decl_param_name
+        self.decl_param_datatype = decl_param_datatype
+        self.decl_param_pos = decl_param_pos
+
+
 class BugInCompiler(Exception):
     def __init__(self, fun_name, args):
         self.description = f"{CM().YELLOW}BugInCompiler:{CM().RESET_ALL} Error in function {CM().BLUE}'{fun_name}'{CM().RESET} with {args}. This error should not be possible, but it occured. Please report this issue under {CM().RED}https://github.com/matthejue/PicoC-Compiler/issues/new/choose{CM().RESET}"

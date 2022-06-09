@@ -64,7 +64,8 @@ file ::= File(Name(str), <decl_def>*)
 decl_def ::= FunDef(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(str))*, <block>*)
 ----------------------------------- L_Blocks ----------------------------------
 block ::= Block(Name(str), <stmt>*)
-stmt ::= Goto(Name(str)) | NewStackframe(Num(), Goto(str)) | RemoveStackframe()
+stmt ::= Goto(Name(str)) | NewStackframe(Name(), Goto(str)) | RemoveStackframe()
+       | SetScope(Name(str))
 ===============================================================================
 =                                  PicoC_Mon                                  =
 ===============================================================================
