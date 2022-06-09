@@ -200,38 +200,6 @@ class Exp(ASTNode):
     __match_args__ = ("exp",)
 
 
-class StackRead(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class StackWrite(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalRead(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalWrite(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
 # --------------------------------- L_Pntr --------------------------------
 class PntrDecl(ASTNode):
     def __init__(self, num, datatype):
@@ -442,7 +410,7 @@ class Block(ASTNode):
         self.stmts_instrs = stmts_instrs
         self.instrs_before: Num
         self.num_instrs: Num
-        self.stackframe_size: Num
+        self.local_vars_size: Num
         super().__init__(
             visible=[
                 self.name,
@@ -471,3 +439,44 @@ class SingleLineComment:
         return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
+
+
+# ----------------------------------- L_Mon -----------------------------------
+class Tmp(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackRead(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalRead(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)

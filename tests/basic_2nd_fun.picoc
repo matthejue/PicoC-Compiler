@@ -1,0 +1,17 @@
+// in:40 42
+// expected:40
+
+int fun(int param);
+
+void main() {
+  int arg = input();
+  int var = fun(arg);
+  print(var);
+}
+
+int fun(int param) {
+  int local_var = 2
+  print(param);
+  int arg2 = param + local_var;
+  return arg2;
+}

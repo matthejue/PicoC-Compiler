@@ -70,7 +70,7 @@ stmt ::= Goto(Name(str)) | NewStackframe(Name(), Goto(str)) | RemoveStackframe()
 =                                  PicoC_Mon                                  =
 ===============================================================================
 -------------------------------- L_Assign_Alloc -------------------------------
-ref_loc ::= Memory(Num(str))
+ref_loc ::= Tmp(Num(str)) | StackRead(Num(str)) | StackWrite(Num(str)) | GlobalRead(Num(str)) | GlobalWrite(Num(str))
 error_data ::= <exp> | Pos(Num(str), Num(str))
 exp ::= Stack(Num(str)) | Ref(<ref_loc>, <datatype>, <error_data>)
 stmt ::= Exp(<exp>)
@@ -91,8 +91,8 @@ size ::= Num(str) | Empty()
 ===============================================================================
 ---------------------------------- L_Program ----------------------------------
 program ::= Program(Name(str), <block>*)
-exp_stmts ::= Goto(str)
 ----------------------------------- L_Blocks ----------------------------------
+exp_stmts ::= Goto(str)
 instrs_before = Num(str)
 num_instrs = Num(str)
 block ::= Block(Name(str), <instr>*, <instrs_before>, <num_instrs>)
