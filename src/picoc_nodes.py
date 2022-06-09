@@ -200,7 +200,7 @@ class Exp(ASTNode):
     __match_args__ = ("exp",)
 
 
-class Stack(ASTNode):
+class StackRead(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])
@@ -208,7 +208,23 @@ class Stack(ASTNode):
     __match_args__ = ("num",)
 
 
-class Memory(ASTNode):
+class StackWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalRead(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalWrite(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])
@@ -426,6 +442,7 @@ class Block(ASTNode):
         self.stmts_instrs = stmts_instrs
         self.instrs_before: Num
         self.num_instrs: Num
+        self.stackframe_size: Num
         super().__init__(
             visible=[
                 self.name,
