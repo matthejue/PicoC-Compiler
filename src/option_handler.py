@@ -30,7 +30,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
-    cli_args_parser.add_argument("-B", "--process_begin", type=int, default=8)
+    cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"

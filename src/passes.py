@@ -18,7 +18,7 @@ class Passes:
         # PicoC_Blocks
         self.block_id = 0
         self.all_blocks = dict()
-        self.funs = dict()
+        self.fun_name_to_block_name = dict()
         # RETI_Blocks
         self.instrs_cnt = 0
         self.current_scope = "global"
@@ -128,40 +128,60 @@ class Passes:
             # ----------------------------- L_Fun -----------------------------
             case pn.Return():
                 return [stmt]
-            case pn.Call(pn.Name(val) as name, exps):
+            case pn.Exp(pn.Call(pn.Name("print"))):
+                return [stmt]
+            case pn.Exp(pn.Call(pn.Name(val, pos) as name, exps)):
+                fun_name = val
+                fun_call_pos = pos
                 goto_after = self._create_block(
-                    f"{val}_after",
+                    f"{self.current_scope}_after",
                     [pn.RemoveStackframe()] + processed_stmts,
                     blocks,
                 )
-                return self._single_line_comment_picoc(stmt) + [
-                    pn.NewStackframe(pn.Name("{val}"), goto_after),
-                    pn.Call(name, exps),
-                ]
-            #  case pn.Assign(ref_loc, pn.Call(pn.Name(val) as name, exps):
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + [pn.StackMalloc(pn.Num("2"))]
+                    + [pn.Exp(exp) for exp in exps]
+                    + [
+                        pn.NewStackframe(name, goto_after),
+                        pn.GoTo(pn.Name(f"lookup@{fun_name}", fun_call_pos)),
+                    ]
+                )
+            #  case pn.Assign(ref_loc, pn.Call(pn.Name(val) as name, exps)):
             #      goto_after = self._create_block(
             #          f"{val}_after",
-            #          [pn.RemoveStackframe()] + processed_stmts,
+            #          [
+            #              pn.RemoveStackframe(),
+            #              pn.Assign(ref_loc, rn.Reg(rn.Acc())),
+            #          ]
+            #          + processed_stmts,
             #          blocks,
             #      )
-            #      return self._single_line_comment_picoc(stmt) + [
-            #          pn.NewStackframe(pn.Name("{val}"), goto_after),
-            #          pn.Assign(ref_loc, pn.Call(name, exps))
-            #      ]
+            #      return (
+            #          self._single_line_comment_picoc(stmt)
+            #          + [pn.StackMalloc(pn.Num("2"))]
+            #          + [pn.Exp(exp) for exp in exps]
+            #          + [
+            #              pn.NewStackframe(name, goto_after),
+            #              pn.GoTo(name),
+            #          ]
+            #      )
             case _:
                 return [stmt] + processed_stmts
 
     def _picoc_blocks_def(self, decl_def):
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
-            case pn.FunDef(datatype, pn.Name(fun_name) as name, allocs, stmts):
+            case pn.FunDef(datatype, pn.Name(val) as name, allocs, stmts):
+                fun_name = val
+                self.current_scope = fun_name
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
                     processed_stmts = self._picoc_blocks_stmt(
                         stmt, processed_stmts, blocks
                     )
-                self.funs[fun_name] = f"{fun_name}.{self.block_id}"
+                self.fun_name_to_block_name[fun_name] = f"{fun_name}.{self.block_id}"
                 self._create_block(fun_name, processed_stmts, blocks)
                 self.all_blocks |= blocks
                 return [
@@ -236,7 +256,7 @@ class Passes:
                     bug_in_compiler(alloc)
         return size
 
-    def _local_variables_size(self, stmts):
+    def _local_vars_size(self, stmts):
         size = 0
         for stmt in stmts:
             match stmt:
@@ -252,6 +272,8 @@ class Passes:
     def _check_prototype(self, prototype_def, prototype_decl):
         for def_datatype, decl_datatype in zip(prototype_def, prototype_decl):
             match (def_datatype, decl_datatype):
+                case (pn.Alloc(_, pn.VoidType(), _), pn.Alloc(_, pn.VoidType(), _)):
+                    return tuple()
                 case (pn.Alloc(_, pn.CharType(), _), pn.Alloc(_, pn.CharType(), _)):
                     return tuple()
                 case (pn.Alloc(_, pn.IntType(), _), pn.Alloc(_, pn.IntType(), _)):
@@ -660,21 +682,6 @@ class Passes:
             case (pn.Subscr() | pn.Attr() | pn.Deref()):
                 refs_mon = self._picoc_mon_ref(exp, [])
                 return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
-            # ----------------------------- L_Fun -----------------------------
-            case pn.Call(pn.Name(val, pos), exps):
-                fun_name = val
-                fun_pos = pos
-                exps_mon = []
-                for exp in exps:
-                    exps_mon += self._picoc_mon_exp(exp)
-                try:
-                    fun_block_name = self.funs[fun_name]
-                except KeyError:
-                    raise errors.UnknownIdentifier(fun_name, fun_pos)
-                return exps_mon + [
-                    pn.Assign(pn.StackWrite("0"), pn.Tmp(pn.Num())),
-                    pn.GoTo(pn.Name(fun_block_name)),
-                ]
             case _:
                 bug_in_compiler(exp)
 
@@ -786,14 +793,17 @@ class Passes:
                     + exps_mon
                     + [pn.Return(pn.Tmp(pn.Num("1")))]
                 )
+            case pn.StackMalloc():
+                return [stmt]
             case pn.NewStackframe():
                 return [stmt]
             case pn.RemoveStackframe():
                 return [stmt]
             # ---------------------------- L_Block ----------------------------
-            case pn.GoTo():
-                # to not have to put in the work to add the Exp everyhwere in
-                # the previous pass
+            case pn.GoTo(pn.Name(val)):
+                if "lookup@" in val:
+                    fun_block_name = self.fun_name_to_block_name[val[7:]]
+                    return [pn.GoTo(pn.Name(fun_block_name))]
                 return [stmt]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment():
@@ -811,11 +821,19 @@ class Passes:
                 self.rel_fun_addr = 0
                 blocks_mon = []
                 match blocks[0]:
-                    case pn.Block(name, stmts):
-                        blocks[0].stmts_instrs = allocs + stmts
-                        local_vars_size = self._local_variables_size(stmts)
-                        # signature_size = self._signature_size(allocs)
+                    case pn.Block(_, stmts):
+                        signature_size = self._signature_size(allocs)
+                        local_vars_size = self._local_vars_size(stmts)
+                        blocks[0].signature_size = pn.Num(str(signature_size))
                         blocks[0].local_vars_size = pn.Num(str(local_vars_size))
+                        blocks[0].visible += (
+                            [blocks[0].signature_size, blocks[0].local_vars_size]
+                            if global_vars.args.double_verbose
+                            else []
+                        )
+                        blocks[0].stmts_instrs[:] = [
+                            pn.Exp(alloc) for alloc in allocs
+                        ] + stmts
 
                         # check if prototoype of definition and declaration match
                         prototype_def = [
@@ -824,13 +842,28 @@ class Passes:
                         try:
                             symbol = self.symbol_table.resolve(def_name)
                         except KeyError:
-                            raise errors.UnknownIdentifier(def_name, def_pos)
+                            symbol = st.Symbol(
+                                pn.Const(),
+                                pn.FunDecl(datatype, name, allocs),
+                                name,
+                                st.Empty(),
+                                st.Pos(
+                                    pn.Num(str(def_pos.line)),
+                                    pn.Num(str(def_pos.column)),
+                                ),
+                                st.Empty(),
+                            )
+                            self.symbol_table.define(symbol)
                         match symbol:
                             case st.Symbol(
-                                _, datatype2, pn.Name(_, pos2) as name2, val_addr
+                                _,
+                                pn.FunDecl(datatype2, _, allocs),
+                                pn.Name(_, pos2) as name2,
                             ):
                                 decl_pos = pos2
-                                signature2 = val_addr
+                                signature2 = (
+                                    [] if isinstance(allocs, st.Empty) else allocs
+                                )
                                 prototype_decl = [
                                     pn.Alloc(pn.Writeable(), datatype2, name2)
                                 ] + signature2
@@ -868,6 +901,11 @@ class Passes:
                                         mismatched_allocs[0], mismatched_allocs[1]
                                     )
 
+                        stmts_mon = []
+                        for stmt in blocks[0].stmts_instrs:
+                            stmts_mon += self._picoc_mon_stmt(stmt)
+                        blocks[0].stmts_instrs[:] = stmts_mon
+
                         blocks_mon += [blocks[0]]
                     case _:
                         bug_in_compiler(blocks[0])
@@ -881,6 +919,7 @@ class Passes:
                             blocks_mon += [block]
                         case _:
                             bug_in_compiler(block)
+
                 # add a return if the last instruction is no return
                 match blocks[-1]:
                     case pn.Block(_, stmts):
@@ -892,12 +931,12 @@ class Passes:
                 return blocks_mon
             case pn.FunDecl(datatype, pn.Name(_, pos) as name, allocs):
                 symbol = st.Symbol(
-                    st.Empty(),
-                    datatype,
+                    pn.Const(),
+                    decl_def,
                     name,
-                    allocs,
+                    st.Empty(),
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column))),
-                    pn.Num(str(self._datatype_size(datatype))),
+                    st.Empty(),
                 )
                 self.symbol_table.define(symbol)
                 # Function declaration isn't needed anymore after being evaluated
@@ -1191,8 +1230,10 @@ class Passes:
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(
-                (pn.GlobalWrite() | pn.StackWrite()) as mem, pn.Tmp(pn.Num(val2)) as sta
+                (pn.GlobalWrite() | pn.StackWrite()) as lhs, pn.Tmp(pn.Num(val2)) as exp
             ):
+                mem = copy.deepcopy(lhs)
+                sta = copy.deepcopy(exp)
                 reti_instrs = []
                 stack_offset = val2
                 # TODO: remove in case global won't be implemented
@@ -1200,7 +1241,7 @@ class Passes:
                     match (mem, sta):
                         case (_, pn.Tmp(pn.Num("0"))):
                             break
-                        case (pn.StackWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
+                        case (pn.GlobalWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
                             reti_instrs += self._single_line_comment_reti(stmt) + [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1219,7 +1260,7 @@ class Passes:
                                     ],
                                 ),
                             ]
-                        case (pn.GlobalWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
+                        case (pn.StackWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
                             reti_instrs += self._single_line_comment_reti(stmt) + [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1541,39 +1582,63 @@ class Passes:
                     + [pn.Exp(goto1)]
                 )
             # ----------------------------- L_Fun -----------------------------
-            case pn.NewStackframe(pn.Name(val), pn.GoTo() as goto):
-                fun_block = self.all_blocks[self.funs[val]]
-                num = fun_block.size_local_variables
-                match num:
-                    case pn.Num(val):
-                        size_local_variables = val
+            case pn.StackMalloc(pn.Num(val)):
+                return self._single_line_comment_reti(stmt) + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
+                ]
+            case pn.NewStackframe(pn.Name(val, pos), pn.GoTo() as goto):
+                fun_name = val
+                fun_call_pos = pos
+                try:
+                    fun_block = self.all_blocks[self.fun_name_to_block_name[val]]
+                except KeyError:
+                    raise errors.UnknownIdentifier(fun_name, fun_call_pos)
+                num1 = fun_block.signature_size
+                num2 = fun_block.local_vars_size
+                match (num1, num2):
+                    case (pn.Num(val1), pn.Num(val2)):
+                        signature_size = val1
+                        local_vars_size = val2
                         return self._single_line_comment_reti(stmt) + [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
+                            rn.Instr(
+                                rn.Addi(),
+                                [rn.Reg(rn.Sp()), rn.Im(str(2 + int(signature_size)))],
+                            ),
                             rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
                             rn.Instr(
                                 rn.Subi(),
-                                [rn.Reg(rn.Sp()), rn.Im(str(size_local_variables))],
+                                [
+                                    rn.Reg(rn.Sp()),
+                                    rn.Im(
+                                        str(
+                                            2
+                                            + int(signature_size)
+                                            + int(local_vars_size)
+                                        )
+                                    ),
+                                ],
                             ),
                             rn.Instr(
                                 rn.Storein(),
                                 [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
                             ),
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), goto]),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Ds())]),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                             rn.Instr(
                                 rn.Storein(),
                                 [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")],
                             ),
                         ]
                     case _:
-                        bug_in_compiler(num)
+                        bug_in_compiler(num1, num2)
             case pn.RemoveStackframe():
                 return self._single_line_comment_reti(stmt) + [
-                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.In1()]),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.In1()), rn.Reg(rn.Baf()), rn.Im("0")]
                     ),
-                    rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Sp()]),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Reg(rn.Sp())]),
                 ]
             case pn.Return(pn.Tmp(pn.Num(val))):
                 return self._single_line_comment_reti(stmt) + [
@@ -1592,7 +1657,7 @@ class Passes:
                     ),
                 ]
             # ---------------------------- L_Blocks ---------------------------
-            case pn.GoTo():
+            case pn.GoTo(pn.Name(val)):
                 return self._single_line_comment_reti(pn.Exp(stmt)) + [pn.Exp(stmt)]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment(prefix, content):
@@ -1696,10 +1761,11 @@ class Passes:
                     rn.Jump(rn.Eq(), rn.Im(str(distance)))
                 ]
             case rn.Instr(rn.Loadi(), [reg, pn.GoTo(pn.Name(val))]):
-                target_block = self.all_blocks[val]
-                rel_addr = int(target_block.instrs_before.val)
+                fun_block_name = val
+                fun_block = self.all_blocks[fun_block_name]
+                rel_addr = fun_block.instrs_before.val
                 return self._single_line_comment_reti(instr) + [
-                    rn.Instr(rn.Loadi(), [reg, rn.Im(str(rel_addr))])
+                    rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
             case _:
                 return [instr]
@@ -1724,6 +1790,7 @@ class Passes:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), blocks):
+                # self.instrs_cnt = 0
                 instrs_block_free = []
                 for block in blocks:
                     instrs_block_free += self._reti_block(block)

@@ -38,7 +38,9 @@ class Symbol(ASTNode):
         self.type_qual = type_qual if type_qual else Empty()
         self.datatype = datatype if datatype else Empty()
         self.name = name if name else Empty()
-        self.val_addr = val_addr if val_addr else Empty()
+        self.val_addr = (
+            val_addr if val_addr else [] if isinstance(val_addr, list) else Empty()
+        )
         self.pos2 = pos if pos else Empty()
         self.size = size if size else Empty()
 
