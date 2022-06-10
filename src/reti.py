@@ -137,8 +137,9 @@ class EPROM(ASTNode):
             0: rn.Instr(rn.Loadi(), [rn.Reg(rn.Ds()), rn.Im(str(-(2**21)))]),
             1: rn.Instr(rn.Multi(), [rn.Reg(rn.Ds()), rn.Im(str(2**10))]),
             2: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Sp())]),
-            3: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Cs())]),
-            4: rn.Instr(
+            3: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Baf())]),
+            4: rn.Instr(rn.Move(), [rn.Reg(rn.Ds()), rn.Reg(rn.Cs())]),
+            5: rn.Instr(
                 rn.Addi(),
                 [
                     rn.Reg(rn.Sp()),
@@ -152,18 +153,19 @@ class EPROM(ASTNode):
                     ),
                 ],
             ),
-            5: rn.Instr(
+            6: rn.Instr(rn.Addi(), [rn.Reg(rn.Baf()), rn.Im("2")]),
+            7: rn.Instr(
                 rn.Addi(),
                 [rn.Reg(rn.Cs()), rn.Im(str(global_vars.args.process_begin))],
             ),
-            6: rn.Instr(
+            8: rn.Instr(
                 rn.Addi(),
                 [
                     rn.Reg(rn.Ds()),
                     rn.Im(str(global_vars.args.process_begin + len_instrs)),
                 ],
             ),
-            7: rn.Instr(rn.Move(), [rn.Reg(rn.Cs()), rn.Reg(rn.Pc())]),
+            9: rn.Instr(rn.Move(), [rn.Reg(rn.Cs()), rn.Reg(rn.Pc())]),
         }
         super().__init__(visible=[self.cells])
 
@@ -216,7 +218,12 @@ class UART(ASTNode):
 
 class SRAM(ASTNode):
     def __init__(self, instrs):
-        start = global_vars.args.process_begin
+        term_process = {
+            0: rn.Jump(rn.Always(), rn.Im("0")),
+            1: rn.Im(str(2**31)),
+            2: rn.Im("-1"),
+        }
+        start = max(global_vars.args.process_begin, len(term_process))
         end = global_vars.args.process_begin + len(instrs) - 1
         min_sram_size = (
             global_vars.args.process_begin
@@ -227,6 +234,8 @@ class SRAM(ASTNode):
             i: (
                 instrs[i - global_vars.args.process_begin]
                 if i >= start and i <= end
+                else term_process[i]
+                if i < len(term_process)
                 else rn.Im("0")
             )
             for i in range(min_sram_size)

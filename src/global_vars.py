@@ -15,7 +15,7 @@ class Args:
         self.debug = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
-        self.process_begin = 8
+        self.process_begin = 3
         self.datasegment_size = 32
 
 

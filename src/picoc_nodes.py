@@ -382,11 +382,12 @@ class FunDef(ASTNode):
 
 
 class NewStackframe(ASTNode):
-    def __init__(self, size_stackframe, goto_after_call):
-        self.size_stackframe = size_stackframe
+    def __init__(self, fun_name, goto_after_call):
+        self.fun_name = fun_name
         self.goto_after_call = goto_after_call
+        super().__init__(visible=[self.fun_name, self.goto_after_call])
 
-    __match_args__ = ("size_stackframe", "goto_after_call")
+    __match_args__ = ("fun_name", "goto_after_call")
 
 
 class RemoveStackframe(ASTNode):
@@ -410,6 +411,7 @@ class Block(ASTNode):
         self.stmts_instrs = stmts_instrs
         self.instrs_before: Num
         self.num_instrs: Num
+        self.signature_size: Num
         self.local_vars_size: Num
         super().__init__(
             visible=[
@@ -418,7 +420,14 @@ class Block(ASTNode):
             ]
         )
 
-    __match_args__ = ("name", "stmts_instrs", "instrs_before", "num_instrs")
+    __match_args__ = (
+        "name",
+        "stmts_instrs",
+        "instrs_before",
+        "num_instrs",
+        "signature_size",
+        "local_vars_size",
+    )
 
 
 class GoTo(ASTNode):
@@ -475,6 +484,22 @@ class GlobalRead(ASTNode):
 
 
 class GlobalWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackMalloc(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackFree(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])

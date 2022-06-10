@@ -39,7 +39,7 @@ class Instr(ASTNode):
         for arg in self.args:
             match arg:
                 case pn.GoTo():
-                    instr_str += f" {arg.__repr__(depth + 1 + len(instr_str))}".lstrip()
+                    instr_str += " " + arg.__repr__(len(instr_str)).lstrip()
                 case _:
                     instr_str += f" {arg}"
         return f"{instr_str}{'' if depth > 0 else ';'}"
