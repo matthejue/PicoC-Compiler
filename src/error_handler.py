@@ -14,6 +14,7 @@ from lark.lark import Lark
 from global_funs import subheading
 import os
 import sys
+import traceback
 
 
 class ErrorHandler:
@@ -182,12 +183,21 @@ class ErrorHandler:
         except errors.BugInCompiler as e:
             self._error_heading()
             error_header = self._error_header(e.description)
-            self._output_error(error_header, e.__class__.__name__)
+            note_header = self._error_header(
+                e.description2,
+            )
+            self._output_error(error_header + "\n" + note_header, e.__class__.__name__)
+            traceback.print_exc()
             exit(1)
         except errors.BugInInterpreter as e:
             self._error_heading()
             error_header = self._error_header(e.description)
-            self._output_error(error_header, e.__class__.__name__)
+            note_header = self._error_header(
+                e.description2,
+            )
+            self._output_error(error_header + "\n" + note_header, e.__class__.__name__)
+
+            traceback.print_exc()
             exit(1)
         return rtrn_val
 

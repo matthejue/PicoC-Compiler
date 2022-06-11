@@ -706,7 +706,7 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(exp)
                 symbol, choosen_scope = self._resolve_name(var_name, var_pos)
                 match symbol:
-                    case st.Symbol(_, _, _, val_addr, _, size):
+                    case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
                         addr = val_addr
                         match choosen_scope:
                             case ("main" | "global"):
@@ -731,6 +731,12 @@ class Passes:
                                         )
                                     ]
                                 )
+                    case st.Symbol(
+                        pn.Const(),
+                    ):
+                        identifier_name = val
+                        identifier_pos = pos
+                        raise errors.ConstAssign(identifier_name, identifier_pos)
                     case _:
                         bug_in_compiler(symbol)
             case pn.Assign(
@@ -924,7 +930,9 @@ class Passes:
                 match blocks[-1]:
                     case pn.Block(_, stmts):
                         blocks[-1].stmts_instrs += (
-                            [] if isinstance(stmts[-1], pn.Return) else [pn.Return()]
+                            []
+                            if stmts and isinstance(stmts[-1], pn.Return)
+                            else [pn.Return()]
                         )
                     case _:
                         bug_in_compiler(blocks[-1])
