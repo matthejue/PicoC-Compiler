@@ -1801,17 +1801,23 @@ class Passes:
     # - deal with large immediates
     # - deal with goto directly to next block
     # - deal with division by 0
-    #  def reti_patch(self, file: pn.File):
-    #      match file:
-    #          case pn.File(pn.Name(val), blocks):
-    #              patched_blocks = []
-    #              for block in blocks:
-    #                  patched_blocks += self._reti_patch_blocks(block)
-    #              return pn.File(
-    #                  pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
-    #              )
-    #          case _:
-    #              bug_in_compiler(file)
+
+    def reti_patch_block(self, block):
+        match block:
+            case pn.Block():
+                return
+
+    def reti_patch(self, file: pn.File):
+        match file:
+            case pn.File(pn.Name(val), blocks):
+                patched_blocks = []
+                for block in blocks:
+                    patched_blocks += self._reti_patch_blocks(block)
+                return pn.File(
+                    pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
+                )
+            case _:
+                bug_in_compiler(file)
 
     # =========================================================================
     # =                                  RETI                                 =
