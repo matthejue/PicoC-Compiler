@@ -137,8 +137,10 @@ class PrototypeMismatch(Exception):
 class BugInCompiler(Exception):
     def __init__(self, fun_name, args):
         self.description = f"{CM().YELLOW}BugInCompiler:{CM().RESET_ALL} Error in function {CM().BLUE}'{fun_name}'{CM().RESET} with {args}. This error should not be possible, but it occured. Please report this issue under {CM().RED}https://github.com/matthejue/PicoC-Compiler/issues/new/choose{CM().RESET}"
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Stacktrace:"
 
 
 class BugInInterpreter(Exception):
     def __init__(self, fun_name, args):
         self.description = f"{CM().YELLOW}BugInInterpreter:{CM().RESET_ALL} Error in function {CM().BLUE}'{fun_name}'{CM().RESET} with {args}. This error should not be possible, but it occured. Please report this issue under {CM().RED}https://github.com/matthejue/PicoC-Compiler/issues/new/choose{CM().RESET}"
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Stacktrace:"
