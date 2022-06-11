@@ -31,9 +31,9 @@ class ASTNode:
         for i, child in enumerate(self.visible):
             if isinstance(child, list):
                 if not child:
-                    acc += f"\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
                     continue
-                acc += f"\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
                 for i, list_child in enumerate(child):
                     acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
                 acc += f"\n{' ' * (depth + 2)}]"
@@ -41,9 +41,9 @@ class ASTNode:
             elif isinstance(child, dict):
                 dict_children = child.values()
                 if not dict_children:
-                    acc += f"\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
                     continue
-                acc += f"\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
                 for i, dict_child in enumerate(dict_children):
                     acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
                 acc += f"\n{' ' * (depth + 2)}]"

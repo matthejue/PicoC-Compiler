@@ -94,7 +94,7 @@ else ifeq ($(PAGES),3)
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
 else ifeq ($(PAGES),2)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE);\

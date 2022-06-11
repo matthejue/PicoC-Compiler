@@ -260,9 +260,9 @@ class Passes:
         size = 0
         for stmt in stmts:
             match stmt:
-                case pn.Exp(pn.Alloc(_, datatype)):
+                case (pn.Assign(pn.Alloc(_, datatype)) | pn.Exp(pn.Alloc(_, datatype))):
                     size += self._datatype_size(datatype)
-                case pn.Assign():
+                case pn.SingleLineComment():
                     # const init and normal assign get skipped
                     pass
                 case _:
@@ -837,9 +837,11 @@ class Passes:
                             if global_vars.args.double_verbose
                             else []
                         )
-                        blocks[0].stmts_instrs[:] = [
-                            pn.Exp(alloc) for alloc in allocs
-                        ] + stmts
+                        blocks[0].stmts_instrs[:] = (
+                            self._single_line_comment_picoc(decl_def)
+                            + [pn.Exp(alloc) for alloc in allocs]
+                            + stmts
+                        )
 
                         # check if prototoype of definition and declaration match
                         prototype_def = [
