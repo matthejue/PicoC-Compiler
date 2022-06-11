@@ -119,8 +119,11 @@ class Reg(ASTNode):
     def __init__(self, reg):
         self.reg = reg
 
-    def __repr__(self):
-        return f"{self.reg}"
+    def __repr__(self, depth=0):
+        if depth == 0:
+            return str(self.reg)
+        else:
+            return f"\n{' ' * depth}{self.reg}"
 
     __match_args__ = ("reg",)
 
