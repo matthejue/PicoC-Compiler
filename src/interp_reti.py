@@ -276,12 +276,6 @@ class RETIInterpreter:
                             encoding="utf-8",
                         ) as fout:
                             fout.write(" " + str(c_int32(reti.reg_get(str(reg))).value))
-                if (
-                    global_vars.args.intermediate_stages
-                    and global_vars.args.verbose
-                    and not global_vars.args.double_verbose
-                ):
-                    self._reti_state_option(reti)
                 reti.reg_increase("PC")
             case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
                 if self.test_input:
@@ -314,23 +308,18 @@ class RETIInterpreter:
                 case _:
                     reti.save_last_instruction()
                     self._instr(next_instruction, reti)
-                    if (
-                        global_vars.args.intermediate_stages
-                        and global_vars.args.double_verbose
+                    if global_vars.args.intermediate_stages and (
+                        global_vars.args.verbose or global_vars.args.double_verbose
                     ):
                         self._reti_state_option(reti)
 
     def _conclude(self, reti: RETI):
-        if global_vars.args.intermediate_stages and not global_vars.args.double_verbose:
-            if not global_vars.args.verbose:
-                self._reti_state_option(reti)
+        if global_vars.args.intermediate_stages and not (
+            global_vars.args.verbose or global_vars.args.double_verbose
+        ):
+            self._reti_state_option(reti)
             # in case of an print call as last instruction with the --verbose
             # option, the reti state was already printed
-            match reti.sram_get(reti.reg_get("PC") - 2**31 - 1):
-                case rn.Call(rn.Name("PRINT")):
-                    pass
-                case _:
-                    self._reti_state_option(reti)
         # needs a newline at the end, else it differs from .out_expected
         file_not_empty = True
         if os.path.isfile(global_vars.path + global_vars.basename + ".out"):
