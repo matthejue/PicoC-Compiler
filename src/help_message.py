@@ -34,9 +34,9 @@ def generate_help_message():
     -l, --lines LINES
     >  sets the number of lines visible around a error message
     -v, --verbose
-    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the RETI instructions following after it. If the --run option is activated, it show the state of the RETI after each print call
+    >  inserts comments before RETI instructions that contain the PicoC statement or expression that has the same meaning as the RETI instructions following after it. If the --run and --intermediate-stages options are activated, it shows the state of the RETI after each RETI instruction.
     -vv, --double_verbose
-    >  has the same effects as --verbose, but adds extra effects on top of --verbose. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. If the --run option is activated, it shows the state of the RETI after each RETI instruction. Shows more expected tokens in error messages. Shows error data and datatype data in the abstract syntax tree that is used for error messages and required for the compilation process, respectively
+    >  has the same effects as --verbose, but adds extra effects on top of --verbose. If the --intermediate-stages option is activated, the nodes of the abstract syntax trees get extra parenthesis. Shows more expected tokens in error messages. Shows error data and datatype data in the abstract syntax tree that is used for error messages and is required for the compilation process, respectively. If the --run and --intermediate-stages options are activated, it does also display the real address next to the mapped address in the reti state for EPROM, UART and SRAM.
     -c, --color
     >  colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
     -d, --debug
