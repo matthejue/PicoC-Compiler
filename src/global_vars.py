@@ -108,3 +108,5 @@ COMPUTE_IMMEDIATE_INSTRUCTION = [
     rn.Ori,
     rn.Andi,
 ]
+
+BUILTIN_FUNS = ["print", "input"]
