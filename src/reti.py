@@ -221,7 +221,6 @@ class SRAM(ASTNode):
         term_process = {
             0: rn.Jump(rn.Always(), rn.Im("0")),
             1: rn.Im(str(2**31)),
-            2: rn.Im("-1"),
         }
         start = max(global_vars.args.process_begin, len(term_process))
         end = global_vars.args.process_begin + len(instrs) - 1
@@ -279,7 +278,11 @@ def print_cells(
         acc += (
             "\n  "
             + ("%05i " % addr)
-            #  + ("(%010i): " % (addr + constant))
+            + (
+                ("(%010i): " % (addr + constant))
+                if global_vars.args.double_verbose
+                else ""
+            )
             + str(cells[addr]).lstrip()
             + (" <- ACC" if addr == acc_addr - constant else "")
             + (" <- IN1" if addr == in1_addr - constant else "")
