@@ -129,7 +129,7 @@ class Passes:
             case pn.Return():
                 return [stmt]
             case pn.Exp(pn.Call(pn.Name("print"))):
-                return [stmt]
+                return [stmt] + processed_stmts
             case pn.Exp(pn.Call(pn.Name(val, pos) as name, exps)):
                 fun_name = val
                 fun_call_pos = pos
@@ -559,6 +559,8 @@ class Passes:
                 return []
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val, pos)):
+                identifier_name = val
+                identifier_pos = pos
                 symbol, choosen_scope = self._resolve_name(val, pos)
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, num):
@@ -567,10 +569,8 @@ class Passes:
                                 return [pn.Exp(pn.Ref(pn.GlobalRead(num)))]
                             case _:
                                 return [pn.Exp(pn.Ref(pn.StackRead(num)))]
-                    case st.Symbol(
-                        pn.Const(),
-                    ):
-                        raise errors.ConstRef(val, pos)
+                    case st.Symbol(pn.Const()):
+                        raise errors.ConstRef(identifier_name, identifier_pos)
                     case _:
                         bug_in_compiler(symbol)
             # TODO: remove Deref after Shrink Pass is implemented
