@@ -1,0 +1,14 @@
+// in:42
+// expected:42 14 7 7
+// datasegment:10
+
+void main() {
+  int var = input();
+  int div = 3;
+  while (div >= 0) {
+    print(var);
+    var = var / div;
+    div = div - 1;
+  }
+  print(var);
+}

@@ -143,6 +143,14 @@ class UnOp(ASTNode):
     __match_args__ = ("un_op", "exp")
 
 
+class Exit(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
 # -------------------------------- L_Logic --------------------------------
 class Atom(ASTNode):
     def __init__(self, left_exp, rel, right_exp):
@@ -198,6 +206,62 @@ class Exp(ASTNode):
         super().__init__(visible=[self.exp])
 
     __match_args__ = ("exp",)
+
+
+class Tmp(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackRead(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalRead(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class GlobalWrite(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackMalloc(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
+
+
+class StackFree(ASTNode):
+    def __init__(self, num):
+        self.num = num
+        super().__init__(visible=[self.num])
+
+    __match_args__ = ("num",)
 
 
 # --------------------------------- L_Pntr --------------------------------
@@ -448,60 +512,3 @@ class SingleLineComment:
         return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
-
-
-# ----------------------------------- L_Mon -----------------------------------
-class Tmp(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class StackRead(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class StackWrite(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalRead(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalWrite(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class StackMalloc(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class StackFree(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
