@@ -128,45 +128,6 @@ class Passes:
             # ----------------------------- L_Fun -----------------------------
             case pn.Return():
                 return [stmt]
-            case pn.Exp(pn.Call(pn.Name(val, pos) as name, exps)):
-                fun_name = val
-                if fun_name in global_vars.BUILTIN_FUNS:
-                    return [stmt] + processed_stmts
-                fun_call_pos = pos
-                goto_after = self._create_block(
-                    f"{self.current_scope}_after",
-                    [pn.RemoveStackframe()] + processed_stmts,
-                    blocks,
-                )
-                return (
-                    self._single_line_comment_picoc(stmt)
-                    + [pn.StackMalloc(pn.Num("2"))]
-                    + [pn.Exp(exp) for exp in exps]
-                    + [
-                        pn.NewStackframe(name, goto_after),
-                        pn.GoTo(pn.Name(f"lookup@{fun_name}", fun_call_pos)),
-                    ]
-                )
-            case pn.Assign(name_ref_loc, pn.Call(pn.Name(val, pos) as name, exps)):
-                fun_name = val
-                if fun_name in global_vars.BUILTIN_FUNS:
-                    return [stmt] + processed_stmts
-                fun_call_pos = pos
-                goto_after = self._create_block(
-                    f"{self.current_scope}_after",
-                    [pn.RemoveStackframe(), pn.Assign(name_ref_loc, rn.Reg(rn.Acc()))]
-                    + processed_stmts,
-                    blocks,
-                )
-                return (
-                    self._single_line_comment_picoc(stmt)
-                    + [pn.StackMalloc(pn.Num("2"))]
-                    + [pn.Exp(exp) for exp in exps]
-                    + [
-                        pn.NewStackframe(name, goto_after),
-                        pn.GoTo(pn.Name(f"lookup@{fun_name}", fun_call_pos)),
-                    ]
-                )
             case _:
                 return [stmt] + processed_stmts
 
@@ -683,6 +644,30 @@ class Passes:
             case (pn.Subscr() | pn.Attr() | pn.Deref()):
                 refs_mon = self._picoc_mon_ref(exp, [])
                 return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
+            # ----------------------------- L_Fun -----------------------------
+            case pn.Call(pn.Name(val, pos) as name, exps):
+                # TODO: check if exps types match with function signature
+                fun_name = val
+                fun_call_pos = pos
+                exps_mon = []
+                for exp in exps:
+                    exps_mon += self._picoc_mon_exp(exp)
+                return (
+                    [pn.StackMalloc(pn.Num("2"))]
+                    + exps_mon
+                    + [
+                        pn.NewStackframe(name, pn.GoTo(pn.Name(self.current_scope))),
+                        pn.Exp(
+                            pn.GoTo(
+                                pn.Name(
+                                    self.fun_name_to_block_name[fun_name], fun_call_pos
+                                )
+                            )
+                        ),
+                        pn.RemoveStackframe(),
+                        pn.Exp(rn.Reg(rn.Acc())),
+                    ]
+                )
             case _:
                 bug_in_compiler(exp)
 
@@ -704,60 +689,34 @@ class Passes:
             case pn.Assign(pn.Name(val, pos), exp):
                 var_name = val
                 var_pos = pos
-                match exp:
-                    case rn.Reg():
-                        exps_mon = []
-                    case _:
-                        exps_mon = self._picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 symbol, choosen_scope = self._resolve_name(var_name, var_pos)
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
                         addr = val_addr
                         match choosen_scope:
                             case ("main" | "global"):
-                                match exp:
-                                    case rn.Reg():
-                                        return self._single_line_comment_picoc(stmt) + [
-                                            pn.Assign(
-                                                pn.GlobalWrite(addr),
-                                                exp,
-                                            )
-                                        ]
-                                    case _:
-                                        return (
-                                            self._single_line_comment_picoc(stmt)
-                                            + exps_mon
-                                            + [
-                                                pn.Assign(
-                                                    pn.GlobalWrite(addr),
-                                                    pn.Tmp(size),
-                                                )
-                                            ]
+                                return (
+                                    self._single_line_comment_picoc(stmt)
+                                    + exps_mon
+                                    + [
+                                        pn.Assign(
+                                            pn.GlobalWrite(addr),
+                                            pn.Tmp(size),
                                         )
+                                    ]
+                                )
                             case _:
-                                match exp:
-                                    case rn.Reg():
-                                        return (
-                                            self._single_line_comment_picoc(stmt)
-                                            + exps_mon
-                                            + [
-                                                pn.Assign(
-                                                    pn.StackWrite(addr),
-                                                    exp,
-                                                )
-                                            ]
+                                return (
+                                    self._single_line_comment_picoc(stmt)
+                                    + exps_mon
+                                    + [
+                                        pn.Assign(
+                                            pn.StackWrite(addr),
+                                            pn.Tmp(size),
                                         )
-                                    case _:
-                                        return (
-                                            self._single_line_comment_picoc(stmt)
-                                            + exps_mon
-                                            + [
-                                                pn.Assign(
-                                                    pn.StackWrite(addr),
-                                                    pn.Tmp(size),
-                                                )
-                                            ]
-                                        )
+                                    ]
+                                )
                     case st.Symbol(
                         pn.Const(),
                     ):
@@ -791,37 +750,19 @@ class Passes:
                 return self._single_line_comment_picoc(stmt) + stmt_mon
             case pn.Assign(ref_loc, exp):
                 # Deref, Subscript, Attribute
-                match exp:
-                    case rn.Reg():
-                        exps_mon = []
-                    case _:
-                        exps_mon = self._picoc_mon_exp(exp)
+                exps_mon = self._picoc_mon_exp(exp)
                 refs_mon = self._picoc_mon_ref(ref_loc, [])
-                match exp:
-                    case rn.Reg():
-                        return (
-                            self._single_line_comment_picoc(stmt)
-                            + refs_mon
-                            + [
-                                pn.Exp(exp),
-                                pn.Assign(
-                                    pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")),
-                                    pn.Tmp(pn.Num("2")),
-                                ),
-                            ]
+                return (
+                    self._single_line_comment_picoc(stmt)
+                    + exps_mon
+                    + refs_mon
+                    + [
+                        pn.Assign(
+                            pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")),
+                            pn.Tmp(pn.Num("2")),
                         )
-                    case _:
-                        return (
-                            self._single_line_comment_picoc(stmt)
-                            + exps_mon
-                            + refs_mon
-                            + [
-                                pn.Assign(
-                                    pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")),
-                                    pn.Tmp(pn.Num("2")),
-                                )
-                            ]
-                        )
+                    ]
+                )
             # --------------------- L_Assign_Alloc + L_Fun --------------------
             case pn.Exp(alloc_call):
                 exps_mon = self._picoc_mon_exp(alloc_call)
@@ -852,10 +793,7 @@ class Passes:
                 return [stmt]
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
-                if "lookup@" in val:
-                    fun_block_name = self.fun_name_to_block_name[val[7:]]
-                    return [pn.GoTo(pn.Name(fun_block_name))]
-                return [stmt]
+                return [pn.Exp(stmt)]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment():
                 return [stmt]
@@ -1162,7 +1100,7 @@ class Passes:
                             )
                         ]
                     case rn.Reg(val):
-                        return [
+                        return reti_instrs + [
                             rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), exp, rn.Im("1")]),
                         ]
                     case _:
@@ -1348,31 +1286,6 @@ class Passes:
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
-            case pn.Assign(
-                (pn.GlobalWrite() | pn.StackWrite()) as lhs,
-                rn.Reg() as reg_exp,
-            ):
-                mem = lhs
-                reg = reg_exp
-                match mem:
-                    case pn.GlobalWrite(pn.Num(val)):
-                        return self._single_line_comment_reti(stmt) + [
-                            rn.Instr(
-                                rn.Storein(),
-                                [rn.Reg(rn.Ds()), reg, rn.Im(val)],
-                            )
-                        ]
-                    case pn.StackWrite(pn.Num(val)):
-                        return self._single_line_comment_reti(stmt) + [
-                            rn.Instr(
-                                rn.Storein(),
-                                [
-                                    rn.Reg(rn.Baf()),
-                                    reg,
-                                    rn.Im(str(-(2 + int(val)))),
-                                ],
-                            ),
-                        ]
             # ----------------------------- L_Pntr ----------------------------
             case pn.Exp(pn.Ref((pn.GlobalRead() | pn.StackRead()) as exp)):
                 reti_instrs = self._single_line_comment_reti(stmt) + [
@@ -1744,8 +1657,8 @@ class Passes:
                     ),
                 ]
             # ---------------------------- L_Blocks ---------------------------
-            case pn.GoTo(pn.Name(val)):
-                return self._single_line_comment_reti(pn.Exp(stmt)) + [pn.Exp(stmt)]
+            case pn.Exp(pn.GoTo(pn.Name(val))):
+                return self._single_line_comment_reti(stmt) + [stmt]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment(prefix, content):
                 match prefix:
@@ -1802,23 +1715,23 @@ class Passes:
     # - deal with goto directly to next block
     # - deal with division by 0
 
-    def reti_patch_block(self, block):
-        match block:
-            case pn.Block():
-                return
+    # def reti_patch_block(self, block):
+    #     match block:
+    #         case pn.Block():
+    #             return
 
-    def reti_patch(self, file: pn.File):
-        match file:
-            case pn.File(pn.Name(val), blocks):
-                patched_blocks = []
-                for block in blocks:
-                    patched_blocks += self._reti_patch_blocks(block)
-                return pn.File(
-                    pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
-                )
-            case _:
-                bug_in_compiler(file)
-
+    # def reti_patch(self, file: pn.File):
+    #     match file:
+    #         case pn.File(pn.Name(val), blocks):
+    #             patched_blocks = []
+    #             for block in blocks:
+    #                 patched_blocks += self._reti_patch_blocks(block)
+    #             return pn.File(
+    #                 pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
+    #             )
+    #         case _:
+    #             bug_in_compiler(file)
+    #
     # =========================================================================
     # =                                  RETI                                 =
     # =========================================================================
@@ -1854,9 +1767,10 @@ class Passes:
                     rn.Jump(rn.Eq(), rn.Im(str(distance)))
                 ]
             case rn.Instr(rn.Loadi(), [reg, pn.GoTo(pn.Name(val))]):
-                fun_block_name = val
-                fun_block = self.all_blocks[fun_block_name]
-                rel_addr = fun_block.instrs_before.val
+                fun_name = val
+                block_name = self.fun_name_to_block_name[fun_name]
+                fun_block = self.all_blocks[block_name]
+                rel_addr = str(int(fun_block.instrs_before.val) + idx + 4)
                 return self._single_line_comment_reti(instr) + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
