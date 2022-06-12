@@ -25,3 +25,19 @@ nnoremap s ggzR:<C-u>:set noscb<CR>:bo vs<CR>zRLjzt:setl scb<CR><C-w>p:setl scb<
 nnoremap m <C-w>1<bar>
 nnoremap M <C-w><bar>
 nnoremap e <C-w>=
+
+let s:comments = 1
+function! ToggleComments()
+    if s:comments
+      execute 'g/\/\/\|\#/d'
+      set nu
+      let s:comments = 0
+    else
+      norm u
+      set nonu
+      let s:comments = 1
+    endif
+endfunction
+
+nnoremap c :call ToggleComments()<CR>
+
