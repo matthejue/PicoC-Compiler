@@ -652,6 +652,12 @@ class Passes:
                 exps_mon = []
                 for exp in exps:
                     exps_mon += self._picoc_mon_exp(exp)
+                symbol = self.symbol_table.resolve(fun_name)
+                match symbol:
+                    case st.Symbol(_, pn.FunDecl(datatype)):
+                        return_type = datatype
+                    case _:
+                        bug_in_compiler(symbol)
                 return (
                     [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
@@ -665,8 +671,12 @@ class Passes:
                             )
                         ),
                         pn.RemoveStackframe(),
-                        pn.Exp(rn.Reg(rn.Acc())),
                     ]
+                    + (
+                        [pn.Exp(rn.Reg(rn.Acc()))]
+                        if not isinstance(return_type, pn.VoidType)
+                        else []
+                    )
                 )
             case _:
                 bug_in_compiler(exp)
@@ -1677,20 +1687,6 @@ class Passes:
                 for stmt in stmts:
                     instrs += self._reti_blocks_stmt(stmt)
                 block.stmts_instrs[:] = instrs
-                # this has to be done in this pass, because the reti_blocks
-                # pass sometimes needs to access this attribute from a block
-                # where it hasn't yet beeen determined
-                # TODO: Move this into the patch_instructions pass, because
-                # in this pass goto(next_block_name) gets removed
-                block.instrs_before = pn.Num(str(self.instrs_cnt))
-                num_instrs = len(list(filter_out_comments(block.stmts_instrs)))
-                block.num_instrs = pn.Num(str(num_instrs))
-                block.visible += (
-                    [block.instrs_before, block.num_instrs]
-                    if global_vars.args.double_verbose
-                    else []
-                )
-                self.instrs_cnt += num_instrs
             case _:
                 bug_in_compiler(block)
 
@@ -1711,27 +1707,54 @@ class Passes:
     # =========================================================================
     # =                               RETI_Patch                              =
     # =========================================================================
-    # - deal with large immediates
-    # - deal with goto directly to next block
-    # - deal with division by 0
+    #  - deal with large immediates
+    #  - deal with goto directly to next block
+    #  - deal with division by 0
+    # - what if the main fun isn't the first fun in the file
 
-    # def reti_patch_block(self, block):
-    #     match block:
-    #         case pn.Block():
-    #             return
+    def _reti_patch_block(self, block):
+        match block:
+            case pn.Block():
+                # this has to be done in this pass, because the reti_blocks
+                # pass sometimes needs to access this attribute from a block
+                # where it hasn't yet beeen determined
+                # TODO: Move this into the patch_instructions pass, because
+                # in this pass goto(next_block_name) gets removed
+                block.instrs_before = pn.Num(str(self.instrs_cnt))
+                num_instrs = len(list(filter_out_comments(block.stmts_instrs)))
+                block.num_instrs = pn.Num(str(num_instrs))
+                block.visible += (
+                    [block.instrs_before, block.num_instrs]
+                    if global_vars.args.double_verbose
+                    else []
+                )
+                self.instrs_cnt += num_instrs
 
-    # def reti_patch(self, file: pn.File):
-    #     match file:
-    #         case pn.File(pn.Name(val), blocks):
-    #             patched_blocks = []
-    #             for block in blocks:
-    #                 patched_blocks += self._reti_patch_blocks(block)
-    #             return pn.File(
-    #                 pn.Name(remove_extension(val) + ".reti_patch"), patched_blocks
-    #             )
-    #         case _:
-    #             bug_in_compiler(file)
-    #
+    def reti_patch(self, file: pn.File):
+        match file:
+            case pn.File(pn.Name(val), blocks):
+                # in case the main fun isn't the first fun in the file
+                start_block = pn.Block(
+                    pn.Name("start"),
+                    self._single_line_comment_picoc(
+                        pn.Exp(pn.GoTo(pn.Name(self.fun_name_to_block_name["main"])))
+                    )
+                    + [pn.Exp(pn.GoTo(pn.Name(self.fun_name_to_block_name["main"])))],
+                )
+                start_block.instrs_before = pn.Num("0")
+                start_block.num_instrs = pn.Num("1")
+
+                patched_blocks = []
+                for block in [start_block] + blocks:
+                    self._reti_patch_block(block)
+                patched_blocks = blocks
+                return pn.File(
+                    pn.Name(remove_extension(val) + ".reti_patch"),
+                    [start_block] + patched_blocks,
+                )
+            case _:
+                bug_in_compiler(file)
+
     # =========================================================================
     # =                                  RETI                                 =
     # =========================================================================

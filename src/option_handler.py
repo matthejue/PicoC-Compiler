@@ -252,10 +252,13 @@ class OptionHandler(cmd2.Cmd):
             print(subheading("RETI Blocks", terminal_width, "-"))
             self._reti_blocks_option(reti_blocks)
 
+        reti_patch = error_handler.handle(passes.reti_patch, reti_blocks)
+
         if global_vars.args.intermediate_stages:
             print(subheading("RETI Patch", terminal_width, "-"))
+            self._reti_patch_option(reti_patch)
 
-        reti = error_handler.handle(passes.reti, reti_blocks)
+        reti = error_handler.handle(passes.reti, reti_patch)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI", terminal_width, "-"))
@@ -368,13 +371,13 @@ class OptionHandler(cmd2.Cmd):
                 case _:
                     bug_in_compiler(reti_blocks)
 
-    def _reti_patch_option(self, reti_patch: rn.Program):
+    def _reti_patch_option(self, reti_patch: pn.File):
         if global_vars.args.print:
             print(reti_patch)
 
         if global_vars.path:
             match reti_patch:
-                case rn.Program(rn.Name(val)):
+                case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(reti_patch))
                 case _:
