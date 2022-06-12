@@ -216,7 +216,7 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages:
             print(subheading("Derivation Tree Simple", terminal_width, "-"))
-            self._dt_simple_option(dt)
+            self._dt_option(dt)
 
         ast_transformer_picoc = ASTTransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
@@ -234,35 +234,41 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages:
             print(subheading("PicoC Blocks", terminal_width, "-"))
-            self._picoc_blocks_option(picoc_blocks)
+            self._output_pass(picoc_blocks)
 
         picoc_mon = error_handler.handle(passes.picoc_mon, picoc_blocks)
 
         if global_vars.args.intermediate_stages:
             print(subheading("PicoC Mon", terminal_width, "-"))
-            self._picoc_mon_option(picoc_mon)
+            self._output_pass(picoc_mon)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Symbol Table", terminal_width, "-"))
             self._st_option(passes.symbol_table)
 
-        reti_blocks = error_handler.handle(passes.reti_blocks, picoc_mon)
+        picoc_patch = error_handler.handle(passes.picoc_patch, picoc_mon)
+
+        if global_vars.args.intermediate_stages:
+            print(subheading("PicoC Patch", terminal_width, "-"))
+            self._output_pass(picoc_patch)
+
+        reti_blocks = error_handler.handle(passes.reti_blocks, picoc_patch)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI Blocks", terminal_width, "-"))
-            self._reti_blocks_option(reti_blocks)
+            self._output_pass(reti_blocks)
 
         reti_patch = error_handler.handle(passes.reti_patch, reti_blocks)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI Patch", terminal_width, "-"))
-            self._reti_patch_option(reti_patch)
+            self._output_pass(reti_patch)
 
         reti = error_handler.handle(passes.reti, reti_patch)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI", terminal_width, "-"))
-            self._reti_option(reti)
+            self._output_pass(reti)
 
         if global_vars.args.run:
             print(subheading("RETI Run", terminal_width, "-"))
@@ -300,18 +306,6 @@ class OptionHandler(cmd2.Cmd):
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _dt_simple_option(self, dt_simple):
-        if global_vars.args.print:
-            print(dt_simple.pretty())
-
-        if global_vars.path:
-            with open(
-                dt_simple.children[0].value,
-                "w",
-                encoding="utf-8",
-            ) as fout:
-                fout.write(dt_simple.pretty())
-
     def _ast_option(self, ast: pn.File):
         if global_vars.args.print:
             print(ast)
@@ -322,30 +316,20 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
 
-    def _picoc_blocks_option(self, picoc_blocks: pn.File):
+    def _output_pass(self, pass_ast):
         if global_vars.args.print:
-            print(picoc_blocks)
+            print(pass_ast)
 
         if global_vars.path:
-            match picoc_blocks:
+            match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(picoc_blocks))
-                case _:
-                    bug_in_compiler(picoc_blocks)
-
-    def _picoc_mon_option(self, picoc_mon: pn.File):
-
-        if global_vars.args.print:
-            print(picoc_mon)
-
-        if global_vars.path:
-            match picoc_mon:
-                case pn.File(pn.Name(val)):
+                        fout.write(str(pass_ast))
+                case rn.Program(rn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(picoc_mon))
+                        fout.write(str(pass_ast))
                 case _:
-                    bug_in_compiler(picoc_mon)
+                    bug_in_compiler(pass_ast)
 
     def _st_option(self, symbol_table: st.SymbolTable):
         if global_vars.args.print:
@@ -358,39 +342,3 @@ class OptionHandler(cmd2.Cmd):
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(symbol_table))
-
-    def _reti_blocks_option(self, reti_blocks: pn.File):
-        if global_vars.args.print:
-            print(reti_blocks)
-
-        if global_vars.path:
-            match reti_blocks:
-                case pn.File(pn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(reti_blocks))
-                case _:
-                    bug_in_compiler(reti_blocks)
-
-    def _reti_patch_option(self, reti_patch: pn.File):
-        if global_vars.args.print:
-            print(reti_patch)
-
-        if global_vars.path:
-            match reti_patch:
-                case pn.File(pn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(reti_patch))
-                case _:
-                    bug_in_compiler(reti_patch)
-
-    def _reti_option(self, reti: rn.Program):
-        if global_vars.args.print:
-            print(reti)
-
-        if global_vars.path:
-            match reti:
-                case rn.Program(rn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(reti))
-                case _:
-                    bug_in_compiler(reti)

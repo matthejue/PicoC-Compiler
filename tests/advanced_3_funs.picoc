@@ -9,16 +9,16 @@ void main() {
   print(local_var2 + 2);
 }
 
+int fun2(int param)
+{
+  int local_var = 2;
+  return param + local_var;
+}
+
 int fun(int param) {
   int local_var1 = 2;
   int local_var2 = param + local_var1;
   print(local_var2);
   print(fun2(local_var2));
   return local_var2;
-}
-
-int fun2(int param)
-{
-  int local_var = 2;
-  return param + local_var;
 }

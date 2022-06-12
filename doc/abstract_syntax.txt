@@ -8,7 +8,6 @@ exp ::= Name(str) | Num(str) | Char(str)
       | BinOp(<exp>, <bin_op>, <exp>)
       | UnOp(<un_op>, <exp>) | Call(Name('input'), None)
 exp_stmts ::= Alloc(<type_qual>, <dataype>, Name(str)) | Call(Name('print'), <exp>)
-stmt ::= SingleLineComment(str, str)
 ----------------------------------- L_Logic -----------------------------------
 un_op ::= LogicNot()
 rel ::= Eq() | NEq() | Lt() | LtE() | Gt() | GtE()
@@ -33,12 +32,10 @@ exp ::= Deref(<deref_loc>, <exp>)
       | Ref(<ref_loc>)
 ----------------------------------- L_Array -----------------------------------
 datatype ::= ArrayDecl(Num(str)+, <datatype>)
-exp ::= Subscr(<deref_loc>, <exp>)
-stmt ::= Assign(Alloc(Writeable(), ArrayDecl(Num(str)+, <datatype>), Name(str)), Array(<exp>+))
+exp ::= Subscr(<deref_loc>, <exp>) | Array(<exp>+)
 ----------------------------------- L_Struct ----------------------------------
 datatype ::= StructSpec(Name(str))
-exp ::= Attr(<ref_loc>, Name(str))
-stmt ::= Assign(Alloc(Writeable(), StructSpec(Name(str)), Name(str)), Struct(Assign(Name(str), <exp>)+))
+exp ::= Attr(<ref_loc>, Name(str)) | Struct(Assign(Name(str), <exp>)+)
 decl_def ::= StructDecl(Name(str), Alloc(Writeable(), <datatype>, Name(str))+)
 ---------------------------------- L_If_Else ----------------------------------
 stmt ::= If(<exp>, <stmt>*)
@@ -65,7 +62,7 @@ decl_def ::= FunDef(<datatype>, Name(str), Alloc(Writeable(), <datatype>, Name(s
 ----------------------------------- L_Blocks ----------------------------------
 block ::= Block(Name(str), <stmt>*)
 stmt ::= Goto(Name(str)) | NewStackframe(Name(), Goto(str)) | RemoveStackframe()
-       | SetScope(Name(str))
+       | SetScope(Name(str)) | SingleLineComment(str, str)
 ===============================================================================
 =                                  PicoC_Mon                                  =
 ===============================================================================
@@ -100,6 +97,7 @@ instr ::= Goto(Name(str))
 ===============================================================================
 =                                  RETI_Patch                                 =
 ===============================================================================
+stmt ::= Exit(pn.Num(str))
 ===============================================================================
 =                                     RETI                                    =
 ===============================================================================

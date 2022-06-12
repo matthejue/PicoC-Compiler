@@ -25,10 +25,136 @@ class Passes:
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
         self.symbol_table = st.SymbolTable()
+        # RETI_Patch
+        self.has_div = False
 
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
+    def _picoc_shrink_exp(self, exp):
+        match exp:
+            case pn.Name():
+                return exp
+            case pn.Num():
+                return exp
+            case pn.Char():
+                return exp
+            case pn.BinOp(left_exp, pn.Div(), right_exp):
+                return pn.BinOp(
+                    self._picoc_shrink_exp(left_exp),
+                    pn.Div(),
+                    self._picoc_shrink_exp(right_exp),
+                )
+            case pn.BinOp(left_exp, bin_op, right_exp):
+                return pn.BinOp(
+                    self._picoc_shrink_exp(left_exp),
+                    bin_op,
+                    self._picoc_shrink_exp(right_exp),
+                )
+            case pn.UnOp(un_op, exp):
+                return pn.UnOp(un_op, self._picoc_shrink_exp(exp))
+            case pn.Atom(left_exp, rel, right_exp):
+                return pn.Atom(
+                    self._picoc_shrink_exp(left_exp),
+                    rel,
+                    self._picoc_shrink_exp(right_exp),
+                )
+            case pn.ToBool(exp):
+                return pn.ToBool(self._picoc_shrink_exp(exp))
+            case pn.Deref(deref_loc, exp):
+                # shrink: Deref gets replaced by Subscr
+                return pn.Subscr(
+                    self._picoc_shrink_exp(deref_loc), self._picoc_shrink_exp(exp)
+                )
+            case pn.Ref():
+                return exp
+            case pn.Subscr(deref_loc, exp):
+                return pn.Subscr(
+                    self._picoc_shrink_exp(deref_loc), self._picoc_shrink_exp(exp)
+                )
+            case pn.Array(exps):
+                return pn.Array([self._picoc_shrink_exp(exp) for exp in exps])
+            case pn.Attr(ref_loc, name):
+                return pn.Attr(self._picoc_shrink_exp(ref_loc), name)
+            case pn.Struct(assigns):
+                assigns_shrinked = []
+                for assign in assigns:
+                    match assign:
+                        case pn.Assign(lhs, exp):
+                            assigns_shrinked += [
+                                pn.Assign(
+                                    lhs,
+                                    self._picoc_shrink_exp(exp),
+                                )
+                            ]
+                        case _:
+                            bug_in_compiler(assign)
+                return pn.Struct(assigns_shrinked)
+            case pn.Call(name, exps):
+                return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
+            case _:
+                bug_in_compiler(exp)
+
+    def _picoc_shrink_stmt(self, stmt):
+        match stmt:
+            case pn.Assign(lhs, exp):
+                return pn.Assign(
+                    self._picoc_shrink_exp(lhs), self._picoc_shrink_exp(exp)
+                )
+            case pn.Exp(exp):
+                return pn.Exp(self._picoc_shrink_exp(exp))
+            case pn.If(exp, stmts):
+                stmts_shrinked = []
+                for stmt in stmts:
+                    stmts_shrinked += self._picoc_shrink_stmt(stmt)
+                return pn.If(self._picoc_shrink_exp(exp), stmts_shrinked)
+            case pn.IfElse(exp, stmts1, stmts2):
+                stmts_shrinked1 = []
+                for stmt1 in stmts1:
+                    stmts_shrinked1 += self._picoc_shrink_stmt(stmt1)
+                stmts_shrinked2 = []
+                for stmt2 in stmts2:
+                    stmts_shrinked2 += self._picoc_shrink_stmt(stmt2)
+                return pn.IfElse(
+                    self._picoc_shrink_exp(exp), stmts_shrinked1, stmts_shrinked2
+                )
+            case pn.While(exp, stmts):
+                stmts_shrinked = []
+                for stmt in stmts:
+                    stmts_shrinked += self._picoc_shrink_stmt(stmt)
+                return pn.While(self._picoc_shrink_exp(exp), stmts_shrinked)
+            case pn.DoWhile(exp, stmts):
+                stmts_shrinked = []
+                for stmt in stmts:
+                    stmts_shrinked += self._picoc_shrink_stmt(stmt)
+                return pn.DoWhile(self._picoc_shrink_exp(exp), stmts_shrinked)
+            case pn.Return(exp):
+                return pn.Return(self._picoc_shrink_exp(exp))
+
+    def picoc_shrink(self, file: pn.File):
+        match file:
+            # ----------------------------- L_File ----------------------------
+            case pn.File(pn.Name(val), decls_defs):
+                decls_defs = []
+                for decl_def in decls_defs:
+                    match decl_def:
+                        case pn.FunDef(datatype, name, allocs, stmts):
+                            stmts_shrinked = []
+                            for stmt in stmts:
+                                stmts_shrinked = self._picoc_shrink_stmt(stmt)
+                            decls_defs += [
+                                pn.FunDef(datatype, name, allocs, stmts_shrinked)
+                            ]
+                        case (pn.StructDecl() | pn.FunDecl()):
+                            decls_defs += [decl_def]
+                        case _:
+                            bug_in_compiler(decl_def)
+                return pn.File(
+                    pn.Name(remove_extension(val) + ".picoc_shrink"), decls_defs
+                )
+            case _:
+                bug_in_compiler(file)
+
     # =========================================================================
     # =                              PicoC_Blocks                             =
     # =========================================================================
@@ -135,6 +261,7 @@ class Passes:
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
             case pn.FunDef(datatype, pn.Name(val) as name, allocs, stmts):
+                blocks = []
                 fun_name = val
                 self.current_scope = fun_name
                 blocks = dict()
@@ -170,6 +297,25 @@ class Passes:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
+                # blocks = dict()
+                # # for the patch_instr pass later
+                # self._create_block(
+                #     "check@division_by_zero",
+                #     [
+                #         pn.If(
+                #             pn.Atom(pn.Tmp("1"), pn.Eq(), pn.Num("0")),
+                #             [pn.Exit(pn.Num("1"))],
+                #         )
+                #     ],
+                #     blocks,
+                # )
+                # self.all_blocks |= blocks
+                # match decls_defs[-1]:
+                #     case pn.FunDef(_, _, _, blocks):
+                #         decls_defs[-1].stmts_blocks += [blocks[0]]
+                #     case _:
+                #         bug_in_compiler(decls_defs)
+
                 decls_defs_blocks = []
                 for decl_def in decls_defs:
                     decls_defs_blocks += self._picoc_blocks_def(decl_def)
@@ -683,6 +829,9 @@ class Passes:
 
     def _picoc_mon_stmt(self, stmt):
         match stmt:
+            # ---------------------------- L_Arith ----------------------------
+            case pn.Exit(pn.Num(val)):
+                return [stmt]
             # ----------------------- L_Array + L_Struct ----------------------
             case pn.Assign(
                 pn.Alloc(_, datatype, name) as alloc,
@@ -1013,9 +1162,51 @@ class Passes:
                 bug_in_compiler(file)
 
     # =========================================================================
+    # =                              PicoC_Patch                              =
+    # =========================================================================
+    # def picoc_patch_stmt(self, stmt):
+    #     match stmt:
+    #         case pn.Exp(pn.BinOp(_, pn.Div(), _)):
+    #             self.has_div = True
+    #             return [
+    #                 [pn.StackMalloc(pn.Num("2"))]
+    #                 + exps_mon
+    #                 + [
+    #                     pn.NewStackframe(name, pn.GoTo(pn.Name(self.current_scope))),
+    #                     goto
+    #                 ]
+    #                 + (
+    #                     [pn.Exp(rn.Reg(rn.Acc()))]
+    #                     if not isinstance(return_type, pn.VoidType)
+    #                     else []
+    #                 ),
+    #                 stmt,
+    #             ]
+    #         case _:
+    #             return [stmt]
+    #
+    # def picoc_patch(self, file: pn.File):
+    #     match file:
+    #         case pn.File(pn.Name(val), blocks):
+    #             for block in blocks:
+    #                 match block:
+    #                     case pn.Block(_, stmts):
+    #                         patched_stmts = []
+    #                         for stmt in stmts:
+    #                             patched_stmts += self.picoc_patch_stmt(stmt)
+    #                         block.stmts_instrs[:] = patched_stmts
+    #             patched_blocks = blocks
+    #             if self.has_div == False:
+    #                 del self.all_blocks[
+    #                     self.fun_name_to_block_name["check@division_by_zero"]
+    #                 ]
+    #             return pn.File(
+    #                 pn.Name(remove_extension(val) + ".picoc_patch"), patched_blocks
+    #             )
+
+    # =========================================================================
     # =                              RETI_Blocks                              =
     # =========================================================================
-
     def _single_line_comment_reti(self, stmt):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
             return []
@@ -1191,6 +1382,11 @@ class Passes:
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Call(rn.Name("PRINT"), rn.Reg(rn.Acc())),
+                ]
+            case pn.Exit(pn.Num(val)):
+                return self._single_line_comment_reti(stmt) + [
+                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
+                    rn.Jump(rn.Always(), rn.Im("0")),
                 ]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(pn.ToBool(pn.Tmp(pn.Num(val)))):
@@ -1591,6 +1787,8 @@ class Passes:
                     + self._single_line_comment_reti(goto1)
                     + [pn.Exp(goto1)]
                 )
+            case pn.Exp(pn.GoTo(pn.Name(val))):
+                return self._single_line_comment_reti(stmt) + [stmt]
             # ----------------------------- L_Fun -----------------------------
             case pn.StackMalloc(pn.Num(val)):
                 return self._single_line_comment_reti(stmt) + [
@@ -1666,9 +1864,6 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
                     ),
                 ]
-            # ---------------------------- L_Blocks ---------------------------
-            case pn.Exp(pn.GoTo(pn.Name(val))):
-                return self._single_line_comment_reti(stmt) + [stmt]
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment(prefix, content):
                 match prefix:
@@ -1679,24 +1874,20 @@ class Passes:
             case _:
                 bug_in_compiler(stmt)
 
-    def _reti_blocks_block(self, block):
-        # ---------------------------- L_Blocks ---------------------------
-        match block:
-            case pn.Block(_, stmts):
-                instrs = []
-                for stmt in stmts:
-                    instrs += self._reti_blocks_stmt(stmt)
-                block.stmts_instrs[:] = instrs
-            case _:
-                bug_in_compiler(block)
-
     def reti_blocks(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), blocks):
                 reti_blocks = []
                 for block in blocks:
-                    self._reti_blocks_block(block)
+                    match block:
+                        case pn.Block(_, stmts):
+                            instrs = []
+                            for stmt in stmts:
+                                instrs += self._reti_blocks_stmt(stmt)
+                            block.stmts_instrs[:] = instrs
+                        case _:
+                            bug_in_compiler(block)
                 reti_blocks = blocks
                 return pn.File(
                     pn.Name(remove_extension(val) + ".reti_blocks"), reti_blocks
@@ -1707,14 +1898,26 @@ class Passes:
     # =========================================================================
     # =                               RETI_Patch                              =
     # =========================================================================
-    #  - deal with large immediates
-    #  - deal with goto directly to next block
-    #  - deal with division by 0
+    # - deal with large immediates
+    # - deal with goto directly to next block
+    # - deal with division by 0
     # - what if the main fun isn't the first fun in the file
+    # - what is there's no main function
+
+    def reti_patch_instr(self, instr):
+        match instr:
+            case pn.GoTo():
+                pass
+            case _:
+                return [instr]
 
     def _reti_patch_block(self, block):
         match block:
-            case pn.Block():
+            case pn.Block(_, instrs):
+                patched_instrs = []
+                for instr in instrs:
+                    patched_instrs += self.reti_patch_instr(instr)
+                block.stmts_instrs[:] = patched_instrs
                 # this has to be done in this pass, because the reti_blocks
                 # pass sometimes needs to access this attribute from a block
                 # where it hasn't yet beeen determined
@@ -1744,7 +1947,6 @@ class Passes:
                 start_block.instrs_before = pn.Num("0")
                 start_block.num_instrs = pn.Num("1")
 
-                patched_blocks = []
                 for block in [start_block] + blocks:
                     self._reti_patch_block(block)
                 patched_blocks = blocks
@@ -1800,30 +2002,24 @@ class Passes:
             case _:
                 return [instr]
 
-    def _reti_block(self, block: pn.Block):
-        match block:
-            case pn.Block(_, instrs):
-                instrs_block_free = []
-                idx = 0
-                for instr in instrs:
-                    instrs_block_free += self._reti_instr(instr, idx, block)
-                    match instr:
-                        case pn.SingleLineComment():
-                            pass
-                        case _:
-                            idx += 1
-                return instrs_block_free
-            case _:
-                bug_in_compiler(block)
-
     def reti(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), blocks):
-                # self.instrs_cnt = 0
                 instrs_block_free = []
                 for block in blocks:
-                    instrs_block_free += self._reti_block(block)
+                    match block:
+                        case pn.Block(_, instrs):
+                            idx = 0
+                            for instr in instrs:
+                                instrs_block_free += self._reti_instr(instr, idx, block)
+                                match instr:
+                                    case pn.SingleLineComment():
+                                        pass
+                                    case _:
+                                        idx += 1
+                        case _:
+                            bug_in_compiler(block)
                 return rn.Program(
                     rn.Name(remove_extension(val) + ".reti"), instrs_block_free
                 )

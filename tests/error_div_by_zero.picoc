@@ -1,0 +1,10 @@
+// in:42
+// expected:42
+// datasegment:10
+
+void main() {
+  int var = input() / 2;
+  print(var);
+  var = var / 0;
+  print(var);
+}
