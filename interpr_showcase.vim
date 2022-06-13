@@ -41,3 +41,5 @@ endfunction
 
 nnoremap c :call ToggleComments()<CR>
 
+nnoremap n :set nu!<CR>
+nnoremap r :set rnu!<CR>

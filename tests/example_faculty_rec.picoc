@@ -5,7 +5,7 @@
 int factorial(int n) {
   int res_f;
   int h;
-  if (n== 1) {
+  if (n == 1) {
     res_f = 1;
   } else {
     h = factorial(n-1);
