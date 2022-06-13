@@ -110,3 +110,12 @@ COMPUTE_IMMEDIATE_INSTRUCTION = [
 ]
 
 BUILTIN_FUNS = ["print", "input"]
+
+NEG_RELS = {
+    "==": rn.NEq(),
+    "!=": rn.NEq(),
+    "<": rn.GtE(),
+    "<=": rn.Gt(),
+    ">": rn.LtE(),
+    ">=": rn.Lt(),
+}

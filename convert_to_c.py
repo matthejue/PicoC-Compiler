@@ -25,7 +25,7 @@ def find_all_paths(pattern, from_start):
 
 
 def main():
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or sys.argv[1] == "default":
         pattern = ["basic", "advanced", "example"]
         paths = find_all_paths(pattern, from_start=True)
     elif sys.argv[1] == "all":

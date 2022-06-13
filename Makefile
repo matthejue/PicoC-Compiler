@@ -71,12 +71,12 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
 
 test-show:
 ifeq ($(PAGES),5)
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
@@ -84,25 +84,25 @@ ifeq ($(PAGES),5)
 	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),4)
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
 	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim  -c "$${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),3)
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
 else ifeq ($(PAGES),2)
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h"
 else ifeq ($(PAGES),1)
 	-./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(DEBUG) $(VERBOSE);\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "0 | norm zt"
 endif
 
@@ -180,6 +180,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.reti_states" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete
+	find . -type f -wholename "./tests/*.res" -delete
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

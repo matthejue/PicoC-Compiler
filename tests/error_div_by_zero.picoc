@@ -1,5 +1,5 @@
 // in:42
-// expected:42
+// expected:21
 // datasegment:10
 
 void main() {

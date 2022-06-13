@@ -11,6 +11,8 @@ if [[ $2 == "all" ]]; then
   paths+=(./tests/{basic,advanced,example,hard}*.c)
 elif [[ -n "$2" ]]; then
   paths=(./tests/*$2*.c)
+elif [[ $2 == "default" ]]; then
+  paths+=(./tests/{basic,advanced,example}*.c)
 else
   paths+=(./tests/{basic,advanced,example}*.c)
 fi
