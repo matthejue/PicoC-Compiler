@@ -38,6 +38,9 @@ class OptionHandler(cmd2.Cmd):
     PERSISTENT_HISTORY_LENGTH = 100
 
     def __init__(self):
+        self.terminal_width = (
+            os.get_terminal_size().columns if sys.stdin.isatty() else 79
+        )
         global_vars.args = self.cli_args_parser.parse_args()
         if not global_vars.args.infile:
             self._shell__init__()
@@ -176,13 +179,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
-        terminal_width = os.get_terminal_size().columns if sys.stdin.isatty() else 79
-
         # add the filename to the start of the code
         code_with_file = f"{global_vars.args.infile}\n" + code
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
-            print(subheading("Code", terminal_width, "-"))
+            print(subheading("Code", self.terminal_width, "-"))
             print(f"// {global_vars.args.infile}:\n" + code)
 
         parser = Lark.open(
@@ -199,8 +200,7 @@ class OptionHandler(cmd2.Cmd):
         error_handler = ErrorHandler(code_with_file)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Tokens", terminal_width, "-"))
-            error_handler.handle(self._tokens_option, code_with_file)
+            error_handler.handle(self._tokens_option, code_with_file, "Tokens")
 
         dt = error_handler.handle(parser.parse, code_with_file)
 
@@ -208,74 +208,62 @@ class OptionHandler(cmd2.Cmd):
         error_handler.handle(dt_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Derivation Tree", terminal_width, "-"))
-            self._dt_option(dt)
+            self._dt_option(dt, "Derivation Tree")
 
         dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
         error_handler.handle(dt_simple_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Derivation Tree Simple", terminal_width, "-"))
-            self._dt_option(dt)
+            self._dt_option(dt, "Derivation Tree Simple")
 
         ast_transformer_picoc = ASTTransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Abstract Syntax Tree", terminal_width, "-"))
-            self._ast_option(ast)
+            self._ast_option(ast, "Abstract Syntax Tree")
 
         passes = Passes()
 
-        picoc_blocks = error_handler.handle(passes.picoc_blocks, ast)
+        picoc_shrink = error_handler.handle(passes.picoc_shrink, ast)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("PicoC Shrink", terminal_width, "-"))
+            self._output_pass(picoc_shrink, "PicoC Shrink")
+
+        picoc_blocks = error_handler.handle(passes.picoc_blocks, picoc_shrink)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("PicoC Blocks", terminal_width, "-"))
-            self._output_pass(picoc_blocks)
+            self._output_pass(picoc_blocks, "PicoC Blocks")
 
         picoc_mon = error_handler.handle(passes.picoc_mon, picoc_blocks)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("PicoC Mon", terminal_width, "-"))
-            self._output_pass(picoc_mon)
+            self._output_pass(picoc_mon, "PicoC Mon")
 
         if global_vars.args.intermediate_stages:
-            print(subheading("Symbol Table", terminal_width, "-"))
-            self._st_option(passes.symbol_table)
+            self._st_option(passes.symbol_table, "Symbol Table")
 
-        picoc_patch = error_handler.handle(passes.picoc_patch, picoc_mon)
-
-        if global_vars.args.intermediate_stages:
-            print(subheading("PicoC Patch", terminal_width, "-"))
-            self._output_pass(picoc_patch)
-
-        reti_blocks = error_handler.handle(passes.reti_blocks, picoc_patch)
+        reti_blocks = error_handler.handle(passes.reti_blocks, picoc_mon)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("RETI Blocks", terminal_width, "-"))
-            self._output_pass(reti_blocks)
+            self._output_pass(reti_blocks, "RETI Blocks")
 
         reti_patch = error_handler.handle(passes.reti_patch, reti_blocks)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("RETI Patch", terminal_width, "-"))
-            self._output_pass(reti_patch)
+            self._output_pass(reti_patch, "RETI Patch")
 
         reti = error_handler.handle(passes.reti, reti_patch)
 
         if global_vars.args.intermediate_stages:
-            print(subheading("RETI", terminal_width, "-"))
-            self._output_pass(reti)
+            self._output_pass(reti, "RETI")
 
         if global_vars.args.run:
-            print(subheading("RETI Run", terminal_width, "-"))
+            if global_vars.args.print:
+                print(subheading("RETI Run", self.terminal_width, "-"))
             reti_interp = RETIInterpreter()
             error_handler.handle(reti_interp.interp_reti, reti)
 
-    def _tokens_option(self, code_with_file):
+    def _tokens_option(self, code_with_file, heading):
         parser = Lark.open(
             "./src/concrete_syntax_picoc.lark",
             lexer="basic",
@@ -288,6 +276,7 @@ class OptionHandler(cmd2.Cmd):
         tokens = list(parser.lex(code_with_file))
 
         if global_vars.args.print:
+            print(subheading(heading, self.terminal_width, "-"))
             print(tokens)
 
         if global_vars.path:
@@ -298,16 +287,18 @@ class OptionHandler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(tokens))
 
-    def _dt_option(self, dt):
+    def _dt_option(self, dt, heading):
         if global_vars.args.print:
+            print(subheading(heading, self.terminal_width, "-"))
             print(dt.pretty())
 
         if global_vars.path:
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _ast_option(self, ast: pn.File):
+    def _ast_option(self, ast: pn.File, heading):
         if global_vars.args.print:
+            print(subheading(heading, self.terminal_width, "-"))
             print(ast)
 
         if global_vars.path:
@@ -316,8 +307,9 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
 
-    def _output_pass(self, pass_ast):
+    def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
+            print(subheading(heading, self.terminal_width, "-"))
             print(pass_ast)
 
         if global_vars.path:
@@ -331,8 +323,9 @@ class OptionHandler(cmd2.Cmd):
                 case _:
                     bug_in_compiler(pass_ast)
 
-    def _st_option(self, symbol_table: st.SymbolTable):
+    def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
+            print(subheading(heading, self.terminal_width, "-"))
             print(symbol_table)
 
         if global_vars.path:
