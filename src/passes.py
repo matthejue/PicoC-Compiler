@@ -310,10 +310,11 @@ class Passes:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
                 decls_defs_blocks = []
-                for decl_def in decls_defs:
+                for decl_def in reversed(decls_defs):
                     decls_defs_blocks += self._picoc_blocks_def(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_blocks"), decls_defs_blocks
+                    pn.Name(remove_extension(val) + ".picoc_blocks"),
+                    list(reversed(decls_defs_blocks)),
                 )
             case _:
                 bug_in_compiler(file)
@@ -798,7 +799,7 @@ class Passes:
                     [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
                     + [
-                        pn.NewStackframe(name, pn.GoTo(pn.Name(self.current_scope))),
+                        pn.NewStackframe(name, pn.GoTo(pn.Name("addr@next_instr"))),
                         pn.Exp(
                             pn.GoTo(
                                 pn.Name(
@@ -2017,11 +2018,8 @@ class Passes:
                 return self._single_line_comment(instr, "#") + [
                     rn.Jump(rn.Eq(), rn.Im(str(distance)))
                 ]
-            case rn.Instr(rn.Loadi(), [reg, pn.GoTo(pn.Name(val))]):
-                fun_name = val
-                block_name = self.fun_name_to_block_name[fun_name]
-                fun_block = self.all_blocks[block_name]
-                rel_addr = str(int(fun_block.instrs_before.val) + idx + 4)
+            case rn.Instr(rn.Loadi(), [reg, pn.GoTo(_)]):
+                rel_addr = str(int(current_block.instrs_before.val) + idx + 4)
                 return self._single_line_comment(instr, "#") + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
