@@ -169,14 +169,17 @@ class Passes:
     # =                              PicoC_Blocks                             =
     # =========================================================================
 
-    def _single_line_comment(self, stmt_instr, prefix):
+    def _single_line_comment(self, stmt_instr, prefix, filtr=[1, 2, 3]):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
             return []
         if hasattr(stmt_instr, "visible"):
             visible_emptied_lists = list(
                 map(
-                    lambda node: [] if isinstance(node, list) else node,
+                    lambda node, i: []
+                    if isinstance(node, list) and i in filtr
+                    else node,
                     stmt_instr.visible,
+                    range(0, len(stmt_instr.visible)),
                 )
             )
             stmt_instr.visible = visible_emptied_lists
@@ -478,13 +481,14 @@ class Passes:
                             )
                             break
                         case pn.PntrDecl(pn.Num(val), datatype):
+                            if int(val) == 0:
+                                current_datatype = datatype
+                                continue
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
                             )
-                            if int(val) == 0:
-                                current_datatype = datatype
                             current_datatype.num.val = int(val) - 1
                         case pn.ArrayDecl(nums, datatype):
                             if len(nums) == 0:
@@ -493,6 +497,8 @@ class Passes:
                                 # gesondert betrachten und bei Ref(Name) was dranhängen
                                 current_datatype = datatype
                                 continue
+                            # TODO: think bit about if add_dadatype should be
+                            # before or after the pop
                             self._add_datatype_and_error_data(
                                 prev_refs.pop(),
                                 datatype=copy.deepcopy(current_datatype),
@@ -564,12 +570,21 @@ class Passes:
             case pn.Name(val, pos):
                 symbol, choosen_scope = self._resolve_name(val, pos)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), _, _, num):
+                    case st.Symbol(pn.Writeable(), datatype, _, num):
+                        size = self._datatype_size(datatype)
                         match choosen_scope:
                             case ("main" | "global"):
-                                return [pn.Exp(pn.GlobalRead(num))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num(str(size))), pn.GlobalRead(num)
+                                    )
+                                ]
                             case _:
-                                return [pn.Exp(pn.StackRead(num))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num(str(size))), pn.StackRead(num)
+                                    )
+                                ]
                     case st.Symbol(pn.Const(), _, _, num):
                         return [pn.Exp(num)]
                     case _:
@@ -787,8 +802,8 @@ class Passes:
                 fun_name = val
                 fun_call_pos = pos
                 exps_mon = []
-                for exp in exps:
-                    exps_mon += self._picoc_mon_exp(exp)
+                for exp2 in exps:
+                    exps_mon += self._picoc_mon_exp(exp2)
                 symbol = self.symbol_table.resolve(fun_name)
                 match symbol:
                     case st.Symbol(_, pn.FunDecl(datatype)):
@@ -796,7 +811,8 @@ class Passes:
                     case _:
                         bug_in_compiler(symbol)
                 return (
-                    [pn.StackMalloc(pn.Num("2"))]
+                    self._single_line_comment(exp, "%", filtr=[])
+                    + [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
                     + [
                         pn.NewStackframe(name, pn.GoTo(pn.Name("addr@next_instr"))),
@@ -971,7 +987,7 @@ class Passes:
                             else []
                         )
                         blocks[0].stmts_instrs[:] = (
-                            self._single_line_comment(decl_def, "//")
+                            self._single_line_comment(decl_def, "//", filtr=[3])
                             + [pn.Exp(alloc) for alloc in allocs]
                             + stmts
                         )
@@ -1197,33 +1213,11 @@ class Passes:
                     ),
                 ]
             # ---------------------------- L_Arith ----------------------------
-            case pn.Exp(
-                (
-                    pn.GlobalRead() | pn.StackRead() | pn.Num() | pn.Char() | rn.Reg()
-                ) as exp
-            ):
+            case pn.Exp((pn.Num() | pn.Char() | rn.Reg()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
-                    case pn.GlobalRead(pn.Num(val)):
-                        reti_instrs += [
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), rn.Im(val)],
-                            )
-                        ]
-                    case pn.StackRead(pn.Num(val)):
-                        reti_instrs += [
-                            rn.Instr(
-                                rn.Loadin(),
-                                [
-                                    rn.Reg(rn.Baf()),
-                                    rn.Reg(rn.Acc()),
-                                    rn.Im(str(-(2 + int(val)))),
-                                ],
-                            )
-                        ]
                     case pn.Num(val):
                         reti_instrs += [
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)])
@@ -1369,6 +1363,48 @@ class Passes:
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(
+                pn.Tmp(pn.Num(val1)) as lhs_tmp,
+                (pn.GlobalRead() | pn.StackRead()) as exp,
+            ):
+                tmp = copy.deepcopy(lhs_tmp)
+                mem = copy.deepcopy(exp)
+                reti_instrs = self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)])
+                ]
+                while True:
+                    match (tmp, mem):
+                        case (pn.Tmp(pn.Num("0")), _):
+                            break
+                        case (pn.Tmp(pn.Num(val1)), pn.GlobalRead(pn.Num(val2))):
+                            reti_instrs += [
+                                rn.Instr(
+                                    rn.Loadin(),
+                                    [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), rn.Im(val2)],
+                                ),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)],
+                                ),
+                            ]
+                        case (pn.Tmp(pn.Num(val1)), pn.StackRead(pn.Num(val2))):
+                            reti_instrs += [
+                                rn.Instr(
+                                    rn.Loadin(),
+                                    [
+                                        rn.Reg(rn.Baf()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(str(-(2 + int(val2)))),
+                                    ],
+                                ),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)],
+                                ),
+                            ]
+                    mem.num.val = str(int(mem.num.val) + 1)
+                    tmp.num.val = str(int(tmp.num.val) - 1)
+                    return reti_instrs
+            case pn.Assign(
                 (pn.GlobalWrite() | pn.StackWrite()) as lhs,
                 pn.Tmp(pn.Num(val2)) as tmp_exp,
             ):
@@ -1437,7 +1473,7 @@ class Passes:
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
                             rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Ds())]),
                         ]
-                    case pn.Tmp(pn.Num(val)):
+                    case pn.StackRead(pn.Num(val)):
                         reti_instrs += [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.In2()), rn.Im(val)]),
@@ -1788,6 +1824,8 @@ class Passes:
                 match prefix:
                     case "//":
                         return [pn.SingleLineComment("# //", content)]
+                    case "%":
+                        return [pn.SingleLineComment("# %", content)]
                     case _:
                         bug_in_compiler(prefix)
             case _:
