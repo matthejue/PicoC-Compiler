@@ -324,33 +324,23 @@ class ASTTransformerPicoC(Transformer):
             case _:
                 return pn.ArrayDecl(nodes[0], nodes[1])
 
+    def derived_dt(self, nodes):
+        return nodes[0]
+
     def subscr_loc(self, nodes):
         return nodes[0]
 
     def array_subscr(self, nodes):
         return pn.Subscr(nodes[0], nodes[1])
 
-    def entry_subexp(self, nodes):
+    def entry(self, nodes):
         return nodes[0]
 
-    def array_subexps(self, nodes):
+    def array(self, nodes):
         return pn.Array(nodes)
 
-    def array_init_dims(self, nodes):
-        return nodes
-
-    def array_init_decl(self, nodes):
-        return pn.ArrayDecl(nodes[0], nodes[1])
-
     def array_init(self, nodes):
-        return pn.Assign(
-            pn.Alloc(
-                pn.Writeable(),
-                nodes[0],
-                nodes[1],
-            ),
-            nodes[2],
-        )
+        return pn.Assign(nodes[0], nodes[1])
 
     # -------------------------------- L_Struct -------------------------------
     def struct_spec(self, nodes):
@@ -365,21 +355,14 @@ class ASTTransformerPicoC(Transformer):
     def struct_decl(self, nodes):
         return pn.StructDecl(nodes[0], nodes[1])
 
-    def struct_subexps(self, nodes):
+    def struct(self, nodes):
         assigns = []
         for node1, node2 in zip(nodes[0::2], nodes[1::2]):
             assigns += [pn.Assign(node1, node2)]
         return pn.Struct(assigns)
 
     def struct_init(self, nodes):
-        return pn.Assign(
-            pn.Alloc(
-                pn.Writeable(),
-                nodes[0],
-                nodes[1],
-            ),
-            nodes[2],
-        )
+        return pn.Assign(nodes[0], nodes[1])
 
     # -------------------------------- L_If_Else ------------------------------
     def if_stmt(self, nodes):
@@ -441,7 +424,13 @@ class ASTTransformerPicoC(Transformer):
         return pn.FunDecl(nodes[0], nodes[1], nodes[2])
 
     def fun_def(self, nodes):
-        return pn.FunDef(nodes[0], nodes[1], nodes[2], nodes[3])
+        match nodes[0]:
+            case pn.Num("0"):
+                return pn.FunDef(nodes[0], nodes[2], nodes[3], nodes[4])
+            case _:
+                return pn.FunDef(
+                    pn.PntrDecl(nodes[1], nodes[0]), nodes[2], nodes[3], nodes[4]
+                )
 
     # --------------------------------- L_File --------------------------------
     def decl_def(self, nodes):
