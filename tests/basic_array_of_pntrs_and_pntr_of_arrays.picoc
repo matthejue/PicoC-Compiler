@@ -1,0 +1,14 @@
+// in:42
+// expected:42 42
+
+void main() {
+  int var1 = 1;
+  int var2 = input();
+  int var3 = 3;
+  int *ar_of_pntrs[3] = {&var1, &var2, &var3};
+  int *(*pntr_on_ars)[3] = &ar_of_pntrs;
+  // print(*ar_of_pntrs[1]);
+  // print(*(*pntr_on_ars)[1]);
+  print(*ar_of_pntrs[1]);
+  print(*(*pntr_on_ars)[1]);
+}
