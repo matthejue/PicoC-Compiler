@@ -300,10 +300,7 @@ class ArrayDecl(ASTNode):
         self.datatype = datatype
         super().__init__(visible=[self.nums, self.datatype])
 
-    __match_args__ = (
-        "nums",
-        "datatype",
-    )
+    __match_args__ = ("nums", "datatype")
 
 
 class Array(ASTNode):

@@ -49,9 +49,10 @@ deref_offset_op: ADD|SUB_MINUS
 // ============================================================================
 // ---------------------------------- L_Arith ---------------------------------
 input_odp: "input""("")"
-arith_opd: name|NUM|CHAR|input_odp|"("logic_exp")"|pntr_opd|array_subscr|struct_attr|fun_call
-un_opd: un_op* arith_opd
+arith_opd: name|NUM|CHAR|input_odp|"("logic_exp")"|array_subscr|struct_attr|fun_call
+un_opd: un_op* arith_opd|pntr_opd
 arith_prec1: un_opd (prec1_op un_opd)*
+arith_prec2: arith_prec1 (prec2_op arith_prec1)*
 arith_prec2: arith_prec1 (prec2_op arith_prec1)*
 arith_exp: arith_prec2
 print_stmt: "print""("arith_exp")"";"
@@ -81,22 +82,19 @@ ref: "&"ref_loc
 pntr_opd: deref|ref
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
-array_decl: name array_dims|"("pntr_decl")"array_dims
+array_decl: name array_dims|"("pntr_decl")" array_dims
 subscr_loc: name|array_subscr|struct_attr
 array_subscr: subscr_loc"["logic_exp"]"|"("pntr_opd")""["logic_exp"]"
-entry_subexp: logic_exp|array_subexps|struct_subexps
-array_subexps: "{"entry_subexp("," entry_subexp)*"}"
-// TODO: danach checken, ob Array funktioniert
-array_init_dims: ("["NUM"]")+
-array_init_decl: name array_init_dims
-array_init: size_qual array_init_decl "=" array_subexps";"
+entry: logic_exp|array|struct
+array: "{"entry("," entry)*"}"
+array_init: alloc "=" array";"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" name
 struct_attr: subscr_loc"."name|"("deref")""."name
 struct_allocs: (alloc";")+
 struct_decl: "struct" name "{"struct_allocs"}"";"
-struct_subexps: "{""."name"="entry_subexp ("," "."name"="entry_subexp)*"}"
-struct_init: struct_spec name "=" struct_subexps";"
+struct: "{""."name"="entry ("," "."name"="entry)*"}"
+struct_init: alloc "=" struct";"
 // --------------------------------- L_If_Else --------------------------------
 if_stmt: "if""("logic_exp")" "{" exec_stmts "}"
 if_else_stmt: "if""("logic_exp")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
@@ -118,7 +116,7 @@ fun_return: "return" [logic_exp]";"
 fun_stmt: fun_call_stmt|fun_return
 fun_allocs: [alloc("," alloc)*]
 fun_decl: prim_dt name"("fun_allocs")"";"
-fun_def: prim_dt name"("fun_allocs")" "{" decl_exec_stmts "}"
+fun_def: prim_dt pntr_deg name"("fun_allocs")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 decl_def: struct_decl|fun_decl|fun_def
 decls_defs: decl_def*

@@ -37,18 +37,7 @@ class DTSimpleVisitorPicoC(Visitor):
         tree.children[0] = tree.children[1]
         tree.children[1] = left_tree
 
-    def array_init_decl(self, tree: Tree):
-        left_tree = tree.children[0]
-        tree.children[0] = tree.children[1]
-        tree.children[1] = left_tree
-
-    def array_init(self, tree: Tree):
-        deepest_tree = tree.children[1]
-        size_qual = tree.children[0]
-        tree.children[0] = tree.children[1]
-        tree.children[1] = deepest_tree.children[1]
-        deepest_tree.children[1] = size_qual
-
+    # --------------------------------- L_File --------------------------------
     def file(self, tree: Tree):
         tree.children[0] = Token(
             tree.children[0].type,

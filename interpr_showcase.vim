@@ -43,19 +43,38 @@ nnoremap c :call ToggleComments()<CR>
 nnoremap n :set nu!<CR>
 nnoremap r :set rnu!<CR>
 
-autocmd VimEnter *
-        \ highlight Color1 ctermbg=1 ctermfg=0 guibg=1 guifg=0 |
-        \ highlight Color2 ctermbg=2 ctermfg=0 guibg=2 guifg=0 |
-        \ highlight Color3 ctermbg=3 ctermfg=0 guibg=3 guifg=0 |
-        \ highlight Color4 ctermbg=4 ctermfg=0 guibg=4 guifg=0 |
-        \ highlight Color5 ctermbg=5 ctermfg=0 guibg=5 guifg=0 |
-        \ highlight Color6 ctermbg=6 ctermfg=0 guibg=6 guifg=0 |
-        \ highlight Color7 ctermbg=7 ctermfg=0 guibg=7 guifg=0
-  nnoremap 1 :call matchadd("Color1", '\%'.line('.').'l')<CR>
-  nnoremap 2 :call matchadd("Color2", '\%'.line('.').'l')<CR>
-  nnoremap 3 :call matchadd("Color3", '\%'.line('.').'l')<CR>
-  nnoremap 4 :call matchadd("Color4", '\%'.line('.').'l')<CR>
-  nnoremap 5 :call matchadd("Color5", '\%'.line('.').'l')<CR>
-  nnoremap 6 :call matchadd("Color6", '\%'.line('.').'l')<CR>
-  nnoremap 7 :call matchadd("Color7", '\%'.line('.').'l')<CR>
-  nnoremap C :call clearmatches()<CR>
+let s:higlight_on = 1
+function! ToggleMatchHighlight()
+    if s:higlight_on  == 1
+        let s:higlight_on = 0
+        highlight Color1 ctermbg=1 ctermfg=0 guibg=1 guifg=0
+        highlight Color2 ctermbg=2 ctermfg=0 guibg=2 guifg=0
+        highlight Color3 ctermbg=3 ctermfg=0 guibg=3 guifg=0
+        highlight Color4 ctermbg=4 ctermfg=0 guibg=4 guifg=0
+        highlight Color5 ctermbg=5 ctermfg=0 guibg=5 guifg=0
+        highlight Color6 ctermbg=6 ctermfg=0 guibg=6 guifg=0
+        highlight Color7 ctermbg=7 ctermfg=0 guibg=7 guifg=0
+    else
+        let s:higlight_on = 1
+        highlight clear Color1
+        highlight clear Color2
+        highlight clear Color3
+        highlight clear Color4
+        highlight clear Color5
+        highlight clear Color6
+        highlight clear Color7
+    endif
+endfunction
+
+nnoremap h :call ToggleMatchHighlight()<CR>
+
+call ToggleMatchHighlight()
+
+nnoremap 1 :call matchadd("Color1", '\%'.line('.').'l')<CR>
+nnoremap 2 :call matchadd("Color2", '\%'.line('.').'l')<CR>
+nnoremap 3 :call matchadd("Color3", '\%'.line('.').'l')<CR>
+nnoremap 4 :call matchadd("Color4", '\%'.line('.').'l')<CR>
+nnoremap 5 :call matchadd("Color5", '\%'.line('.').'l')<CR>
+nnoremap 6 :call matchadd("Color6", '\%'.line('.').'l')<CR>
+nnoremap 7 :call matchadd("Color7", '\%'.line('.').'l')<CR>
+nnoremap d :call clearmatches()<CR>
