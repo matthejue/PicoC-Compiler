@@ -182,6 +182,12 @@ _clean-files:
 	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.res" -delete
 
+record:
+	asciinema rec -i 1 -t $(TESTNAME).cast --overwrite
+
+upload:
+	asciinema upload $(TESTNAME).cast
+
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip
 	pip install tabulate

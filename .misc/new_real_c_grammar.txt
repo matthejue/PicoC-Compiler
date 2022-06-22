@@ -122,6 +122,7 @@ shift_expression
 	| shift_expression RIGHT_OP additive_expression
 	;
 
+-------------------------------------------------------------------------------start
 relational_expression
 	: shift_expression
 	| relational_expression '<' shift_expression
@@ -135,6 +136,7 @@ equality_expression
 	| equality_expression EQ_OP relational_expression
 	| equality_expression NE_OP relational_expression
 	;
+-------------------------------------------------------------------------------end
 
 and_expression
 	: equality_expression
