@@ -13,10 +13,10 @@ FILENAME: ASCII_CHAR+".picoc"
 identifier: IDENTIFIER|INT_NAME|CHAR_NAME|VOID_NAME
 LETTER: "a".."z"|"A".."Z"
 IDENTIFIER: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
-unary_op: REF|PNTR_DEREF|SUB_MINUS|NOT|LOGIC_NOT
-REF: "&"
-PNTR_DEREF: "*"
+unary_op: SUB_MINUS|LOGIC_NOT|NOT|PNTR_DEREF|REF
 NOT: "~"
+PNTR_DEREF: "*"
+REF: "&"
 prec1_op: MUL|DIV|MOD
 MUL: "*"
 DIV: "/"
@@ -42,8 +42,6 @@ CHAR_DT.2: "char"
 CHAR_NAME.3: "char"(LETTER|DIG_WITH_0|"_")+
 VOID_DT.2: "void"
 VOID_NAME.3: "void"(LETTER|DIG_WITH_0|"_")+
-// ---------------------------------- L_Pntr ----------------------------------
-deref_offset_op: ADD|SUB_MINUS
 // ============================================================================
 // =                                  Parser                                  =
 // ============================================================================
@@ -83,29 +81,31 @@ struct_params: (alloc";")+
 struct_decl: "struct" identifier "{"struct_params"}"";"
 struct_initializer: "{""."identifier"="entry ("," "."identifier"="entry)*"}"
 // --------------------------------- L_If_Else --------------------------------
-exec_stmts: exec_part*
-if_stmt: "if""("logic_or")" "{" exec_stmts "}"
-if_else_stmt: "if""("logic_or")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
-selection_stmt: if_stmt|if_else_stmt
+if_stmt: "if""("logic_or")" exec_part
+if_else_stmt: "if""("logic_or")" exec_part "else" exec_part
 // ---------------------------------- L_Loop ----------------------------------
-while_stmt: "while""("logic_or")" "{" exec_stmts "}"
-do_while_stmt: "do" "{" exec_stmts "}" "while""("logic_or")"";"
-loop_stmt: while_stmt|do_while_stmt
+while_stmt: "while""("logic_or")" exec_part
+do_while_stmt: "do" exec_part "while""("logic_or")"";"
 // ---------------------------------- L_Stmt ----------------------------------
 decl_exp_stmt: alloc";"
 decl_direct_stmt: assign";"
-decl_part: decl_exp_stmt|decl_direct_smt
+decl_part: decl_exp_stmt|decl_direct_stmt
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+compound_stmt: "{" exec_part* "}"
+selection_stmt: if_stmt|if_else_stmt
+iteration_stmt: while_stmt|do_while_stmt
 exec_exp_stmt: logic_or";"
 exec_direct_stmt: (assign|return)";"
-exec_part: selection_stmt|loop_stmt|exec_exp_stmt|exec_direct_stmt
+exec_part: compound_stmt|selection_stmt|iteration_stmt|exec_exp_stmt|exec_direct_stmt
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_args: [logic_or("," logic_or)*]
 fun_call: identifier"("fun_args")"
-return_stmt: "return" [logic_or]
+return: "return" [logic_or]
 fun_params: [alloc("," alloc)*]
 fun_decl: type_specifier pntr_deg identifier"("fun_params")"";"
-fun_def: type_specifier pntr_deg identifier"("fun_params")" "{" decl_exec_stmts "}"
+fun_def: type_specifier pntr_deg identifier"("fun_params")" compound_stmt
 // ---------------------------------- L_File ----------------------------------
 decl_def: struct_decl|fun_decl|fun_def
 decls_defs: decl_def*
