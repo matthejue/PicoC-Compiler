@@ -48,29 +48,27 @@ deref_offset_op: ADD|SUB_MINUS
 // =                                  Parser                                  =
 // ============================================================================
 // --------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun --------------
-primary_exp: identifier|NUM|CHAR|"("logic_exp")"
-postfix_exp: postfix_exp"["logic_exp"]"|postfix_exp"."identifier|fun_call|input_exp|print_exp|primary_exp
+primary_exp: identifier|NUM|CHAR|"("logic_or")"
+postfix_exp: postfix_exp"["logic_or"]"|postfix_exp"."identifier|fun_call|input_exp|print_exp|primary_exp
 unary_exp: unary_op unary_exp|postfix_exp
 // ---------------------------------- L_Arith ---------------------------------
 input_exp: "input""("")"
-print_exp: "print""("logic_exp")"
+print_exp: "print""("logic_or")"
 arith_prec1: arith_prec1 prec1_op unary_exp
 arith_prec2: arith_prec2 prec2_op arith_prec1
 arith_and: arith_and "&" arith_prec2
 arith_oplus: arith_oplus "^" arith_and
 arith_or: arith_or "|" arith_oplus
-arith_exp: arith_or
 // ---------------------------------- L_Logic ---------------------------------
-rel_exp: rel_exp rel_op arith_exp
+rel_exp: rel_exp rel_op arith_or
 eq_exp: eq_exp eq_op rel_exp
-logic_and: eq_exp "&&" eq_exp
-logic_or: logic_and "||" logic_and
-logic_exp: logic_or
+logic_and: logic_and "&&" eq_exp
+logic_or: logic_or "||" logic_and
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_specifier: PRIM_DT|struct_specifier
 alloc: ["const"] type_specifier pntr_declarator
 lhs: postfix_exp|alloc
-initializer: logic_exp|array_initializer|struct_initializer
+initializer: logic_or|array_initializer|struct_initializer
 assign: lhs "=" initializer
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
@@ -86,22 +84,25 @@ struct_decl: "struct" identifier "{"struct_params"}"";"
 struct_initializer: "{""."identifier"="entry ("," "."identifier"="entry)*"}"
 // --------------------------------- L_If_Else --------------------------------
 exec_stmts: exec_part*
-if_stmt: "if""("logic_exp")" "{" exec_stmts "}"
-if_else_stmt: "if""("logic_exp")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
+if_stmt: "if""("logic_or")" "{" exec_stmts "}"
+if_else_stmt: "if""("logic_or")" "{" exec_stmts "}" "else" ("{" exec_stmts "}"|exec_part)
 selection_stmt: if_stmt|if_else_stmt
 // ---------------------------------- L_Loop ----------------------------------
-while_stmt: "while""("logic_exp")" "{" exec_stmts "}"
-do_while_stmt: "do" "{" exec_stmts "}" "while""("logic_exp")"";"
+while_stmt: "while""("logic_or")" "{" exec_stmts "}"
+do_while_stmt: "do" "{" exec_stmts "}" "while""("logic_or")"";"
 loop_stmt: while_stmt|do_while_stmt
 // ---------------------------------- L_Stmt ----------------------------------
-exp_stmt: logic_exp";"
-decl_part: (assign|alloc|init|const_init)";"
-exec_part: assign|selection_stmt|loop_stmt|exp_stmt|return_stmt
+decl_exp_stmt: alloc";"
+decl_direct_stmt: assign";"
+decl_part: decl_exp_stmt|decl_direct_smt
+exec_exp_stmt: logic_or";"
+exec_direct_stmt: (assign|return)";"
+exec_part: selection_stmt|loop_stmt|exec_exp_stmt|exec_direct_stmt
 decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
-fun_args: [logic_exp("," logic_exp)*]
+fun_args: [logic_or("," logic_or)*]
 fun_call: identifier"("fun_args")"
-return_stmt: "return" [logic_exp]";"
+return_stmt: "return" [logic_or]
 fun_params: [alloc("," alloc)*]
 fun_decl: type_specifier pntr_deg identifier"("fun_params")"";"
 fun_def: type_specifier pntr_deg identifier"("fun_params")" "{" decl_exec_stmts "}"
