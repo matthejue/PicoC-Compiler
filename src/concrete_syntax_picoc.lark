@@ -10,49 +10,49 @@ NUM: "0"|DIG_NO_0 DIG_WITH_0*
 ASCII_CHAR: " ".."~"
 CHAR: "'"ASCII_CHAR"'"
 FILENAME: ASCII_CHAR+".picoc"
-identifier: IDENTIFIER|INT_NAME|CHAR_NAME|VOID_NAME
 LETTER: "a".."z"|"A".."Z"
-IDENTIFIER: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
-unary_op: SUB_MINUS|LOGIC_NOT|NOT|PNTR_DEREF|REF
+NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
+name: NAME|INT_NAME|CHAR_NAME|VOID_NAME
 NOT: "~"
-PNTR_DEREF: "*"
-REF: "&"
-prec1_op: MUL|DIV|MOD
+DEREF_PNTR: "*"
+REF_AND: "&"
+un_op: SUB_MINUS|LOGIC_NOT|NOT|DEREF_PNTR|REF_AND
 MUL: "*"
 DIV: "/"
 MOD: "%"
-prec2_op: ADD|SUB_MINUS
+prec1_op: MUL|DIV|MOD
 ADD: "+"
 SUB_MINUS: "-"
+prec2_op: ADD|SUB_MINUS
 // ---------------------------------- L_Logic ---------------------------------
-LOGIC_NOT: "!"
-rel_op: LT|LTE|GT|GTE
-eq_op: EQ|NEQ
-EQ: "=="
-NEQ: "!="
 LT: "<"
 LTE: "<="
 GT: ">"
 GTE: ">="
+rel_op: LT|LTE|GT|GTE
+EQ: "=="
+NEQ: "!="
+eq_op: EQ|NEQ
+LOGIC_NOT: "!"
 // ------------------------------ L_Assign_Alloc ------------------------------
-PRIM_DT: INT_DT|CHAR_DT|VOID_DT
 INT_DT.2: "int"
 INT_NAME.3: "int"(LETTER|DIG_WITH_0|"_")+
 CHAR_DT.2: "char"
 CHAR_NAME.3: "char"(LETTER|DIG_WITH_0|"_")+
 VOID_DT.2: "void"
 VOID_NAME.3: "void"(LETTER|DIG_WITH_0|"_")+
+prim_dt: INT_DT|CHAR_DT|VOID_DT
 // ============================================================================
 // =                                  Parser                                  =
 // ============================================================================
 // --------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun --------------
-primary_exp: identifier|NUM|CHAR|"("logic_or")"
-postfix_exp: postfix_exp"["logic_or"]"|postfix_exp"."identifier|fun_call|input_exp|print_exp|primary_exp
-unary_exp: unary_op unary_exp|postfix_exp
+prim_exp: name|NUM|CHAR|"("logic_or")"
+post_exp: array_subscr|struct_attr|fun_call|input_exp|print_exp|prim_exp
+un_exp: un_op un_exp|post_exp
 // ---------------------------------- L_Arith ---------------------------------
 input_exp: "input""("")"
 print_exp: "print""("logic_or")"
-arith_prec1: arith_prec1 prec1_op unary_exp
+arith_prec1: arith_prec1 prec1_op un_exp
 arith_prec2: arith_prec2 prec2_op arith_prec1
 arith_and: arith_and "&" arith_prec2
 arith_oplus: arith_oplus "^" arith_and
@@ -63,23 +63,26 @@ eq_exp: eq_exp eq_op rel_exp
 logic_and: logic_and "&&" eq_exp
 logic_or: logic_or "||" logic_and
 // ------------------------------ L_Assign_Alloc ------------------------------
-type_specifier: PRIM_DT|struct_specifier
-alloc: ["const"] type_specifier pntr_declarator
-lhs: postfix_exp|alloc
-initializer: logic_or|array_initializer|struct_initializer
-assign: lhs "=" initializer
+type_spec: prim_dt|struct_spec
+alloc: type_spec pntr_decl
+assign_stmt: post_exp "=" logic_or";"
+initializer: logic_or|array_init|struct_init
+init_stmt: alloc "=" initializer";"
+const_init_stmt: "const" type_spec name "=" NUM";"
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
-array_declarator: identifier array_dims|"("pntr_declarator")" array_dims
-array_initializer: "{"entry("," entry)*"}"
+array_decl: name array_dims|"("pntr_decl")" array_dims
+array_init: "{"entry("," entry)*"}"
+array_subscr: post_exp"["logic_or"]"
 // ---------------------------------- L_Pntr ----------------------------------
 !pntr_deg: "*"*
-pntr_declarator: pntr_deg array_declarator|array_declarator
+pntr_decl: pntr_deg array_decl|array_decl
 // --------------------------------- L_Struct ---------------------------------
-struct_specifier: "struct" identifier
+struct_spec: "struct" name
 struct_params: (alloc";")+
-struct_decl: "struct" identifier "{"struct_params"}"";"
-struct_initializer: "{""."identifier"="entry ("," "."identifier"="entry)*"}"
+struct_decl: "struct" name "{"struct_params"}"
+struct_init: "{""."name"="entry ("," "."name"="entry)*"}"
+struct_attr: post_exp"."name
 // --------------------------------- L_If_Else --------------------------------
 if_stmt: "if""("logic_or")" exec_part
 if_else_stmt: "if""("logic_or")" exec_part "else" exec_part
@@ -88,26 +91,24 @@ while_stmt: "while""("logic_or")" exec_part
 do_while_stmt: "do" exec_part "while""("logic_or")"";"
 // ---------------------------------- L_Stmt ----------------------------------
 decl_exp_stmt: alloc";"
-decl_direct_stmt: assign";"
+decl_direct_stmt: assign_stmt|init_stmt|const_init_stmt
 decl_part: decl_exp_stmt|decl_direct_stmt
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 compound_stmt: "{" exec_part* "}"
-selection_stmt: if_stmt|if_else_stmt
-iteration_stmt: while_stmt|do_while_stmt
 exec_exp_stmt: logic_or";"
-exec_direct_stmt: (assign|return)";"
-exec_part: compound_stmt|selection_stmt|iteration_stmt|exec_exp_stmt|exec_direct_stmt
+exec_direct_stmt: if_stmt|if_else_stmt|while_stmt|do_while_stmt|assign_stmt|fun_return_stmt
+exec_part: compound_stmt|exec_exp_stmt|exec_direct_stmt
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_args: [logic_or("," logic_or)*]
-fun_call: identifier"("fun_args")"
-return: "return" [logic_or]
+fun_call: name"("fun_args")"
+fun_return_stmt: "return" [logic_or]";"
 fun_params: [alloc("," alloc)*]
-fun_decl: type_specifier pntr_deg identifier"("fun_params")"";"
-fun_def: type_specifier pntr_deg identifier"("fun_params")" compound_stmt
+fun_decl: type_spec pntr_deg name"("fun_params")"
+fun_def: type_spec pntr_deg name"("fun_params")" compound_stmt
 // ---------------------------------- L_File ----------------------------------
-decl_def: struct_decl|fun_decl|fun_def
+decl_def: (struct_decl|fun_decl)";"|fun_def
 decls_defs: decl_def*
 file: FILENAME decls_defs
 

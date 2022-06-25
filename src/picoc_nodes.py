@@ -62,6 +62,14 @@ class Or(ASTNode):
     pass
 
 
+class DerefOp(ASTNode):
+    pass
+
+
+class RefOp(ASTNode):
+    pass
+
+
 # -------------------------------- L_Logic --------------------------------
 class Eq(ASTNode):
     pass
@@ -275,22 +283,22 @@ class PntrDecl(ASTNode):
 
 
 class Ref(ASTNode):
-    def __init__(self, ref_loc):
-        self.ref_loc = ref_loc
+    def __init__(self, exp):
+        self.exp = exp
         self.datatype: ASTNode
         self.error_data: list
-        super().__init__(visible=[self.ref_loc])
+        super().__init__(visible=[self.exp])
 
-    __match_args__ = ("ref_loc", "datatype", "error_data")
+    __match_args__ = ("exp", "datatype", "error_data")
 
 
 class Deref(ASTNode):
-    def __init__(self, deref_loc, exp):
-        self.deref_loc = deref_loc
+    def __init__(self, lhs, exp):
+        self.lhs = lhs
         self.exp = exp
-        super().__init__(visible=[self.deref_loc, self.exp])
+        super().__init__(visible=[self.lhs, self.exp])
 
-    __match_args__ = ("deref_loc", "exp")
+    __match_args__ = ("lhs", "exp")
 
 
 # -------------------------------- L_Array --------------------------------
@@ -313,12 +321,12 @@ class Array(ASTNode):
 
 
 class Subscr(ASTNode):
-    def __init__(self, deref_loc, exp):
-        self.deref_loc = deref_loc
+    def __init__(self, lhs, exp):
+        self.lhs = lhs
         self.exp = exp
-        super().__init__(visible=[self.deref_loc, self.exp])
+        super().__init__(visible=[self.lhs, self.exp])
 
-    __match_args__ = ("deref_loc", "exp")
+    __match_args__ = ("lhs", "exp")
 
 
 # -------------------------------- L_Struct -------------------------------
@@ -331,12 +339,12 @@ class StructSpec(ASTNode):
 
 
 class Attr(ASTNode):
-    def __init__(self, ref_loc, name):
-        self.ref_loc = ref_loc
+    def __init__(self, lsh, name):
+        self.lhs = lsh
         self.name = name
-        super().__init__(visible=[self.ref_loc, self.name])
+        super().__init__(visible=[self.lhs, self.name])
 
-    __match_args__ = ("ref_loc", "name")
+    __match_args__ = ("lhs", "name")
 
 
 class Struct(ASTNode):
