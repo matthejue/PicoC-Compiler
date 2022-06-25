@@ -394,10 +394,14 @@ class ASTTransformerPicoC(Transformer):
         return nodes
 
     def fun_decl(self, nodes):
-        return pn.FunDecl(nodes[0], nodes[1], nodes[2])
+        match nodes[1]:
+            case pn.Num("0"):
+                return pn.FunDecl(nodes[0], nodes[2], nodes[3])
+            case _:
+                return pn.FunDecl(pn.PntrDecl(nodes[1], nodes[0]), nodes[2], nodes[3])
 
     def fun_def(self, nodes):
-        match nodes[0]:
+        match nodes[1]:
             case pn.Num("0"):
                 return pn.FunDef(nodes[0], nodes[2], nodes[3], nodes[4])
             case _:
