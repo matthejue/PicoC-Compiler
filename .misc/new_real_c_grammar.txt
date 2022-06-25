@@ -116,7 +116,7 @@ shift_expression
 	| shift_expression RIGHT_OP additive_expression
 	;
 
-relational_expression
+elational_expression
 	: shift_expression
 	| relational_expression '<' shift_expression
 	| relational_expression '>' shift_expression

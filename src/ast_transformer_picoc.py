@@ -159,17 +159,17 @@ class ASTTransformerPicoC(Transformer):
         if len(nodes) == 1:
             return nodes[0]
         match (nodes[0], nodes[1]):
-            case ((pn.Minus() | pn.LogicNot() | pn.Not()) as op, exp):
-                return pn.UnOp(op, exp)
-            case (pn.DerefOp() as op, pn.BinOp(exp1, op, exp2)):
-                match op:
+            case ((pn.Minus() | pn.LogicNot() | pn.Not()) as bin_op, exp):
+                return pn.UnOp(bin_op, exp)
+            case (pn.DerefOp(), pn.BinOp(exp1, bin_op, exp2)):
+                match bin_op:
                     case pn.Add():
                         return pn.Deref(exp1, exp2)
                     case pn.Sub():
                         return pn.Deref(exp1, pn.UnOp(pn.Minus(), exp2))
                     case _:
                         raise errors.UnexpectedToken(
-                            nodes_to_str([pn.Add, pn.Sub]), op.val, op.pos
+                            nodes_to_str([pn.Add, pn.Sub]), bin_op.val, bin_op.pos
                         )
             case (pn.DerefOp(), exp):
                 return pn.Deref(exp, pn.Num("0"))
@@ -273,7 +273,7 @@ class ASTTransformerPicoC(Transformer):
     def assign_stmt(self, nodes):
         return pn.Assign(nodes[0], nodes[1])
 
-    def initializer(self, nodes):
+    def bug_initializer(self, nodes):
         return nodes[0]
 
     def init_stmt(self, nodes):

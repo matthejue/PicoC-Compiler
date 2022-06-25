@@ -14,6 +14,7 @@ class Args:
         self.double_verbose = False
         self.color = True
         self.debug = False
+        self.traceback = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3
