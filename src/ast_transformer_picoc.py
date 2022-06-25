@@ -159,8 +159,10 @@ class ASTTransformerPicoC(Transformer):
         if len(nodes) == 1:
             return nodes[0]
         match (nodes[0], nodes[1]):
-            case ((pn.Minus() | pn.LogicNot() | pn.Not()) as bin_op, exp):
+            case ((pn.Minus() | pn.Not()) as bin_op, exp):
                 return pn.UnOp(bin_op, exp)
+            case (pn.LogicNot() as bin_op, exp):
+                return pn.UnOp(bin_op, self._insert_to_bool(exp))
             case (pn.DerefOp(), pn.BinOp(exp1, bin_op, exp2)):
                 match bin_op:
                     case pn.Add():

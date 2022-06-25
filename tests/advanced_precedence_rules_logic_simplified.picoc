@@ -1,0 +1,12 @@
+// in:32
+// expected:0 0
+
+void main() {
+  int or_exp_false;
+  int and_exp_false;
+  int var = input();
+  or_exp_false = 0 || 0 + !'A' || !var;
+  and_exp_false = 1 &&  var && !var;
+  print(or_exp_false);
+  print(and_exp_false);
+}
