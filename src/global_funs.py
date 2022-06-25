@@ -17,16 +17,28 @@ def overwrite(old, replace_with, idx, color=""):
     )
 
 
-def set_to_str(tokens: set):
-    tokens = set(global_vars.MAP_NAME_TO_SYMBOL.get(elem, elem) for elem in tokens)
+def tokennames_to_str(tokens: set):
+    tokens = set(global_vars.TOKENNAME_TO_SYMBOL.get(elem, elem) for elem in tokens)
     return " or ".join(
         CM().BLUE + elem + CM().RESET_ALL
         for elem in (
             tokens
             if global_vars.args.double_verbose
-            else itertools.islice(tokens, global_vars.MAX_PRINT_OUT_TOKENS + 1)
+            else itertools.islice(tokens, global_vars.max_print_out_elements + 1)
         )
         if "ANON" not in elem
+    )
+
+
+def nodes_to_str(nodes: list):
+    nodes = [global_vars.NODE_TO_Symbol.get(elem, elem) for elem in nodes]
+    return " or ".join(
+        CM().BLUE + elem + CM().RESET_ALL
+        for elem in (
+            nodes
+            if global_vars.args.double_verbose
+            else itertools.islice(nodes, global_vars.max_print_out_elements + 1)
+        )
     )
 
 

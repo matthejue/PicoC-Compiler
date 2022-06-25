@@ -437,6 +437,7 @@ designator_list
 	| designator_list designator
 	;
 
+// difference to PicoC.Compiler
 designator
 	: '[' constant_expression ']'
 	| '.' IDENTIFIER

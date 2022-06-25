@@ -3,7 +3,7 @@ import errors
 from global_classes import Pos
 import global_vars
 from colormanager import ColorManager as CM
-from global_funs import overwrite, set_to_str
+from global_funs import overwrite, tokennames_to_str
 from lark.exceptions import (
     UnexpectedCharacters,
     UnexpectedToken,
@@ -29,7 +29,7 @@ class ErrorHandler:
             self._error_heading()
             prev_token = e.token_history[-1]
             expected_pos = Pos(prev_token.end_line - 1, prev_token.end_column - 2)
-            expected_str = global_vars.MAP_NAME_TO_SYMBOL.get(
+            expected_str = global_vars.TOKENNAME_TO_SYMBOL.get(
                 prev_token.type, prev_token.type
             )
             e = errors.UnexpectedCharacter(
@@ -50,7 +50,7 @@ class ErrorHandler:
             exit(0)
         except UnexpectedToken as e:
             self._error_heading()
-            expected_str = set_to_str(e.expected)
+            expected_str = tokennames_to_str(e.expected)
             # -1 because lark starts counting from 1
             e = errors.UnexpectedToken(
                 expected_str,
@@ -76,7 +76,7 @@ class ErrorHandler:
             exit(0)
         except UnexpectedEOF as e:
             self._error_heading()
-            expected_str = set_to_str(e.expected)
+            expected_str = tokennames_to_str(e.expected)
             last_token = self._find_last_token()
             last_pos = Pos(last_token.end_line - 1, last_token.end_column - 2 + 1)
             e = errors.UnexpectedEOF(expected_str, last_pos)

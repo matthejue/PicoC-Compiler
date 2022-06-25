@@ -1,4 +1,5 @@
 import reti_nodes as rn
+import picoc_nodes as pn
 
 
 class Args:
@@ -29,13 +30,15 @@ basename = ""
 
 uart_size = 4
 
+max_print_out_elements = 5
+
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
 RANGE_OF_CHAR = (-128, 127)
 RANGE_OF_PARAMETER = (-2097152, 2097151)
 RANGE_OF_INT = (-2147483648, 2147483647)
 
-MAP_NAME_TO_SYMBOL = {
+TOKENNAME_TO_SYMBOL = {
     "NUM": "number",
     "CHAR": "character",
     "NAME": "identifier",
@@ -85,7 +88,7 @@ MAP_NAME_TO_SYMBOL = {
     "RSQB": "']'",
 }
 
-MAX_PRINT_OUT_TOKENS = 5
+NODE_TO_Symbol = {pn.Add: "+", pn.Sub: "-"}
 
 COMPUTE_INSTRUCTION = [
     rn.Add,
