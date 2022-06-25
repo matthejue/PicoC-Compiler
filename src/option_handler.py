@@ -28,6 +28,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-vv", "--double_verbose", action="store_true")
     cli_args_parser.add_argument("-c", "--color", action="store_true")
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
+    cli_args_parser.add_argument("-t", "--traceback", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)

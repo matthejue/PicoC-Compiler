@@ -187,7 +187,6 @@ class ErrorHandler:
                 e.description2,
             )
             self._output_error(error_header + "\n" + note_header, e.__class__.__name__)
-            traceback.print_exc()
             exit(1)
         except errors.BugInInterpreter as e:
             self._error_heading()
@@ -267,6 +266,8 @@ class ErrorHandler:
                 encoding="utf-8",
             ) as fout:
                 fout.write(error_str)
+        if global_vars.args.traceback:
+            traceback.print_exc()
 
     def __repr__(self):
         return self.split_code

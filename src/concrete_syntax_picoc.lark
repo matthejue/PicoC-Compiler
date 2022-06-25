@@ -52,27 +52,27 @@ un_exp: un_op un_exp|post_exp
 // ---------------------------------- L_Arith ---------------------------------
 input_exp: "input""("")"
 print_exp: "print""("logic_or")"
-arith_prec1: arith_prec1 prec1_op un_exp
-arith_prec2: arith_prec2 prec2_op arith_prec1
-arith_and: arith_and "&" arith_prec2
-arith_oplus: arith_oplus "^" arith_and
-arith_or: arith_or "|" arith_oplus
+arith_prec1: arith_prec1 prec1_op un_exp|un_exp
+arith_prec2: arith_prec2 prec2_op arith_prec1|arith_prec1
+arith_and: arith_and "&" arith_prec2|arith_prec2
+arith_oplus: arith_oplus "^" arith_and|arith_and
+arith_or: arith_or "|" arith_oplus|arith_oplus
 // ---------------------------------- L_Logic ---------------------------------
-rel_exp: rel_exp rel_op arith_or
-eq_exp: eq_exp eq_op rel_exp
-logic_and: logic_and "&&" eq_exp
-logic_or: logic_or "||" logic_and
+rel_exp: rel_exp rel_op arith_or|arith_or
+eq_exp: eq_exp eq_op rel_exp|rel_exp
+logic_and: logic_and "&&" eq_exp|eq_exp
+logic_or: logic_or "||" logic_and|logic_and
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_spec: prim_dt|struct_spec
 alloc: type_spec pntr_decl
 assign_stmt: post_exp "=" logic_or";"
-initializer: logic_or|array_init|struct_init
-init_stmt: alloc "=" initializer";"
+bug_initializer: logic_or|array_init|struct_init
+init_stmt: alloc "=" bug_initializer";"
 const_init_stmt: "const" type_spec name "=" NUM";"
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
 array_decl: name array_dims|"("pntr_decl")" array_dims
-array_init: "{"entry("," entry)*"}"
+array_init: "{"bug_initializer("," bug_initializer)*"}"
 array_subscr: post_exp"["logic_or"]"
 // ---------------------------------- L_Pntr ----------------------------------
 !pntr_deg: "*"*
@@ -81,7 +81,7 @@ pntr_decl: pntr_deg array_decl|array_decl
 struct_spec: "struct" name
 struct_params: (alloc";")+
 struct_decl: "struct" name "{"struct_params"}"
-struct_init: "{""."name"="entry ("," "."name"="entry)*"}"
+struct_init: "{""."name"="bug_initializer ("," "."name"="bug_initializer)*"}"
 struct_attr: post_exp"."name
 // --------------------------------- L_If_Else --------------------------------
 if_stmt: "if""("logic_or")" exec_part
@@ -106,7 +106,7 @@ fun_call: name"("fun_args")"
 fun_return_stmt: "return" [logic_or]";"
 fun_params: [alloc("," alloc)*]
 fun_decl: type_spec pntr_deg name"("fun_params")"
-fun_def: type_spec pntr_deg name"("fun_params")" compound_stmt
+fun_def: type_spec pntr_deg name"("fun_params")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
 decl_def: (struct_decl|fun_decl)";"|fun_def
 decls_defs: decl_def*
