@@ -155,27 +155,55 @@ class ASTTransformerPicoC(Transformer):
     def post_exp(self, nodes):
         return nodes[0]
 
+    def _leftmost_node(self, bin_exp):
+        current_bin_exp = bin_exp
+        previous_bin_exp = None
+        match bin_exp:
+            case pn.BinOp():
+                pass
+            case _:
+                return bin_exp, None, None
+        while isinstance(current_bin_exp.left_exp, pn.BinOp):
+            match current_bin_exp:
+                case pn.BinOp(exp1, _, _):
+                    previous_bin_exp = current_bin_exp
+                    current_bin_exp = exp1
+        if current_bin_exp == bin_exp:
+            match current_bin_exp:
+                case pn.BinOp(exp1, bin_op, exp2):
+                    return exp1, bin_op, exp2
+        match current_bin_exp:
+            case pn.BinOp(exp1, bin_op, exp2):
+                previous_bin_exp.left_exp = exp2
+                return exp1, bin_op, bin_exp
+            case _:
+                bug_in_compiler(current_bin_exp)
+
     def un_exp(self, nodes):
         if len(nodes) == 1:
             return nodes[0]
-        match (nodes[0], nodes[1]):
-            case ((pn.Minus() | pn.Not()) as bin_op, exp):
-                return pn.UnOp(bin_op, exp)
-            case (pn.LogicNot() as bin_op, exp):
-                return pn.UnOp(bin_op, self._insert_to_bool(exp))
-            case (pn.DerefOp(), pn.BinOp(exp1, bin_op, exp2)):
+        un_op = nodes[0]
+        exp = nodes[1]
+        match un_op:
+            case (pn.Minus() | pn.Not()):
+                return pn.UnOp(un_op, exp)
+            case pn.LogicNot():
+                return pn.UnOp(un_op, self._insert_to_bool(exp))
+            case pn.DerefOp():
+                #  __import__("pudb").set_trace()
+                exp1, bin_op, exp2 = self._leftmost_node(exp)
                 match bin_op:
                     case pn.Add():
                         return pn.Deref(exp1, exp2)
                     case pn.Sub():
                         return pn.Deref(exp1, pn.UnOp(pn.Minus(), exp2))
+                    case None:
+                        return pn.Deref(exp1, pn.Num("0"))
                     case _:
                         raise errors.UnexpectedToken(
                             nodes_to_str([pn.Add, pn.Sub]), bin_op.val, bin_op.pos
                         )
-            case (pn.DerefOp(), exp):
-                return pn.Deref(exp, pn.Num("0"))
-            case (pn.RefOp(), exp):
+            case pn.RefOp():
                 return pn.Ref(exp)
             case _:
                 bug_in_compiler(nodes)
