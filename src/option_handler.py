@@ -188,7 +188,7 @@ class OptionHandler(cmd2.Cmd):
             print(f"// {global_vars.args.infile}:\n" + code)
 
         parser = Lark.open(
-            "./src/concrete_syntax_picoc.lark",
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",
@@ -266,7 +266,7 @@ class OptionHandler(cmd2.Cmd):
 
     def _tokens_option(self, code_with_file, heading):
         parser = Lark.open(
-            "./src/concrete_syntax_picoc.lark",
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",

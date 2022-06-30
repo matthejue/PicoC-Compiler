@@ -697,6 +697,7 @@ class Passes:
                 match datatype:
                     case pn.ArrayDecl(nums, _):
                         if int(nums[0].val) != len(exps):
+                            # TODO:
                             raise errors.ArrayInitNotEnoughDims()
                     case _:
                         bug_in_compiler(datatype)
