@@ -517,3 +517,8 @@ class SingleLineComment:
         return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
+
+
+# ------------------------------- L_Placeholder -------------------------------
+class Placeholder(ASTNode):
+    pass
