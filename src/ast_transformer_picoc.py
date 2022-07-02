@@ -297,7 +297,15 @@ class ASTTransformerPicoC(Transformer):
         return nodes[0]
 
     def alloc(self, nodes):
-        return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
+        if isinstance(nodes[0], list):
+            datatype = nodes[0][0]
+            for node in nodes[0][:0:-1]:
+                node.datatype = datatype
+                node.visible[1] = datatype
+                datatype = node
+            return pn.Alloc(pn.Writeable(), datatype, nodes[1])
+        else:
+            return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
 
     def assign_stmt(self, nodes):
         return pn.Assign(nodes[0], nodes[1])
@@ -323,7 +331,10 @@ class ASTTransformerPicoC(Transformer):
             case []:
                 return nodes[1]
             case _:
-                return pn.ArrayDecl(nodes[0], nodes[1])
+                if isinstance(nodes[1], list):
+                    return nodes[1] + [pn.ArrayDecl(nodes[0], pn.Placeholder())]
+                else:
+                    return [nodes[1], pn.ArrayDecl(nodes[0], pn.Placeholder())]
 
     def array_init(self, nodes):
         return pn.Array(nodes)
@@ -341,7 +352,10 @@ class ASTTransformerPicoC(Transformer):
             case pn.Num("0"):
                 return nodes[1]
             case _:
-                return pn.PntrDecl(nodes[0], nodes[1])
+                if isinstance(nodes[1], list):
+                    return nodes[1] + [pn.PntrDecl(nodes[0], pn.Placeholder())]
+                else:
+                    return [nodes[1], pn.PntrDecl(nodes[0], pn.Placeholder())]
 
     # -------------------------------- L_Struct -------------------------------
     def struct_spec(self, nodes):

@@ -459,66 +459,6 @@ class Passes:
                 raise errors.UnknownIdentifier(name, pos)
         return symbol, choosen_scope
 
-    def _reverse_pntr_array_decl(self, datatype):
-        match datatype:
-            case (pn.PntrDecl() | pn.ArrayDecl()):
-                pass
-            case _:
-                return datatype
-        current_datatype = copy.deepcopy(datatype)
-        reversed_datatype = datatype
-        last_datatype = datatype
-
-        # TODO: ugly solution
-        reversed_datatype.datatype = pn.Placeholder()
-        reversed_datatype.visible[1] = pn.Placeholder()
-        while True:
-            match current_datatype:
-                case (pn.PntrDecl(_, datatype) | pn.ArrayDecl(_, datatype)):
-                    current_datatype = copy.deepcopy(datatype)
-                    match datatype:
-                        case (pn.PntrDecl() | pn.ArrayDecl()):
-                            datatype.datatype = reversed_datatype
-                            datatype.visible[1] = reversed_datatype
-                            reversed_datatype = datatype
-                        case _:
-                            last_datatype.datatype = datatype
-                            last_datatype.visible[1] = datatype
-                            break
-                case _:
-                    bug_in_compiler(current_datatype)
-        return reversed_datatype
-
-    #  def _reverse_subscr(self, datatype):
-    #      match datatype:
-    #          case (pn.PntrDecl() | pn.ArrayDecl()):
-    #              pass
-    #          case _:
-    #              return datatype
-    #      current_datatype = copy.deepcopy(datatype)
-    #      reversed_datatype = datatype
-    #      last_datatype = datatype
-    #
-    #      # TODO: ugly solution
-    #      reversed_datatype.datatype = pn.Placeholder()
-    #      reversed_datatype.visible[1] = pn.Placeholder()
-    #      while True:
-    #          match current_datatype:
-    #              case (pn.PntrDecl(_, datatype) | pn.ArrayDecl(_, datatype)):
-    #                  current_datatype = copy.deepcopy(datatype)
-    #                  match datatype:
-    #                      case (pn.PntrDecl() | pn.ArrayDecl()):
-    #                          datatype.datatype = reversed_datatype
-    #                          datatype.visible[1] = reversed_datatype
-    #                          reversed_datatype = datatype
-    #                      case _:
-    #                          last_datatype.datatype = datatype
-    #                          last_datatype.visible[1] = datatype
-    #                          break
-    #              case _:
-    #                  bug_in_compiler(current_datatype)
-    #      return reversed_datatype
-
     def _picoc_mon_ref(self, ref, prev_refs):
         match ref:
             # ---------------------------- L_Arith ----------------------------
@@ -700,20 +640,15 @@ class Passes:
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1)):
                 var_name = val1
                 var_pos = pos1
-                # TODO: ugly solution
-                exp.datatype = self._reverse_pntr_array_decl(datatype)
-                exp.visible[1] = exp.datatype
                 self._check_redef_and_redecl_error(
                     var_name, var_pos, errors.Redefinition
                 )
-                # TODO: ugly solution
-                size = self._datatype_size(exp.datatype)
-                # TODO: ugly solution
+                size = self._datatype_size(datatype)
                 match self.current_scope:
                     case "main":
                         symbol = st.Symbol(
                             type_qual,
-                            exp.datatype,
+                            datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_global_addr)),
                             st.Pos(
@@ -726,7 +661,7 @@ class Passes:
                     case _:
                         symbol = st.Symbol(
                             type_qual,
-                            exp.datatype,
+                            datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_fun_addr)),
                             st.Pos(
