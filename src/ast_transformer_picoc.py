@@ -190,7 +190,6 @@ class ASTTransformerPicoC(Transformer):
             case pn.LogicNot():
                 return pn.UnOp(un_op, self._insert_to_bool(exp))
             case pn.DerefOp():
-                #  __import__("pudb").set_trace()
                 exp1, bin_op, exp2 = self._leftmost_node(exp)
                 match bin_op:
                     case pn.Add():

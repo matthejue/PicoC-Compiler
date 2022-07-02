@@ -63,23 +63,23 @@ class Passes:
             case pn.Alloc():
                 return exp
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Deref(deref_loc, exp):
+            case pn.Deref(ref, exp):
                 # shrink: Deref gets replaced by Subscr
                 return pn.Subscr(
-                    self._picoc_shrink_exp(deref_loc), self._picoc_shrink_exp(exp)
+                    self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
                 )
             case pn.Ref():
                 return exp
             # ---------------------------- L_Array ----------------------------
-            case pn.Subscr(deref_loc, exp):
+            case pn.Subscr(ref, exp):
                 return pn.Subscr(
-                    self._picoc_shrink_exp(deref_loc), self._picoc_shrink_exp(exp)
+                    self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
                 )
             case pn.Array(exps):
                 return pn.Array([self._picoc_shrink_exp(exp) for exp in exps])
             # ---------------------------- L_Struct ---------------------------
-            case pn.Attr(ref_loc, name):
-                return pn.Attr(self._picoc_shrink_exp(ref_loc), name)
+            case pn.Attr(ref, name):
+                return pn.Attr(self._picoc_shrink_exp(ref), name)
             case pn.Struct(assigns):
                 assigns_shrinked = []
                 for assign in assigns:
@@ -411,12 +411,12 @@ class Passes:
                     return self._get_leftmost_pos(left_exp)
                 case pn.ToBool(exp):
                     return self._get_leftmost_pos(exp)
-                case pn.Ref(ref_loc):
-                    return self._get_leftmost_pos(ref_loc)
-                case (pn.Subscr(deref_loc, _)):
-                    return self._get_leftmost_pos(deref_loc)
-                case pn.Attr(ref_loc, _):
-                    return self._get_leftmost_pos(ref_loc)
+                case pn.Ref(ref):
+                    return self._get_leftmost_pos(ref)
+                case (pn.Subscr(ref, _)):
+                    return self._get_leftmost_pos(ref)
+                case pn.Attr(ref, _):
+                    return self._get_leftmost_pos(ref)
                 case _:
                     bug_in_compiler(exp)
 
@@ -459,8 +459,68 @@ class Passes:
                 raise errors.UnknownIdentifier(name, pos)
         return symbol, choosen_scope
 
-    def _picoc_mon_ref(self, ref_loc, prev_refs):
-        match ref_loc:
+    def _reverse_pntr_array_decl(self, datatype):
+        match datatype:
+            case (pn.PntrDecl() | pn.ArrayDecl()):
+                pass
+            case _:
+                return datatype
+        current_datatype = copy.deepcopy(datatype)
+        reversed_datatype = datatype
+        last_datatype = datatype
+
+        # TODO: ugly solution
+        reversed_datatype.datatype = pn.Placeholder()
+        reversed_datatype.visible[1] = pn.Placeholder()
+        while True:
+            match current_datatype:
+                case (pn.PntrDecl(_, datatype) | pn.ArrayDecl(_, datatype)):
+                    current_datatype = copy.deepcopy(datatype)
+                    match datatype:
+                        case (pn.PntrDecl() | pn.ArrayDecl()):
+                            datatype.datatype = reversed_datatype
+                            datatype.visible[1] = reversed_datatype
+                            reversed_datatype = datatype
+                        case _:
+                            last_datatype.datatype = datatype
+                            last_datatype.visible[1] = datatype
+                            break
+                case _:
+                    bug_in_compiler(current_datatype)
+        return reversed_datatype
+
+    #  def _reverse_subscr(self, datatype):
+    #      match datatype:
+    #          case (pn.PntrDecl() | pn.ArrayDecl()):
+    #              pass
+    #          case _:
+    #              return datatype
+    #      current_datatype = copy.deepcopy(datatype)
+    #      reversed_datatype = datatype
+    #      last_datatype = datatype
+    #
+    #      # TODO: ugly solution
+    #      reversed_datatype.datatype = pn.Placeholder()
+    #      reversed_datatype.visible[1] = pn.Placeholder()
+    #      while True:
+    #          match current_datatype:
+    #              case (pn.PntrDecl(_, datatype) | pn.ArrayDecl(_, datatype)):
+    #                  current_datatype = copy.deepcopy(datatype)
+    #                  match datatype:
+    #                      case (pn.PntrDecl() | pn.ArrayDecl()):
+    #                          datatype.datatype = reversed_datatype
+    #                          datatype.visible[1] = reversed_datatype
+    #                          reversed_datatype = datatype
+    #                      case _:
+    #                          last_datatype.datatype = datatype
+    #                          last_datatype.visible[1] = datatype
+    #                          break
+    #              case _:
+    #                  bug_in_compiler(current_datatype)
+    #      return reversed_datatype
+
+    def _picoc_mon_ref(self, ref, prev_refs):
+        match ref:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val, pos) as name:
                 var_name = val
@@ -543,26 +603,26 @@ class Passes:
                     case _:
                         bug_in_compiler(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
-            case (pn.Subscr(deref_loc, exp)):
-                ref = pn.Ref(pn.Subscr(pn.Tmp(pn.Num("2")), pn.Tmp(pn.Num("1"))))
-                # for e.g. Deref(deref_loc, Num("0")) for the position
+            case (pn.Subscr(ref2, exp)):
+                ref3 = pn.Ref(pn.Subscr(pn.Tmp(pn.Num("2")), pn.Tmp(pn.Num("1"))))
+                # for e.g. Deref(ref, Num("0")) for the position
                 # Pos(-1, -1) gets saved
-                ref.error_data = (
+                ref3.error_data = (
                     [self._get_leftmost_pos(exp)] if exp.pos != Pos(-1, -1) else []
                 )
-                refs_mon = self._picoc_mon_ref(deref_loc, prev_refs + [ref])
+                refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
                 exps_mon = self._picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [pn.Exp(ref)]
+                return refs_mon + exps_mon + [pn.Exp(ref3)]
             # ---------------------------- L_Struct ---------------------------
-            case pn.Attr(ref_loc2, pn.Name(_, pos) as name):
-                ref = pn.Ref(pn.Attr(pn.Tmp(pn.Num("1")), name))
-                ref.error_data = [
+            case pn.Attr(ref2, pn.Name(_, pos) as name):
+                ref3 = pn.Ref(pn.Attr(pn.Tmp(pn.Num("1")), name))
+                ref3.error_data = [
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
-                refs_mon = self._picoc_mon_ref(ref_loc2, prev_refs + [ref])
-                return refs_mon + [pn.Exp(ref)]
+                refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
+                return refs_mon + [pn.Exp(ref2)]
             case _:
-                bug_in_compiler(ref_loc)
+                bug_in_compiler(ref)
 
     def _picoc_mon_exp(self, exp):
         match exp:
@@ -640,15 +700,20 @@ class Passes:
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1)):
                 var_name = val1
                 var_pos = pos1
+                # TODO: ugly solution
+                exp.datatype = self._reverse_pntr_array_decl(datatype)
+                exp.visible[1] = exp.datatype
                 self._check_redef_and_redecl_error(
                     var_name, var_pos, errors.Redefinition
                 )
-                size = self._datatype_size(datatype)
+                # TODO: ugly solution
+                size = self._datatype_size(exp.datatype)
+                # TODO: ugly solution
                 match self.current_scope:
                     case "main":
                         symbol = st.Symbol(
                             type_qual,
-                            datatype,
+                            exp.datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_global_addr)),
                             st.Pos(
@@ -661,7 +726,7 @@ class Passes:
                     case _:
                         symbol = st.Symbol(
                             type_qual,
-                            datatype,
+                            exp.datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_fun_addr)),
                             st.Pos(
@@ -689,15 +754,14 @@ class Passes:
                         raise errors.ConstRef(identifier_name, identifier_pos)
                     case _:
                         bug_in_compiler(symbol)
-            case pn.Ref((pn.Subscr() | pn.Attr()) as ref_loc):
-                return self._picoc_mon_ref(ref_loc, [])
+            case pn.Ref((pn.Subscr() | pn.Attr()) as ref):
+                return self._picoc_mon_ref(ref, [])
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps, datatype):
                 exps_mon = []
                 match datatype:
                     case pn.ArrayDecl(nums, _):
                         if int(nums[0].val) != len(exps):
-                            # TODO:
                             raise errors.ArrayInitNotEnoughDims()
                     case _:
                         bug_in_compiler(datatype)
@@ -845,11 +909,14 @@ class Passes:
                 pn.Alloc(_, datatype, name) as alloc,
                 (pn.Array(_) | pn.Struct(_)) as array_struct,
             ):
-                array_struct.datatype = datatype
+                self._picoc_mon_exp(alloc)
+                # this has to be in this order because the datatype declarator
+                # has to be reversed in the _picoc_mon_exp call
+                # TODO: ugly solution
+                array_struct.datatype = alloc.datatype
                 array_struct.visible += (
                     [array_struct.datatype] if global_vars.args.double_verbose else []
                 )
-                self._picoc_mon_exp(alloc)
                 stmt_mon = self._picoc_mon_stmt(pn.Assign(name, array_struct))
                 return self._single_line_comment(stmt, "//") + stmt_mon
             # ------------------------- L_Assign_Alloc ------------------------
@@ -915,10 +982,10 @@ class Passes:
                 self._picoc_mon_exp(alloc)
                 stmt_mon = self._picoc_mon_stmt(pn.Assign(name, exp))
                 return self._single_line_comment(stmt, "//") + stmt_mon
-            case pn.Assign(ref_loc, exp):
+            case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
                 exps_mon = self._picoc_mon_exp(exp)
-                refs_mon = self._picoc_mon_ref(ref_loc, [])
+                refs_mon = self._picoc_mon_ref(ref, [])
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_mon
@@ -1573,7 +1640,7 @@ class Passes:
                                         )
                                     case _:
                                         bug_in_compiler(datatype)
-                            # bei z.B. Deref(deref_loc, Num("0")) wird für die
+                            # bei z.B. Deref(ref, Num("0")) wird für die
                             # Position nur Pos(-1, -1) gespeichert
                             case [pn.Name(val1, pos1)]:
                                 match datatype:
