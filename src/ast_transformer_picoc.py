@@ -149,8 +149,31 @@ class ASTTransformerPicoC(Transformer):
     # =                                 Parser                                =
     # =========================================================================
     # ------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun -------------
+    def _flatten_exp(self, exp):
+        match exp:
+            case (pn.Deref() | pn.Subscr() | pn.Attr()):
+                flattened_exp = []
+                current_exp = exp
+                while True:
+                    match current_exp:
+                        case (pn.Deref(lhs, _) | pn.Subscr(lhs, _) | pn.Attr(lhs, _)):
+                            current_exp.lhs = pn.Placeholder()
+                            current_exp.visible[0] = pn.Placeholder()
+                            flattened_exp[0:0] = [current_exp]
+                            current_exp = lhs
+                        case _:
+                            flattened_exp[0:0] = [current_exp]
+                            break
+                return flattened_exp
+            case _:
+                return exp
+
     def prim_exp(self, nodes):
-        return nodes[0]
+        match nodes[0]:
+            case (pn.Name() | pn.Num() | pn.Char()):
+                return nodes[0]
+            case _:
+                return self._flatten_exp(nodes[0])
 
     def post_exp(self, nodes):
         return nodes[0]
