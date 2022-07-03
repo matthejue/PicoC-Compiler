@@ -1,7 +1,7 @@
 # SHELL := /bin/bash
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 FILETYPE ?= reti_states
-PAGES ?= 4
+PAGES ?= 5
 .PHONY: all test clean
 
 all: interpret-color

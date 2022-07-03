@@ -1,5 +1,6 @@
 // in:42
 // expected:42 42
+// datasegment:10
 
 void main() {
   // deref a ref

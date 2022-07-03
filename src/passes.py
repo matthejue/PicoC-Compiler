@@ -70,8 +70,8 @@ class Passes:
                 return pn.Subscr(
                     self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
                 )
-            case pn.Ref():
-                return exp
+            case pn.Ref(ref):
+                return pn.Ref(self._picoc_shrink_exp(ref))
             # ---------------------------- L_Array ----------------------------
             case pn.Subscr(ref, exp):
                 return pn.Subscr(
@@ -547,6 +547,7 @@ class Passes:
             # ------------------------ L_Pntr + L_Array -----------------------
             case (pn.Subscr(ref2, exp)):
                 ref3 = pn.Ref(pn.Subscr(pn.Tmp(pn.Num("2")), pn.Tmp(pn.Num("1"))))
+                # TODO: this isn't the case anymore
                 # for e.g. Deref(ref, Num("0")) for the position
                 # Pos(-1, -1) gets saved
                 ref3.error_data = (
@@ -563,6 +564,14 @@ class Passes:
                 ]
                 refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
                 return refs_mon + [ref3]
+            case pn.Ref(ref2):
+                # TODO: Fehlermeldung, und das nur Placeholder
+                last_ref = prev_refs[-1]
+                refs_mon = self._picoc_mon_ref(ref2, prev_refs)
+                last_ref.datatype = pn.ArrayDecl([pn.Num("1")], last_ref.datatype)
+                if global_vars.args.double_verbose:
+                    last_ref.visible[1] = last_ref.datatype
+                return refs_mon
             case _:
                 bug_in_compiler(ref)
 
@@ -690,6 +699,10 @@ class Passes:
                         self.rel_fun_addr += size
                 # Alloc isn't needed anymore after being evaluated
                 return []
+            # ------------------ L_Pntr + L_Array + L_Struct ------------------
+            case (pn.Subscr() | pn.Attr()):
+                refs_mon = self._picoc_mon_ref(exp, [])
+                return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val, pos)):
                 identifier_name = val
@@ -809,10 +822,6 @@ class Passes:
                     # values mit 0 initialisieren
                     raise errors.StructInitAttrsMissing(attr_ids, exp)
                 return exps_mon
-            # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case (pn.Subscr() | pn.Attr()):
-                refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val, pos) as name, exps):
                 # TODO: check if exps types match with function signature
@@ -1517,29 +1526,36 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Ref((pn.GlobalRead() | pn.StackRead()) as exp):
+            case pn.Ref((pn.GlobalRead() | pn.StackRead() | pn.Tmp()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
                     case pn.GlobalRead(pn.Num(val)):
                         reti_instrs += [
-                            rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Ds())]),
+                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In1()), rn.Im(val)]),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
                         ]
                     case pn.StackRead(pn.Num(val)):
                         reti_instrs += [
-                            rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
-                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In2()), rn.Im(val)]),
-                            rn.Instr(rn.Sub(), [rn.Reg(rn.Acc()), rn.Reg(rn.In2())]),
-                            rn.Instr(rn.Subi(), [rn.Reg(rn.Acc()), rn.Im("2")]),
+                            rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
+                            rn.Instr(
+                                rn.Subi(), [rn.Reg(rn.In1()), rn.Im(str(int(val) + 2))]
+                            ),
                         ]
+                    # case pn.Tmp(pn.Num(val)):
+                    #     reti_instrs += [
+                    #         rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1())]),
+                    #         rn.Instr(
+                    #             rn.Addi(), [rn.Reg(rn.In1()), rn.Im(str(int(val) + 1))]
+                    #         ),
+                    #     ]
                     case _:
                         bug_in_compiler(exp)
                 return reti_instrs + [
                     rn.Instr(
                         rn.Storein(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
+                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
                     )
                 ]
             case pn.Ref(

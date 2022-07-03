@@ -339,8 +339,8 @@ class StructSpec(ASTNode):
 
 
 class Attr(ASTNode):
-    def __init__(self, lsh, name):
-        self.lhs = lsh
+    def __init__(self, lhs, name):
+        self.lhs = lhs
         self.name = name
         super().__init__(visible=[self.lhs, self.name])
 
