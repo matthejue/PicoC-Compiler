@@ -203,7 +203,9 @@ class ASTTransformerPicoC(Transformer):
                             nodes_to_str([pn.Add, pn.Sub]), bin_op.val, bin_op.pos
                         )
             case pn.RefOp():
-                return pn.Ref(exp)
+                ref = pn.Ref(exp)
+                ref.pos = un_op.pos
+                return ref
             case _:
                 bug_in_compiler(nodes)
 
