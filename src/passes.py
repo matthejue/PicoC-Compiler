@@ -560,7 +560,7 @@ class Passes:
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
                 refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
-                return refs_mon + [pn.Exp(ref2)]
+                return refs_mon + [pn.Exp(ref3)]
             case _:
                 bug_in_compiler(ref)
 

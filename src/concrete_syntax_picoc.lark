@@ -64,7 +64,7 @@ logic_or: logic_or "||" logic_and|logic_and
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_spec: prim_dt|struct_spec
 alloc: type_spec pntr_decl
-assign_stmt: post_exp "=" logic_or";"
+assign_stmt: un_exp "=" logic_or";"
 bug_initializer: logic_or|array_init|struct_init
 init_stmt: alloc "=" bug_initializer";"
 const_init_stmt: "const" type_spec name "=" NUM";"
