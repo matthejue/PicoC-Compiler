@@ -149,31 +149,8 @@ class ASTTransformerPicoC(Transformer):
     # =                                 Parser                                =
     # =========================================================================
     # ------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun -------------
-    def _flatten_exp(self, exp):
-        match exp:
-            case (pn.Deref() | pn.Subscr() | pn.Attr()):
-                flattened_exp = []
-                current_exp = exp
-                while True:
-                    match current_exp:
-                        case (pn.Deref(lhs, _) | pn.Subscr(lhs, _) | pn.Attr(lhs, _)):
-                            current_exp.lhs = pn.Placeholder()
-                            current_exp.visible[0] = pn.Placeholder()
-                            flattened_exp[0:0] = [current_exp]
-                            current_exp = lhs
-                        case _:
-                            flattened_exp[0:0] = [current_exp]
-                            break
-                return flattened_exp
-            case _:
-                return exp
-
     def prim_exp(self, nodes):
-        match nodes[0]:
-            case (pn.Name() | pn.Num() | pn.Char()):
-                return nodes[0]
-            case _:
-                return self._flatten_exp(nodes[0])
+        return nodes[0]
 
     def post_exp(self, nodes):
         return nodes[0]
@@ -191,14 +168,10 @@ class ASTTransformerPicoC(Transformer):
                 case pn.BinOp(exp1, _, _):
                     previous_bin_exp = current_bin_exp
                     current_bin_exp = exp1
-                case _:
-                    bug_in_compiler(current_bin_exp)
         if current_bin_exp == bin_exp:
             match current_bin_exp:
                 case pn.BinOp(exp1, bin_op, exp2):
                     return exp1, bin_op, exp2
-                case _:
-                    bug_in_compiler(current_bin_exp)
         match current_bin_exp:
             case pn.BinOp(exp1, bin_op, exp2):
                 previous_bin_exp.left_exp = exp2
@@ -213,39 +186,24 @@ class ASTTransformerPicoC(Transformer):
         exp = nodes[1]
         match un_op:
             case (pn.Minus() | pn.Not()):
-                if isinstance(exp, list):
-                    return exp + [pn.UnOp(un_op, pn.Placeholder())]
-                return [exp, pn.UnOp(un_op, pn.Placeholder())]
+                return pn.UnOp(un_op, exp)
             case pn.LogicNot():
                 return pn.UnOp(un_op, self._insert_to_bool(exp))
             case pn.DerefOp():
                 exp1, bin_op, exp2 = self._leftmost_node(exp)
                 match bin_op:
                     case pn.Add():
-                        if isinstance(exp1, list):
-                            return exp1 + [pn.Deref(pn.Placeholder(), exp2)]
-                        return [exp1, pn.Deref(pn.Placeholder(), exp2)]
+                        return pn.Deref(exp1, exp2)
                     case pn.Sub():
-                        if isinstance(exp1, list):
-                            return exp1 + [
-                                pn.Deref(pn.Placeholder(), pn.UnOp(pn.Minus(), exp2))
-                            ]
-                        return [
-                            exp1,
-                            pn.Deref(pn.Placeholder(), pn.UnOp(pn.Minus(), exp2)),
-                        ]
+                        return pn.Deref(exp1, pn.UnOp(pn.Minus(), exp2))
                     case None:
-                        if isinstance(exp1, list):
-                            return exp1 + [pn.Deref(pn.Placeholder(), pn.Num("0"))]
-                        return [exp1, pn.Deref(pn.Placeholder(), pn.Num("0"))]
+                        return pn.Deref(exp1, pn.Num("0"))
                     case _:
                         raise errors.UnexpectedToken(
                             nodes_to_str([pn.Add, pn.Sub]), bin_op.val, bin_op.pos
                         )
             case pn.RefOp():
-                if isinstance(exp, list):
-                    return exp + [pn.Ref(pn.Placeholder())]
-                return [exp, pn.Ref(pn.Placeholder())]
+                return pn.Ref(exp)
             case _:
                 bug_in_compiler(nodes)
 
@@ -256,29 +214,10 @@ class ASTTransformerPicoC(Transformer):
     def print_exp(self, nodes):
         return pn.Call(pn.Name("print"), [nodes[0]])
 
-    def _reverse_un_exp(self, nodes):
-        reversed_un_exp = nodes[0]
-        for node in nodes[:0:-1]:
-            match node:
-                case pn.UnOp():
-                    node.exp = reversed_un_exp
-                case (pn.Deref() | pn.Subscr() | pn.Attr()):
-                    node.lhs = reversed_un_exp
-                case (pn.Ref()):
-                    node.exp = reversed_un_exp
-            node.visible[0] = reversed_un_exp
-            reversed_un_exp = node
-        return reversed_un_exp
-
     def arith_prec1(self, nodes):
         if len(nodes) == 1:
-            if isinstance(nodes[0], list):
-                reversed_un_exp = self._reverse_un_exp(nodes[0])
-                return reversed_un_exp
             return nodes[0]
-        if isinstance(nodes[0], list):
-            reversed_un_exp = self._reverse_un_exp(nodes[2])
-            return pn.BinOp(nodes[0], nodes[1], reversed_un_exp)
+        return pn.BinOp(nodes[0], nodes[1], nodes[2])
 
     def arith_prec2(self, nodes):
         if len(nodes) == 1:
@@ -359,13 +298,14 @@ class ASTTransformerPicoC(Transformer):
 
     def alloc(self, nodes):
         if isinstance(nodes[0], list):
-            reversed_pntr_array_decl = nodes[0][0]
+            datatype = nodes[0][0]
             for node in nodes[0][:0:-1]:
-                node.datatype = reversed_pntr_array_decl
-                node.visible[1] = reversed_pntr_array_decl
-                reversed_pntr_array_decl = node
-            return pn.Alloc(pn.Writeable(), reversed_pntr_array_decl, nodes[1])
-        return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
+                node.datatype = datatype
+                node.visible[1] = datatype
+                datatype = node
+            return pn.Alloc(pn.Writeable(), datatype, nodes[1])
+        else:
+            return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
 
     def assign_stmt(self, nodes):
         return pn.Assign(nodes[0], nodes[1])
@@ -393,16 +333,15 @@ class ASTTransformerPicoC(Transformer):
             case _:
                 if isinstance(nodes[1], list):
                     return nodes[1] + [pn.ArrayDecl(nodes[0], pn.Placeholder())]
-                return [nodes[1], pn.ArrayDecl(nodes[0], pn.Placeholder())]
+                else:
+                    return [nodes[1], pn.ArrayDecl(nodes[0], pn.Placeholder())]
 
     def array_init(self, nodes):
         return pn.Array(nodes)
 
     def array_subscr(self, nodes):
-        # TOO: Fehlermeldungen, wenn da eine Num ist
-        if isinstance(nodes[0], list):
-            return nodes[0] + [pn.Subscr(pn.Placeholder(), nodes[1])]
-        return [nodes[0], pn.Subscr(pn.Placeholder(), nodes[1])]
+        # TODO: Fehlermeldungen, wenn da eine Num ist
+        return pn.Subscr(nodes[0], nodes[1])
 
     # --------------------------------- L_Pntr --------------------------------
     def pntr_deg(self, nodes):
@@ -415,7 +354,8 @@ class ASTTransformerPicoC(Transformer):
             case _:
                 if isinstance(nodes[1], list):
                     return nodes[1] + [pn.PntrDecl(nodes[0], pn.Placeholder())]
-                return [nodes[1], pn.PntrDecl(nodes[0], pn.Placeholder())]
+                else:
+                    return [nodes[1], pn.PntrDecl(nodes[0], pn.Placeholder())]
 
     # -------------------------------- L_Struct -------------------------------
     def struct_spec(self, nodes):
@@ -434,9 +374,7 @@ class ASTTransformerPicoC(Transformer):
         return pn.Struct(assigns)
 
     def struct_attr(self, nodes):
-        if isinstance(nodes[0], list):
-            return nodes[0] + [pn.Attr(pn.Placeholder(), nodes[1])]
-        return [nodes[0], pn.Attr(pn.Placeholder(), nodes[1])]
+        return pn.Attr(nodes[0], nodes[1])
 
     # -------------------------------- L_If_Else ------------------------------
     def if_stmt(self, nodes):
