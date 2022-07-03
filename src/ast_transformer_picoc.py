@@ -207,7 +207,6 @@ class ASTTransformerPicoC(Transformer):
                 bug_in_compiler(current_bin_exp)
 
     def un_exp(self, nodes):
-        # __import__("pudb").set_trace()
         if len(nodes) == 1:
             return nodes[0]
         un_op = nodes[0]
@@ -218,7 +217,6 @@ class ASTTransformerPicoC(Transformer):
                     return exp + [pn.UnOp(un_op, pn.Placeholder())]
                 return [exp, pn.UnOp(un_op, pn.Placeholder())]
             case pn.LogicNot():
-                # TODO:
                 return pn.UnOp(un_op, self._insert_to_bool(exp))
             case pn.DerefOp():
                 exp1, bin_op, exp2 = self._leftmost_node(exp)
@@ -273,7 +271,6 @@ class ASTTransformerPicoC(Transformer):
         return reversed_un_exp
 
     def arith_prec1(self, nodes):
-        # __import__("pudb").set_trace()
         if len(nodes) == 1:
             if isinstance(nodes[0], list):
                 reversed_un_exp = self._reverse_un_exp(nodes[0])
@@ -402,7 +399,6 @@ class ASTTransformerPicoC(Transformer):
         return pn.Array(nodes)
 
     def array_subscr(self, nodes):
-        # __import__("pudb").set_trace()
         # TOO: Fehlermeldungen, wenn da eine Num ist
         if isinstance(nodes[0], list):
             return nodes[0] + [pn.Subscr(pn.Placeholder(), nodes[1])]
@@ -438,7 +434,6 @@ class ASTTransformerPicoC(Transformer):
         return pn.Struct(assigns)
 
     def struct_attr(self, nodes):
-        # __import__("pudb").set_trace()
         if isinstance(nodes[0], list):
             return nodes[0] + [pn.Attr(pn.Placeholder(), nodes[1])]
         return [nodes[0], pn.Attr(pn.Placeholder(), nodes[1])]
