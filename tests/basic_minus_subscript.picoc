@@ -1,4 +1,7 @@
+// in:2
+// expected:-2
+
 void main() {
-  int a[2] = {1, 2};
+  int a[2] = {1, input()};
   print(-a[1]);
 }
