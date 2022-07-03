@@ -20,12 +20,14 @@ class Passes:
         self.block_id = 0
         self.all_blocks = dict()
         self.fun_name_to_block_name = dict()
-        # RETI_Blocks
-        self.instrs_cnt = 0
+        # PicoC_Mon
+        self.argmode_on = False
+        self.symbol_table = st.SymbolTable()
         self.current_scope = "global"
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
-        self.symbol_table = st.SymbolTable()
+        # RETI_Blocks
+        self.instrs_cnt = 0
         # RETI_Patch
         self.has_div = False
 
@@ -537,9 +539,17 @@ class Passes:
                         addr = val_addr
                         match choosen_scope:
                             case ("main" | "global"):
-                                return [pn.Exp(pn.Ref(pn.GlobalRead(addr)))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num("1")), pn.Ref(pn.GlobalRead(addr))
+                                    )
+                                ]
                             case _:
-                                return [pn.Exp(pn.Ref(pn.StackRead(addr)))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num("1")), pn.Ref(pn.StackRead(addr))
+                                    )
+                                ]
                     case _:
                         bug_in_compiler(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
@@ -552,7 +562,7 @@ class Passes:
                 )
                 refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
                 exps_mon = self._picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [pn.Exp(ref3)]
+                return refs_mon + exps_mon + [pn.Assign(pn.Tmp(pn.Num("1")), ref3)]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref2, pn.Name(_, pos) as name):
                 ref3 = pn.Ref(pn.Attr(pn.Tmp(pn.Num("1")), name))
@@ -560,7 +570,7 @@ class Passes:
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
                 refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
-                return refs_mon + [pn.Exp(ref3)]
+                return refs_mon + [pn.Assign(pn.Tmp(pn.Num("1")), ref3)]
             case _:
                 bug_in_compiler(ref)
 
@@ -571,26 +581,58 @@ class Passes:
                 symbol, choosen_scope = self._resolve_name(val, pos)
                 match symbol:
                     case st.Symbol(pn.Writeable(), datatype, _, num):
-                        size = self._datatype_size(datatype)
-                        match choosen_scope:
-                            case ("main" | "global"):
+                        match choosen_scope, datatype:
+                            case (
+                                ("main" | "global"),
+                                (pn.ArrayDecl() | pn.StructSpec()),
+                            ):
+                                if self.argmode_on:
+                                    size = self._datatype_size(datatype)
+                                    return [
+                                        pn.Assign(
+                                            pn.Tmp(pn.Num(str(size))),
+                                            pn.GlobalRead(num),
+                                        )
+                                    ]
+                                else:
+                                    return [
+                                        pn.Assign(
+                                            pn.Tmp(pn.Num("1")),
+                                            pn.Ref(pn.GlobalRead(num)),
+                                        ),
+                                    ]
+                            case (("main" | "global"), _):
                                 return [
                                     pn.Assign(
-                                        pn.Tmp(pn.Num(str(size))), pn.GlobalRead(num)
+                                        pn.Tmp(pn.Num("1")),
+                                        pn.GlobalRead(num),
                                     )
                                 ]
-                            case _:
+                            case (_, (pn.ArrayDecl() | pn.StructSpec())):
+                                if self.argmode_on:
+                                    size = self._datatype_size(datatype)
+                                    return [
+                                        pn.Assign(
+                                            pn.Tmp(pn.Num(str(size))), pn.StackRead(num)
+                                        )
+                                    ]
+                                else:
+                                    return [
+                                        pn.Assign(
+                                            pn.Tmp(pn.Num("1")),
+                                            pn.Ref(pn.StackRead(num)),
+                                        )
+                                    ]
+                            case (_, _):
                                 return [
-                                    pn.Assign(
-                                        pn.Tmp(pn.Num(str(size))), pn.StackRead(num)
-                                    )
+                                    pn.Assign(pn.Tmp(pn.Num("1")), pn.StackRead(num))
                                 ]
                     case st.Symbol(pn.Const(), _, _, num):
-                        return [pn.Exp(num)]
+                        return [pn.Assign(pn.Tmp(pn.Num("1")), num)]
                     case _:
                         bug_in_compiler(symbol)
             case (pn.Num() | pn.Char()):
-                return [pn.Exp(exp)]
+                return [pn.Assign(pn.Tmp(pn.Num("1")), exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
                 exp_mon = self._picoc_mon_exp(exp)
                 return exp_mon + [pn.Exp(pn.Call(name, [pn.Tmp(pn.Num("1"))]))]
@@ -682,9 +724,17 @@ class Passes:
                     case st.Symbol(pn.Writeable(), _, _, num):
                         match choosen_scope:
                             case ("main" | "global"):
-                                return [pn.Exp(pn.Ref(pn.GlobalRead(num)))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num("1")), pn.Ref(pn.GlobalRead(num))
+                                    )
+                                ]
                             case _:
-                                return [pn.Exp(pn.Ref(pn.StackRead(num)))]
+                                return [
+                                    pn.Assign(
+                                        pn.Tmp(pn.Num("1")), pn.Ref(pn.StackRead(num))
+                                    )
+                                ]
                     case st.Symbol(pn.Const()):
                         raise errors.ConstRef(identifier_name, identifier_pos)
                     case _:
@@ -795,15 +845,21 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case (pn.Subscr() | pn.Attr()):
                 refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
+                return refs_mon + [
+                    pn.Assign(
+                        pn.Tmp(pn.Num("1")), pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0"))
+                    )
+                ]
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val, pos) as name, exps):
                 # TODO: check if exps types match with function signature
                 fun_name = val
                 fun_call_pos = pos
                 exps_mon = []
+                self.argmode_on = True
                 for exp2 in exps:
                     exps_mon += self._picoc_mon_exp(exp2)
+                self.argmode_on = False
                 symbol = self.symbol_table.resolve(fun_name)
                 match symbol:
                     case st.Symbol(_, pn.FunDecl(datatype)):
@@ -826,7 +882,7 @@ class Passes:
                         pn.RemoveStackframe(),
                     ]
                     + (
-                        [pn.Exp(rn.Reg(rn.Acc()))]
+                        [pn.Assign(pn.Tmp(pn.Num("1")), rn.Reg(rn.Acc()))]
                         if not isinstance(return_type, pn.VoidType)
                         else []
                     )
@@ -1216,7 +1272,9 @@ class Passes:
                     ),
                 ]
             # ---------------------------- L_Arith ----------------------------
-            case pn.Exp((pn.Num() | pn.Char() | rn.Reg()) as exp):
+            case pn.Assign(
+                pn.Tmp(pn.Num("1")), (pn.Num() | pn.Char() | rn.Reg()) as exp
+            ):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
@@ -1406,7 +1464,7 @@ class Passes:
                             ]
                     mem.num.val = str(int(mem.num.val) + 1)
                     tmp.num.val = str(int(tmp.num.val) - 1)
-                    return reti_instrs
+                return reti_instrs
             case pn.Assign(
                 (pn.GlobalWrite() | pn.StackWrite()) as lhs,
                 pn.Tmp(pn.Num(val2)) as tmp_exp,
@@ -1415,13 +1473,13 @@ class Passes:
                 tmp = copy.deepcopy(tmp_exp)
                 reti_instrs = []
                 stack_offset = val2
-                # TODO: remove in case global won't be implemented
+                reti_instrs = self._single_line_comment(stmt, "#")
                 while True:
                     match (mem, tmp):
                         case (_, pn.Tmp(pn.Num("0"))):
                             break
                         case (pn.GlobalWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
-                            reti_instrs += self._single_line_comment(stmt, "#") + [
+                            reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
                                     [
@@ -1466,7 +1524,9 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Exp(pn.Ref((pn.GlobalRead() | pn.StackRead()) as exp)):
+            case pn.Assign(
+                pn.Tmp(pn.Num("1")), pn.Ref((pn.GlobalRead() | pn.StackRead()) as exp)
+            ):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
@@ -1491,12 +1551,13 @@ class Passes:
                         [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
                     )
                 ]
-            case pn.Exp(
+            case pn.Assign(
+                pn.Tmp(pn.Num("1")),
                 pn.Ref(
                     pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))),
                     datatype,
                     error_data,
-                )
+                ),
             ):
                 reti_instrs = self._single_line_comment(stmt, "#")
                 match datatype:
@@ -1613,12 +1674,13 @@ class Passes:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")]
                     ),
                 ]
-            case pn.Exp(
+            case pn.Assign(
+                pn.Tmp(pn.Num("1")),
                 pn.Ref(
                     pn.Attr(pn.Tmp(pn.Num(val1)), pn.Name(val2, pos2)),
                     datatype,
                     error_data,
-                )
+                ),
             ):
                 attr_name = val2
                 rel_pos_in_struct = 0
@@ -1703,7 +1765,9 @@ class Passes:
                     ),
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0"))):
+            case pn.Assign(
+                pn.Tmp(pn.Num("1")), pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0"))
+            ):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(),
