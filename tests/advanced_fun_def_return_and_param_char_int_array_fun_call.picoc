@@ -1,0 +1,29 @@
+// in:42
+// expected:1 2 3 42
+// actual_expected:1 2 3 42 42 -1
+
+struct array_with_len {int ar[3]; int len;};
+
+int print_all(int ar_ref[3], int len);
+
+void main() {
+  // fun_call as statement
+  int ar[3] = {1, 2, 3};
+
+  print_all(ar, 3);
+  // print(ar[2]);
+  // if (ar[2] == 42) {
+  //   print(-1);
+  // }
+}
+
+int print_all(int ar_ref[3], int len) {
+  int i = 0;
+  while (i < len) {
+    print(ar_ref[i]);
+    i = i + 1;
+  }
+  ar_ref[2] = input();
+  print(ar_ref[2]);
+  return 1;
+}
