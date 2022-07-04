@@ -1,8 +1,6 @@
 // in:42
-// expected:1 2 3 42
-// actual_expected:1 2 3 42 42 -1
-
-struct array_with_len {int ar[3]; int len;};
+// expected:1 2 3 42 42
+// datasegment:16
 
 int print_all(int ar_ref[3], int len);
 
@@ -11,10 +9,7 @@ void main() {
   int ar[3] = {1, 2, 3};
 
   print_all(ar, 3);
-  // print(ar[2]);
-  // if (ar[2] == 42) {
-  //   print(-1);
-  // }
+  print(ar[2]);
 }
 
 int print_all(int ar_ref[3], int len) {
@@ -24,6 +19,6 @@ int print_all(int ar_ref[3], int len) {
     i = i + 1;
   }
   ar_ref[2] = input();
-  print(ar_ref[2]);
+  // print(ar_ref[2]);
   return 1;
 }

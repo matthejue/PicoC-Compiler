@@ -1,5 +1,6 @@
 from ast_node import ASTNode
 import symbol_table as st
+import global_vars
 
 
 # =========================================================================
@@ -184,19 +185,18 @@ class Alloc(ASTNode):
         self.type_qual = type_qual
         self.datatype = datatype
         self.name = name
+        # default is LocalVar()
+        self.local_var_or_param = st.LocalVar()
         super().__init__(
             visible=[
                 self.type_qual,
                 self.datatype,
                 self.name,
             ]
+            + ([self.local_var_or_param] if global_vars.args.double_verbose else [])
         )
 
-    __match_args__ = (
-        "type_qual",
-        "datatype",
-        "name",
-    )
+    __match_args__ = ("type_qual", "datatype", "name", "local_var_or_param")
 
 
 class Assign(ASTNode):
