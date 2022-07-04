@@ -1,0 +1,30 @@
+// in:42
+// expected:1 2 3 4 5 6 42
+
+struct array_with_len {int ar[3]; int len;};
+
+void print_all_pntr(int *len_ref, int *ar_ref, struct array_with_len *st_ar_ref);
+
+void main() {
+  // fun_call as statement
+  int ar[3] = {1, 2, 3};
+  struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};
+  int len;
+  len = 3;
+  print_all_pntr(&len, ar, &st_ar);
+  print(st_ar.ar[2]);
+}
+
+void print_all_pntr(int *len_ref, int *ar_ref, struct array_with_len *st_ar_ref) {
+  int i = 0;
+  while (i < *len_ref) {
+    print(ar_ref[i]);
+    i = i + 1;
+  }
+  i = 0;
+  while (i < (*st_ar_ref).len) {
+    print((*st_ar_ref).ar[i]);
+    i = i + 1;
+  }
+  (*st_ar_ref).ar[2] = input();
+}
