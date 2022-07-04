@@ -422,12 +422,17 @@ class Passes:
                 case _:
                     bug_in_compiler(exp)
 
-    def _add_datatype_and_error_data(self, ref, datatype, error_data: list):
+    def _add_datatype_and_error_data(
+        self, ref, datatype, error_data: list, local_var_or_param
+    ):
         ref.datatype = datatype
         ref.error_data[0:0] = error_data
         ref.global_or_stack = (
-            pn.Name("global") if self.current_scope == "main" else pn.Name("stack")
+            pn.Name("global")
+            if self.current_scope in ["main", "global"]
+            else pn.Name("stack")
         )
+        ref.local_var_or_param = local_var_or_param
         ref.visible += (
             [ref.datatype, ref.error_data, ref.global_or_stack]
             if global_vars.args.double_verbose
@@ -474,7 +479,7 @@ class Passes:
                 var_pos = pos
                 symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
                 match symbol:
-                    case st.Symbol(_, datatype):
+                    case st.Symbol(_, datatype, _, _, _, _, local_var_or_param):
                         current_datatype = copy.deepcopy(datatype)
                     case _:
                         bug_in_compiler(symbol)
@@ -485,6 +490,7 @@ class Passes:
                                 prev_refs.pop(),
                                 datatype=current_datatype,
                                 error_data=[name],
+                                local_var_or_param=local_var_or_param,
                             )
                             break
                         case pn.PntrDecl(pn.Num(val), datatype):
@@ -495,6 +501,7 @@ class Passes:
                                 prev_refs.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
+                                local_var_or_param=local_var_or_param,
                             )
                             current_datatype.num.val = int(val) - 1
                         case pn.ArrayDecl(nums, datatype):
@@ -510,6 +517,7 @@ class Passes:
                                 prev_refs.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
+                                local_var_or_param=local_var_or_param,
                             )
                             current_datatype.nums.pop(0)
                         case pn.StructSpec(pn.Name(val1)):
@@ -519,6 +527,7 @@ class Passes:
                                 ref,
                                 datatype=current_datatype,
                                 error_data=[name],
+                                local_var_or_param=local_var_or_param,
                             )
                             match ref:
                                 case pn.Ref(pn.Attr(_, pn.Name(val2))):
@@ -588,10 +597,9 @@ class Passes:
                 match symbol:
                     case st.Symbol(pn.Writeable(), datatype, _, num):
                         match choosen_scope, datatype:
-                            case (
-                                ("main" | "global"),
-                                (pn.ArrayDecl() | pn.StructSpec()),
-                            ):
+                            case (("main" | "global"), pn.ArrayDecl()):
+                                return [pn.Ref(pn.GlobalRead(num))]
+                            case (("main" | "global"), pn.StructSpec()):
                                 if self.argmode_on:
                                     size = self._datatype_size(datatype)
                                     return [
@@ -604,7 +612,9 @@ class Passes:
                                     return [pn.Ref(pn.GlobalRead(num))]
                             case (("main" | "global"), _):
                                 return [pn.Exp(pn.GlobalRead(num))]
-                            case (_, (pn.ArrayDecl() | pn.StructSpec())):
+                            case (_, pn.ArrayDecl()):
+                                return [pn.Ref(pn.StackRead(num))]
+                            case (_, pn.StructSpec()):
                                 if self.argmode_on:
                                     size = self._datatype_size(datatype)
                                     return [
@@ -668,7 +678,7 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(exp)
                 return exps_mon + [pn.Exp(pn.ToBool(pn.Tmp(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1)):
+            case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
                 var_name = val1
                 var_pos = pos1
                 self._check_redef_and_redecl_error(
@@ -685,7 +695,11 @@ class Passes:
                             st.Pos(
                                 pn.Num(str(var_pos.line)), pn.Num(str(var_pos.column))
                             ),
-                            pn.Num(str(size)),
+                            pn.Num("1")
+                            if isinstance(local_var_or_param, st.Param)
+                            and isinstance(datatype, pn.ArrayDecl)
+                            else pn.Num(str(size)),
+                            local_var_or_param,
                         )
                         self.symbol_table.define(symbol)
                         self.rel_global_addr += size
@@ -699,6 +713,7 @@ class Passes:
                                 pn.Num(str(var_pos.line)), pn.Num(str(var_pos.column))
                             ),
                             pn.Num(str(size)),
+                            local_var_or_param,
                         )
                         self.symbol_table.define(symbol)
                         self.rel_fun_addr += size
@@ -1022,6 +1037,12 @@ class Passes:
                             if global_vars.args.double_verbose
                             else []
                         )
+                        # attach param or not information to alloc
+                        for alloc in allocs:
+                            alloc.local_var_or_param = st.Param()
+                            if global_vars.args.double_verbose:
+                                alloc.visible[3] = alloc.local_var_or_param
+
                         blocks[0].stmts_instrs[:] = (
                             self._single_line_comment(decl_def, "//", filtr=[3])
                             + [pn.Exp(alloc) for alloc in allocs]
@@ -1568,10 +1589,11 @@ class Passes:
                 datatype,
                 error_data,
                 global_or_stack,
+                local_var_or_param,
             ):
                 reti_instrs = self._single_line_comment(stmt, "#")
-                match datatype:
-                    case pn.ArrayDecl(nums, datatype2):
+                match (datatype, local_var_or_param):
+                    case (pn.ArrayDecl(nums, datatype2), st.LocalVar()):
                         help_const = self._datatype_size(datatype2)
                         for num in nums[1:]:
                             match num:
@@ -1599,7 +1621,8 @@ class Passes:
                                 )
                             ),
                         ]
-                    case pn.PntrDecl(_, datatype2):
+                    case ((pn.PntrDecl(_, datatype2) | pn.ArrayDecl(_, datatype2)), _):
+                        # for ArrayDecl only 'if local_var_or_parameter.val == "parameter"' keep left
                         help_const = self._datatype_size(datatype2)
                         reti_instrs += [
                             rn.Instr(
