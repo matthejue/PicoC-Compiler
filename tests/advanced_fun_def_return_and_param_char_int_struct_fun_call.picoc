@@ -1,0 +1,29 @@
+// in:42
+// expected:4 5 6 42 6 -1
+
+struct array_with_len {int ar[3]; int len;};
+
+int print_all(struct array_with_len st_ar_copy);
+
+void main() {
+  // fun_call as statement
+  struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};
+  int success;
+  success = print_all(st_ar);
+  print(st_ar.ar[2]);
+  // fun_call as expression
+  if (success) {
+    print(-1);
+  }
+}
+
+int print_all(struct array_with_len st_ar_copy) {
+  int i = 0;
+  while (i < st_ar_copy.len) {
+    print(st_ar_copy.ar[i]);
+    i = i + 1;
+  }
+  st_ar_copy.ar[2] = input();
+  print(st_ar_copy.ar[2]);
+  return 1;
+}
