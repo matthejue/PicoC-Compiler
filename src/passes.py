@@ -425,8 +425,13 @@ class Passes:
     def _add_datatype_and_error_data(self, ref, datatype, error_data: list):
         ref.datatype = datatype
         ref.error_data[0:0] = error_data
-        ref.visible += ([ref.datatype] if global_vars.args.double_verbose else []) + (
-            [ref.error_data] if global_vars.args.double_verbose else []
+        ref.global_or_stack = (
+            pn.Name("global") if self.current_scope == "main" else pn.Name("stack")
+        )
+        ref.visible += (
+            [ref.datatype, ref.error_data, ref.global_or_stack]
+            if global_vars.args.double_verbose
+            else []
         )
 
     def _check_redef_and_redecl_error(self, var_name, var_pos, Error):
@@ -1562,6 +1567,7 @@ class Passes:
                 pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))),
                 datatype,
                 error_data,
+                global_or_stack,
             ):
                 reti_instrs = self._single_line_comment(stmt, "#")
                 match datatype:
@@ -1585,7 +1591,13 @@ class Passes:
                             rn.Instr(
                                 rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
                             ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
+                            (
+                                rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())])
+                                if global_or_stack.val == "global"
+                                else rn.Instr(
+                                    rn.Sub(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]
+                                )
+                            ),
                         ]
                     case pn.PntrDecl(_, datatype2):
                         help_const = self._datatype_size(datatype2)
@@ -1605,7 +1617,13 @@ class Passes:
                             rn.Instr(
                                 rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
                             ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
+                            (
+                                rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())])
+                                if global_or_stack.val == "global"
+                                else rn.Instr(
+                                    rn.Sub(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]
+                                )
+                            ),
                         ]
                     case _:
                         match error_data:
