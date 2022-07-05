@@ -186,7 +186,7 @@ class Alloc(ASTNode):
         self.datatype = datatype
         self.name = name
         # default is LocalVar()
-        self.local_var_or_param = st.LocalVar()
+        self.local_var_or_param = Name("local_var")
         super().__init__(
             visible=[
                 self.type_qual,

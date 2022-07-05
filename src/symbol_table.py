@@ -16,14 +16,6 @@ class SelfDeclared(ASTNode):
     pass
 
 
-class LocalVar(ASTNode):
-    pass
-
-
-class Param(ASTNode):
-    pass
-
-
 class Pos(ASTNode):
     def __init__(self, line, column):
         self.line = line
@@ -42,7 +34,6 @@ class Symbol(ASTNode):
         val_addr=None,
         pos=None,
         size=None,
-        local_var_or_param=None,
     ):
         self.type_qual = type_qual if type_qual else Empty()
         self.datatype = datatype if datatype else Empty()
@@ -52,17 +43,8 @@ class Symbol(ASTNode):
         )
         self.pos2 = pos if pos else Empty()
         self.size = size if size else Empty()
-        self.local_var_or_param = local_var_or_param if local_var_or_param else Empty()
 
-    __match_args__ = (
-        "type_qual",
-        "datatype",
-        "name",
-        "val_addr",
-        "pos2",
-        "size",
-        "local_var_or_param",
-    )
+    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos2", "size")
 
     def __repr__(self, depth=0):
         tmp = global_vars.args.double_verbose
@@ -81,9 +63,6 @@ class Symbol(ASTNode):
         )
         acc += "\n      position:               " + convert_to_single_line(self.pos2)
         acc += "\n      size:                   " + convert_to_single_line(self.size)
-        acc += "\n      local var or parameter: " + convert_to_single_line(
-            self.local_var_or_param
-        )
         global_vars.args.double_verbose = tmp
         acc += "\n    }"
         return acc + ("\n  )" if global_vars.args.double_verbose else "")
