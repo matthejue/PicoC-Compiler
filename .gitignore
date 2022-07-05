@@ -31,3 +31,4 @@ README.txt
 *.reti_states
 *.res
 *.cast
+*.gdb_history

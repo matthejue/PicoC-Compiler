@@ -1,5 +1,5 @@
 // in:42
-// expected:1 2 3 42
+// expected:1 2 3 42 42
 // datasegment:16
 
 int print_all(int ar_ref[3], int len);
@@ -19,6 +19,6 @@ int print_all(int ar_ref[3], int len) {
     i = i + 1;
   }
   ar_ref[2] = input();
-  // print(ar_ref[2]);
+  print(ar_ref[2]);
   return 1;
 }

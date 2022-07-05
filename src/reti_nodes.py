@@ -1,6 +1,6 @@
 from ast_node import ASTNode
 import picoc_nodes as pn
-from global_funs import bug_in_compiler
+from global_funs import throw_error
 
 
 # =========================================================================
@@ -63,7 +63,7 @@ class Jump(ASTNode):
                     + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
                 )
             case _:
-                bug_in_compiler(self.im_goto)
+                throw_error(self.im_goto)
 
     __match_args__ = ("rel", "im_goto")
 

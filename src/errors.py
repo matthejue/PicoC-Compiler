@@ -51,20 +51,6 @@ class Redeclaration(Exception):
         self.first_pos = first_pos
 
 
-class ConstAssign(Exception):
-    def __init__(self, found, found_pos):
-        self.description = f"{CM().YELLOW}ConstAssign:{CM().RESET_ALL} Can't assign a new value to named constant {CM().RED}'{found}'{CM().RESET}"
-        self.found = found
-        self.found_pos = found_pos
-
-
-class ConstRef(Exception):
-    def __init__(self, found, found_pos):
-        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}"
-        self.found = found
-        self.found_pos = found_pos
-
-
 class UnknownAttribute(Exception):
     def __init__(self, attribute_name, attribute_pos, struct_name):
         self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} doesn't have a attribute {CM().RED}'attribute_name'{CM().RESET}"
@@ -83,6 +69,32 @@ class DatatypeMismatch(Exception):
         self.var_pos = var_pos
         self.expected_pos = expected_pos
         self.expected_datatype = expected_datatype
+
+
+class UniversalError(Exception):
+    def __init__(self, node_name, node_pos):
+        self.description = (
+            f"{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}"
+        )
+        self.node_name = node_name
+        self.node_pos = node_pos
+
+
+# -----------------------------------------------------------------------------
+
+
+class ConstAssign(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstAssign:{CM().RESET_ALL} Can't assign a new value to named constant {CM().RED}'{found}'{CM().RESET}"
+        self.found = found
+        self.found_pos = found_pos
+
+
+class ConstRef(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}"
+        self.found = found
+        self.found_pos = found_pos
 
 
 # TODO

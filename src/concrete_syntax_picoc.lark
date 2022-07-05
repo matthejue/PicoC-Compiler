@@ -3,6 +3,7 @@
 // ============================================================================
 // --------------------------------- L_Comment --------------------------------
 COMMENT: "//" /[^\n]*/|"/*" /(.|\n)*?/ "*/"
+RETI_COMMENT.2: "//" " "? "#" /[^\n]*/
 // ---------------------------------- L_Arith ---------------------------------
 DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 DIG_WITH_0: "0"|DIG_NO_0
@@ -96,7 +97,7 @@ decl_part: decl_exp_stmt|decl_direct_stmt
 compound_stmt: "{" exec_part* "}"
 exec_exp_stmt: logic_or";"
 exec_direct_stmt: if_stmt|if_else_stmt|while_stmt|do_while_stmt|assign_stmt|fun_return_stmt
-exec_part: compound_stmt|exec_exp_stmt|exec_direct_stmt
+exec_part: compound_stmt|exec_exp_stmt|exec_direct_stmt|RETI_COMMENT
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------

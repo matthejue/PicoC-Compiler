@@ -2,7 +2,7 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
 from global_classes import Pos
-from global_funs import bug_in_compiler, remove_extension, nodes_to_str
+from global_funs import throw_error, remove_extension, nodes_to_str
 import errors
 
 
@@ -11,6 +11,12 @@ class ASTTransformerPicoC(Transformer):
     # =                                 Lexer                                 =
     # =========================================================================
     # --------------------------------- L_Arith -------------------------------
+    def RETI_COMMENT(self, token: Token):
+        return pn.RETIComment(
+            token.value[token.value.find("#") + 1 :].lstrip(),
+            Pos(token.line - 1, token.column - 1),
+        )
+
     def NUM(self, token: Token):
         return pn.Num(token.value, Pos(token.line - 1, token.column - 1))
 
@@ -177,7 +183,7 @@ class ASTTransformerPicoC(Transformer):
                 previous_bin_exp.left_exp = exp2
                 return exp1, bin_op, bin_exp
             case _:
-                bug_in_compiler(current_bin_exp)
+                throw_error(current_bin_exp)
 
     def un_exp(self, nodes):
         if len(nodes) == 1:
@@ -207,7 +213,7 @@ class ASTTransformerPicoC(Transformer):
                 ref.pos = un_op.pos
                 return ref
             case _:
-                bug_in_compiler(nodes)
+                throw_error(nodes)
 
     # --------------------------------- L_Arith -------------------------------
     def input_exp(self, _):
@@ -274,7 +280,7 @@ class ASTTransformerPicoC(Transformer):
             case pn.Char():
                 return pn.ToBool(node)
             case _:
-                bug_in_compiler(node)
+                throw_error(node)
 
     def logic_and(self, nodes):
         if len(nodes) == 1:

@@ -12,7 +12,7 @@ from lark.lark import Lark
 from dt_visitor_picoc import DTVisitorPicoC, DTSimpleVisitorPicoC
 from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
-from global_funs import remove_extension, subheading, bug_in_compiler
+from global_funs import remove_extension, subheading, throw_error
 from interp_reti import RETIInterpreter
 
 
@@ -322,7 +322,7 @@ class OptionHandler(cmd2.Cmd):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(pass_ast))
                 case _:
-                    bug_in_compiler(pass_ast)
+                    throw_error(pass_ast)
 
     def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:

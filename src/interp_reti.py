@@ -1,4 +1,5 @@
 import reti_nodes as rn
+import picoc_nodes as pn
 from reti import RETI
 import global_vars
 from global_funs import (
@@ -138,6 +139,8 @@ class RETIInterpreter:
 
     def _instr(self, instr, reti: RETI):
         match instr:
+            case pn.RETIComment():
+                reti.reg_increase("PC")
             case rn.Instr(
                 operation,
                 [rn.Reg() as destination, (rn.Im() | rn.Reg()) as source],

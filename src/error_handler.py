@@ -138,6 +138,17 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
+        except errors.UniversalError as e:
+            self._error_heading()
+            error_header = self._error_header(e.description, e.node_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.node_pos.line, e.node_pos.line
+            )
+            error_screen.mark(e.node_pos, len(e.node_name))
+            error_screen.filter()
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
+            exit(0)
+        # ---------------------------------------------------------------------
         except errors.TooLargeLiteral as e:
             error_header = self._error_header(e.found_pos, e.description)
             error_screen = AnnotationScreen(
