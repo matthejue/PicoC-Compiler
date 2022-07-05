@@ -4,6 +4,10 @@ se so=0
 se nocursorcolumn
 se nocursorline
 
+set expandtab     " insert spaces whenever tab key is pressed
+set tabstop=2     " number of space characters that will be inserted with tab
+set shiftwidth=2  " indentation by 2 spaces
+
 set noshowmode
 set noruler
 set laststatus=0
@@ -18,12 +22,12 @@ nnoremap <S-tab> ?index:<CR>:noh<CR>zt
 nnoremap <esc> :qa!<CR>
 nnoremap q :qa!<CR>
 
-nnoremap s ggzR:<C-u>:set noscb<CR>:bo vs<CR>zRLjzt:setl scb<CR><C-w>p:setl scb<CR>
+nnoremap S ggzR:<C-u>:set noscb<CR>:bo vs<CR>zRLjzt:setl scb<CR><C-w>p:setl scb<CR>
 
 " minimize / maximize window and equalize windows
 nnoremap m <C-w>1<bar>
 nnoremap M <C-w><bar>
-nnoremap e <C-w>=
+nnoremap E <C-w>=
 
 let s:comments = 1
 function! ToggleComments()
@@ -40,8 +44,8 @@ endfunction
 
 nnoremap c :call ToggleComments()<CR>
 
-nnoremap n :set nu!<CR>
-nnoremap r :set rnu!<CR>
+nnoremap N :set nu!<CR>
+nnoremap R :set rnu!<CR>
 
 " hide/unhide colorized lines
 let s:higlight_on = 1
@@ -67,7 +71,7 @@ function! ToggleMatchHighlight()
     endif
 endfunction
 
-nnoremap h :call ToggleMatchHighlight()<CR>
+nnoremap H :call ToggleMatchHighlight()<CR>
 
 call ToggleMatchHighlight()
 
@@ -80,7 +84,7 @@ nnoremap 5 :call matchadd("Color5", '\%'.line('.').'l')<CR>
 nnoremap 6 :call matchadd("Color6", '\%'.line('.').'l')<CR>
 nnoremap 7 :call matchadd("Color7", '\%'.line('.').'l')<CR>
 " remove colorized lines
-nnoremap d :call clearmatches()<CR>
+nnoremap D :call clearmatches()<CR>
 
 " colorize selectection everywhere
 vnoremap 1 "ay:call matchadd("Color1", "<C-r>a")<CR>

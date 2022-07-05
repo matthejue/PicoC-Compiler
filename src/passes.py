@@ -3,7 +3,7 @@ import reti_nodes as rn
 import errors
 import symbol_table as st
 from global_funs import (
-    bug_in_compiler,
+    throw_error,
     remove_extension,
     filter_out_comments,
     convert_to_single_line,
@@ -94,16 +94,19 @@ class Passes:
                                 )
                             ]
                         case _:
-                            bug_in_compiler(assign)
+                            throw_error(assign)
                 return pn.Struct(assigns_shrinked)
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(name, exps):
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case _:
-                bug_in_compiler(exp)
+                throw_error(exp)
 
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
+            # --------------------------- L_Comment ---------------------------
+            case pn.RETIComment():
+                return stmt
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(lhs, exp):
                 return pn.Assign(
@@ -159,13 +162,13 @@ class Passes:
                         case (pn.StructDecl() | pn.FunDecl()):
                             decls_defs_shrinked += [decl_def]
                         case _:
-                            bug_in_compiler(decl_def)
+                            throw_error(decl_def)
                 return pn.File(
                     pn.Name(remove_extension(val) + ".picoc_shrink"),
                     decls_defs_shrinked,
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)
 
     # =========================================================================
     # =                              PicoC_Blocks                             =
@@ -308,7 +311,7 @@ class Passes:
             case (pn.FunDecl() | pn.StructDecl()):
                 return [decl_def]
             case _:
-                bug_in_compiler(decl_def)
+                throw_error(decl_def)
 
     def picoc_blocks(self, file: pn.File):
         match file:
@@ -322,7 +325,7 @@ class Passes:
                     list(reversed(decls_defs_blocks)),
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)
 
     # =========================================================================
     # =                               PicoC_Mon                               =
@@ -339,7 +342,7 @@ class Passes:
                     case st.Symbol(_, _, _, _, _, pn.Num(val)):
                         return int(val)
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
             # ---------------------------- L_Array ----------------------------
             case pn.ArrayDecl(nums, datatype2):
                 size = self._datatype_size(datatype2)
@@ -348,10 +351,10 @@ class Passes:
                         case pn.Num(val):
                             size *= int(val)
                         case _:
-                            bug_in_compiler(num)
+                            throw_error(num)
                 return size
             case _:
-                bug_in_compiler(datatype)
+                throw_error(datatype)
 
     def _signature_size(self, allocs):
         size = 0
@@ -362,7 +365,7 @@ class Passes:
                 case pn.Alloc(_, datatype):
                     size += self._datatype_size(datatype)
                 case _:
-                    bug_in_compiler(alloc)
+                    throw_error(alloc)
         return size
 
     def _local_vars_size(self, stmts):
@@ -422,7 +425,7 @@ class Passes:
                 case pn.Attr(ref, _):
                     return self._get_leftmost_pos(ref)
                 case _:
-                    bug_in_compiler(exp)
+                    throw_error(exp)
 
     def _add_datatype_and_error_data(self, ref, datatype, error_data: list):
         ref.datatype = datatype
@@ -448,7 +451,7 @@ class Passes:
                         Pos(int(pos_first_line), int(pos_first_column)),
                     )
                 case _:
-                    bug_in_compiler(symbol)
+                    throw_error(symbol)
 
     def _resolve_name(self, name, pos):
         try:
@@ -474,7 +477,7 @@ class Passes:
                     case st.Symbol(_, datatype, _, _, _, _):
                         current_datatype = copy.deepcopy(datatype)
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
                 while prev_refs:
                     match current_datatype:
                         case (pn.CharType() | pn.IntType()):
@@ -526,14 +529,14 @@ class Passes:
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
-                                    bug_in_compiler(ref)
+                                    throw_error(ref)
                             match symbol:
                                 case st.Symbol(_, datatype):
                                     current_datatype = copy.deepcopy(datatype)
                                 case _:
-                                    bug_in_compiler(symbol)
+                                    throw_error(symbol)
                         case _:
-                            bug_in_compiler(current_datatype)
+                            throw_error(current_datatype)
 
                 symbol, choosen_scope = self._resolve_name(var_name, var_pos)
                 match symbol:
@@ -545,7 +548,7 @@ class Passes:
                             case _:
                                 return [pn.Ref(pn.StackRead(addr))]
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
             case (pn.Subscr(ref2, exp)):
                 ref3 = pn.Ref(pn.Subscr(pn.Tmp(pn.Num("2")), pn.Tmp(pn.Num("1"))))
@@ -575,7 +578,7 @@ class Passes:
                     last_ref.visible[1] = last_ref.datatype
                 return refs_mon
             case _:
-                bug_in_compiler(ref)
+                throw_error(ref)
 
     def _picoc_mon_exp(self, exp):
         match exp:
@@ -617,7 +620,7 @@ class Passes:
                     case st.Symbol(pn.Const(), _, _, num):
                         return [pn.Exp(num)]
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
             case (pn.Num() | pn.Char()):
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
@@ -739,110 +742,117 @@ class Passes:
                     case st.Symbol(pn.Const()):
                         raise errors.ConstRef(identifier_name, identifier_pos)
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
             case pn.Ref((pn.Subscr() | pn.Attr()) as ref):
                 return self._picoc_mon_ref(ref, [])
             # ---------------------------- L_Array ----------------------------
-            case pn.Array(exps, datatype):
+            case pn.Array(exps):
+                #  case pn.Array(exps, datatype):
                 exps_mon = []
-                match datatype:
-                    case pn.ArrayDecl(nums, _):
-                        if int(nums[0].val) != len(exps):
-                            raise errors.ArrayInitNotEnoughDims()
-                    case _:
-                        bug_in_compiler(datatype)
+                #  match datatype:
+                #      case pn.ArrayDecl(nums, _):
+                #          if int(nums[0].val) != len(exps):
+                #              raise errors.ArrayInitNotEnoughDims()
+                #      case _:
+                #          bug_in_compiler(datatype)
                 for exp in exps:
                     # add datatype from array to exp
                     # TODO: drüber nachdenken, was ist, wenn
                     # eine Funktion einen Pointer oder Struct
                     # returnt
-                    dt_array = copy.deepcopy(datatype)
-                    match (dt_array, exp):
-                        case (pn.ArrayDecl(_), pn.Array()):
-                            dt_array.nums.pop(0)
-                            exp.datatype = dt_array
-                            exp.visible += (
-                                [exp.datatype]
-                                if global_vars.args.double_verbose
-                                else []
-                            )
-                        case (pn.ArrayDecl([pn.Num()], datatype2), pn.Struct()):
-                            match datatype2:
-                                case pn.StructSpec():
-                                    exp.datatype = datatype2
-                                case _:
-                                    bug_in_compiler(datatype2)
-                            exp.visible += (
-                                [exp.datatype]
-                                if global_vars.args.double_verbose
-                                else []
-                            )
-                        case (pn.ArrayDecl([pn.Num()], dt_array), _):
-                            # TODO maybe
-                            pass
-                        case _:
-                            bug_in_compiler(dt_array, exp)
+                    #  dt_array = copy.deepcopy(datatype)
+                    #  match (dt_array, exp):
+                    #      case (pn.ArrayDecl(_), pn.Array()):
+                    #          dt_array.nums.pop(0)
+                    #          exp.datatype = dt_array
+                    #          exp.visible += (
+                    #              [exp.datatype]
+                    #              if global_vars.args.double_verbose
+                    #              else []
+                    #          )
+                    #      case (pn.ArrayDecl([pn.Num()], datatype2), pn.Struct()):
+                    #          match datatype2:
+                    #              case pn.StructSpec():
+                    #                  exp.datatype = datatype2
+                    #              case _:
+                    #                  bug_in_compiler(datatype2)
+                    #          exp.visible += (
+                    #              [exp.datatype]
+                    #              if global_vars.args.double_verbose
+                    #              else []
+                    #          )
+                    #      case (pn.ArrayDecl([pn.Num()], dt_array), _):
+                    #          # TODO maybe
+                    #          pass
+                    #      case _:
+                    #          bug_in_compiler(dt_array, exp)
                     # epxressions should be evaluated in reversed order
                     exps_mon += self._picoc_mon_exp(exp)
                 return exps_mon
             # ---------------------------- L_Struct ---------------------------
-            case pn.Struct(assigns, datatype):
+            #  case pn.Struct(assigns, datatype):
+            case pn.Struct(assigns):
                 exps_mon = []
-                match datatype:
-                    case pn.StructSpec(pn.Name(val1)):
-                        struct_name = val1
-                    case _:
-                        # TODO
-                        raise errors.DatatypeMismatch()
-                symbol = self.symbol_table.resolve(f"{struct_name}")
-                match symbol:
-                    case st.Symbol(_, _, _, val2):
-                        attr_ids = copy.deepcopy(val2)
-                    case _:
-                        bug_in_compiler(symbol)
+                #  match datatype:
+                #      case pn.StructSpec(pn.Name(val1)):
+                #          struct_name = val1
+                #      case _:
+                #          # TODO
+                #          raise errors.DatatypeMismatch()
+                #  symbol = self.symbol_table.resolve(f"{struct_name}")
+                #  match symbol:
+                #      case st.Symbol(_, _, _, val2):
+                #          attr_ids = copy.deepcopy(val2)
+                #      case _:
+                #          bug_in_compiler(symbol)
                 for assign in assigns:
                     match assign:
-                        case pn.Assign(pn.Name(val3), exp):
-                            attr_name = val3
-                            # Fehlermeldung, wenn dieses Attribut garnicht existiert
-                            # raise errors.UnknownAttributeError
-                            attr_ids.remove(pn.Name(f"{attr_name}@{struct_name}"))
-                            symbol = self.symbol_table.resolve(
-                                f"{attr_name}@{struct_name}"
-                            )
-                            match symbol:
-                                case st.Symbol(_, datatype2):
-                                    dt_attr = copy.deepcopy(datatype2)
-                                    match (dt_attr, exp):
-                                        case (pn.StructSpec(), pn.Struct()):
-                                            exp.datatype = dt_attr
-                                            exp.visible += (
-                                                [exp.datatype]
-                                                if global_vars.args.double_verbose
-                                                else []
-                                            )
-                                        case (pn.ArrayDecl(), pn.Array()):
-                                            exp.datatype = dt_attr
-                                            exp.visible += (
-                                                [exp.datatype]
-                                                if global_vars.args.double_verbose
-                                                else []
-                                            )
-                                        # TODO: spezielle Behandlung bei CharType
-                                        case ((pn.IntType() | pn.CharType()), _):
-                                            pass
-                                        case _:
-                                            # TODO:
-                                            raise errors.DatatypeMismatch(dt_attr, exp)
-                                case _:
-                                    bug_in_compiler(symbol)
+                        case pn.Assign(_, exp):
+                            #  case pn.Assign(pn.Name(val3), exp):
+                            #  attr_name = val3
+                            #  # TODO: this part is only for error messages
+                            #  # Fehlermeldung, wenn dieses Attribut garnicht existiert
+                            #  # raise errors.UnknownAttributeError
+                            #  attr_ids.remove(pn.Name(f"{attr_name}@{struct_name}"))
+                            #  symbol = self.symbol_table.resolve(
+                            #      f"{attr_name}@{struct_name}"
+                            #  )
+                            #  match symbol:
+                            #      case st.Symbol(_, datatype2):
+                            #          dt_attr = copy.deepcopy(datatype2)
+                            #          match (dt_attr, exp):
+                            #              case (pn.StructSpec(), pn.Struct()):
+                            #                  exp.datatype = dt_attr
+                            #                  exp.visible += (
+                            #                      [exp.datatype]
+                            #                      if global_vars.args.double_verbose
+                            #                      else []
+                            #                  )
+                            #              case (
+                            #                  (pn.ArrayDecl() | pn.PntrDecl()),
+                            #                  pn.Array(),
+                            #              ):
+                            #                  exp.datatype = dt_attr
+                            #                  exp.visible += (
+                            #                      [exp.datatype]
+                            #                      if global_vars.args.double_verbose
+                            #                      else []
+                            #                  )
+                            #              # TODO: spezielle Behandlung bei CharType
+                            #              case ((pn.IntType() | pn.CharType()), _):
+                            #                  pass
+                            #              case _:
+                            #                  # TODO:
+                            #                  raise errors.DatatypeMismatch(dt_attr, exp)
+                            #      case _:
+                            #          bug_in_compiler(symbol)
                             exps_mon += self._picoc_mon_exp(exp)
                         case _:
-                            bug_in_compiler(assign)
-                if attr_ids:
-                    # TODO: Error implementieren oder alternativ alle diese
-                    # values mit 0 initialisieren
-                    raise errors.StructInitAttrsMissing(attr_ids, exp)
+                            throw_error(assign)
+                #  if attr_ids:
+                #      # TODO: Error implementieren oder alternativ alle diese
+                #      # values mit 0 initialisieren
+                #      raise errors.StructInitAttrsMissing(attr_ids, exp)
                 return exps_mon
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val, pos) as name, exps):
@@ -859,9 +869,9 @@ class Passes:
                     case st.Symbol(_, pn.FunDecl(datatype)):
                         return_type = datatype
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
                 return (
-                    self._single_line_comment(exp, "%", filtr=[])
+                    self._single_line_comment(exp, "// //", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
                     + [
@@ -882,10 +892,15 @@ class Passes:
                     )
                 )
             case _:
-                bug_in_compiler(exp)
+                throw_error(exp)
 
     def _picoc_mon_stmt(self, stmt):
         match stmt:
+            # --------------------------- L_Comment ---------------------------
+            case pn.SingleLineComment():
+                return [stmt]
+            case pn.RETIComment():
+                return [stmt]
             # ---------------------------- L_Arith ----------------------------
             case pn.Exit(pn.Num(val)):
                 return [stmt]
@@ -897,11 +912,11 @@ class Passes:
                 self._picoc_mon_exp(alloc)
                 # this has to be in this order because the datatype declarator
                 # has to be reversed in the _picoc_mon_exp call
-                # TODO: ugly solution
-                array_struct.datatype = alloc.datatype
-                array_struct.visible += (
-                    [array_struct.datatype] if global_vars.args.double_verbose else []
-                )
+                # TODO: ugly solution and add it again
+                #  array_struct.datatype = alloc.datatype
+                #  array_struct.visible += (
+                #      [array_struct.datatype] if global_vars.args.double_verbose else []
+                #  )
                 stmt_mon = self._picoc_mon_stmt(pn.Assign(name, array_struct))
                 return self._single_line_comment(stmt, "//") + stmt_mon
             # ------------------------- L_Assign_Alloc ------------------------
@@ -943,7 +958,7 @@ class Passes:
                         identifier_pos = pos
                         raise errors.ConstAssign(identifier_name, identifier_pos)
                     case _:
-                        bug_in_compiler(symbol)
+                        throw_error(symbol)
             case pn.Assign(
                 pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1, pos1)), num
             ):
@@ -1013,11 +1028,8 @@ class Passes:
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
                 return [pn.Exp(stmt)]
-            # --------------------------- L_Comment ---------------------------
-            case pn.SingleLineComment():
-                return [stmt]
             case _:
-                bug_in_compiler(stmt)
+                throw_error(stmt)
 
     def _picoc_mon_def(self, decl_def):
         match decl_def:
@@ -1086,7 +1098,7 @@ class Passes:
                                     pn.Alloc(pn.Writeable(), datatype2, name2)
                                 ] + signature2
                             case _:
-                                bug_in_compiler(symbol)
+                                throw_error(symbol)
 
                         mismatched_allocs = self._check_prototype(
                             prototype_def, prototype_decl
@@ -1115,7 +1127,7 @@ class Passes:
                                         decl_param_pos,
                                     )
                                 case _:
-                                    bug_in_compiler(
+                                    throw_error(
                                         mismatched_allocs[0], mismatched_allocs[1]
                                     )
 
@@ -1126,7 +1138,7 @@ class Passes:
 
                         blocks_mon += [blocks[0]]
                     case _:
-                        bug_in_compiler(blocks[0])
+                        throw_error(blocks[0])
                 for block in blocks[1:]:
                     match block:
                         case pn.Block(_, stmts):
@@ -1136,7 +1148,7 @@ class Passes:
                             block.stmts_instrs[:] = stmts_mon
                             blocks_mon += [block]
                         case _:
-                            bug_in_compiler(block)
+                            throw_error(block)
 
                 # add a return if the last instruction is no return
                 match blocks[-1]:
@@ -1147,7 +1159,7 @@ class Passes:
                             else [pn.Return()]
                         )
                     case _:
-                        bug_in_compiler(blocks[-1])
+                        throw_error(blocks[-1])
                 return blocks_mon
             case pn.FunDecl(datatype, pn.Name(_, pos) as name, allocs):
                 symbol = st.Symbol(
@@ -1181,7 +1193,7 @@ class Passes:
                                 Pos(int(pos_first_line), int(pos_first_column)),
                             )
                         case _:
-                            bug_in_compiler(symbol)
+                            throw_error(symbol)
                 for alloc in allocs:
                     match alloc:
                         case pn.Alloc(pn.Writeable(), datatype, pn.Name(val2, pos2)):
@@ -1201,7 +1213,7 @@ class Passes:
                             attrs += [pn.Name(f"{attr_name}@{struct_name}")]
                             struct_size += attr_size
                         case _:
-                            bug_in_compiler(alloc)
+                            throw_error(alloc)
                 symbol = st.Symbol(
                     st.Empty(),
                     st.SelfDeclared(),
@@ -1214,7 +1226,7 @@ class Passes:
                 # Struct declaration isn't needed anymore after being evaluated
                 return []
             case _:
-                bug_in_compiler(decl_def)
+                throw_error(decl_def)
 
     def picoc_mon(self, file: pn.File):
         match file:
@@ -1227,13 +1239,24 @@ class Passes:
                     pn.Name(remove_extension(val) + ".picoc_mon"), decls_defs_mon
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)
 
     # =========================================================================
     # =                              RETI_Blocks                              =
     # =========================================================================
     def _reti_blocks_stmt(self, stmt):
         match stmt:
+            # --------------------------- L_Comment ---------------------------
+            case pn.SingleLineComment(prefix, content):
+                match prefix:
+                    case "//":
+                        return [pn.SingleLineComment("# //", content)]
+                    case "// //":
+                        return [pn.SingleLineComment("# // //", content)]
+                    case _:
+                        throw_error(prefix)
+            case pn.RETIComment():
+                return [stmt]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(
                 pn.BinOp(
@@ -1248,7 +1271,7 @@ class Passes:
                     case pn.LogicOr():
                         lop = rn.Or()
                     case _:
-                        bug_in_compiler(bin_lop)
+                        throw_error(bin_lop)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1294,7 +1317,7 @@ class Passes:
                             rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), exp, rn.Im("1")]),
                         ]
                     case _:
-                        bug_in_compiler(exp)
+                        throw_error(exp)
 
                 return reti_instrs + [
                     rn.Instr(
@@ -1352,7 +1375,7 @@ class Passes:
                     case pn.Or():
                         aop = rn.Or()
                     case _:
-                        bug_in_compiler(bin_aop)
+                        throw_error(bin_aop)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1382,7 +1405,7 @@ class Passes:
                     case pn.Minus():
                         pass
                     case _:
-                        bug_in_compiler(un_op)
+                        throw_error(un_op)
                 return reti_instrs + [
                     rn.Instr(
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
@@ -1436,7 +1459,7 @@ class Passes:
                     case pn.GtE():
                         rel = rn.GtE()
                     case _:
-                        bug_in_compiler(rel)
+                        throw_error(rel)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1576,7 +1599,7 @@ class Passes:
                                 ),
                             ]
                         case _:
-                            bug_in_compiler(mem, tmp)
+                            throw_error(mem, tmp)
                     tmp.num.val = str(int(tmp.num.val) + 1)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
@@ -1607,7 +1630,7 @@ class Passes:
                     #         ),
                     #     ]
                     case _:
-                        bug_in_compiler(exp)
+                        throw_error(exp)
                 return reti_instrs + [
                     rn.Instr(
                         rn.Storein(),
@@ -1628,7 +1651,7 @@ class Passes:
                                 case pn.Num(val3):
                                     help_const *= int(val3)
                                 case _:
-                                    bug_in_compiler(num)
+                                    throw_error(num)
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
@@ -1696,7 +1719,7 @@ class Passes:
                                             "array or pointer",
                                         )
                                     case _:
-                                        bug_in_compiler(datatype)
+                                        throw_error(datatype)
                             # bei z.B. Deref(ref, Num("0")) wird für die
                             # Position nur Pos(-1, -1) gespeichert
                             case [pn.Name(val1, pos1)]:
@@ -1726,9 +1749,9 @@ class Passes:
                                             "array or pointer",
                                         )
                                     case _:
-                                        bug_in_compiler(datatype)
+                                        throw_error(datatype)
                             case _:
-                                bug_in_compiler(error_data)
+                                throw_error(error_data)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(
@@ -1760,14 +1783,14 @@ class Passes:
                                             attr_size = val4
                                             rel_pos_in_struct += int(attr_size)
                                         case _:
-                                            bug_in_compiler(symbol)
+                                            throw_error(symbol)
                                 else:
                                     attr_pos = pos2
                                     raise errors.UnknownAttribute(
                                         attr_name, attr_pos, struct_name
                                     )
                             case _:
-                                bug_in_compiler(symbol)
+                                throw_error(symbol)
                     case _:
                         match error_data:
                             case [
@@ -1808,9 +1831,9 @@ class Passes:
                                             "struct",
                                         )
                                     case _:
-                                        bug_in_compiler(datatype)
+                                        throw_error(datatype)
                             case _:
-                                bug_in_compiler(error_data)
+                                throw_error(error_data)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
@@ -1917,7 +1940,7 @@ class Passes:
                             ),
                         ]
                     case _:
-                        bug_in_compiler(num1, num2)
+                        throw_error(num1, num2)
             case pn.RemoveStackframe():
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
@@ -1942,17 +1965,8 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
                     ),
                 ]
-            # --------------------------- L_Comment ---------------------------
-            case pn.SingleLineComment(prefix, content):
-                match prefix:
-                    case "//":
-                        return [pn.SingleLineComment("# //", content)]
-                    case "%":
-                        return [pn.SingleLineComment("# %", content)]
-                    case _:
-                        bug_in_compiler(prefix)
             case _:
-                bug_in_compiler(stmt)
+                throw_error(stmt)
 
     def reti_blocks(self, file: pn.File):
         match file:
@@ -1967,13 +1981,13 @@ class Passes:
                                 instrs += self._reti_blocks_stmt(stmt)
                             block.stmts_instrs[:] = instrs
                         case _:
-                            bug_in_compiler(block)
+                            throw_error(block)
                 reti_blocks = blocks
                 return pn.File(
                     pn.Name(remove_extension(val) + ".reti_blocks"), reti_blocks
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)
 
     # =========================================================================
     # =                               RETI_Patch                              =
@@ -2060,13 +2074,13 @@ class Passes:
                                 rn.Instr(rn.Storein(), [reg1, reg2, rn.Im("0")]),
                             ]
                         case _:
-                            bug_in_compiler()
+                            throw_error()
                 else:
                     return [instr]
             case rn.Instr(rn.Loadi(), [reg, rn.Im(val)]):
                 s_num = int(val)
                 if s_num < -(2**31) and s_num > 2**31 - 1:
-                    bug_in_compiler(instr)
+                    throw_error(instr)
                 elif s_num < -(2**21) and s_num > 2**21 - 1:
                     return self._write_large_immediate_in_register(reg, s_num)
                 else:
@@ -2074,7 +2088,7 @@ class Passes:
             case rn.Jump(rel, rn.Im(val)):
                 s_num = int(val)
                 if s_num < -(2**31) and s_num > 2**31 - 1:
-                    bug_in_compiler(instr)
+                    throw_error(instr)
                 elif s_num < -(2**21) and s_num > 2**21 - 1:
                     neg_rel = global_vars.NEG_RELS[str(rel)]
                     instrs_for_immediate = self._write_large_immediate_in_register(
@@ -2143,7 +2157,7 @@ class Passes:
                     start_block_in_list + patched_blocks,
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)
 
     # =========================================================================
     # =                                  RETI                                 =
@@ -2204,9 +2218,9 @@ class Passes:
                                     case _:
                                         idx += 1
                         case _:
-                            bug_in_compiler(block)
+                            throw_error(block)
                 return rn.Program(
                     rn.Name(remove_extension(val) + ".reti"), instrs_block_free
                 )
             case _:
-                bug_in_compiler(file)
+                throw_error(file)

@@ -519,6 +519,11 @@ class SingleLineComment:
     __match_args__ = ("prefix", "content")
 
 
+class RETIComment(ASTNode):
+    def __repr__(self, depth=0):
+        return f"\n{' ' * depth}# {self.val}"
+
+
 # ------------------------------- L_Placeholder -------------------------------
 class Placeholder(ASTNode):
     pass

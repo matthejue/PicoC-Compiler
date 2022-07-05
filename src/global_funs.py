@@ -5,6 +5,7 @@ import global_vars
 import picoc_nodes as pn
 import sys
 import os
+from global_classes import Pos
 
 
 def overwrite(old, replace_with, idx, color=""):
@@ -59,11 +60,18 @@ def convert_to_single_line(stmt):
     return "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
 
 
-def bug_in_compiler(*args):
-    import inspect
+def throw_error(*nodes):
+    _throw_error(nodes)
 
-    # return name of caller of this function
-    raise errors.BugInCompiler(inspect.stack()[1][3], args_to_str(args))
+
+def _throw_error(nodes):
+    for node in nodes:
+        if isinstance(node, list):
+            _throw_error(node)
+            return
+        _throw_error(node.visible)
+        if node.pos != Pos(-1, -1):
+            raise errors.UniversalError("test", node.pos)
 
 
 def bug_in_interpreter(*args):
