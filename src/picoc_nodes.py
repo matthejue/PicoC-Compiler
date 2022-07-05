@@ -287,10 +287,9 @@ class Ref(ASTNode):
         self.exp = exp
         self.datatype: ASTNode
         self.error_data: list
-        self.global_or_stack: Name
         super().__init__(visible=[self.exp])
 
-    __match_args__ = ("exp", "datatype", "error_data", "global_or_stack")
+    __match_args__ = ("exp", "datatype", "error_data")
 
 
 class Deref(ASTNode):

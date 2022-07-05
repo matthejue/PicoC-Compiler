@@ -427,15 +427,8 @@ class Passes:
     def _add_datatype_and_error_data(self, ref, datatype, error_data: list):
         ref.datatype = datatype
         ref.error_data[0:0] = error_data
-        ref.global_or_stack = (
-            pn.Name("global")
-            if self.current_scope in ["main", "global"]
-            else pn.Name("stack")
-        )
         ref.visible += (
-            [ref.datatype, ref.error_data, ref.global_or_stack]
-            if global_vars.args.double_verbose
-            else []
+            [ref.datatype, ref.error_data] if global_vars.args.double_verbose else []
         )
 
     def _check_redef_and_redecl_error(self, var_name, var_pos, Error):
@@ -679,9 +672,9 @@ class Passes:
                 self._check_redef_and_redecl_error(
                     var_name, var_pos, errors.Redefinition
                 )
-                size = self._datatype_size(datatype)
                 match self.current_scope:
                     case "main":
+                        size = self._datatype_size(datatype)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
@@ -702,11 +695,12 @@ class Passes:
                                 datatype = pn.PntrDecl(pn.Num("1"), datatype2)
                             case _:
                                 pass
+                        size = self._datatype_size(datatype)
                         symbol = st.Symbol(
                             type_qual,
                             datatype,
                             pn.Name(f"{var_name}@{self.current_scope}"),
-                            pn.Num(str(self.rel_fun_addr)),
+                            pn.Num(str(self.rel_fun_addr + size - 1)),
                             st.Pos(
                                 pn.Num(str(var_pos.line)), pn.Num(str(var_pos.column))
                             ),
@@ -788,7 +782,8 @@ class Passes:
                             pass
                         case _:
                             bug_in_compiler(dt_array, exp)
-                    exps_mon += self._picoc_mon_exp(exp)
+                    # epxressions should be evaluated in reversed order
+                    exps_mon[0:0] = self._picoc_mon_exp(exp)
                 return exps_mon
             # ---------------------------- L_Struct ---------------------------
             case pn.Struct(assigns, datatype):
@@ -841,7 +836,7 @@ class Passes:
                                             raise errors.DatatypeMismatch(dt_attr, exp)
                                 case _:
                                     bug_in_compiler(symbol)
-                            exps_mon += self._picoc_mon_exp(exp)
+                            exps_mon[0:0] = self._picoc_mon_exp(exp)
                         case _:
                             bug_in_compiler(assign)
                 if attr_ids:
@@ -1306,48 +1301,6 @@ class Passes:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
                     ),
                 ]
-            case pn.Assign(
-                pn.Tmp(pn.Num(val1)) as lhs_tmp,
-                (pn.GlobalRead() | pn.StackRead()) as exp,
-            ):
-                tmp = copy.deepcopy(lhs_tmp)
-                mem = copy.deepcopy(exp)
-                reti_instrs = self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)])
-                ]
-                while True:
-                    match (tmp, mem):
-                        case (pn.Tmp(pn.Num("0")), _):
-                            break
-                        case (pn.Tmp(pn.Num(val1)), pn.GlobalRead(pn.Num(val2))):
-                            reti_instrs += [
-                                rn.Instr(
-                                    rn.Loadin(),
-                                    [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), rn.Im(val2)],
-                                ),
-                                rn.Instr(
-                                    rn.Storein(),
-                                    [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)],
-                                ),
-                            ]
-                        case (pn.Tmp(pn.Num(val1)), pn.StackRead(pn.Num(val2))):
-                            reti_instrs += [
-                                rn.Instr(
-                                    rn.Loadin(),
-                                    [
-                                        rn.Reg(rn.Baf()),
-                                        rn.Reg(rn.Acc()),
-                                        rn.Im(str(-(2 + int(val2)))),
-                                    ],
-                                ),
-                                rn.Instr(
-                                    rn.Storein(),
-                                    [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)],
-                                ),
-                            ]
-                    mem.num.val = str(int(mem.num.val) + 1)
-                    tmp.num.val = str(int(tmp.num.val) - 1)
-                return reti_instrs
             case pn.Exp((pn.GlobalRead() | pn.StackRead()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
@@ -1503,17 +1456,72 @@ class Passes:
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(
-                (pn.GlobalWrite() | pn.StackWrite()) as lhs,
-                pn.Tmp(pn.Num(val2)) as tmp_exp,
+                pn.Tmp(pn.Num(val1)) as lhs,
+                (pn.GlobalRead() | pn.StackRead()) as exp,
             ):
+                tmp_max = lhs.num.val
+                tmp = pn.Tmp(pn.Num("0"))
+                mem = copy.deepcopy(exp)
+                reti_instrs = self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)])
+                ]
+                while True:
+                    match (tmp, mem):
+                        case (pn.Tmp(pn.Num(val)), _) if val == tmp_max:
+                            break
+                        case (pn.Tmp(pn.Num(val1)), pn.GlobalRead(pn.Num(val2))):
+                            reti_instrs += [
+                                rn.Instr(
+                                    rn.Loadin(),
+                                    [
+                                        rn.Reg(rn.Ds()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(str(int(val2) + int(val1))),
+                                    ],
+                                ),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [
+                                        rn.Reg(rn.Sp()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(str(int(val1) + 1)),
+                                    ],
+                                ),
+                            ]
+                        case (pn.Tmp(pn.Num(val1)), pn.StackRead(pn.Num(val2))):
+                            reti_instrs += [
+                                rn.Instr(
+                                    rn.Loadin(),
+                                    [
+                                        rn.Reg(rn.Baf()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(str(-(2 + int(val2) - int(val1)))),
+                                    ],
+                                ),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [
+                                        rn.Reg(rn.Sp()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(str(int(val1) + 1)),
+                                    ],
+                                ),
+                            ]
+                    tmp.num.val = str(int(tmp.num.val) + 1)
+                return reti_instrs
+            case pn.Assign(
+                (pn.GlobalWrite() | pn.StackWrite()) as lhs,
+                pn.Tmp(pn.Num(val2)) as tmp,
+            ):
+                tmp_max = tmp.num.val
                 mem = copy.deepcopy(lhs)
-                tmp = copy.deepcopy(tmp_exp)
+                tmp = pn.Tmp(pn.Num("0"))
                 reti_instrs = []
                 stack_offset = val2
                 reti_instrs = self._single_line_comment(stmt, "#")
                 while True:
                     match (mem, tmp):
-                        case (_, pn.Tmp(pn.Num("0"))):
+                        case (_, pn.Tmp(pn.Num(val))) if val == tmp_max:
                             break
                         case (pn.GlobalWrite(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
                             reti_instrs += [
@@ -1522,7 +1530,7 @@ class Passes:
                                     [
                                         rn.Reg(rn.Sp()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(val2),
+                                        rn.Im(str(int(val2) + 1)),
                                     ],
                                 ),
                                 rn.Instr(
@@ -1530,7 +1538,7 @@ class Passes:
                                     [
                                         rn.Reg(rn.Ds()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(val1),
+                                        rn.Im(str(int(val1) + int(val2))),
                                     ],
                                 ),
                             ]
@@ -1541,7 +1549,7 @@ class Passes:
                                     [
                                         rn.Reg(rn.Sp()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(val2),
+                                        rn.Im(str(int(val2) + 1)),
                                     ],
                                 ),
                                 rn.Instr(
@@ -1549,14 +1557,13 @@ class Passes:
                                     [
                                         rn.Reg(rn.Baf()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(-(2 + int(val1)))),
+                                        rn.Im(str(-(2 + int(val1) - int(val2)))),
                                     ],
                                 ),
                             ]
                         case _:
                             bug_in_compiler(mem, tmp)
-                    mem.num.val = str(int(mem.num.val) + 1)
-                    tmp.num.val = str(int(tmp.num.val) - 1)
+                    tmp.num.val = str(int(tmp.num.val) + 1)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
@@ -1597,7 +1604,6 @@ class Passes:
                 pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))),
                 datatype,
                 error_data,
-                global_or_stack,
             ):
                 reti_instrs = self._single_line_comment(stmt, "#")
                 match datatype:
@@ -1621,13 +1627,7 @@ class Passes:
                             rn.Instr(
                                 rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
                             ),
-                            (
-                                rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())])
-                                if global_or_stack.val == "global"
-                                else rn.Instr(
-                                    rn.Sub(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]
-                                )
-                            ),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
                     case pn.PntrDecl(_, datatype2):
                         # for ArrayDecl only 'if local_var_or_parameter.val == "parameter"' keep left
@@ -1648,13 +1648,7 @@ class Passes:
                             rn.Instr(
                                 rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
                             ),
-                            (
-                                rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())])
-                                if global_or_stack.val == "global"
-                                else rn.Instr(
-                                    rn.Sub(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]
-                                )
-                            ),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
                     case _:
                         match error_data:
