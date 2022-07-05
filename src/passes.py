@@ -783,7 +783,7 @@ class Passes:
                         case _:
                             bug_in_compiler(dt_array, exp)
                     # epxressions should be evaluated in reversed order
-                    exps_mon[0:0] = self._picoc_mon_exp(exp)
+                    exps_mon += self._picoc_mon_exp(exp)
                 return exps_mon
             # ---------------------------- L_Struct ---------------------------
             case pn.Struct(assigns, datatype):
@@ -836,7 +836,7 @@ class Passes:
                                             raise errors.DatatypeMismatch(dt_attr, exp)
                                 case _:
                                     bug_in_compiler(symbol)
-                            exps_mon[0:0] = self._picoc_mon_exp(exp)
+                            exps_mon += self._picoc_mon_exp(exp)
                         case _:
                             bug_in_compiler(assign)
                 if attr_ids:
@@ -1538,7 +1538,11 @@ class Passes:
                                     [
                                         rn.Reg(rn.Ds()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(int(val1) + int(val2))),
+                                        rn.Im(
+                                            str(
+                                                int(val1) + int(tmp_max) - 1 - int(val2)
+                                            )
+                                        ),
                                     ],
                                 ),
                             ]
@@ -1557,7 +1561,17 @@ class Passes:
                                     [
                                         rn.Reg(rn.Baf()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(-(2 + int(val1) - int(val2)))),
+                                        rn.Im(
+                                            str(
+                                                -(
+                                                    2
+                                                    + int(val1)
+                                                    - int(tmp_max)
+                                                    + 1
+                                                    + int(val2)
+                                                )
+                                            )
+                                        ),
                                     ],
                                 ),
                             ]
