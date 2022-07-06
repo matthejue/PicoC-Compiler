@@ -7,6 +7,7 @@ from global_funs import (
     remove_extension,
     filter_out_comments,
     convert_to_single_line,
+    find_first_pos_in_node,
 )
 from global_classes import Pos
 import global_vars
@@ -525,11 +526,17 @@ class Passes:
                                     symbol = self.symbol_table.resolve(
                                         f"{attr_name}@{struct_name}"
                                     )
+                                case pn.Ref(pn.Subscr()):
+                                    raise errors.DatatypeMismatch(
+                                        var_name,
+                                        "struct",
+                                        var_pos,
+                                        find_first_pos_in_node([ref])[1],
+                                        "array or ponter",
+                                    )
                                 case pn.Exp():
                                     break
                                 case _:
-                                    # TODO: here belongs a proper error message
-                                    # nachsehen, ob [] auf Structvariable anwendbar ist
                                     throw_error(ref)
                             match symbol:
                                 case st.Symbol(_, datatype):
@@ -559,6 +566,8 @@ class Passes:
                 ref3.error_data = (
                     [self._get_leftmost_pos(exp)] if exp.pos != Pos(-1, -1) else []
                 )
+                # save position
+                ref3.pos = find_first_pos_in_node(ref.visible)[1]
                 refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
                 exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [ref3]
@@ -568,6 +577,8 @@ class Passes:
                 ref3.error_data = [
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
+                # save position
+                ref3.pos = find_first_pos_in_node(ref.visible)[1]
                 refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
                 return refs_mon + [ref3]
             case pn.Ref(ref2):
