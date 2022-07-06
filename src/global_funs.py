@@ -62,6 +62,7 @@ def convert_to_single_line(stmt):
 
 def throw_error(*nodes):
     _throw_error(nodes)
+    raise Exception
 
 
 def _throw_error(nodes):
@@ -71,7 +72,7 @@ def _throw_error(nodes):
             return
         _throw_error(node.visible)
         if node.pos != Pos(-1, -1):
-            raise errors.UniversalError("test", node.pos)
+            raise errors.NodeError(convert_to_single_line(str(node)), node.pos)
 
 
 def bug_in_interpreter(*args):

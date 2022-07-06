@@ -211,9 +211,11 @@ class Assign(ASTNode):
 class Exp(ASTNode):
     def __init__(self, exp):
         self.exp = exp
+        self.datatype: ASTNode
+        self.error_data: list
         super().__init__(visible=[self.exp])
 
-    __match_args__ = ("exp",)
+    __match_args__ = ("exp", "datatype", "error_data")
 
 
 class Tmp(ASTNode):
