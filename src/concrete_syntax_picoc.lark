@@ -92,7 +92,7 @@ do_while_stmt: "do" exec_part "while""("logic_or")"";"
 // ---------------------------------- L_Stmt ----------------------------------
 decl_exp_stmt: alloc";"
 decl_direct_stmt: assign_stmt|init_stmt|const_init_stmt
-decl_part: decl_exp_stmt|decl_direct_stmt
+decl_part: decl_exp_stmt|decl_direct_stmt|RETI_COMMENT
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 compound_stmt: "{" exec_part* "}"
 exec_exp_stmt: logic_or";"

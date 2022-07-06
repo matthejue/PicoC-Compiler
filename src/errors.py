@@ -71,11 +71,9 @@ class DatatypeMismatch(Exception):
         self.expected_datatype = expected_datatype
 
 
-class UniversalError(Exception):
+class NodeError(Exception):
     def __init__(self, node_name, node_pos):
-        self.description = (
-            f"{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}"
-        )
+        self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}"
         self.node_name = node_name
         self.node_pos = node_pos
 

@@ -466,7 +466,7 @@ class Passes:
                 raise errors.UnknownIdentifier(name, pos)
         return symbol, choosen_scope
 
-    def _picoc_mon_ref(self, ref, prev_refs):
+    def _picoc_mon_ref(self, ref, prev_stmts):
         match ref:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val, pos) as name:
@@ -478,21 +478,20 @@ class Passes:
                         current_datatype = copy.deepcopy(datatype)
                     case _:
                         throw_error(symbol)
-                while prev_refs:
+                while prev_stmts:
                     match current_datatype:
                         case (pn.CharType() | pn.IntType()):
                             self._add_datatype_and_error_data(
-                                prev_refs.pop(),
+                                prev_stmts.pop(),
                                 datatype=current_datatype,
                                 error_data=[name],
                             )
-                            break
                         case pn.PntrDecl(pn.Num(val), datatype):
                             if int(val) == 0:
                                 current_datatype = datatype
                                 continue
                             self._add_datatype_and_error_data(
-                                prev_refs.pop(),
+                                prev_stmts.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
                             )
@@ -507,14 +506,14 @@ class Passes:
                             # TODO: think bit about if add_dadatype should be
                             # before or after the pop
                             self._add_datatype_and_error_data(
-                                prev_refs.pop(),
+                                prev_stmts.pop(),
                                 datatype=copy.deepcopy(current_datatype),
                                 error_data=[name],
                             )
                             current_datatype.nums.pop(0)
                         case pn.StructSpec(pn.Name(val1)):
                             struct_name = val1
-                            ref = prev_refs.pop()
+                            ref = prev_stmts.pop()
                             self._add_datatype_and_error_data(
                                 ref,
                                 datatype=current_datatype,
@@ -526,6 +525,8 @@ class Passes:
                                     symbol = self.symbol_table.resolve(
                                         f"{attr_name}@{struct_name}"
                                     )
+                                case pn.Exp():
+                                    break
                                 case _:
                                     # TODO: here belongs a proper error message
                                     # nachsehen, ob [] auf Structvariable anwendbar ist
@@ -558,7 +559,7 @@ class Passes:
                 ref3.error_data = (
                     [self._get_leftmost_pos(exp)] if exp.pos != Pos(-1, -1) else []
                 )
-                refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
+                refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
                 exps_mon = self._picoc_mon_exp(exp)
                 return refs_mon + exps_mon + [ref3]
             # ---------------------------- L_Struct ---------------------------
@@ -567,12 +568,12 @@ class Passes:
                 ref3.error_data = [
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
-                refs_mon = self._picoc_mon_ref(ref2, prev_refs + [ref3])
+                refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
                 return refs_mon + [ref3]
             case pn.Ref(ref2):
                 # TODO: Fehlermeldung, und das nur Placeholder
-                last_ref = prev_refs[-1]
-                refs_mon = self._picoc_mon_ref(ref2, prev_refs)
+                last_ref = prev_stmts[-1]
+                refs_mon = self._picoc_mon_ref(ref2, prev_stmts)
                 last_ref.datatype = pn.ArrayDecl([pn.Num("1")], last_ref.datatype)
                 if global_vars.args.double_verbose:
                     last_ref.visible[1] = last_ref.datatype
@@ -725,8 +726,11 @@ class Passes:
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case (pn.Subscr() | pn.Attr()):
-                refs_mon = self._picoc_mon_ref(exp, [])
-                return refs_mon + [pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))]
+                final_exp = pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))
+                # in case of *&var
+                final_exp.error_data = []
+                refs_mon = self._picoc_mon_ref(exp, [final_exp])
+                return refs_mon + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val, pos)):
                 identifier_name = val
@@ -1846,19 +1850,27 @@ class Passes:
                     ),
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0"))):
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)],
-                    ),
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.In1()), rn.Reg(rn.Acc()), rn.Im("0")]
-                    ),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
-                ]
+            case pn.Exp(pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0")), datatype):
+                match datatype:
+                    case (pn.StructSpec() | pn.IntType() | pn.CharType()):
+                        return self._single_line_comment(stmt, "#") + [
+                            rn.Instr(
+                                rn.Loadin(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)],
+                            ),
+                            rn.Instr(
+                                rn.Loadin(),
+                                [rn.Reg(rn.In1()), rn.Reg(rn.Acc()), rn.Im("0")],
+                            ),
+                            rn.Instr(
+                                rn.Storein(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
+                            ),
+                        ]
+                    case (pn.ArrayDecl() | pn.PntrDecl()):
+                        return self._single_line_comment(stmt, "#")
+                    case _:
+                        throw_error(datatype)
             case pn.Assign(
                 pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0")), pn.Tmp(pn.Num(val2))
             ):

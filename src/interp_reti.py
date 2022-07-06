@@ -380,7 +380,7 @@ class RETIInterpreter:
                                     for line in fin.readline()
                                     .replace("\n", "")
                                     .split(" ")
-                                    if line
+                                    if line.lstrip("-").isdigit()
                                 ]
                             )
                         )
