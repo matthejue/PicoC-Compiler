@@ -60,19 +60,25 @@ def convert_to_single_line(stmt):
     return "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
 
 
-def throw_error(*nodes):
-    _throw_error(nodes)
-    raise Exception
-
-
-def _throw_error(nodes):
+def find_first_pos_in_node(nodes):
+    res = []
     for node in nodes:
         if isinstance(node, list):
-            _throw_error(node)
-            return
-        _throw_error(node.visible)
-        if node.pos != Pos(-1, -1):
-            raise errors.NodeError(convert_to_single_line(str(node)), node.pos)
+            res += find_first_pos_in_node(node)
+        elif node.pos == Pos(-1, -1):
+            res += find_first_pos_in_node(node.visible)
+        else:  # node.pos != Pos(-1, -1):
+            return [node, node.pos]
+    return res
+
+
+def throw_error(*nodes):
+    node_name_and_node_pos = find_first_pos_in_node(nodes)
+    if node_name_and_node_pos:
+        node_name, node_pos = node_name_and_node_pos
+        raise errors.NodeError(convert_to_single_line(str(node_name)), node_pos)
+    else:
+        raise Exception
 
 
 def bug_in_interpreter(*args):

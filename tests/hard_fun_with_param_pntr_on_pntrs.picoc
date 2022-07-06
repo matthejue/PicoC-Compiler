@@ -11,10 +11,10 @@ void main() {
   int i;
   connect(pntr, ar, len_ar);
   i = 0;
-  // while (i < len_pntr) {
-  //   print((*pntr)[i]);
-  //   i = i + 1;
-  // }
+  while (i < len_pntr) {
+    print((*pntr)[i]);
+    i = i + 1;
+  }
 }
 
 void connect(int **pntr, int (*ar)[2], int len) {
