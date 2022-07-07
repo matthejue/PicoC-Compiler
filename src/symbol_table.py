@@ -12,10 +12,6 @@ class BuiltIn(ASTNode):
     pass
 
 
-class SelfDeclared(ASTNode):
-    pass
-
-
 class Pos(ASTNode):
     def __init__(self, line, column):
         self.line = line
@@ -75,8 +71,9 @@ class SymbolTable(ASTNode):
         super().__init__(visible=[self.symbols])
 
     def _init_type_sytem(self):
-        self.define(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
-        self.define(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
+        if global_vars.args.double_verbose:
+            self.define(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
+            self.define(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
 
     def exists(self, name):
         return self.symbols.get(name)

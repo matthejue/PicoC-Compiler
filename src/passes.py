@@ -143,6 +143,8 @@ class Passes:
                     stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
                 return pn.DoWhile(self._picoc_shrink_exp(exp), stmts_shrinked)
             # ----------------------------- L_Fun -----------------------------
+            case pn.Return(st.Empty()):
+                return stmt
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
 
@@ -879,6 +881,7 @@ class Passes:
                 for exp2 in exps:
                     exps_mon += self._picoc_mon_exp(exp2)
                 self.argmode_on = False
+                # TODO: add error when function undefined
                 symbol = self.symbol_table.resolve(fun_name)
                 match symbol:
                     case st.Symbol(_, pn.FunDecl(datatype)):
@@ -1088,7 +1091,7 @@ class Passes:
                             symbol = self.symbol_table.resolve(def_name)
                         except KeyError:
                             symbol = st.Symbol(
-                                pn.Const(),
+                                st.Empty(),
                                 pn.FunDecl(datatype, name, allocs),
                                 name,
                                 st.Empty(),
@@ -1178,7 +1181,7 @@ class Passes:
                 return blocks_mon
             case pn.FunDecl(datatype, pn.Name(_, pos) as name, allocs):
                 symbol = st.Symbol(
-                    pn.Const(),
+                    st.Empty(),
                     decl_def,
                     name,
                     st.Empty(),
@@ -1231,7 +1234,7 @@ class Passes:
                             throw_error(alloc)
                 symbol = st.Symbol(
                     st.Empty(),
-                    st.SelfDeclared(),
+                    decl_def,
                     pn.Name(struct_name),
                     attrs,
                     st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
