@@ -475,6 +475,7 @@ class Passes:
             case pn.Name(val, pos) as name:
                 var_name = val
                 var_pos = pos
+                # TODO: undefinied identifier error
                 symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
                 match symbol:
                     case st.Symbol(_, datatype, _, _, _, _):
@@ -707,9 +708,13 @@ class Passes:
                     case _:
                         match datatype:
                             case pn.ArrayDecl(
-                                _, datatype2
+                                nums, datatype2
                             ) if local_var_or_param.val == "param":
-                                datatype = pn.PntrDecl(pn.Num("1"), datatype2)
+                                if nums:
+                                    datatype.nums.pop(0)
+                                    datatype = pn.PntrDecl(pn.Num("1"), datatype)
+                                else:
+                                    datatype = pn.PntrDecl(pn.Num("1"), datatype2)
                             case _:
                                 pass
                         size = self._datatype_size(datatype)
