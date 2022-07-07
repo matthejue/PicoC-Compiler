@@ -45,23 +45,23 @@ class Symbol(ASTNode):
     def __repr__(self, depth=0):
         tmp = global_vars.args.double_verbose
         global_vars.args.double_verbose = True
-        acc = f"\n  {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += "\n    {"
-        acc += "\n      type qualifier:         " + convert_to_single_line(
+        acc = f"\n    {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+        acc += "\n      {"
+        acc += "\n        type qualifier:         " + convert_to_single_line(
             self.type_qual
         )
-        acc += "\n      datatype:               " + convert_to_single_line(
+        acc += "\n        datatype:               " + convert_to_single_line(
             self.datatype
         )
-        acc += "\n      name:                   " + convert_to_single_line(self.name)
-        acc += "\n      value or address:       " + convert_to_single_line(
+        acc += "\n        name:                   " + convert_to_single_line(self.name)
+        acc += "\n        value or address:       " + convert_to_single_line(
             self.val_addr
         )
-        acc += "\n      position:               " + convert_to_single_line(self.pos2)
-        acc += "\n      size:                   " + convert_to_single_line(self.size)
+        acc += "\n        position:               " + convert_to_single_line(self.pos2)
+        acc += "\n        size:                   " + convert_to_single_line(self.size)
         global_vars.args.double_verbose = tmp
-        acc += "\n    }"
-        return acc + ("\n  )" if global_vars.args.double_verbose else "")
+        acc += "\n      }"
+        return acc + ("\n    )" if global_vars.args.double_verbose else "")
 
 
 class SymbolTable(ASTNode):
