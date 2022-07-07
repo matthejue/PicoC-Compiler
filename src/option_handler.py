@@ -181,7 +181,11 @@ class OptionHandler(cmd2.Cmd):
             __import__("pudb").set_trace()
 
         # add the filename to the start of the code
-        code_with_file = f"{global_vars.args.infile}\n" + code
+        code_with_file = (
+            ("./" if not global_vars.args.infile.startswith("./") else "")
+            + f"{global_vars.args.infile}\n"
+            + code
+        )
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_width, "-"))
