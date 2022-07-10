@@ -15,6 +15,7 @@ class Args:
         self.color = True
         self.debug = False
         self.traceback = False
+        self.example = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3
@@ -123,3 +124,27 @@ NEG_RELS = {
     ">": rn.LtE(),
     ">=": rn.Lt(),
 }
+
+IMPORTANT_STMTS_INSTRS = [
+    pn.Ref,
+    pn.Assign(pn.Tmp, pn.GlobalRead),
+    pn.Assign(pn.Tmp, pn.StackRead),
+    pn.Assign(pn.GlobalWrite, pn.Tmp),
+    pn.Assign(pn.StackWrite, pn.Tmp),
+    pn.Assign(pn.Name, object),
+    pn.Assign(pn.Attr, object),
+    pn.Assign(pn.Subscr, object),
+    pn.Exp(pn.GlobalRead),
+    pn.Exp(pn.StackRead),
+    pn.Exp(pn.Num),
+    pn.Exp(pn.Subscr),
+    pn.StackMalloc,
+    pn.NewStackframe,
+    pn.RemoveStackframe,
+    pn.Return,
+    pn.Exit,
+    pn.If,
+    pn.IfElse,
+    pn.While,
+    pn.DoWhile,
+]

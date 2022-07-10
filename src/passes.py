@@ -13,6 +13,7 @@ from global_classes import Pos
 import global_vars
 import copy
 from bitstring import Bits
+from inspect import isclass
 
 
 class Passes:
@@ -177,23 +178,37 @@ class Passes:
     # =                              PicoC_Blocks                             =
     # =========================================================================
 
-    def _single_line_comment(self, stmt_instr, prefix, filtr=[1, 2, 3]):
+    def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
             return []
-        if hasattr(stmt_instr, "visible"):
+        if global_vars.args.example:
+            for stmt_instr in global_vars.IMPORTANT_STMTS_INSTRS:
+                if isclass(stmt_instr):
+                    if isinstance(node, stmt_instr):
+                        break  # success
+                else:
+                    if type(node) is type(stmt_instr):
+                        for i in range(len(stmt_instr.visible)):
+                            if not isinstance(node.visible[i], stmt_instr.visible[i]):
+                                break
+                        else:
+                            break  # success
+            else:
+                return []
+        if hasattr(node, "visible"):
             visible_emptied_lists = list(
                 map(
                     lambda node, i: []
                     if isinstance(node, list) and i in filtr
                     else node,
-                    stmt_instr.visible,
-                    range(0, len(stmt_instr.visible)),
+                    node.visible,
+                    range(0, len(node.visible)),
                 )
             )
-            stmt_instr.visible = visible_emptied_lists
+            node.visible = visible_emptied_lists
         tmp = global_vars.args.double_verbose
         global_vars.args.double_verbose = True
-        comment = pn.SingleLineComment(prefix, convert_to_single_line(stmt_instr))
+        comment = pn.SingleLineComment(prefix, convert_to_single_line(node))
         global_vars.args.double_verbose = tmp
         return [comment]
 
@@ -1628,7 +1643,7 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Ref((pn.GlobalRead() | pn.StackRead() | pn.Tmp()) as exp):
+            case pn.Ref((pn.GlobalRead() | pn.StackRead()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
