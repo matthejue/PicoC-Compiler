@@ -69,14 +69,14 @@ assign_stmt: un_exp "=" logic_or";"
 bug_initializer: logic_or|array_init|struct_init
 init_stmt: alloc "=" bug_initializer";"
 const_init_stmt: "const" type_spec name "=" NUM";"
+// ---------------------------------- L_Pntr ----------------------------------
+!pntr_deg: "*"*
+pntr_decl: pntr_deg array_decl|array_decl
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
 array_decl: name array_dims|"("pntr_decl")" array_dims
 array_init: "{"bug_initializer("," bug_initializer)*"}"
 array_subscr: post_exp"["logic_or"]"
-// ---------------------------------- L_Pntr ----------------------------------
-!pntr_deg: "*"*
-pntr_decl: pntr_deg array_decl|array_decl
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" name
 struct_params: (alloc";")+

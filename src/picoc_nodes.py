@@ -266,14 +266,6 @@ class StackMalloc(ASTNode):
     __match_args__ = ("num",)
 
 
-class StackFree(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
 # --------------------------------- L_Pntr --------------------------------
 class PntrDecl(ASTNode):
     def __init__(self, num, datatype):
