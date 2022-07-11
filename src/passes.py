@@ -759,7 +759,7 @@ class Passes:
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case (pn.Subscr() | pn.Attr()):
-                final_exp = pn.Exp(pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")))
+                final_exp = pn.Exp(pn.Tmp(pn.Num("1")))
                 # in case of *&var
                 final_exp.error_data = []
                 refs_mon = self._picoc_mon_ref(exp, [final_exp])
@@ -1030,7 +1030,7 @@ class Passes:
                     + refs_mon
                     + [
                         pn.Assign(
-                            pn.Subscr(pn.Tmp(pn.Num("1")), pn.Num("0")),
+                            pn.Tmp(pn.Num("1")),
                             pn.Tmp(pn.Num("2")),
                         )
                     ]
@@ -1884,7 +1884,7 @@ class Passes:
                     ),
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0")), datatype):
+            case pn.Exp(pn.Tmp(pn.Num(val1)), datatype):
                 match datatype:
                     case (pn.StructSpec() | pn.IntType() | pn.CharType()):
                         return self._single_line_comment(stmt, "#") + [
@@ -1905,9 +1905,7 @@ class Passes:
                         return self._single_line_comment(stmt, "#")
                     case _:
                         throw_error(datatype)
-            case pn.Assign(
-                pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Num("0")), pn.Tmp(pn.Num(val2))
-            ):
+            case pn.Assign(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
