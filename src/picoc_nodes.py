@@ -226,7 +226,7 @@ class Tmp(ASTNode):
     __match_args__ = ("num",)
 
 
-class StackRead(ASTNode):
+class Stackframe(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])
@@ -234,23 +234,7 @@ class StackRead(ASTNode):
     __match_args__ = ("num",)
 
 
-class StackWrite(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalRead(ASTNode):
-    def __init__(self, num):
-        self.num = num
-        super().__init__(visible=[self.num])
-
-    __match_args__ = ("num",)
-
-
-class GlobalWrite(ASTNode):
+class Global(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])
