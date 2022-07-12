@@ -127,10 +127,10 @@ NEG_RELS = {
 
 IMPORTANT_STMTS_INSTRS = [
     pn.Ref,
-    pn.Assign(pn.Tmp, pn.Global),
-    pn.Assign(pn.Tmp, pn.Stackframe),
-    pn.Assign(pn.Global, pn.Tmp),
-    pn.Assign(pn.Stackframe, pn.Tmp),
+    pn.Assign(pn.Stack, pn.Global),
+    pn.Assign(pn.Stack, pn.Stackframe),
+    pn.Assign(pn.Global, pn.Stack),
+    pn.Assign(pn.Stackframe, pn.Stack),
     pn.Assign(pn.Name, object),
     pn.Assign(pn.Attr, object),
     pn.Assign(pn.Subscr, object),
