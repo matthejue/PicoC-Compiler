@@ -577,7 +577,7 @@ class Passes:
                         throw_error(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
             case (pn.Subscr(ref2, exp)):
-                ref3 = pn.Ref(pn.Subscr(pn.Tmp(pn.Num("2")), pn.Tmp(pn.Num("1"))))
+                ref3 = pn.Ref(pn.Subscr(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))
                 # TODO: this isn't the case anymore
                 # for e.g. Deref(ref, Num("0")) for the position
                 # Pos(-1, -1) gets saved
@@ -591,7 +591,7 @@ class Passes:
                 return refs_mon + exps_mon + [ref3]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref2, pn.Name(_, pos) as name):
-                ref3 = pn.Ref(pn.Attr(pn.Tmp(pn.Num("1")), name))
+                ref3 = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))
                 ref3.error_data = [
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column)))
                 ]
@@ -625,7 +625,7 @@ class Passes:
                                     size = self._datatype_size(datatype)
                                     return [
                                         pn.Assign(
-                                            pn.Tmp(pn.Num(str(size))),
+                                            pn.Stack(pn.Num(str(size))),
                                             pn.Global(num),
                                         )
                                     ]
@@ -640,7 +640,7 @@ class Passes:
                                     size = self._datatype_size(datatype)
                                     return [
                                         pn.Assign(
-                                            pn.Tmp(pn.Num(str(size))),
+                                            pn.Stack(pn.Num(str(size))),
                                             pn.Stackframe(num),
                                         )
                                     ]
@@ -656,7 +656,7 @@ class Passes:
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
                 exp_mon = self._picoc_mon_exp(exp)
-                return exp_mon + [pn.Exp(pn.Call(name, [pn.Tmp(pn.Num("1"))]))]
+                return exp_mon + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
                 return [pn.Exp(exp)]
             # ----------------------- L_Arith + L_Logic -----------------------
@@ -669,16 +669,16 @@ class Passes:
                     + [
                         pn.Exp(
                             pn.BinOp(
-                                pn.Tmp(pn.Num("2")),
+                                pn.Stack(pn.Num("2")),
                                 bin_op,
-                                pn.Tmp(pn.Num("1")),
+                                pn.Stack(pn.Num("1")),
                             )
                         )
                     ]
                 )
             case pn.UnOp(un_op, exp):
                 exps_mon = self._picoc_mon_exp(exp)
-                return exps_mon + [pn.Exp(pn.UnOp(un_op, pn.Tmp(pn.Num("1"))))]
+                return exps_mon + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
                 exps1_mon = self._picoc_mon_exp(left_exp)
@@ -689,16 +689,16 @@ class Passes:
                     + [
                         pn.Exp(
                             pn.Atom(
-                                pn.Tmp(pn.Num("2")),
+                                pn.Stack(pn.Num("2")),
                                 rel,
-                                pn.Tmp(pn.Num("1")),
+                                pn.Stack(pn.Num("1")),
                             )
                         )
                     ]
                 )
             case pn.ToBool(exp):
                 exps_mon = self._picoc_mon_exp(exp)
-                return exps_mon + [pn.Exp(pn.ToBool(pn.Tmp(pn.Num("1"))))]
+                return exps_mon + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
                 var_name = val1
@@ -760,7 +760,7 @@ class Passes:
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case (pn.Subscr() | pn.Attr()):
-                final_exp = pn.Exp(pn.Tmp(pn.Num("1")))
+                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
                 # in case of *&var
                 final_exp.error_data = []
                 refs_mon = self._picoc_mon_ref(exp, [final_exp])
@@ -975,7 +975,7 @@ class Passes:
                                     + [
                                         pn.Assign(
                                             pn.Global(addr),
-                                            pn.Tmp(size),
+                                            pn.Stack(size),
                                         )
                                     ]
                                 )
@@ -986,7 +986,7 @@ class Passes:
                                     + [
                                         pn.Assign(
                                             pn.Stackframe(addr),
-                                            pn.Tmp(size),
+                                            pn.Stack(size),
                                         )
                                     ]
                                 )
@@ -1031,8 +1031,8 @@ class Passes:
                     + refs_mon
                     + [
                         pn.Assign(
-                            pn.Tmp(pn.Num("1")),
-                            pn.Tmp(pn.Num("2")),
+                            pn.Stack(pn.Num("1")),
+                            pn.Stack(pn.Num("2")),
                         )
                     ]
                 )
@@ -1046,7 +1046,7 @@ class Passes:
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_mon
-                    + [pn.IfElse(pn.Tmp(pn.Num("1")), goto1, goto2)]
+                    + [pn.IfElse(pn.Stack(pn.Num("1")), goto1, goto2)]
                 )
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(st.Empty()):
@@ -1056,7 +1056,7 @@ class Passes:
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_mon
-                    + [pn.Return(pn.Tmp(pn.Num("1")))]
+                    + [pn.Return(pn.Stack(pn.Num("1")))]
                 )
             case pn.StackMalloc():
                 return [stmt]
@@ -1299,9 +1299,9 @@ class Passes:
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(
                 pn.BinOp(
-                    pn.Tmp(pn.Num(val1)),
+                    pn.Stack(pn.Num(val1)),
                     (pn.LogicAnd() | pn.LogicOr()) as bin_lop,
-                    pn.Tmp(pn.Num(val2)),
+                    pn.Stack(pn.Num(val2)),
                 )
             ):
                 match bin_lop:
@@ -1324,7 +1324,7 @@ class Passes:
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                 ]
-            case pn.Exp(pn.UnOp(pn.LogicNot(), pn.Tmp(pn.Num(val)))):
+            case pn.Exp(pn.UnOp(pn.LogicNot(), pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("1")]),
                     rn.Instr(
@@ -1395,7 +1395,9 @@ class Passes:
                             ),
                         ]
                 return reti_instrs
-            case pn.Exp(pn.BinOp(pn.Tmp(pn.Num(val1)), bin_aop, pn.Tmp(pn.Num(val2)))):
+            case pn.Exp(
+                pn.BinOp(pn.Stack(pn.Num(val1)), bin_aop, pn.Stack(pn.Num(val2)))
+            ):
                 match bin_aop:
                     case pn.Add():
                         aop = rn.Add()
@@ -1428,7 +1430,7 @@ class Passes:
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                 ]
-            case pn.Exp(pn.UnOp(un_op, pn.Tmp(pn.Num(val)))):
+            case pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num(val)))):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("0")]),
                     rn.Instr(
@@ -1458,7 +1460,7 @@ class Passes:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
                     ),
                 ]
-            case pn.Exp(pn.Call(pn.Name("print"), [pn.Tmp(pn.Num(val))])):
+            case pn.Exp(pn.Call(pn.Name("print"), [pn.Stack(pn.Num(val))])):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
@@ -1472,7 +1474,7 @@ class Passes:
                     rn.Jump(rn.Always(), rn.Im("0")),
                 ]
             # ---------------------------- L_Logic ----------------------------
-            case pn.Exp(pn.ToBool(pn.Tmp(pn.Num(val)))):
+            case pn.Exp(pn.ToBool(pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
@@ -1483,7 +1485,7 @@ class Passes:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                 ]
-            case pn.Exp(pn.Atom(pn.Tmp(pn.Num(val1)), rel, pn.Tmp(pn.Num(val2)))):
+            case pn.Exp(pn.Atom(pn.Stack(pn.Num(val1)), rel, pn.Stack(pn.Num(val2)))):
                 match rel:
                     case pn.Eq():
                         rel = rn.Eq()
@@ -1518,20 +1520,20 @@ class Passes:
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(
-                pn.Tmp(pn.Num(val1)) as lhs,
+                pn.Stack(pn.Num(val1)) as lhs,
                 (pn.Global() | pn.Stackframe()) as exp,
             ):
                 tmp_max = lhs.num.val
-                tmp = pn.Tmp(pn.Num("0"))
+                tmp = pn.Stack(pn.Num("0"))
                 mem = copy.deepcopy(exp)
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)])
                 ]
                 while True:
                     match (tmp, mem):
-                        case (pn.Tmp(pn.Num(val)), _) if val == tmp_max:
+                        case (pn.Stack(pn.Num(val)), _) if val == tmp_max:
                             break
-                        case (pn.Tmp(pn.Num(val1)), pn.Global(pn.Num(val2))):
+                        case (pn.Stack(pn.Num(val1)), pn.Global(pn.Num(val2))):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1550,7 +1552,7 @@ class Passes:
                                     ],
                                 ),
                             ]
-                        case (pn.Tmp(pn.Num(val1)), pn.Stackframe(pn.Num(val2))):
+                        case (pn.Stack(pn.Num(val1)), pn.Stackframe(pn.Num(val2))):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1573,19 +1575,19 @@ class Passes:
                 return reti_instrs
             case pn.Assign(
                 (pn.Global() | pn.Stackframe()) as lhs,
-                pn.Tmp(pn.Num(val2)) as tmp,
+                pn.Stack(pn.Num(val2)) as tmp,
             ):
                 tmp_max = tmp.num.val
                 mem = copy.deepcopy(lhs)
-                tmp = pn.Tmp(pn.Num("0"))
+                tmp = pn.Stack(pn.Num("0"))
                 reti_instrs = []
                 stack_offset = val2
                 reti_instrs = self._single_line_comment(stmt, "#")
                 while True:
                     match (mem, tmp):
-                        case (_, pn.Tmp(pn.Num(val))) if val == tmp_max:
+                        case (_, pn.Stack(pn.Num(val))) if val == tmp_max:
                             break
-                        case (pn.Global(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
+                        case (pn.Global(pn.Num(val1)), pn.Stack(pn.Num(val2))):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1608,7 +1610,7 @@ class Passes:
                                     ],
                                 ),
                             ]
-                        case (pn.Stackframe(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
+                        case (pn.Stackframe(pn.Num(val1)), pn.Stack(pn.Num(val2))):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1677,7 +1679,7 @@ class Passes:
                     )
                 ]
             case pn.Ref(
-                pn.Subscr(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))),
+                pn.Subscr(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))),
                 datatype,
                 error_data,
             ):
@@ -1798,7 +1800,7 @@ class Passes:
                     ),
                 ]
             case pn.Ref(
-                pn.Attr(pn.Tmp(pn.Num(val1)), pn.Name(val2, pos2)),
+                pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2, pos2)),
                 datatype,
                 error_data,
             ):
@@ -1885,7 +1887,7 @@ class Passes:
                     ),
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Tmp(pn.Num(val1)), datatype):
+            case pn.Exp(pn.Stack(pn.Num(val1)), datatype):
                 match datatype:
                     case (pn.StructSpec() | pn.IntType() | pn.CharType()):
                         return self._single_line_comment(stmt, "#") + [
@@ -1906,7 +1908,7 @@ class Passes:
                         return self._single_line_comment(stmt, "#")
                     case _:
                         throw_error(datatype)
-            case pn.Assign(pn.Tmp(pn.Num(val1)), pn.Tmp(pn.Num(val2))):
+            case pn.Assign(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
@@ -1920,7 +1922,7 @@ class Passes:
                     ),
                 ]
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(pn.Tmp(pn.Num(val)), goto1, goto2):
+            case pn.IfElse(pn.Stack(pn.Num(val)), goto1, goto2):
                 return (
                     self._single_line_comment(stmt, "#")
                     + [
@@ -1994,7 +1996,7 @@ class Passes:
                     ),
                     rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Reg(rn.Sp())]),
                 ]
-            case pn.Return(pn.Tmp(pn.Num(val))):
+            case pn.Return(pn.Stack(pn.Num(val))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]

@@ -1,0 +1,12 @@
+// in:42
+// expected:42
+
+void main() {
+  // # begin
+  int var = input();
+  //  # this shouldn't be visible
+  // # this should be visible
+  //# this should be visible
+  print(var);
+  // # end
+}

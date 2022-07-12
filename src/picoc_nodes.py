@@ -218,7 +218,7 @@ class Exp(ASTNode):
     __match_args__ = ("exp", "datatype", "error_data")
 
 
-class Tmp(ASTNode):
+class Stack(ASTNode):
     def __init__(self, num):
         self.num = num
         super().__init__(visible=[self.num])
@@ -299,12 +299,12 @@ class Array(ASTNode):
 
 
 class Subscr(ASTNode):
-    def __init__(self, lhs, exp):
-        self.lhs = lhs
-        self.exp = exp
-        super().__init__(visible=[self.lhs, self.exp])
+    def __init__(self, exp1, exp2):
+        self.exp1 = exp1
+        self.exp2 = exp2
+        super().__init__(visible=[self.exp1, self.exp2])
 
-    __match_args__ = ("lhs", "exp")
+    __match_args__ = ("exp1", "exp2")
 
 
 # -------------------------------- L_Struct -------------------------------
@@ -317,12 +317,12 @@ class StructSpec(ASTNode):
 
 
 class Attr(ASTNode):
-    def __init__(self, lhs, name):
-        self.lhs = lhs
+    def __init__(self, exp, name):
+        self.exp = exp
         self.name = name
-        super().__init__(visible=[self.lhs, self.name])
+        super().__init__(visible=[self.exp, self.name])
 
-    __match_args__ = ("lhs", "name")
+    __match_args__ = ("exp", "name")
 
 
 class Struct(ASTNode):
