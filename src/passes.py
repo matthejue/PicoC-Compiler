@@ -374,7 +374,7 @@ class Passes:
             case _:
                 throw_error(datatype)
 
-    def _signature_size(self, allocs):
+    def _param_size(self, allocs):
         size = 0
         for alloc in allocs:
             match alloc:
@@ -1088,12 +1088,12 @@ class Passes:
                                 if global_vars.args.double_verbose:
                                     alloc.visible[3] = alloc.local_var_or_param
 
-                        signature_size = self._signature_size(allocs)
+                        param_size = self._param_size(allocs)
                         local_vars_size = self._local_vars_size(stmts)
-                        blocks[0].signature_size = pn.Num(str(signature_size))
+                        blocks[0].param_size = pn.Num(str(param_size))
                         blocks[0].local_vars_size = pn.Num(str(local_vars_size))
                         blocks[0].visible += (
-                            [blocks[0].signature_size, blocks[0].local_vars_size]
+                            [blocks[0].param_size, blocks[0].local_vars_size]
                             if global_vars.args.double_verbose
                             else []
                         )
@@ -1949,17 +1949,17 @@ class Passes:
                     fun_block = self.all_blocks[self.fun_name_to_block_name[val]]
                 except KeyError:
                     raise errors.UnknownIdentifier(fun_name, fun_call_pos)
-                num1 = fun_block.signature_size
+                num1 = fun_block.param_size
                 num2 = fun_block.local_vars_size
                 match (num1, num2):
                     case (pn.Num(val1), pn.Num(val2)):
-                        signature_size = val1
+                        param_size = val1
                         local_vars_size = val2
                         return self._single_line_comment(stmt, "#") + [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
                             rn.Instr(
                                 rn.Addi(),
-                                [rn.Reg(rn.Sp()), rn.Im(str(2 + int(signature_size)))],
+                                [rn.Reg(rn.Sp()), rn.Im(str(2 + int(param_size)))],
                             ),
                             rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
                             rn.Instr(
@@ -1967,11 +1967,7 @@ class Passes:
                                 [
                                     rn.Reg(rn.Sp()),
                                     rn.Im(
-                                        str(
-                                            2
-                                            + int(signature_size)
-                                            + int(local_vars_size)
-                                        )
+                                        str(2 + int(param_size) + int(local_vars_size))
                                     ),
                                 ],
                             ),

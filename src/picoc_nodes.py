@@ -458,7 +458,7 @@ class Block(ASTNode):
         self.stmts_instrs = stmts_instrs
         self.instrs_before: Num
         self.num_instrs: Num
-        self.signature_size: Num
+        self.param_size: Num
         self.local_vars_size: Num
         super().__init__(
             visible=[
@@ -472,7 +472,7 @@ class Block(ASTNode):
         "stmts_instrs",
         "instrs_before",
         "num_instrs",
-        "signature_size",
+        "param_size",
         "local_vars_size",
     )
 
