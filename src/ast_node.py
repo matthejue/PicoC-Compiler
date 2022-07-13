@@ -28,14 +28,7 @@ class ASTNode:
         else:
             acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
 
-        for i, child in enumerate(
-            #  (
-            #      [self.pos]
-            #      if global_vars.args.double_verbose and self.pos != Pos(-1, -1)
-            #      else []
-            #  ) +
-            self.visible
-        ):
+        for i, child in enumerate(self.visible):
             if isinstance(child, list):
                 if not child:
                     acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"

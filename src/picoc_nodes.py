@@ -1,6 +1,7 @@
 from ast_node import ASTNode
 import symbol_table as st
 import global_vars
+from global_funs import repr_example
 
 
 # =========================================================================
@@ -345,41 +346,65 @@ class StructDecl(ASTNode):
 
 # ------------------------------- L_If_Else -------------------------------
 class If(ASTNode):
-    def __init__(self, exp, stmts_goto):
+    def __init__(self, exp, stmts):
         self.exp = exp
-        self.stmts_goto = stmts_goto
-        super().__init__(visible=[self.exp, self.stmts_goto])
+        self.stmts = stmts
+        super().__init__(visible=[self.exp, self.stmts])
 
-    __match_args__ = ("exp", "stmts_goto")
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
+    __match_args__ = ("exp", "stmts")
 
 
 class IfElse(ASTNode):
-    def __init__(self, exp, stmts_goto1, stmts_goto2):
+    def __init__(self, exp, stmts1, stmts2):
         self.exp = exp
-        self.stmts_goto1 = stmts_goto1
-        self.stmts_goto2 = stmts_goto2
-        super().__init__(visible=[self.exp, self.stmts_goto1, self.stmts_goto2])
+        self.stmts1 = stmts1
+        self.stmts2 = stmts2
+        super().__init__(visible=[self.exp, self.stmts1, self.stmts2])
 
-    __match_args__ = ("exp", "stmts_goto1", "stmts_goto2")
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
+    __match_args__ = ("exp", "stmts1", "stmts2")
 
 
 # --------------------------------- L_Loop --------------------------------
 class While(ASTNode):
-    def __init__(self, exp, stmts_goto):
+    def __init__(self, exp, stmts):
         self.exp = exp
-        self.stmts_goto = stmts_goto
-        super().__init__(visible=[self.exp, self.stmts_goto])
+        self.stmts = stmts
+        super().__init__(visible=[self.exp, self.stmts])
 
-    __match_args__ = ("exp", "stmts_goto")
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
+    __match_args__ = ("exp", "stmts")
 
 
 class DoWhile(ASTNode):
-    def __init__(self, exp, stmts_goto):
+    def __init__(self, exp, stmts):
         self.exp = exp
-        self.stmts_goto = stmts_goto
-        super().__init__(visible=[self.exp, self.stmts_goto])
+        self.stmts = stmts
+        super().__init__(visible=[self.exp, self.stmts])
 
-    __match_args__ = ("exp", "stmts_goto")
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
+    __match_args__ = ("exp", "stmts")
 
 
 # --------------------------------- L_Fun ---------------------------------
@@ -425,6 +450,12 @@ class FunDef(ASTNode):
             ]
         )
 
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
 
@@ -467,6 +498,12 @@ class Block(ASTNode):
             ]
         )
 
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
     __match_args__ = (
         "name",
         "stmts_instrs",
@@ -489,6 +526,7 @@ class GoTo(ASTNode):
 class SingleLineComment:
     def __init__(self, prefix, content):
         self.prefix = prefix
+
         self.content = content
 
     def __repr__(self, depth=0):
