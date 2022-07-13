@@ -43,8 +43,6 @@ class Symbol(ASTNode):
     __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos2", "size")
 
     def __repr__(self, depth=0):
-        tmp = global_vars.args.double_verbose
-        global_vars.args.double_verbose = True
         acc = f"\n    {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
         acc += "\n      {"
         acc += "\n        type qualifier:         " + convert_to_single_line(
@@ -59,7 +57,6 @@ class Symbol(ASTNode):
         )
         acc += "\n        position:               " + convert_to_single_line(self.pos2)
         acc += "\n        size:                   " + convert_to_single_line(self.size)
-        global_vars.args.double_verbose = tmp
         acc += "\n      }"
         return acc + ("\n    )" if global_vars.args.double_verbose else "")
 

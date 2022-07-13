@@ -47,7 +47,6 @@ def args_to_str(args: list):
     if args:
         # this function only gets called in case of an error, so the verbose
         # option doesn't have to be reset, because execution ends anyways
-        global_vars.args.double_verbose = True
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
             f"{CM().BLUE}'" + convert_to_single_line(arg) + f"'{CM().RESET_ALL}"
             for arg in args
@@ -56,8 +55,67 @@ def args_to_str(args: list):
         return "no arguments"
 
 
+def repr_example(self, depth=0):
+    if not self.visible:
+        if not self.val:
+            return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"
+        return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}'{self.val}'{')' if global_vars.args.double_verbose else ''}"
+
+    acc = ""
+
+    if depth > 0:
+        acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+    else:
+        acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+
+    for i, child in enumerate(self.visible):
+        match child:
+            case list():
+                if not child:
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    continue
+
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                for i, list_child in enumerate(child):
+                    match list_child:
+                        case (
+                            pn.If()
+                            | pn.IfElse()
+                            | pn.While()
+                            | pn.DoWhile()
+                            | pn.Block()
+                        ):
+                            pass
+                        case _:
+                            acc += f"\n{' ' * (depth + 4)}{convert_to_single_line(list_child)}"
+                            continue
+                    acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
+                acc += f"\n{' ' * (depth + 2)}]"
+                continue
+            case dict():
+                dict_children = child.values()
+                if not dict_children:
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    continue
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                for i, dict_child in enumerate(dict_children):
+                    acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
+                acc += f"\n{' ' * (depth + 2)}]"
+                continue
+            case _:
+                pass
+
+        acc += f"{', ' if i > 0 else ''}{child.__repr__(depth+2)}"
+
+    return acc + (f"\n{' ' * depth})" if global_vars.args.double_verbose else "")
+
+
 def convert_to_single_line(stmt):
-    return "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
+    tmp = global_vars.args.double_verbose
+    global_vars.args.double_verbose = True
+    single_line = "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
+    global_vars.args.double_verbose = tmp
+    return single_line
 
 
 def find_first_pos_in_node(nodes):

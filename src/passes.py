@@ -206,11 +206,7 @@ class Passes:
                 )
             )
             node.visible = visible_emptied_lists
-        tmp = global_vars.args.double_verbose
-        global_vars.args.double_verbose = True
-        comment = pn.SingleLineComment(prefix, convert_to_single_line(node))
-        global_vars.args.double_verbose = tmp
-        return [comment]
+        return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
@@ -236,7 +232,7 @@ class Passes:
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment(stmt, "//") + [
-                    pn.IfElse(exp, goto_if, goto_after)
+                    pn.IfElse(exp, [goto_if], [goto_after])
                 ]
             case pn.IfElse(exp, stmts1, stmts2):
                 goto_after = self._create_block(
@@ -254,7 +250,7 @@ class Passes:
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment(stmt, "//") + [
-                    pn.IfElse(exp, goto_if, goto_else)
+                    pn.IfElse(exp, [goto_if], [goto_else])
                 ]
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
@@ -270,7 +266,7 @@ class Passes:
                     "while_branch", stmts_while, blocks
                 ).name.val
 
-                condition_check = [pn.IfElse(exp, goto_branch, goto_after)]
+                condition_check = [pn.IfElse(exp, [goto_branch], [goto_after])]
                 goto_condition_check.name.val = self._create_block(
                     "condition_check", condition_check, blocks
                 ).name.val
@@ -282,7 +278,7 @@ class Passes:
                 )
 
                 goto_branch = pn.GoTo(pn.Name("placeholder"))
-                stmts_while = [pn.IfElse(exp, goto_branch, goto_after)]
+                stmts_while = [pn.IfElse(exp, [goto_branch], [goto_after])]
 
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
@@ -1041,12 +1037,12 @@ class Passes:
                 exps_mon = self._picoc_mon_exp(alloc_call)
                 return self._single_line_comment(stmt, "//") + exps_mon
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(exp, goto1, goto2):
+            case pn.IfElse(exp, goto1_list, goto2_list):
                 exps_mon = self._picoc_mon_exp(exp)
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_mon
-                    + [pn.IfElse(pn.Stack(pn.Num("1")), goto1, goto2)]
+                    + [pn.IfElse(pn.Stack(pn.Num("1")), goto1_list, goto2_list)]
                 )
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(st.Empty()):
@@ -1922,7 +1918,7 @@ class Passes:
                     ),
                 ]
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(pn.Stack(pn.Num(val)), goto1, goto2):
+            case pn.IfElse(pn.Stack(pn.Num(val)), [goto1], [goto2]):
                 return (
                     self._single_line_comment(stmt, "#")
                     + [
@@ -1946,7 +1942,7 @@ class Passes:
                 fun_name = val
                 fun_call_pos = pos
                 try:
-                    fun_block = self.all_blocks[self.fun_name_to_block_name[val]]
+                    fun_block = self.all_blocks[self.fun_name_to_block_name[fun_name]]
                 except KeyError:
                     raise errors.UnknownIdentifier(fun_name, fun_call_pos)
                 num1 = fun_block.param_size
