@@ -388,7 +388,7 @@ class Passes:
             match stmt:
                 case (pn.Assign(pn.Alloc(_, datatype)) | pn.Exp(pn.Alloc(_, datatype))):
                     size += self._datatype_size(datatype)
-                case pn.SingleLineComment():
+                case (pn.SingleLineComment() | pn.RETIComment()):
                     # const init and normal assign get skipped
                     pass
                 case _:
@@ -615,6 +615,7 @@ class Passes:
                     case st.Symbol(pn.Writeable(), datatype, _, num):
                         match choosen_scope, datatype:
                             case (("main" | "global"), pn.ArrayDecl()):
+                                # TODO: struct st1 st = {.ar_var=ar]
                                 return [pn.Ref(pn.Global(num))]
                             case (("main" | "global"), pn.StructSpec()):
                                 if self.argmode_on:
@@ -626,6 +627,7 @@ class Passes:
                                         )
                                     ]
                                 else:
+                                    # TODO: struct st2 st = {.st_var=st1]
                                     return [pn.Ref(pn.Global(num))]
                             case (("main" | "global"), _):
                                 return [pn.Exp(pn.Global(num))]
@@ -1885,7 +1887,9 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Exp(pn.Stack(pn.Num(val1)), datatype):
                 match datatype:
-                    case (pn.StructSpec() | pn.IntType() | pn.CharType()):
+                    case (
+                        pn.StructSpec() | pn.PntrDecl() | pn.IntType() | pn.CharType()
+                    ):
                         return self._single_line_comment(stmt, "#") + [
                             rn.Instr(
                                 rn.Loadin(),
@@ -1900,8 +1904,8 @@ class Passes:
                                 [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
                             ),
                         ]
-                    case (pn.ArrayDecl() | pn.PntrDecl()):
-                        return self._single_line_comment(stmt, "#")
+                    case (pn.ArrayDecl()):
+                        return self._single_line_comment(stmt, "# // not included")
                     case _:
                         throw_error(datatype)
             case pn.Assign(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))):
@@ -2069,7 +2073,7 @@ class Passes:
                     goto_block.name.val[goto_block.name.val.rindex(".") + 1 :]
                 )
                 if current_block_idx - 1 == goto_block_idx:
-                    return self._single_line_comment(instr, "# // patched out")
+                    return self._single_line_comment(instr, "# // not included")
                 else:
                     return [instr]
             case rn.Instr(rn.Div(), _):

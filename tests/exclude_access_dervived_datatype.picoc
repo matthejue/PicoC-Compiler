@@ -1,5 +1,5 @@
 // in:
-// expected:-2147483500 3 -2147483492
+// expected:-2147483499 3 -2147483488
 // datasegment: 16
 
 
@@ -24,7 +24,7 @@ void half_accessed_pntr(){
 void main() {
   // # array
   int ar[2][2] = {{1, 2}, {3, 4}};
-  print(ar[2]);
+  print(ar[1]);
 
   half_accessed_st();
   half_accessed_pntr();

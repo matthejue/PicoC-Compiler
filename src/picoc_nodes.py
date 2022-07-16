@@ -343,6 +343,12 @@ class StructDecl(ASTNode):
 
     __match_args__ = ("name", "allocs")
 
+    def __repr__(self, depth=0):
+        if global_vars.args.example:
+            return repr_example(self, depth)
+        else:
+            return super().__repr__(depth)
+
 
 # ------------------------------- L_If_Else -------------------------------
 class If(ASTNode):
