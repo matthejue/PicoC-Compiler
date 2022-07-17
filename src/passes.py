@@ -148,6 +148,8 @@ class Passes:
                 return stmt
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
+            case _:
+                throw_error(stmt)
 
     def picoc_shrink(self, file: pn.File):
         match file:
