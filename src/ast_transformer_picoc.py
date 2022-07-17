@@ -418,11 +418,7 @@ class ASTTransformerPicoC(Transformer):
         return nodes
 
     def exec_exp_stmt(self, nodes):
-        match nodes[0]:
-            case pn.Ref():
-                return nodes[0]
-            case _:
-                return pn.Exp(nodes[0])
+        return pn.Exp(nodes[0])
 
     def exec_direct_stmt(self, nodes):
         return nodes[0]
