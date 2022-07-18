@@ -505,10 +505,10 @@ class Block(ASTNode):
         )
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_example(self, depth)
 
     __match_args__ = (
         "name",
