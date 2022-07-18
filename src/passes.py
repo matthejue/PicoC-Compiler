@@ -214,7 +214,7 @@ class Passes:
         label = f"{labelbase}.{self.block_id}"
         new_block = pn.Block(
             pn.Name(label),
-            self._single_line_comment(pn.Block(pn.Name(label), []), "//") + stmts,
+            stmts,
         )
         blocks[label] = new_block
         self.block_id += 1
@@ -1099,7 +1099,11 @@ class Passes:
                         )
 
                         blocks[0].stmts_instrs[:] = (
-                            self._single_line_comment(decl_def, "//", filtr=[3])
+                            (
+                                self._single_line_comment(decl_def, "//", filtr=[3])
+                                if global_vars.args.double_verbose
+                                else []
+                            )
                             + [pn.Exp(alloc) for alloc in allocs]
                             + stmts
                         )
@@ -2253,8 +2257,11 @@ class Passes:
                 instrs_block_free = []
                 for block in blocks:
                     match block:
-                        case pn.Block(_, instrs):
+                        case pn.Block(name, instrs):
                             idx = 0
+                            instrs_block_free += self._single_line_comment(
+                                pn.Block(name, []), "# //"
+                            )
                             for instr in instrs:
                                 instrs_block_free += self._reti_instr(instr, idx, block)
                                 match instr:
