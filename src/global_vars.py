@@ -127,6 +127,7 @@ NEG_RELS = {
 
 IMPORTANT_STMTS_INSTRS = [
     pn.Ref,
+    #  pn.Assign,
     pn.Assign(pn.Stack, pn.Global),
     pn.Assign(pn.Stack, pn.Stackframe),
     pn.Assign(pn.Global, pn.Stack),
@@ -135,7 +136,18 @@ IMPORTANT_STMTS_INSTRS = [
     pn.Assign(pn.Attr, object),
     pn.Assign(pn.Subscr, object),
     pn.Assign(pn.Stack, pn.Stack),
-    pn.Exp,
+    #  pn.Exp,
+    pn.Exp(pn.Num),
+    pn.Exp(pn.Name),
+    pn.Exp(pn.BinOp),
+    pn.Exp(pn.Stack),
+    pn.Exp(pn.Global),
+    pn.Exp(pn.Stackframe),
+    pn.Exp(pn.Subscr),
+    pn.Exp(pn.Attr),
+    pn.Exp(pn.Deref),
+    pn.Exp(pn.Ref),
+    pn.Exp(pn.GoTo),
     pn.StackMalloc,
     pn.NewStackframe,
     pn.RemoveStackframe,
@@ -145,4 +157,5 @@ IMPORTANT_STMTS_INSTRS = [
     pn.IfElse,
     pn.While,
     pn.DoWhile,
+    pn.StackMalloc,
 ]

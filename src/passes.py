@@ -910,7 +910,7 @@ class Passes:
                     case _:
                         throw_error(symbol)
                 return (
-                    self._single_line_comment(exp, "// //", filtr=[])
+                    self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
                     + [
@@ -1294,8 +1294,8 @@ class Passes:
                 match prefix:
                     case "//":
                         return [pn.SingleLineComment("# //", content)]
-                    case "// //":
-                        return [pn.SingleLineComment("# // //", content)]
+                    #  case "// //":
+                    #      return [pn.SingleLineComment("# // //", content)]
                     case _:
                         throw_error(prefix)
             case pn.RETIComment():
@@ -2223,11 +2223,8 @@ class Passes:
         else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
             return (
                 int(other_block.instrs_before.val)
-                - (
-                    int(current_block.instrs_before.val)
-                    + int(current_block.num_instrs.val)
-                )
-                + (int(current_block.num_instrs.val) - idx)
+                - int(current_block.instrs_before.val)
+                - idx
             )
 
     def _reti_instr(self, instr, idx, current_block):
