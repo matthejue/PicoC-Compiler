@@ -148,6 +148,7 @@ IMPORTANT_STMTS_INSTRS = [
     pn.Exp(pn.Deref),
     pn.Exp(pn.Ref),
     pn.Exp(pn.GoTo),
+    pn.Exp(rn.Acc),
     pn.StackMalloc,
     pn.NewStackframe,
     pn.RemoveStackframe,

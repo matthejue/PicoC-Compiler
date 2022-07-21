@@ -631,8 +631,6 @@ class Passes:
                                 else:
                                     # TODO: struct st2 st = {.st_var=st1]
                                     return [pn.Ref(pn.Global(num))]
-                            case (("main" | "global"), _):
-                                return [pn.Exp(pn.Global(num))]
                             case (_, pn.ArrayDecl()):
                                 return [pn.Ref(pn.Stackframe(num))]
                             case (_, pn.StructSpec()):
@@ -646,6 +644,8 @@ class Passes:
                                     ]
                                 else:
                                     return [pn.Ref(pn.Stackframe(num))]
+                            case (("main" | "global"), _):
+                                return [pn.Exp(pn.Global(num))]
                             case (_, _):
                                 return [pn.Exp(pn.Stackframe(num))]
                     case st.Symbol(pn.Const(), _, _, num):
