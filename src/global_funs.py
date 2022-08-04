@@ -102,6 +102,9 @@ def repr_example(self, depth=0):
                     acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
                 acc += f"\n{' ' * (depth + 2)}]"
                 continue
+            case pn.Atom():
+                acc += f"\n{' ' * (depth + 2)}{convert_to_single_line(child)}"
+                continue
             case _:
                 pass
 
