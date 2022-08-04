@@ -260,7 +260,7 @@ class OptionHandler(cmd2.Cmd):
 
         reti = error_handler.handle(passes.reti, reti_patch)
 
-        if global_vars.args.intermediate_stages:
+        if global_vars.args.intermediate_stages or global_vars.args.print:
             self._output_pass(reti, "RETI")
 
         if global_vars.args.run:
