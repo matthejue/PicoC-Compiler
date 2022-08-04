@@ -162,7 +162,7 @@ class OptionHandler(cmd2.Cmd):
 
         self._compl("void main() {" + code + "}")
         print(
-            f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+            f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
         )
 
     def do_help(self, _):
