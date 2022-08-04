@@ -5,7 +5,7 @@ import picoc_nodes as pn
 class Args:
     def __init__(self):
         # --------------------------- PicoC_Compiler --------------------------
-        self.infile = "stdin"
+        self.infile = "stdin.picoc"
         # ----------------- PicoC_Compiler + RETI_Interpreter -----------------
         self.intermediate_stages = True
         self.print = True
@@ -148,7 +148,7 @@ IMPORTANT_STMTS_INSTRS = [
     pn.Exp(pn.Deref),
     pn.Exp(pn.Ref),
     pn.Exp(pn.GoTo),
-    pn.Exp(rn.Acc),
+    pn.Exp(rn.Reg),
     pn.StackMalloc,
     pn.NewStackframe,
     pn.RemoveStackframe,

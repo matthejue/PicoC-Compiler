@@ -152,7 +152,7 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args = args
         # is important to give this attribute a filename as value again,
         # because it's needed later
-        global_vars.args.infile = "stdin"
+        global_vars.args.infile = "stdin.picoc"
         global_vars.args.color = color
         self._do_compile_shell(code)
 
@@ -160,7 +160,7 @@ class OptionHandler(cmd2.Cmd):
         # printing is always turned on in shell
         global_vars.args.print = True
 
-        self._compl(["void main() {"] + code.split("\n") + ["}"])
+        self._compl("void main() {" + code + "}")
         print(
             f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
         )
