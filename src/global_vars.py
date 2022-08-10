@@ -47,6 +47,7 @@ TOKENNAME_TO_SYMBOL = {
     "INT_NAME": "identifier",
     "CHAR_NAME": "identifier",
     "VOID_NAME": "identifier",
+    "RETI_COMMENT": "reti comment",
     "NEG": "'~'",
     "NOT": "'!'",
     "SUB_MINUS": "'-'",
@@ -75,6 +76,7 @@ TOKENNAME_TO_SYMBOL = {
     "WHILE": "'while'",
     "DO": "'do'",
     "RETURN": "'return'",
+    "MUL_DEREF_PNTR": "'*'",
     # tokennames from https://github.com/lark-parser/lark/blob/86c8ad41c9e5380e
     # 30f3b63b894ec0b3cb21a20a/lark/load_grammar.py#L34
     "EQUAL": "'='",

@@ -1,0 +1,22 @@
+// in:42
+// expected:0
+
+int ret0() {
+  return 0;
+}
+
+int ret1() {
+  return 1;
+}
+
+int tail_call_fun(int bool_val) {
+  if (bool_val) {
+    return ret0();
+  } else {
+    return ret1();
+  }
+}
+
+void main() {
+  print(tail_call_fun(input()));
+}

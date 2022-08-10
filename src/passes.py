@@ -548,7 +548,7 @@ class Passes:
                                         "struct",
                                         var_pos,
                                         find_first_pos_in_node([ref])[1],
-                                        "array or ponter",
+                                        "array or pointer",
                                     )
                                 case pn.Exp():
                                     break
