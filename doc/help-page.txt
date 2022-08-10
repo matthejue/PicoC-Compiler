@@ -3,8 +3,8 @@
 =                                  `Synopsis`                                 =
 ===============================================================================
 
-Usage: picoc_compiler / compile [-i] [-p] [-l LINES] [-v] [-c] [-d] [-h] [-R]
-[-B PROCESS_BEGIN] [-D DATASEGMENT_SIZE] [-U UART_SIZE] [-S SRAM_SIZE] [infile]
+Usage: picoc_compiler / compile [-i] [-p] [-l LINES] [-v[v]] [-c] [-d] [-h]
+[-R] [-B PROCESS_BEGIN] [-D DATASEGMENT_SIZE] [infile]
 
 Compiles PicoC Code into RETI Code.
 
@@ -32,16 +32,17 @@ abstract syntax trees get extra parenthesis
 -v, --verbose
 >  inserts comments before RETI instructions that contain the PicoC statement
 or expression that has the same meaning as the RETI instructions following
-after it. If the --run option is activated, it show the state of the RETI after
-each print call
+after it. If the --run and --intermediate-stages options are activated, it
+shows the state of the RETI after each RETI instruction.
 -vv, --double_verbose
 >  has the same effects as --verbose, but adds extra effects on top of
 --verbose. If the --intermediate-stages option is activated, the nodes of the
-abstract syntax trees get extra parenthesis. If the --run option is activated,
-it shows the state of the RETI after each RETI instruction. Shows more expected
-tokens in error messages. Shows error data and datatype data in the abstract
-syntax tree that is used for error messages and required for the compilation
-process, respectively
+abstract syntax trees get extra parenthesis. Shows more expected tokens in
+error messages. Shows error data and datatype data in the abstract syntax tree
+that is used for error messages and is required for the compilation process,
+respectively. If the --run and --intermediate-stages options are activated, it
+does also display the real address next to the mapped address in the reti state
+for EPROM, UART and SRAM.
 -c, --color
 >  colorizes the terminal output. Gets ignored in the shell. Instead in the
 shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
@@ -123,7 +124,7 @@ If you don't want to type the most likely used cli options out every time, you
 can use the `most_used "<code>";` command (shortcut `mu`).
 It's a shortcut for:
 
-`compile -i -p -l 2 -v -R -B 8 -D 32
+`compile -i -p -l 2 -t -R -B 3 -D 32
 "<code>";`
 
 and shrinks it down to:
