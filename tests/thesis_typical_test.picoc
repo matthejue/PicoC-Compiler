@@ -1,0 +1,8 @@
+// in:21 2 6 7
+// expected:42 42
+// datasegment:4
+
+void main() {
+  print(input() * input());
+  print(input() * input());
+}

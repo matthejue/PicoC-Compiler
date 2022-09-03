@@ -1,0 +1,16 @@
+// in:
+// expected:42
+
+void fun1() {
+  print(42);
+}
+
+int fun2() {
+  print(42);
+  return 1;
+}
+
+void main() {
+  print(42);
+  return;
+}

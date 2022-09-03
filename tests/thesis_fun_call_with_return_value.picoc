@@ -1,0 +1,16 @@
+// in:
+// expected:42
+
+int fun_with_return_value() {
+  return 21 * 2;
+}
+
+void fun_no_return_value() {
+  return;
+}
+
+void main() {
+  int var = fun_with_return_value();
+  print(var);
+  fun_no_return_value();
+}

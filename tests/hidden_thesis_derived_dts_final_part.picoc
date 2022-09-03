@@ -1,0 +1,16 @@
+// in:
+// expected:-2147483569 0 -2147483565
+
+struct st {int attr[2];};
+
+void main() {
+  int complex_var1[1][2];
+  struct st complex_var2[1];
+  int var = 42;
+  int *pntr1 = &var;
+  int **complex_var3 = &pntr1;
+
+  print(complex_var1[0]);
+  print(complex_var2[0]);
+  print(*complex_var3);
+}

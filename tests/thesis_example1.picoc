@@ -1,0 +1,8 @@
+// in:
+// expected:42
+
+void main() {
+  if(42) {
+    print(42);
+  }
+}

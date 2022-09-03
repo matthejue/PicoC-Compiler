@@ -1,0 +1,16 @@
+// in:
+// expected:314 314
+
+struct st {int ar[2];};
+
+int fun(struct st copyable_ar) {
+  copyable_ar.ar[1] = 42;
+}
+
+void main() {
+  struct st copyable_ar = {.ar={314, 314}};
+  print(copyable_ar.ar[1]);
+  fun(copyable_ar);
+  print(copyable_ar.ar[1]);
+}
+

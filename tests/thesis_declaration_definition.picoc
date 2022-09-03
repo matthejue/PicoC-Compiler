@@ -1,0 +1,18 @@
+// in:
+// expected:42
+
+void fun_declared_before(int *param);
+
+int fun_defined(int param) {
+  return param + 10;
+}
+
+void main() {
+  int res = fun_defined(22);
+  fun_declared_before(&res);
+  print(res);
+}
+
+void fun_declared_before(int *param) {
+  *param = *param + 10;
+}

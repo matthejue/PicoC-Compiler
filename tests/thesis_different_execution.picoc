@@ -1,0 +1,9 @@
+// in:
+// expected:42 42
+
+void main() {
+  int ar[1][2] = {{314, 42}};
+  int (*pntr)[2] = &ar[0];
+  print(ar[0][1]);
+  print(pntr[0][1]);
+}

@@ -1,0 +1,9 @@
+// in:
+// expected:2
+
+struct pos {int x; int y;};
+
+void main() {
+  struct pos st = {.x=4, .y=2};
+  print(st.y);
+}

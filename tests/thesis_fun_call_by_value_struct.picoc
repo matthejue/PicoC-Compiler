@@ -1,0 +1,21 @@
+// in:
+// expected:42 42
+
+struct st {int attr1; int attr2[2];};
+
+
+void fun_struct_from_stackframe(struct st param) {
+  print(param.attr2[1]);
+}
+
+void fun_struct_from_global_data(struct st param) {
+  print(param.attr2[1]);
+  fun_struct_from_stackframe(param);
+}
+
+
+void main() {
+  struct st local_var;
+  local_var.attr2[1] = 42;
+  fun_struct_from_global_data(local_var);
+}

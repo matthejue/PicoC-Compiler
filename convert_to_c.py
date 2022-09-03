@@ -26,10 +26,10 @@ def find_all_paths(pattern, from_start):
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] == "default":
-        pattern = ["basic", "advanced", "example", "hard"]
+        pattern = ["basic", "advanced", "example", "hard", "thesis", "tobias"]
         paths = find_all_paths(pattern, from_start=True)
     elif sys.argv[1] == "all":
-        pattern = ["basic", "advanced", "example", "hard", "hidden"]
+        pattern = ["basic", "advanced", "example", "hard", "thesis", "tobias", "hidden"]
         paths = find_all_paths(pattern, from_start=True)
     else:
         pattern = [sys.argv[1]]

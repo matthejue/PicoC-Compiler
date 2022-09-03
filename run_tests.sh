@@ -12,11 +12,11 @@ not_passed=();
 if [[ $2 == "all" ]]; then
   paths=(./tests/*.picoc)
 elif [[ $2 == "default" ]]; then
-  paths=(./tests/{basic,advanced,example,error,exclude,hard}*.picoc)
+  paths=(./tests/{basic,advanced,example,error,exclude,hard,thesis,tobias}*.picoc)
 elif [[ -n "$2" ]]; then
   paths=(./tests/*$2*.picoc)
 else
-  paths=(./tests/{basic,advanced,example,error,exclude,hard}*.picoc)
+  paths=(./tests/{basic,advanced,example,error,exclude,hard,thesis,tobias}*.picoc)
 fi
 
 for test in "${paths[@]}"; do

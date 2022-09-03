@@ -1,0 +1,12 @@
+// in:
+// expected:
+
+struct st1 {int ar[2];};
+struct st2 {struct st1 st;};
+
+void main() {
+  // # struct 1
+  struct st1 st_var1 = {.ar={2, 4}};
+  // # struct 2
+  struct st2 st_var2 = {.st=st_var1};
+}

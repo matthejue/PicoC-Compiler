@@ -1,0 +1,13 @@
+// in:
+// expected:314 42
+
+int fun(int ar[2]) {
+  ar[1] = 42;
+}
+
+void main() {
+  int ar[2] = {314, 314};
+  print(ar[1]);
+  fun(ar);
+  print(ar[1]);
+}

@@ -1,0 +1,7 @@
+// in:
+// expected:42
+
+void main() {
+  int var = 42;
+  int *pntr = &var;
+}
