@@ -1,0 +1,11 @@
+// in:
+// expected:42
+
+void main() {
+}
+
+int fun(char param2) {
+}
+
+int fun(int param1) {
+}

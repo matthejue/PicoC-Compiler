@@ -8,13 +8,13 @@ not_verified=();
 
 if [[ $2 == "all" ]]; then
   # paths=(./tests/!(error*|exclude*).c)
-  paths+=(./tests/{basic,advanced,example,hard,hidden}*.c)
+  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.c)
 elif [[ -n "$2" ]]; then
   paths=(./tests/*$2*.c)
 elif [[ $2 == "default" ]]; then
-  paths+=(./tests/{basic,advanced,example,hard}*.c)
+  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias}*.c)
 else
-  paths+=(./tests/{basic,advanced,example,hard}*.c)
+  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias}*.c)
 fi
 
 for test in "${paths[@]}"; do

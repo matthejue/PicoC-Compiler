@@ -1,0 +1,17 @@
+// in:
+// expected:42
+
+struct st {int attr1; int attr2[2];};
+
+void stack_fun(struct st param[2][3]);
+
+void main() {
+  struct st local_var[2][3];
+  int local_var2 = 42;
+  stack_fun(local_var);
+  return;
+}
+
+void stack_fun(struct st param[2][3]) {
+  print(param[1][3]);
+}

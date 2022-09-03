@@ -940,9 +940,9 @@ class Passes:
                 return [stmt]
             case pn.RETIComment():
                 return [stmt]
-            # ---------------------------- L_Arith ----------------------------
-            case pn.Exit(pn.Num(val)):
-                return [stmt]
+            #  ---------------------------- L_Arith ----------------------------
+            #  case pn.Exit(pn.Num(val)):
+            #  return [stmt]
             # ----------------------- L_Array + L_Struct ----------------------
             case pn.Assign(
                 pn.Alloc(_, datatype, name) as alloc,
@@ -1472,11 +1472,11 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Call(rn.Name("PRINT"), rn.Reg(rn.Acc())),
                 ]
-            case pn.Exit(pn.Num(val)):
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
-                    rn.Jump(rn.Always(), rn.Im("0")),
-                ]
+            #  case pn.Exit(pn.Num(val)):
+            #  return self._single_line_comment(stmt, "#") + [
+            #  rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
+            #  rn.Jump(rn.Always(), rn.Im("0")),
+            #  ]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(pn.ToBool(pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
@@ -2212,20 +2212,14 @@ class Passes:
     # =                                  RETI                                 =
     # =========================================================================
     def _determine_distance(self, current_block, other_block, idx):
-        if int(other_block.instrs_before.val) < int(current_block.instrs_before.val):
-            return -(
-                int(current_block.instrs_before.val)
-                - int(other_block.instrs_before.val)
-                + idx
-            )
-        elif int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
-            return -idx
-        else:  # int(current_block.instrs_before.val) < int(other_block.instrs_before.val):
+        if int(other_block.instrs_before.val) != int(current_block.instrs_before.val):
             return (
                 int(other_block.instrs_before.val)
                 - int(current_block.instrs_before.val)
                 - idx
             )
+        else:  # int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
+            return -idx
 
     def _reti_instr(self, instr, idx, current_block):
         match instr:

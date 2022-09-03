@@ -1,0 +1,10 @@
+// in:
+// expected:42
+
+struct st {int len; int ar[2];};
+
+void main() {
+  struct st st_var;
+  st_var.ar[1] = 42;
+  print(st_var.ar[1]);
+}

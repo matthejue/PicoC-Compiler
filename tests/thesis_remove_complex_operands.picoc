@@ -1,0 +1,7 @@
+// in:
+// expected:42
+
+void main() {
+  int x = 5 % 4;
+  print(x + 41);
+}

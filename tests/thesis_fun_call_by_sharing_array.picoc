@@ -1,0 +1,19 @@
+// in:
+// expected:42 314
+
+void fun_array_from_stackframe(int (*param)[3]) {
+  print(param[1][2]);
+}
+
+void fun_array_from_global_data(int param[2][3]) {
+  int local_var[2][3];
+  local_var[1][2] = 314;
+  print(param[1][2]);
+  fun_array_from_stackframe(local_var);
+}
+
+void main() {
+  int local_var[2][3];
+  local_var[1][2] = 42;
+  fun_array_from_global_data(local_var);
+}

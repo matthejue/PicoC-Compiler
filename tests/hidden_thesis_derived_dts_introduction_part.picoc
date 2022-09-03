@@ -1,0 +1,17 @@
+// in:
+// expected:-2147483606 -2147483595
+
+struct ar_with_len {int len; int ar[2];};
+
+void fun() {
+  struct ar_with_len st_ar[3];
+  int (*complex_var)[3];
+  print(&complex_var);
+}
+
+void main() {
+  struct ar_with_len st_ar[3];
+  int *(*complex_var)[3];
+  print(&complex_var);
+  fun();
+}

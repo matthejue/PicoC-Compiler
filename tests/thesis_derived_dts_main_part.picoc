@@ -1,0 +1,10 @@
+// in:
+// expected:42
+
+struct st {int (*ar)[1];};
+
+void main() {
+  int var[1] = {42};
+  struct st complex_var = {.ar=&var};
+  print((*complex_var.ar)[2-2]);
+}

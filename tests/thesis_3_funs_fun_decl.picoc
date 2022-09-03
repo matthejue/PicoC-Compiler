@@ -1,0 +1,18 @@
+// in:
+// expected:42
+
+int fun2(int var);
+
+void fun1() {
+}
+
+void main() {
+  int var = fun2(42);
+  fun1();
+  return;
+}
+
+int fun2(int var) {
+  print(var);
+  return var;
+}

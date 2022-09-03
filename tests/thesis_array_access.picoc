@@ -1,0 +1,15 @@
+// in:
+// expected:42 3
+
+void fun();
+
+void main() {
+  int ar[1] = {42};
+  print(ar[0]);
+  fun();
+}
+
+void fun() {
+  int ar[3] = {1, 2, 3};
+  print(ar[1+1]);
+}

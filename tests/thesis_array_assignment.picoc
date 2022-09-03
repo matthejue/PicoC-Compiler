@@ -1,0 +1,8 @@
+// in:
+// expected:42
+
+void main() {
+  int ar[2];
+  ar[1] = 42;
+  print(ar[1]);
+}

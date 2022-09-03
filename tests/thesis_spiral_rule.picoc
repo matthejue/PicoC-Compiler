@@ -1,0 +1,10 @@
+// in:
+// expected:42
+
+struct st {int attr;};
+
+void main() {
+  struct st st_var[2] = {{.attr=314}, {.attr=42}};
+  struct st (*complex_var[1][2])[2] = {{&st_var, &st_var}};
+  print((*complex_var[0][1])[1].attr);
+}

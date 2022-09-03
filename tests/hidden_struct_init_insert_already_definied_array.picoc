@@ -1,0 +1,11 @@
+// in:
+// expected:
+
+struct st {int ar[2];};
+
+void main() {
+  // # array
+  int ar[2] = {2, 4};
+  // # struct
+  struct st st_var = {.ar=ar};
+}

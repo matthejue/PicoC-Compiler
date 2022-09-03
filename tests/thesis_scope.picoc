@@ -1,0 +1,13 @@
+// in:
+// expected:4 2
+
+int fun_scope(int param) {
+  int local_var = 2;
+  print(param);
+  print(local_var);
+}
+
+void main() {
+  int local_var = 4;
+  fun_scope(local_var);
+}
