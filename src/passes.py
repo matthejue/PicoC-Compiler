@@ -909,19 +909,18 @@ class Passes:
                         return_type = datatype
                     case _:
                         throw_error(symbol)
+                block_name = pn.Name(
+                    self.fun_name_to_block_name[fun_name], fun_call_pos
+                )
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
                     + exps_mon
                     + [
-                        pn.NewStackframe(name, pn.GoTo(pn.Name("addr@next_instr"))),
-                        pn.Exp(
-                            pn.GoTo(
-                                pn.Name(
-                                    self.fun_name_to_block_name[fun_name], fun_call_pos
-                                )
-                            )
+                        pn.NewStackframe(
+                            block_name, pn.GoTo(pn.Name("addr@next_instr"))
                         ),
+                        pn.Exp(pn.GoTo(block_name)),
                         pn.RemoveStackframe(),
                     ]
                     + (
@@ -1952,7 +1951,7 @@ class Passes:
                 fun_name = val
                 fun_call_pos = pos
                 try:
-                    fun_block = self.all_blocks[self.fun_name_to_block_name[fun_name]]
+                    fun_block = self.all_blocks[fun_name]
                 except KeyError:
                     raise errors.UnknownIdentifier(fun_name, fun_call_pos)
                 num1 = fun_block.param_size
