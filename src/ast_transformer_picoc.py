@@ -461,6 +461,9 @@ class ASTTransformerPicoC(Transformer):
                 )
 
     # --------------------------------- L_File --------------------------------
+    def global_var_decl(self, nodes):
+        return nodes[0]
+
     def decl_def(self, nodes):
         return nodes[0]
 

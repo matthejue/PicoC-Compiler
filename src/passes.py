@@ -25,9 +25,10 @@ class Passes:
         # PicoC_Mon
         self.argmode_on = False
         self.symbol_table = st.SymbolTable()
-        self.current_scope = "global"
+        self.current_scope = "global!"
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
+        self.global_stmts_instrs = []
         # RETI_Blocks
         self.instrs_cnt = 0
         # RETI_Patch
@@ -165,7 +166,7 @@ class Passes:
                             decls_defs_shrinked += [
                                 pn.FunDef(datatype, name, allocs, stmts_shrinked)
                             ]
-                        case (pn.StructDecl() | pn.FunDecl()):
+                        case (pn.StructDecl() | pn.FunDecl() | pn.Exp() | pn.Assign()):
                             decls_defs_shrinked += [decl_def]
                         case _:
                             throw_error(decl_def)
@@ -324,7 +325,7 @@ class Passes:
                         ),
                     )
                 ]
-            case (pn.FunDecl() | pn.StructDecl()):
+            case (pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign()):
                 return [decl_def]
             case _:
                 throw_error(decl_def)
@@ -474,10 +475,9 @@ class Passes:
             symbol = self.symbol_table.resolve(f"{name}@{self.current_scope}")
             choosen_scope = self.current_scope
         except KeyError:
-            # TODO: remove in case global variables won't be implemented
             try:
-                symbol = self.symbol_table.resolve(f"{name}@global")
-                choosen_scope = "global"
+                symbol = self.symbol_table.resolve(f"{name}@global!")
+                choosen_scope = "global!"
             except KeyError:
                 raise errors.UnknownIdentifier(name, pos)
         return symbol, choosen_scope
@@ -489,7 +489,7 @@ class Passes:
                 var_name = val
                 var_pos = pos
                 # TODO: undefinied identifier error
-                symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
+                symbol, choosen_scope = self._resolve_name(var_name, var_pos)
                 match symbol:
                     case st.Symbol(_, datatype, _, _, _, _):
                         current_datatype = copy.deepcopy(datatype)
@@ -567,7 +567,7 @@ class Passes:
                     case st.Symbol(_, _, _, val_addr):
                         addr = val_addr
                         match choosen_scope:
-                            case ("main" | "global"):
+                            case ("main" | "global!"):
                                 return [pn.Ref(pn.Global(addr))]
                             case _:
                                 return [pn.Ref(pn.Stackframe(addr))]
@@ -616,10 +616,10 @@ class Passes:
                 match symbol:
                     case st.Symbol(pn.Writeable(), datatype, _, num):
                         match choosen_scope, datatype:
-                            case (("main" | "global"), pn.ArrayDecl()):
+                            case (("main" | "global!"), pn.ArrayDecl()):
                                 # TODO: struct st1 st = {.ar_var=ar]
                                 return [pn.Ref(pn.Global(num))]
-                            case (("main" | "global"), pn.StructSpec()):
+                            case (("main" | "global!"), pn.StructSpec()):
                                 if self.argmode_on:
                                     size = self._datatype_size(datatype)
                                     return [
@@ -644,7 +644,7 @@ class Passes:
                                     ]
                                 else:
                                     return [pn.Exp(pn.Stackframe(num))]
-                            case (("main" | "global"), _):
+                            case (("main" | "global!"), _):
                                 return [pn.Exp(pn.Global(num))]
                             case (_, _):
                                 return [pn.Exp(pn.Stackframe(num))]
@@ -707,7 +707,7 @@ class Passes:
                     var_name, var_pos, errors.Redefinition
                 )
                 match self.current_scope:
-                    case "main":
+                    case ("main" | "global!"):
                         size = self._datatype_size(datatype)
                         symbol = st.Symbol(
                             type_qual,
@@ -773,7 +773,7 @@ class Passes:
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, num):
                         match choosen_scope:
-                            case ("main" | "global"):
+                            case ("main" | "global!"):
                                 return [pn.Ref(pn.Global(num))]
                             case _:
                                 return [pn.Ref(pn.Stackframe(num))]
@@ -967,7 +967,7 @@ class Passes:
                     case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
                         addr = val_addr
                         match choosen_scope:
-                            case ("main" | "global"):
+                            case ("main" | "global!"):
                                 return (
                                     self._single_line_comment(stmt, "//")
                                     + exps_mon
@@ -1081,7 +1081,7 @@ class Passes:
                 match blocks[0]:
                     case pn.Block(_, stmts):
                         # attach param or not information to alloc
-                        if def_name not in ["main", "global"]:
+                        if def_name not in ["main", "global!"]:
                             for alloc in allocs:
                                 alloc.local_var_or_param = pn.Name("param")
                                 if global_vars.args.double_verbose:
@@ -1267,6 +1267,10 @@ class Passes:
                 self.symbol_table.define(symbol)
                 # Struct declaration isn't needed anymore after being evaluated
                 return []
+            case (pn.Exp() | pn.Assign()):
+                self.current_scope = "global!"
+                self.global_stmts_instrs += self._picoc_mon_stmt(decl_def)
+                return []
             case _:
                 throw_error(decl_def)
 
@@ -1274,11 +1278,18 @@ class Passes:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
-                decls_defs_mon = []
+                blocks_mon = []
                 for decl_def in decls_defs:
-                    decls_defs_mon += self._picoc_mon_def(decl_def)
+                    blocks_mon += self._picoc_mon_def(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_mon"), decls_defs_mon
+                    pn.Name(remove_extension(val) + ".picoc_mon"),
+                    [
+                        pn.Block(
+                            pn.Name(f"global.{self.block_id}"),
+                            self.global_stmts_instrs,
+                        )
+                    ]
+                    + blocks_mon,
                 )
             case _:
                 throw_error(file)
@@ -1948,12 +1959,12 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
                 ]
             case pn.NewStackframe(pn.Name(val, pos), pn.GoTo() as goto):
-                fun_name = val
+                fun_block_name = val
                 fun_call_pos = pos
                 try:
-                    fun_block = self.all_blocks[fun_name]
+                    fun_block = self.all_blocks[fun_block_name]
                 except KeyError:
-                    raise errors.UnknownIdentifier(fun_name, fun_call_pos)
+                    raise errors.UnknownIdentifier(fun_block_name, fun_call_pos)
                 num1 = fun_block.param_size
                 num2 = fun_block.local_vars_size
                 match (num1, num2):
@@ -2182,27 +2193,22 @@ class Passes:
     def reti_patch(self, file: pn.File):
         match file:
             case pn.File(pn.Name(val), blocks):
-                main_with_id = self.fun_name_to_block_name.get("main")
-                if main_with_id:
-                    # in case the main fun isn't the first fun in the file
-                    goto_main = pn.Exp(pn.GoTo(pn.Name(main_with_id)))
-                    start_block = pn.Block(
-                        pn.Name(f"start.{self.block_id}"),
-                        self._single_line_comment(goto_main, "# //") + [goto_main],
-                    )
-                    start_block.instrs_before = pn.Num("0")
-                    start_block.num_instrs = pn.Num("1")
-                    self.all_blocks[f"start.{self.block_id}"] = start_block
-                    start_block_in_list = [start_block]
-                else:
-                    start_block_in_list = []
+                # jump to main function if main function isn't first function
+                try:
+                    main_with_id = self.fun_name_to_block_name["main"]
+                except KeyError:
+                    raise errors.NotExactlyOneMainFunction("less")
+                goto_main = pn.Exp(pn.GoTo(pn.Name(main_with_id)))
+                self.global_stmts_instrs += self._single_line_comment(
+                    goto_main, "# //"
+                ) + [goto_main]
 
-                for block in start_block_in_list + blocks:
+                for block in blocks:
                     self._reti_patch_block(block)
                 patched_blocks = blocks
                 return pn.File(
                     pn.Name(remove_extension(val) + ".reti_patch"),
-                    start_block_in_list + patched_blocks,
+                    patched_blocks,
                 )
             case _:
                 throw_error(file)
