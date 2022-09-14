@@ -65,10 +65,10 @@ logic_or: logic_or "||" logic_and|logic_and
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_spec: prim_dt|struct_spec
 alloc: type_spec pntr_decl
-assign_stmt: un_exp "=" logic_or";"
+assign_stmt: un_exp "=" logic_or
 bug_initializer: logic_or|array_init|struct_init
-init_stmt: alloc "=" bug_initializer";"
-const_init_stmt: "const" type_spec name "=" NUM";"
+init_stmt: alloc "=" bug_initializer
+const_init_stmt: "const" type_spec name "=" NUM
 // ---------------------------------- L_Pntr ----------------------------------
 !pntr_deg: "*"*
 pntr_decl: pntr_deg array_decl|array_decl
@@ -88,27 +88,28 @@ if_stmt: "if""("logic_or")" exec_part
 if_else_stmt: "if""("logic_or")" exec_part "else" exec_part
 // ---------------------------------- L_Loop ----------------------------------
 while_stmt: "while""("logic_or")" exec_part
-do_while_stmt: "do" exec_part "while""("logic_or")"";"
+do_while_stmt: "do" exec_part "while""("logic_or")"
 // ---------------------------------- L_Stmt ----------------------------------
 decl_exp_stmt: alloc";"
-decl_direct_stmt: assign_stmt|init_stmt|const_init_stmt
+decl_direct_stmt: (init_stmt|const_init_stmt)";"
 decl_part: decl_exp_stmt|decl_direct_stmt|RETI_COMMENT
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 compound_stmt: "{" exec_part* "}"
 exec_exp_stmt: logic_or";"
-exec_direct_stmt: if_stmt|if_else_stmt|while_stmt|do_while_stmt|assign_stmt|fun_return_stmt
+exec_direct_stmt: if_stmt|if_else_stmt|while_stmt|do_while_stmt";"|assign_stmt";"|fun_return_stmt";"
 exec_part: compound_stmt|exec_exp_stmt|exec_direct_stmt|RETI_COMMENT
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 decl_exec_stmts: decl_part* exec_part*
 // ----------------------------------- L_Fun ----------------------------------
 fun_args: [logic_or("," logic_or)*]
 fun_call: name"("fun_args")"
-fun_return_stmt: "return" [logic_or]";"
+fun_return_stmt: "return" [logic_or]
 fun_params: [alloc("," alloc)*]
 fun_decl: type_spec pntr_deg name"("fun_params")"
 fun_def: type_spec pntr_deg name"("fun_params")" "{" decl_exec_stmts "}"
 // ---------------------------------- L_File ----------------------------------
-decl_def: (struct_decl|fun_decl)";"|fun_def
+global_var_decl: decl_exp_stmt|decl_direct_stmt
+decl_def: global_var_decl|(struct_decl|fun_decl)";"|fun_def
 decls_defs: decl_def*
 file: FILENAME decls_defs
 

@@ -71,6 +71,12 @@ class DatatypeMismatch(Exception):
         self.expected_datatype = expected_datatype
 
 
+class NotExactlyOneMainFunction(Exception):
+    def __init__(self, more_or_less):
+        self.description = f"{CM().YELLOW}NotExactlyOneMainFunction:{CM().RESET_ALL} This program contains {CM().RED}{more_or_less}{CM().RESET} than 1 main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
+        self.more_or_less = more_or_less
+
+
 class NodeError(Exception):
     def __init__(self, node_name, node_pos):
         self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}"

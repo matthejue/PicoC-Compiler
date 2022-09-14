@@ -1,0 +1,16 @@
+// in:
+// expected:42 314
+
+int global_var;
+
+void fun() {
+  print(global_var);
+}
+
+int global_var2 = 42;
+
+void main() {
+  print(global_var2);
+  global_var = 314;
+  fun();
+}

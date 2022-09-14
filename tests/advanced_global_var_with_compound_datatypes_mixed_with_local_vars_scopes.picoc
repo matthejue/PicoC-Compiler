@@ -1,0 +1,28 @@
+// in:12
+// expected:42 314
+
+struct st {int len; int ar[2];};
+
+int i;
+
+void print_ar(struct st param_st) {
+  // scope test, local i has higher priority
+  int i = 0;
+  while (i < param_st.len) {
+    print(param_st.ar[i]);
+    i = i + 1;
+  }
+}
+
+struct st global_st;
+
+void main() {
+  int ar[2] = {42, 314};
+  i = 0;
+  while (i < 2) {
+    global_st.ar[i] = ar[i];
+    i = i + 1;
+  }
+  global_st.len = i;
+  print_ar(global_st);
+}
