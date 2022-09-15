@@ -1,0 +1,6 @@
+// in:
+// expected:2147483647
+
+void main() {
+  print(2147483647);
+}
