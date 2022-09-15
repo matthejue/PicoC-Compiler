@@ -2218,7 +2218,7 @@ class Passes:
                 try:
                     main_with_id = self.fun_name_to_block_name["main"]
                 except KeyError:
-                    raise errors.NotExactlyOneMainFunction("less")
+                    raise errors.NoMainFunction()
                 goto_main = pn.Exp(pn.GoTo(pn.Name(main_with_id)))
                 self.global_stmts_instrs += self._single_line_comment(
                     goto_main, "# //"
