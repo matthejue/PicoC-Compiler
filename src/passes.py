@@ -1832,10 +1832,9 @@ class Passes:
                 attr_name = val2
                 rel_pos_in_struct = 0
                 match datatype:
-                    case pn.StructSpec(pn.Name(val3, pos3)):
+                    case pn.StructSpec(pn.Name(val3)):
                         # determine relative pos in struct
                         struct_name = val3
-                        struct_pos = val3
                         symbol = self.symbol_table.resolve(struct_name)
                         # TODO: try error and error message
                         match symbol:
@@ -1851,12 +1850,6 @@ class Passes:
                                             rel_pos_in_struct += int(attr_size)
                                         case _:
                                             throw_error(symbol)
-                                # never happens
-                                #  else:
-                                #  attr_pos = pos2
-                                #  raise errors.UnknownAttribute(
-                                #  attr_name, attr_pos, struct_name, struct_pos
-                                #  )
                             case _:
                                 throw_error(symbol)
                     case _:
