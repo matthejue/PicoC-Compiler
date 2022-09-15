@@ -33,6 +33,19 @@ class UnknownIdentifier(Exception):
         self.found_pos = found_pos
 
 
+class NotExactlyOneMainFunction(Exception):
+    def __init__(self, more_or_less):
+        self.description = f"{CM().YELLOW}NotExactlyOneMainFunction:{CM().RESET_ALL} This program contains {CM().RED}{more_or_less}{CM().RESET} than 1 main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
+        self.more_or_less = more_or_less
+
+
+class TooLargeLiteral(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}TooLargeLiteral:{CM().RESET_ALL} The value represented by the literal '{found}' is too large."
+        self.found = found
+        self.found_pos = found_pos
+
+
 class Redefinition(Exception):
     def __init__(self, found, found_pos, first_pos):
         self.description = f"{CM().YELLOW}Redefinition:{CM().RESET_ALL} Redefinition of {CM().RED}'{found}'{CM().RESET}"
@@ -71,12 +84,6 @@ class DatatypeMismatch(Exception):
         self.expected_datatype = expected_datatype
 
 
-class NotExactlyOneMainFunction(Exception):
-    def __init__(self, more_or_less):
-        self.description = f"{CM().YELLOW}NotExactlyOneMainFunction:{CM().RESET_ALL} This program contains {CM().RED}{more_or_less}{CM().RESET} than 1 main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
-        self.more_or_less = more_or_less
-
-
 class NodeError(Exception):
     def __init__(self, node_name, node_pos):
         self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}"
@@ -99,31 +106,6 @@ class ConstRef(Exception):
         self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}"
         self.found = found
         self.found_pos = found_pos
-
-
-# TODO
-class TooLargeLiteral(Exception):
-    def __init__(self, found, found_pos, found_symbol_type, found_from, found_to):
-        self.description = f"{CM().YELLOW}TooLargeLiteral:{CM().RESET_ALL} Literal '{found}' is too large"
-        self.found = found
-        self.found_pos = found_pos
-        self.found_symbol_type = found_symbol_type
-        self.found_from = found_from
-        self.found_to = found_to
-
-
-# TODO
-class NoMainFunction(Exception):
-    def __init__(self, fname):
-        self.description = f"{CM().YELLOW}NoMainFunction:{CM().RESET_ALL} There's no main function in file '{fname}'"
-
-
-# TODO
-class MoreThanOneMainFunction(Exception):
-    def __init__(self, first_pos, second_pos):
-        self.description = f"{CM().YELLOW}MoreThanOneMainFunction:{CM().RESET_ALL} There're at least two main functions"
-        self.first_pos = first_pos
-        self.second_pos = second_pos
 
 
 class PrototypeMismatch(Exception):

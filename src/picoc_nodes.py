@@ -1,4 +1,5 @@
 from ast_node import ASTNode
+from global_classes import Pos
 import symbol_table as st
 import global_vars
 from global_funs import repr_example
@@ -17,7 +18,15 @@ class Name(ASTNode):
 
 
 class Num(ASTNode):
-    pass
+    def __init__(self, val, pos=Pos(-1, -1)):
+        self.is_negative = Name("not_negative")
+        super().__init__(
+            val,
+            pos,
+            visible=[self.is_negative] if global_vars.args.double_verbose else [],
+        )
+
+    __match_args__ = ("val", "pos", "is_negative")
 
 
 class Char(ASTNode):

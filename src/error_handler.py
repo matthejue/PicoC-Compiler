@@ -98,6 +98,21 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
+        except errors.NotExactlyOneMainFunction as e:
+            self._error_heading()
+            error_header = self._error_header(e.description)
+            self._output_error(error_header, e.__class__.__name__)
+            exit(0)
+        except errors.TooLargeLiteral as e:
+            self._error_heading()
+            error_header = self._error_header(e.description)
+            error_screen = AnnotationScreen(
+                self.split_code, e.found_pos.line, e.found_pos.line
+            )
+            error_screen.mark(e.found_pos, len(e.found))
+            error_screen.filter()
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
+            exit(0)
         except (errors.Redefinition, errors.Redeclaration) as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
@@ -137,11 +152,6 @@ class ErrorHandler:
             self.color_offset = 0
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
-            exit(0)
-        except errors.NotExactlyOneMainFunction as e:
-            self._error_heading()
-            error_header = self._error_header(e.description)
-            self._output_error(error_header, e.__class__.__name__)
             exit(0)
         except errors.NodeError as e:
             self._error_heading()

@@ -678,6 +678,11 @@ class Passes:
                 )
             case pn.UnOp(un_op, exp):
                 exps_mon = self._picoc_mon_exp(exp)
+                match exp:
+                    case pn.Num(val):
+                        if val == "2147483648":
+                            return [pn.Exp(pn.Num("-2147483648"))]
+                        exp.is_negative = pn.Name("negative")
                 return exps_mon + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
@@ -1355,7 +1360,13 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
-                    case pn.Num(val):
+                    case pn.Num(val, pos, is_negative):
+                        if int(val) > 2**31 and is_negative.val == "negative":
+                            raise errors.TooLargeLiteral(val, pos)
+                        elif (
+                            int(val) > 2**31 - 1 and is_negative.val == "not_negative"
+                        ):
+                            raise errors.TooLargeLiteral(val, pos)
                         reti_instrs += [
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)])
                         ]
@@ -1365,7 +1376,7 @@ class Passes:
                                 rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(str(ord(val)))]
                             )
                         ]
-                    case rn.Reg(val):
+                    case rn.Reg():
                         return reti_instrs + [
                             rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), exp, rn.Im("1")]),
                         ]
@@ -2058,6 +2069,7 @@ class Passes:
     # - what is there's no main function
 
     def _write_large_immediate_in_register(self, reg, s_num):
+        #  __import__("pudb").set_trace()
         bits = Bits(int=s_num, length=32).bin
         sign = bits[0]
         h_bits = bits[1:11]
@@ -2066,16 +2078,25 @@ class Passes:
         l_num = Bits(bin="0" + l_bits).int
         return (
             self._single_line_comment(reg, "# write large immediate into")
-            + [rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))])]
             + (
-                [rn.Instr(rn.Multi(), [reg, rn.Im(str(-(2**21)))])]
-                if sign == "1"
-                else [
-                    rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
-                    rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
+                [
+                    rn.Instr(rn.Loadi(), [reg, rn.Im("-1")]),
+                    rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
                 ]
+                if h_num == 0
+                else [rn.Instr(rn.Loadi(), [reg, rn.Im(str(-h_num))])]
             )
-            + [rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))])]
+            + [
+                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**21))]),
+                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+            ]
+            if sign == "1"
+            else [
+                rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
+                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
+                rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
+                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+            ]
         )
 
     def _reti_patch_instr(self, instr, current_block_idx, is_last_instr):
@@ -2138,9 +2159,9 @@ class Passes:
                     return [instr]
             case rn.Instr(rn.Loadi(), [reg, rn.Im(val)]):
                 s_num = int(val)
-                if s_num < -(2**31) and s_num > 2**31 - 1:
+                if s_num < -(2**31) or s_num > 2**31:
                     throw_error(instr)
-                elif s_num < -(2**21) and s_num > 2**21 - 1:
+                elif s_num < -(2**21) or s_num > 2**21 - 1:
                     return self._write_large_immediate_in_register(reg, s_num)
                 else:
                     return [instr]
