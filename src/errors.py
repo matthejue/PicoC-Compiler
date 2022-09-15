@@ -33,10 +33,16 @@ class UnknownIdentifier(Exception):
         self.found_pos = found_pos
 
 
-class NotExactlyOneMainFunction(Exception):
-    def __init__(self, more_or_less):
-        self.description = f"{CM().YELLOW}NotExactlyOneMainFunction:{CM().RESET_ALL} This program contains {CM().RED}{more_or_less}{CM().RESET} than 1 main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
-        self.more_or_less = more_or_less
+class UnknownAttribute(Exception):
+    def __init__(self, found: str, found_pos: Pos):
+        self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Identifier {CM().RED}'{found}'{CM().RESET} wasn't declared yet"
+        self.found = found
+        self.found_pos = found_pos
+
+
+class NoMainFunction(Exception):
+    def __init__(self):
+        self.description = f"{CM().YELLOW}NoMainFunction:{CM().RESET_ALL} This program contains {CM().RED}no{CM().RESET} main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
 
 
 class TooLargeLiteral(Exception):

@@ -98,7 +98,7 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
-        except errors.NotExactlyOneMainFunction as e:
+        except errors.NoMainFunction as e:
             self._error_heading()
             error_header = self._error_header(e.description)
             self._output_error(error_header, e.__class__.__name__)
