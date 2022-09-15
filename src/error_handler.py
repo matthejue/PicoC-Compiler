@@ -88,7 +88,7 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
-        except (errors.UnknownIdentifier, errors.ConstAssign, errors.ConstRef) as e:
+        except (errors.UnknownIdentifier, errors.ConstAssign) as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
@@ -105,11 +105,24 @@ class ErrorHandler:
             exit(0)
         except errors.TooLargeLiteral as e:
             self._error_heading()
-            error_header = self._error_header(e.description)
+            error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos.line, e.found_pos.line
             )
             error_screen.mark(e.found_pos, len(e.found))
+            error_screen.filter()
+            self._output_error(error_header + str(error_screen), e.__class__.__name__)
+            exit(0)
+        except errors.UnknownAttribute as e:
+            self._error_heading()
+            error_header = self._error_header(e.description, e.attr_pos)
+            error_screen = AnnotationScreen(
+                self.split_code,
+                e.attr_pos.line,
+                e.attr_pos.line,
+            )
+            error_screen.mark(e.attr_pos, len(e.attr_name))
+            error_screen.mark(e.struct_pos, len(e.struct_name))
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
