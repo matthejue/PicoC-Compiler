@@ -528,8 +528,9 @@ class Passes:
                                 error_data=[name],
                             )
                             current_datatype.nums.pop(0)
-                        case pn.StructSpec(pn.Name(val1)):
+                        case pn.StructSpec(pn.Name(val1, pos1)):
                             struct_name = val1
+                            struct_pos = pos1
                             ref = prev_stmts.pop()
                             self._add_datatype_and_error_data(
                                 ref,
@@ -537,11 +538,22 @@ class Passes:
                                 error_data=[name],
                             )
                             match ref:
-                                case pn.Ref(pn.Attr(_, pn.Name(val2))):
+                                case pn.Ref(pn.Attr(_, pn.Name(val2, pos2))):
                                     attr_name = val2
-                                    symbol = self.symbol_table.resolve(
-                                        f"{attr_name}@{struct_name}"
-                                    )
+                                    attr_pos = pos2
+                                    try:
+                                        symbol = self.symbol_table.resolve(
+                                            f"{attr_name}@{struct_name}"
+                                        )
+                                    except KeyError:
+                                        raise errors.UnknownAttribute(
+                                            attr_name,
+                                            attr_pos,
+                                            struct_name,
+                                            struct_pos,
+                                            var_name,
+                                            var_pos,
+                                        )
                                 case pn.Ref(pn.Subscr()):
                                     raise errors.DatatypeMismatch(
                                         var_name,
@@ -709,7 +721,7 @@ class Passes:
                 var_name = val1
                 var_pos = pos1
                 self._check_redef_and_redecl_error(
-                    var_name, var_pos, errors.Redefinition
+                    var_name, var_pos, errors.ReDeclarationOrRedefinition
                 )
                 match self.current_scope:
                     case ("main" | "global!"):

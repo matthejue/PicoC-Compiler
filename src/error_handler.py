@@ -98,6 +98,33 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
+        except errors.UnknownAttribute as e:
+            self._error_heading()
+            error_header = self._error_header(e.description, e.attr_pos)
+            error_screen = AnnotationScreen(
+                self.split_code,
+                e.attr_pos.line,
+                e.attr_pos.line,
+            )
+            error_screen.mark_consider_colors(e.var_pos, len(e.var_name))
+            error_screen.mark(e.attr_pos, len(e.attr_name))
+            note_header = self._error_header(
+                e.description2,
+                e.struct_pos,
+            )
+            error_screen2 = AnnotationScreen(
+                self.split_code,
+                e.struct_pos.line,
+                e.struct_pos.line,
+            )
+            error_screen2.mark(e.struct_pos, len(e.struct_name))
+            error_screen.filter()
+            error_screen2.filter()
+            self._output_error(
+                error_header + str(error_screen) + note_header + str(error_screen2),
+                e.__class__.__name__,
+            )
+            exit(0)
         except errors.NoMainFunction as e:
             self._error_heading()
             error_header = self._error_header(e.description)
@@ -110,19 +137,6 @@ class ErrorHandler:
                 self.split_code, e.found_pos.line, e.found_pos.line
             )
             error_screen.mark(e.found_pos, len(e.found))
-            error_screen.filter()
-            self._output_error(error_header + str(error_screen), e.__class__.__name__)
-            exit(0)
-        except errors.UnknownAttribute as e:
-            self._error_heading()
-            error_header = self._error_header(e.description, e.attr_pos)
-            error_screen = AnnotationScreen(
-                self.split_code,
-                e.attr_pos.line,
-                e.attr_pos.line,
-            )
-            error_screen.mark(e.attr_pos, len(e.attr_name))
-            error_screen.mark(e.struct_pos, len(e.struct_name))
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
@@ -353,7 +367,10 @@ class AnnotationScreen:
     def mark(self, pos: Pos, width: int):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().RED
+            self.screen[3 * rel_row + 1],
+            "~" * width,
+            pos.column + self.color_offset,
+            CM().RED,
         )
         self.marked_lines += [3 * rel_row + 1]
 

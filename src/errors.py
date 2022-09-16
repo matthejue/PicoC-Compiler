@@ -5,7 +5,7 @@ from global_classes import Pos
 
 class UnexpectedCharacter(Exception):
     def __init__(self, expected: str, found: str, found_pos: Pos):
-        self.description = f"{CM().YELLOW}UnexpectedCharacter:{CM().RESET_ALL} No terminal matches {CM().RED}'{found}'{CM().RESET} in the current lexical context of {CM().BLUE}{expected}{CM().RESET}"
+        self.description = f"{CM().YELLOW}UnexpectedCharacter:{CM().RESET_ALL} No terminal matches {CM().RED}'{found}'{CM().RESET} in the current lexical context of {CM().BLUE}{expected}{CM().RESET}:"
         self.expected = expected
         self.found = found
         self.found_pos = found_pos
@@ -13,7 +13,7 @@ class UnexpectedCharacter(Exception):
 
 class UnexpectedToken(Exception):
     def __init__(self, expected: str, found: Token, found_pos: Pos):
-        self.description = f"{CM().YELLOW}UnexpectedToken:{CM().RESET_ALL} Expected e.g. {expected}, found {CM().RED}'{found}'{CM().RESET}"
+        self.description = f"{CM().YELLOW}UnexpectedToken:{CM().RESET_ALL} Expected e.g. {expected}, found {CM().RED}'{found}'{CM().RESET}:"
         self.expected = expected
         self.found = found
         self.found_pos = found_pos
@@ -21,42 +21,45 @@ class UnexpectedToken(Exception):
 
 class UnexpectedEOF(Exception):
     def __init__(self, expected: str, last_pos: Pos):
-        self.description = f"{CM().YELLOW}UnexpectedEOF:{CM().RESET_ALL} Unexpected end-of-file, expected e.g. {expected}"
+        self.description = f"{CM().YELLOW}UnexpectedEOF:{CM().RESET_ALL} Unexpected end-of-file, expected e.g. {expected}:"
         self.expected = expected
         self.last_pos = last_pos
 
 
 class UnknownIdentifier(Exception):
     def __init__(self, found: str, found_pos: Pos):
-        self.description = f"{CM().YELLOW}UnknownIdentifier:{CM().RESET_ALL} Identifier {CM().RED}'{found}'{CM().RESET} wasn't declared yet"
+        self.description = f"{CM().YELLOW}UnknownIdentifier:{CM().RESET_ALL} Identifier {CM().RED}'{found}'{CM().RESET} wasn't declared yet:"
         self.found = found
         self.found_pos = found_pos
 
 
 class UnknownAttribute(Exception):
-    def __init__(self, attr_name, attr_pos, struct_name, struct_pos):
-        self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} doesn't have a attribute {CM().RED}'attr_name'{CM().RESET}."
+    def __init__(self, attr_name, attr_pos, struct_name, struct_pos, var_name, var_pos):
+        self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} doesn't have a attribute {CM().RED}'attr_name'{CM().RESET}:"
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} was declared here:"
         self.attr_name = attr_name
         self.attr_pos = attr_pos
         self.struct_name = struct_name
         self.struct_pos = struct_pos
+        self.var_name = var_name
+        self.var_pos = var_pos
 
 
 class NoMainFunction(Exception):
     def __init__(self):
-        self.description = f"{CM().YELLOW}NoMainFunction:{CM().RESET_ALL} This program contains {CM().RED}no{CM().RESET} main function. Expected exactly {CM().BLUE}1{CM().RESET} main function."
+        self.description = f"{CM().YELLOW}NoMainFunction:{CM().RESET_ALL} This program contains {CM().RED}no{CM().RESET} main function. Expected exactly {CM().BLUE}1{CM().RESET} main function:"
 
 
 class TooLargeLiteral(Exception):
     def __init__(self, found, found_pos):
-        self.description = f"{CM().YELLOW}TooLargeLiteral:{CM().RESET_ALL} The value represented by the literal '{found}' is too large."
+        self.description = f"{CM().YELLOW}TooLargeLiteral:{CM().RESET_ALL} The value represented by the literal '{found}' is too large:"
         self.found = found
         self.found_pos = found_pos
 
 
-class Redefinition(Exception):
+class ReDeclarationOrRedefinition(Exception):
     def __init__(self, found, found_pos, first_pos):
-        self.description = f"{CM().YELLOW}Redefinition:{CM().RESET_ALL} Redefinition of {CM().RED}'{found}'{CM().RESET}"
+        self.description = f"{CM().YELLOW}Redefinition:{CM().RESET_ALL} Redefinition of {CM().RED}'{found}'{CM().RESET}:"
         self.found = found
         self.found_pos = found_pos
         self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already defined here:"

@@ -1,0 +1,20 @@
+// in:10
+// expected:55
+// datasegment:64
+
+int fib_efficient(int n, int* res){
+    if (n == 0)
+        return 0;
+    if (n == 1){
+        res[0] = 0;
+        res[1] = 1;
+        return 1;
+    }
+    res[n] = fib_efficient(n - 1, res) + res[n - 2];
+    return res[n];
+}
+
+void main() {
+  int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  print(fib_efficient(input(), ar));
+}
