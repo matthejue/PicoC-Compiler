@@ -74,7 +74,37 @@ _test:
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
 
 test-show:
-ifeq ($(PAGES),5)
+ifeq ($(PAGES),8)
+	-./export_environment_vars_for_makefile.sh;\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
+	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
+	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
+	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
+	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
+	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
+	LINE_NUM6=$$(expr $${LINES} '*' 6 + 1 - 6);\
+	LINE_NUM7=$$(expr $${LINES} '*' 7 + 1 - 7);\
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM7} | norm zt" -c "$$vs | {LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+else ifeq ($(PAGES),7)
+	-./export_environment_vars_for_makefile.sh;\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
+	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
+	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
+	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
+	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
+	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
+	LINE_NUM6=$$(expr $${LINES} '*' 6 + 1 - 6);\
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+else ifeq ($(PAGES),6)
+	-./export_environment_vars_for_makefile.sh;\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
+	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
+	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
+	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
+	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
+	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+else ifeq ($(PAGES),5)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\

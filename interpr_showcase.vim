@@ -42,7 +42,7 @@ function! ToggleComments()
     endif
 endfunction
 
-nnoremap c :call ToggleComments()<CR>
+nnoremap C :call ToggleComments()<CR>
 
 nnoremap N :set nu!<CR>
 nnoremap R :set rnu!<CR>
@@ -76,21 +76,21 @@ nnoremap H :call ToggleMatchHighlight()<CR>
 call ToggleMatchHighlight()
 
 " colorize line under cursor
-nnoremap 1 :call matchadd("Color1", '\%'.line('.').'l')<CR>
-nnoremap 2 :call matchadd("Color2", '\%'.line('.').'l')<CR>
-nnoremap 3 :call matchadd("Color3", '\%'.line('.').'l')<CR>
-nnoremap 4 :call matchadd("Color4", '\%'.line('.').'l')<CR>
-nnoremap 5 :call matchadd("Color5", '\%'.line('.').'l')<CR>
-nnoremap 6 :call matchadd("Color6", '\%'.line('.').'l')<CR>
-nnoremap 7 :call matchadd("Color7", '\%'.line('.').'l')<CR>
+nnoremap c1 :call matchadd("Color1", '\%'.line('.').'l')<CR>
+nnoremap c2 :call matchadd("Color2", '\%'.line('.').'l')<CR>
+nnoremap c3 :call matchadd("Color3", '\%'.line('.').'l')<CR>
+nnoremap c4 :call matchadd("Color4", '\%'.line('.').'l')<CR>
+nnoremap c5 :call matchadd("Color5", '\%'.line('.').'l')<CR>
+nnoremap c6 :call matchadd("Color6", '\%'.line('.').'l')<CR>
+nnoremap c7 :call matchadd("Color7", '\%'.line('.').'l')<CR>
 " remove colorized lines
 nnoremap D :call clearmatches()<CR>
 
 " colorize selectection everywhere
-vnoremap 1 "ay:call matchadd("Color1", "<C-r>a")<CR>
-vnoremap 2 "ay:call matchadd("Color2", "<C-r>a")<CR>
-vnoremap 3 "ay:call matchadd("Color3", "<C-r>a")<CR>
-vnoremap 4 "ay:call matchadd("Color4", "<C-r>a")<CR>
-vnoremap 5 "ay:call matchadd("Color5", "<C-r>a")<CR>
-vnoremap 6 "ay:call matchadd("Color6", "<C-r>a")<CR>
-vnoremap 7 "ay:call matchadd("Color7", "<C-r>a")<CR>
+vnoremap c1 "ay:call matchadd("Color1", "<C-r>a")<CR>
+vnoremap c2 "ay:call matchadd("Color2", "<C-r>a")<CR>
+vnoremap c3 "ay:call matchadd("Color3", "<C-r>a")<CR>
+vnoremap c4 "ay:call matchadd("Color4", "<C-r>a")<CR>
+vnoremap c5 "ay:call matchadd("Color5", "<C-r>a")<CR>
+vnoremap c6 "ay:call matchadd("Color6", "<C-r>a")<CR>
+vnoremap c7 "ay:call matchadd("Color7", "<C-r>a")<CR>
