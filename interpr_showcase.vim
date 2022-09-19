@@ -94,3 +94,5 @@ vnoremap c4 "ay:call matchadd("Color4", "<C-r>a")<CR>
 vnoremap c5 "ay:call matchadd("Color5", "<C-r>a")<CR>
 vnoremap c6 "ay:call matchadd("Color6", "<C-r>a")<CR>
 vnoremap c7 "ay:call matchadd("Color7", "<C-r>a")<CR>
+
+noremap S ggzR:<C-u>:set noscb<CR>:bo vs<CR>zRLjzt:setl scb<CR><C-w>p:setl scb<CR>

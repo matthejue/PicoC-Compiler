@@ -2,6 +2,7 @@
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 FILETYPE ?= reti_states
 PAGES ?= 5
+VERBOSE ?= -v
 .PHONY: all test clean
 
 all: interpret-color
