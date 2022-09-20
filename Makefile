@@ -2,7 +2,6 @@
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 FILETYPE ?= reti_states
 PAGES ?= 5
-VERBOSE ?= -v
 .PHONY: all test clean
 
 all: interpret-color
@@ -75,6 +74,7 @@ _test:
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
 
 test-show:
+	$(eval VERBOSE := -v)
 ifeq ($(PAGES),8)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
