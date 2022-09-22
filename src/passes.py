@@ -401,20 +401,50 @@ class Passes:
     def _check_prototype(self, prototype_def, prototype_decl):
         for def_datatype, decl_datatype in zip(prototype_def, prototype_decl):
             match (def_datatype, decl_datatype):
-                case (pn.Alloc(_, pn.VoidType(), _), pn.Alloc(_, pn.VoidType(), _)):
-                    return tuple()
-                case (pn.Alloc(_, pn.CharType(), _), pn.Alloc(_, pn.CharType(), _)):
-                    return tuple()
-                case (pn.Alloc(_, pn.IntType(), _), pn.Alloc(_, pn.IntType(), _)):
-                    return tuple()
-                case (pn.Alloc(_, pn.PntrDecl(), _), pn.Alloc(_, pn.PntrDecl(), _)):
-                    return tuple()
-                case (pn.Alloc(_, pn.ArrayDecl(), _), pn.Alloc(_, pn.PntrDecl(), _)):
-                    return tuple()
-                case (pn.Alloc(_, pn.StructSpec(), _), pn.Alloc(_, pn.StructSpec(), _)):
-                    return tuple()
+                case (
+                    pn.Alloc(_, pn.VoidType(), pn.Name(val1)),
+                    pn.Alloc(_, pn.VoidType(), pn.Name(val2)),
+                ) if val1 == val2:
+                    pass
+                case (
+                    pn.Alloc(_, pn.CharType(), pn.Name(val1)),
+                    pn.Alloc(_, pn.CharType(), pn.Name(val2)),
+                ) if val1 == val2:
+                    pass
+                case (
+                    pn.Alloc(_, pn.IntType(), pn.Name(val1)),
+                    pn.Alloc(_, pn.IntType(), pn.Name(val2)),
+                ) if val1 == val2:
+                    pass
+                case (
+                    pn.Alloc(_, pn.PntrDecl(num1, datatype1), pn.Name(val1)),
+                    pn.Alloc(_, pn.PntrDecl(num2, datatype2), pn.Name(val2)),
+                ) if val1 == val2 and num1 == num2:
+                    mismatch = self._check_prototype(
+                        [pn.Alloc(pn.Writeable(), datatype1, pn.Name("tmp"))],
+                        [pn.Alloc(pn.Writeable(), datatype2, pn.Name("tmp"))],
+                    )
+                    if mismatch:
+                        return (def_datatype, decl_datatype)
+                case (
+                    pn.Alloc(_, pn.ArrayDecl(nums1, datatype1), pn.Name(val1)),
+                    pn.Alloc(_, pn.ArrayDecl(nums2, datatype2), pn.Name(val2)),
+                ) if val1 == val2 and nums1 == nums2:
+                    mismatch = self._check_prototype(
+                        [pn.Alloc(pn.Writeable(), datatype1, pn.Name("tmp"))],
+                        [pn.Alloc(pn.Writeable(), datatype2, pn.Name("tmp"))],
+                    )
+                    if mismatch:
+                        return (def_datatype, decl_datatype)
+                case (
+                    pn.Alloc(_, pn.StructSpec(pn.Name(val1)), pn.Name(val3)),
+                    pn.Alloc(_, pn.StructSpec(pn.Name(val2)), pn.Name(val4)),
+                ) if val3 == val4:
+                    pass
                 case _:
                     return (def_datatype, decl_datatype)
+        else:
+            return ()
 
     def _get_leftmost_pos(self, exp):
         while True:
@@ -1092,8 +1122,10 @@ class Passes:
             case pn.FunDef(datatype, pn.Name(val1, pos1) as name, allocs, blocks):
                 def_name = val1
                 def_pos = pos1
+
                 self.current_scope = def_name
                 self.rel_fun_addr = 0
+
                 blocks_mon = []
                 match blocks[0]:
                     case pn.Block(_, stmts):
@@ -1130,6 +1162,50 @@ class Passes:
                         ] + allocs
                         try:
                             symbol = self.symbol_table.resolve(def_name)
+
+                            match symbol:
+                                case st.Symbol(
+                                    _,
+                                    pn.FunDecl(datatype2, _, allocs),
+                                    pn.Name(_, pos2) as name2,
+                                ):
+                                    decl_pos = pos2
+                                    prototype_decl = [
+                                        pn.Alloc(pn.Writeable(), datatype2, name2)
+                                    ] + ([] if isinstance(allocs, st.Empty) else allocs)
+                                case _:
+                                    throw_error(symbol)
+
+                            mismatched_allocs = self._check_prototype(
+                                prototype_def, prototype_decl
+                            )
+                            if mismatched_allocs:
+                                match (mismatched_allocs[0], mismatched_allocs[1]):
+                                    case (
+                                        pn.Alloc(_, datatype3, pn.Name(name3, pos3)),
+                                        pn.Alloc(_, datatype4, pn.Name(name4, pos4)),
+                                    ):
+                                        def_param_datatype = datatype3
+                                        decl_param_datatype = datatype4
+                                        def_param_name = name3
+                                        decl_param_name = name4
+                                        def_param_pos = pos3
+                                        decl_param_pos = pos4
+                                        raise errors.PrototypeMismatch(
+                                            def_name,
+                                            def_pos,
+                                            def_param_name,
+                                            convert_to_single_line(def_param_datatype),
+                                            def_param_pos,
+                                            decl_pos,
+                                            decl_param_name,
+                                            convert_to_single_line(decl_param_datatype),
+                                            decl_param_pos,
+                                        )
+                                    case _:
+                                        throw_error(
+                                            mismatched_allocs[0], mismatched_allocs[1]
+                                        )
                         except KeyError:
                             symbol = st.Symbol(
                                 st.Empty(),
@@ -1143,52 +1219,6 @@ class Passes:
                                 st.Empty(),
                             )
                             self.symbol_table.define(symbol)
-                        match symbol:
-                            case st.Symbol(
-                                _,
-                                pn.FunDecl(datatype2, _, allocs),
-                                pn.Name(_, pos2) as name2,
-                            ):
-                                decl_pos = pos2
-                                signature2 = (
-                                    [] if isinstance(allocs, st.Empty) else allocs
-                                )
-                                prototype_decl = [
-                                    pn.Alloc(pn.Writeable(), datatype2, name2)
-                                ] + signature2
-                            case _:
-                                throw_error(symbol)
-
-                        mismatched_allocs = self._check_prototype(
-                            prototype_def, prototype_decl
-                        )
-                        if mismatched_allocs:
-                            match (mismatched_allocs[0], mismatched_allocs[1]):
-                                case (
-                                    pn.Alloc(_, datatype3, pn.Name(name3, pos3)),
-                                    pn.Alloc(_, datatype4, pn.Name(name4, pos4)),
-                                ):
-                                    def_param_datatype = datatype3
-                                    decl_param_datatype = datatype4
-                                    def_param_name = name3
-                                    decl_param_name = name4
-                                    def_param_pos = pos3
-                                    decl_param_pos = pos4
-                                    raise errors.PrototypeMismatch(
-                                        def_name,
-                                        def_pos,
-                                        def_param_name,
-                                        convert_to_single_line(def_param_datatype),
-                                        def_param_pos,
-                                        decl_pos,
-                                        decl_param_name,
-                                        convert_to_single_line(decl_param_datatype),
-                                        decl_param_pos,
-                                    )
-                                case _:
-                                    throw_error(
-                                        mismatched_allocs[0], mismatched_allocs[1]
-                                    )
 
                         stmts_mon = []
                         for stmt in blocks[0].stmts_instrs:

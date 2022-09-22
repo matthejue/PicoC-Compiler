@@ -69,7 +69,7 @@ class ErrorHandler:
             )
             error_screen.mark(e.found_pos, len(e.found))
             if e.found_pos == prev_pos:
-                error_screen.clear(1)
+                error_screen.clear(0)
             error_screen.point_at(prev_pos, expected_str)
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
@@ -140,7 +140,37 @@ class ErrorHandler:
             error_screen.filter()
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
-        except (errors.Redefinition, errors.Redeclaration) as e:
+        except errors.PrototypeMismatch as e:
+            self._error_heading()
+
+            error_header = self._error_header(e.description, e.def_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.def_pos.line, e.def_param_pos.line
+            )
+            error_screen.mark_consider_colors(e.def_pos, len(e.def_name))
+            if e.decl_param_pos == e.decl_pos:
+                error_screen.clear(0)
+                error_screen.color_offset = 0
+            error_screen.point_at(e.def_param_pos, e.decl_param_datatype)
+
+            error_header2 = self._error_header(e.description2, e.decl_pos)
+            error_screen2 = AnnotationScreen(
+                self.split_code, e.decl_pos.line, e.decl_param_pos.line
+            )
+            error_screen2.mark_consider_colors(e.decl_pos, len(e.def_name))
+            if e.decl_param_pos == e.decl_pos:
+                error_screen2.clear(0)
+                error_screen2.color_offset = 0
+            error_screen2.point_at(e.decl_param_pos, e.def_param_datatype)
+
+            error_screen.filter()
+            error_screen2.filter()
+            self._output_error(
+                error_header + str(error_screen) + error_header2 + str(error_screen2),
+                e.__class__.__name__,
+            )
+            exit(0)
+        except (errors.ReDefinition, errors.Redeclaration) as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
@@ -170,7 +200,7 @@ class ErrorHandler:
             )
             error_screen.mark_consider_colors(e.var_pos, len(e.var_name))
             if e.var_pos == e.expected_pos:
-                error_screen.clear(1)
+                error_screen.clear(0)
                 error_screen.color_offset = 0
             error_screen.point_at(
                 e.expected_pos,
@@ -397,7 +427,7 @@ class AnnotationScreen:
             del self.screen[i]
 
     def clear(self, rel_line):
-        self.screen[rel_line] = " " * (len(self.screen[rel_line]) + 1)
+        self.screen[rel_line * 3 + 1] = " " * (len(self.screen[rel_line * 3 + 1]) + 1)
 
     def __repr__(self):
         acc = "\n"

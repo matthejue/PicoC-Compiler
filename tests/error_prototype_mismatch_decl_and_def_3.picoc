@@ -1,0 +1,10 @@
+// in:
+// expected:PrototypeMismatch
+
+void fun(int arg1, int arg2[2]);
+
+void main(){
+}
+
+void fun(int arg2[2], int arg1) {
+}
