@@ -170,7 +170,7 @@ class ErrorHandler:
                 e.__class__.__name__,
             )
             exit(0)
-        except (errors.ReDefinition, errors.Redeclaration) as e:
+        except errors.ReDeclaration as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
@@ -194,17 +194,17 @@ class ErrorHandler:
             exit(0)
         except errors.DatatypeMismatch as e:
             self._error_heading()
-            error_header = self._error_header(e.description, e.var_pos)
+            error_header = self._error_header(e.description, e.identifier_pos)
             error_screen = AnnotationScreen(
-                self.split_code, e.var_pos.line, e.var_pos.line
+                self.split_code, e.identifier_pos.line, e.identifier_pos.line
             )
-            error_screen.mark_consider_colors(e.var_pos, len(e.var_name))
-            if e.var_pos == e.expected_pos:
+            error_screen.mark_consider_colors(e.identifier_pos, len(e.identifier_name))
+            if e.identifier_pos == e.expected_pos:
                 error_screen.clear(0)
                 error_screen.color_offset = 0
             error_screen.point_at(
                 e.expected_pos,
-                f"expected '{e.expected_datatype}', found '{e.var_context_datatype}'",
+                f"expected '{e.expected_datatype}', found '{e.identifier_context_datatype}'",
             )
             self.color_offset = 0
             error_screen.filter()

@@ -26,6 +26,9 @@ class Num(ASTNode):
             visible=[self.is_negative] if global_vars.args.double_verbose else [],
         )
 
+    def __eq__(self, other):
+        return self.val == other.val
+
     __match_args__ = ("val", "pos", "is_negative")
 
 

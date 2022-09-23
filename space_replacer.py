@@ -32,7 +32,7 @@ def only_keep_path(fname):
 
 
 filenames = [
-f for f in os.listdir("./tests") if f.endswith(".picoc") and f.find(" ") != -1
+    f for f in os.listdir("./tests") if f.endswith(".picoc") and f.find(" ") != -1
 ]
 
 for filename in filenames:

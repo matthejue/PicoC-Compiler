@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./space_replacer.sh
+./space_replacer.py
 ./extract_input_and_expected.sh $2
 ./convert_to_c.py $2
 verification_res=$(./verify_tests.sh $1 $2)
@@ -40,7 +40,7 @@ echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests | tee -a ./tests/tes
 echo Not passed: ${not_passed[*]} | tee -a ./tests/tests.res
 
 
-./space_inserter.sh
+./space_inserter.py
 
 if [[ ${#not_passed[@]} != 0 ]]; then
     exit 1

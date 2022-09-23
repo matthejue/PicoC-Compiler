@@ -69,13 +69,13 @@ class SymbolTable(ASTNode):
 
     def _init_type_sytem(self):
         if global_vars.args.double_verbose:
-            self.define(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
-            self.define(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
+            self.declare(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
+            self.declare(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
 
     def exists(self, name):
         return self.symbols.get(name)
 
-    def define(self, symbol):
+    def declare(self, symbol):
         self.symbols[symbol.name.val] = symbol
 
     def resolve(self, name):

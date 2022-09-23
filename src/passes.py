@@ -481,7 +481,7 @@ class Passes:
             [ref.datatype, ref.error_data] if global_vars.args.double_verbose else []
         )
 
-    def _check_redef_and_redecl_error(self, var_name, var_pos, Error):
+    def _check_redef_and_redecl_error(self, var_name, var_pos):
         if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
             symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
             match symbol:
@@ -492,7 +492,7 @@ class Passes:
                     _,
                     st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
                 ):
-                    raise Error(
+                    raise errors.ReDeclaration(
                         var_name,
                         var_pos,
                         Pos(int(pos_first_line), int(pos_first_column)),
@@ -750,9 +750,7 @@ class Passes:
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
                 var_name = val1
                 var_pos = pos1
-                self._check_redef_and_redecl_error(
-                    var_name, var_pos, errors.ReDeclarationOrRedefinition
-                )
+                self._check_redef_and_redecl_error(var_name, var_pos)
                 match self.current_scope:
                     case ("main" | "global!"):
                         size = self._datatype_size(datatype)
@@ -766,7 +764,7 @@ class Passes:
                             ),
                             pn.Num(str(size)),
                         )
-                        self.symbol_table.define(symbol)
+                        self.symbol_table.declare(symbol)
                         self.rel_global_addr += size
                     case _:
                         match datatype:
@@ -796,7 +794,7 @@ class Passes:
                                 else pn.Num(str(size))
                             ),
                         )
-                        self.symbol_table.define(symbol)
+                        self.symbol_table.declare(symbol)
                         self.rel_fun_addr += (
                             1
                             if local_var_or_param.val == "param"
@@ -824,8 +822,15 @@ class Passes:
                                 return [pn.Ref(pn.Global(num))]
                             case _:
                                 return [pn.Ref(pn.Stackframe(num))]
-                    case st.Symbol(pn.Const()):
-                        raise errors.ConstRef(identifier_name, identifier_pos)
+                    case st.Symbol(pn.Const(), datatype):
+                        raise errors.DatatypeMismatch(
+                            identifier_name,
+                            "const " + convert_to_single_line(datatype),
+                            identifier_pos,
+                            identifier_pos,
+                            #  find_first_pos_in_node([exp])[1],
+                            convert_to_single_line(datatype),
+                        )
                     case _:
                         throw_error(symbol)
             case pn.Ref((pn.Subscr() | pn.Attr()) as ref):
@@ -1049,9 +1054,7 @@ class Passes:
             ):
                 var_name = val1
                 var_pos = pos1
-                self._check_redef_and_redecl_error(
-                    var_name, var_pos, errors.Redeclaration
-                )
+                self._check_redef_and_redecl_error(var_name, var_pos)
                 symbol = st.Symbol(
                     type_qual,
                     datatype,
@@ -1060,7 +1063,7 @@ class Passes:
                     st.Pos(pn.Num(str(var_pos.line)), pn.Num(str(var_pos.column))),
                     st.Empty(),
                 )
-                self.symbol_table.define(symbol)
+                self.symbol_table.declare(symbol)
                 # Alloc isn't needed anymore after being evaluated
                 return self._single_line_comment(stmt, "//") + []
             case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
@@ -1218,7 +1221,7 @@ class Passes:
                                 ),
                                 st.Empty(),
                             )
-                            self.symbol_table.define(symbol)
+                            self.symbol_table.declare(symbol)
 
                         stmts_mon = []
                         for stmt in blocks[0].stmts_instrs:
@@ -1259,7 +1262,7 @@ class Passes:
                     st.Pos(pn.Num(str(pos.line)), pn.Num(str(pos.column))),
                     st.Empty(),
                 )
-                self.symbol_table.define(symbol)
+                self.symbol_table.declare(symbol)
                 # Function declaration isn't needed anymore after being evaluated
                 return []
             case pn.StructDecl(pn.Name(val1, pos1), allocs):
@@ -1276,7 +1279,7 @@ class Passes:
                             _,
                             st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
                         ):
-                            raise errors.Redeclaration(
+                            raise errors.ReDeclaration(
                                 val1,
                                 pos1,
                                 Pos(int(pos_first_line), int(pos_first_column)),
@@ -1298,7 +1301,7 @@ class Passes:
                                 ),
                                 pn.Num(str(attr_size)),
                             )
-                            self.symbol_table.define(symbol)
+                            self.symbol_table.declare(symbol)
                             attrs += [pn.Name(f"{attr_name}@{struct_name}")]
                             struct_size += attr_size
                         case _:
@@ -1311,7 +1314,7 @@ class Passes:
                     st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
                     pn.Num(str(struct_size)),
                 )
-                self.symbol_table.define(symbol)
+                self.symbol_table.declare(symbol)
                 # Struct declaration isn't needed anymore after being evaluated
                 return []
             case (pn.Exp() | pn.Assign()):

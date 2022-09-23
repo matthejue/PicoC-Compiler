@@ -57,60 +57,6 @@ class TooLargeLiteral(Exception):
         self.found_pos = found_pos
 
 
-class ReDeclarationOrRedefinition(Exception):
-    def __init__(self, found, found_pos, first_pos):
-        self.description = f"{CM().YELLOW}Redefinition:{CM().RESET_ALL} Redefinition of {CM().RED}'{found}'{CM().RESET}."
-        self.found = found
-        self.found_pos = found_pos
-        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already defined here:"
-        self.first_pos = first_pos
-
-
-class Redeclaration(Exception):
-    def __init__(self, found, found_pos, first_pos):
-        self.description = f"{CM().YELLOW}Redeclaration:{CM().RESET_ALL} Redeclaration of {CM().RED}'{found}'{CM().RESET}."
-        self.found = found
-        self.found_pos = found_pos
-        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already declared here:"
-        self.first_pos = first_pos
-
-
-class DatatypeMismatch(Exception):
-    def __init__(
-        self, var_name, var_context_datatype, var_pos, expected_pos, expected_datatype
-    ):
-        self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Datatype {CM().RED}{var_context_datatype}{CM().RESET} of variable {CM().RED}{var_name}{CM().RESET} isn't matching in the present context. Expected {CM().BLUE}{expected_datatype}{CM().RESET}."
-        self.var_name = var_name
-        self.var_context_datatype = var_context_datatype
-        self.var_pos = var_pos
-        self.expected_pos = expected_pos
-        self.expected_datatype = expected_datatype
-
-
-class NodeError(Exception):
-    def __init__(self, node_name, node_pos):
-        self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}."
-        self.node_name = node_name
-        self.node_pos = node_pos
-
-
-# -----------------------------------------------------------------------------
-
-
-class ConstAssign(Exception):
-    def __init__(self, found, found_pos):
-        self.description = f"{CM().YELLOW}ConstAssign:{CM().RESET_ALL} Can't assign a new value to named constant {CM().RED}'{found}'{CM().RESET}."
-        self.found = found
-        self.found_pos = found_pos
-
-
-class ConstRef(Exception):
-    def __init__(self, found, found_pos):
-        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}."
-        self.found = found
-        self.found_pos = found_pos
-
-
 class PrototypeMismatch(Exception):
     def __init__(
         self,
@@ -137,6 +83,84 @@ class PrototypeMismatch(Exception):
         self.decl_param_name = decl_param_name
         self.decl_param_datatype = decl_param_datatype
         self.decl_param_pos = decl_param_pos
+
+
+class ArgumentMismatch(Exception):
+    def __init__(
+        self,
+        fun_call_pos,
+        argument_exp,
+        argument_datatype,
+        argument_pos,
+        decl_name,
+        decl_pos,
+        decl_param_name,
+        decl_param_datatype,
+        decl_param_pos,
+    ):
+        self.description = f"{CM().YELLOW}ArgumentMismatch:{CM().RESET_ALL} Argument {CM().RED}{argument_exp}{CM().RESET_ALL} of datatype {CM().RED}{argument_datatype}{CM().RESET_ALL} in function call is not matching with parameter {CM().BLUE}{decl_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{decl_param_datatype}{CM().RESET_ALL} from function {CM().RED}{decl_name}{CM().RESET_ALL}."
+        self.description2 = (
+            f"{CM().YELLOW}Note:{CM().RESET_ALL} Function was declared here:"
+        )
+        self.fun_call_pos = fun_call_pos
+        self.argument_exp = argument_exp
+        self.argument_datatype = argument_datatype
+        self.argument_pos = argument_pos
+        self.decl_name = decl_name
+        self.decl_pos = decl_pos
+        self.decl_param_name = decl_param_name
+        self.decl_param_datatype = decl_param_datatype
+        self.decl_param_pos = decl_param_pos
+
+
+class ReDeclaration(Exception):
+    def __init__(self, found, found_pos, first_pos):
+        self.description = f"{CM().YELLOW}ReDeclaration:{CM().RESET_ALL} Redeclaration of {CM().RED}'{found}'{CM().RESET}."
+        self.found = found
+        self.found_pos = found_pos
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already declared here:"
+        self.first_pos = first_pos
+
+
+class DatatypeMismatch(Exception):
+    def __init__(
+        self,
+        identifier_name,
+        identifier_context_datatype,
+        identifier_pos,
+        expected_pos,
+        expected_datatype,
+    ):
+        self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Datatype {CM().RED}'{identifier_context_datatype}'{CM().RESET} of variable {CM().RED}'{identifier_name}'{CM().RESET} isn't matching in the present context. Expected {CM().BLUE}'{expected_datatype}'{CM().RESET}."
+        self.identifier_name = identifier_name
+        self.identifier_context_datatype = identifier_context_datatype
+        self.identifier_pos = identifier_pos
+        self.expected_pos = expected_pos
+        self.expected_datatype = expected_datatype
+
+
+class NodeError(Exception):
+    def __init__(self, node_name, node_pos):
+        self.description = f"{CM().YELLOW}DatatypeMismatch:{CM().RESET_ALL} Error occured at Node {CM().RED}{node_name}{CM().RESET}."
+        self.node_name = node_name
+        self.node_pos = node_pos
+
+
+# -----------------------------------------------------------------------------
+
+
+class ConstAssign(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstAssign:{CM().RESET_ALL} Can't assign a new value to named constant {CM().RED}'{found}'{CM().RESET}."
+        self.found = found
+        self.found_pos = found_pos
+
+
+class ConstRef(Exception):
+    def __init__(self, found, found_pos):
+        self.description = f"{CM().YELLOW}ConstRef:{CM().RESET_ALL} Can't apply the reference / address-of operator to named constant {CM().RED}'{found}'{CM().RESET}."
+        self.found = found
+        self.found_pos = found_pos
 
 
 class BugInCompiler(Exception):

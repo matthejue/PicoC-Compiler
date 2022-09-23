@@ -1,5 +1,5 @@
 // in:
-// expected:Redeclaration
+// expected:ReDeclaration
 
 void main() {
   const int var = 42;
