@@ -1,5 +1,5 @@
 // in:
-// expected:ConstRef
+// expected:DatatypeMismatch
 
 void main() {
   const int const_val = 42;
