@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-./space_replacer.py
-./extract_input_and_expected.sh $2
-./convert_to_c.py $2
-verification_res=$(./verify_tests.sh $1 $2)
-
-num_tests=0;
-not_running_through=();
-not_passed=();
-
 if [[ $2 == "all" ]]; then
   paths=(./tests/*.picoc)
 elif [[ $2 == "default" ]]; then
@@ -18,6 +9,19 @@ elif [[ -n "$2" ]]; then
 else
   paths=(./tests/{basic,advanced,example,error,exclude,hard,thesis,tobias}*.picoc)
 fi
+
+if [ ! -f "${paths[0]}" ]; then
+  exit 1
+fi
+
+./space_replacer.py
+./extract_input_and_expected.sh $2
+./convert_to_c.py $2
+verification_res=$(./verify_tests.sh $1 $2)
+
+num_tests=0;
+not_running_through=();
+not_passed=();
 
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
