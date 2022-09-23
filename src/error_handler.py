@@ -170,6 +170,30 @@ class ErrorHandler:
                 e.__class__.__name__,
             )
             exit(0)
+        except errors.ArgumentMismatch as e:
+            self._error_heading()
+
+            error_header = self._error_header(e.description, e.fun_call_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.fun_call_pos.line, e.argument_pos.line
+            )
+            error_screen.mark_consider_colors(e.fun_call_pos, len(e.decl_name))
+            error_screen.point_at(e.argument_pos, e.decl_param_datatype)
+
+            error_header2 = self._error_header(e.description2, e.decl_pos)
+            error_screen2 = AnnotationScreen(
+                self.split_code, e.decl_pos.line, e.decl_param_pos.line
+            )
+            error_screen2.mark_consider_colors(e.decl_pos, len(e.decl_name))
+            error_screen2.point_at(e.decl_param_pos, e.argument_datatype)
+
+            error_screen.filter()
+            error_screen2.filter()
+            self._output_error(
+                error_header + str(error_screen) + error_header2 + str(error_screen2),
+                e.__class__.__name__,
+            )
+            exit(0)
         except errors.ReDeclaration as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.found_pos)
