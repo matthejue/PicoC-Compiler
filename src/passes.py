@@ -398,7 +398,7 @@ class Passes:
                     break
         return size
 
-    def _check_prototype(self, prototype_def, prototype_decl):
+    def _check_prototypes(self, prototype_def, prototype_decl):
         for def_datatype, decl_datatype in zip(prototype_def, prototype_decl):
             match (def_datatype, decl_datatype):
                 case (
@@ -420,7 +420,7 @@ class Passes:
                     pn.Alloc(_, pn.PntrDecl(num1, datatype1), pn.Name(val1)),
                     pn.Alloc(_, pn.PntrDecl(num2, datatype2), pn.Name(val2)),
                 ) if val1 == val2 and num1 == num2:
-                    mismatch = self._check_prototype(
+                    mismatch = self._check_prototypes(
                         [pn.Alloc(pn.Writeable(), datatype1, pn.Name("tmp"))],
                         [pn.Alloc(pn.Writeable(), datatype2, pn.Name("tmp"))],
                     )
@@ -430,7 +430,7 @@ class Passes:
                     pn.Alloc(_, pn.ArrayDecl(nums1, datatype1), pn.Name(val1)),
                     pn.Alloc(_, pn.ArrayDecl(nums2, datatype2), pn.Name(val2)),
                 ) if val1 == val2 and nums1 == nums2:
-                    mismatch = self._check_prototype(
+                    mismatch = self._check_prototypes(
                         [pn.Alloc(pn.Writeable(), datatype1, pn.Name("tmp"))],
                         [pn.Alloc(pn.Writeable(), datatype2, pn.Name("tmp"))],
                     )
@@ -444,7 +444,300 @@ class Passes:
                 case _:
                     return (def_datatype, decl_datatype)
         else:
-            return ()
+            return tuple()
+
+    def _check_args_params(self, args, params):
+        for arg, param in zip(args, params):
+            match (arg, param):
+                # TODO: what is with void? --> datatype mismatch
+                case (
+                    (
+                        pn.IntType()
+                        | pn.CharType()
+                        | pn.Num()
+                        | pn.Char()
+                        | pn.BinOp()
+                        | pn.UnOp()
+                        | pn.Atom()
+                        | pn.Deref()
+                    ),
+                    pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
+                ):
+                    pass
+                case (
+                    pn.Name(val, pos),
+                    pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
+                ):
+                    symbol = self._resolve_name(val, pos)[0]
+                    match symbol:
+                        case st.Symbol(_, datatype):
+                            match datatype:
+                                case (pn.CharType() | pn.IntType()):
+                                    pass
+                                case _:
+                                    return ((datatype, arg), param)
+                        case _:
+                            throw_error(symbol)
+                case (
+                    pn.Ref(exp1),
+                    _,
+                ):
+                    match param:
+                        case pn.Alloc(_, pn.PntrDecl(num2, datatype2) as pntrdecl, _):
+                            if int(num2.val) > 1:
+                                pntrdecl_copy = copy.deepcopy(pntrdecl)
+                                pntrdecl_copy.num.val = str(
+                                    int(pntrdecl_copy.num.val) - 1
+                                )
+                                mismatch = self._check_args_params(
+                                    [exp1],
+                                    [
+                                        pn.Alloc(
+                                            pn.Writeable(),
+                                            pntrdecl_copy,
+                                            pn.Name("tmp"),
+                                        )
+                                    ],
+                                )
+                            else:
+                                mismatch = self._check_args_params(
+                                    [exp1],
+                                    [
+                                        pn.Alloc(
+                                            pn.Writeable(),
+                                            datatype2,
+                                            pn.Name("tmp"),
+                                        )
+                                    ],
+                                )
+                            if mismatch:
+                                ((datatype_from_mismatch, _), _) = mismatch
+                                return (
+                                    (
+                                        pn.PntrDecl(
+                                            pn.Num("1"), datatype_from_mismatch
+                                        ),
+                                        arg,
+                                    ),
+                                    param,
+                                )
+                        case _:
+                            match exp1:
+                                case (
+                                    pn.Num()
+                                    | pn.Char()
+                                    | pn.BinOp()
+                                    | pn.UnOp()
+                                    | pn.Atom()
+                                    | pn.Deref()
+                                ):
+                                    determined_datatype = pn.IntType()
+                                case pn.Name(val, pos):
+                                    symbol = self._resolve_name(val, pos)[0]
+                                    match symbol:
+                                        case st.Symbol(_, datatype):
+                                            determined_datatype = datatype
+                                        case _:
+                                            throw_error(symbol)
+                                case _:
+                                    throw_error(param)
+                            return (
+                                (pn.PntrDecl(pn.Num("1"), determined_datatype), arg),
+                                param,
+                            )
+                case (
+                    (pn.Name() | pn.ArrayDecl() | pn.PntrDecl()),
+                    pn.Alloc(_, pn.PntrDecl(num2, datatype2) as pntrdecl, _),
+                ):
+                    match arg:
+                        case pn.Name():
+                            symbol = self._resolve_name(arg.val, arg.pos)[0]
+                        case _:
+                            symbol = st.Symbol(
+                                st.Empty(),
+                                arg,
+                            )
+                    match symbol:
+                        case st.Symbol(_, datatype1):
+                            match datatype1:
+                                case pn.PntrDecl(num1, datatype1_2) if num1 == num2:
+                                    mismatch = self._check_args_params(
+                                        [datatype1_2],
+                                        [
+                                            pn.Alloc(
+                                                pn.Writeable(),
+                                                datatype2,
+                                                pn.Name("tmp"),
+                                            )
+                                        ],
+                                    )
+                                    if mismatch:
+                                        return ((datatype1, arg), param)
+                                case pn.ArrayDecl(nums1, datatype1_2) as arraydecl:
+                                    if len(nums1) > 1 and int(num2.val) == 1:
+                                        arraydecl_copy = copy.deepcopy(arraydecl)
+                                        arraydecl_copy.nums.pop(0)
+                                        mismatch = self._check_args_params(
+                                            [arraydecl_copy],
+                                            [
+                                                pn.Alloc(
+                                                    pn.Writeable(),
+                                                    datatype2,
+                                                    pn.Name("tmp"),
+                                                )
+                                            ],
+                                        )
+                                    elif len(nums1) > 1 and int(num2.val) > 1:
+                                        arraydecl_copy = copy.deepcopy(arraydecl)
+                                        arraydecl_copy.nums.pop(0)
+                                        pntrdecl_copy = copy.deepcopy(pntrdecl)
+                                        pntrdecl_copy.num.val = str(
+                                            int(pntrdecl_copy.num.val) - 1
+                                        )
+                                        mismatch = self._check_args_params(
+                                            [arraydecl_copy],
+                                            [
+                                                pn.Alloc(
+                                                    pn.Writeable(),
+                                                    pntrdecl_copy,
+                                                    pn.Name("tmp"),
+                                                )
+                                            ],
+                                        )
+                                    elif len(nums1) == 1 and int(num2.val) > 1:
+                                        pntrdecl_copy = copy.deepcopy(pntrdecl)
+                                        pntrdecl_copy.num.val = str(
+                                            int(pntrdecl_copy.num.val) - 1
+                                        )
+                                        mismatch = self._check_args_params(
+                                            [datatype1_2],
+                                            [
+                                                pn.Alloc(
+                                                    pn.Writeable(),
+                                                    pntrdecl_copy,
+                                                    pn.Name("tmp"),
+                                                )
+                                            ],
+                                        )
+                                    else:
+                                        mismatch = self._check_args_params(
+                                            [datatype1_2],
+                                            [
+                                                pn.Alloc(
+                                                    pn.Writeable(),
+                                                    datatype2,
+                                                    pn.Name("tmp"),
+                                                )
+                                            ],
+                                        )
+                                    if mismatch:
+                                        return ((datatype1, arg), param)
+                                case _:
+                                    return ((datatype1, arg), param)
+                case (
+                    (pn.Name() | pn.ArrayDecl()),
+                    pn.Alloc(_, pn.ArrayDecl(nums2, datatype2) as arraydecl, _),
+                ):
+                    match arg:
+                        case pn.Name():
+                            symbol = self._resolve_name(arg.val, arg.pos)[0]
+                        case _:
+                            symbol = st.Symbol(
+                                st.Empty(),
+                                arg,
+                            )
+                    match symbol:
+                        case st.Symbol(_, datatype1):
+                            match datatype1:
+                                case pn.ArrayDecl(nums1, datatype1_2) if nums1 == nums2:
+                                    mismatch = self._check_args_params(
+                                        [datatype1_2],
+                                        [
+                                            pn.Alloc(
+                                                pn.Writeable(),
+                                                datatype2,
+                                                pn.Name("tmp"),
+                                            )
+                                        ],
+                                    )
+                                    if mismatch:
+                                        return ((datatype1, arg), param)
+                                #  case pn.PntrDecl(num, datatype1_2) as pntrdecl:
+                                #      if int(num.val) == 1 and len(nums2) > 1:
+                                #          arraydecl_copy = copy.deepcopy(arraydecl)
+                                #          arraydecl_copy.nums.pop(0)
+                                #          mismatch = self._check_args_params(
+                                #              [datatype1_2],
+                                #              [
+                                #                  pn.Alloc(
+                                #                      pn.Writeable(),
+                                #                      arraydecl_copy,
+                                #                      pn.Name("tmp"),
+                                #                  )
+                                #              ],
+                                #          )
+                                #      elif int(num.val) > 1 and len(nums2) > 1:
+                                #          pntrdecl_copy = copy.deepcopy(pntrdecl)
+                                #          pntrdecl_copy.num.val = str(int(num.val) - 1)
+                                #          arraydecl_copy = copy.deepcopy(arraydecl)
+                                #          arraydecl_copy.nums.pop(0)
+                                #          mismatch = self._check_args_params(
+                                #              [pntrdecl_copy],
+                                #              [
+                                #                  pn.Alloc(
+                                #                      pn.Writeable(),
+                                #                      arraydecl_copy,
+                                #                      pn.Name("tmp"),
+                                #                  )
+                                #              ],
+                                #          )
+                                #      elif int(num.val) > 1 and len(nums2) == 1:
+                                #          pntrdecl_copy = copy.deepcopy(pntrdecl)
+                                #          pntrdecl_copy.num.val = str(int(num.val) - 1)
+                                #          mismatch = self._check_args_params(
+                                #              [pntrdecl_copy],
+                                #              [
+                                #                  pn.Alloc(
+                                #                      pn.Writeable(),
+                                #                      datatype2,
+                                #                      pn.Name("tmp"),
+                                #                  )
+                                #              ],
+                                #          )
+                                #
+                                #      else:
+                                #          mismatch = self._check_args_params(
+                                #              [datatype1_2],
+                                #              [
+                                #                  pn.Alloc(
+                                #                      pn.Writeable(),
+                                #                      datatype2,
+                                #                      pn.Name("tmp"),
+                                #                  )
+                                #              ],
+                                #          )
+                                #      if mismatch:
+                                #          return ((datatype1, arg), param)
+                                case _:
+                                    return ((datatype1, arg), param)
+                        case _:
+                            throw_error(symbol)
+                case (
+                    pn.Name(val, pos),
+                    pn.Alloc(_, pn.StructSpec(name2), _),
+                ):
+                    symbol = self._resolve_name(val, pos)[0]
+                    match symbol:
+                        case st.Symbol(_, datatype1):
+                            match datatype1:
+                                case pn.StructSpec(name1) if name1 == name2:
+                                    pass
+                                case _:
+                                    return ((datatype1, arg), param)
+                case _:
+                    return ((pn.IntType(), arg), param)
+        else:
+            return tuple()
 
     def _get_leftmost_pos(self, exp):
         while True:
@@ -751,12 +1044,13 @@ class Passes:
                 var_name = val1
                 var_pos = pos1
                 self._check_redef_and_redecl_error(var_name, var_pos)
+                datatype_copy = copy.deepcopy(datatype)
                 match self.current_scope:
                     case ("main" | "global!"):
-                        size = self._datatype_size(datatype)
+                        size = self._datatype_size(datatype_copy)
                         symbol = st.Symbol(
                             type_qual,
-                            datatype,
+                            datatype_copy,
                             pn.Name(f"{var_name}@{self.current_scope}"),
                             pn.Num(str(self.rel_global_addr)),
                             st.Pos(
@@ -767,13 +1061,13 @@ class Passes:
                         self.symbol_table.declare(symbol)
                         self.rel_global_addr += size
                     case _:
-                        match datatype:
+                        match datatype_copy:
                             case pn.ArrayDecl(
                                 nums, datatype2
                             ) if local_var_or_param.val == "param":
-                                if nums:
-                                    datatype.nums.pop(0)
-                                    datatype = pn.PntrDecl(pn.Num("1"), datatype)
+                                if len(nums) > 1:
+                                    datatype_copy.nums.pop(0)
+                                    datatype = pn.PntrDecl(pn.Num("1"), datatype_copy)
                                 else:
                                     datatype = pn.PntrDecl(pn.Num("1"), datatype2)
                             case _:
@@ -946,21 +1240,60 @@ class Passes:
                 return exps_mon
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val, pos) as name, exps):
-                # TODO: check if exps types match with function signature
                 fun_name = val
                 fun_call_pos = pos
+                args = exps
+
+                # return type for decision about Exp(Reg(Acc())) later
+                # params for mismatched allocs
+                try:
+                    symbol = self.symbol_table.resolve(fun_name)
+                    match symbol:
+                        case st.Symbol(
+                            _, pn.FunDecl(datatype, pn.Name(_, pos2), allocs)
+                        ):
+                            fun_pos = pos2
+                            params = allocs
+                            return_type = datatype
+                        case _:
+                            throw_error(symbol)
+                except KeyError:
+                    raise errors.UnknownIdentifier(fun_name, fun_call_pos)
+
+                #  check if function call args match with function parameters
+                mismatch_dt_alloc = self._check_args_params(args, params)
+                if mismatch_dt_alloc:
+                    match (mismatch_dt_alloc[0], mismatch_dt_alloc[1]):
+                        case (
+                            (datatype3, exp3),
+                            pn.Alloc(_, datatype4, pn.Name(name4, pos4)),
+                        ):
+                            argument_exp = convert_to_single_line(exp3)
+                            fun_param_name = name4
+                            argument_datatype = convert_to_single_line(datatype3)
+                            fun_param_datatype = convert_to_single_line(datatype4)
+                            argument_pos = find_first_pos_in_node([exp3])[1]
+                            fun_param_pos = pos4
+                            raise errors.ArgumentMismatch(
+                                fun_call_pos,
+                                argument_exp,
+                                argument_datatype,
+                                argument_pos,
+                                fun_name,
+                                fun_pos,
+                                fun_param_name,
+                                fun_param_datatype,
+                                fun_param_pos,
+                            )
+                        case _:
+                            throw_error(mismatch_dt_alloc[0], mismatch_dt_alloc[1])
+
                 exps_mon = []
                 self.argmode_on = True
                 for exp2 in exps:
                     exps_mon += self._picoc_mon_exp(exp2)
                 self.argmode_on = False
-                # TODO: add error when function undefined
-                symbol = self.symbol_table.resolve(fun_name)
-                match symbol:
-                    case st.Symbol(_, pn.FunDecl(datatype)):
-                        return_type = datatype
-                    case _:
-                        throw_error(symbol)
+
                 block_name = pn.Name(
                     self.fun_name_to_block_name[fun_name], fun_call_pos
                 )
@@ -1179,7 +1512,7 @@ class Passes:
                                 case _:
                                     throw_error(symbol)
 
-                            mismatched_allocs = self._check_prototype(
+                            mismatched_allocs = self._check_prototypes(
                                 prototype_def, prototype_decl
                             )
                             if mismatched_allocs:
@@ -2109,7 +2442,6 @@ class Passes:
     # - what is there's no main function
 
     def _write_large_immediate_in_register(self, reg, s_num):
-        #  __import__("pudb").set_trace()
         bits = Bits(int=s_num, length=32).bin
         sign = bits[0]
         h_bits = bits[1:11]

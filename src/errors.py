@@ -92,13 +92,13 @@ class ArgumentMismatch(Exception):
         argument_exp,
         argument_datatype,
         argument_pos,
-        decl_name,
-        decl_pos,
-        decl_param_name,
-        decl_param_datatype,
-        decl_param_pos,
+        fun_name,
+        fun_pos,
+        fun_param_name,
+        fun_param_datatype,
+        fun_param_pos,
     ):
-        self.description = f"{CM().YELLOW}ArgumentMismatch:{CM().RESET_ALL} Argument {CM().RED}{argument_exp}{CM().RESET_ALL} of datatype {CM().RED}{argument_datatype}{CM().RESET_ALL} in function call is not matching with parameter {CM().BLUE}{decl_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{decl_param_datatype}{CM().RESET_ALL} from function {CM().RED}{decl_name}{CM().RESET_ALL}."
+        self.description = f"{CM().YELLOW}ArgumentMismatch:{CM().RESET_ALL} Argument {CM().RED}{argument_exp}{CM().RESET_ALL} of datatype {CM().RED}{argument_datatype}{CM().RESET_ALL} in function call is not matching with parameter {CM().BLUE}{fun_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{fun_param_datatype}{CM().RESET_ALL} from function {CM().RED}{fun_name}{CM().RESET_ALL}."
         self.description2 = (
             f"{CM().YELLOW}Note:{CM().RESET_ALL} Function was declared here:"
         )
@@ -106,11 +106,11 @@ class ArgumentMismatch(Exception):
         self.argument_exp = argument_exp
         self.argument_datatype = argument_datatype
         self.argument_pos = argument_pos
-        self.decl_name = decl_name
-        self.decl_pos = decl_pos
-        self.decl_param_name = decl_param_name
-        self.decl_param_datatype = decl_param_datatype
-        self.decl_param_pos = decl_param_pos
+        self.fun_name = fun_name
+        self.fun_pos = fun_pos
+        self.fun_param_name = fun_param_name
+        self.fun_param_datatype = fun_param_datatype
+        self.fun_param_pos = fun_param_pos
 
 
 class ReDeclaration(Exception):

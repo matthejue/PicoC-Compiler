@@ -1,0 +1,12 @@
+// in:
+// expected:ArgumentMismatch
+
+struct stt {int attr;};
+
+void fun(int *arg1, struct stt *arg2) {
+}
+
+void main() {
+  int var = 42;
+  fun(&var, &var);
+}
