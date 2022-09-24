@@ -151,7 +151,7 @@ class ErrorHandler:
             if e.decl_param_pos == e.decl_pos:
                 error_screen.clear(0)
                 error_screen.color_offset = 0
-            error_screen.point_at(e.def_param_pos, e.decl_param_datatype)
+            error_screen.point_at(e.def_param_pos, e.def_param_datatype)
 
             error_header2 = self._error_header(e.description2, e.decl_pos)
             error_screen2 = AnnotationScreen(
@@ -161,7 +161,7 @@ class ErrorHandler:
             if e.decl_param_pos == e.decl_pos:
                 error_screen2.clear(0)
                 error_screen2.color_offset = 0
-            error_screen2.point_at(e.decl_param_pos, e.def_param_datatype)
+            error_screen2.point_at(e.decl_param_pos, e.decl_param_datatype)
 
             error_screen.filter()
             error_screen2.filter()
@@ -177,15 +177,15 @@ class ErrorHandler:
             error_screen = AnnotationScreen(
                 self.split_code, e.fun_call_pos.line, e.argument_pos.line
             )
-            error_screen.mark_consider_colors(e.fun_call_pos, len(e.decl_name))
-            error_screen.point_at(e.argument_pos, e.decl_param_datatype)
+            error_screen.mark_consider_colors(e.fun_call_pos, len(e.fun_name))
+            error_screen.point_at(e.argument_pos, e.argument_datatype)
 
-            error_header2 = self._error_header(e.description2, e.decl_pos)
+            error_header2 = self._error_header(e.description2, e.fun_pos)
             error_screen2 = AnnotationScreen(
-                self.split_code, e.decl_pos.line, e.decl_param_pos.line
+                self.split_code, e.fun_pos.line, e.fun_param_pos.line
             )
-            error_screen2.mark_consider_colors(e.decl_pos, len(e.decl_name))
-            error_screen2.point_at(e.decl_param_pos, e.argument_datatype)
+            error_screen2.mark_consider_colors(e.fun_pos, len(e.fun_name))
+            error_screen2.point_at(e.fun_param_pos, e.fun_param_datatype)
 
             error_screen.filter()
             error_screen2.filter()
@@ -424,7 +424,7 @@ class AnnotationScreen:
             self.screen[3 * rel_row + 1],
             "~" * width,
             pos.column + self.color_offset,
-            CM().RED,
+            CM().BLUE,
         )
         self.marked_lines += [3 * rel_row + 1]
 
@@ -434,7 +434,7 @@ class AnnotationScreen:
         len_line_before = len(self.screen[3 * rel_row + 1])
 
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().RED
+            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().BLUE
         )
         self.marked_lines += [3 * rel_row + 1]
 

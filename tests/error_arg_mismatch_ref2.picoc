@@ -1,0 +1,10 @@
+// in:
+// expected:ArgumentMismatch
+
+void fun(int *arg1, int arg2) {
+}
+
+void main() {
+  int var = 42;
+  fun(&var, &var);
+}
