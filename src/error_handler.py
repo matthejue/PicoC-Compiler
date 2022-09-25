@@ -175,10 +175,10 @@ class ErrorHandler:
 
             error_header = self._error_header(e.description, e.fun_call_pos)
             error_screen = AnnotationScreen(
-                self.split_code, e.fun_call_pos.line, e.argument_pos.line
+                self.split_code, e.fun_call_pos.line, e.arg_pos.line
             )
             error_screen.mark_consider_colors(e.fun_call_pos, len(e.fun_name))
-            error_screen.point_at(e.argument_pos, e.argument_datatype)
+            error_screen.point_at(e.arg_pos, e.arg_datatype)
 
             error_header2 = self._error_header(e.description2, e.fun_pos)
             error_screen2 = AnnotationScreen(
@@ -186,6 +186,28 @@ class ErrorHandler:
             )
             error_screen2.mark_consider_colors(e.fun_pos, len(e.fun_name))
             error_screen2.point_at(e.fun_param_pos, e.fun_param_datatype)
+
+            error_screen.filter()
+            error_screen2.filter()
+            self._output_error(
+                error_header + str(error_screen) + error_header2 + str(error_screen2),
+                e.__class__.__name__,
+            )
+            exit(0)
+        except errors.WrongNumberArguments as e:
+            self._error_heading()
+
+            error_header = self._error_header(e.description, e.fun_call_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.fun_call_pos.line, e.fun_call_pos.line
+            )
+            error_screen.mark_consider_colors(e.fun_call_pos, len(e.fun_name))
+
+            error_header2 = self._error_header(e.description2, e.fun_pos)
+            error_screen2 = AnnotationScreen(
+                self.split_code, e.fun_pos.line, e.fun_pos.line
+            )
+            error_screen2.mark_consider_colors(e.fun_pos, len(e.fun_name))
 
             error_screen.filter()
             error_screen2.filter()

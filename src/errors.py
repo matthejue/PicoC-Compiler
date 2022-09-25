@@ -71,9 +71,7 @@ class PrototypeMismatch(Exception):
         decl_param_pos,
     ):
         self.description = f"{CM().YELLOW}PrototypeMismatch:{CM().RESET_ALL} Parameter {CM().RED}{def_param_name}{CM().RESET_ALL} of datatype {CM().RED}{def_param_datatype}{CM().RESET_ALL} from function definition {CM().RED}{def_name}{CM().RESET_ALL} is not matching with parameter {CM().BLUE}{decl_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{decl_param_datatype}{CM().RESET_ALL} from function declaration."
-        self.description2 = (
-            f"{CM().YELLOW}Note:{CM().RESET_ALL} Function was declared here:"
-        )
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Function {CM().BLUE}{def_name}{CM().RESET_ALL} was declared here:"
         self.def_name = def_name
         self.def_pos = def_pos
         self.def_param_name = def_param_name
@@ -89,28 +87,47 @@ class ArgumentMismatch(Exception):
     def __init__(
         self,
         fun_call_pos,
-        argument_exp,
-        argument_datatype,
-        argument_pos,
+        arg_exp,
+        arg_datatype,
+        arg_pos,
         fun_name,
         fun_pos,
         fun_param_name,
         fun_param_datatype,
         fun_param_pos,
     ):
-        self.description = f"{CM().YELLOW}ArgumentMismatch:{CM().RESET_ALL} Argument {CM().RED}{argument_exp}{CM().RESET_ALL} of datatype {CM().RED}{argument_datatype}{CM().RESET_ALL} in function call is not matching with parameter {CM().BLUE}{fun_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{fun_param_datatype}{CM().RESET_ALL} from function {CM().RED}{fun_name}{CM().RESET_ALL}."
-        self.description2 = (
-            f"{CM().YELLOW}Note:{CM().RESET_ALL} Function was declared here:"
-        )
+        self.description = f"{CM().YELLOW}ArgumentMismatch:{CM().RESET_ALL} Argument {CM().RED}{arg_exp}{CM().RESET_ALL} of datatype {CM().RED}{arg_datatype}{CM().RESET_ALL} in function call is not matching with parameter {CM().BLUE}{fun_param_name}{CM().RESET_ALL} of datatype {CM().BLUE}{fun_param_datatype}{CM().RESET_ALL} from function {CM().RED}{fun_name}{CM().RESET_ALL}."
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Function {CM().BLUE}{fun_name}{CM().RESET_ALL} was declared here:"
         self.fun_call_pos = fun_call_pos
-        self.argument_exp = argument_exp
-        self.argument_datatype = argument_datatype
-        self.argument_pos = argument_pos
+        self.arg_exp = arg_exp
+        self.arg_datatype = arg_datatype
+        self.arg_pos = arg_pos
         self.fun_name = fun_name
         self.fun_pos = fun_pos
         self.fun_param_name = fun_param_name
         self.fun_param_datatype = fun_param_datatype
         self.fun_param_pos = fun_param_pos
+
+
+class WrongNumberArguments(Exception):
+    def __init__(
+        self,
+        too_few,
+        fun_call_pos,
+        fun_call_num_args,
+        fun_name,
+        fun_pos,
+        fun_num_params,
+    ):
+
+        self.description = f"{CM().YELLOW}WrongNumberArguments:{CM().RESET_ALL} Too {('few' if too_few else 'many')} arguments. Function call contains {CM().RED}{fun_call_num_args}{CM().RESET_ALL} arguments, but function {CM().BLUE}{fun_name}{CM().RESET_ALL} excepts {('only ' if not too_few else '')}{CM().BLUE}{fun_num_params}{CM().RESET_ALL} arguments."
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Function {CM().BLUE}{fun_name}{CM().RESET_ALL} was declared here:"
+        self.too_few = too_few
+        self.fun_call_pos = fun_call_pos
+        self.fun_call_num_args = fun_call_num_args
+        self.fun_name = fun_name
+        self.fun_pos = fun_pos
+        self.fun_num_params = fun_num_params
 
 
 class ReDeclaration(Exception):
