@@ -119,7 +119,6 @@ class WrongNumberArguments(Exception):
         fun_pos,
         fun_num_params,
     ):
-
         self.description = f"{CM().YELLOW}WrongNumberArguments:{CM().RESET_ALL} Too {('few' if too_few else 'many')} arguments. Function call contains {CM().RED}{fun_call_num_args}{CM().RESET_ALL} arguments, but function {CM().BLUE}{fun_name}{CM().RESET_ALL} excepts {('only ' if not too_few else '')}{CM().BLUE}{fun_num_params}{CM().RESET_ALL} arguments."
         self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Function {CM().BLUE}{fun_name}{CM().RESET_ALL} was declared here:"
         self.too_few = too_few
