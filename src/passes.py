@@ -447,6 +447,10 @@ class Passes:
             return tuple()
 
     def _check_args_params(self, args, params):
+        if len(args) < len(params):
+            return ((len(args), len(params)), "<")
+        elif len(args) > len(params):
+            return ((len(args), len(params)), ">")
         for arg, param in zip(args, params):
             match (arg, param):
                 # TODO: what is with void? --> datatype mismatch
@@ -460,6 +464,7 @@ class Passes:
                         | pn.UnOp()
                         | pn.Atom()
                         | pn.Deref()
+                        | pn.Call()
                     ),
                     pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
                 ):
@@ -723,10 +728,17 @@ class Passes:
                         case _:
                             throw_error(symbol)
                 case (
-                    pn.Name(val, pos),
+                    (pn.StructSpec() | pn.Name()),
                     pn.Alloc(_, pn.StructSpec(name2), _),
                 ):
-                    symbol = self._resolve_name(val, pos)[0]
+                    match arg:
+                        case pn.Name():
+                            symbol = self._resolve_name(arg.val, arg.pos)[0]
+                        case _:
+                            symbol = st.Symbol(
+                                st.Empty(),
+                                arg,
+                            )
                     match symbol:
                         case st.Symbol(_, datatype1):
                             match datatype1:
@@ -1261,6 +1273,7 @@ class Passes:
                     raise errors.UnknownIdentifier(fun_name, fun_call_pos)
 
                 #  check if function call args match with function parameters
+                #  __import__("pudb").set_trace()
                 mismatch_dt_alloc = self._check_args_params(args, params)
                 if mismatch_dt_alloc:
                     match (mismatch_dt_alloc[0], mismatch_dt_alloc[1]):
@@ -1285,9 +1298,17 @@ class Passes:
                                 fun_param_datatype,
                                 fun_param_pos,
                             )
+                        case ((fun_call_num_args, fun_num_params), rel):
+                            raise errors.WrongNumberArguments(
+                                rel == "<",
+                                fun_call_pos,
+                                fun_call_num_args,
+                                fun_name,
+                                fun_pos,
+                                fun_num_params,
+                            )
                         case _:
                             throw_error(mismatch_dt_alloc[0], mismatch_dt_alloc[1])
-
                 exps_mon = []
                 self.argmode_on = True
                 for exp2 in exps:

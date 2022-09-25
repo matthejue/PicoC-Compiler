@@ -1,0 +1,11 @@
+// in:
+// expected:WrongNumberArguments
+
+void fun(int arg1, int arg2[2], int *arg3) {
+
+}
+
+void main() {
+  int ar[2];
+  fun(12, ar);
+}
