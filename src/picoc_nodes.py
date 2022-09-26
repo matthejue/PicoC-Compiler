@@ -293,12 +293,12 @@ class Ref(ASTNode):
 
 
 class Deref(ASTNode):
-    def __init__(self, lhs, exp):
-        self.lhs = lhs
-        self.exp = exp
-        super().__init__(visible=[self.lhs, self.exp])
+    def __init__(self, exp1, exp2):
+        self.exp1 = exp1
+        self.exp2 = exp2
+        super().__init__(visible=[self.exp1, self.exp2])
 
-    __match_args__ = ("lhs", "exp")
+    __match_args__ = ("exp1", "exp2")
 
 
 # -------------------------------- L_Array --------------------------------
@@ -507,6 +507,12 @@ class File(ASTNode):
         super().__init__(visible=[self.name, self.decls_defs_blocks])
 
     __match_args__ = ("name", "decls_defs_blocks")
+
+    def __repr__(self, depth=0):
+        if global_vars.args.double_verbose:
+            return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
 
 # -------------------------------- L_Block --------------------------------

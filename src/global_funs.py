@@ -84,6 +84,9 @@ def repr_single_line(self, depth=0):
                             | pn.While()
                             | pn.DoWhile()
                             | pn.Block()
+                            | pn.FunDef()
+                            | pn.FunDecl()
+                            | pn.StructDecl()
                         ):
                             pass
                         case _:
