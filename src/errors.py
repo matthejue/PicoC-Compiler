@@ -36,12 +36,12 @@ class UnknownIdentifier(Exception):
 
 class UnknownAttribute(Exception):
     def __init__(self, attr_name, attr_pos, struct_name, struct_pos, var_name, var_pos):
-        self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} doesn't have a attribute {CM().RED}'attr_name'{CM().RESET}."
-        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Struct {CM().BLUE}'{struct_name}'{CM().RESET} was declared here:"
+        self.description = f"{CM().YELLOW}UnknownAttribute:{CM().RESET_ALL} Attribute {CM().RED}'{attr_name}'{CM().RESET}{CM().RESET_ALL} is unknown in struct type {CM().BLUE}'{struct_name}'{CM().RESET}."
+        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Struct type {CM().BLUE}'{struct_name}'{CM().RESET} was declared here:"
         self.attr_name = attr_name
         self.attr_pos = attr_pos
-        self.struct_name = struct_name
-        self.struct_pos = struct_pos
+        self.struct_type_name = struct_name
+        self.struct_type_pos = struct_pos
         self.var_name = var_name
         self.var_pos = var_pos
 

@@ -1,0 +1,6 @@
+// in:
+// expected:ReDeclarationOrDefinition
+
+struct stt {int attr; int attr[2];};
+
+void main() {}

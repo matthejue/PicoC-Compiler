@@ -942,9 +942,9 @@ class Passes:
                                 error_data=[name],
                             )
                             current_datatype.nums.pop(0)
-                        case pn.StructSpec(pn.Name(val1, pos1)):
-                            struct_name = val1
-                            struct_pos = pos1
+                        case pn.StructSpec(pn.Name(val1, _)):
+                            struct_type_name = val1
+                            #  struct_pos = pos1
                             ref = prev_stmts.pop()
                             self._add_datatype_and_error_data(
                                 ref,
@@ -957,17 +957,23 @@ class Passes:
                                     attr_pos = pos2
                                     try:
                                         symbol = self.symbol_table.resolve(
-                                            f"{attr_name}@{struct_name}"
+                                            f"{attr_name}@{struct_type_name}"
                                         )
                                     except KeyError:
-                                        raise errors.UnknownAttribute(
-                                            attr_name,
-                                            attr_pos,
-                                            struct_name,
-                                            struct_pos,
-                                            var_name,
-                                            var_pos,
+                                        symbol = self.symbol_table.resolve(
+                                            struct_type_name
                                         )
+                                        match symbol:
+                                            case st.Symbol(_, _, pn.Name(_, pos1)):
+                                                struct_type_pos = pos1
+                                                raise errors.UnknownAttribute(
+                                                    attr_name,
+                                                    attr_pos,
+                                                    struct_type_name,
+                                                    struct_type_pos,
+                                                    var_name,
+                                                    var_pos,
+                                                )
                                 case pn.Ref(pn.Subscr()):
                                     raise errors.DatatypeMismatch(
                                         var_name,
@@ -1715,26 +1721,32 @@ class Passes:
                 self.symbol_table.declare(symbol)
                 # Function declaration isn't needed anymore after being evaluated
                 return []
-            case pn.StructDecl(pn.Name(val1, pos1), allocs):
+            case pn.StructDecl(pn.Name(val1, pos1) as name, allocs):
                 struct_name = val1
                 struct_pos = pos1
                 attrs = []
                 struct_size = 0
-                self._check_redecl_redef_error(
-                    struct_name, struct_pos, is_fun_or_struct=True
-                )
                 for alloc in allocs:
                     match alloc:
                         case pn.Alloc(pn.Writeable(), datatype, pn.Name(val2, pos2)):
                             attr_name = val2
+                            attr_pos = pos2
                             attr_size = self._datatype_size(datatype)
+                            self.copy_old_scope = self.current_scope
+                            self.current_scope = struct_name
+                            self._check_redecl_redef_error(
+                                f"{attr_name}",
+                                attr_pos,
+                            )
+                            self.current_scope = self.copy_old_scope
                             symbol = st.Symbol(
                                 st.Empty(),
                                 datatype,
                                 pn.Name(f"{attr_name}@{struct_name}"),
                                 st.Empty(),
                                 st.Pos(
-                                    pn.Num(str(pos2.line)), pn.Num(str(pos2.column))
+                                    pn.Num(str(attr_pos.line)),
+                                    pn.Num(str(attr_pos.column)),
                                 ),
                                 pn.Num(str(attr_size)),
                             )
@@ -1743,10 +1755,14 @@ class Passes:
                             struct_size += attr_size
                         case _:
                             throw_error(alloc)
+
+                self._check_redecl_redef_error(
+                    struct_name, struct_pos, is_fun_or_struct=True
+                )
                 symbol = st.Symbol(
                     st.Empty(),
                     decl_def,
-                    pn.Name(struct_name),
+                    name,
                     attrs,
                     st.Pos(pn.Num(str(pos1.line)), pn.Num(str(pos1.column))),
                     pn.Num(str(struct_size)),
