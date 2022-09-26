@@ -195,7 +195,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.picoc_shrink" -delete
 	find . -type f -wholename "./tests/*.picoc_blocks" -delete
 	find . -type f -wholename "./tests/*.picoc_patch" -delete
-	find . -type f -wholename "./tests/*.picoc_mon" -delete
+	find . -type f -wholename "./tests/*.picoc_anf" -delete
 	find . -type f -wholename "./tests/*.reti_blocks" -delete
 	find . -type f -wholename "./tests/*.reti_patch" -delete
 	find . -type f -wholename "./tests/*.reti" -delete

@@ -1,6 +1,6 @@
 // in:3 4
 // expected:6 24
-// Author: Christoph Scholl, from the Operating Systems Lecture
+// from the Operating Systems Lecture by Christoph Scholl
 
 int factorial(int n) {
   int res_f;

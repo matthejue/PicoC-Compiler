@@ -539,17 +539,108 @@ class Passes:
                         | pn.BinOp()
                         | pn.UnOp()
                         | pn.Atom()
-                        | pn.Deref()
                         | pn.Call()
                     ),
                     pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
                 ):
                     pass
                 case (
-                    pn.Name(val, pos),
+                    (pn.Deref(exp, _) | pn.Subscr(exp, _) | pn.Attr(exp, _)),
+                    _,
+                ):
+                    current_exp = arg
+                    access_exp_list = []
+
+                    while not isinstance(exp, pn.Name):
+                        match current_exp:
+                            case (pn.Deref(exp) | pn.Subscr(exp) | pn.Attr(exp)):
+                                access_exp_list += [current_exp]
+                                current_exp = exp
+                            case _:
+                                throw_error(current_exp)
+
+                    access_exp_list[:0] = [current_exp]
+                    match current_exp:
+                        case pn.Name(val1, pos1):
+                            symbol, _ = self._resolve_name(val1, pos1)
+                            match symbol:
+                                case st.Symbol(_, datatype):
+                                    current_dt = copy.deepcopy(datatype)
+                                case _:
+                                    throw_error(symbol)
+                        case _:
+                            throw_error(current_exp)
+
+                    current_exp = access_exp_list.pop()
+                    while access_exp_list:
+                        match (current_exp, current_dt):
+                            case (
+                                pn.Subscr() | pn.Deref(),
+                                pn.ArrayDecl(nums, datatype),
+                            ):
+
+                                current_exp = access_exp_list.pop()
+                                if len(nums) > 1:
+                                    current_dt.nums.pop(0)
+                                else:
+                                    current_dt = datatype
+                            case (
+                                pn.Subscr() | pn.Deref(),
+                                pn.PntrDecl(num, datatype),
+                            ):
+                                current_exp = access_exp_list.pop()
+                                if int(num.val) > 1:
+                                    current_dt.num.val = str(
+                                        int(current_dt.num.val) - 1
+                                    )
+                                else:
+                                    current_dt = datatype
+                            case (
+                                pn.Attr(exp, pn.Name(val2, _)),
+                                pn.StructSpec(pn.Name(val3, _)),
+                            ):
+                                current_exp = access_exp_list.pop()
+
+                                attr_name = val2
+                                #  attr_pos = pos2
+                                struct_type_name = val3
+                                #  struct_type_pos = pos3
+
+                                symbol = self.symbol_table.resolve(
+                                    f"{attr_name}@{struct_type_name}"
+                                )
+                                match symbol:
+                                    case st.Symbol(_, datatype):
+                                        current_dt = datatype
+                                    case _:
+                                        throw_error(symbol)
+                            case _:
+                                pass
+                    match (current_dt, param):
+                        case (
+                            (pn.IntType() | pn.CharType()),
+                            pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
+                        ):
+                            pass
+                        case (pn.ArrayDecl(), pn.Alloc(_, pn.ArrayDecl(), _)):
+                            pass
+                        case (
+                            (pn.ArrayDecl() | pn.PntrDecl()),
+                            pn.Alloc(_, pn.PntrDecl(), _),
+                        ):
+                            pass
+                        case (
+                            (pn.StructSpec(name1)),
+                            pn.Alloc(_, pn.StructSpec(name2), _),
+                        ) if name1 == name2:
+                            pass
+                        case _:
+                            return ((current_dt, arg), param)
+                case (
+                    pn.Name(val1, pos1),
                     pn.Alloc(_, (pn.IntType() | pn.CharType()), _),
                 ):
-                    symbol = self._resolve_name(val, pos)[0]
+                    symbol = self._resolve_name(val1, pos1)[0]
                     match symbol:
                         case st.Symbol(_, datatype):
                             match datatype:
@@ -613,8 +704,8 @@ class Passes:
                                     | pn.Deref()
                                 ):
                                     determined_datatype = pn.IntType()
-                                case pn.Name(val, pos):
-                                    symbol = self._resolve_name(val, pos)[0]
+                                case pn.Name(val1, pos1):
+                                    symbol = self._resolve_name(val1, pos1)[0]
                                     match symbol:
                                         case st.Symbol(_, datatype):
                                             determined_datatype = datatype
@@ -1138,6 +1229,7 @@ class Passes:
                 return exps_anf + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
+                #  __import__("pudb").set_trace()
                 var_name = val1
                 var_pos = pos1
                 self._check_redecl_redef_error(var_name, var_pos)
@@ -1453,7 +1545,6 @@ class Passes:
                 var_pos = pos
                 exps_anf = self._picoc_anf_exp(exp)
                 symbol, choosen_scope = self._resolve_name(var_name, var_pos)
-                #  __import__("pudb").set_trace()
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
                         addr = val_addr
@@ -1603,7 +1694,6 @@ class Passes:
                             pn.Alloc(pn.Writeable(), datatype, name)
                         ] + allocs
                         try:
-                            #  __import__("pudb").set_trace()
                             symbol = self.symbol_table.resolve(def_name)
 
                             match symbol:
