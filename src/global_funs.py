@@ -55,7 +55,7 @@ def args_to_str(args: list):
         return "no arguments"
 
 
-def repr_example(self, depth=0):
+def repr_single_line(self, depth=0):
     if not self.visible:
         if not self.val:
             return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"

@@ -1,0 +1,18 @@
+// in:
+// expected:ReDeclarationOrDefinition
+
+void fun(int arg1, int arg2[2]);
+
+void fun(int arg1, int arg2[2]){
+}
+
+void fun(int arg1[2], int arg2){
+}
+
+void fun(int arg3[2], int arg4){
+}
+
+void fun(int arg3[2], int arg4){
+}
+
+void main() {}

@@ -1,0 +1,80 @@
+File 
+  Name './tests/thesis_faculty_it.picoc_anf', 
+  [
+    Block 
+      Name 'global.7', 
+      [], 
+    Block 
+      Name 'faculty.6', 
+      [
+        Exp(Num('1'))
+        Assign(Stackframe(Num('1')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.5')))
+      ], 
+    Block 
+      Name 'condition_check.5', 
+      [
+        Exp(Num('1')), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('while_branch.4'))
+          ], 
+          [
+            GoTo(Name('while_after.1'))
+          ]
+      ], 
+    Block 
+      Name 'while_branch.4', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Num('1'))
+        Exp(Atom(Stack(Num('2')), Eq('=='), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.3'))
+          ], 
+          [
+            GoTo(Name('if_else_after.2'))
+          ]
+      ], 
+    Block 
+      Name 'if.3', 
+      [
+        Exp(Stackframe(Num('1')))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'if_else_after.2', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Stackframe(Num('1')))
+        Exp(BinOp(Stack(Num('2')), Mul('*'), Stack(Num('1'))))
+        Assign(Stackframe(Num('1')), Stack(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Sub('-'), Stack(Num('1'))))
+        Assign(Stackframe(Num('0')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.5')))
+      ], 
+    Block 
+      Name 'while_after.1', 
+      [
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        StackMalloc(Num('2'))
+        Exp(Num('4'))
+        NewStackframe(Name('faculty.6'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('faculty.6')))
+        RemoveStackframe()
+        Exp(ACC)
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

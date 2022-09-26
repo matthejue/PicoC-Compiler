@@ -16,6 +16,7 @@ class Args:
         self.debug = False
         self.traceback = False
         self.example = False
+        self.supress_errors = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3

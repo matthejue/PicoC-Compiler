@@ -1,0 +1,7 @@
+File 
+  Name './tests/exclude_filename_with_spaces_no_spaces.picoc_anf', 
+  [
+    Block 
+      Name 'global.0', 
+      []
+  ]

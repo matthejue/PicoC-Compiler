@@ -30,6 +30,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
     cli_args_parser.add_argument("-t", "--traceback", action="store_true")
     cli_args_parser.add_argument("-e", "--example", action="store_true")
+    cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
@@ -240,7 +241,7 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._output_pass(picoc_blocks, "PicoC Blocks")
 
-        picoc_mon = error_handler.handle(passes.picoc_mon, picoc_blocks)
+        picoc_mon = error_handler.handle(passes.picoc_anf, picoc_blocks)
 
         if global_vars.args.intermediate_stages:
             self._output_pass(picoc_mon, "PicoC Mon")

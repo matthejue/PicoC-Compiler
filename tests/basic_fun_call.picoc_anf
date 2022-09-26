@@ -1,0 +1,32 @@
+File 
+  Name './tests/basic_fun_call.picoc_anf', 
+  [
+    Block 
+      Name 'global.2', 
+      [], 
+    Block 
+      Name 'main.1', 
+      [
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        StackMalloc(Num('2'))
+        Exp(Global(Num('0')))
+        NewStackframe(Name('fun.0'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun.0')))
+        RemoveStackframe()
+        Return(Empty())
+      ], 
+    Block 
+      Name 'fun.0', 
+      [
+        Exp(Num('2'))
+        Assign(Stackframe(Num('1')), Stack(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Exp(Stackframe(Num('1')))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Stackframe(Num('2')), Stack(Num('1')))
+        Exp(Stackframe(Num('2')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

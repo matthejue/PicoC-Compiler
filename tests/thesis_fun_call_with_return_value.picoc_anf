@@ -1,0 +1,37 @@
+File 
+  Name './tests/thesis_fun_call_with_return_value.picoc_anf', 
+  [
+    Block 
+      Name 'global.3', 
+      [], 
+    Block 
+      Name 'fun_with_return_value.2', 
+      [
+        Exp(Num('21'))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Mul('*'), Stack(Num('1'))))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'fun_no_return_value.1', 
+      [
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        StackMalloc(Num('2'))
+        NewStackframe(Name('fun_with_return_value.2'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun_with_return_value.2')))
+        RemoveStackframe()
+        Exp(ACC)
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        StackMalloc(Num('2'))
+        NewStackframe(Name('fun_no_return_value.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun_no_return_value.1')))
+        RemoveStackframe()
+        Return(Empty())
+      ]
+  ]

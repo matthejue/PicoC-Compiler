@@ -1,0 +1,24 @@
+File 
+  Name './tests/basic_complex_arithmetic_exp.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('1'))
+        Exp(Num('2'))
+        Exp(Num('3'))
+        Exp(BinOp(Stack(Num('2')), Mul('*'), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), Sub('-'), Stack(Num('1'))))
+        Exp(Num('6'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Global(Num('0')))
+        Exp(Call(Name('input'), []))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

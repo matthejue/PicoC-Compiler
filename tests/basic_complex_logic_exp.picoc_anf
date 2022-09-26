@@ -1,0 +1,51 @@
+File 
+  Name './tests/basic_complex_logic_exp.picoc_anf', 
+  [
+    Block 
+      Name 'global.3', 
+      [], 
+    Block 
+      Name 'main.2', 
+      [
+        Exp(Num('10'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Num('0'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Num('1'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Global(Num('0')))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicAnd(), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicOr(), Stack(Num('1'))))
+        Exp(Global(Num('0')))
+        Exp(Num('10'))
+        Exp(Atom(Stack(Num('2')), Lt('<'), Stack(Num('1'))))
+        Exp(Num('1'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicAnd(), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicOr(), Stack(Num('1'))))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(Global(Num('1'))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.1'))
+          ], 
+          [
+            GoTo(Name('if_else_after.0'))
+          ]
+      ], 
+    Block 
+      Name 'if.1', 
+      [
+        Exp(Num('42'))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(GoTo(Name('if_else_after.0')))
+      ], 
+    Block 
+      Name 'if_else_after.0', 
+      [
+        Return(Empty())
+      ]
+  ]

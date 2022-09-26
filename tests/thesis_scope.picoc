@@ -1,7 +1,7 @@
 // in:
 // expected:4 2
 
-int fun_scope(int param) {
+void fun_scope(int param) {
   int local_var = 2;
   print(param);
   print(local_var);

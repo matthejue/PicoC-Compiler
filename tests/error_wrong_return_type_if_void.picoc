@@ -1,0 +1,24 @@
+// in:
+// expected:WrongReturnType
+
+void fun1(){
+  int var = 41;
+  if (1) {
+    var = 42;
+  } else {
+    return;
+  }
+}
+
+void fun2(){
+  if (1) {
+    return 1;
+  } else {
+
+  }
+}
+
+void main() {
+  fun1();
+  fun2();
+}

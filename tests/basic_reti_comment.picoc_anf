@@ -1,0 +1,20 @@
+File 
+  Name './tests/basic_reti_comment.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        # begin
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        # this should be visible
+        # this should be visible
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        # end
+        Return(Empty())
+      ]
+  ]

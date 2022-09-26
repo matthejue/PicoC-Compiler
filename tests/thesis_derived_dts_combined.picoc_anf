@@ -1,0 +1,37 @@
+File 
+  Name './tests/thesis_derived_dts_combined.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('42'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Ref(Global(Num('0')))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Ref(Global(Num('1')))
+        Assign(Global(Num('2')), Stack(Num('1')))
+        Ref(Global(Num('1')))
+        Ref(Attr(Stack(Num('1')), Name('ar')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Ref(Global(Num('2')))
+        Ref(Attr(Stack(Num('1')), Name('st')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Ref(Attr(Stack(Num('1')), Name('ar')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

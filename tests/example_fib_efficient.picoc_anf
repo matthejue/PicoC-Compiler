@@ -1,0 +1,115 @@
+File 
+  Name './tests/example_fib_efficient.picoc_anf', 
+  [
+    Block 
+      Name 'global.6', 
+      [], 
+    Block 
+      Name 'fib_efficient.5', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Num('0'))
+        Exp(Atom(Stack(Num('2')), Eq('=='), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.4'))
+          ], 
+          [
+            GoTo(Name('if_else_after.3'))
+          ]
+      ], 
+    Block 
+      Name 'if.4', 
+      [
+        Exp(Num('0'))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'if_else_after.3', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Num('1'))
+        Exp(Atom(Stack(Num('2')), Eq('=='), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.2'))
+          ], 
+          [
+            GoTo(Name('if_else_after.1'))
+          ]
+      ], 
+    Block 
+      Name 'if.2', 
+      [
+        Exp(Num('0'))
+        Ref(Stackframe(Num('1')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        Exp(Num('1'))
+        Ref(Stackframe(Num('1')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        Exp(Num('1'))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'if_else_after.1', 
+      [
+        StackMalloc(Num('2'))
+        Exp(Stackframe(Num('0')))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Sub('-'), Stack(Num('1'))))
+        Exp(Stackframe(Num('1')))
+        NewStackframe(Name('fib_efficient.5'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fib_efficient.5')))
+        RemoveStackframe()
+        Exp(ACC)
+        Ref(Stackframe(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Sub('-'), Stack(Num('1'))))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Ref(Stackframe(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        Ref(Stackframe(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Exp(Num('0'))
+        Assign(Global(Num('0')), Stack(Num('11')))
+        StackMalloc(Num('2'))
+        Exp(Call(Name('input'), []))
+        Ref(Global(Num('0')))
+        NewStackframe(Name('fib_efficient.5'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fib_efficient.5')))
+        RemoveStackframe()
+        Exp(ACC)
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

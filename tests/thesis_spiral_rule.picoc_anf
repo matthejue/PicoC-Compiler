@@ -1,0 +1,30 @@
+File 
+  Name './tests/thesis_spiral_rule.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('314'))
+        Exp(Num('42'))
+        Assign(Global(Num('0')), Stack(Num('2')))
+        Ref(Global(Num('0')))
+        Ref(Global(Num('0')))
+        Assign(Global(Num('2')), Stack(Num('2')))
+        Ref(Global(Num('2')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Ref(Attr(Stack(Num('1')), Name('attr')))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

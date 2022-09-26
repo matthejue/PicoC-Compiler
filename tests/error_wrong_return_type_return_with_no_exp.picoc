@@ -1,0 +1,10 @@
+// in:
+// expected:WrongReturnType
+
+int fun(){
+  return;
+}
+
+void main() {
+  fun();
+}

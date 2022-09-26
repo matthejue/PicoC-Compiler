@@ -22,6 +22,7 @@ class Passes:
         self.block_id = 0
         self.all_blocks = dict()
         self.fun_name_to_block_name = dict()
+        self.marked_funs_for_error = []
         # PicoC_Mon
         self.argmode_on = False
         self.symbol_table = st.SymbolTable()
@@ -37,6 +38,40 @@ class Passes:
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
+    def _check_return_stmt(self, stmts, datatype):
+        if global_vars.args.supress_errors:
+            return ()
+        if not stmts:
+            match datatype:
+                case pn.VoidType():
+                    return ()
+                case _:
+                    return (Pos(-1, -1), "irrelevant")
+        match (stmts[-1], datatype):
+            case (pn.Return(st.Empty()), pn.VoidType()):
+                return ()
+            case (pn.Return(exp), pn.VoidType()):
+                return (find_first_pos_in_node([exp])[1], "return")
+            case (pn.IfElse(_, stmts1, stmts2), _):
+                last_stmt_pos1 = self._check_return_stmt(stmts1, datatype)
+                if last_stmt_pos1:
+                    return last_stmt_pos1
+                last_stmt_pos2 = self._check_return_stmt(stmts2, datatype)
+                if last_stmt_pos2:
+                    return last_stmt_pos2
+            case ((pn.DoWhile() | pn.While()), _):
+                pass
+            case (_, pn.VoidType()):
+                return ()
+            case (pn.Return(st.Empty()), _):
+                return (Pos(-1, -1), "irrelevant")
+            case (pn.Return(exp), _):
+                return ()
+            case (_, _):
+                found_pos = find_first_pos_in_node([stmts[-1]])
+                if not found_pos:
+                    return (Pos(-1, -1), "exp")
+                return (found_pos[1], "exp")
 
     def _picoc_shrink_exp(self, exp):
         match exp:
@@ -156,10 +191,39 @@ class Passes:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
+                filename = val
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
                     match decl_def:
-                        case pn.FunDef(datatype, name, allocs, stmts):
+                        case pn.FunDef(
+                            datatype, pn.Name(val2, pos2) as name, allocs, stmts
+                        ):
+                            fun_name = val2
+                            fun_pos = pos2
+
+                            last_stmt_pos_exp_or_return = self._check_return_stmt(
+                                stmts, datatype
+                            )
+                            if last_stmt_pos_exp_or_return:
+                                match (
+                                    last_stmt_pos_exp_or_return[0],
+                                    last_stmt_pos_exp_or_return[1],
+                                ):
+                                    case (last_stmt_pos, return_or_exp):
+                                        raise errors.WrongReturnType(
+                                            fun_name,
+                                            fun_pos,
+                                            convert_to_single_line(datatype),
+                                            (
+                                                "IntType()"
+                                                if isinstance(datatype, pn.VoidType)
+                                                else "VoidType()"
+                                            ),
+                                            last_stmt_pos
+                                            if last_stmt_pos != Pos(-1, -1)
+                                            else fun_pos,
+                                            return_or_exp == "return",
+                                        )
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
@@ -171,7 +235,7 @@ class Passes:
                         case _:
                             throw_error(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_shrink"),
+                    pn.Name(remove_extension(filename) + ".picoc_shrink"),
                     decls_defs_shrinked,
                 )
             case _:
@@ -307,7 +371,15 @@ class Passes:
                     processed_stmts = self._picoc_blocks_stmt(
                         stmt, processed_stmts, blocks
                     )
-                self.fun_name_to_block_name[fun_name] = f"{fun_name}.{self.block_id}"
+
+                # check for redefinition
+                if not self.fun_name_to_block_name.get(fun_name):
+                    self.fun_name_to_block_name[
+                        fun_name
+                    ] = f"{fun_name}.{self.block_id}"
+                else:
+                    if fun_name not in self.marked_funs_for_error:
+                        self.marked_funs_for_error += [fun_name]
                 self._create_block(fun_name, processed_stmts, blocks)
                 self.all_blocks |= blocks
                 return [
@@ -399,6 +471,8 @@ class Passes:
         return size
 
     def _check_prototypes(self, prototype_def, prototype_decl):
+        if global_vars.args.supress_errors:
+            return ()
         for def_datatype, decl_datatype in zip(prototype_def, prototype_decl):
             match (def_datatype, decl_datatype):
                 case (
@@ -447,6 +521,8 @@ class Passes:
             return tuple()
 
     def _check_args_params(self, args, params):
+        if global_vars.args.supress_errors:
+            return ()
         if len(args) < len(params):
             return ((len(args), len(params)), "<")
         elif len(args) > len(params):
@@ -749,7 +825,7 @@ class Passes:
                 case _:
                     return ((pn.IntType(), arg), param)
         else:
-            return tuple()
+            return ()
 
     def _get_leftmost_pos(self, exp):
         while True:
@@ -786,20 +862,23 @@ class Passes:
             [ref.datatype, ref.error_data] if global_vars.args.double_verbose else []
         )
 
-    def _check_redef_and_redecl_error(self, var_name, var_pos):
-        if self.symbol_table.exists(f"{var_name}@{self.current_scope}"):
-            symbol = self.symbol_table.resolve(f"{var_name}@{self.current_scope}")
+    def _check_redecl_redef_error(
+        self, identifier, identifier_pos, is_fun_or_struct=False
+    ):
+        at_scope = "" if is_fun_or_struct else f"@{self.current_scope}"
+        if self.symbol_table.exists(f"{identifier}{at_scope}"):
+            symbol = self.symbol_table.resolve(f"{identifier}{at_scope}")
             match symbol:
                 case st.Symbol(
                     _,
                     _,
-                    pn.Name(_),
+                    _,
                     _,
                     st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
                 ):
-                    raise errors.ReDeclaration(
-                        var_name,
-                        var_pos,
+                    raise errors.ReDeclarationOrDefinition(
+                        identifier,
+                        identifier_pos,
                         Pos(int(pos_first_line), int(pos_first_column)),
                     )
                 case _:
@@ -817,7 +896,7 @@ class Passes:
                 raise errors.UnknownIdentifier(name, pos)
         return symbol, choosen_scope
 
-    def _picoc_mon_ref(self, ref, prev_stmts):
+    def _picoc_anf_ref(self, ref, prev_stmts):
         match ref:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val, pos) as name:
@@ -931,9 +1010,9 @@ class Passes:
                 )
                 # save position
                 ref3.pos = find_first_pos_in_node(ref.visible)[1]
-                refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
-                exps_mon = self._picoc_mon_exp(exp)
-                return refs_mon + exps_mon + [ref3]
+                refs_anf = self._picoc_anf_ref(ref2, prev_stmts + [ref3])
+                exps_anf = self._picoc_anf_exp(exp)
+                return refs_anf + exps_anf + [ref3]
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref2, pn.Name(_, pos) as name):
                 ref3 = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))
@@ -942,20 +1021,20 @@ class Passes:
                 ]
                 # save position
                 ref3.pos = find_first_pos_in_node(ref.visible)[1]
-                refs_mon = self._picoc_mon_ref(ref2, prev_stmts + [ref3])
-                return refs_mon + [ref3]
+                refs_anf = self._picoc_anf_ref(ref2, prev_stmts + [ref3])
+                return refs_anf + [ref3]
             case pn.Ref(ref2):
                 # TODO: Fehlermeldung, und das nur Placeholder
                 last_ref = prev_stmts[-1]
-                refs_mon = self._picoc_mon_ref(ref2, prev_stmts)
+                refs_anf = self._picoc_anf_ref(ref2, prev_stmts)
                 last_ref.datatype = pn.ArrayDecl([pn.Num("1")], last_ref.datatype)
                 if global_vars.args.double_verbose:
                     last_ref.visible[1] = last_ref.datatype
-                return refs_mon
+                return refs_anf
             case _:
                 throw_error(ref)
 
-    def _picoc_mon_exp(self, exp):
+    def _picoc_anf_exp(self, exp):
         match exp:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val, pos):
@@ -1002,17 +1081,17 @@ class Passes:
             case (pn.Num() | pn.Char()):
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
-                exp_mon = self._picoc_mon_exp(exp)
-                return exp_mon + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
+                exp_anf = self._picoc_anf_exp(exp)
+                return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
                 return [pn.Exp(exp)]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp):
-                exps1_mon = self._picoc_mon_exp(left_exp)
-                exps2_mon = self._picoc_mon_exp(right_exp)
+                exps1_anf = self._picoc_anf_exp(left_exp)
+                exps2_anf = self._picoc_anf_exp(right_exp)
                 return (
-                    exps1_mon
-                    + exps2_mon
+                    exps1_anf
+                    + exps2_anf
                     + [
                         pn.Exp(
                             pn.BinOp(
@@ -1024,20 +1103,20 @@ class Passes:
                     ]
                 )
             case pn.UnOp(un_op, exp):
-                exps_mon = self._picoc_mon_exp(exp)
+                exps_anf = self._picoc_anf_exp(exp)
                 match exp:
                     case pn.Num(val):
                         if val == "2147483648":
                             return [pn.Exp(pn.Num("-2147483648"))]
                         exp.is_negative = pn.Name("negative")
-                return exps_mon + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
+                return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
-                exps1_mon = self._picoc_mon_exp(left_exp)
-                exps2_mon = self._picoc_mon_exp(right_exp)
+                exps1_anf = self._picoc_anf_exp(left_exp)
+                exps2_anf = self._picoc_anf_exp(right_exp)
                 return (
-                    exps1_mon
-                    + exps2_mon
+                    exps1_anf
+                    + exps2_anf
                     + [
                         pn.Exp(
                             pn.Atom(
@@ -1049,13 +1128,13 @@ class Passes:
                     ]
                 )
             case pn.ToBool(exp):
-                exps_mon = self._picoc_mon_exp(exp)
-                return exps_mon + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
+                exps_anf = self._picoc_anf_exp(exp)
+                return exps_anf + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
                 var_name = val1
                 var_pos = pos1
-                self._check_redef_and_redecl_error(var_name, var_pos)
+                self._check_redecl_redef_error(var_name, var_pos)
                 datatype_copy = copy.deepcopy(datatype)
                 match self.current_scope:
                     case ("main" | "global!"):
@@ -1114,8 +1193,8 @@ class Passes:
                 final_exp = pn.Exp(pn.Stack(pn.Num("1")))
                 # in case of *&var
                 final_exp.error_data = []
-                refs_mon = self._picoc_mon_ref(exp, [final_exp])
-                return refs_mon + [final_exp]
+                refs_anf = self._picoc_anf_ref(exp, [final_exp])
+                return refs_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val, pos)):
                 identifier_name = val
@@ -1140,11 +1219,11 @@ class Passes:
                     case _:
                         throw_error(symbol)
             case pn.Ref((pn.Subscr() | pn.Attr()) as ref):
-                return self._picoc_mon_ref(ref, [])
+                return self._picoc_anf_ref(ref, [])
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps):
                 #  case pn.Array(exps, datatype):
-                exps_mon = []
+                exps_anf = []
                 #  match datatype:
                 #      case pn.ArrayDecl(nums, _):
                 #          if int(nums[0].val) != len(exps):
@@ -1183,12 +1262,12 @@ class Passes:
                     #      case _:
                     #          bug_in_compiler(dt_array, exp)
                     # epxressions should be evaluated in reversed order
-                    exps_mon += self._picoc_mon_exp(exp)
-                return exps_mon
+                    exps_anf += self._picoc_anf_exp(exp)
+                return exps_anf
             # ---------------------------- L_Struct ---------------------------
             #  case pn.Struct(assigns, datatype):
             case pn.Struct(assigns):
-                exps_mon = []
+                exps_anf = []
                 #  match datatype:
                 #      case pn.StructSpec(pn.Name(val1)):
                 #          struct_name = val1
@@ -1242,14 +1321,14 @@ class Passes:
                             #                  raise errors.DatatypeMismatch(dt_attr, exp)
                             #      case _:
                             #          bug_in_compiler(symbol)
-                            exps_mon += self._picoc_mon_exp(exp)
+                            exps_anf += self._picoc_anf_exp(exp)
                         case _:
                             throw_error(assign)
                 #  if attr_ids:
                 #      # TODO: Error implementieren oder alternativ alle diese
                 #      # values mit 0 initialisieren
                 #      raise errors.StructInitAttrsMissing(attr_ids, exp)
-                return exps_mon
+                return exps_anf
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val, pos) as name, exps):
                 fun_name = val
@@ -1273,7 +1352,6 @@ class Passes:
                     raise errors.UnknownIdentifier(fun_name, fun_call_pos)
 
                 #  check if function call args match with function parameters
-                #  __import__("pudb").set_trace()
                 mismatch_dt_alloc = self._check_args_params(args, params)
                 if mismatch_dt_alloc:
                     match (mismatch_dt_alloc[0], mismatch_dt_alloc[1]):
@@ -1309,10 +1387,10 @@ class Passes:
                             )
                         case _:
                             throw_error(mismatch_dt_alloc[0], mismatch_dt_alloc[1])
-                exps_mon = []
+                exps_anf = []
                 self.argmode_on = True
                 for exp2 in exps:
-                    exps_mon += self._picoc_mon_exp(exp2)
+                    exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
                 block_name = pn.Name(
@@ -1321,7 +1399,7 @@ class Passes:
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
-                    + exps_mon
+                    + exps_anf
                     + [
                         pn.NewStackframe(
                             block_name, pn.GoTo(pn.Name("addr@next_instr"))
@@ -1338,7 +1416,7 @@ class Passes:
             case _:
                 throw_error(exp)
 
-    def _picoc_mon_stmt(self, stmt):
+    def _picoc_anf_stmt(self, stmt):
         match stmt:
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment():
@@ -1353,7 +1431,7 @@ class Passes:
                 pn.Alloc(_, datatype, name) as alloc,
                 (pn.Array(_) | pn.Struct(_)) as array_struct,
             ):
-                self._picoc_mon_exp(alloc)
+                self._picoc_anf_exp(alloc)
                 # this has to be in this order because the datatype declarator
                 # has to be reversed in the _picoc_mon_exp call
                 # TODO: ugly solution and add it again
@@ -1361,14 +1439,15 @@ class Passes:
                 #  array_struct.visible += (
                 #      [array_struct.datatype] if global_vars.args.double_verbose else []
                 #  )
-                stmt_mon = self._picoc_mon_stmt(pn.Assign(name, array_struct))
-                return self._single_line_comment(stmt, "//") + stmt_mon
+                stmt_anf = self._picoc_anf_stmt(pn.Assign(name, array_struct))
+                return self._single_line_comment(stmt, "//") + stmt_anf
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Name(val, pos), exp):
                 var_name = val
                 var_pos = pos
-                exps_mon = self._picoc_mon_exp(exp)
+                exps_anf = self._picoc_anf_exp(exp)
                 symbol, choosen_scope = self._resolve_name(var_name, var_pos)
+                #  __import__("pudb").set_trace()
                 match symbol:
                     case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
                         addr = val_addr
@@ -1376,7 +1455,7 @@ class Passes:
                             case ("main" | "global!"):
                                 return (
                                     self._single_line_comment(stmt, "//")
-                                    + exps_mon
+                                    + exps_anf
                                     + [
                                         pn.Assign(
                                             pn.Global(addr),
@@ -1387,7 +1466,7 @@ class Passes:
                             case _:
                                 return (
                                     self._single_line_comment(stmt, "//")
-                                    + exps_mon
+                                    + exps_anf
                                     + [
                                         pn.Assign(
                                             pn.Stackframe(addr),
@@ -1408,7 +1487,7 @@ class Passes:
             ):
                 var_name = val1
                 var_pos = pos1
-                self._check_redef_and_redecl_error(var_name, var_pos)
+                self._check_redecl_redef_error(var_name, var_pos)
                 symbol = st.Symbol(
                     type_qual,
                     datatype,
@@ -1421,17 +1500,17 @@ class Passes:
                 # Alloc isn't needed anymore after being evaluated
                 return self._single_line_comment(stmt, "//") + []
             case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
-                self._picoc_mon_exp(alloc)
-                stmt_mon = self._picoc_mon_stmt(pn.Assign(name, exp))
-                return self._single_line_comment(stmt, "//") + stmt_mon
+                self._picoc_anf_exp(alloc)
+                stmt_anf = self._picoc_anf_stmt(pn.Assign(name, exp))
+                return self._single_line_comment(stmt, "//") + stmt_anf
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
-                exps_mon = self._picoc_mon_exp(exp)
-                refs_mon = self._picoc_mon_ref(ref, [])
+                exps_anf = self._picoc_anf_exp(exp)
+                refs_anf = self._picoc_anf_ref(ref, [])
                 return (
                     self._single_line_comment(stmt, "//")
-                    + exps_mon
-                    + refs_mon
+                    + exps_anf
+                    + refs_anf
                     + [
                         pn.Assign(
                             pn.Stack(pn.Num("1")),
@@ -1441,24 +1520,24 @@ class Passes:
                 )
             # --------------------- L_Assign_Alloc + L_Fun --------------------
             case pn.Exp(alloc_call):
-                exps_mon = self._picoc_mon_exp(alloc_call)
-                return self._single_line_comment(stmt, "//") + exps_mon
+                exps_anf = self._picoc_anf_exp(alloc_call)
+                return self._single_line_comment(stmt, "//") + exps_anf
             # ----------------------- L_If_Else + L_Loop ----------------------
             case pn.IfElse(exp, goto1_list, goto2_list):
-                exps_mon = self._picoc_mon_exp(exp)
+                exps_anf = self._picoc_anf_exp(exp)
                 return (
                     self._single_line_comment(stmt, "//")
-                    + exps_mon
+                    + exps_anf
                     + [pn.IfElse(pn.Stack(pn.Num("1")), goto1_list, goto2_list)]
                 )
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(st.Empty()):
                 return [stmt]
             case pn.Return(exp):
-                exps_mon = self._picoc_mon_exp(exp)
+                exps_anf = self._picoc_anf_exp(exp)
                 return (
                     self._single_line_comment(stmt, "//")
-                    + exps_mon
+                    + exps_anf
                     + [pn.Return(pn.Stack(pn.Num("1")))]
                 )
             case pn.StackMalloc():
@@ -1473,7 +1552,7 @@ class Passes:
             case _:
                 throw_error(stmt)
 
-    def _picoc_mon_def(self, decl_def):
+    def _picoc_anf_def(self, decl_def):
         match decl_def:
             # ------------------------ L_Fun + L_Blocks -----------------------
             case pn.FunDef(datatype, pn.Name(val1, pos1) as name, allocs, blocks):
@@ -1483,7 +1562,7 @@ class Passes:
                 self.current_scope = def_name
                 self.rel_fun_addr = 0
 
-                blocks_mon = []
+                blocks_anf = []
                 match blocks[0]:
                     case pn.Block(_, stmts):
                         # attach param or not information to alloc
@@ -1518,6 +1597,7 @@ class Passes:
                             pn.Alloc(pn.Writeable(), datatype, name)
                         ] + allocs
                         try:
+                            #  __import__("pudb").set_trace()
                             symbol = self.symbol_table.resolve(def_name)
 
                             match symbol:
@@ -1526,7 +1606,18 @@ class Passes:
                                     pn.FunDecl(datatype2, _, allocs),
                                     pn.Name(_, pos2) as name2,
                                 ):
+
                                     decl_pos = pos2
+                                    if def_name in self.marked_funs_for_error:
+                                        if (
+                                            self.marked_funs_for_error.count(def_name)
+                                            == 2
+                                        ):
+                                            raise errors.ReDeclarationOrDefinition(
+                                                def_name, def_pos, decl_pos
+                                            )
+                                        symbol.name.pos = def_pos
+                                        self.marked_funs_for_error += [def_name]
                                     prototype_decl = [
                                         pn.Alloc(pn.Writeable(), datatype2, name2)
                                     ] + ([] if isinstance(allocs, st.Empty) else allocs)
@@ -1577,22 +1668,22 @@ class Passes:
                             )
                             self.symbol_table.declare(symbol)
 
-                        stmts_mon = []
+                        stmts_anf = []
                         for stmt in blocks[0].stmts_instrs:
-                            stmts_mon += self._picoc_mon_stmt(stmt)
-                        blocks[0].stmts_instrs[:] = stmts_mon
+                            stmts_anf += self._picoc_anf_stmt(stmt)
+                        blocks[0].stmts_instrs[:] = stmts_anf
 
-                        blocks_mon += [blocks[0]]
+                        blocks_anf += [blocks[0]]
                     case _:
                         throw_error(blocks[0])
                 for block in blocks[1:]:
                     match block:
                         case pn.Block(_, stmts):
-                            stmts_mon = []
+                            stmts_anf = []
                             for stmt in stmts:
-                                stmts_mon += self._picoc_mon_stmt(stmt)
-                            block.stmts_instrs[:] = stmts_mon
-                            blocks_mon += [block]
+                                stmts_anf += self._picoc_anf_stmt(stmt)
+                            block.stmts_instrs[:] = stmts_anf
+                            blocks_anf += [block]
                         case _:
                             throw_error(block)
 
@@ -1606,8 +1697,13 @@ class Passes:
                         )
                     case _:
                         throw_error(blocks[-1])
-                return blocks_mon
-            case pn.FunDecl(datatype, pn.Name(_, pos) as name, allocs):
+                return blocks_anf
+            case pn.FunDecl(datatype, pn.Name(val, pos) as name, allocs):
+                decl_name = val
+                decl_pos = pos
+                self._check_redecl_redef_error(
+                    decl_name, decl_pos, is_fun_or_struct=True
+                )
                 symbol = st.Symbol(
                     st.Empty(),
                     decl_def,
@@ -1621,25 +1717,12 @@ class Passes:
                 return []
             case pn.StructDecl(pn.Name(val1, pos1), allocs):
                 struct_name = val1
+                struct_pos = pos1
                 attrs = []
                 struct_size = 0
-                if self.symbol_table.exists(struct_name):
-                    symbol = self.symbol_table.resolve(struct_name)
-                    match symbol:
-                        case st.Symbol(
-                            _,
-                            _,
-                            pn.Name(),
-                            _,
-                            st.Pos(pn.Num(pos_first_line), pn.Num(pos_first_column)),
-                        ):
-                            raise errors.ReDeclaration(
-                                val1,
-                                pos1,
-                                Pos(int(pos_first_line), int(pos_first_column)),
-                            )
-                        case _:
-                            throw_error(symbol)
+                self._check_redecl_redef_error(
+                    struct_name, struct_pos, is_fun_or_struct=True
+                )
                 for alloc in allocs:
                     match alloc:
                         case pn.Alloc(pn.Writeable(), datatype, pn.Name(val2, pos2)):
@@ -1673,27 +1756,27 @@ class Passes:
                 return []
             case (pn.Exp() | pn.Assign()):
                 self.current_scope = "global!"
-                self.global_stmts_instrs += self._picoc_mon_stmt(decl_def)
+                self.global_stmts_instrs += self._picoc_anf_stmt(decl_def)
                 return []
             case _:
                 throw_error(decl_def)
 
-    def picoc_mon(self, file: pn.File):
+    def picoc_anf(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
-                blocks_mon = []
+                blocks_anf = []
                 for decl_def in decls_defs:
-                    blocks_mon += self._picoc_mon_def(decl_def)
+                    blocks_anf += self._picoc_anf_def(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_mon"),
+                    pn.Name(remove_extension(val) + ".picoc_anf"),
                     [
                         pn.Block(
                             pn.Name(f"global.{self.block_id}"),
                             self.global_stmts_instrs,
                         )
                     ]
-                    + blocks_mon,
+                    + blocks_anf,
                 )
             case _:
                 throw_error(file)

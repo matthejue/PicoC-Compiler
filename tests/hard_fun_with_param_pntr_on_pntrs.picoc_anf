@@ -1,0 +1,115 @@
+File 
+  Name './tests/hard_fun_with_param_pntr_on_pntrs.picoc_anf', 
+  [
+    Block 
+      Name 'global.8', 
+      [], 
+    Block 
+      Name 'main.7', 
+      [
+        Exp(Call(Name('input'), []))
+        Exp(Call(Name('input'), []))
+        Exp(Call(Name('input'), []))
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('2')), Stack(Num('4')))
+        Exp(Num('2'))
+        Assign(Global(Num('6')), Stack(Num('1')))
+        Exp(Num('4'))
+        Assign(Global(Num('7')), Stack(Num('1')))
+        StackMalloc(Num('2'))
+        Ref(Global(Num('0')))
+        Ref(Global(Num('2')))
+        Exp(Global(Num('6')))
+        NewStackframe(Name('connect.3'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('connect.3')))
+        RemoveStackframe()
+        Exp(Num('0'))
+        Assign(Global(Num('8')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.6')))
+      ], 
+    Block 
+      Name 'condition_check.6', 
+      [
+        Exp(Global(Num('8')))
+        Exp(Global(Num('7')))
+        Exp(Atom(Stack(Num('2')), Lt('<'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('while_branch.5'))
+          ], 
+          [
+            GoTo(Name('while_after.4'))
+          ]
+      ], 
+    Block 
+      Name 'while_branch.5', 
+      [
+        Ref(Global(Num('0')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Global(Num('8')))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Global(Num('8')))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Global(Num('8')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.6')))
+      ], 
+    Block 
+      Name 'while_after.4', 
+      [
+        Return(Empty())
+      ], 
+    Block 
+      Name 'connect.3', 
+      [
+        Exp(Num('0'))
+        Assign(Stackframe(Num('3')), Stack(Num('1')))
+        # condition
+        Exp(GoTo(Name('condition_check.2')))
+      ], 
+    Block 
+      Name 'condition_check.2', 
+      [
+        Exp(Stackframe(Num('3')))
+        Exp(Stackframe(Num('2')))
+        Exp(Atom(Stack(Num('2')), Lt('<'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('while_branch.1'))
+          ], 
+          [
+            GoTo(Name('while_after.0'))
+          ]
+      ], 
+    Block 
+      Name 'while_branch.1', 
+      [
+        # assignment
+        Ref(Stackframe(Num('1')))
+        Exp(Stackframe(Num('3')))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Ref(Stackframe(Num('0')))
+        Exp(Stackframe(Num('3')))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        # increase
+        Exp(Stackframe(Num('3')))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Stackframe(Num('3')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.2')))
+      ], 
+    Block 
+      Name 'while_after.0', 
+      [
+        Return(Empty())
+      ]
+  ]

@@ -1,0 +1,9 @@
+// in:
+// expected:ReDeclarationOrDefinition
+
+void fun(int param_same_name, int param_same_name) {
+
+}
+
+void main() {
+}

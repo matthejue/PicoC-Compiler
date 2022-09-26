@@ -3,7 +3,7 @@
 
 struct st {int ar[2];};
 
-int fun(struct st copyable_ar) {
+void fun(struct st copyable_ar) {
   copyable_ar.ar[1] = 42;
 }
 
