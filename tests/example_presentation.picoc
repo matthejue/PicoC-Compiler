@@ -10,11 +10,14 @@ int fun(struct stt (*param)[3][2]);
 
 void main() {
   struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;
-  fun(pntr_on_ar_of_sts);
-  print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);
+  int res = fun(pntr_on_ar_of_sts);
+  if (res) {
+    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);
+  }
 }
 
 int fun(struct stt (*param)[3][2]){
   (*(*param+2))[1].attr2[input()] = 42;
+  return 1;
 }
 

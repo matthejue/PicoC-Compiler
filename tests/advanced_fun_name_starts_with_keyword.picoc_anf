@@ -1,0 +1,23 @@
+File 
+  Name './tests/advanced_fun_name_starts_with_keyword.picoc_anf', 
+  [
+    Block 
+      Name 'global.2', 
+      [], 
+    Block 
+      Name 'int_while_if.1', 
+      [
+        Exp(Call(Name('input'), []))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        StackMalloc(Num('2'))
+        NewStackframe(Name('int_while_if.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('int_while_if.1')))
+        RemoveStackframe()
+        Return(Empty())
+      ]
+  ]

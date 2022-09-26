@@ -1,0 +1,38 @@
+File 
+  Name './tests/advanced_do_while_get_into_loop_condition_not_satisfied.picoc_anf', 
+  [
+    Block 
+      Name 'global.3', 
+      [], 
+    Block 
+      Name 'main.2', 
+      [
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(GoTo(Name('do_while_branch.1')))
+      ], 
+    Block 
+      Name 'do_while_branch.1', 
+      [
+        Exp(Global(Num('0')))
+        Exp(UnOp(Minus('-'), Stack(Num('1'))))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Global(Num('0')))
+        Exp(Num('0'))
+        Exp(Atom(Stack(Num('2')), Gt('>'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('do_while_branch.1'))
+          ], 
+          [
+            GoTo(Name('do_while_after.0'))
+          ]
+      ], 
+    Block 
+      Name 'do_while_after.0', 
+      [
+        Return(Empty())
+      ]
+  ]

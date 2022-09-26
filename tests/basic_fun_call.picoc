@@ -2,14 +2,14 @@
 // expected:42
 // datasegment:8
 
-int fun(int param);
+void fun(int param);
 
 void main() {
   int local_var1 = input();
   fun(local_var1);
 }
 
-int fun(int param) {
+void fun(int param) {
   int local_var1 = 2;
   int local_var2 = param + local_var1;
   print(local_var2);

@@ -1,0 +1,46 @@
+File 
+  Name './tests/basic_while.picoc_anf', 
+  [
+    Block 
+      Name 'global.4', 
+      [], 
+    Block 
+      Name 'main.3', 
+      [
+        Exp(Num('6'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.2')))
+      ], 
+    Block 
+      Name 'condition_check.2', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Num('42'))
+        Exp(Atom(Stack(Num('2')), Lt('<'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('while_branch.1'))
+          ], 
+          [
+            GoTo(Name('while_after.0'))
+          ]
+      ], 
+    Block 
+      Name 'while_branch.1', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Call(Name('input'), []))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.2')))
+      ], 
+    Block 
+      Name 'while_after.0', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

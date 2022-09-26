@@ -1,6 +1,7 @@
 from colormanager import ColorManager as CM
 from lark.lexer import Token
 from global_classes import Pos
+import picoc_nodes as pn
 
 
 class UnexpectedCharacter(Exception):
@@ -129,12 +130,33 @@ class WrongNumberArguments(Exception):
         self.fun_num_params = fun_num_params
 
 
-class ReDeclaration(Exception):
+class WrongReturnType(Exception):
+    def __init__(
+        self,
+        fun_name,
+        fun_pos,
+        expected_return_type,
+        found_return_type,
+        last_stmt_pos,
+        is_return,
+    ):
+        self.description = f"{CM().YELLOW}WrongReturnType:{CM().RESET_ALL} Function {CM().BLUE}{fun_name}{CM().RESET_ALL} has return type {CM().BLUE}{expected_return_type}{CM().RESET_ALL}, but function returns type {CM().RED}{found_return_type}{CM().RESET_ALL}."
+        self.fun_name = fun_name
+        self.fun_pos = fun_pos
+        self.expected_return_type = expected_return_type
+        self.found_return_type = found_return_type
+        self.last_stmt_pos = last_stmt_pos
+        self.is_return = is_return
+
+
+class ReDeclarationOrDefinition(Exception):
     def __init__(self, found, found_pos, first_pos):
-        self.description = f"{CM().YELLOW}ReDeclaration:{CM().RESET_ALL} Redeclaration of {CM().RED}'{found}'{CM().RESET}."
+        self.description = f"{CM().YELLOW}ReDeclarationOrDefinition:{CM().RESET_ALL} Redeclaration or Redefinition of {CM().RED}'{found}'{CM().RESET}."
         self.found = found
         self.found_pos = found_pos
-        self.description2 = f"{CM().YELLOW}Note:{CM().RESET_ALL} Already declared here:"
+        self.description2 = (
+            f"{CM().YELLOW}Note:{CM().RESET_ALL} Already declared or defined here:"
+        )
         self.first_pos = first_pos
 
 

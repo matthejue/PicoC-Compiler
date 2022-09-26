@@ -1,5 +1,5 @@
 // in:
-// expected:ReDeclaration
+// expected:ReDeclarationOrDefinition
 
 struct redeclared_struct {int attr1; char attr2;};
 struct redeclared_struct {char attr0; int attr1;};

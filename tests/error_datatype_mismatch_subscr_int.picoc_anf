@@ -1,0 +1,19 @@
+File 
+  Name './tests/error_datatype_mismatch_subscr_int.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('42'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Ref(Global(Num('0')))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

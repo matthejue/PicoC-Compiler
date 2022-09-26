@@ -1,0 +1,20 @@
+// in:
+// expected:WrongReturnType
+
+void fun(){
+  if (1) {
+    if (1) {
+      return;
+    } else {
+      return 1;
+    }
+  } else {
+    if (1) {
+    } else {
+    }
+  }
+}
+
+void main() {
+  fun();
+}

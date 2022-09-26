@@ -1,0 +1,191 @@
+File 
+  Name './tests/hard_if_else_if_else_var_init_def_inline_comment.picoc_anf', 
+  [
+    Block 
+      Name 'global.18', 
+      [], 
+    Block 
+      Name 'main.17', 
+      [
+        Exp(Call(Name('input'), []))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Num('1'))
+        Assign(Global(Num('2')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.16')))
+      ], 
+    Block 
+      Name 'condition_check.16', 
+      [
+        Exp(Global(Num('2')))
+        Exp(Num('2'))
+        Exp(Atom(Stack(Num('2')), LtE('<='), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('while_branch.15'))
+          ], 
+          [
+            GoTo(Name('while_after.0'))
+          ]
+      ], 
+    Block 
+      Name 'while_branch.15', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Num('100'))
+        Exp(Atom(Stack(Num('2')), Gt('>'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.14'))
+          ], 
+          [
+            GoTo(Name('else.13'))
+          ]
+      ], 
+    Block 
+      Name 'if.14', 
+      [
+        Exp(Num('0'))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(GoTo(Name('if_else_after.4')))
+      ], 
+    Block 
+      Name 'else.13', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Num('42'))
+        Exp(Global(Num('2')))
+        Exp(BinOp(Stack(Num('2')), Div('/'), Stack(Num('1'))))
+        Exp(Atom(Stack(Num('2')), Gt('>'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.12'))
+          ], 
+          [
+            GoTo(Name('else.6'))
+          ]
+      ], 
+    Block 
+      Name 'if.12', 
+      [
+        Exp(Num('0'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Num('1'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicAnd(), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.11'))
+          ], 
+          [
+            GoTo(Name('else.10'))
+          ]
+      ], 
+    Block 
+      Name 'if.11', 
+      [
+        Exp(Num('1'))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(GoTo(Name('if_else_after.7')))
+      ], 
+    Block 
+      Name 'else.10', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Num('10'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.9'))
+          ], 
+          [
+            GoTo(Name('if_else_after.8'))
+          ]
+      ], 
+    Block 
+      Name 'if.9', 
+      [
+        Exp(Num('42'))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(GoTo(Name('if_else_after.8')))
+      ], 
+    Block 
+      Name 'if_else_after.8', 
+      [
+        Exp(GoTo(Name('if_else_after.7')))
+      ], 
+    Block 
+      Name 'if_else_after.7', 
+      [
+        Exp(GoTo(Name('if_else_after.5')))
+      ], 
+    Block 
+      Name 'else.6', 
+      [
+        Exp(Num('24'))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(GoTo(Name('if_else_after.5')))
+      ], 
+    Block 
+      Name 'if_else_after.5', 
+      [
+        Exp(GoTo(Name('if_else_after.4')))
+      ], 
+    Block 
+      Name 'if_else_after.4', 
+      [
+        Exp(Num('4'))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Num('0'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicOr(), Stack(Num('1')))), 
+        IfElse 
+          Stack 
+            Num '1', 
+          [
+            GoTo(Name('if.3'))
+          ], 
+          [
+            GoTo(Name('else.2'))
+          ]
+      ], 
+    Block 
+      Name 'if.3', 
+      [
+        Exp(Global(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(GoTo(Name('if_else_after.1')))
+      ], 
+    Block 
+      Name 'else.2', 
+      [
+        Exp(GoTo(Name('if_else_after.1')))
+      ], 
+    Block 
+      Name 'if_else_after.1', 
+      [
+        Exp(Global(Num('2')))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Global(Num('2')), Stack(Num('1')))
+        Exp(GoTo(Name('condition_check.16')))
+      ], 
+    Block 
+      Name 'while_after.0', 
+      [
+        Return(Empty())
+      ]
+  ]

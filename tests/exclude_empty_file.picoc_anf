@@ -1,0 +1,7 @@
+File 
+  Name './tests/exclude_empty_file.picoc_anf', 
+  [
+    Block 
+      Name 'global.0', 
+      []
+  ]

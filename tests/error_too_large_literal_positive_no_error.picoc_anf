@@ -1,0 +1,14 @@
+File 
+  Name './tests/error_too_large_literal_positive_no_error.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('2147483647'))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

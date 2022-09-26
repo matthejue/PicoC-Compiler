@@ -1,0 +1,45 @@
+File 
+  Name './tests/basic_funs_with_void_type_and_int_type.picoc_anf', 
+  [
+    Block 
+      Name 'global.3', 
+      [], 
+    Block 
+      Name 'void_fun.2', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Assign(Stackframe(Num('0')), Stack(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ], 
+    Block 
+      Name 'int_fun.1', 
+      [
+        Exp(Stackframe(Num('0')))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Return(Stack(Num('1')))
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        StackMalloc(Num('2'))
+        Exp(Global(Num('0')))
+        NewStackframe(Name('void_fun.2'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('void_fun.2')))
+        RemoveStackframe()
+        StackMalloc(Num('2'))
+        Exp(Global(Num('0')))
+        NewStackframe(Name('int_fun.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('int_fun.1')))
+        RemoveStackframe()
+        Exp(ACC)
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

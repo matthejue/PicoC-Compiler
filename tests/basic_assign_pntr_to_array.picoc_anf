@@ -1,0 +1,26 @@
+File 
+  Name './tests/basic_assign_pntr_to_array.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Ref(Global(Num('0')))
+        Ref(Global(Num('1')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        Ref(Global(Num('1')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('0'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

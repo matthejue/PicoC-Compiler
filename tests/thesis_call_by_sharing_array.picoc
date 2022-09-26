@@ -1,7 +1,7 @@
 // in:
 // expected:314 42
 
-int fun(int ar[2]) {
+void fun(int ar[2]) {
   ar[1] = 42;
 }
 

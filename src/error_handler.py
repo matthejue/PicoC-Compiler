@@ -216,13 +216,37 @@ class ErrorHandler:
                 e.__class__.__name__,
             )
             exit(0)
-        except errors.ReDeclaration as e:
+        except errors.WrongReturnType as e:
             self._error_heading()
+
+            error_header = self._error_header(e.description, e.fun_pos)
+            error_screen = AnnotationScreen(
+                self.split_code, e.fun_pos.line, e.last_stmt_pos.line
+            )
+            error_screen.mark(e.fun_pos, len(e.fun_name))
+            if e.last_stmt_pos != e.fun_pos:
+                error_screen.point_at(
+                    e.last_stmt_pos,
+                    e.found_return_type
+                    if e.is_return
+                    else "last statement is no return",
+                )
+
+            error_screen.filter()
+            self._output_error(
+                error_header + str(error_screen),
+                e.__class__.__name__,
+            )
+            exit(0)
+        except errors.ReDeclarationOrDefinition as e:
+            self._error_heading()
+
             error_header = self._error_header(e.description, e.found_pos)
             error_screen = AnnotationScreen(
                 self.split_code, e.found_pos.line, e.found_pos.line
             )
             error_screen.mark(e.found_pos, len(e.found))
+
             note_header = self._error_header(
                 e.description2,
                 e.first_pos,
@@ -231,6 +255,7 @@ class ErrorHandler:
                 self.split_code, e.first_pos.line, e.first_pos.line
             )
             error_screen_2.mark(e.first_pos, len(e.found))
+
             error_screen.filter()
             error_screen_2.filter()
             self._output_error(

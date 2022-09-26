@@ -1,0 +1,30 @@
+File 
+  Name './tests/thesis_scope.picoc_anf', 
+  [
+    Block 
+      Name 'global.2', 
+      [], 
+    Block 
+      Name 'fun_scope.1', 
+      [
+        Exp(Num('2'))
+        Assign(Stackframe(Num('1')), Stack(Num('1')))
+        Exp(Stackframe(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Stackframe(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('4'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        StackMalloc(Num('2'))
+        Exp(Global(Num('0')))
+        NewStackframe(Name('fun_scope.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun_scope.1')))
+        RemoveStackframe()
+        Return(Empty())
+      ]
+  ]

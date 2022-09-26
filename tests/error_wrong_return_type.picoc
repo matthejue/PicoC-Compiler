@@ -1,0 +1,20 @@
+// in:
+// expected:WrongReturnType
+
+void fun1(){
+
+}
+
+int fun2(){
+  return 1;
+}
+
+int fun3(){
+
+}
+
+void main() {
+  fun1();
+  fun2();
+  fun3();
+}

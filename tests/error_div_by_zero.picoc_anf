@@ -1,0 +1,24 @@
+File 
+  Name './tests/error_div_by_zero.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Call(Name('input'), []))
+        Exp(Num('2'))
+        Exp(BinOp(Stack(Num('2')), Div('/'), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Global(Num('0')))
+        Exp(Num('0'))
+        Exp(BinOp(Stack(Num('2')), Div('/'), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

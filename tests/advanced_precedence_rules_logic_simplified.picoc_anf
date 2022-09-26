@@ -1,0 +1,42 @@
+File 
+  Name './tests/advanced_precedence_rules_logic_simplified.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Call(Name('input'), []))
+        Assign(Global(Num('2')), Stack(Num('1')))
+        Exp(Num('0'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Num('0'))
+        Exp(Char('A'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(UnOp(LogicNot('!'), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicOr(), Stack(Num('1'))))
+        Exp(Global(Num('2')))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(UnOp(LogicNot('!'), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicOr(), Stack(Num('1'))))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        Exp(Num('1'))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(Global(Num('2')))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicAnd(), Stack(Num('1'))))
+        Exp(Global(Num('2')))
+        Exp(ToBool(Stack(Num('1'))))
+        Exp(UnOp(LogicNot('!'), Stack(Num('1'))))
+        Exp(BinOp(Stack(Num('2')), LogicAnd(), Stack(Num('1'))))
+        Assign(Global(Num('1')), Stack(Num('1')))
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Global(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

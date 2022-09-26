@@ -1,5 +1,5 @@
 // in:
-// expected:ReDeclaration
+// expected:ReDeclarationOrDefinition
 
 void main() {
   int var = 42;

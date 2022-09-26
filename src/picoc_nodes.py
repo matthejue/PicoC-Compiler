@@ -2,7 +2,7 @@ from ast_node import ASTNode
 from global_classes import Pos
 import symbol_table as st
 import global_vars
-from global_funs import repr_example
+from global_funs import repr_single_line
 
 
 # =========================================================================
@@ -133,13 +133,22 @@ class Writeable(ASTNode):
 class IntType(ASTNode):
     pass
 
+    def __repr__(self, depth=0):
+        return f"\n{' ' * depth}IntType()"
+
 
 class CharType(ASTNode):
     pass
 
+    def __repr__(self, depth=0):
+        return f"\n{' ' * depth}CharType()"
+
 
 class VoidType(ASTNode):
     pass
+
+    def __repr__(self, depth=0):
+        return f"\n{' ' * depth}VoidType()"
 
 
 # =========================================================================
@@ -356,10 +365,10 @@ class StructDecl(ASTNode):
     __match_args__ = ("name", "allocs")
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
 
 # ------------------------------- L_If_Else -------------------------------
@@ -370,10 +379,10 @@ class If(ASTNode):
         super().__init__(visible=[self.exp, self.stmts])
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts")
 
@@ -386,10 +395,10 @@ class IfElse(ASTNode):
         super().__init__(visible=[self.exp, self.stmts1, self.stmts2])
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts1", "stmts2")
 
@@ -402,10 +411,10 @@ class While(ASTNode):
         super().__init__(visible=[self.exp, self.stmts])
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts")
 
@@ -417,10 +426,10 @@ class DoWhile(ASTNode):
         super().__init__(visible=[self.exp, self.stmts])
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts")
 
@@ -469,10 +478,10 @@ class FunDef(ASTNode):
         )
 
     def __repr__(self, depth=0):
-        if global_vars.args.example:
-            return repr_example(self, depth)
-        else:
+        if global_vars.args.double_verbose:
             return super().__repr__(depth)
+        else:
+            return repr_single_line(self, depth)
 
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
@@ -520,7 +529,7 @@ class Block(ASTNode):
         if global_vars.args.double_verbose:
             return super().__repr__(depth)
         else:
-            return repr_example(self, depth)
+            return repr_single_line(self, depth)
 
     __match_args__ = (
         "name",

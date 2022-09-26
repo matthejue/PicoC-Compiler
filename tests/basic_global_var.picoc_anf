@@ -1,0 +1,30 @@
+File 
+  Name './tests/basic_global_var.picoc_anf', 
+  [
+    Block 
+      Name 'global.2', 
+      [
+        Exp(Num('42'))
+        Assign(Global(Num('1')), Stack(Num('1')))
+      ], 
+    Block 
+      Name 'fun.1', 
+      [
+        Exp(Global(Num('0')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Global(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Exp(Num('314'))
+        Assign(Global(Num('0')), Stack(Num('1')))
+        StackMalloc(Num('2'))
+        NewStackframe(Name('fun.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun.1')))
+        RemoveStackframe()
+        Return(Empty())
+      ]
+  ]

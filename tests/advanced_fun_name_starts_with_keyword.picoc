@@ -1,7 +1,7 @@
 // in:42
 // expected:42
 
-int int_while_if(){
+void int_while_if(){
   print(input());
 }
 

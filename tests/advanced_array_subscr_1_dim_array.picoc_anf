@@ -1,0 +1,32 @@
+File 
+  Name './tests/advanced_array_subscr_1_dim_array.picoc_anf', 
+  [
+    Block 
+      Name 'global.1', 
+      [], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('1'))
+        Exp(Num('2'))
+        Exp(Num('3'))
+        Assign(Global(Num('0')), Stack(Num('3')))
+        Exp(Call(Name('input'), []))
+        Ref(Global(Num('0')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('1'))
+        Exp(Num('1'))
+        Exp(BinOp(Stack(Num('2')), Add('+'), Stack(Num('1'))))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        Ref(Global(Num('0')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Num('2'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ]
+  ]

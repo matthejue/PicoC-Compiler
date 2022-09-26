@@ -1,0 +1,50 @@
+File 
+  Name './tests/thesis_fun_call_by_value_struct.picoc_anf', 
+  [
+    Block 
+      Name 'global.3', 
+      [], 
+    Block 
+      Name 'fun_struct_from_stackframe.2', 
+      [
+        Ref(Stackframe(Num('2')))
+        Ref(Attr(Stack(Num('1')), Name('attr2')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        Return(Empty())
+      ], 
+    Block 
+      Name 'fun_struct_from_global_data.1', 
+      [
+        Ref(Stackframe(Num('2')))
+        Ref(Attr(Stack(Num('1')), Name('attr2')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Exp(Stack(Num('1')))
+        Exp(Call(Name('print'), [Stack(Num('1'))]))
+        StackMalloc(Num('2'))
+        Assign(Stack(Num('3')), Stackframe(Num('2')))
+        NewStackframe(Name('fun_struct_from_stackframe.2'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun_struct_from_stackframe.2')))
+        RemoveStackframe()
+        Return(Empty())
+      ], 
+    Block 
+      Name 'main.0', 
+      [
+        Exp(Num('42'))
+        Ref(Global(Num('0')))
+        Ref(Attr(Stack(Num('1')), Name('attr2')))
+        Exp(Num('1'))
+        Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
+        Assign(Stack(Num('1')), Stack(Num('2')))
+        StackMalloc(Num('2'))
+        Assign(Stack(Num('3')), Global(Num('0')))
+        NewStackframe(Name('fun_struct_from_global_data.1'), GoTo(Name('addr@next_instr')))
+        Exp(GoTo(Name('fun_struct_from_global_data.1')))
+        RemoveStackframe()
+        Return(Empty())
+      ]
+  ]
