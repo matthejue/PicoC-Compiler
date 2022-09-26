@@ -101,23 +101,28 @@ class ErrorHandler:
         except errors.UnknownAttribute as e:
             self._error_heading()
             error_header = self._error_header(e.description, e.attr_pos)
+
             error_screen = AnnotationScreen(
                 self.split_code,
                 e.attr_pos.line,
                 e.attr_pos.line,
             )
             error_screen.mark_consider_colors(e.var_pos, len(e.var_name))
-            error_screen.mark(e.attr_pos, len(e.attr_name))
+            error_screen.point_at(
+                e.attr_pos, f"is unknown in struct type '{e.struct_type_name}'"
+            )
             note_header = self._error_header(
                 e.description2,
-                e.struct_pos,
+                e.struct_type_pos,
             )
+
             error_screen2 = AnnotationScreen(
                 self.split_code,
-                e.struct_pos.line,
-                e.struct_pos.line,
+                e.struct_type_pos.line,
+                e.struct_type_pos.line,
             )
-            error_screen2.mark(e.struct_pos, len(e.struct_name))
+            error_screen2.mark(e.struct_type_pos, len(e.struct_type_name))
+
             error_screen.filter()
             error_screen2.filter()
             self._output_error(
@@ -151,7 +156,12 @@ class ErrorHandler:
             if e.decl_param_pos == e.decl_pos:
                 error_screen.clear(0)
                 error_screen.color_offset = 0
-            error_screen.point_at(e.def_param_pos, e.def_param_datatype)
+            if e.decl_param_name == e.def_param_name:
+                error_screen.point_at(e.def_param_pos, e.def_param_datatype)
+            else:
+                error_screen.point_at(
+                    e.def_param_pos, f"not same identifier as '{e.decl_param_name}'"
+                )
 
             error_header2 = self._error_header(e.description2, e.decl_pos)
             error_screen2 = AnnotationScreen(
@@ -161,7 +171,12 @@ class ErrorHandler:
             if e.decl_param_pos == e.decl_pos:
                 error_screen2.clear(0)
                 error_screen2.color_offset = 0
-            error_screen2.point_at(e.decl_param_pos, e.decl_param_datatype)
+            if e.decl_param_name == e.def_param_name:
+                error_screen2.point_at(e.decl_param_pos, e.decl_param_datatype)
+            else:
+                error_screen2.point_at(
+                    e.decl_param_pos, f"not same identifier as '{e.def_param_name}'"
+                )
 
             error_screen.filter()
             error_screen2.filter()

@@ -4,6 +4,5 @@
 struct stt {int attr1; int attr2[2];};
 
 void main() {
-  struct stt st_var = {.attr1=42, .attr2={1, 2}};
-  print(st_var.unknown_attr);
+  struct stt st_var = {.attr1=42, .unknown_attr={314, 42}};
 }
