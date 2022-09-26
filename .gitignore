@@ -16,6 +16,7 @@ README.txt
 *.picoc_blocks
 *.picoc_patch
 *.picoc_mon
+*.picoc_anf
 *.reti_blocks
 *.reti_patch
 *.reti
