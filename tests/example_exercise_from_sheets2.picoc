@@ -1,0 +1,18 @@
+// in:3 15
+// expected:3
+
+void main() {
+  //Deklarationsteil
+  int x;
+  int y;
+  const int z = 2;
+
+  //Anweisungsteil
+  y = input();
+  x = input();
+
+  while(x >= z * y) {
+    x = x - 3;
+  }
+  print(x);
+}
