@@ -15,8 +15,10 @@
     <br />
     <br />
     <a href="./doc/getting_started.md">Getting Started</a>
+    <!-- · -->
+    <!-- <a href="./doc/help-page.txt">Usage</a> -->
     ·
-    <a href="./doc/help-page.txt">Usage</a>
+    Koloquium Presentation <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation">Source</a>
     ·
     Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Source</a>
     ·
