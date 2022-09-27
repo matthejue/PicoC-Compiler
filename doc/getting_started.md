@@ -1,8 +1,5 @@
 # Compiling a file
 With the following **cli-options** you won't miss anything when compiling **PicoC** into **RETI-Code**:
-
-<a href="https://asciinema.org/a/524082" target="_blank"><img src="https://asciinema.org/a/524082.svg" /></a>
-
 ```bash
 ./picoc_compiler -i -p -l 2 -t -R -B 3 -D 32 /code.picoc
 ```
