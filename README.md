@@ -6,7 +6,7 @@
     <img src="./doc/logo.png" alt="Logo" height="80px">
   </a>
   <p align="center">
-    Compiles the programming language <strong>PicoC</strong> (a subset of C) into <strong>RETI machine Language</strong>.
+    Compiles the programming language <strong>PicoC</strong> (a subset of C) into the <strong>RETI</strong> machine Language.
     <br />
     <br />
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
@@ -14,18 +14,19 @@
     <img height="20px" src="http://ForTheBadge.com/images/badges/made-with-python.svg">
     <br />
     <br />
-    <a href="./doc/getting_started.md">Getting Started</a>
-    <!-- · -->
-    <!-- <a href="./doc/help-page.txt">Usage</a> -->
-    ·
     Koloquium Presentation <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation">Source</a>
     ·
     Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Source</a>
+    <br />
+    <a href="./doc/getting_started.md">Getting Started</a>
     ·
-    <a href="./src/concrete_syntax_picoc.lark/">Concrete Syntax</a>
-    <!-- · -->
-    <!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
+    <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Dokumentation.pdf">Usage</a>
+    ·
+    <a href="./src/concrete_syntax_picoc.lark/">Concrete Syntax of PicoC</a>
     ·
     <a href="./doc/references.md">References</a>
   </p>
 </div>
+<!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
+<!-- · -->
+<!-- <a href="./doc/help-page.txt">Usage</a> -->
