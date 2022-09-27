@@ -21,8 +21,8 @@
     Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Source</a>
     ·
     <a href="./src/concrete_syntax_picoc.lark/">Concrete Syntax</a>
-    ·
-    <a href="./doc/abstract_syntax.txt">Abstract Syntax</a>
+    <!-- · -->
+    <!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
     ·
     <a href="./doc/references.md">References</a>
   </p>
