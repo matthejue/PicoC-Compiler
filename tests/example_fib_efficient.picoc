@@ -3,6 +3,8 @@
 // datasegment:64
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
 
+int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 int fib_efficient(int n, int* res){
     if (n == 0)
         return 0;
@@ -16,6 +18,5 @@ int fib_efficient(int n, int* res){
 }
 
 void main() {
-  int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   print(fib_efficient(input(), ar));
 }
