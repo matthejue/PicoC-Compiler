@@ -1,10 +1,11 @@
 // in:0 5
 // expected:-2 314
-// from the Operating Systems Lecture by Christoph Scholl and https://de.wikipedia.org/wiki/Bubblesort
+// based on a function from the Operating Systems Lecture by Prof. Dr. Christoph Scholl and https://de.wikipedia.org/wiki/Bubblesort
 
 struct stt {int len; int *ar;};
 
 int ar[6] = {314, 42, 4, 42, -2, 5};
+
 struct stt st_ar = {.len=6, .ar=ar};
 
 int swap(int *x, int *y) {

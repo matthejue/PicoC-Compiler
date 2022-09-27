@@ -1,0 +1,17 @@
+// in:2 8
+// expected:256
+// datasegment:64
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+
+int power(int a, int n) {
+  if (n == 0) {
+    return 1;
+  } else {
+    return a * power(a, n - 1);
+  }
+}
+
+void main() {
+  print(power(input(), input()));
+}

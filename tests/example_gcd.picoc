@@ -1,0 +1,17 @@
+// in:12 9
+// expected:3
+// from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann
+
+int gcd(int a, int b) {
+  int c;
+  while (b != 0) {
+    c = a % b;
+    a = b;
+    b = c;
+  }
+  return a;
+}
+
+void main() {
+  print(gcd(input(), input()));
+}

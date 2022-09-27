@@ -1,0 +1,27 @@
+// in:10 5
+// expected:10 5 1 5 10
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+
+int b;
+int x;
+
+int ps(int *x_ps, int *y_ps) {
+  int h_ps;
+  int getauscht_ps;
+  getauscht_ps = 0;
+  if (*x_ps > *y_ps) {
+    h_ps = *x_ps; *x_ps = *y_ps;
+    *y_ps = h_ps; getauscht_ps = 1;
+  }
+  return getauscht_ps;
+}
+void main() {
+  int b_main; int res_main;
+  x = input(); b_main = input();
+  print(x);
+  print(b_main);
+  res_main = ps(&x, &b_main);
+  print(res_main);
+  print(x);
+  print(b_main);
+}

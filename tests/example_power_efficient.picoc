@@ -1,0 +1,18 @@
+// in:2 9
+// expected:512
+// datasegment:32
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+int power_efficient(int a, int n) {
+  if (n == 0) {
+    return 1;
+  } else if (n % 2 == 0) {
+    return power_efficient(a * a, n / 2);
+  } else {
+    return a * power_efficient(a * a, n / 2);
+  }
+}
+
+void main() {
+  print(power_efficient(input(), input()));
+}

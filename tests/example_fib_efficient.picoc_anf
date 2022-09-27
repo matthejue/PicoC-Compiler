@@ -7,10 +7,6 @@ File
     Block 
       Name 'fib_efficient.5', 
       [
-        // Exp(Alloc(Writeable(), IntType(), Name('n')))
-        // Exp(Alloc(Writeable(), PntrDecl(Num('1'), IntType()), Name('res')))
-        // If(Atom(Name('n'), Eq('=='), Num('0')), [])
-        // IfElse(Atom(Name('n'), Eq('=='), Num('0')), [], [])
         Exp(Stackframe(Num('0')))
         Exp(Num('0'))
         Exp(Atom(Stack(Num('2')), Eq('=='), Stack(Num('1')))), 
@@ -27,15 +23,12 @@ File
     Block 
       Name 'if.4', 
       [
-        // Return(Num('0'))
         Exp(Num('0'))
         Return(Stack(Num('1')))
       ], 
     Block 
       Name 'if_else_after.3', 
       [
-        // If(Atom(Name('n'), Eq('=='), Num('1')), [])
-        // IfElse(Atom(Name('n'), Eq('=='), Num('1')), [], [])
         Exp(Stackframe(Num('0')))
         Exp(Num('1'))
         Exp(Atom(Stack(Num('2')), Eq('=='), Stack(Num('1')))), 
@@ -52,27 +45,22 @@ File
     Block 
       Name 'if.2', 
       [
-        // Assign(Subscr(Name('res'), Num('0')), Num('0'))
         Exp(Num('0'))
         Ref(Stackframe(Num('1')))
         Exp(Num('0'))
         Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
         Assign(Stack(Num('1')), Stack(Num('2')))
-        // Assign(Subscr(Name('res'), Num('1')), Num('1'))
         Exp(Num('1'))
         Ref(Stackframe(Num('1')))
         Exp(Num('1'))
         Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
         Assign(Stack(Num('1')), Stack(Num('2')))
-        // Return(Num('1'))
         Exp(Num('1'))
         Return(Stack(Num('1')))
       ], 
     Block 
       Name 'if_else_after.1', 
       [
-        // Assign(Subscr(Name('res'), Name('n')), BinOp(Call(Name('fib_efficient'), [BinOp(Name('n'), Sub('-'), Num('1')), Name('res')]), Add('+'), Subscr(Name('res'), BinOp(Name('n'), Sub('-'), Num('2')))))
-        // Call(Name('fib_efficient'), [BinOp(Name('n'), Sub('-'), Num('1')), Name('res')])
         StackMalloc(Num('2'))
         Exp(Stackframe(Num('0')))
         Exp(Num('1'))
@@ -93,7 +81,6 @@ File
         Exp(Stackframe(Num('0')))
         Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
         Assign(Stack(Num('1')), Stack(Num('2')))
-        // Return(Subscr(Name('res'), Name('n')))
         Ref(Stackframe(Num('1')))
         Exp(Stackframe(Num('0')))
         Ref(Subscr(Stack(Num('2')), Stack(Num('1'))))
@@ -103,8 +90,6 @@ File
     Block 
       Name 'main.0', 
       [
-        // Assign(Alloc(Writeable(), ArrayDecl([Num('11')], IntType()), Name('ar')), Array([Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0')]))
-        // Assign(Name('ar'), Array([Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0')]))
         Exp(Num('0'))
         Exp(Num('0'))
         Exp(Num('0'))
@@ -117,8 +102,6 @@ File
         Exp(Num('0'))
         Exp(Num('0'))
         Assign(Global(Num('0')), Stack(Num('11')))
-        // Exp(Call(Name('print'), [Call(Name('fib_efficient'), [Call(Name('input'), []), Name('ar')])]))
-        // Call(Name('fib_efficient'), [Call(Name('input'), []), Name('ar')])
         StackMalloc(Num('2'))
         Exp(Call(Name('input'), []))
         Ref(Global(Num('0')))
