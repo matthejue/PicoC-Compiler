@@ -214,7 +214,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.res" -delete
 
 record:
-	asciinema rec -i 1 -t $(TESTNAME).cast --overwrite
+	asciinema rec -i 1 -t $(TESTNAME) --overwrite
 
 upload:
 	asciinema upload $(TESTNAME).cast
