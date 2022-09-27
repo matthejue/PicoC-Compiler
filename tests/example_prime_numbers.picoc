@@ -1,0 +1,41 @@
+// in:30
+// expected:2 3 5 7 11 13 17 19 23 29
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+int ar[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int len = 10;
+
+void primes(int *primes, int n) {
+  int i = 3;
+  int j;
+  int idx = 1;
+  char undividable = 1;
+  if (n <= 1)
+      return;
+  primes[0] = 2;
+
+  while (i <= n) {
+    j = 0;
+    while (j < idx) {
+      if (i % primes[j] == 0) {
+        undividable = 0;
+      }
+      j = j + 1;
+    }
+    if (undividable) {
+      primes[idx] = i;
+      idx = idx + 1;
+    }
+    undividable = 1;
+    i = i + 1;
+  }
+}
+
+void main() {
+  int i = 0;
+  primes(ar, input());
+  while (i < len) {
+    print(ar[i]);
+    i = i + 1;
+  }
+}

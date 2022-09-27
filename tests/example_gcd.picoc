@@ -1,6 +1,6 @@
-// in:12 9
-// expected:3
-// from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann
+// in:12 9 16 12
+// expected:3 4
+// from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann and was also needed in one exercise sheet in the Operating Systems Lecture by Prof. Dr. Scholl
 
 int gcd(int a, int b) {
   int c;
@@ -13,5 +13,6 @@ int gcd(int a, int b) {
 }
 
 void main() {
+  print(gcd(input(), input()));
   print(gcd(input(), input()));
 }

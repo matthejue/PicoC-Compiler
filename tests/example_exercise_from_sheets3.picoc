@@ -1,15 +1,16 @@
 // in:42 24 42 -24 -42 24 -42 -24
 // expected:0 0 1 1
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
 
 int is_less_equal_without_overflow(int x, int y) {
   if((x > 0) ^ (y > 0)) {
     return x <= y;
   } else {
     if (x > 0) {
-      // x >= 0 -> y < 0 implies x - -y <= 0 implies x <= -y
+      // x >= 0 and y < 0 implies x - -y <= 0 implies x <= -y
       return 0;
     } else {
-      // x < 0 -> y >= 0 implies -x - y <= implies -x <= y
+      // x < 0 and y >= 0 implies -x - y <= 0 implies -x <= y
       return 1;
     }
   }

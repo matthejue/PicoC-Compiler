@@ -307,48 +307,6 @@ class ErrorHandler:
             self._output_error(error_header + str(error_screen), e.__class__.__name__)
             exit(0)
         # ---------------------------------------------------------------------
-        except errors.TooLargeLiteral as e:
-            error_header = self._error_header(e.found_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.found_pos[0], e.found_pos[0]
-            )
-            error_screen.mark(e.found_pos, len(e.found))
-            node_header = self._error_header(
-                None,
-                f"{CM().MAGENTA}Note{CM().RESET_ALL}: The max size of a literal for a {e.found_symbol_type} is "
-                f"in range '{e.found_from}' to '{e.found_to}'",
-            )
-            error_screen.filter()
-            print("\n" + error_header + str(error_screen) + node_header)
-            exit(0)
-        except errors.NoMainFunction as e:
-            error_header = e.description + "\n"
-            print("\n" + error_header)
-            exit(0)
-        except errors.MoreThanOneMainFunction as e:
-            error_header = self._error_header(e.first_pos, e.description)
-            error_screen = AnnotationScreen(
-                self.split_code, e.first_pos[0], e.first_pos[0]
-            )
-            error_screen.mark(e.first_pos, 4)
-            note_header = self._error_header(
-                e.second_pos,
-                f"{CM().MAGENTA}Note{CM().RESET_ALL}: Second main function defined here:",
-            )
-            error_screen_2 = AnnotationScreen(
-                self.split_code, e.second_pos[0], e.second_pos[0]
-            )
-            error_screen_2.mark(e.second_pos, 4)
-            error_screen.filter()
-            error_screen_2.filter()
-            print(
-                "\n"
-                + error_header
-                + str(error_screen)
-                + note_header
-                + str(error_screen_2)
-            )
-            exit(0)
         except errors.BugInCompiler as e:
             self._error_heading()
             error_header = self._error_header(e.description)

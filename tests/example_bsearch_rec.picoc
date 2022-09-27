@@ -1,0 +1,28 @@
+// in:41 42
+// expected:-1 5
+// datasegment:64
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+struct ar_with_lent {int len; int *ar;};
+
+int ar[10] = {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024};
+
+struct ar_with_lent ar_with_len = {.len=10, .ar=ar};
+
+int bsearch_rec(int *ar, int key, int lo, int hi) {
+    int m;
+    if (lo == hi)
+        return -1;  // key not in empty segment
+    m = (lo + hi) / 2;  // position of root
+    if (ar[m] == key)
+        return m;
+    else if (ar[m] > key)
+        return bsearch_rec(ar, key, lo, m);
+    else  // ar[m] < key
+        return bsearch_rec(ar, key, m+1, hi);
+}
+
+void main() {
+  print(bsearch_rec(ar_with_len.ar, input(), 0, ar_with_len.len - 1));
+  print(bsearch_rec(ar_with_len.ar, input(), 0, ar_with_len.len - 1));
+}
