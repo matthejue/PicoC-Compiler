@@ -1,0 +1,22 @@
+// in:10
+// expected:55
+// datasegment:64
+
+int fib(int n) {
+  int res_f; int a; int b;
+  if (n==0)
+    res_f = 0;
+  else if (n==1)
+    res_f = 1;
+  else /* Fall: n > 1. */ {
+    a = fib(n-1); // Ruecksprungadresse 200
+    b = fib(n-2); // Ruecksprungadresse 300
+    res_f = a + b;
+  }
+  return res_f;
+}
+
+void main() {
+  print(fib(input()));
+}
+

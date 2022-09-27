@@ -1,0 +1,23 @@
+// in:42 24 42 -24 -42 24 -42 -24
+// expected:0 0 1 1
+
+int is_less_equal_without_overflow(int x, int y) {
+  if((x > 0) ^ (y > 0)) {
+    return x <= y;
+  } else {
+    if (x > 0) {
+      // x >= 0 -> y < 0 implies x - -y <= 0 implies x <= -y
+      return 0;
+    } else {
+      // x < 0 -> y >= 0 implies -x - y <= implies -x <= y
+      return 1;
+    }
+  }
+}
+
+void main() {
+  print(is_less_equal_without_overflow(input(), input()));
+  print(is_less_equal_without_overflow(input(), input()));
+  print(is_less_equal_without_overflow(input(), input()));
+  print(is_less_equal_without_overflow(input(), input()));
+}
