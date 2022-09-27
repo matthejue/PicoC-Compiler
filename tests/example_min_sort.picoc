@@ -1,0 +1,41 @@
+// in:
+// expected:-2 4 5 42 42 314
+// from the Algorithms and Datastructures Lecture by Prof. Dr. Bast
+
+struct stt {int len; int *ar;};
+
+void min_sort(int *ar, int len) {
+  int i = 0;
+  int j;
+  int minimum;
+  int minimum_index;
+  int tmp;
+  while (i < len) {
+    minimum = ar[i];
+    minimum_index = i;
+    j = i + 1;
+    while (j < len) {
+      if (ar[j] < minimum) {
+        minimum = ar[j];
+        minimum_index = j;
+      }
+      j = j + 1;
+    }
+    tmp = ar[i];
+    ar[i] = ar[minimum_index];
+    ar[minimum_index] = tmp;
+    i = i + 1;
+  }
+}
+
+void main() {
+  int len = 6;
+  int ar[6] = {314, 42, 4, 42, -2, 5};
+  min_sort(ar, len);
+  print(ar[0]);
+  print(ar[1]);
+  print(ar[2]);
+  print(ar[3]);
+  print(ar[4]);
+  print(ar[5]);
+}

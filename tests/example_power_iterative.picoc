@@ -1,0 +1,18 @@
+// in:2 11
+// expected:2048
+// datasegment:8
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+
+int power_iterative(int a, int n, int acc) {
+    while (n != 0) {
+        n = n - 1;
+        acc = acc * a;
+    }
+    return acc;
+}
+
+
+void main() {
+  print(power_iterative(input(), input(), 1));
+}

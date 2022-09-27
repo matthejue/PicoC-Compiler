@@ -1,0 +1,25 @@
+// in:10 5
+// expected:10 5 1 5 10
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+
+
+int pairsort(int *x, int *y) {
+  int h;
+  int getauscht = 0;
+  if (*x > *y) {
+    h = *x; *x = *y; *y = h; getauscht = 1;
+  }
+  return getauscht;
+}
+
+void main() {
+  int res;
+  int a = input();
+  int b = input();
+  print(a);
+  print(b);
+  res = pairsort(&a, &b);
+  print(res);
+  print(a);
+  print(b);
+}

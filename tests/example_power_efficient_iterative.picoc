@@ -1,0 +1,24 @@
+// in:2 10
+// expected:1024
+// datasegment:8
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+int fast_efficient_iterative(int a, int n, int acc) {
+  int tmp;
+  while (n != 0) {
+    if (n % 2 == 0) {
+      a = a * a;
+      n = n / 2;
+    } else {
+      tmp = a;
+      a = a * a;
+      n = n / 2;
+      acc = acc * tmp;
+    }
+  }
+  return acc;
+}
+
+void main() {
+  print(fast_efficient_iterative(input(), input(), 1));
+}

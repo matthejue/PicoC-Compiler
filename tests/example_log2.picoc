@@ -1,0 +1,16 @@
+// in:128
+// expected:7
+// from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann
+
+int log2(int a) {
+    int b = -1;
+    while (a > 0) {
+        b = b + 1;
+        a = a / 2;
+    }
+    return b;
+}
+
+void main() {
+  print(log2(input()));
+}
