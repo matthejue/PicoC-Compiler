@@ -425,8 +425,13 @@ class Passes:
             case (pn.IntType() | pn.CharType() | pn.PntrDecl()):
                 return 1
             # ---------------------------- L_Struct ---------------------------
-            case pn.StructSpec(pn.Name(val)):
-                symbol = self.symbol_table.resolve(val)
+            case pn.StructSpec(pn.Name(val, pos)):
+                struct_type_name = val
+                struct_type_pos = pos
+                try:
+                    symbol = self.symbol_table.resolve(struct_type_name)
+                except KeyError:
+                    raise errors.UnknownIdentifier(struct_type_name, struct_type_pos)
                 match symbol:
                     case st.Symbol(_, _, _, _, _, pn.Num(val)):
                         return int(val)
@@ -551,7 +556,7 @@ class Passes:
                     current_exp = arg
                     access_exp_list = []
 
-                    while not isinstance(exp, pn.Name):
+                    while not isinstance(current_exp, pn.Name):
                         match current_exp:
                             case (pn.Deref(exp) | pn.Subscr(exp) | pn.Attr(exp)):
                                 access_exp_list += [current_exp]
@@ -562,7 +567,9 @@ class Passes:
                     access_exp_list[:0] = [current_exp]
                     match current_exp:
                         case pn.Name(val1, pos1):
-                            symbol, _ = self._resolve_name(val1, pos1)
+                            var_name = val1
+                            var_pos = pos1
+                            symbol, _ = self._resolve_name(var_name, var_pos)
                             match symbol:
                                 case st.Symbol(_, datatype):
                                     current_dt = copy.deepcopy(datatype)
@@ -596,19 +603,35 @@ class Passes:
                                 else:
                                     current_dt = datatype
                             case (
-                                pn.Attr(exp, pn.Name(val2, _)),
-                                pn.StructSpec(pn.Name(val3, _)),
+                                pn.Attr(exp, pn.Name(val2, pos2)),
+                                pn.StructSpec(pn.Name(val3, pos3)),
                             ):
                                 current_exp = access_exp_list.pop()
 
                                 attr_name = val2
-                                #  attr_pos = pos2
+                                attr_pos = pos2
                                 struct_type_name = val3
-                                #  struct_type_pos = pos3
+                                struct_type_pos = pos3
 
-                                symbol = self.symbol_table.resolve(
-                                    f"{attr_name}@{struct_type_name}"
-                                )
+                                try:
+                                    symbol = self.symbol_table.resolve(
+                                        f"{attr_name}@{struct_type_name}"
+                                    )
+                                except KeyError:
+                                    symbol = self.symbol_table.resolve(struct_type_name)
+                                    match symbol:
+                                        case st.Symbol(_, _, pn.Name(_, pos1)):
+                                            struct_type_pos = pos1
+                                            raise errors.UnknownAttribute(
+                                                attr_name,
+                                                attr_pos,
+                                                struct_type_name,
+                                                struct_type_pos,
+                                                var_name,
+                                                var_pos,
+                                            )
+
+                                # TODO: UnknownAttribute
                                 match symbol:
                                     case st.Symbol(_, datatype):
                                         current_dt = datatype

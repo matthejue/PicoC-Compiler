@@ -1,0 +1,60 @@
+// in:7 4
+// expected:7 4 7 7 7 4 2 1 0 0
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+
+struct point {
+  int x;
+  int y;
+};
+
+struct point heap_space = {.x=0, .y=0};
+
+void main() {
+  // Annahme Symboltabelleneintrag st(p1) = (var, struct point*, 8)
+  struct point *p1;
+  // Annahme Symboltabelleneintrag st(p3) = (var, struct point*, 9)
+  struct point *p3;
+  // Annahme Symboltabelleneintrag st(a) = (var, int*, 10)
+  int* a;
+
+  //Annahme Symboltabelleneintrag:
+  //st(p2) = (struct, x -> (int,0), y -> (int,1), 15)
+  struct point p2;
+  a = &(p2.x);
+  p2.x = input();
+  p2.y = input();
+  print(*a);
+  print(*(a+1));
+
+  /*** MARKE 1 ***/
+
+  //Annahme: reserviert zusammenhaengenden Bereich auf dem Heap ab Adresse 33
+  // p1 = (struct point *) malloc(sizeof(struct point));
+  p1 = &heap_space;
+  (*p1).y = *a;
+  print(heap_space.y);
+  p3 = p1;
+  print((*p3).y);
+  p1 = &p2;
+  print((*p1).x);
+  print((*p1).y);
+
+  /*** MARKE 2 ***/
+
+  if((*p1).y > 5) {
+    print(1);
+    *a = 42;
+  } else {
+    print(2);
+    *a = 1;
+  }
+  print(p2.x);
+
+  /*** MARKE 3 ***/
+
+  // free(p3);
+  (*p3).x = 0;
+  (*p3).y = 0;
+  print(heap_space.x);
+  print(heap_space.y);
+}

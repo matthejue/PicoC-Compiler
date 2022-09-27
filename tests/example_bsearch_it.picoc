@@ -1,0 +1,31 @@
+// in:41 42
+// expected:-1 5
+// datasegment:32
+// from the Introduction to Programming Lecture by Peter Thiemann
+
+struct ar_with_lent {int len; int *ar;};
+
+int ar[10] = {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024};
+
+struct ar_with_lent ar_with_len = {.len=10, .ar=ar};
+
+int bsearch_it(struct ar_with_lent ar_with_len, int key) {
+    int lo = 0;
+    int hi = ar_with_len.len;
+    int m;
+    while (lo != hi) {
+        m = (lo + hi) / 2;
+        if (ar_with_len.ar[m] == key)
+            return m;
+        else if (ar_with_len.ar[m] > key)
+            hi = m;  // bsearch_rec(ar, key, lo, m)
+        else  // ar_with_len.ar[m] < key
+            lo = m+1;  // bsearch_rec(ar, key, m+1, hi)
+    }
+    return -1;
+}
+
+void main() {
+  print(bsearch_it(ar_with_len, input()));
+  print(bsearch_it(ar_with_len, input()));
+}
