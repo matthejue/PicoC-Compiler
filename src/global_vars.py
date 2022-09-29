@@ -21,6 +21,7 @@ class Args:
         self.run = True
         self.process_begin = 3
         self.datasegment_size = 32
+        self.show_mode = False
 
 
 # options from command-line arguments

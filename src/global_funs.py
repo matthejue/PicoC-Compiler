@@ -160,6 +160,14 @@ def remove_extension(fname):
     return fname[0:index_of_extension_start]
 
 
+def get_extension(fname):
+    # if there's no '.' rindex raises a exception, find returns -1
+    idx_of_extension_start = fname.rfind(".")
+    if idx_of_extension_start == -1:
+        return fname
+    return fname[idx_of_extension_start + 1 :]
+
+
 def _remove_path(fname):
     index_of_path_end = fname.rfind("/")
     if index_of_path_end == -1:
