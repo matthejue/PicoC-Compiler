@@ -1,0 +1,41 @@
+// ============================================================================
+// =                                   Lexer                                  =
+// ============================================================================
+// --------------------------------- L_Comment --------------------------------
+COMMENT: "# /[^\n]*/
+// ---------------------------------- L_REIT ----------------------------------
+DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+DIG_WITH_0: "0"|DIG_NO_0
+IM: "0"|DIG_NO_0 DIG_WITH_0*|"-"DIG_NO_0 DIG_WITH_0*
+ASCII_CHAR: " ".."~"
+FILENAME: ASCII_CHAR+".reti"
+LETTER: "a".."z"|"A".."Z"
+NAME: (LETTER|"_")(LETTER|DIG_WITH_0|"_")*
+ACC: "ACC"
+IN1: "IN1"
+IN2: "IN2"
+PC: "PC"
+SP: "SP"
+BAF: "BAF"
+CS: "CS"
+DS: "DS"
+reg: ACC | IN1 | IN2 | PC | SP | BAF | CS | DS
+arg: reg|IM
+LT: "<"
+LTE: "<="
+GT: ">"
+GTE: ">="
+EQ: "=="
+NEQ: "!="
+NOP: "_NOP"
+rel_op: LT|LTE|GT|GTE|EQ|NEQ|NOP
+// ============================================================================
+// =                                  Parser                                  =
+// ============================================================================
+// --------------------------------- L_Program --------------------------------
+instr: "ADD" reg arg|"ADDI" reg IM|"SUB" reg arg |"SUBI" reg IM|"MULT" reg arg|"MULTI" reg IM|"DIV" reg arg|"DIVI" reg IM|"MOD" reg arg|"MODI" reg IM|"OPLUS" reg arg|"OPLUSI" reg IM|"OR" reg arg|"ORI" reg IM|"AND" reg arg|"ANDI" reg IM|"LOAD" reg IM|"LOADIN" arg arg IM|"LOADI" reg IM|"STORE" reg IM|"STOREIN" arg arg IM|"MOVE" reg reg|"JUMP"rel IM|"INT" IM|"RTI"|"CALL" "INPUT" reg|"CALL" "PRINT" reg
+program: FILENAME (instr";")*
+
+%import common.WS
+%ignore WS
+%ignore COMMENT

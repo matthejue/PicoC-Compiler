@@ -12,7 +12,7 @@ from lark.lark import Lark
 from dt_visitor_picoc import DTVisitorPicoC, DTSimpleVisitorPicoC
 from ast_transformer_picoc import ASTTransformerPicoC
 from passes import Passes
-from global_funs import remove_extension, subheading, throw_error
+from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
 
 
@@ -35,9 +35,10 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
+    cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
 
-    HISTORY_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/history.json"
-    SETTINGS_FILE = os.path.expanduser("~") + "/.config/pico_c_compiler/settings.conf"
+    HISTORY_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/history.json"
+    SETTINGS_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/settings.conf"
     PERSISTENT_HISTORY_LENGTH = 100
 
     def __init__(self):
@@ -56,11 +57,14 @@ class OptionHandler(cmd2.Cmd):
             {
                 "cpl": "compile",
                 "mu": "most_used",
+                "itp": "interpret",
                 "ct": "color_toggle",
             }
         )
         cmd2.Cmd.__init__(
-            self, shortcuts=shortcuts, multiline_commands=["compile", "most_used"]
+            self,
+            shortcuts=shortcuts,
+            multiline_commands=["compile", "most_used", "interpret"],
         )
         del cmd2.Cmd.do_help
 
@@ -108,12 +112,12 @@ class OptionHandler(cmd2.Cmd):
 
         # prompts
         self.prompt = (
-            f"{CM().BRIGHT}{CM().GREEN}P{CM().CYAN}ico{CM().MAGENTA}C{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
+            f"{CM().BRIGHT}{CM().GREEN}P{CM().CYAN}ico{CM().MAGENTA}C{CM().WHITE}>{CM().RESET_ALL} "
             if global_vars.args.color
             else "PicoC> "
         )
         self.continuation_prompt = (
-            f"{CM().BRIGHT}{CM().WHITE}>{CM().RESET}{CM().RESET_ALL} "
+            f"{CM().BRIGHT}{CM().WHITE}>{CM().RESET_ALL} "
             if global_vars.args.color
             else "> "
         )
@@ -161,9 +165,27 @@ class OptionHandler(cmd2.Cmd):
         # printing is always turned on in shell
         global_vars.args.print = True
 
+        # TODO: "and Interpretation"
         self._compl("void main() {" + code + "}")
+        print(f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET_ALL}\n")
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_interpret(self, args):
+        # shell is only going to open, if there're no options from outside, so
+        # shell is anyways always starting with everything turned off in
+        # global_vars.args besides color being set from settings.conf before
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = args
+        # is important to give this attribute a filename as value again,
+        # because it's needed later
+        global_vars.args.infile = "stdin.reti"
+        global_vars.args.color = color
+
+        global_vars.args.print = True
+        self._interp(code)
         print(
-            f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+            f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
         )
 
     def do_help(self, _):
@@ -174,9 +196,14 @@ class OptionHandler(cmd2.Cmd):
         :returns: pico_c Code compiled in RETI Assembler
         """
         with open(global_vars.args.infile, encoding="utf-8") as fin:
-            pico_c_in = fin.read()
+            picoc_in = fin.read()
 
-        self._compl(pico_c_in)
+        extension = get_extension(global_vars.args.infile)
+        match extension:
+            case "picoc":
+                self._compl(picoc_in)
+            case "reti":
+                self._interp(picoc_in)
 
     def _compl(self, code):
         if global_vars.args.debug:
@@ -207,7 +234,7 @@ class OptionHandler(cmd2.Cmd):
         error_handler = ErrorHandler(code_with_file)
 
         if global_vars.args.intermediate_stages:
-            error_handler.handle(self._tokens_option, code_with_file, "Tokens")
+            error_handler.handle(self._tokens_option, code_with_file, "Tokens", "picoc")
 
         dt = error_handler.handle(parser.parse, code_with_file)
 
@@ -270,9 +297,60 @@ class OptionHandler(cmd2.Cmd):
             reti_interp = RETIInterpreter()
             error_handler.handle(reti_interp.interp_reti, reti)
 
-    def _tokens_option(self, code_with_file, heading):
+    def _interp(self, code):
+        if global_vars.args.debug:
+            __import__("pudb").set_trace()
+
+        # add the filename to the start of the code
+        code_with_file = (
+            ("./" if not global_vars.args.infile.startswith("./") else "")
+            + f"{global_vars.args.infile}\n"
+            + code
+        )
+
+        if global_vars.args.intermediate_stages and global_vars.args.print:
+            print(subheading("Code", self.terminal_width, "-"))
+            print(f"// {global_vars.args.infile}:\n" + code)
+
         parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
+            lexer="basic",
+            priority="normal",
+            parser="earley",
+            start="file",
+            maybe_placeholders=False,
+            propagate_positions=True,
+        )
+
+        # handle errors
+        error_handler = ErrorHandler(code_with_file)
+
+        if global_vars.args.intermediate_stages:
+            error_handler.handle(self._tokens_option, code_with_file, "Tokens", "reti")
+
+        dt = error_handler.handle(parser.parse, code_with_file)
+
+        #  dt_visitor_picoc = DTVisitorPicoC()
+        #  error_handler.handle(dt_visitor_picoc.visit, dt)
+
+        if global_vars.args.intermediate_stages:
+            self._dt_option(dt, "Derivation Tree")
+
+        #  dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
+        #  error_handler.handle(dt_simple_visitor_picoc.visit, dt)
+        #
+        #  if global_vars.args.intermediate_stages:
+        #      self._dt_option(dt, "Derivation Tree Simple")
+
+        #  ast_transformer_picoc = ASTTransformerPicoC()
+        #  ast = error_handler.handle(ast_transformer_picoc.transform, dt)
+        #
+        #  if global_vars.args.intermediate_stages:
+        #      self._ast_option(ast, "Abstract Syntax Tree")
+
+    def _tokens_option(self, code_with_file, heading, picoc_or_reti):
+        parser = Lark.open(
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_{picoc_or_reti}.lark",
             lexer="basic",
             priority="normal",
             parser="earley",
