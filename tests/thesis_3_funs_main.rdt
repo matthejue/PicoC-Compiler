@@ -1,0 +1,137 @@
+program
+  ./tests/thesis_3_funs_main.rdt
+  jump	20
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    42
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    42
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    42
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1

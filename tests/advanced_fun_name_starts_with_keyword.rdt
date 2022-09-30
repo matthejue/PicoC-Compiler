@@ -1,0 +1,104 @@
+program
+  ./tests/advanced_fun_name_starts_with_keyword.rdt
+  jump	8
+  call
+    INPUT
+    reg	ACC
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1
+  instr
+    SUBI
+    reg	SP
+    2
+  instr
+    MOVE
+    reg	BAF
+    reg	ACC
+  instr
+    ADDI
+    reg	SP
+    2
+  instr
+    MOVE
+    reg	SP
+    reg	BAF
+  instr
+    SUBI
+    reg	SP
+    2
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    0
+  instr
+    LOADI
+    reg	ACC
+    18
+  instr
+    ADD
+    reg	ACC
+    arg
+      reg	CS
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -1
+  jump	-16
+  instr
+    MOVE
+    reg	BAF
+    reg	IN1
+  instr
+    LOADIN
+    arg
+      reg	IN1
+    arg
+      reg	BAF
+    0
+  instr
+    MOVE
+    reg	IN1
+    reg	SP
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1

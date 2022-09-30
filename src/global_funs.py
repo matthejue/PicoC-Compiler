@@ -235,7 +235,7 @@ def wrap_text(text, terminal_width):
 
 def get_most_used_interpret_opts():
     with open(
-        f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_interpret_opts.txt",
+        f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
         "r",
         encoding="utf-8",
     ) as fin:

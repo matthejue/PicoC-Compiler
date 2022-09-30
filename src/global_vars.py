@@ -22,6 +22,7 @@ class Args:
         self.process_begin = 3
         self.datasegment_size = 32
         self.show_mode = False
+        self.pages = 5
 
 
 # options from command-line arguments

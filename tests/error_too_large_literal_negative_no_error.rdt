@@ -1,0 +1,73 @@
+program
+  ./tests/error_too_large_literal_negative_no_error.rdt
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    1023
+  instr
+    MULTI
+    reg	ACC
+    1048576
+  instr
+    MULTI
+    reg	ACC
+    2
+  instr
+    ORI
+    reg	ACC
+    2097151
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADI
+    reg	ACC
+    0
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	IN2
+    1
+  instr
+    SUB
+    reg	ACC
+    arg
+      reg	IN2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1
