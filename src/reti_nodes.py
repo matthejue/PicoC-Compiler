@@ -69,11 +69,8 @@ class Jump(ASTNode):
 
 
 class Int(ASTNode):
-    def __init__(self, num):
-        self.num = num
-
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}INT {self.num};"
+        return f"\n{' ' * depth}INT {self.val};"
 
     __match_args__ = ("num",)
 
@@ -96,23 +93,13 @@ class Call(ASTNode):
 # ------------------- Identifier, Immediate and Register ------------------
 class Name(ASTNode):
     # shorter then 'Identifier'
-    def __init__(self, val):
-        self.val = val
-
     def __repr__(self):
         return self.val
-
-    __match_args__ = ("val",)
 
 
 class Im(ASTNode):
-    def __init__(self, val):
-        self.val = val
-
     def __repr__(self):
         return self.val
-
-    __match_args__ = ("val",)
 
 
 class Reg(ASTNode):

@@ -1252,7 +1252,6 @@ class Passes:
                 return exps_anf + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1, pos1), local_var_or_param):
-                #  __import__("pudb").set_trace()
                 var_name = val1
                 var_pos = pos1
                 self._check_redecl_redef_error(var_name, var_pos)

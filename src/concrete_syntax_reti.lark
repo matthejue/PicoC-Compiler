@@ -2,8 +2,8 @@
 // =                                   Lexer                                  =
 // ============================================================================
 // --------------------------------- L_Comment --------------------------------
-COMMENT: "# /[^\n]*/
-// ---------------------------------- L_REIT ----------------------------------
+COMMENT: "#" /[^\n]*/
+// --------------------------------- L_Program --------------------------------
 DIG_NO_0: "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 DIG_WITH_0: "0"|DIG_NO_0
 IM: "0"|DIG_NO_0 DIG_WITH_0*|"-"DIG_NO_0 DIG_WITH_0*
@@ -28,13 +28,39 @@ GTE: ">="
 EQ: "=="
 NEQ: "!="
 NOP: "_NOP"
-rel_op: LT|LTE|GT|GTE|EQ|NEQ|NOP
+rel: LT|LTE|GT|GTE|EQ|NEQ|NOP
+ADD: "ADD"
+ADDI: "ADDI"
+SUB: "SUB"
+SUBI: "SUBI"
+MULT: "MULT"
+MULTI: "MULTI"
+DIV: "DIV"
+DIVI: "DIVI"
+MOD: "MOD"
+MODI: "MODI"
+OPLUS: "OPLUS"
+OPLUSI: "OPLUSI"
+OR: "OR"
+ORI: "ORI"
+AND: "AND"
+ANDI: "ANDI"
+LOAD: "LOAD"
+LOADIN: "LOADIN"
+LOADI: "LOADI"
+STORE: "STORE"
+STOREIN: "STOREIN"
+MOVE: "MOVE"
+INT: "INT"
+RTI: "RTI"
 // ============================================================================
 // =                                  Parser                                  =
 // ============================================================================
 // --------------------------------- L_Program --------------------------------
-instr: "ADD" reg arg|"ADDI" reg IM|"SUB" reg arg |"SUBI" reg IM|"MULT" reg arg|"MULTI" reg IM|"DIV" reg arg|"DIVI" reg IM|"MOD" reg arg|"MODI" reg IM|"OPLUS" reg arg|"OPLUSI" reg IM|"OR" reg arg|"ORI" reg IM|"AND" reg arg|"ANDI" reg IM|"LOAD" reg IM|"LOADIN" arg arg IM|"LOADI" reg IM|"STORE" reg IM|"STOREIN" arg arg IM|"MOVE" reg reg|"JUMP"rel IM|"INT" IM|"RTI"|"CALL" "INPUT" reg|"CALL" "PRINT" reg
-program: FILENAME (instr";")*
+instr: ADD reg arg|ADDI reg IM|SUB reg arg |SUBI reg IM|MULT reg arg|MULTI reg IM|DIV reg arg|DIVI reg IM|MOD reg arg|MODI reg IM|OPLUS reg arg|OPLUSI reg IM|OR reg arg|ORI reg IM|AND reg arg|ANDI reg IM|LOAD reg IM|LOADIN arg arg IM|LOADI reg IM|STORE reg IM|STOREIN arg arg IM|MOVE reg reg|INT IM|RTI
+jump: "JUMP" rel? IM
+call: "CALL" NAME reg
+program: FILENAME ((instr|jump|call)";")*
 
 %import common.WS
 %ignore WS
