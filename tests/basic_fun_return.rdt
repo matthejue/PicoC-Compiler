@@ -1,0 +1,409 @@
+program
+  ./tests/basic_fun_return.rdt
+  call
+    INPUT
+    reg	ACC
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	DS
+    arg
+      reg	ACC
+    0
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    SUBI
+    reg	SP
+    2
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	DS
+    arg
+      reg	ACC
+    0
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    MOVE
+    reg	BAF
+    reg	ACC
+  instr
+    ADDI
+    reg	SP
+    3
+  instr
+    MOVE
+    reg	SP
+    reg	BAF
+  instr
+    SUBI
+    reg	SP
+    5
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    0
+  instr
+    LOADI
+    reg	ACC
+    19
+  instr
+    ADD
+    reg	ACC
+    arg
+      reg	CS
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -1
+  jump	24
+  instr
+    MOVE
+    reg	BAF
+    reg	IN1
+  instr
+    LOADIN
+    arg
+      reg	IN1
+    arg
+      reg	BAF
+    0
+  instr
+    MOVE
+    reg	IN1
+    reg	SP
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	DS
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	DS
+    arg
+      reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    2
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	IN2
+    1
+  instr
+    ADD
+    reg	ACC
+    arg
+      reg	IN2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    2
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADI
+    reg	ACC
+    2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -3
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -3
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    2
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	IN2
+    1
+  instr
+    ADD
+    reg	ACC
+    arg
+      reg	IN2
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    2
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    STOREIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -4
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -4
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  call
+    PRINT
+    reg	ACC
+  instr
+    SUBI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	ACC
+    -4
+  instr
+    STOREIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    LOADIN
+    arg
+      reg	SP
+    arg
+      reg	ACC
+    1
+  instr
+    ADDI
+    reg	SP
+    1
+  instr
+    LOADIN
+    arg
+      reg	BAF
+    arg
+      reg	PC
+    -1

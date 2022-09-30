@@ -18,6 +18,7 @@ from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
+import subprocess
 
 
 class OptionHandler(cmd2.Cmd):
@@ -40,15 +41,17 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
+    cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/settings.conf"
     PERSISTENT_HISTORY_LENGTH = 100
 
     def __init__(self):
-        self.terminal_width = (
-            os.get_terminal_size().columns if sys.stdin.isatty() else 79
+        self.terminal_columns = (
+            os.get_terminal_size().columns if sys.stdin.isatty() else 72
         )
+        self.terminal_lines = os.get_terminal_size().lines if sys.stdin.isatty() else 24
         global_vars.args = self.cli_args_parser.parse_args()
         if not global_vars.args.infile:
             self._shell__init__()
@@ -221,7 +224,7 @@ class OptionHandler(cmd2.Cmd):
         )
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
-            print(subheading("Code", self.terminal_width, "-"))
+            print(subheading("Code", self.terminal_columns, "-"))
             print(f"// {global_vars.args.infile}:\n" + code)
 
         parser = Lark.open(
@@ -295,11 +298,17 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages or global_vars.args.print:
             self._output_pass(reti, "RETI")
 
+        if global_vars.args.show_mode:
+            global_vars.args.verbose = True
+
         if global_vars.args.run:
             if global_vars.args.print:
-                print(subheading("RETI Run", self.terminal_width, "-"))
+                print(subheading("RETI Run", self.terminal_columns, "-"))
             reti_interp = RETIInterpreter()
             error_handler.handle(reti_interp.interp_reti, reti)
+
+        if global_vars.args.show_mode and global_vars.args.run:
+            self._show_mode()
 
     def _interp(self, code):
         if global_vars.args.debug:
@@ -313,7 +322,7 @@ class OptionHandler(cmd2.Cmd):
         )
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
-            print(subheading("Code", self.terminal_width, "-"))
+            print(subheading("Code", self.terminal_columns, "-"))
             print(f"// {global_vars.args.infile}:\n" + code)
 
         parser = Lark.open(
@@ -330,7 +339,9 @@ class OptionHandler(cmd2.Cmd):
         error_handler = ErrorHandler(code_with_file)
 
         if global_vars.args.intermediate_stages:
-            error_handler.handle(self._tokens_option, code_with_file, "Tokens", "reti")
+            error_handler.handle(
+                self._tokens_option, code_with_file, "RETI Tokens", "reti"
+            )
 
         dt = error_handler.handle(parser.parse, code_with_file)
 
@@ -338,18 +349,25 @@ class OptionHandler(cmd2.Cmd):
         error_handler.handle(dt_visitor_reti.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            self._dt_option(dt, "Derivation Tree")
+            self._dt_option(dt, "RETI Derivation Tree")
 
         ast_transformer_reti = ASTTransformerRETI()
         ast = error_handler.handle(ast_transformer_reti.transform, dt)
 
         if global_vars.args.intermediate_stages:
-            self._ast_option(ast, "Abstract Syntax Tree")
+            self._ast_option(ast, "RETI Abstract Syntax Tree")
+
+        if global_vars.args.show_mode:
+            global_vars.args.verbose = True
+            global_vars.args.intermediate_stages = True
 
         if global_vars.args.print:
-            print(subheading("RETI Run", self.terminal_width, "-"))
+            print(subheading("RETI Run", self.terminal_columns, "-"))
         reti_interp = RETIInterpreter()
         error_handler.handle(reti_interp.interp_reti, ast)
+
+        if global_vars.args.show_mode:
+            self._show_mode()
 
     def _tokens_option(self, code_with_file, heading, picoc_or_reti):
         parser = Lark.open(
@@ -364,7 +382,7 @@ class OptionHandler(cmd2.Cmd):
         tokens = list(parser.lex(code_with_file))
 
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_width, "-"))
+            print(subheading(heading, self.terminal_columns, "-"))
             print(tokens)
 
         if global_vars.path:
@@ -378,7 +396,7 @@ class OptionHandler(cmd2.Cmd):
 
     def _dt_option(self, dt, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_width, "-"))
+            print(subheading(heading, self.terminal_columns, "-"))
             print(dt.pretty())
 
         if global_vars.path:
@@ -387,7 +405,7 @@ class OptionHandler(cmd2.Cmd):
 
     def _ast_option(self, ast: pn.File, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_width, "-"))
+            print(subheading(heading, self.terminal_columns, "-"))
             print(ast)
 
         if global_vars.path:
@@ -401,7 +419,7 @@ class OptionHandler(cmd2.Cmd):
 
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_width, "-"))
+            print(subheading(heading, self.terminal_columns, "-"))
             print(pass_ast)
 
         if global_vars.path:
@@ -417,7 +435,7 @@ class OptionHandler(cmd2.Cmd):
 
     def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_width, "-"))
+            print(subheading(heading, self.terminal_columns, "-"))
             print(symbol_table)
 
         if global_vars.path:
@@ -427,3 +445,33 @@ class OptionHandler(cmd2.Cmd):
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(symbol_table))
+
+    def _show_mode(self):
+        #  __import__("pudb").set_trace()
+        first = True
+        command = [
+            "nvim",
+            f"{remove_extension(global_vars.args.infile)}.reti_states",
+            "-u",
+            os.path.expanduser("~") + "/.config/picoc_compiler/interpr_showcase.vim",
+        ]
+        for i in reversed(range(1, global_vars.args.pages)):
+            current_line_num = self.terminal_lines * i + 1 - i
+            if first:
+                command += [
+                    "-c",
+                    f"{current_line_num} | norm zt",
+                ]
+                first = False
+            else:
+                command += [
+                    "-c",
+                    f"vs | {current_line_num} | norm zt",
+                ]
+        command += [
+            "-c",
+            "vs | 0 | norm zt",
+        ]
+        command += ["-c", "windo se scb!"]
+        command += ["-c", "wincmd h" + ("| wincmd h" * (global_vars.args.pages - 2))]
+        subprocess.call(command)
