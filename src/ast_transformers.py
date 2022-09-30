@@ -1,12 +1,13 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
+import reti_nodes as rn
 from global_classes import Pos
 from global_funs import throw_error, remove_extension, nodes_to_str
 import errors
 
 
-class ASTTransformerPicoC(Transformer):
+class TransformerPicoC(Transformer):
     # =========================================================================
     # =                                 Lexer                                 =
     # =========================================================================
@@ -26,12 +27,12 @@ class ASTTransformerPicoC(Transformer):
     def FILENAME(self, token: Token):
         return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
-    def name(self, token_list):
-        token = token_list[0]
+    def name(self, tokens):
+        token = tokens[0]
         return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
 
-    def un_op(self, token_list: list[Token]):
-        token = token_list[0]
+    def un_op(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "-":
                 return pn.Minus(
@@ -59,8 +60,8 @@ class ASTTransformerPicoC(Transformer):
                     Pos(token.line - 1, token.column - 1),
                 )
 
-    def prec1_op(self, token_list: list[Token]):
-        token = token_list[0]
+    def prec1_op(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "*":
                 return pn.Mul(
@@ -78,8 +79,8 @@ class ASTTransformerPicoC(Transformer):
                     Pos(token.line - 1, token.column - 1),
                 )
 
-    def prec2_op(self, token_list: list[Token]):
-        token = token_list[0]
+    def prec2_op(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "+":
                 return pn.Add(
@@ -93,8 +94,8 @@ class ASTTransformerPicoC(Transformer):
                 )
 
     # --------------------------------- L_Logic -------------------------------
-    def rel_op(self, token_list: list[Token]):
-        token = token_list[0]
+    def rel_op(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "<":
                 return pn.Lt(
@@ -117,8 +118,8 @@ class ASTTransformerPicoC(Transformer):
                     Pos(token.line - 1, token.column - 1),
                 )
 
-    def eq_op(self, token_list: list[Token]):
-        token = token_list[0]
+    def eq_op(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "==":
                 return pn.Eq(
@@ -132,8 +133,8 @@ class ASTTransformerPicoC(Transformer):
                 )
 
     # ----------------------------- L_Assign_Alloc ----------------------------
-    def prim_dt(self, token_list):
-        token = token_list[0]
+    def prim_dt(self, tokens: list[Token]):
+        token = tokens[0]
         match token.value:
             case "int":
                 return pn.IntType(
@@ -473,3 +474,212 @@ class ASTTransformerPicoC(Transformer):
     def file(self, nodes):
         nodes[0].val = remove_extension(nodes[0].val) + ".ast"
         return pn.File(nodes[0], nodes[1])
+
+
+class ASTTransformerRETI(Transformer):
+    # =========================================================================
+    # =                                 Lexer                                 =
+    # =========================================================================
+    # ------------------------------- L_Program -------------------------------
+    def IM(self, token: Token):
+        return rn.Im(token.value, Pos(token.line - 1, token.column - 1))
+
+    def FILENAME(self, token: Token):
+        return rn.Name(token.value, Pos(token.line - 1, token.column - 1))
+
+    def NAME(self, token: Token):
+        return rn.Name(token.value, Pos(token.line - 1, token.column - 1))
+
+    def reg(self, tokens: list[Token]):
+        token = tokens[0]
+        match token.value:
+            case "ACC":
+                return rn.Reg(
+                    rn.Acc(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "IN1":
+                return rn.Reg(
+                    rn.In1(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "IN2":
+                return rn.Reg(
+                    rn.In2(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "PC":
+                return rn.Reg(
+                    rn.Pc(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "SP":
+                return rn.Reg(
+                    rn.Sp(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "BAF":
+                return rn.Reg(
+                    rn.Baf(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "CS":
+                return rn.Reg(
+                    rn.Cs(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+            case "DS":
+                return rn.Reg(
+                    rn.Ds(
+                        token.value,
+                        Pos(token.line - 1, token.column - 1),
+                    )
+                )
+
+    def arg(self, nodes_tokens):
+        return nodes_tokens[0]
+
+    def rel(self, tokens: list[Token]):
+        token = tokens[0]
+        match token.value:
+            case "<":
+                return rn.Lt(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case "<=":
+                return rn.LtE(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case ">":
+                return rn.Gt(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case ">=":
+                return rn.GtE(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case "==":
+                return rn.Eq(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case "!=":
+                return rn.NEq(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+            case "_NOP":
+                return rn.NOp(
+                    token.value,
+                    Pos(token.line - 1, token.column - 1),
+                )
+
+    def ADD(self, token: Token):
+        return rn.Add(token.value, Pos(token.line - 1, token.column - 1))
+
+    def ADDI(self, token: Token):
+        return rn.Addi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def SUB(self, token: Token):
+        return rn.Sub(token.value, Pos(token.line - 1, token.column - 1))
+
+    def SUBI(self, token: Token):
+        return rn.Subi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def MULT(self, token: Token):
+        return rn.Mult(token.value, Pos(token.line - 1, token.column - 1))
+
+    def MULTI(self, token: Token):
+        return rn.Multi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def DIV(self, token: Token):
+        return rn.Div(token.value, Pos(token.line - 1, token.column - 1))
+
+    def DIVI(self, token: Token):
+        return rn.Divi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def MOD(self, token: Token):
+        return rn.Mod(token.value, Pos(token.line - 1, token.column - 1))
+
+    def MODI(self, token: Token):
+        return rn.Modi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def OPLUS(self, token: Token):
+        return rn.Oplus(token.value, Pos(token.line - 1, token.column - 1))
+
+    def OPLUSI(self, token: Token):
+        return rn.Oplusi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def OR(self, token: Token):
+        return rn.Or(token.value, Pos(token.line - 1, token.column - 1))
+
+    def ORI(self, token: Token):
+        return rn.Ori(token.value, Pos(token.line - 1, token.column - 1))
+
+    def AND(self, token: Token):
+        return rn.And(token.value, Pos(token.line - 1, token.column - 1))
+
+    def ANDI(self, token: Token):
+        return rn.Andi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def LOAD(self, token: Token):
+        return rn.Load(token.value, Pos(token.line - 1, token.column - 1))
+
+    def LOADIN(self, token: Token):
+        return rn.Loadin(token.value, Pos(token.line - 1, token.column - 1))
+
+    def LOADI(self, token: Token):
+        return rn.Loadi(token.value, Pos(token.line - 1, token.column - 1))
+
+    def STORE(self, token: Token):
+        return rn.Store(token.value, Pos(token.line - 1, token.column - 1))
+
+    def STOREIN(self, token: Token):
+        return rn.Storein(token.value, Pos(token.line - 1, token.column - 1))
+
+    def MOVE(self, token: Token):
+        return rn.Move(token.value, Pos(token.line - 1, token.column - 1))
+
+    def INT(self, token: Token):
+        return rn.Int(token.value, Pos(token.line - 1, token.column - 1))
+
+    def RTI(self, token: Token):
+        return rn.Rti(token.value, Pos(token.line - 1, token.column - 1))
+
+    # =========================================================================
+    # =                                 Parser                                =
+    # =========================================================================
+    # ------------------------------- L_Program -------------------------------
+    def instr(self, nodes):
+        return rn.Instr(nodes[0], nodes[1:])
+
+    def jump(self, nodes):
+        if len(nodes) == 1:
+            return rn.Jump(rn.Always(), nodes[0])
+        else:  # len(nodes) == 2:
+            return rn.Jump(nodes[0], nodes[1])
+
+    def call(self, nodes):
+        return rn.Call(nodes[0], nodes[1])
+
+    def program(self, nodes):
+        nodes[0].val = remove_extension(nodes[0].val) + ".rast"
+        return rn.Program(nodes[0], nodes[1:])

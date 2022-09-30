@@ -16,6 +16,18 @@ class DTVisitorPicoC(Visitor):
         )
 
 
+class DTVisitorRETI(Visitor):
+    def program(self, tree: Tree):
+        tree.children[0] = Token(
+            tree.children[0].type,
+            remove_extension(tree.children[0].value) + ".rdt",
+            tree.children[0].line,
+            tree.children[0].column,
+            tree.children[0].end_line,
+            tree.children[0].end_column,
+        )
+
+
 class DTSimpleVisitorPicoC(Visitor):
     def _return_deepest_tree(self, tree: Tree):
         # array_decl made all continuation nodes to the right

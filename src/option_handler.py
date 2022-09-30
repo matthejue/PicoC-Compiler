@@ -9,8 +9,12 @@ import os
 import sys
 from help_message import generate_help_message
 from lark.lark import Lark
-from dt_visitor_picoc import DTVisitorPicoC, DTSimpleVisitorPicoC
-from ast_transformer_picoc import ASTTransformerPicoC
+from dt_visitors import (
+    DTVisitorPicoC,
+    DTSimpleVisitorPicoC,
+    DTVisitorRETI,
+)
+from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
@@ -250,7 +254,7 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "Derivation Tree Simple")
 
-        ast_transformer_picoc = ASTTransformerPicoC()
+        ast_transformer_picoc = TransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
         if global_vars.args.intermediate_stages:
@@ -317,7 +321,7 @@ class OptionHandler(cmd2.Cmd):
             lexer="basic",
             priority="normal",
             parser="earley",
-            start="file",
+            start="program",
             maybe_placeholders=False,
             propagate_positions=True,
         )
@@ -330,23 +334,22 @@ class OptionHandler(cmd2.Cmd):
 
         dt = error_handler.handle(parser.parse, code_with_file)
 
-        #  dt_visitor_picoc = DTVisitorPicoC()
-        #  error_handler.handle(dt_visitor_picoc.visit, dt)
+        dt_visitor_reti = DTVisitorRETI()
+        error_handler.handle(dt_visitor_reti.visit, dt)
 
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "Derivation Tree")
 
-        #  dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
-        #  error_handler.handle(dt_simple_visitor_picoc.visit, dt)
-        #
-        #  if global_vars.args.intermediate_stages:
-        #      self._dt_option(dt, "Derivation Tree Simple")
+        ast_transformer_reti = ASTTransformerRETI()
+        ast = error_handler.handle(ast_transformer_reti.transform, dt)
 
-        #  ast_transformer_picoc = ASTTransformerPicoC()
-        #  ast = error_handler.handle(ast_transformer_picoc.transform, dt)
-        #
-        #  if global_vars.args.intermediate_stages:
-        #      self._ast_option(ast, "Abstract Syntax Tree")
+        if global_vars.args.intermediate_stages:
+            self._ast_option(ast, "Abstract Syntax Tree")
+
+        if global_vars.args.print:
+            print(subheading("RETI Run", self.terminal_width, "-"))
+        reti_interp = RETIInterpreter()
+        error_handler.handle(reti_interp.interp_reti, ast)
 
     def _tokens_option(self, code_with_file, heading, picoc_or_reti):
         parser = Lark.open(
@@ -354,7 +357,7 @@ class OptionHandler(cmd2.Cmd):
             lexer="basic",
             priority="normal",
             parser="earley",
-            start="file",
+            start="file" if picoc_or_reti == "picoc" else "program",
             maybe_placeholders=False,
             propagate_positions=True,
         )
@@ -366,7 +369,8 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.path:
             with open(
-                remove_extension(tokens[0].value) + ".tokens",
+                remove_extension(tokens[0].value)
+                + f".{'r' if picoc_or_reti == 'reti' else ''}tokens",
                 "w",
                 encoding="utf-8",
             ) as fout:
@@ -389,6 +393,9 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.path:
             match ast:
                 case pn.File(pn.Name(val)):
+                    with open(val, "w", encoding="utf-8") as fout:
+                        fout.write(str(ast))
+                case rn.Program(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
 
