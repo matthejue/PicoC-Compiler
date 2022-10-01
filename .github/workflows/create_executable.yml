@@ -27,7 +27,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install python-tk
           python -m pip install -U -r requirements.txt
 
       - name: Run Pyinstaller
