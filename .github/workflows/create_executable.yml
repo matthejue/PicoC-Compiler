@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install python-tk
-          python -m pip install -U -r /requirements.txt
+          python -m pip install -U -r requirements.txt
 
       - name: Run Pyinstaller
         run: pyinstaller src/main.spec
