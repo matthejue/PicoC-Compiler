@@ -1,0 +1,45 @@
+# resources: https://github.com/qutebrowser/qutebrowser/blob/master/.github/workflows/nightly.yml
+# https://github.com/JackMcKew/pyinstaller-action-windows,
+# https://github.com/Nuitka/Nuitka-Action
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+
+name: Package Application with Pyinstaller
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Master Branch
+        uses: actions/checkout@v3
+        with:
+          ref: "master"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          architecture: "x64"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U -r requirements.txt
+
+      - name: Run Pyinstaller
+        run: pyinstaller src/main.spec
+
+      # - name: Tar files
+      #   run: tar -cvf picoc_compiler.tar dist/picoc_compiler
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PicoC-Compiler-Linux
+          path: dist/picoc_compiler
