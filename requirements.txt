@@ -1,3 +1,4 @@
+pyinstaller
 bitstring
 cmd2
 colorama
