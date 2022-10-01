@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PicoC-Compiler
-          path: src/dist/picoc_compiler.tar
+          path: dist/picoc_compiler.tar
