@@ -187,9 +187,12 @@ _clean-pycache:
 
 _clean-files:
 	find . -type f -wholename "./tests/*.tokens" -delete
+	find . -type f -wholename "./tests/*.rtokens" -delete
 	find . -type f -wholename "./tests/*.dt" -delete
+	find . -type f -wholename "./tests/*.rdt" -delete
 	find . -type f -wholename "./tests/*.dt_simple" -delete
 	find . -type f -wholename "./tests/*.ast" -delete
+	find . -type f -wholename "./tests/*.rast" -delete
 	find . -type f -wholename "./tests/*.st_mon" -delete
 	find . -type f -wholename "./tests/*.st" -delete
 	find . -type f -wholename "./tests/*.picoc_shrink" -delete

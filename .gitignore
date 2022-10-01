@@ -7,9 +7,12 @@ build/
 pico_c_compiler.spec
 README.txt
 *.tokens
+*.rtokens
 *.dt
+*.rdt
 *.dt_simple
 *.ast
+*.rast
 *.st_mon
 *.st
 *.picoc_shrink

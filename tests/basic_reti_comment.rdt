@@ -1,5 +1,6 @@
 program
   ./tests/basic_reti_comment.rdt
+  ## begin
   call
     INPUT
     reg	ACC
@@ -32,6 +33,8 @@ program
     ADDI
     reg	SP
     1
+  ## this should be visible
+  ## this should be visible
   instr
     SUBI
     reg	SP
@@ -64,6 +67,7 @@ program
   call
     PRINT
     reg	ACC
+  ## end
   instr
     LOADIN
     arg

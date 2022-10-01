@@ -506,13 +506,13 @@ class File(ASTNode):
         self.decls_defs_blocks = decls_defs_blocks
         super().__init__(visible=[self.name, self.decls_defs_blocks])
 
-    __match_args__ = ("name", "decls_defs_blocks")
-
     def __repr__(self, depth=0):
         if global_vars.args.double_verbose:
             return super().__repr__(depth)
         else:
             return repr_single_line(self, depth)
+
+    __match_args__ = ("name", "decls_defs_blocks")
 
 
 # -------------------------------- L_Block --------------------------------
@@ -570,7 +570,7 @@ class SingleLineComment:
 
 class RETIComment(ASTNode):
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}# {self.val}"
+        return f"\n{' ' * depth}## {self.val}"
 
 
 # ------------------------------- L_Placeholder -------------------------------
