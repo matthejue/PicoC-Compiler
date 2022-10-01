@@ -32,11 +32,11 @@ jobs:
       - name: Run Pyinstaller
         run: pyinstaller src/main.spec
 
-      - name: Tar files
-        run: tar -cvf picoc_compiler.tar dist/picoc_compiler
+      # - name: Tar files
+      #   run: tar -cvf picoc_compiler.tar dist/picoc_compiler
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: PicoC-Compiler
-          path: picoc_compiler.tar
+          path: dist/picoc_compiler
