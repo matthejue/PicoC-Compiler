@@ -709,6 +709,7 @@ program
     ADDI
     reg	SP
     1
+  ## condition
   instr
     SUBI
     reg	SP
@@ -801,6 +802,7 @@ program
   jump
     rel	==
     50
+  ## assignment
   instr
     SUBI
     reg	SP
@@ -982,6 +984,7 @@ program
     arg
       reg	ACC
     0
+  ## increase
   instr
     SUBI
     reg	SP

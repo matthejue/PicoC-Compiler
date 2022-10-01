@@ -42,6 +42,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
     cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
+    cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/settings.conf"
@@ -295,11 +296,11 @@ class OptionHandler(cmd2.Cmd):
 
         reti = error_handler.handle(passes.reti, reti_patch)
 
-        if global_vars.args.intermediate_stages or global_vars.args.print:
-            self._output_pass(reti, "RETI")
+        self._output_pass(reti, "RETI")
 
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
+            global_vars.args.intermediate_stages = True
 
         if global_vars.args.run:
             if global_vars.args.print:
@@ -363,8 +364,14 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
+
         reti_interp = RETIInterpreter()
-        error_handler.handle(reti_interp.interp_reti, ast)
+        # possiblity to supress error
+        try:
+            error_handler.handle(reti_interp.interp_reti, ast)
+        except Exception as e:
+            if not global_vars.args.supress_errors:
+                raise e
 
         if global_vars.args.show_mode:
             self._show_mode()
@@ -413,9 +420,11 @@ class OptionHandler(cmd2.Cmd):
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
-                case rn.Program(pn.Name(val)):
+                case rn.Program(rn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(ast))
+                case _:
+                    throw_error(ast)
 
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
@@ -447,11 +456,10 @@ class OptionHandler(cmd2.Cmd):
                 fout.write(str(symbol_table))
 
     def _show_mode(self):
-        #  __import__("pudb").set_trace()
         first = True
         command = [
             "nvim",
-            f"{remove_extension(global_vars.args.infile)}.reti_states",
+            f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
             "-u",
             os.path.expanduser("~") + "/.config/picoc_compiler/interpr_showcase.vim",
         ]
@@ -474,4 +482,14 @@ class OptionHandler(cmd2.Cmd):
         ]
         command += ["-c", "windo se scb!"]
         command += ["-c", "wincmd h" + ("| wincmd h" * (global_vars.args.pages - 2))]
+
+        if global_vars.args.pages == 1:
+            command = [
+                "nvim",
+                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
+                "-u",
+                "~/.config/picoc_compiler/interpr_showcase.vim",
+                "-c",
+                "0 | norm zt",
+            ]
         subprocess.call(command)

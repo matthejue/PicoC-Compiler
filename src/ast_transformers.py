@@ -481,6 +481,12 @@ class ASTTransformerRETI(Transformer):
     # =                                 Lexer                                 =
     # =========================================================================
     # ------------------------------- L_Program -------------------------------
+    def RETI_COMMENT(self, token: Token):
+        return pn.RETIComment(
+            token.value[2:].lstrip(),
+            Pos(token.line - 1, token.column - 1),
+        )
+
     def IM(self, token: Token):
         return rn.Im(token.value, Pos(token.line - 1, token.column - 1))
 

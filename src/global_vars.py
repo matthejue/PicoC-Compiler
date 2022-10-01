@@ -23,6 +23,7 @@ class Args:
         self.datasegment_size = 32
         self.show_mode = False
         self.pages = 5
+        self.extension = "reti_states"
 
 
 # options from command-line arguments

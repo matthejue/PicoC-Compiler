@@ -1,6 +1,7 @@
 program
   ./tests/exclude_access_dervived_datatype.rdt
   jump	79
+  ## struct
   instr
     SUBI
     reg	SP
@@ -200,6 +201,7 @@ program
     arg
       reg	PC
     -1
+  ## pntr
   instr
     SUBI
     reg	SP
@@ -424,6 +426,7 @@ program
     arg
       reg	PC
     -1
+  ## array
   instr
     SUBI
     reg	SP

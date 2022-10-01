@@ -261,8 +261,7 @@ class RETIInterpreter:
             #      # delete PC from stack
             #      reti.reg_set("SP", c_uint32(reti.reg_get("SP")).value + 1)
             case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
-                if global_vars.args.print:
-                    print("Output:\n\t" + str(c_int32(reti.reg_get(str(reg))).value))
+                print("Output:\n\t" + str(c_int32(reti.reg_get(str(reg))).value))
                 if global_vars.path:
                     if self.first_out:
                         with open(
