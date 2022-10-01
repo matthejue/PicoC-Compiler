@@ -3,7 +3,7 @@
 # https://github.com/Nuitka/Nuitka-Action
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 
-name: Package Application with Pyinstaller
+name: Package Application Linux
 
 on:
   push:
