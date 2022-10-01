@@ -39,7 +39,7 @@ jobs:
       # Build python script into a stand-alone exe
       - uses: jimkring/python-script-to-exe@v0.2.0
         with:
-          script-name: test.py
+          script-name: ./src/main.py
           onefile: true
           # access-token: ${{ secrets.NUITKA_COMMERCIAL_ACCESS_TOKEN }}
           # macos-create-app-bundle: ${{ runner.os == 'macOS' }}
