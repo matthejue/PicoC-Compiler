@@ -14,9 +14,9 @@
     <img height="20px" src="http://ForTheBadge.com/images/badges/made-with-python.svg">
     <br />
     <br />
-    Koloquium Presentation <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation">Source</a>
+    <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">Koloquium Presentation</a>
     ·
-    Bachelor Thesis <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">PDF</a> <a href="https://github.com/matthejue/Bachelorarbeit">Source</a>
+    <a href="https://github.com/matthejue/Bachelorarbeit_out/blob/main/Main.pdf">Bachelor Thesis</a>
     <br />
     <a href="./doc/getting_started.md">Getting Started</a>
     ·
