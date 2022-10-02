@@ -5,9 +5,7 @@ import symbol_table as st
 import picoc_nodes as pn
 import reti_nodes as rn
 from colormanager import ColorManager as CM
-import os
 import sys
-from help_message import _open_documentation
 from lark.lark import Lark
 from dt_visitors import (
     DTVisitorPicoC,
@@ -18,7 +16,7 @@ from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
-import subprocess
+import subprocess, os, platform
 
 
 class OptionHandler(cmd2.Cmd):
@@ -493,3 +491,16 @@ class OptionHandler(cmd2.Cmd):
                 "0 | norm zt",
             ]
         subprocess.call(command)
+
+
+def _open_documentation():
+    filepath = "./Dokumentation.pdf"
+
+    #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7
+    # https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(("open", filepath))
+    elif platform.system() == "Windows":  # Windows
+        os.startfile(filepath)
+    else:  # linux variants
+        subprocess.call(("xdg-open", filepath))
