@@ -8,6 +8,9 @@
 name: Package Application
 
 on:
+  workflow_dispatch:
+    tags:
+      - "*"
   # push:
   #   branches: [ master ]
   #   tags:
@@ -16,9 +19,6 @@ on:
   #   branches: [ master ]
   #   tags:
   #     - "*"
-  workflow_dispatch:
-    tags:
-      - "*"
 
 jobs:
   build:
