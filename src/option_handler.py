@@ -494,7 +494,7 @@ class OptionHandler(cmd2.Cmd):
 
 
 def _open_documentation():
-    filepath = "./Dokumentation.pdf"
+    filepath = "Dokumentation.pdf"
 
     #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7
     # https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
