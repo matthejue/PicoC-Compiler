@@ -43,7 +43,8 @@ jobs:
           ref: "master"
 
       - name: Get Documentation
-        run: cd src
+        run: |
+          cd src
           git clone https://github.com/matthejue/Bachelorarbeit_Dokumentation_out --depth=1
 
       - name: Set up Python
@@ -60,7 +61,8 @@ jobs:
         run: pyinstaller src/main.spec
 
       - name: Tar files
-        run: cd dist
+        run: |
+          cd dist
           tar -zcvf picoc_compiler.tar.gz picoc_compiler
 
       # - name: Upload Artifact
