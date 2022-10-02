@@ -187,10 +187,6 @@ def only_keep_path(fname):
     return fname[: index_of_path_end + 1]
 
 
-def subheading(heading, terminal_width, symbol):
-    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
-
-
 def filter_out_comments(instrs):
     if not (global_vars.args.verbose or global_vars.args.double_verbose):
         return instrs
@@ -200,25 +196,17 @@ def filter_out_comments(instrs):
     )
 
 
-def strip_multiline_string(multiline_str):
-    """helper function to make mutlineline string usable on different
-    indent levels
-
-    :grammar: grammar specification
-    :returns: None
-    """
-    multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
-    # every code piece ends with \n, so the last element can always be poped
-    return multiline_str
+def subheading(heading, terminal_width, symbol):
+    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
 
 
-def heading(heading, terminal_width, symbol):
-    return f"""{symbol * terminal_width}
-    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
-    (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
-    ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
-    {symbol * terminal_width}
-    """
+#  def heading(heading, terminal_width, symbol):
+#      return f"""{symbol * terminal_width}
+#      {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
+#      (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
+#      ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
+#      {symbol * terminal_width}
+#      """
 
 
 def wrap_text(text, terminal_width):
@@ -233,11 +221,23 @@ def wrap_text(text, terminal_width):
     return "\n".join(lines)
 
 
-def get_most_used_interpret_opts():
-    with open(
-        f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
-        "r",
-        encoding="utf-8",
-    ) as fin:
-        most_used_opts = fin.read()
-    return most_used_opts
+#  def strip_multiline_string(multiline_str):
+#      """helper function to make mutlineline string usable on different
+#      indent levels
+#
+#      :grammar: grammar specification
+#      :returns: None
+#      """
+#      multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
+#      # every code piece ends with \n, so the last element can always be poped
+#      return multiline_str
+
+
+#  def get_most_used_interpret_opts():
+#      with open(
+#          f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
+#          "r",
+#          encoding="utf-8",
+#      ) as fin:
+#          most_used_opts = fin.read()
+#      return most_used_opts

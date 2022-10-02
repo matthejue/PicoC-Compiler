@@ -7,7 +7,7 @@ import reti_nodes as rn
 from colormanager import ColorManager as CM
 import os
 import sys
-from help_message import generate_help_message
+from help_message import _open_documentation
 from lark.lark import Lark
 from dt_visitors import (
     DTVisitorPicoC,
@@ -197,7 +197,7 @@ class OptionHandler(cmd2.Cmd):
         )
 
     def do_help(self, _):
-        print(generate_help_message())
+        _open_documentation()
 
     def read_and_write_file(self):
         """reads a pico_c file and compiles it
