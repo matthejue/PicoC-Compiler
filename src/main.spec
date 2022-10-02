@@ -9,7 +9,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[("concrete_syntax_picoc.lark", "."),
-           ("concrete_syntax_reti.lark", ".")
+           ("concrete_syntax_reti.lark", "."),
            ("Bachelorarbeit_Dokumentation_out/Dokumentation.pdf", ".")
     ],
     hiddenimports=[],
