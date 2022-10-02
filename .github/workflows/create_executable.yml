@@ -44,7 +44,7 @@ jobs:
 
       - name: Get Documentation
         run: cd src
-          git clone https://github.com/matthejue/Bachelorarbeit_Dokumentation_out depth=1
+          git clone https://github.com/matthejue/Bachelorarbeit_Dokumentation_out --depth=1
 
       - name: Set up Python
         uses: actions/setup-python@v4
