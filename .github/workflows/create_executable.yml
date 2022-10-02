@@ -53,7 +53,7 @@ jobs:
         run: pyinstaller src/main.spec
 
       - name: Tar files
-        run: tar -cvfz picoc_compiler.tar.gz dist/picoc_compiler
+        run: tar -zcvf picoc_compiler.tar.gz dist/picoc_compiler
 
       # - name: Upload Artifact
         # uses: actions/upload-artifact@v3
