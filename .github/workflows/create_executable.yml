@@ -3,6 +3,7 @@
 # https://github.com/Nuitka/Nuitka-Action
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 # https://github.com/svenstaro/upload-release-action
+# https://blog.knoldus.com/manual-trigger-in-github-actions/
 
 name: Package Application
 
