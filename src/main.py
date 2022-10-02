@@ -7,13 +7,13 @@ from global_funs import only_keep_path, basename
 import global_vars
 from colorama import init
 from colormanager import ColorManager as CM
-from help_message import generate_help_message
+from help_message import _open_documentation
 import traceback
 
 
 def main():
     if set(["-h", "--help"]).intersection(sys.argv):
-        _deal_with_help_page()
+        _open_documentation()
         return
 
     init(strip=False)
@@ -41,16 +41,6 @@ def main():
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
         )
-
-
-def _deal_with_help_page():
-    if set(["-c", "--color"]).intersection(sys.argv):
-        global_vars.args.color = True
-        CM().color_on()
-    else:
-        global_vars.args.color = False
-        CM().color_off()
-    print(generate_help_message())
 
 
 if __name__ == "__main__":
