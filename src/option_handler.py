@@ -502,5 +502,7 @@ def _open_documentation():
         subprocess.call(("open", filepath))
     elif platform.system() == "Windows":  # Windows
         os.startfile(filepath)
-    else:  # linux variants
+    elif platform.system() == "Linux":  # linux variants
         subprocess.call(("xdg-open", filepath))
+    else:
+        print("OS not supported.")
