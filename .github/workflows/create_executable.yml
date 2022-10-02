@@ -2,8 +2,9 @@
 # https://github.com/JackMcKew/pyinstaller-action-windows,
 # https://github.com/Nuitka/Nuitka-Action
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+# https://github.com/svenstaro/upload-release-action
 
-name: Package Application Windows
+name: Package Application
 
 on:
   push:
@@ -13,8 +14,17 @@ on:
 
 jobs:
   build:
-
-    runs-on: windows-2019
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: PicoC-Compiler-Linux
+          - os: windows-2019
+            artifact_name: PicoC-Compiler-Windows
+          - os: macos-2019
+            artifact_name: PicoC-Compiler-MacOs
 
     steps:
       - name: Checkout Master Branch
@@ -41,5 +51,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: PicoC-Compiler-Windows
+          name: ${{ matrix.artifact_name }}
           path: dist/picoc_compiler
