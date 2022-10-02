@@ -25,13 +25,13 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: PicoC-Compiler-Linux
-            asset_name: picoc_compiler_linux_amd64
+            asset_name: picoc_compiler_linux_amd64.tar
           - os: windows-latest
             artifact_name: PicoC-Compiler-Windows
-            asset_name: picoc_compiler_windows_amd64
+            asset_name: picoc_compiler_windows_amd64.tar
           - os: macos-latest
             artifact_name: PicoC-Compiler-MacOs
-            asset_name: picoc_compiler_macos_amd64
+            asset_name: picoc_compiler_macos_amd64.tar
 
     steps:
       - name: Checkout Master Branch
