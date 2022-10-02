@@ -53,7 +53,7 @@ jobs:
         run: pyinstaller src/main.spec
 
       - name: Tar files
-        run: tar -cvf picoc_compiler.tar dist/picoc_compiler
+        run: tar -cvfz picoc_compiler.tar.gz dist/picoc_compiler
 
       # - name: Upload Artifact
         # uses: actions/upload-artifact@v3
@@ -65,7 +65,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.UPLOAD_TO_REPO }}
-          file: picoc_compiler.tar
+          file: picoc_compiler.tar.gz
           asset_name: ${{ matrix.asset_name }}
           tag: ${{ github.ref }}
           overwrite: true
