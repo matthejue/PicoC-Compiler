@@ -9,6 +9,21 @@ from colorama import init
 from colormanager import ColorManager as CM
 from help_message import _open_documentation
 import traceback
+import subprocess, os, platform
+
+
+def _open_documentation():
+
+    filepath = "./Dokumentation.pdf"
+
+    #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7
+    # https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(("open", filepath))
+    elif platform.system() == "Windows":  # Windows
+        os.startfile(filepath)
+    else:  # linux variants
+        subprocess.call(("xdg-open", filepath))
 
 
 def main():
