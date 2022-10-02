@@ -10,7 +10,8 @@ a = Analysis(
     binaries=[],
     datas=[("concrete_syntax_picoc.lark", "."),
            ("concrete_syntax_reti.lark", "."),
-           ("Bachelorarbeit_Dokumentation_out/Dokumentation.pdf", ".")],
+           ("Bachelorarbeit_Dokumentation_out/Dokumentation.pdf", ".")
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
