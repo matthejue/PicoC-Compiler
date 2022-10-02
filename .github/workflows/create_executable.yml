@@ -9,8 +9,12 @@ name: Package Application
 on:
   push:
     branches: [ master ]
+    tags:
+      - "*"
   pull_request:
     branches: [ master ]
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -21,10 +25,13 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: PicoC-Compiler-Linux
+            asset_name: picoc_compiler_linux_amd64
           - os: windows-latest
             artifact_name: PicoC-Compiler-Windows
+            asset_name: picoc_compiler_windows_amd64
           - os: macos-latest
             artifact_name: PicoC-Compiler-MacOs
+            asset_name: picoc_compiler_macos_amd64
 
     steps:
       - name: Checkout Master Branch
@@ -45,11 +52,23 @@ jobs:
       - name: Run Pyinstaller
         run: pyinstaller src/main.spec
 
-      # - name: Tar files
-      #   run: tar -cvf picoc_compiler.tar dist/picoc_compiler
+      - name: Tar files
+        run: tar -cvf picoc_compiler.tar dist/picoc_compiler
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      # - name: Upload Artifact
+        # uses: actions/upload-artifact@v3
+        # with:
+          # name: ${{ matrix.artifact_name }}
+          # path: dist/picoc_compiler
+
+      - name: Build
+        run: cargo build --release --locked
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          name: ${{ matrix.artifact_name }}
-          path: dist/picoc_compiler
+          repo_token: ${{ secrets.UPLOAD_TO_REPO }}
+          file: picoc_compiler.tar
+          asset_name: ${{ matrix.asset_name }}
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "Release for all platforms."
