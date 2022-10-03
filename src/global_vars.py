@@ -34,6 +34,8 @@ args = Args()
 path = ""
 basename = ""
 
+reti_states = ""
+
 uart_size = 4
 
 max_print_out_elements = 5

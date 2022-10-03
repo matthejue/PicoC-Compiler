@@ -364,6 +364,8 @@ class RETIInterpreter:
                     encoding="utf-8",
                 ) as fout:
                     fout.write("\n" + str(reti_state))
+        elif global_vars.args.show_mode:
+            global_vars.reti_states += str(reti_state)
 
     def _preconfigs(self, program):
         match program:
