@@ -486,7 +486,7 @@ class OptionHandler(cmd2.Cmd):
                 "nvim",
                 f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
                 "-u",
-                "~/.config/picoc_compiler/interpr_showcase.vim",
+                "interpr_showcase.vim",
                 "-c",
                 "0 | norm zt",
             ]
