@@ -65,12 +65,20 @@ class OptionHandler(cmd2.Cmd):
                 "mu": "most_used",
                 "itp": "interpret",
                 "ct": "color_toggle",
+                "cs": "compile_show",
+                "is": "interpret_show",
             }
         )
         cmd2.Cmd.__init__(
             self,
             shortcuts=shortcuts,
-            multiline_commands=["compile", "most_used", "interpret"],
+            multiline_commands=[
+                "compile",
+                "most_used",
+                "interpret",
+                "compile_show",
+                "interpret_show",
+            ],
         )
         del cmd2.Cmd.do_help
 
@@ -143,52 +151,66 @@ class OptionHandler(cmd2.Cmd):
         self._color_for_prompt_and_intro()
 
     @cmd2.with_argparser(cli_args_parser)
-    def do_most_used(self, args):
-        # the 'infile' attribute is used as a storage for the code
-        code = args.infile
-        # color should never be effected by the '-C' option, because it's
-        # determined before via 'settings.conf' before and this should be kept
-        color = global_vars.args.color
-        global_vars.args = global_vars.Args()
-        global_vars.args.color = color
-        self._do_compile_shell(code)
-
-    @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
-        # shell is only going to open, if there're no options from outside, so
-        # shell is anyways always starting with everything turned off in
-        # global_vars.args besides color being set from settings.conf before
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        # is important to give this attribute a filename as value again,
-        # because it's needed later
         global_vars.args.infile = "stdin.picoc"
         global_vars.args.color = color
-        self._do_compile_shell(code)
-
-    def _do_compile_shell(self, code):
-        # printing is always turned on in shell
         global_vars.args.print = True
-
-        # TODO: "and Interpretation"
         self._compl("void main() {" + code + "}")
         print(f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET_ALL}\n")
 
     @cmd2.with_argparser(cli_args_parser)
-    def do_interpret(self, args):
-        # shell is only going to open, if there're no options from outside, so
-        # shell is anyways always starting with everything turned off in
-        # global_vars.args besides color being set from settings.conf before
+    def do_most_used(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = global_vars.Args()
+        global_vars.args.color = color
+        global_vars.args.print = True
+        self._compl("void main() {" + code + "}")
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_compile_show(self, args):
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        # is important to give this attribute a filename as value again,
-        # because it's needed later
+        global_vars.args.infile = "stdin.picoc"
+        global_vars.args.show_mode = True
+        global_vars.args.color = color
+        global_vars.args.print = True
+        global_vars.args.show_mode = True
+        global_vars.args.run = True
+        self._compl("void main() {" + code + "}")
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_interpret(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = args
         global_vars.args.infile = "stdin.reti"
         global_vars.args.color = color
-
         global_vars.args.print = True
+        self._interp(code)
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_interpret_show(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = args
+        global_vars.args.infile = "stdin.reti"
+        global_vars.args.color = color
+        global_vars.args.print = True
+        global_vars.args.show_mode = True
         self._interp(code)
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
@@ -454,13 +476,35 @@ class OptionHandler(cmd2.Cmd):
                 fout.write(str(symbol_table))
 
     def _show_mode(self):
+        if global_vars.args.pages == 1:
+            command = [
+                "nvim",
+                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
+                "-u",
+                os.path.dirname(os.path.realpath(sys.argv[0]))
+                + "/interpr_showcase.vim",
+                "-c",
+                "0 | norm zt",
+            ]
+            subprocess.call(command)
+            return
+
         first = True
-        command = [
-            "nvim",
-            f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
-            "-u",
-            os.path.expanduser("~") + "/.config/picoc_compiler/interpr_showcase.vim",
-        ]
+        command = (
+            ["nvim"]
+            + (
+                [
+                    f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}"
+                ]
+                if global_vars.path
+                else []
+            )
+            + [
+                "-u",
+                os.path.dirname(os.path.realpath(sys.argv[0]))
+                + "/interpr_showcase.vim",
+            ]
+        )
         for i in reversed(range(1, global_vars.args.pages)):
             current_line_num = self.terminal_lines * i + 1 - i
             if first:
@@ -481,16 +525,12 @@ class OptionHandler(cmd2.Cmd):
         command += ["-c", "windo se scb!"]
         command += ["-c", "wincmd h" + ("| wincmd h" * (global_vars.args.pages - 2))]
 
-        if global_vars.args.pages == 1:
-            command = [
-                "nvim",
-                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
-                "-u",
-                "interpr_showcase.vim",
-                "-c",
-                "0 | norm zt",
-            ]
-        subprocess.call(command)
+        if global_vars.path:
+            subprocess.call(command)
+        else:
+            subprocess.run(command, input=global_vars.reti_states.encode("utf-8"))
+
+        global_vars.reti_states = ""
 
 
 def _open_documentation():
