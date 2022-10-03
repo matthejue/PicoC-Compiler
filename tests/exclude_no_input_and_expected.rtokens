@@ -1,1 +1,0 @@
-[Token('FILENAME', './tests/exclude_no_input_and_expected.reti'), Token('LOADIN', 'LOADIN'), Token('BAF', 'BAF'), Token('PC', 'PC'), Token('IM', '-1'), Token('SEMICOLON', ';')]
