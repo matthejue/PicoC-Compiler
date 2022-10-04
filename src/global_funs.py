@@ -58,24 +58,24 @@ def args_to_str(args: list):
 def repr_single_line(self, depth=0):
     if not self.visible:
         if not self.val:
-            return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"
-        return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}'{self.val}'{')' if global_vars.args.double_verbose else ''}"
+            return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'()' if global_vars.args.double_verbose else ''}{CM().RESET}"
+        return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}{CM().RED}'{self.val}'{CM().RESET}{CM().CYAN}{')' if global_vars.args.double_verbose else ''}{CM().RESET}"
 
     acc = ""
 
     if depth > 0:
-        acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+        acc += f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
     else:
-        acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+        acc += f"{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
 
     for i, child in enumerate(self.visible):
         match child:
             case list():
                 if not child:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
                     continue
 
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
                 for i, list_child in enumerate(child):
                     match list_child:
                         case (
@@ -93,17 +93,17 @@ def repr_single_line(self, depth=0):
                             acc += f"\n{' ' * (depth + 4)}{convert_to_single_line(list_child)}"
                             continue
                     acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}]"
+                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
                 continue
             case dict():
                 dict_children = child.values()
                 if not dict_children:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
                     continue
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
                 for i, dict_child in enumerate(dict_children):
                     acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}]"
+                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
                 continue
             case pn.Atom():
                 acc += f"\n{' ' * (depth + 2)}{convert_to_single_line(child)}"
@@ -113,14 +113,25 @@ def repr_single_line(self, depth=0):
 
         acc += f"{', ' if i > 0 else ''}{child.__repr__(depth+2)}"
 
-    return acc + (f"\n{' ' * depth})" if global_vars.args.double_verbose else "")
+    return acc + (
+        f"\n{' ' * depth}{CM().CYAN}){CM().RESET}"
+        if global_vars.args.double_verbose
+        else ""
+    )
 
 
-def convert_to_single_line(stmt):
+def convert_to_single_line(stmt, no_colors=False):
+    if no_colors:
+        CM().color_off()
     tmp = global_vars.args.double_verbose
     global_vars.args.double_verbose = True
     single_line = "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
     global_vars.args.double_verbose = tmp
+    if no_colors:
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
     return single_line
 
 

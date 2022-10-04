@@ -17,6 +17,11 @@ from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
 import subprocess, os, platform
+from lexers_for_colorizing import TokenLexer, DTLexer
+from pygments import highlight
+from pygments.token import *
+from pygments.formatters.terminal import TerminalFormatter
+from pygments.lexers.c_cpp import CLexer
 
 
 class OptionHandler(cmd2.Cmd):
@@ -180,11 +185,12 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args = args
         global_vars.args.infile = "stdin.picoc"
         global_vars.args.show_mode = True
-        global_vars.args.color = color
+        global_vars.args.color = False
         global_vars.args.print = True
         global_vars.args.show_mode = True
         global_vars.args.run = True
         self._compl("void main() {" + code + "}")
+        global_vars.args.color = color
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
         )
@@ -208,10 +214,11 @@ class OptionHandler(cmd2.Cmd):
         color = global_vars.args.color
         global_vars.args = args
         global_vars.args.infile = "stdin.reti"
-        global_vars.args.color = color
+        global_vars.args.color = False
         global_vars.args.print = True
         global_vars.args.show_mode = True
         self._interp(code)
+        global_vars.args.color = color
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
         )
@@ -237,6 +244,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         # add the filename to the start of the code
         code_with_file = (
             ("./" if not global_vars.args.infile.startswith("./") else "")
@@ -246,7 +258,11 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
-            print(f"// {global_vars.args.infile}:\n" + code)
+            inserted_code = f"// {global_vars.args.infile}:\n" + code
+            if global_vars.args.color:
+                print(highlight(inserted_code, CLexer(), TerminalFormatter()))
+            else:
+                print(inserted_code)
 
         parser = Lark.open(
             f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
@@ -335,6 +351,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         # add the filename to the start of the code
         code_with_file = (
             ("./" if not global_vars.args.infile.startswith("./") else "")
@@ -410,7 +431,25 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
-            print(tokens)
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        str(tokens),
+                        TokenLexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Whitespace: ("gray", "white"),
+                                Keyword: ("blue", "brightblue"),
+                                Punctuation: ("gray", "white"),
+                                String.Delimiter: ("cyan", "brightcyan"),
+                                Name.Variable: ("green", "brightgreen"),
+                                Name.Attribute: ("red", "brightred"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(tokens)
 
         if global_vars.path:
             with open(
@@ -424,7 +463,22 @@ class OptionHandler(cmd2.Cmd):
     def _dt_option(self, dt, heading):
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
-            print(dt.pretty())
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        dt.pretty().replace("\t", "    "),
+                        DTLexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Whitespace: ("gray", "white"),
+                                Name.Variable: ("blue", "brightgreen"),
+                                Name.Attribute: ("red", "brightred"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(dt.pretty().replace("\t", "    "))
 
         if global_vars.path:
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
@@ -436,6 +490,7 @@ class OptionHandler(cmd2.Cmd):
             print(ast)
 
         if global_vars.path:
+            CM().color_off()
             match ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
@@ -445,6 +500,10 @@ class OptionHandler(cmd2.Cmd):
                         fout.write(str(ast))
                 case _:
                     throw_error(ast)
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
 
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
@@ -452,6 +511,7 @@ class OptionHandler(cmd2.Cmd):
             print(pass_ast)
 
         if global_vars.path:
+            CM().color_off()
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
@@ -461,6 +521,10 @@ class OptionHandler(cmd2.Cmd):
                         fout.write(str(pass_ast))
                 case _:
                     throw_error(pass_ast)
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
 
     def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
@@ -468,12 +532,17 @@ class OptionHandler(cmd2.Cmd):
             print(symbol_table)
 
         if global_vars.path:
+            CM().color_off()
             with open(
                 global_vars.path + global_vars.basename + ".st",
                 "w",
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(symbol_table))
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
 
     def _show_mode(self):
         if global_vars.args.pages == 1:
@@ -534,7 +603,7 @@ class OptionHandler(cmd2.Cmd):
 
 
 def _open_documentation():
-    filepath = "Dokumentation.pdf"
+    filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/Dokumentation.pdf"
 
     #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7
     # https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os

@@ -11,8 +11,11 @@ class _ColorManager:
             self.GREEN
         ) = (
             self.YELLOW
-        ) = self.BLUE = self.MAGENTA = self.CYAN = self.WHITE = self.RESET = ""
-        self.BRIGHT = self.RESET_ALL = ""
+        ) = (
+            self.BLUE
+        ) = (
+            self.MAGENTA
+        ) = self.CYAN = self.WHITE = self.RESET = self.BRIGHT = self.RESET_ALL = ""
 
     def color_on(
         self,
