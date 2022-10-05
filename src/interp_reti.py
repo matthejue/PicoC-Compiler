@@ -9,6 +9,7 @@ from global_funs import (
 )
 import os
 from ctypes import c_int32, c_uint32
+from colormanager import ColorManager as CM
 
 
 class RETIInterpreter:
@@ -261,7 +262,9 @@ class RETIInterpreter:
             #      # delete PC from stack
             #      reti.reg_set("SP", c_uint32(reti.reg_get("SP")).value + 1)
             case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
-                print("Output:\n\t" + str(c_int32(reti.reg_get(str(reg))).value))
+                print(
+                    f"{CM().GREEN}Output:{CM().RESET}\n\t{CM().RED}{c_int32(reti.reg_get(str(reg))).value}{CM().RESET}"
+                )
                 if global_vars.path:
                     if self.first_out:
                         with open(

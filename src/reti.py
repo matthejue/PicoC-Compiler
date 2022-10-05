@@ -2,6 +2,7 @@ import global_vars
 from ast_node import ASTNode
 import reti_nodes as rn
 import os
+from colormanager import ColorManager as CM
 
 
 class RETI(ASTNode):
@@ -19,22 +20,22 @@ class RETI(ASTNode):
                 global_vars.args.datasegment_size = int(fin.read())
         self.idx = rn.Im("0")
         self.regs = {
-            "ACC": rn.Im("0"),
-            "ACC_SIMPLE": rn.Im("0"),
-            "IN1": rn.Im("0"),
-            "IN1_SIMPLE": rn.Im("0"),
-            "IN2": rn.Im("0"),
-            "IN2_SIMPLE": rn.Im("0"),
-            "PC": rn.Im("0"),
-            "PC_SIMPLE": rn.Im("0"),
-            "SP": rn.Im("0"),
-            "SP_SIMPLE": rn.Im("0"),
-            "BAF": rn.Im("0"),
-            "BAF_SIMPLE": rn.Im("0"),
-            "CS": rn.Im("0"),
-            "CS_SIMPLE": rn.Im("0"),
-            "DS": rn.Im("0"),
-            "DS_SIMPLE": rn.Im("0"),
+            f"ACC": rn.Im("0"),
+            f"ACC_SIMPLE": rn.Im("0"),
+            f"IN1": rn.Im("0"),
+            f"IN1_SIMPLE": rn.Im("0"),
+            f"IN2": rn.Im("0"),
+            f"IN2_SIMPLE": rn.Im("0"),
+            f"PC": rn.Im("0"),
+            f"PC_SIMPLE": rn.Im("0"),
+            f"SP": rn.Im("0"),
+            f"SP_SIMPLE": rn.Im("0"),
+            f"BAF": rn.Im("0"),
+            f"BAF_SIMPLE": rn.Im("0"),
+            f"CS": rn.Im("0"),
+            f"CS_SIMPLE": rn.Im("0"),
+            f"DS": rn.Im("0"),
+            f"DS_SIMPLE": rn.Im("0"),
         }
         self.sram = SRAM(instrs)
         self.uart = UART()
@@ -105,10 +106,14 @@ class RETI(ASTNode):
     def __repr__(self):
         #  acc = f"{self.__class__.__name__}("
         #  acc = "{"
-        acc = ("\n" if int(self.idx.val) > 1 else "") + f"index:       {self.idx}"
-        acc += f"\ninstruction: " + str(self.last_instr).lstrip()
+        acc = (
+            "\n" if int(self.idx.val) > 1 else ""
+        ) + f"{CM().GREEN}index:{CM().RESET}       {self.idx}"
+        acc += (
+            f"\n{CM().GREEN}instruction:{CM().RESET} " + str(self.last_instr).lstrip()
+        )
         for reg in self.regs.keys():
-            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+            acc += f"\n{CM().GREEN}{reg}:{CM().RESET} {' ' * (11-len(reg))}{self.regs[reg]}"
         #  acc += "\n}"
         acc_addr = self.reg_get("ACC")
         in1_addr = self.reg_get("IN1")
@@ -172,7 +177,7 @@ class EPROM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
         # acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -198,7 +203,7 @@ class UART(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
         #  acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -243,7 +248,7 @@ class SRAM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
         #  acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -277,20 +282,36 @@ def print_cells(
     for addr in range(len(cells)):
         acc += (
             "\n  "
-            + ("%05i " % addr)
+            + (f"{CM().GREEN}%05i{CM().RESET} " % addr)
             + (
                 ("(%010i): " % (addr + constant))
                 if global_vars.args.double_verbose
                 else ""
             )
             + str(cells[addr]).lstrip()
-            + (" <- ACC" if addr == acc_addr - constant else "")
-            + (" <- IN1" if addr == in1_addr - constant else "")
-            + (" <- IN2" if addr == in2_addr - constant else "")
-            + (" <- PC" if addr == pc_addr - constant else "")
-            + (" <- SP" if addr == sp_addr - constant else "")
-            + (" <- BAF" if addr == baf_addr - constant else "")
-            + (" <- CS" if addr == cs_addr - constant else "")
-            + (" <- DS" if addr == ds_addr - constant else "")
+            + (
+                f" {CM().GREEN}<- ACC{CM().RESET}"
+                if addr == acc_addr - constant
+                else ""
+            )
+            + (
+                f" {CM().GREEN}<- IN1{CM().RESET}"
+                if addr == in1_addr - constant
+                else ""
+            )
+            + (
+                f" {CM().GREEN}<- IN2{CM().RESET}"
+                if addr == in2_addr - constant
+                else ""
+            )
+            + (f" {CM().GREEN}<- PC{CM().RESET}" if addr == pc_addr - constant else "")
+            + (f" {CM().GREEN}<- SP{CM().RESET}" if addr == sp_addr - constant else "")
+            + (
+                f" {CM().GREEN}<- BAF{CM().RESET}"
+                if addr == baf_addr - constant
+                else ""
+            )
+            + (f" {CM().GREEN}<- CS{CM().RESET}" if addr == cs_addr - constant else "")
+            + (f" {CM().GREEN}<- DS{CM().RESET}" if addr == ds_addr - constant else "")
         )
     return acc

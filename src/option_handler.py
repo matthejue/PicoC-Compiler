@@ -17,7 +17,7 @@ from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
 import subprocess, os, platform
-from lexers_for_colorizing import TokenLexer, DTLexer
+from lexers_for_colorizing import TokenLexer, DTLexer, RETILexer
 from pygments import highlight
 from pygments.token import *
 from pygments.formatters.terminal import TerminalFormatter
@@ -365,7 +365,28 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
-            print(f"// {global_vars.args.infile}:\n" + code)
+            inserted_code = f"# {global_vars.args.infile}:\n" + code + "\n"
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        inserted_code,
+                        RETILexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Comment: ("magenta", "brightmagenta"),
+                                Whitespace: ("gray", "white"),
+                                Keyword: ("blue", "brightblue"),
+                                Punctuation: ("gray", "white"),
+                                Name: ("cyan", "brightcyan"),
+                                Number: ("red", "brightred"),
+                                Name.Tag: ("green", "brightgreen"),
+                                Operator: ("yellow", "brightyellow"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(inserted_code)
 
         parser = Lark.open(
             f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
