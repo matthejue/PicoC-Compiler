@@ -120,143 +120,143 @@ class RETILexer(RegexLexer):
     }
 
 
-if __name__ == "__main__":
-    print(
-        highlight(
-            "[Token('FILENAME', './stdin.picoc'), Token('VOID_DT', 'void'), Token('NAME', 'main'), Token('LPAR', '('), Token('RPAR', ')'), Token('LBRACE', '{'), Token('WHILE', 'while'), Token('LPAR', '('), Token('NUM', '0'), Token('RPAR', ')'), Token('LBRACE', '{'), Token('PRINT', 'print'), Token('LPAR', '('), Token('NUM', '1'), Token('ADD', '+'), Token('NUM', '1'), Token('RPAR', ')'), Token('SEMICOLON', ';'), Token('RBRACE', '}'), Token('RBRACE', '}')]",
-            TokenLexer(),
-            TerminalFormatter(
-                colorscheme={
-                    Whitespace: ("gray", "white"),
-                    Keyword: ("blue", "brightblue"),
-                    Punctuation: ("gray", "white"),
-                    String.Delimiter: ("cyan", "brightcyan"),
-                    Name.Variable: ("green", "brightgreen"),
-                    Name.Attribute: ("red", "brightred"),
-                    Name.Tag: ("blue", "brightblue"),
-                }
-            ),
-            outfile=None,
-        )
-    )
-
-    print(
-        highlight(
-            """file
-              ./stdin.dt_simple
-              decls_defs
-                decl_def
-                  fun_def
-                    type_spec
-                      prim_dt       void
-                    pntr_deg
-                    name    main
-                    fun_params
-                    decl_exec_stmts
-                      exec_part
-                        exec_direct_stmt
-                          while_stmt
-                            logic_or
-                              logic_and
-                                eq_exp
-                                  rel_exp
-                                    arith_or
-                                      arith_oplus
-                                        arith_and
-                                          arith_prec2
-                                            arith_prec1
-                                              un_exp
-                                                post_exp
-                                                  prim_exp  0
-                            exec_part
-                              compound_stmt
-                                exec_part
-                                  exec_exp_stmt
-                                    logic_or
-                                      logic_and
-                                        eq_exp
-                                          rel_exp
-                                            arith_or
-                                              arith_oplus
-                                                arith_and
-                                                  arith_prec2
-                                                    arith_prec1
-                                                      un_exp
-                                                        post_exp
-                                                          print_exp
-                                                            logic_or
-                                                              logic_and
-                                                                eq_exp
-                                                                  rel_exp
-                                                                    arith_or
-                                                                      arith_oplus
-                                                                        arith_and
-                                                                          arith_prec2
-                                                                            arith_prec2
-                                                                              arith_prec1
-                                                                                un_exp
-                                                                                  post_exp
-                                                                                    prim_exp        1
-                                                                            prec2_op        +
-                                                                            arith_prec1
-                                                                              un_exp
-                                                                                post_exp
-                                                                                  prim_exp  1""",
-            DTLexer(),
-            TerminalFormatter(
-                colorscheme={
-                    Whitespace: ("gray", "white"),
-                    Keyword: ("blue", "brightblue"),
-                    Punctuation: ("gray", "white"),
-                    String.Delimiter: ("cyan", "brightcyan"),
-                    Name.Variable: ("green", "brightgreen"),
-                    Name.Attribute: ("red", "brightred"),
-                }
-            ),
-            outfile=None,
-        )
-    )
-
-    print(
-        highlight(
-            #  """LOADI ACC 1;
-            #  ADDI ACC 1;
-            #  LOADIN ACC IN1 2;
-            #  # asdfadsf
-            #  CALL INPUT ACC;
-            #  ## asdfadsf
-            #  CALL PRINT ACC;""",
-            """
-            ## begin
-            CALL INPUT ACC;
-            SUBI SP 1;
-            STOREIN SP ACC 1;
-            LOADIN SP ACC 1;
-            STOREIN DS ACC 0;
-            ADDI SP 1;
-            ## this should be visible
-            ## this should be visible
-            SUBI SP 1;
-            LOADIN DS ACC 0;
-            STOREIN SP ACC 1;
-            LOADIN SP ACC 1;
-            ADDI SP 1;
-            CALL PRINT ACC;
-            ## end
-            LOADIN BAF PC -1;""",
-            RETILexer(),
-            #  HtmlFormatter(debug_token_types=True),
-            TerminalFormatter(
-                colorscheme={
-                    Comment: ("magenta", "brightmagenta"),
-                    Whitespace: ("gray", "white"),
-                    Keyword: ("blue", "brightblue"),
-                    Punctuation: ("gray", "white"),
-                    Name: ("cyan", "brightcyan"),
-                    Number: ("red", "brightred"),
-                    Name.Tag: ("green", "brightgreen"),
-                }
-            ),
-            outfile=None,
-        )
-    )
+#  if __name__ == "__main__":
+#      print(
+#          highlight(
+#              "[Token('FILENAME', './stdin.picoc'), Token('VOID_DT', 'void'), Token('NAME', 'main'), Token('LPAR', '('), Token('RPAR', ')'), Token('LBRACE', '{'), Token('WHILE', 'while'), Token('LPAR', '('), Token('NUM', '0'), Token('RPAR', ')'), Token('LBRACE', '{'), Token('PRINT', 'print'), Token('LPAR', '('), Token('NUM', '1'), Token('ADD', '+'), Token('NUM', '1'), Token('RPAR', ')'), Token('SEMICOLON', ';'), Token('RBRACE', '}'), Token('RBRACE', '}')]",
+#              TokenLexer(),
+#              TerminalFormatter(
+#                  colorscheme={
+#                      Whitespace: ("gray", "white"),
+#                      Keyword: ("blue", "brightblue"),
+#                      Punctuation: ("gray", "white"),
+#                      String.Delimiter: ("cyan", "brightcyan"),
+#                      Name.Variable: ("green", "brightgreen"),
+#                      Name.Attribute: ("red", "brightred"),
+#                      Name.Tag: ("blue", "brightblue"),
+#                  }
+#              ),
+#              outfile=None,
+#          )
+#      )
+#
+#      print(
+#          highlight(
+#              """file
+#                ./stdin.dt_simple
+#                decls_defs
+#                  decl_def
+#                    fun_def
+#                      type_spec
+#                        prim_dt       void
+#                      pntr_deg
+#                      name    main
+#                      fun_params
+#                      decl_exec_stmts
+#                        exec_part
+#                          exec_direct_stmt
+#                            while_stmt
+#                              logic_or
+#                                logic_and
+#                                  eq_exp
+#                                    rel_exp
+#                                      arith_or
+#                                        arith_oplus
+#                                          arith_and
+#                                            arith_prec2
+#                                              arith_prec1
+#                                                un_exp
+#                                                  post_exp
+#                                                    prim_exp  0
+#                              exec_part
+#                                compound_stmt
+#                                  exec_part
+#                                    exec_exp_stmt
+#                                      logic_or
+#                                        logic_and
+#                                          eq_exp
+#                                            rel_exp
+#                                              arith_or
+#                                                arith_oplus
+#                                                  arith_and
+#                                                    arith_prec2
+#                                                      arith_prec1
+#                                                        un_exp
+#                                                          post_exp
+#                                                            print_exp
+#                                                              logic_or
+#                                                                logic_and
+#                                                                  eq_exp
+#                                                                    rel_exp
+#                                                                      arith_or
+#                                                                        arith_oplus
+#                                                                          arith_and
+#                                                                            arith_prec2
+#                                                                              arith_prec2
+#                                                                                arith_prec1
+#                                                                                  un_exp
+#                                                                                    post_exp
+#                                                                                      prim_exp        1
+#                                                                              prec2_op        +
+#                                                                              arith_prec1
+#                                                                                un_exp
+#                                                                                  post_exp
+#                                                                                    prim_exp  1""",
+#              DTLexer(),
+#              TerminalFormatter(
+#                  colorscheme={
+#                      Whitespace: ("gray", "white"),
+#                      Keyword: ("blue", "brightblue"),
+#                      Punctuation: ("gray", "white"),
+#                      String.Delimiter: ("cyan", "brightcyan"),
+#                      Name.Variable: ("green", "brightgreen"),
+#                      Name.Attribute: ("red", "brightred"),
+#                  }
+#              ),
+#              outfile=None,
+#          )
+#      )
+#
+#      print(
+#          highlight(
+#              #  """LOADI ACC 1;
+#              #  ADDI ACC 1;
+#              #  LOADIN ACC IN1 2;
+#              #  # asdfadsf
+#              #  CALL INPUT ACC;
+#              #  ## asdfadsf
+#              #  CALL PRINT ACC;""",
+#              """
+#              ## begin
+#              CALL INPUT ACC;
+#              SUBI SP 1;
+#              STOREIN SP ACC 1;
+#              LOADIN SP ACC 1;
+#              STOREIN DS ACC 0;
+#              ADDI SP 1;
+#              ## this should be visible
+#              ## this should be visible
+#              SUBI SP 1;
+#              LOADIN DS ACC 0;
+#              STOREIN SP ACC 1;
+#              LOADIN SP ACC 1;
+#              ADDI SP 1;
+#              CALL PRINT ACC;
+#              ## end
+#              LOADIN BAF PC -1;""",
+#              RETILexer(),
+#              #  HtmlFormatter(debug_token_types=True),
+#              TerminalFormatter(
+#                  colorscheme={
+#                      Comment: ("magenta", "brightmagenta"),
+#                      Whitespace: ("gray", "white"),
+#                      Keyword: ("blue", "brightblue"),
+#                      Punctuation: ("gray", "white"),
+#                      Name: ("cyan", "brightcyan"),
+#                      Number: ("red", "brightred"),
+#                      Name.Tag: ("green", "brightgreen"),
+#                  }
+#              ),
+#              outfile=None,
+#          )
+#      )
