@@ -4,6 +4,7 @@ from pygments.lexer import RegexLexer, bygroups
 from pygments.token import *
 from pygments.token import Token
 from pygments.formatters.terminal import TerminalFormatter
+from pygments.formatters import HtmlFormatter
 from pygments import highlight
 
 # resources: https://pygments.org/docs/lexerdevelopment/
@@ -54,6 +55,67 @@ class DTLexer(RegexLexer):
         "node": [
             (r" *[^\n]+\n", Name.Attribute, "#pop"),
             (r" *\n", Whitespace, "#pop"),
+        ],
+    }
+
+
+class RETILexer(RegexLexer):
+    name = "RETI"
+    aliases = ["reti"]
+    filenames = ["*.reti"]
+
+    tokens = {
+        "root": [
+            (r" *#[^\n]+\n", Comment),
+            (
+                r" *(CALL)( )(INPUT|PRINT)( )([^ ]+)(;)(\n)",
+                bygroups(
+                    Keyword,
+                    Whitespace,
+                    Name.Tag,
+                    Whitespace,
+                    Name,
+                    Punctuation,
+                    Whitespace,
+                ),
+            ),
+            (
+                r" *(JUMP)([^ ]*)( )([^ ]+)(;)(\n)",
+                bygroups(
+                    Keyword,
+                    Operator,
+                    Whitespace,
+                    Number,
+                    Punctuation,
+                    Whitespace,
+                ),
+            ),
+            (
+                r" *([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n)",
+                bygroups(
+                    Keyword,
+                    Whitespace,
+                    Name,
+                    Whitespace,
+                    Number,
+                    Punctuation,
+                    Whitespace,
+                ),
+            ),
+            (
+                r" *([^ ]+)( )([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n)",
+                bygroups(
+                    Keyword,
+                    Whitespace,
+                    Name,
+                    Whitespace,
+                    Name,
+                    Whitespace,
+                    Number,
+                    Punctuation,
+                    Whitespace,
+                ),
+            ),
         ],
     }
 
@@ -149,6 +211,50 @@ if __name__ == "__main__":
                     String.Delimiter: ("cyan", "brightcyan"),
                     Name.Variable: ("green", "brightgreen"),
                     Name.Attribute: ("red", "brightred"),
+                }
+            ),
+            outfile=None,
+        )
+    )
+
+    print(
+        highlight(
+            #  """LOADI ACC 1;
+            #  ADDI ACC 1;
+            #  LOADIN ACC IN1 2;
+            #  # asdfadsf
+            #  CALL INPUT ACC;
+            #  ## asdfadsf
+            #  CALL PRINT ACC;""",
+            """
+            ## begin
+            CALL INPUT ACC;
+            SUBI SP 1;
+            STOREIN SP ACC 1;
+            LOADIN SP ACC 1;
+            STOREIN DS ACC 0;
+            ADDI SP 1;
+            ## this should be visible
+            ## this should be visible
+            SUBI SP 1;
+            LOADIN DS ACC 0;
+            STOREIN SP ACC 1;
+            LOADIN SP ACC 1;
+            ADDI SP 1;
+            CALL PRINT ACC;
+            ## end
+            LOADIN BAF PC -1;""",
+            RETILexer(),
+            #  HtmlFormatter(debug_token_types=True),
+            TerminalFormatter(
+                colorscheme={
+                    Comment: ("magenta", "brightmagenta"),
+                    Whitespace: ("gray", "white"),
+                    Keyword: ("blue", "brightblue"),
+                    Punctuation: ("gray", "white"),
+                    Name: ("cyan", "brightcyan"),
+                    Number: ("red", "brightred"),
+                    Name.Tag: ("green", "brightgreen"),
                 }
             ),
             outfile=None,
