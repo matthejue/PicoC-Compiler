@@ -68,7 +68,7 @@ class RETILexer(RegexLexer):
         "root": [
             (r" *#[^\n]+\n", Comment),
             (
-                r" *(CALL)( )(INPUT|PRINT)( )([^ ]+)(;)(\n)",
+                r" *(CALL)( )(INPUT|PRINT)( )([^ ]+)(;)(\n?)",
                 bygroups(
                     Keyword,
                     Whitespace,
@@ -80,7 +80,7 @@ class RETILexer(RegexLexer):
                 ),
             ),
             (
-                r" *(JUMP)([^ ]*)( )([^ ]+)(;)(\n)",
+                r" *(JUMP)([^ ]*)( )([^ ]+)(;)(\n?)",
                 bygroups(
                     Keyword,
                     Operator,
@@ -91,7 +91,7 @@ class RETILexer(RegexLexer):
                 ),
             ),
             (
-                r" *([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n)",
+                r" *([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
                 bygroups(
                     Keyword,
                     Whitespace,
@@ -103,7 +103,7 @@ class RETILexer(RegexLexer):
                 ),
             ),
             (
-                r" *([^ ]+)( )([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n)",
+                r" *([^ ]+)( )([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
                 bygroups(
                     Keyword,
                     Whitespace,
