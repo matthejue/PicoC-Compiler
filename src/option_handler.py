@@ -31,13 +31,13 @@ class OptionHandler(cmd2.Cmd):
     # ------------------- PicoC_Compiler + RETI_Interpreter -------------------
     cli_args_parser.add_argument("-i", "--intermediate_stages", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-vv", "--double_verbose", action="store_true")
+    cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-c", "--color", action="store_true")
-    cli_args_parser.add_argument("-d", "--debug", action="store_true")
-    cli_args_parser.add_argument("-t", "--traceback", action="store_true")
     cli_args_parser.add_argument("-e", "--example", action="store_true")
+    cli_args_parser.add_argument("-t", "--traceback", action="store_true")
+    cli_args_parser.add_argument("-d", "--debug", action="store_true")
     cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
@@ -184,13 +184,11 @@ class OptionHandler(cmd2.Cmd):
         color = global_vars.args.color
         global_vars.args = args
         global_vars.args.infile = "stdin.picoc"
-        global_vars.args.show_mode = True
-        global_vars.args.color = False
+        global_vars.args.color = color
         global_vars.args.print = True
         global_vars.args.show_mode = True
         global_vars.args.run = True
         self._compl("void main() {" + code + "}")
-        global_vars.args.color = color
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
         )
@@ -214,11 +212,10 @@ class OptionHandler(cmd2.Cmd):
         color = global_vars.args.color
         global_vars.args = args
         global_vars.args.infile = "stdin.reti"
-        global_vars.args.color = False
+        global_vars.args.color = color
         global_vars.args.print = True
         global_vars.args.show_mode = True
         self._interp(code)
-        global_vars.args.color = color
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
         )
@@ -243,11 +240,6 @@ class OptionHandler(cmd2.Cmd):
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
-
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
 
         # add the filename to the start of the code
         code_with_file = (
@@ -294,6 +286,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "Derivation Tree Simple")
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         ast_transformer_picoc = TransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
@@ -337,6 +334,8 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
+            if not global_vars.path:
+                CM().color_off()
 
         if global_vars.args.run:
             if global_vars.args.print:
@@ -350,11 +349,6 @@ class OptionHandler(cmd2.Cmd):
     def _interp(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
-
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
 
         # add the filename to the start of the code
         code_with_file = (
@@ -414,6 +408,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "RETI Derivation Tree")
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         ast_transformer_reti = ASTTransformerRETI()
         ast = error_handler.handle(ast_transformer_reti.transform, dt)
 
@@ -423,6 +422,8 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
+            if not global_vars.path:
+                CM().color_off()
 
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
