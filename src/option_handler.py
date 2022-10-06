@@ -337,13 +337,13 @@ class OptionHandler(cmd2.Cmd):
             if not global_vars.path:
                 CM().color_off()
 
-        if global_vars.args.run:
+        if global_vars.args.run or global_vars.args.show_mode:
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
             reti_interp = RETIInterpreter()
             error_handler.handle(reti_interp.interp_reti, reti)
 
-        if global_vars.args.show_mode and global_vars.args.run:
+        if global_vars.args.show_mode:
             self._show_mode()
 
     def _interp(self, code):
