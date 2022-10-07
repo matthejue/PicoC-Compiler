@@ -339,7 +339,12 @@ class OptionHandler(cmd2.Cmd):
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
             reti_interp = RETIInterpreter()
-            error_handler.handle(reti_interp.interp_reti, reti)
+            # possiblity to supress error
+            try:
+                error_handler.handle(reti_interp.interp_reti, reti)
+            except Exception as e:
+                if not global_vars.args.supress_errors:
+                    raise e
 
         if global_vars.args.show_mode:
             self._show_mode()
