@@ -22,7 +22,7 @@
     <br />
     <a href="./doc/getting_started.md">Getting Started</a>
     ·
-    <a href="https://github.com/matthejue/Bachelorarbeit_Dokumentation_out/blob/main/Dokumentation.pdf">Dokumentation</a>
+    <a href="https://github.com/matthejue/Bachelorarbeit_Dokumentation_out/blob/main/Dokumentation.pdf">Documentation</a>
     ·
     <a href="./src/concrete_syntax_picoc.lark/">Concrete Syntax of PicoC</a>
     ·
