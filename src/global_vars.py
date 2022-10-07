@@ -40,6 +40,8 @@ uart_size = 4
 
 max_print_out_elements = 5
 
+extension = "picoc"
+
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
 RANGE_OF_CHAR = (-128, 127)

@@ -30,7 +30,7 @@
   </p>
 </div>
 
-[![asciicast](https://asciinema.org/a/526500.svg)](https://asciinema.org/a/526500)
+[![asciicast](https://asciinema.org/a/526542.svg)](https://asciinema.org/a/526542)
 
 <!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
 <!-- · -->
