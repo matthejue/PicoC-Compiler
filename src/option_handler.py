@@ -334,8 +334,6 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
-            if not global_vars.path:
-                CM().color_off()
 
         if global_vars.args.run or global_vars.args.show_mode:
             if global_vars.args.print:

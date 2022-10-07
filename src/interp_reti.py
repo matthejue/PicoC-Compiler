@@ -351,6 +351,9 @@ class RETIInterpreter:
         reti_state.idx.val = str(int(reti_state.idx.val) + 1)
         if global_vars.args.print:
             print(reti_state)
+
+        CM().color_off()
+
         if global_vars.path:
             if self.first_reti_state:
                 with open(
@@ -369,6 +372,11 @@ class RETIInterpreter:
                     fout.write("\n" + str(reti_state))
         elif global_vars.args.show_mode:
             global_vars.reti_states += str(reti_state)
+
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
 
     def _preconfigs(self, program):
         match program:
