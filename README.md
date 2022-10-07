@@ -29,6 +29,9 @@
     <a href="./doc/references.md">References</a>
   </p>
 </div>
+
+[![asciicast](https://asciinema.org/a/526500.svg)](https://asciinema.org/a/526500)
+
 <!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
 <!-- · -->
 <!-- <a href="./doc/help-page.txt">Usage</a> -->
