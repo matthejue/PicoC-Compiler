@@ -230,12 +230,16 @@ class OptionHandler(cmd2.Cmd):
         with open(global_vars.args.infile, encoding="utf-8") as fin:
             picoc_in = fin.read()
 
-        extension = get_extension(global_vars.args.infile)
-        match extension:
+        global_vars.extension = get_extension(global_vars.args.infile)
+        match global_vars.extension:
             case "picoc":
                 self._compl(picoc_in)
             case "reti":
                 self._interp(picoc_in)
+            case _:
+                print(
+                    f"File with extension '.{global_vars.extension}' cannot be compiled or interpreted."
+                )
 
     def _compl(self, code):
         if global_vars.args.debug:
