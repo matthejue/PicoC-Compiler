@@ -28,3 +28,5 @@ PicoC> most_used "char bool_val = ('c' < 1 + 2);";
 # Show-Mode (Seeing the execution of reti instructions)
 
 - Click on the **image** to see a short **tutorial** showcasing the **Show-Mode**.
+
+[![asciicast](https://asciinema.org/a/526601.svg)](https://asciinema.org/a/526601)
