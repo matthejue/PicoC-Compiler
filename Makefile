@@ -175,9 +175,9 @@ _verify:
 	./verify_tests.sh $${COLUMNS} $(TESTNAME_BASE)
 
 help:
-	./src/main.py -h -c
+	./src/main.py -h
 	# ./src/main.py -h > ./doc/help-page.txt
-	sed "s/most_used_compile_and_interpret_opts/$$(cat ./most_used_compile_and_interpret_opts.txt)/" ./doc/getting_started_raw.md > ./doc/getting_started.md
+	# sed "s/most_used_compile_and_interpret_opts/$$(cat ./most_used_compile_and_interpret_opts.txt)/" ./doc/getting_started_raw.md > ./doc/getting_started.md
 
 
 clean: _clean-pycache _clean-files
