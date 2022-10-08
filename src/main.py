@@ -38,9 +38,15 @@ def main():
             traceback.print_exc()
     else:
         if global_vars.args.run or global_vars.args.show_mode:
-            print(
-                f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
-            )
+            match global_vars.extension:
+                case "reti":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+                case _:
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
         else:
             match global_vars.extension:
                 case "picoc":
