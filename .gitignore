@@ -36,3 +36,4 @@ README.txt
 *.res
 *.cast
 *.gdb_history
+*.venv/
