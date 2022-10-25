@@ -6,8 +6,8 @@ let
 in pkgs.mkShell rec {
   name = "impurePythonEnv";
   # buildInputs = [
-  #  python310Packages.python
-  #  ];
+  #   python310Packages.python
+  # ];
 
   # This is very close to how venvShellHook is implemented, but
   # adapted to use 'virtualenv'
