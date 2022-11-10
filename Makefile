@@ -212,6 +212,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.out_expected" -delete
 	find . -type f -wholename "./tests/*.datasegment_size" -delete
 	find . -type f -wholename "./tests/*.reti_states" -delete
+	find . -type f -wholename "./tests/*.eprom" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.res" -delete
