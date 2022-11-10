@@ -1,0 +1,14 @@
+// in:42 314
+// expected:42 314
+
+int var = input();
+
+void fun_with_local_var() {
+  int var = input();
+  print(var);
+}
+
+void main() {
+  print(var);
+  fun_with_local_var();
+}
