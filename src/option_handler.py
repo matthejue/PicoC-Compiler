@@ -342,13 +342,17 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.run or global_vars.args.show_mode:
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
-            reti_interp = RETIInterpreter()
-            # possiblity to supress error
+            reti_interp = RETIInterpreter(reti)
+            # possibility to supress error
             try:
-                error_handler.handle(reti_interp.interp_reti, reti)
+                error_handler.handle(reti_interp.interp_reti)
             except Exception as e:
                 if not global_vars.args.supress_errors:
                     raise e
+
+        if global_vars.args.intermediate_stages:
+            reti_interp = RETIInterpreter(reti)
+            self._eprom_write_startprogram_to_file(reti_interp, "EPROM")
 
         if global_vars.args.show_mode:
             self._show_mode()
@@ -435,10 +439,10 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
 
-        reti_interp = RETIInterpreter()
+        reti_interp = RETIInterpreter(ast)
         # possiblity to supress error
         try:
-            error_handler.handle(reti_interp.interp_reti, ast)
+            error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
             if not global_vars.args.supress_errors:
                 raise e
@@ -572,6 +576,30 @@ class OptionHandler(cmd2.Cmd):
                 CM().color_on()
             else:
                 CM().color_off()
+
+    def _eprom_write_startprogram_to_file(self, reti_interp: RETIInterpreter, heading):
+        with open(
+            global_vars.path + global_vars.basename + ".eprom", "w", encoding="utf-8"
+        ) as fout:
+            if global_vars.args.print:
+                acc = ""
+                for cell in reti_interp.reti.eprom.cells.values():
+                    acc += str(cell)
+                print(subheading(heading, self.terminal_columns, "-"))
+                print(acc.lstrip())
+
+            CM().color_off()
+
+            acc = ""
+            for cell in reti_interp.reti.eprom.cells.values():
+                acc += str(cell)
+
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
+
+            fout.write(acc.lstrip())
 
     def _show_mode(self):
         if global_vars.args.pages == 1:
