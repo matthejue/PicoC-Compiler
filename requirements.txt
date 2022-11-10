@@ -4,3 +4,4 @@ cmd2
 colorama
 lark
 pygments
+pudb
