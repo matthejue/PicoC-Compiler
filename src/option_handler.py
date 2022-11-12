@@ -39,6 +39,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--traceback", action="store_true")
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
     cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
+    cli_args_parser.add_argument("-b", "--binary", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
@@ -187,7 +188,7 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args.color = color
         global_vars.args.print = True
         global_vars.args.show_mode = True
-        global_vars.args.run = True
+        #  global_vars.args.run = True gets activated by show_mode anyways
         self._compl("void main() {" + code + "}")
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
@@ -342,8 +343,9 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
+            global_vars.args.run = True
 
-        if global_vars.args.run or global_vars.args.show_mode:
+        if global_vars.args.run:
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
             reti_interp = RETIInterpreter(reti)

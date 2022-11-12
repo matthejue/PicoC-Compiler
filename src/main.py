@@ -37,7 +37,7 @@ def main():
         if global_vars.args.traceback:
             traceback.print_exc()
     else:
-        if global_vars.args.run or global_vars.args.show_mode:
+        if global_vars.args.run:
             match global_vars.extension:
                 case "reti":
                     print(

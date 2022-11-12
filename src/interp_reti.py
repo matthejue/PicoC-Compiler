@@ -384,6 +384,7 @@ class RETIInterpreter:
         # deal with input for tests
         match self.program:
             case rn.Program(rn.Name(val)):
+                # .in file
                 if os.path.isfile(remove_extension(val) + ".in"):
                     with open(
                         remove_extension(val) + ".in", "r", encoding="utf-8"
@@ -399,6 +400,10 @@ class RETIInterpreter:
                                 ]
                             )
                         )
+                # .uart_r file
+                # TODO
+                # .uart_s file
+                # TODO
             case _:
                 bug_in_interpreter(self.program)
 
