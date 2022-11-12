@@ -37,7 +37,7 @@ class Instr(ASTNode):
         self.args = args
 
     def __repr__(self, depth=0):
-        global_vars.is_instr = True
+        global_vars.next_as_22 = True
         instr_str = f"\n{' ' * depth}{CM().BLUE}{self.op}{CM().RESET}"
         for arg in self.args:
             match arg:
@@ -45,7 +45,7 @@ class Instr(ASTNode):
                     instr_str += " " + arg.__repr__(len(instr_str)).lstrip()
                 case _:
                     instr_str += f" {arg}"
-        global_vars.is_instr = False
+        global_vars.next_as_22 = False
         return f"{instr_str}{'' if depth > 0 else ';'}"
 
     __match_args__ = ("op", "args")
@@ -60,7 +60,10 @@ class Jump(ASTNode):
     def __repr__(self, depth=0):
         match self.im_goto:
             case Im():
-                return f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET};"
+                global_vars.next_as_normal = True
+                acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET};"
+                global_vars.next_as_normal = False
+                return acc
             case pn.GoTo():
                 return (
                     f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} "
@@ -106,12 +109,14 @@ class Name(ASTNode):
 class Im(ASTNode):
     def __repr__(self):
         if global_vars.args.binary:
-            if global_vars.is_instr:
+            if global_vars.next_as_22:
                 bin_val = Bits(int=int(self.val), length=22).bin
                 bin_val_with_gaps = (
                     bin_val[:6] + "_" + bin_val[6:14] + "_" + bin_val[14:]
                 )
                 return f"{CM().RED}{bin_val_with_gaps}{CM().RESET}"
+            elif global_vars.next_as_normal:
+                return f"{CM().RED}{self.val}{CM().RESET}"
             else:
                 bin_val = Bits(uint=int(self.val), length=32).bin
                 bin_val_with_gaps = (
