@@ -24,6 +24,7 @@ class Args:
         self.show_mode = False
         self.pages = 5
         self.extension = "reti_states"
+        self.binary = False
 
 
 # options from command-line arguments
@@ -36,7 +37,9 @@ basename = ""
 
 reti_states = ""
 
-uart_size = 4
+uart_size = 3
+
+is_instr = False
 
 max_print_out_elements = 5
 

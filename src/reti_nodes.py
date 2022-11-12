@@ -2,7 +2,8 @@ from ast_node import ASTNode
 import picoc_nodes as pn
 from global_funs import throw_error
 from colormanager import ColorManager as CM
-
+import global_vars
+from bitstring import Bits
 
 # =========================================================================
 # =                            Container Nodes                            =
@@ -36,6 +37,7 @@ class Instr(ASTNode):
         self.args = args
 
     def __repr__(self, depth=0):
+        global_vars.is_instr = True
         instr_str = f"\n{' ' * depth}{CM().BLUE}{self.op}{CM().RESET}"
         for arg in self.args:
             match arg:
@@ -43,6 +45,7 @@ class Instr(ASTNode):
                     instr_str += " " + arg.__repr__(len(instr_str)).lstrip()
                 case _:
                     instr_str += f" {arg}"
+        global_vars.is_instr = False
         return f"{instr_str}{'' if depth > 0 else ';'}"
 
     __match_args__ = ("op", "args")
@@ -102,6 +105,25 @@ class Name(ASTNode):
 
 class Im(ASTNode):
     def __repr__(self):
+        if global_vars.args.binary:
+            if global_vars.is_instr:
+                bin_val = Bits(int=int(self.val), length=22).bin
+                bin_val_with_gaps = (
+                    bin_val[:6] + "_" + bin_val[6:14] + "_" + bin_val[14:]
+                )
+                return f"{CM().RED}{bin_val_with_gaps}{CM().RESET}"
+            else:
+                bin_val = Bits(uint=int(self.val), length=32).bin
+                bin_val_with_gaps = (
+                    bin_val[:8]
+                    + "_"
+                    + bin_val[8:16]
+                    + "_"
+                    + bin_val[16:24]
+                    + "_"
+                    + bin_val[24:]
+                )
+                return f"{CM().RED}{bin_val_with_gaps}{CM().RESET}"
         return f"{CM().RED}{self.val}{CM().RESET}"
 
 
