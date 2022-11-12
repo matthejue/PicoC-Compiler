@@ -128,7 +128,7 @@ class RETI(ASTNode):
             r_reg = self.uart_r.pop()
             if r_reg > 2 ^ 8 - 1:
                 print(
-                    f"The value {r_reg} for the uart receive register is larger than 8 bit."
+                    f"The value {r_reg} for the uart receive register needs more than 8 bit."
                 )
             return r_reg
         elif addr == 2:
@@ -137,7 +137,7 @@ class RETI(ASTNode):
             s_reg = self.uart_s.pop()
             if s_reg > 2 ^ 8 - 1:
                 print(
-                    f"The value {s_reg} for the uart status register is larger than 8 bit."
+                    f"The value {s_reg} for the uart status register needs more than 8 bit."
                 )
             return int(self.uart.cells[addr].val) | s_reg
         else:
