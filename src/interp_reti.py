@@ -4,7 +4,6 @@ from reti import RETI
 import global_vars
 from global_funs import (
     bug_in_interpreter,
-    remove_extension,
     filter_out_comments,
 )
 import os
@@ -382,30 +381,19 @@ class RETIInterpreter:
 
     def _preconfigs(self):
         # deal with input for tests
-        match self.program:
-            case rn.Program(rn.Name(val)):
-                # .in file
-                if os.path.isfile(remove_extension(val) + ".in"):
-                    with open(
-                        remove_extension(val) + ".in", "r", encoding="utf-8"
-                    ) as fin:
-                        self.test_input = list(
-                            reversed(
-                                [
-                                    int(line)
-                                    for line in fin.readline()
-                                    .replace("\n", "")
-                                    .split(" ")
-                                    if line.lstrip("-").isdigit()
-                                ]
-                            )
-                        )
-                # .uart_r file
-                # TODO
-                # .uart_s file
-                # TODO
-            case _:
-                bug_in_interpreter(self.program)
+        if os.path.isfile(global_vars.path + global_vars.basename + ".in"):
+            with open(
+                global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
+            ) as fin:
+                self.test_input = list(
+                    reversed(
+                        [
+                            int(line)
+                            for line in fin.readline().replace("\n", "").split(" ")
+                            if line.lstrip("-").isdigit()
+                        ]
+                    )
+                )
 
     def interp_reti(self):
         self._preconfigs()
