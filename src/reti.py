@@ -104,11 +104,11 @@ class RETI(ASTNode):
         self.eprom.cells[addr].val = str(val)
 
     def __repr__(self):
-        #  acc = f"{self.__class__.__name__}("
-        #  acc = "{"
+        global_vars.next_as_normal = True
         acc = (
             "\n" if int(self.idx.val) > 1 else ""
         ) + f"{CM().GREEN}index:{CM().RESET}       {self.idx}"
+        global_vars.next_as_normal = False
         acc += (
             f"\n{CM().GREEN}instruction:{CM().RESET} " + str(self.last_instr).lstrip()
         )
