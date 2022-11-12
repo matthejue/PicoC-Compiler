@@ -45,6 +45,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
+    cli_args_parser.add_argument("-N", "--no_run", action="store_true")
     cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
     cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
 
@@ -246,6 +247,10 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
+        if global_vars.args.show_mode and global_vars.args.no_run:
+            self._show_mode()
+            return
+
         # add the filename to the start of the code
         code_with_file = (
             ("./" if not global_vars.args.infile.startswith("./") else "")
@@ -362,6 +367,10 @@ class OptionHandler(cmd2.Cmd):
     def _interp(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
+
+        if global_vars.args.show_mode and global_vars.args.no_run:
+            self._show_mode()
+            return
 
         # add the filename to the start of the code
         code_with_file = (
