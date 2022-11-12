@@ -42,6 +42,36 @@ class RETI(ASTNode):
         self.eprom = EPROM(len(instrs))
         self.last_instr = None
 
+        # deal with uart receive register and status register files
+        if os.path.isfile(global_vars.path + global_vars.basename + ".uart_r"):
+            with open(
+                global_vars.path + global_vars.basename + ".uart_s",
+                "r",
+                encoding="utf-8",
+            ) as fin_s, open(
+                global_vars.path + global_vars.basename + ".uart_r",
+                "r",
+                encoding="utf-8",
+            ) as fin_r:
+                self.uart_s = list(
+                    reversed(
+                        [
+                            int(line)
+                            for line in fin_s.readline().replace("\n", "").split(" ")
+                            if line.isdigit()
+                        ]
+                    )
+                )
+                self.uart_r = list(
+                    reversed(
+                        [
+                            int(line)
+                            for line in fin_r.readline().replace("\n", "").split(" ")
+                            if line.isdigit()
+                        ]
+                    )
+                )
+
     def reg_get(self, reg):
         return int(self.regs[reg.upper()].val)
 
@@ -92,7 +122,26 @@ class RETI(ASTNode):
         self.sram.cells[addr].val = str(val)
 
     def uart_get(self, addr):
-        return int(self.uart.cells[addr].val)
+        if addr == 1:
+            if len(self.uart_r) == 1:
+                return self.uart_r[0]
+            r_reg = self.uart_r.pop()
+            if r_reg > 2 ^ 8 - 1:
+                print(
+                    f"The value in the uart receive register {r_reg} is larger than 8 bit"
+                )
+            return r_reg
+        elif addr == 2:
+            if len(self.uart_s) == 1:
+                return int(self.uart.cells[addr].val) | self.uart_s[0]
+            s_reg = self.uart_s.pop()
+            if s_reg > 2 ^ 8 - 1:
+                print(
+                    f"The value in the uart receive register {s_reg} is larger than 8 bit"
+                )
+            return int(self.uart.cells[addr].val) | s_reg
+        else:
+            return int(self.uart.cells[addr].val)
 
     def uart_set(self, addr, val):
         self.uart.cells[addr].val = str(val)
@@ -113,8 +162,21 @@ class RETI(ASTNode):
             f"\n{CM().GREEN}instruction:{CM().RESET} " + str(self.last_instr).lstrip()
         )
         for reg in self.regs.keys():
+            if reg in [
+                "PC",
+                "PC_SIMPLE",
+                "SP",
+                "SP_SIMPLE",
+                "BAF",
+                "BAF_SIMPLE",
+                "CS",
+                "CS_SIMPLE",
+                "BAF",
+                "BAF_SIMPLE",
+            ]:
+                global_vars.next_as_normal = True
             acc += f"\n{CM().GREEN}{reg}:{CM().RESET} {' ' * (11-len(reg))}{self.regs[reg]}"
-        #  acc += "\n}"
+            global_vars.next_as_normal = False
         acc_addr = self.reg_get("ACC")
         in1_addr = self.reg_get("IN1")
         in2_addr = self.reg_get("IN2")
