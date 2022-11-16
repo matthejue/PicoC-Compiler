@@ -40,6 +40,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-d", "--debug", action="store_true")
     cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
     cli_args_parser.add_argument("-b", "--binary", action="store_true")
+    cli_args_parser.add_argument("-n", "--no_long_jumps", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
@@ -322,7 +323,7 @@ class OptionHandler(cmd2.Cmd):
         picoc_mon = error_handler.handle(passes.picoc_anf, picoc_blocks)
 
         if global_vars.args.intermediate_stages:
-            self._output_pass(picoc_mon, "PicoC Mon")
+            self._output_pass(picoc_mon, "PicoC ANF")
 
         if global_vars.args.intermediate_stages:
             self._st_option(passes.symbol_table, "Symbol Table")

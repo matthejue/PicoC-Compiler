@@ -24,7 +24,9 @@ class Num(ASTNode):
         super().__init__(
             val,
             pos,
-            visible=[self.is_negative] if global_vars.args.double_verbose else [],
+            #  visible=[str(val), self.is_negative]
+            #  if global_vars.args.double_verbose
+            #  else [str(val)],
         )
 
     def __eq__(self, other):

@@ -17,6 +17,7 @@ class Args:
         self.traceback = False
         self.example = False
         self.supress_errors = False
+        self.no_long_jumps = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3
@@ -133,6 +134,8 @@ COMPUTE_IMMEDIATE_INSTRUCTION = [
 BUILTIN_FUNS = ["print", "input"]
 
 NEG_RELS = {
+    "": rn.Always(),
+    "==": rn.NEq(),
     "==": rn.NEq(),
     "!=": rn.NEq(),
     "<": rn.GtE(),
