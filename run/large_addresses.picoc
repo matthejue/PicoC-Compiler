@@ -1,0 +1,9 @@
+// in:3
+// expected:
+
+void main() {
+  int i = input();
+  while(i) {
+    i = i - 1;
+  }
+}
