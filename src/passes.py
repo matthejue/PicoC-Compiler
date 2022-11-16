@@ -2687,12 +2687,12 @@ class Passes:
     # - what is there's no main function
 
     def count_instrs(self, instrs):
-        if not (
-            global_vars.args.verbose
-            or global_vars.args.double_verbose
-            or global_vars.args.no_long_jumps
-        ):
-            return len(instrs)
+        #  if not (
+        #      global_vars.args.verbose
+        #      and global_vars.args.double_verbose
+        #      and global_vars.args.no_long_jumps
+        #  ):
+        #      return len(instrs)
         cnt = 0
         for instr in instrs:
             match instr:
@@ -2706,37 +2706,37 @@ class Passes:
                     cnt += 1
         return cnt
 
-    def _write_large_immediate_in_register(self, reg, s_num):
-        bits = Bits(int=s_num, length=32).bin
-        sign = bits[0]
-        h_bits = bits[1:11]
-        l_bits = bits[11:32]
-        h_num = Bits(bin="0" + h_bits).int
-        l_num = Bits(bin="0" + l_bits).int
-        return (
-            self._single_line_comment(reg, "# write large immediate into")
-            + (
-                [
-                    rn.Instr(rn.Loadi(), [reg, rn.Im("-1")]),
-                    rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
-                ]
-                if h_num == 0
-                else [rn.Instr(rn.Loadi(), [reg, rn.Im(str(-h_num))])]
-            )
-            + [
-                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**21))]),
-                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
-            ]
-            if sign == "1"
-            else [
-                rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
-                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
-                rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
-                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
-            ]
-        )
+    #  def _write_large_immediate_in_register(self, reg, s_num):
+    #      bits = Bits(int=s_num, length=32).bin
+    #      sign = bits[0]
+    #      h_bits = bits[1:11]
+    #      l_bits = bits[11:32]
+    #      h_num = Bits(bin="0" + h_bits).int
+    #      l_num = Bits(bin="0" + l_bits).int
+    #      return (
+    #          self._single_line_comment(reg, "# write large immediate into")
+    #          + (
+    #              [
+    #                  rn.Instr(rn.Loadi(), [reg, rn.Im("-1")]),
+    #                  rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
+    #              ]
+    #              if h_num == 0
+    #              else [rn.Instr(rn.Loadi(), [reg, rn.Im(str(-h_num))])]
+    #          )
+    #          + [
+    #              rn.Instr(rn.Multi(), [reg, rn.Im(str(2**21))]),
+    #              rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+    #          ]
+    #          if sign == "1"
+    #          else [
+    #              rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
+    #              rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
+    #              rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
+    #              rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+    #          ]
+    #      )
 
-    def _write_large_immediate_in_register2(self, reg, s_num):
+    def _write_large_immediate_in_register(self, reg, s_num):
         bits = Bits(int=s_num, length=32).bin
         h_bits = bits[0:22]
         l_bits = bits[22:32]
@@ -2877,15 +2877,11 @@ class Passes:
             #  distance < -(2**21) and distance > 2**21 - 1
             #  ) or global_vars.args.no_jump:
             neg_rel = global_vars.NEG_RELS[str(rel)]
-            instrs_for_immediate = self._write_large_immediate_in_register2(
+            instrs_for_immediate = self._write_large_immediate_in_register(
                 rn.Reg(rn.Acc()), distance
             )
             return self._single_line_comment(instr, "#") + (
-                (
-                    [rn.Jump(neg_rel, rn.Im(str(len(instrs_for_immediate) + 1)))]
-                    if str(rel)
-                    else []
-                )
+                ([rn.Jump(neg_rel, rn.Im("5"))] if str(rel) else [])
                 + instrs_for_immediate
                 + [rn.Instr(rn.Add(), [rn.Reg(rn.Pc()), rn.Reg(rn.Acc())])]
             )
