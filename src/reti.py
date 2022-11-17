@@ -74,6 +74,7 @@ class RETI(ASTNode):
         else:
             self.uart_r = []
             self.uart_s = []
+        self.status_register_lock = False
 
     def reg_get(self, reg):
         return int(self.regs[reg.upper()].val)
@@ -132,17 +133,21 @@ class RETI(ASTNode):
                     f"The value {r_reg} for the uart receive register needs more than 8 bit."
                 )
             self.uart.cells[addr].val = str(r_reg)
-        elif addr == 2 and len(self.uart_s) > 0:
+        elif addr == 2 and len(self.uart_s) > 0 and not self.status_register_lock:
             s_reg = self.uart_s.pop()
             if s_reg > 2 ^ 8 - 1:
                 print(
                     f"The value {s_reg} for the uart status register needs more than 8 bit."
                 )
             self.uart.cells[addr].val = str(int(self.uart.cells[addr].val) | s_reg)
+            if s_reg & 2:
+                self.status_register_lock = True
         return int(self.uart.cells[addr].val)
 
     def uart_set(self, addr, val):
         self.uart.cells[addr].val = str(val)
+        if addr == 2 and not val & 2:
+            self.status_register_lock = False
 
     def eprom_get(self, addr):
         return self.eprom.cells[addr]
