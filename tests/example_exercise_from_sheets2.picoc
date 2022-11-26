@@ -3,12 +3,12 @@
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
 
 void main() {
-  //Deklarationsteil
+  // Deklarationsteil
   int x;
   int y;
   const int z = 2;
 
-  //Anweisungsteil
+  // Anweisungsteil
   y = input();
   x = input();
 
