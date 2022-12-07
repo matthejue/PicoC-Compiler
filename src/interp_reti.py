@@ -57,7 +57,7 @@ class RETIInterpreter:
         match destination:
             # addressbus
             case rn.Im(val):
-                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b100000000 << 22
+                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b1000000000 << 22
                 memory_type = self.reti.reg_get("DS") >> 30
                 match memory_type:
                     case 0b00:
@@ -104,7 +104,7 @@ class RETIInterpreter:
         match source:
             # addressbus
             case rn.Im(val):
-                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b100000000 << 22
+                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b1000000000 << 22
                 memory_type = self.reti.reg_get("DS") >> 30
                 match memory_type:
                     case 0b00:
