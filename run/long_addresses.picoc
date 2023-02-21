@@ -1,0 +1,10 @@
+// in:3
+// expected:
+// opts: -v -p -c -b -n
+
+void main() {
+  int i = input();
+  while(i) {
+    i = i - 1;
+  }
+}

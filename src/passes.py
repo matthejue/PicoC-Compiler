@@ -5,7 +5,6 @@ import symbol_table as st
 from global_funs import (
     throw_error,
     remove_extension,
-    filter_out_comments,
     convert_to_single_line,
     find_first_pos_in_node,
 )
@@ -23,7 +22,7 @@ class Passes:
         self.all_blocks = dict()
         self.fun_name_to_block_name = dict()
         self.marked_funs_for_error = []
-        # PicoC_Mon
+        # PicoC_ANF
         self.argmode_on = False
         self.symbol_table = st.SymbolTable()
         self.current_scope = "global!"
@@ -213,7 +212,9 @@ class Passes:
                                         raise errors.WrongReturnType(
                                             fun_name,
                                             fun_pos,
-                                            convert_to_single_line(datatype),
+                                            convert_to_single_line(
+                                                datatype, no_colors=True
+                                            ),
                                             (
                                                 "IntType()"
                                                 if isinstance(datatype, pn.VoidType)
@@ -273,7 +274,9 @@ class Passes:
                 )
             )
             node.visible = visible_emptied_lists
-        return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
+        return [
+            pn.SingleLineComment(prefix, convert_to_single_line(node, no_colors=True))
+        ]
 
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
@@ -417,8 +420,9 @@ class Passes:
                 throw_error(file)
 
     # =========================================================================
-    # =                               PicoC_Mon                               =
+    # =                               PicoC_ANF                               =
     # =========================================================================
+
     def _datatype_size(self, datatype):
         match datatype:
             # ------------------------ L_Arith + L_Pntr -----------------------
@@ -1330,11 +1334,11 @@ class Passes:
                     case st.Symbol(pn.Const(), datatype):
                         raise errors.DatatypeMismatch(
                             identifier_name,
-                            "const " + convert_to_single_line(datatype),
+                            "const " + convert_to_single_line(datatype, no_colors=True),
                             identifier_pos,
                             identifier_pos,
                             #  find_first_pos_in_node([exp])[1],
-                            convert_to_single_line(datatype),
+                            convert_to_single_line(datatype, no_colors=True),
                         )
                     case _:
                         throw_error(symbol)
@@ -1479,10 +1483,14 @@ class Passes:
                             (datatype3, exp3),
                             pn.Alloc(_, datatype4, pn.Name(name4, pos4)),
                         ):
-                            argument_exp = convert_to_single_line(exp3)
+                            argument_exp = convert_to_single_line(exp3, no_colors=True)
                             fun_param_name = name4
-                            argument_datatype = convert_to_single_line(datatype3)
-                            fun_param_datatype = convert_to_single_line(datatype4)
+                            argument_datatype = convert_to_single_line(
+                                datatype3, no_colors=True
+                            )
+                            fun_param_datatype = convert_to_single_line(
+                                datatype4, no_colors=True
+                            )
                             argument_pos = find_first_pos_in_node([exp3])[1]
                             fun_param_pos = pos4
                             raise errors.ArgumentMismatch(
@@ -1695,11 +1703,11 @@ class Passes:
                         local_vars_size = self._local_vars_size(stmts)
                         blocks[0].param_size = pn.Num(str(param_size))
                         blocks[0].local_vars_size = pn.Num(str(local_vars_size))
-                        blocks[0].visible += (
-                            [blocks[0].param_size, blocks[0].local_vars_size]
-                            if global_vars.args.double_verbose
-                            else []
-                        )
+                        #  blocks[0].visible += (
+                        #      [blocks[0].param_size, blocks[0].local_vars_size]
+                        #      if global_vars.args.double_verbose
+                        #      else []
+                        #  )
 
                         blocks[0].stmts_instrs[:] = (
                             (
@@ -1761,11 +1769,15 @@ class Passes:
                                             def_name,
                                             def_pos,
                                             def_param_name,
-                                            convert_to_single_line(def_param_datatype),
+                                            convert_to_single_line(
+                                                def_param_datatype, no_colors=True
+                                            ),
                                             def_param_pos,
                                             decl_pos,
                                             decl_param_name,
-                                            convert_to_single_line(decl_param_datatype),
+                                            convert_to_single_line(
+                                                decl_param_datatype, no_colors=True
+                                            ),
                                             decl_param_pos,
                                         )
                                     case _:
@@ -2568,7 +2580,8 @@ class Passes:
                     + [pn.Exp(goto1)]
                 )
             case pn.Exp(pn.GoTo(pn.Name(val))):
-                return self._single_line_comment(stmt, "#") + [stmt]
+                # self._single_line_comment(stmt, "#")
+                return [stmt]
             # ----------------------------- L_Fun -----------------------------
             case pn.StackMalloc(pn.Num(val)):
                 return self._single_line_comment(stmt, "#") + [
@@ -2673,35 +2686,67 @@ class Passes:
     # - what if the main fun isn't the first fun in the file
     # - what is there's no main function
 
+    def count_instrs(self, instrs):
+        #  if not (
+        #      global_vars.args.verbose
+        #      and global_vars.args.double_verbose
+        #      and global_vars.args.no_long_jumps
+        #  ):
+        #      return len(instrs)
+        cnt = 0
+        for instr in instrs:
+            match instr:
+                case pn.SingleLineComment():
+                    pass
+                case rn.Jump(rn.Eq(), pn.GoTo()) if global_vars.args.no_long_jumps:
+                    cnt += 5
+                case pn.Exp(pn.GoTo()) if global_vars.args.no_long_jumps:
+                    cnt += 4
+                case _:
+                    cnt += 1
+        return cnt
+
+    #  def _write_large_immediate_in_register(self, reg, s_num):
+    #      bits = Bits(int=s_num, length=32).bin
+    #      sign = bits[0]
+    #      h_bits = bits[1:11]
+    #      l_bits = bits[11:32]
+    #      h_num = Bits(bin="0" + h_bits).int
+    #      l_num = Bits(bin="0" + l_bits).int
+    #      return (
+    #          self._single_line_comment(reg, "# write large immediate into")
+    #          + (
+    #              [
+    #                  rn.Instr(rn.Loadi(), [reg, rn.Im("-1")]),
+    #                  rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
+    #              ]
+    #              if h_num == 0
+    #              else [rn.Instr(rn.Loadi(), [reg, rn.Im(str(-h_num))])]
+    #          )
+    #          + [
+    #              rn.Instr(rn.Multi(), [reg, rn.Im(str(2**21))]),
+    #              rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+    #          ]
+    #          if sign == "1"
+    #          else [
+    #              rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
+    #              rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
+    #              rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
+    #              rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+    #          ]
+    #      )
+
     def _write_large_immediate_in_register(self, reg, s_num):
         bits = Bits(int=s_num, length=32).bin
-        sign = bits[0]
-        h_bits = bits[1:11]
-        l_bits = bits[11:32]
-        h_num = Bits(bin="0" + h_bits).int
+        h_bits = bits[0:22]
+        l_bits = bits[22:32]
+        h_num = Bits(bin=h_bits).int
         l_num = Bits(bin="0" + l_bits).int
-        return (
-            self._single_line_comment(reg, "# write large immediate into")
-            + (
-                [
-                    rn.Instr(rn.Loadi(), [reg, rn.Im("-1")]),
-                    rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
-                ]
-                if h_num == 0
-                else [rn.Instr(rn.Loadi(), [reg, rn.Im(str(-h_num))])]
-            )
-            + [
-                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**21))]),
-                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
-            ]
-            if sign == "1"
-            else [
-                rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
-                rn.Instr(rn.Multi(), [reg, rn.Im(str(2**20))]),
-                rn.Instr(rn.Multi(), [reg, rn.Im("2")]),
-                rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
-            ]
-        )
+        return self._single_line_comment(reg, "# write large immediate into") + [
+            rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
+            rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
+            rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+        ]
 
     def _reti_patch_instr(self, instr, current_block_idx, is_last_instr):
         match instr:
@@ -2769,22 +2814,6 @@ class Passes:
                     return self._write_large_immediate_in_register(reg, s_num)
                 else:
                     return [instr]
-            case rn.Jump(rel, rn.Im(val)):
-                s_num = int(val)
-                if s_num < -(2**31) and s_num > 2**31 - 1:
-                    throw_error(instr)
-                elif s_num < -(2**21) and s_num > 2**21 - 1:
-                    neg_rel = global_vars.NEG_RELS[str(rel)]
-                    instrs_for_immediate = self._write_large_immediate_in_register(
-                        rn.Reg(rn.Acc()), s_num
-                    )
-                    return (
-                        [rn.Jump(neg_rel, rn.Im(str(len(instrs_for_immediate))))]
-                        + instrs_for_immediate
-                        + [rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())])]
-                    )
-                else:
-                    return [instr]
             case _:
                 return [instr]
 
@@ -2806,7 +2835,7 @@ class Passes:
                 # TODO: Move this into the patch_instructions pass, because
                 # in this pass goto(next_block_name) gets removed
                 block.instrs_before = pn.Num(str(self.instrs_cnt))
-                num_instrs = len(list(filter_out_comments(block.stmts_instrs)))
+                num_instrs = self.count_instrs(block.stmts_instrs)
                 block.num_instrs = pn.Num(str(num_instrs))
                 block.visible += (
                     [block.instrs_before, block.num_instrs]
@@ -2841,6 +2870,26 @@ class Passes:
     # =========================================================================
     # =                                  RETI                                 =
     # =========================================================================
+
+    def _patch_too_large_jumps(self, rel, distance, instr):
+        if global_vars.args.no_long_jumps:
+            #  if (
+            #  distance < -(2**21) and distance > 2**21 - 1
+            #  ) or global_vars.args.no_jump:
+            neg_rel = global_vars.NEG_RELS[str(rel)]
+            instrs_for_immediate = self._write_large_immediate_in_register(
+                rn.Reg(rn.Acc()), distance
+            )
+            return self._single_line_comment(instr, "#") + (
+                ([rn.Jump(neg_rel, rn.Im("5"))] if str(rel) else [])
+                + instrs_for_immediate
+                + [rn.Instr(rn.Add(), [rn.Reg(rn.Pc()), rn.Reg(rn.Acc())])]
+            )
+        else:
+            return self._single_line_comment(instr, "#") + [
+                rn.Jump(rel, rn.Im(str(distance)))
+            ]
+
     def _determine_distance(self, current_block, other_block, idx):
         if int(other_block.instrs_before.val) != int(current_block.instrs_before.val):
             return (
@@ -2856,15 +2905,18 @@ class Passes:
             case pn.Exp(pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                return [rn.Jump(rn.Always(), rn.Im(str(distance)))]
-            case rn.Jump(rn.Eq(), pn.GoTo(pn.Name(val))):
+                return self._patch_too_large_jumps(rn.Always(), distance, instr)
+            case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                return self._single_line_comment(instr, "#") + [
-                    rn.Jump(rn.Eq(), rn.Im(str(distance)))
-                ]
+                return self._patch_too_large_jumps(rel, distance, instr)
             case rn.Instr(rn.Loadi(), [reg, pn.GoTo(_)]):
-                rel_addr = str(int(current_block.instrs_before.val) + idx + 4)
+                rel_addr = str(
+                    int(current_block.instrs_before.val)
+                    + idx
+                    + 4
+                    + (3 if global_vars.args.no_long_jumps else 0)
+                )
                 return self._single_line_comment(instr, "#") + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
@@ -2884,6 +2936,17 @@ class Passes:
                                 pn.Block(name, []), "# //"
                             )
                             for instr in instrs:
+                                match instr:
+                                    case pn.Exp(
+                                        pn.GoTo()
+                                    ) if global_vars.args.no_long_jumps:
+                                        idx += 3
+                                    case rn.Jump(
+                                        rn.Eq(), pn.GoTo()
+                                    ) if global_vars.args.no_long_jumps:
+                                        idx += 4
+                                    case _:
+                                        pass
                                 instrs_block_free += self._reti_instr(instr, idx, block)
                                 match instr:
                                     case pn.SingleLineComment():

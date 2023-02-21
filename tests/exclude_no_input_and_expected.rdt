@@ -1,9 +1,0 @@
-program
-  ./tests/exclude_no_input_and_expected.rdt
-  instr
-    LOADIN
-    arg
-      reg	BAF
-    arg
-      reg	PC
-    -1

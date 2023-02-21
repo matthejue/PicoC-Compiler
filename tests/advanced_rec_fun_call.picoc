@@ -1,0 +1,14 @@
+// in:10 10 10 10 10 10 10 10 10 10
+// expected:10
+// datasegment:32
+
+int rec_fun_call(int arg) {
+  if (arg == input()) {
+    return arg;
+  }
+  return rec_fun_call(arg + 1);
+}
+
+void main() {
+  print(rec_fun_call(1));
+}

@@ -5,9 +5,7 @@ import symbol_table as st
 import picoc_nodes as pn
 import reti_nodes as rn
 from colormanager import ColorManager as CM
-import os
 import sys
-from help_message import generate_help_message
 from lark.lark import Lark
 from dt_visitors import (
     DTVisitorPicoC,
@@ -18,7 +16,12 @@ from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
 from global_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
-import subprocess
+import subprocess, os, platform
+from lexers_for_colorizing import TokenLexer, DTLexer, RETILexer
+from pygments import highlight
+from pygments.token import *
+from pygments.formatters.terminal import TerminalFormatter
+from pygments.lexers.c_cpp import CLexer
 
 
 class OptionHandler(cmd2.Cmd):
@@ -28,19 +31,22 @@ class OptionHandler(cmd2.Cmd):
     # ------------------- PicoC_Compiler + RETI_Interpreter -------------------
     cli_args_parser.add_argument("-i", "--intermediate_stages", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-vv", "--double_verbose", action="store_true")
+    cli_args_parser.add_argument("-l", "--lines", type=int, default=2)
     cli_args_parser.add_argument("-c", "--color", action="store_true")
-    cli_args_parser.add_argument("-d", "--debug", action="store_true")
-    cli_args_parser.add_argument("-t", "--traceback", action="store_true")
     cli_args_parser.add_argument("-e", "--example", action="store_true")
+    cli_args_parser.add_argument("-t", "--traceback", action="store_true")
+    cli_args_parser.add_argument("-d", "--debug", action="store_true")
     cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
+    cli_args_parser.add_argument("-b", "--binary", action="store_true")
+    cli_args_parser.add_argument("-n", "--no_long_jumps", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
+    cli_args_parser.add_argument("-N", "--no_run", action="store_true")
     cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
     cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
 
@@ -67,12 +73,20 @@ class OptionHandler(cmd2.Cmd):
                 "mu": "most_used",
                 "itp": "interpret",
                 "ct": "color_toggle",
+                "cs": "compile_show",
+                "is": "interpret_show",
             }
         )
         cmd2.Cmd.__init__(
             self,
             shortcuts=shortcuts,
-            multiline_commands=["compile", "most_used", "interpret"],
+            multiline_commands=[
+                "compile",
+                "most_used",
+                "interpret",
+                "compile_show",
+                "interpret_show",
+            ],
         )
         del cmd2.Cmd.do_help
 
@@ -145,59 +159,72 @@ class OptionHandler(cmd2.Cmd):
         self._color_for_prompt_and_intro()
 
     @cmd2.with_argparser(cli_args_parser)
-    def do_most_used(self, args):
-        # the 'infile' attribute is used as a storage for the code
-        code = args.infile
-        # color should never be effected by the '-C' option, because it's
-        # determined before via 'settings.conf' before and this should be kept
-        color = global_vars.args.color
-        global_vars.args = global_vars.Args()
-        global_vars.args.color = color
-        self._do_compile_shell(code)
-
-    @cmd2.with_argparser(cli_args_parser)
     def do_compile(self, args):
-        # shell is only going to open, if there're no options from outside, so
-        # shell is anyways always starting with everything turned off in
-        # global_vars.args besides color being set from settings.conf before
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        # is important to give this attribute a filename as value again,
-        # because it's needed later
         global_vars.args.infile = "stdin.picoc"
         global_vars.args.color = color
-        self._do_compile_shell(code)
-
-    def _do_compile_shell(self, code):
-        # printing is always turned on in shell
         global_vars.args.print = True
-
-        # TODO: "and Interpretation"
         self._compl("void main() {" + code + "}")
         print(f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET_ALL}\n")
 
     @cmd2.with_argparser(cli_args_parser)
-    def do_interpret(self, args):
-        # shell is only going to open, if there're no options from outside, so
-        # shell is anyways always starting with everything turned off in
-        # global_vars.args besides color being set from settings.conf before
+    def do_most_used(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = global_vars.Args()
+        global_vars.args.color = color
+        global_vars.args.print = True
+        self._compl("void main() {" + code + "}")
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_compile_show(self, args):
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        # is important to give this attribute a filename as value again,
-        # because it's needed later
+        global_vars.args.infile = "stdin.picoc"
+        global_vars.args.color = color
+        global_vars.args.print = True
+        global_vars.args.show_mode = True
+        #  global_vars.args.run = True gets activated by show_mode anyways
+        self._compl("void main() {" + code + "}")
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
+    @cmd2.with_argparser(cli_args_parser)
+    def do_interpret(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = args
         global_vars.args.infile = "stdin.reti"
         global_vars.args.color = color
-
         global_vars.args.print = True
         self._interp(code)
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
         )
 
+    @cmd2.with_argparser(cli_args_parser)
+    def do_interpret_show(self, args):
+        code = args.infile
+        color = global_vars.args.color
+        global_vars.args = args
+        global_vars.args.infile = "stdin.reti"
+        global_vars.args.color = color
+        global_vars.args.print = True
+        global_vars.args.show_mode = True
+        self._interp(code)
+        print(
+            f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
+        )
+
     def do_help(self, _):
-        print(generate_help_message())
+        _open_documentation()
 
     def read_and_write_file(self):
         """reads a pico_c file and compiles it
@@ -206,16 +233,24 @@ class OptionHandler(cmd2.Cmd):
         with open(global_vars.args.infile, encoding="utf-8") as fin:
             picoc_in = fin.read()
 
-        extension = get_extension(global_vars.args.infile)
-        match extension:
+        global_vars.extension = get_extension(global_vars.args.infile)
+        match global_vars.extension:
             case "picoc":
                 self._compl(picoc_in)
             case "reti":
                 self._interp(picoc_in)
+            case _:
+                print(
+                    f"File with extension '.{global_vars.extension}' cannot be compiled or interpreted."
+                )
 
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
+
+        if global_vars.args.show_mode and global_vars.args.no_run:
+            self._show_mode()
+            return
 
         # add the filename to the start of the code
         code_with_file = (
@@ -226,7 +261,11 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
-            print(f"// {global_vars.args.infile}:\n" + code)
+            inserted_code = f"// {global_vars.args.infile}:\n" + code
+            if global_vars.args.color:
+                print(highlight(inserted_code, CLexer(), TerminalFormatter()))
+            else:
+                print(inserted_code)
 
         parser = Lark.open(
             f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
@@ -258,6 +297,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "Derivation Tree Simple")
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         ast_transformer_picoc = TransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
@@ -279,7 +323,7 @@ class OptionHandler(cmd2.Cmd):
         picoc_mon = error_handler.handle(passes.picoc_anf, picoc_blocks)
 
         if global_vars.args.intermediate_stages:
-            self._output_pass(picoc_mon, "PicoC Mon")
+            self._output_pass(picoc_mon, "PicoC ANF")
 
         if global_vars.args.intermediate_stages:
             self._st_option(passes.symbol_table, "Symbol Table")
@@ -298,22 +342,36 @@ class OptionHandler(cmd2.Cmd):
 
         self._output_pass(reti, "RETI")
 
+        if global_vars.args.intermediate_stages:
+            reti_interp = RETIInterpreter(reti)
+            self._eprom_write_startprogram_to_file(reti_interp, "EPROM")
+
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
+            global_vars.args.run = True
 
         if global_vars.args.run:
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
-            reti_interp = RETIInterpreter()
-            error_handler.handle(reti_interp.interp_reti, reti)
+            reti_interp = RETIInterpreter(reti)
+            # possibility to supress error
+            try:
+                error_handler.handle(reti_interp.interp_reti)
+            except Exception as e:
+                if not global_vars.args.supress_errors:
+                    raise e
 
-        if global_vars.args.show_mode and global_vars.args.run:
+        if global_vars.args.show_mode:
             self._show_mode()
 
     def _interp(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
+
+        if global_vars.args.show_mode and global_vars.args.no_run:
+            self._show_mode()
+            return
 
         # add the filename to the start of the code
         code_with_file = (
@@ -324,7 +382,28 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
-            print(f"// {global_vars.args.infile}:\n" + code)
+            inserted_code = f"# {global_vars.args.infile}:\n" + code + "\n"
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        inserted_code,
+                        RETILexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Comment: ("magenta", "brightmagenta"),
+                                Whitespace: ("gray", "white"),
+                                Keyword: ("blue", "brightblue"),
+                                Punctuation: ("gray", "white"),
+                                Name: ("cyan", "brightcyan"),
+                                Number: ("red", "brightred"),
+                                Name.Tag: ("green", "brightgreen"),
+                                Operator: ("yellow", "brightyellow"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(inserted_code)
 
         parser = Lark.open(
             f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
@@ -352,6 +431,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "RETI Derivation Tree")
 
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
+
         ast_transformer_reti = ASTTransformerRETI()
         ast = error_handler.handle(ast_transformer_reti.transform, dt)
 
@@ -361,14 +445,16 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.show_mode:
             global_vars.args.verbose = True
             global_vars.args.intermediate_stages = True
+            if not global_vars.path:
+                CM().color_off()
 
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
 
-        reti_interp = RETIInterpreter()
+        reti_interp = RETIInterpreter(ast)
         # possiblity to supress error
         try:
-            error_handler.handle(reti_interp.interp_reti, ast)
+            error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
             if not global_vars.args.supress_errors:
                 raise e
@@ -390,7 +476,25 @@ class OptionHandler(cmd2.Cmd):
 
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
-            print(tokens)
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        str(tokens),
+                        TokenLexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Whitespace: ("gray", "white"),
+                                Keyword: ("blue", "brightblue"),
+                                Punctuation: ("gray", "white"),
+                                String.Delimiter: ("cyan", "brightcyan"),
+                                Name.Variable: ("green", "brightgreen"),
+                                Name.Attribute: ("red", "brightred"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(tokens)
 
         if global_vars.path:
             with open(
@@ -404,7 +508,22 @@ class OptionHandler(cmd2.Cmd):
     def _dt_option(self, dt, heading):
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
-            print(dt.pretty())
+            if global_vars.args.color:
+                print(
+                    highlight(
+                        dt.pretty().replace("\t", "    "),
+                        DTLexer(),
+                        TerminalFormatter(
+                            colorscheme={
+                                Whitespace: ("gray", "white"),
+                                Name.Variable: ("blue", "brightgreen"),
+                                Name.Attribute: ("red", "brightred"),
+                            }
+                        ),
+                    )
+                )
+            else:
+                print(dt.pretty().replace("\t", "    "))
 
         if global_vars.path:
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
@@ -416,6 +535,7 @@ class OptionHandler(cmd2.Cmd):
             print(ast)
 
         if global_vars.path:
+            CM().color_off()
             match ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
@@ -425,6 +545,10 @@ class OptionHandler(cmd2.Cmd):
                         fout.write(str(ast))
                 case _:
                     throw_error(ast)
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
 
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
@@ -432,6 +556,7 @@ class OptionHandler(cmd2.Cmd):
             print(pass_ast)
 
         if global_vars.path:
+            CM().color_off()
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
@@ -441,6 +566,10 @@ class OptionHandler(cmd2.Cmd):
                         fout.write(str(pass_ast))
                 case _:
                     throw_error(pass_ast)
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
 
     def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
@@ -448,21 +577,75 @@ class OptionHandler(cmd2.Cmd):
             print(symbol_table)
 
         if global_vars.path:
+            CM().color_off()
             with open(
                 global_vars.path + global_vars.basename + ".st",
                 "w",
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(symbol_table))
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
+
+    def _eprom_write_startprogram_to_file(self, reti_interp: RETIInterpreter, heading):
+        if global_vars.args.print:
+            acc = ""
+            for cell in reti_interp.reti.eprom.cells.values():
+                acc += str(cell)
+            print(subheading(heading, self.terminal_columns, "-"))
+            print(acc.lstrip())
+
+        if global_vars.path:
+            with open(
+                global_vars.path + global_vars.basename + ".eprom",
+                "w",
+                encoding="utf-8",
+            ) as fout:
+                CM().color_off()
+
+                acc = ""
+                for cell in reti_interp.reti.eprom.cells.values():
+                    acc += str(cell)
+
+                if global_vars.args.color:
+                    CM().color_on()
+                else:
+                    CM().color_off()
+
+                fout.write(acc.lstrip())
 
     def _show_mode(self):
+        if global_vars.args.pages == 1:
+            command = [
+                "nvim",
+                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
+                "-u",
+                os.path.dirname(os.path.realpath(sys.argv[0]))
+                + "/interpr_showcase.vim",
+                "-c",
+                "0 | norm zt",
+            ]
+            subprocess.call(command)
+            return
+
         first = True
-        command = [
-            "nvim",
-            f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
-            "-u",
-            os.path.expanduser("~") + "/.config/picoc_compiler/interpr_showcase.vim",
-        ]
+        command = (
+            ["nvim"]
+            + (
+                [
+                    f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}"
+                ]
+                if global_vars.path
+                else []
+            )
+            + [
+                "-u",
+                os.path.dirname(os.path.realpath(sys.argv[0]))
+                + "/interpr_showcase.vim",
+            ]
+        )
         for i in reversed(range(1, global_vars.args.pages)):
             current_line_num = self.terminal_lines * i + 1 - i
             if first:
@@ -483,13 +666,24 @@ class OptionHandler(cmd2.Cmd):
         command += ["-c", "windo se scb!"]
         command += ["-c", "wincmd h" + ("| wincmd h" * (global_vars.args.pages - 2))]
 
-        if global_vars.args.pages == 1:
-            command = [
-                "nvim",
-                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
-                "-u",
-                "~/.config/picoc_compiler/interpr_showcase.vim",
-                "-c",
-                "0 | norm zt",
-            ]
-        subprocess.call(command)
+        if global_vars.path:
+            subprocess.call(command)
+        else:
+            subprocess.run(command, input=global_vars.reti_states.encode("utf-8"))
+
+        global_vars.reti_states = ""
+
+
+def _open_documentation():
+    filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/Dokumentation.pdf"
+
+    #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7
+    # https://stackoverflow.com/questions/434597/open-document-with-default-os-application-in-python-both-in-windows-and-mac-os
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(("open", filepath))
+    elif platform.system() == "Windows":  # Windows
+        os.startfile(filepath)
+    elif platform.system() == "Linux":  # linux variants
+        subprocess.call(("xdg-open", filepath))
+    else:
+        print("OS not supported.")

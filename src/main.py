@@ -2,18 +2,17 @@
 
 import sys
 import global_vars
-from option_handler import OptionHandler
+from option_handler import OptionHandler, _open_documentation
 from global_funs import only_keep_path, basename
 import global_vars
 from colorama import init
 from colormanager import ColorManager as CM
-from help_message import generate_help_message
 import traceback
 
 
 def main():
     if set(["-h", "--help"]).intersection(sys.argv):
-        _deal_with_help_page()
+        _open_documentation()
         return
 
     init(strip=False)
@@ -38,19 +37,26 @@ def main():
         if global_vars.args.traceback:
             traceback.print_exc()
     else:
-        print(
-            f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
-        )
-
-
-def _deal_with_help_page():
-    if set(["-c", "--color"]).intersection(sys.argv):
-        global_vars.args.color = True
-        CM().color_on()
-    else:
-        global_vars.args.color = False
-        CM().color_off()
-    print(generate_help_message())
+        if global_vars.args.run:
+            match global_vars.extension:
+                case "reti":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+                case _:
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+        else:
+            match global_vars.extension:
+                case "picoc":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+                case "reti":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
 
 
 if __name__ == "__main__":
