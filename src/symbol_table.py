@@ -2,6 +2,7 @@ from ast_node import ASTNode
 import picoc_nodes as pn
 import global_vars
 from global_funs import convert_to_single_line
+from colormanager import ColorManager as CM
 
 # ------------------------------- L_Symbol_Table ------------------------------
 class Empty(ASTNode):
@@ -43,21 +44,33 @@ class Symbol(ASTNode):
     __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos2", "size")
 
     def __repr__(self, depth=0):
-        acc = f"\n    {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += "\n      {"
-        acc += "\n        type qualifier:         " + convert_to_single_line(
-            self.type_qual
+        acc = f"\n    {CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
+        acc += f"\n      {CM().CYAN}{{{CM().RESET}"
+        acc += (
+            f"\n        {CM().GREEN}type qualifier{CM().RESET}:         "
+            + convert_to_single_line(self.type_qual)
         )
-        acc += "\n        datatype:               " + convert_to_single_line(
-            self.datatype
+        acc += (
+            f"\n        {CM().GREEN}datatype{CM().RESET}:               "
+            + convert_to_single_line(self.datatype)
         )
-        acc += "\n        name:                   " + convert_to_single_line(self.name)
-        acc += "\n        value or address:       " + convert_to_single_line(
-            self.val_addr
+        acc += (
+            f"\n        {CM().GREEN}name{CM().RESET}:                   "
+            + convert_to_single_line(self.name)
         )
-        acc += "\n        position:               " + convert_to_single_line(self.pos2)
-        acc += "\n        size:                   " + convert_to_single_line(self.size)
-        acc += "\n      }"
+        acc += (
+            f"\n        {CM().GREEN}value or address{CM().RESET}:       "
+            + convert_to_single_line(self.val_addr)
+        )
+        acc += (
+            f"\n        {CM().GREEN}position{CM().RESET}:               "
+            + convert_to_single_line(self.pos2)
+        )
+        acc += (
+            f"\n        {CM().GREEN}size{CM().RESET}:                   "
+            + convert_to_single_line(self.size)
+        )
+        acc += f"\n      {CM().CYAN}}}{CM().RESET}"
         return acc + ("\n    )" if global_vars.args.double_verbose else "")
 
 

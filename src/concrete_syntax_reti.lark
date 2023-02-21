@@ -61,7 +61,7 @@ RTI: "RTI"
 instr: ADD reg arg|ADDI reg IM|SUB reg arg |SUBI reg IM|MULT reg arg|MULTI reg IM|DIV reg arg|DIVI reg IM|MOD reg arg|MODI reg IM|OPLUS reg arg|OPLUSI reg IM|OR reg arg|ORI reg IM|AND reg arg|ANDI reg IM|LOAD reg IM|LOADIN arg arg IM|LOADI reg IM|STORE reg IM|STOREIN arg arg IM|MOVE reg reg|INT IM|RTI
 jump: "JUMP" rel? IM
 call: "CALL" NAME reg
-program: FILENAME ((instr|jump|call)";"|RETI_COMMENT)*
+program: FILENAME ((instr|jump|call)[";"]|RETI_COMMENT)*
 
 %import common.WS
 %ignore WS

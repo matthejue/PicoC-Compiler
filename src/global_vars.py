@@ -17,13 +17,16 @@ class Args:
         self.traceback = False
         self.example = False
         self.supress_errors = False
+        self.no_long_jumps = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3
         self.datasegment_size = 32
         self.show_mode = False
+        self.no_run = False
         self.pages = 5
         self.extension = "reti_states"
+        self.binary = False
 
 
 # options from command-line arguments
@@ -34,9 +37,17 @@ args = Args()
 path = ""
 basename = ""
 
-uart_size = 4
+reti_states = ""
+
+uart_size = 3
+
+next_as_22 = False
+
+next_as_normal = False
 
 max_print_out_elements = 5
+
+extension = "picoc"
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
@@ -123,6 +134,8 @@ COMPUTE_IMMEDIATE_INSTRUCTION = [
 BUILTIN_FUNS = ["print", "input"]
 
 NEG_RELS = {
+    "": rn.Always(),
+    "==": rn.NEq(),
     "==": rn.NEq(),
     "!=": rn.NEq(),
     "<": rn.GtE(),

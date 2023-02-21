@@ -6,25 +6,25 @@ PAGES ?= 5
 
 all: interpret-color
 
-install:
-	pip install -r ./requirements.txt
-	@sudo -- sh -c '[[ ! -f /usr/local/bin/picoc_compiler ]] && ln -sr ./src/main.py /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully installed || echo compiler /usr/local/bin/picoc_compiler is already installed'
-	@[[ ! -d ~/.config/picoc_compiler ]] && mkdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler created || echo config folder ~/.config/picoc_compiler does already exist
-	@[[ ! -f ~/.config/picoc_compiler/history.json ]] && touch ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json created || echo history file ~/.config/picoc_compiler/history.json does already exist
-	@[[ ! -f ~/.config/picoc_compiler/settings.conf.json ]] && touch ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json created || echo settings file ~/.config/picoc_compiler/settings.conf.json does already exist
-	@[[ ! -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && ln -sr ./interpr_showcase.vim ~/.config/picoc_compiler/interpr_showcase.vim && echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim created || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim does already exist
-	@[[ ! -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && ln -sr ./most_used_compile_opts.txt ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt created || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt does already exist
-	@[[ ! -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && ln -sr ./most_used_interpret_opts.txt ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt created || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt does already exist
-
-uninstall:
-	pip uninstall -r ./requirements.txt
-	@sudo -- sh -c '[[ -f /usr/local/bin/picoc_compiler ]] && rm /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully uninstalled || echo compiler /usr/local/bin/picoc_compiler is already uninstalled'
-	@[[ -f ~/.config/picoc_compiler/history.json ]] && rm ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json was deleted || echo history file ~/.config/picoc_compiler/history.json is already deleted
-	@[[ -f ~/.config/picoc_compiler/settings.conf.json ]] && rm ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json was deleted || echo settings file ~/.config/picoc_compiler/settings.conf.json is already deleted
-	@[[ -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && rm ~/.config/picoc_compiler/interpr_showcase.vim && echo interpter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim was deleted || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim is already deleted
-	@[[ -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt was deleted || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt is already deleted
-	@[[ -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpert-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt was deleted || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt is already deleted
-	@[[ -d ~/.config/picoc_compiler ]] && rmdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler was deleted || echo config folder ~/.config/picoc_compiler is already deleted
+# install:
+#   pip install -r ./requirements.txt
+#   @sudo -- sh -c '[[ ! -f /usr/local/bin/picoc_compiler ]] && ln -sr ./src/main.py /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully installed || echo compiler /usr/local/bin/picoc_compiler is already installed'
+#   @[[ ! -d ~/.config/picoc_compiler ]] && mkdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler created || echo config folder ~/.config/picoc_compiler does already exist
+#   @[[ ! -f ~/.config/picoc_compiler/history.json ]] && touch ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json created || echo history file ~/.config/picoc_compiler/history.json does already exist
+#   @[[ ! -f ~/.config/picoc_compiler/settings.conf.json ]] && touch ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json created || echo settings file ~/.config/picoc_compiler/settings.conf.json does already exist
+#   @[[ ! -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && ln -sr ./interpr_showcase.vim ~/.config/picoc_compiler/interpr_showcase.vim && echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim created || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim does already exist
+#   @[[ ! -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && ln -sr ./most_used_compile_opts.txt ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt created || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt does already exist
+#   @[[ ! -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && ln -sr ./most_used_interpret_opts.txt ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt created || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt does already exist
+#
+# uninstall:
+#   pip uninstall -r ./requirements.txt
+#   @sudo -- sh -c '[[ -f /usr/local/bin/picoc_compiler ]] && rm /usr/local/bin/picoc_compiler && echo compiler /usr/local/bin/picoc_compiler was successfully uninstalled || echo compiler /usr/local/bin/picoc_compiler is already uninstalled'
+#   @[[ -f ~/.config/picoc_compiler/history.json ]] && rm ~/.config/picoc_compiler/history.json && echo history file ~/.config/picoc_compiler/history.json was deleted || echo history file ~/.config/picoc_compiler/history.json is already deleted
+#   @[[ -f ~/.config/picoc_compiler/settings.conf.json ]] && rm ~/.config/picoc_compiler/settings.conf.json && echo settings file ~/.config/picoc_compiler/settings.conf.json was deleted || echo settings file ~/.config/picoc_compiler/settings.conf.json is already deleted
+#   @[[ -f ~/.config/picoc_compiler/interpr_showcase.vim ]] && rm ~/.config/picoc_compiler/interpr_showcase.vim && echo interpter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim was deleted || echo interpreter-showcase-config file ~/.config/picoc_compiler/interpr_showcase.vim is already deleted
+#   @[[ -f ~/.config/picoc_compiler/most_used_compile_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_compile_opts.txt && echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt was deleted || echo most-used-compile-options file ~/.config/picoc_compiler/most_used_compile_opts.txt is already deleted
+#   @[[ -f ~/.config/picoc_compiler/most_used_interpret_opts.txt ]] && rm ~/.config/picoc_compiler/most_used_interpret_opts.txt && echo most-used-interpert-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt was deleted || echo most-used-interpret-options file ~/.config/picoc_compiler/most_used_interpret_opts.txt is already deleted
+#   @[[ -d ~/.config/picoc_compiler ]] && rmdir ~/.config/picoc_compiler && echo config folder ~/.config/picoc_compiler was deleted || echo config folder ~/.config/picoc_compiler is already deleted
 
 compile: _compile _clean-pycache
 _compile:
@@ -85,7 +85,7 @@ ifeq ($(PAGES),8)
 	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
 	LINE_NUM6=$$(expr $${LINES} '*' 6 + 1 - 6);\
 	LINE_NUM7=$$(expr $${LINES} '*' 7 + 1 - 7);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM7} | norm zt" -c "vs | $${LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM7} | norm zt" -c "vs | $${LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),7)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
@@ -95,7 +95,7 @@ else ifeq ($(PAGES),7)
 	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
 	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
 	LINE_NUM6=$$(expr $${LINES} '*' 6 + 1 - 6);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM6} | norm zt" -c "vs | $${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),6)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
@@ -104,7 +104,7 @@ else ifeq ($(PAGES),6)
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
 	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
 	LINE_NUM5=$$(expr $${LINES} '*' 5 + 1 - 5);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM5} | norm zt" -c "vs | $${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),5)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
@@ -112,29 +112,29 @@ else ifeq ($(PAGES),5)
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
 	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),4)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim  -c "$${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim  -c "$${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),3)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
 else ifeq ($(PAGES),2)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "$${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h"
 else ifeq ($(PAGES),1)
 	-./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);\
-	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "0 | norm zt"
+	nvim ./tests/*$(TESTNAME_BASE)*.$(FILETYPE) -u ./src/interpr_showcase.vim -c "0 | norm zt"
 endif
 
 show:
@@ -144,25 +144,25 @@ ifeq ($(PAGES),5)
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
 	LINE_NUM4=$$(expr $${LINES} '*' 4 + 1 - 4);\
-	nvim $(FILEPATH) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
+	nvim $(FILEPATH) -u ./src/interpr_showcase.vim -c "$${LINE_NUM4} | norm zt" -c "vs | $${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),4)
 	-./export_environment_vars_for_makefile.sh;\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
 	LINE_NUM3=$$(expr $${LINES} '*' 3 + 1 - 3);\
-	nvim $(FILEPATH) -u ~/.config/picoc_compiler/interpr_showcase.vim  -c "$${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h"
+	nvim $(FILEPATH) -u ./src/interpr_showcase.vim  -c "$${LINE_NUM3} | norm zt" -c "vs | $${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h | wincmd h"
 else ifeq ($(PAGES),3)
 	-./export_environment_vars_for_makefile.sh;\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
 	LINE_NUM2=$$(expr $${LINES} '*' 2 + 1 - 2);\
-	nvim .$(FILEPATH) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
+	nvim .$(FILEPATH) -u ./src/interpr_showcase.vim -c "$${LINE_NUM2} | norm zt" -c "vs | $${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h | wincmd h"
 else ifeq ($(PAGES),2)
 	-./export_environment_vars_for_makefile.sh;\
 	LINE_NUM1=$$(expr $${LINES} + 1 - 1);\
-	nvim $(FILEPATH) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "$${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h"
+	nvim $(FILEPATH) -u ./src/interpr_showcase.vim -c "$${LINE_NUM1} | norm zt" -c "vs | 0 | norm zt" -c "windo se scb!" -c "wincmd h"
 else ifeq ($(PAGES),1)
 	-./export_environment_vars_for_makefile.sh;\
-	nvim $(FILEPATH) -u ~/.config/picoc_compiler/interpr_showcase.vim -c "0 | norm zt"
+	nvim $(FILEPATH) -u ./src/interpr_showcase.vim -c "0 | norm zt"
 endif
 
 convert:  extract
@@ -175,9 +175,9 @@ _verify:
 	./verify_tests.sh $${COLUMNS} $(TESTNAME_BASE)
 
 help:
-	./src/main.py -h -c
+	./src/main.py -h
 	# ./src/main.py -h > ./doc/help-page.txt
-	sed "s/most_used_compile_and_interpret_opts/$$(cat ./most_used_compile_and_interpret_opts.txt)/" ./doc/getting_started_raw.md > ./doc/getting_started.md
+	# sed "s/most_used_compile_and_interpret_opts/$$(cat ./most_used_compile_and_interpret_opts.txt)/" ./doc/getting_started_raw.md > ./doc/getting_started.md
 
 
 clean: _clean-pycache _clean-files
@@ -212,6 +212,7 @@ _clean-files:
 	find . -type f -wholename "./tests/*.out_expected" -delete
 	find . -type f -wholename "./tests/*.datasegment_size" -delete
 	find . -type f -wholename "./tests/*.reti_states" -delete
+	find . -type f -wholename "./tests/*.eprom" -delete
 	find . -type f -wholename "./tests/*.c" -delete
 	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.res" -delete

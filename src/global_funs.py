@@ -58,24 +58,24 @@ def args_to_str(args: list):
 def repr_single_line(self, depth=0):
     if not self.visible:
         if not self.val:
-            return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"
-        return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}'{self.val}'{')' if global_vars.args.double_verbose else ''}"
+            return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'()' if global_vars.args.double_verbose else ''}{CM().RESET}"
+        return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}{CM().RED}'{self.val}'{CM().RESET}{CM().CYAN}{')' if global_vars.args.double_verbose else ''}{CM().RESET}"
 
     acc = ""
 
     if depth > 0:
-        acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+        acc += f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
     else:
-        acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
+        acc += f"{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
 
     for i, child in enumerate(self.visible):
         match child:
             case list():
                 if not child:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
                     continue
 
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
                 for i, list_child in enumerate(child):
                     match list_child:
                         case (
@@ -93,17 +93,17 @@ def repr_single_line(self, depth=0):
                             acc += f"\n{' ' * (depth + 4)}{convert_to_single_line(list_child)}"
                             continue
                     acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}]"
+                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
                 continue
             case dict():
                 dict_children = child.values()
                 if not dict_children:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
                     continue
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
                 for i, dict_child in enumerate(dict_children):
                     acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}]"
+                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
                 continue
             case pn.Atom():
                 acc += f"\n{' ' * (depth + 2)}{convert_to_single_line(child)}"
@@ -113,14 +113,25 @@ def repr_single_line(self, depth=0):
 
         acc += f"{', ' if i > 0 else ''}{child.__repr__(depth+2)}"
 
-    return acc + (f"\n{' ' * depth})" if global_vars.args.double_verbose else "")
+    return acc + (
+        f"\n{' ' * depth}{CM().CYAN}){CM().RESET}"
+        if global_vars.args.double_verbose
+        else ""
+    )
 
 
-def convert_to_single_line(stmt):
+def convert_to_single_line(stmt, no_colors=False):
+    if no_colors:
+        CM().color_off()
     tmp = global_vars.args.double_verbose
     global_vars.args.double_verbose = True
     single_line = "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
     global_vars.args.double_verbose = tmp
+    if no_colors:
+        if global_vars.args.color:
+            CM().color_on()
+        else:
+            CM().color_off()
     return single_line
 
 
@@ -187,10 +198,6 @@ def only_keep_path(fname):
     return fname[: index_of_path_end + 1]
 
 
-def subheading(heading, terminal_width, symbol):
-    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
-
-
 def filter_out_comments(instrs):
     if not (global_vars.args.verbose or global_vars.args.double_verbose):
         return instrs
@@ -200,25 +207,17 @@ def filter_out_comments(instrs):
     )
 
 
-def strip_multiline_string(multiline_str):
-    """helper function to make mutlineline string usable on different
-    indent levels
-
-    :grammar: grammar specification
-    :returns: None
-    """
-    multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
-    # every code piece ends with \n, so the last element can always be poped
-    return multiline_str
+def subheading(heading, terminal_width, symbol):
+    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
 
 
-def heading(heading, terminal_width, symbol):
-    return f"""{symbol * terminal_width}
-    {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
-    (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
-    ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
-    {symbol * terminal_width}
-    """
+#  def heading(heading, terminal_width, symbol):
+#      return f"""{symbol * terminal_width}
+#      {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
+#      (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
+#      ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
+#      {symbol * terminal_width}
+#      """
 
 
 def wrap_text(text, terminal_width):
@@ -233,11 +232,23 @@ def wrap_text(text, terminal_width):
     return "\n".join(lines)
 
 
-def get_most_used_interpret_opts():
-    with open(
-        f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
-        "r",
-        encoding="utf-8",
-    ) as fin:
-        most_used_opts = fin.read()
-    return most_used_opts
+#  def strip_multiline_string(multiline_str):
+#      """helper function to make mutlineline string usable on different
+#      indent levels
+#
+#      :grammar: grammar specification
+#      :returns: None
+#      """
+#      multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
+#      # every code piece ends with \n, so the last element can always be poped
+#      return multiline_str
+
+
+#  def get_most_used_interpret_opts():
+#      with open(
+#          f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
+#          "r",
+#          encoding="utf-8",
+#      ) as fin:
+#          most_used_opts = fin.read()
+#      return most_used_opts

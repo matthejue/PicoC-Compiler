@@ -33,6 +33,8 @@ README.txt
 *.out_expected
 *.datasegment_size
 *.reti_states
+*.eprom
 *.res
 *.cast
 *.gdb_history
+*.venv/
