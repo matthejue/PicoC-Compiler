@@ -57,26 +57,28 @@ class RETIInterpreter:
         match destination:
             # addressbus
             case rn.Im(val):
-                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b1000000000 << 22
+                higher_bits = (
+                    self.reti.reg_get("DS") & 0b11111111_11000000_00000000_00000000
+                )
                 memory_type = self.reti.reg_get("DS") >> 30
                 match memory_type:
                     case 0b00:
                         # error, eprom is readonly
                         self.reti.eprom_set(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits,
+                            + higher_bits % 0b01000000_00000000_00000000_00000000,
                             source,
                         )
                     case 0b01:
                         self.reti.uart_set(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits,
+                            + higher_bits % 0b01000000_00000000_00000000_00000000,
                             source,
                         )
                     case (0b10 | 0b11):
                         self.reti.sram_set(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits,
+                            + higher_bits % 0b10000000_00000000_00000000_00000000,
                             source,
                         )
                     case _:
@@ -104,23 +106,25 @@ class RETIInterpreter:
         match source:
             # addressbus
             case rn.Im(val):
-                higher_bits = (self.reti.reg_get("DS") >> 22) % 0b1000000000 << 22
+                higher_bits = (
+                    self.reti.reg_get("DS") & 0b11111111_11000000_00000000_00000000
+                )
                 memory_type = self.reti.reg_get("DS") >> 30
                 match memory_type:
                     case 0b00:
                         return self.reti.eprom_get(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits
+                            + higher_bits % 0b01000000_00000000_00000000_00000000
                         )
                     case 0b01:
                         return self.reti.uart_get(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits
+                            + higher_bits % 0b01000000_00000000_00000000_00000000
                         )
                     case (0b10 | 0b11):
                         return self.reti.sram_get(
                             c_uint32(int(val)).value % 0b1000000_00000000_00000000
-                            + higher_bits
+                            + higher_bits % 0b10000000_00000000_00000000_00000000
                         )
                     case _:
                         bug_in_interpreter(memory_type)
