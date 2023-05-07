@@ -589,7 +589,6 @@ class Passes:
                                 pn.Subscr() | pn.Deref(),
                                 pn.ArrayDecl(nums, datatype),
                             ):
-
                                 current_exp = access_exp_list.pop()
                                 if len(nums) > 1:
                                     current_dt.nums.pop(0)
@@ -1732,7 +1731,6 @@ class Passes:
                                     pn.FunDecl(datatype2, _, allocs),
                                     pn.Name(_, pos2) as name2,
                                 ):
-
                                     decl_pos = pos2
                                     if def_name in self.marked_funs_for_error:
                                         if (

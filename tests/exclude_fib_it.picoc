@@ -1,0 +1,21 @@
+// in:10
+// expected:55
+// datasegment:32
+
+int fib(int num_fibs, int *ar) {
+  int i = 2;
+  while (i < num_fibs) {
+    ar[i] = ar[i - 1] + ar[i - 2];
+    i = i + 1;
+  }
+  return ar[num_fibs - 1];
+}
+
+void main() {
+  int num_fibs = input();
+  int *pntr = &num_fibs;
+  int *ar = &*(pntr + 3);
+  ar[0] = 1;
+  ar[1] = 1;
+  print(fib(num_fibs, ar));
+}
