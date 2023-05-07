@@ -7,7 +7,6 @@ import sys
 import os
 from global_classes import Pos
 
-
 def overwrite(old, replace_with, idx, color=""):
     return (
         old[:idx]
