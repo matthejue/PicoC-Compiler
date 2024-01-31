@@ -1,4 +1,0 @@
-void main() {
-  int var2;
-  int var = var2 = 2147483647;
-}

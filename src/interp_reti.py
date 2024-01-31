@@ -9,6 +9,7 @@ from global_funs import (
 import os
 from ctypes import c_int32, c_uint32
 from colormanager import ColorManager as CM
+from daemon import Deamon
 
 
 class RETIInterpreter:
@@ -24,6 +25,7 @@ class RETIInterpreter:
         self.first_out = True
         self.first_reti_state = True
         self.test_input = []
+        self.daemon = Deamon()
 
     def _jump_condition(self, condition, offset):
         if condition:
@@ -298,6 +300,9 @@ class RETIInterpreter:
 
     def _instrs(self):
         while True:
+            if global_vars.args.show_mode:
+                self.daemon.cont(self.reti)
+
             addr = self.reti.reg_get("PC")
             if addr > 2**31:
                 i = addr - 2**31
@@ -353,7 +358,7 @@ class RETIInterpreter:
                 fout.write("\n")
 
     def _reti_state_option(self):
-        self.reti.idx.val = str(int(self.reti.idx.val) + 1)
+        self.reti.round = self.reti.round + 1
         if global_vars.args.print:
             print(self.reti)
 
@@ -375,8 +380,6 @@ class RETIInterpreter:
                     encoding="utf-8",
                 ) as fout:
                     fout.write("\n" + str(self.reti))
-        elif global_vars.args.show_mode:
-            global_vars.reti_states += str(self.reti)
 
         if global_vars.args.color:
             CM().color_on()
@@ -400,5 +403,9 @@ class RETIInterpreter:
                 )
 
     def interp_reti(self):
-        self._preconfigs()
-        self._instrs()
+        try:
+            self.daemon.create_pipes()
+            self._preconfigs()
+            self._instrs()
+        finally:
+            self.daemon.remove_pipes()

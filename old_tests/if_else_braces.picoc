@@ -1,1 +1,0 @@
-void main() { char var = 0; int cars; char b; if (var == 0) { var = 100; cars = cars + 1; } else { var = var - 1; b = 1; } }

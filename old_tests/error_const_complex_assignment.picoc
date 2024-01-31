@@ -1,4 +1,0 @@
-void main() {
-  int car;
-  const char var = 12 + car;
-}

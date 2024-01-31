@@ -1,6 +1,0 @@
-int main() {
-  int bool_var = 0;
-  if (12 != 3 && (12 > bool_var || bool_var + 1 && 1)) {
-    bool_var = (123 * -(12 - 3) >= 12 ||  0) - 1;
-  }
-}

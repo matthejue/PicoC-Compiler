@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/areo/Documents/Studium/PicoC-Compiler/virtual_env/bin/python
 
 import sys
 import global_vars

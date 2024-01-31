@@ -1,6 +1,0 @@
-struct st {int attr1; int attr2;};
-
-void main() {
-  struct st test = {.attr1=42, .attr2=21};
-  print(test);
-}

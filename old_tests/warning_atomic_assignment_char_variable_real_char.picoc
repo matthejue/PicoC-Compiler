@@ -1,4 +1,0 @@
-void main() {
-  int car = 'c';
-  char var = car;
-}

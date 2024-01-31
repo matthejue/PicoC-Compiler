@@ -1,4 +1,0 @@
-void main() {
-  const int var1 = 1024;
-  char var2 = var1;
-}

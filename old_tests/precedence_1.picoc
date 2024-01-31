@@ -1,1 +1,0 @@
-void main() { char cars; int var = 8 * cars + 2; }

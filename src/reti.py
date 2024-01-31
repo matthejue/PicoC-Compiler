@@ -18,24 +18,24 @@ class RETI(ASTNode):
                 encoding="utf-8",
             ) as fin:
                 global_vars.args.datasegment_size = int(fin.read())
-        self.idx = rn.Im("0")
+        self.round = 0
         self.regs = {
-            f"ACC": rn.Im("0"),
-            f"ACC_SIMPLE": rn.Im("0"),
-            f"IN1": rn.Im("0"),
-            f"IN1_SIMPLE": rn.Im("0"),
-            f"IN2": rn.Im("0"),
-            f"IN2_SIMPLE": rn.Im("0"),
-            f"PC": rn.Im("0"),
-            f"PC_SIMPLE": rn.Im("0"),
-            f"SP": rn.Im("0"),
-            f"SP_SIMPLE": rn.Im("0"),
-            f"BAF": rn.Im("0"),
-            f"BAF_SIMPLE": rn.Im("0"),
-            f"CS": rn.Im("0"),
-            f"CS_SIMPLE": rn.Im("0"),
-            f"DS": rn.Im("0"),
-            f"DS_SIMPLE": rn.Im("0"),
+            "ACC": 0,
+            "ACC_SIMPLE": 0,
+            "IN1": 0,
+            "IN1_SIMPLE": 0,
+            "IN2": 0,
+            "IN2_SIMPLE": 0,
+            "PC": 0,
+            "PC_SIMPLE": 0,
+            "SP": 0,
+            "SP_SIMPLE": 0,
+            "BAF": 0,
+            "BAF_SIMPLE": 0,
+            "CS": 0,
+            "CS_SIMPLE": 0,
+            "DS": 0,
+            "DS_SIMPLE": 0,
         }
         self.sram = SRAM(instrs)
         self.uart = UART()
@@ -77,26 +77,26 @@ class RETI(ASTNode):
         self.status_register_lock = False
 
     def reg_get(self, reg):
-        return int(self.regs[reg.upper()].val)
+        return self.regs[reg.upper()]
 
     def reg_set(self, reg, val):
-        self.regs[reg.upper()].val = str(val)
+        self.regs[reg.upper()] = val
         if reg.upper() == "ACC":
-            self.regs["ACC_SIMPLE"].val = str(val % 2**30)
+            self.regs["ACC_SIMPLE"] = val % 2**30
         if reg.upper() == "IN1":
-            self.regs["IN1_SIMPLE"].val = str(val % 2**30)
+            self.regs["IN1_SIMPLE"] = val % 2**30
         if reg.upper() == "IN2":
-            self.regs["IN2_SIMPLE"].val = str(val % 2**30)
+            self.regs["IN2_SIMPLE"] = val % 2**30
         if reg.upper() == "PC":
-            self.regs["PC_SIMPLE"].val = str(val % 2**30)
+            self.regs["PC_SIMPLE"] = val % 2**30
         if reg.upper() == "SP":
-            self.regs["SP_SIMPLE"].val = str(val % 2**30)
+            self.regs["SP_SIMPLE"] = val % 2**30
         if reg.upper() == "BAF":
-            self.regs["BAF_SIMPLE"].val = str(val % 2**30)
+            self.regs["BAF_SIMPLE"] = val % 2**30
         if reg.upper() == "CS":
-            self.regs["CS_SIMPLE"].val = str(val % 2**30)
+            self.regs["CS_SIMPLE"] = val % 2**30
         if reg.upper() == "DS":
-            self.regs["DS_SIMPLE"].val = str(val % 2**30)
+            self.regs["DS_SIMPLE"] = val % 2**30
 
     def reg_increase(self, reg, offset=1):
         self.reg_set(reg, self.reg_get(reg) + offset)
@@ -115,15 +115,10 @@ class RETI(ASTNode):
         )
 
     def sram_get(self, addr):
-        cell_content = self.sram.cells[addr]
-        match cell_content:
-            case rn.Im(val):
-                return int(val)
-            case _:
-                return cell_content
+        return self.sram.cells[addr]
 
     def sram_set(self, addr, val):
-        self.sram.cells[addr].val = str(val)
+        self.sram.cells[addr] = val
 
     def uart_get(self, addr):
         if addr == 1 and len(self.uart_r) > 0:
@@ -132,20 +127,20 @@ class RETI(ASTNode):
                 print(
                     f"The value {r_reg} for the uart receive register needs more than 8 bit."
                 )
-            self.uart.cells[addr].val = str(r_reg)
+            self.uart.cells[addr] = r_reg
         elif addr == 2 and len(self.uart_s) > 0 and not self.status_register_lock:
             s_reg = self.uart_s.pop()
             if s_reg > 2**8 - 1:
                 print(
                     f"The value {s_reg} for the uart status register needs more than 8 bit."
                 )
-            self.uart.cells[addr].val = str(int(self.uart.cells[addr].val) | s_reg)
+            self.uart.cells[addr] = self.uart.cells[addr] | s_reg
             if s_reg & 2:
                 self.status_register_lock = True
-        return int(self.uart.cells[addr].val)
+        return self.uart.cells[addr]
 
     def uart_set(self, addr, val):
-        self.uart.cells[addr].val = str(val)
+        self.uart.cells[addr] = val
         if addr == 2 and not val & 2:
             self.status_register_lock = False
 
@@ -153,13 +148,13 @@ class RETI(ASTNode):
         return self.eprom.cells[addr]
 
     def eprom_set(self, addr, val):
-        self.eprom.cells[addr].val = str(val)
+        self.eprom.cells[addr] = val
 
     def __repr__(self):
         global_vars.next_as_normal = True
         acc = (
-            "\n" if int(self.idx.val) > 1 else ""
-        ) + f"{CM().GREEN}index:{CM().RESET}       {self.idx}"
+            "\n" if self.round > 1 else ""
+        ) + f"{CM().GREEN}index:{CM().RESET}       {self.round}"
         global_vars.next_as_normal = False
         acc += (
             f"\n{CM().GREEN}instruction:{CM().RESET} " + str(self.last_instr).lstrip()
@@ -197,8 +192,19 @@ class RETI(ASTNode):
         acc += self.eprom.__repr__(
             acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
         )
-        #  acc += "\n)" if global_vars.args.double_verbose else ""
         return acc
+
+    def print_regs(self):
+        return "REGISTERS:"
+
+    def print_eprom(self):
+        return "EPROM:"
+
+    def print_uart(self):
+        return "UART:"
+
+    def print_sram(self):
+        return "SRAM:"
 
 
 class EPROM(ASTNode):
@@ -262,7 +268,7 @@ class EPROM(ASTNode):
 
 class UART(ASTNode):
     def __init__(self):
-        self.cells = {i: rn.Im("0") for i in range(global_vars.uart_size)}
+        self.cells = {i: 0 for i in range(global_vars.uart_size)}
         super().__init__(visible=[self.cells])
 
     def __repr__(
@@ -290,7 +296,7 @@ class SRAM(ASTNode):
     def __init__(self, instrs):
         term_process = {
             0: rn.Jump(rn.Always(), rn.Im("0")),
-            1: rn.Im(str(2**31)),
+            1: 2**31,
         }
         start = max(global_vars.args.process_begin, len(term_process))
         end = global_vars.args.process_begin + len(instrs) - 1

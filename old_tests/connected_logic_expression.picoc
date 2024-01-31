@@ -1,1 +1,0 @@
-void main() { char dom= 'c'; int var =12 > 3 && dom <= 4; }

@@ -1,1 +1,0 @@
-void main() { int x; const char y = 'G'; int z = y; while (x <= 42) { while (y <= 42) { z = x & y; } } }

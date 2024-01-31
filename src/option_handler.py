@@ -46,7 +46,6 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
-    cli_args_parser.add_argument("-N", "--no_run", action="store_true")
     cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
     cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
 
@@ -182,21 +181,6 @@ class OptionHandler(cmd2.Cmd):
         )
 
     @cmd2.with_argparser(cli_args_parser)
-    def do_compile_show(self, args):
-        code = args.infile
-        color = global_vars.args.color
-        global_vars.args = args
-        global_vars.args.infile = "stdin.picoc"
-        global_vars.args.color = color
-        global_vars.args.print = True
-        global_vars.args.show_mode = True
-        #  global_vars.args.run = True gets activated by show_mode anyways
-        self._compl("void main() {" + code + "}")
-        print(
-            f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
-        )
-
-    @cmd2.with_argparser(cli_args_parser)
     def do_interpret(self, args):
         code = args.infile
         color = global_vars.args.color
@@ -204,20 +188,6 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args.infile = "stdin.reti"
         global_vars.args.color = color
         global_vars.args.print = True
-        self._interp(code)
-        print(
-            f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
-        )
-
-    @cmd2.with_argparser(cli_args_parser)
-    def do_interpret_show(self, args):
-        code = args.infile
-        color = global_vars.args.color
-        global_vars.args = args
-        global_vars.args.infile = "stdin.reti"
-        global_vars.args.color = color
-        global_vars.args.print = True
-        global_vars.args.show_mode = True
         self._interp(code)
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
@@ -247,10 +217,6 @@ class OptionHandler(cmd2.Cmd):
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
-
-        if global_vars.args.show_mode and global_vars.args.no_run:
-            self._show_mode()
-            return
 
         # add the filename to the start of the code
         code_with_file = (
@@ -346,11 +312,6 @@ class OptionHandler(cmd2.Cmd):
             reti_interp = RETIInterpreter(reti)
             self._eprom_write_startprogram_to_file(reti_interp, "EPROM")
 
-        if global_vars.args.show_mode:
-            global_vars.args.verbose = True
-            global_vars.args.intermediate_stages = True
-            global_vars.args.run = True
-
         if global_vars.args.run:
             if global_vars.args.print:
                 print(subheading("RETI Run", self.terminal_columns, "-"))
@@ -362,16 +323,9 @@ class OptionHandler(cmd2.Cmd):
                 if not global_vars.args.supress_errors:
                     raise e
 
-        if global_vars.args.show_mode:
-            self._show_mode()
-
     def _interp(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
-
-        if global_vars.args.show_mode and global_vars.args.no_run:
-            self._show_mode()
-            return
 
         # add the filename to the start of the code
         code_with_file = (
@@ -442,12 +396,6 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._ast_option(ast, "RETI Abstract Syntax Tree")
 
-        if global_vars.args.show_mode:
-            global_vars.args.verbose = True
-            global_vars.args.intermediate_stages = True
-            if not global_vars.path:
-                CM().color_off()
-
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
 
@@ -458,9 +406,6 @@ class OptionHandler(cmd2.Cmd):
         except Exception as e:
             if not global_vars.args.supress_errors:
                 raise e
-
-        if global_vars.args.show_mode:
-            self._show_mode()
 
     def _tokens_option(self, code_with_file, heading, picoc_or_reti):
         parser = Lark.open(
@@ -615,63 +560,6 @@ class OptionHandler(cmd2.Cmd):
                     CM().color_off()
 
                 fout.write(acc.lstrip())
-
-    def _show_mode(self):
-        if global_vars.args.pages == 1:
-            command = [
-                "nvim",
-                f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}",
-                "-u",
-                os.path.dirname(os.path.realpath(sys.argv[0]))
-                + "/interpr_showcase.vim",
-                "-c",
-                "0 | norm zt",
-            ]
-            subprocess.call(command)
-            return
-
-        first = True
-        command = (
-            ["nvim"]
-            + (
-                [
-                    f"{remove_extension(global_vars.args.infile)}.{global_vars.args.extension}"
-                ]
-                if global_vars.path
-                else []
-            )
-            + [
-                "-u",
-                os.path.dirname(os.path.realpath(sys.argv[0]))
-                + "/interpr_showcase.vim",
-            ]
-        )
-        for i in reversed(range(1, global_vars.args.pages)):
-            current_line_num = self.terminal_lines * i + 1 - i
-            if first:
-                command += [
-                    "-c",
-                    f"{current_line_num} | norm zt",
-                ]
-                first = False
-            else:
-                command += [
-                    "-c",
-                    f"vs | {current_line_num} | norm zt",
-                ]
-        command += [
-            "-c",
-            "vs | 0 | norm zt",
-        ]
-        command += ["-c", "windo se scb!"]
-        command += ["-c", "wincmd h" + ("| wincmd h" * (global_vars.args.pages - 2))]
-
-        if global_vars.path:
-            subprocess.call(command)
-        else:
-            subprocess.run(command, input=global_vars.reti_states.encode("utf-8"))
-
-        global_vars.reti_states = ""
 
 
 def _open_documentation():

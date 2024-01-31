@@ -1,1 +1,0 @@
-void main() { char dom; int var = 12 >= dom && 34 < 4 || 0; }
