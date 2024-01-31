@@ -1,4 +1,0 @@
-void main() {
-  char var = 127;
-  var = 2147483648;
-}

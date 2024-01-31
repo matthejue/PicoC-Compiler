@@ -1,4 +1,0 @@
-void main() {
-  const int var = 12;
-  var = 13;
-}

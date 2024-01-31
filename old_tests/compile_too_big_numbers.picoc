@@ -1,4 +1,0 @@
-void main() {
-  int car = 2097152;
-  int var = 2097151 & -2097160 | car;
-}

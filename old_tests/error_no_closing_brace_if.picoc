@@ -1,6 +1,0 @@
-void main() {
-  if (1) {
-    const int var = 12;
-  else
-    int car = 3
-}

@@ -1,1 +1,0 @@
-void main() { int dom; int a; char b; char c; int var = 12 == dom || c >= 4 || a != b; }

@@ -1,4 +1,0 @@
-void main() {
-  int x = 'C' + 1;
-  x = x + ('a - 'A');
-}

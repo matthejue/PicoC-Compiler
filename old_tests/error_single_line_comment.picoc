@@ -1,7 +1,0 @@
-void main() {
-  int var = 32
-  // i think there's an error somewhere close
-  if (var < 3) {
-      var = 10;
-  }
-}

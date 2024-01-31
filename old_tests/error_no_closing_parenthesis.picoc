@@ -1,6 +1,0 @@
-void main() {
-  if (12) {
-    int var = (32 * 2;
-    var = 10;
-  }
-}

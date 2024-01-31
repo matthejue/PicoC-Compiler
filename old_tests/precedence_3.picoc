@@ -1,1 +1,0 @@
-void main() { char cars; int var = cars * 4 / 2; }

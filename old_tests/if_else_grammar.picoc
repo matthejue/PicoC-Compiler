@@ -1,1 +1,0 @@
-void main() { char var; if (var >= 0) var = 12; else var = var + 1; }

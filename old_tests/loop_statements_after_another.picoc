@@ -1,1 +1,0 @@
-void main() { int x = 'Z'; while (x <= 100) { x = x + 1; } x = 10; do { x = x + 1; } while (x <= 100); }

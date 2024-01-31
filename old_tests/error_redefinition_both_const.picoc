@@ -1,4 +1,0 @@
-void main() {
-  const char var = 'z';
-  const char var = 'a';
-}

@@ -23,7 +23,6 @@ class Args:
         self.process_begin = 3
         self.datasegment_size = 32
         self.show_mode = False
-        self.no_run = False
         self.pages = 5
         self.extension = "reti_states"
         self.binary = False
