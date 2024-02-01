@@ -77,35 +77,35 @@ class RETI(ASTNode):
         self.status_register_lock = False
 
     def reg_get(self, reg):
-        return self.regs[reg.upper()]
+        return self.regs[reg]
 
     def reg_set(self, reg, val):
-        self.regs[reg.upper()] = val
-        if reg.upper() == "ACC":
+        self.regs[reg] = val
+        if reg == "ACC":
             self.regs["ACC_SIMPLE"] = val % 2**30
-        if reg.upper() == "IN1":
+        if reg == "IN1":
             self.regs["IN1_SIMPLE"] = val % 2**30
-        if reg.upper() == "IN2":
+        if reg == "IN2":
             self.regs["IN2_SIMPLE"] = val % 2**30
-        if reg.upper() == "PC":
+        if reg == "PC":
             self.regs["PC_SIMPLE"] = val % 2**30
-        if reg.upper() == "SP":
+        if reg == "SP":
             self.regs["SP_SIMPLE"] = val % 2**30
-        if reg.upper() == "BAF":
+        if reg == "BAF":
             self.regs["BAF_SIMPLE"] = val % 2**30
-        if reg.upper() == "CS":
+        if reg == "CS":
             self.regs["CS_SIMPLE"] = val % 2**30
-        if reg.upper() == "DS":
+        if reg == "DS":
             self.regs["DS_SIMPLE"] = val % 2**30
 
     def reg_increase(self, reg, offset=1):
-        self.reg_set(reg, self.reg_get(reg) + offset)
+        self.reg_set(reg, self.regs[reg] + offset)
 
     def do_nothing(self):
         pass
 
     def save_last_instruction(self):
-        addr = self.reg_get("PC")
+        addr = self.regs["PC"]
         self.last_instr = (
             self.sram_get(addr - 2**31)
             if addr >= 2**31
@@ -175,14 +175,14 @@ class RETI(ASTNode):
                 global_vars.next_as_normal = True
             acc += f"\n{CM().GREEN}{reg}:{CM().RESET} {' ' * (11-len(reg))}{self.regs[reg]}"
             global_vars.next_as_normal = False
-        acc_addr = self.reg_get("ACC")
-        in1_addr = self.reg_get("IN1")
-        in2_addr = self.reg_get("IN2")
-        pc_addr = self.reg_get("PC")
-        sp_addr = self.reg_get("SP")
-        baf_addr = self.reg_get("BAF")
-        cs_addr = self.reg_get("CS")
-        ds_addr = self.reg_get("DS")
+        acc_addr = self.regs["ACC"]
+        in1_addr = self.regs["IN1"]
+        in2_addr = self.regs["IN2"]
+        pc_addr = self.regs["PC"]
+        sp_addr = self.regs["SP"]
+        baf_addr = self.regs["BAF"]
+        cs_addr = self.regs["CS"]
+        ds_addr = self.regs["DS"]
         acc += self.sram.__repr__(
             acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
         )
@@ -194,17 +194,43 @@ class RETI(ASTNode):
         )
         return acc
 
-    def print_regs(self):
-        return "REGISTERS:"
+    def regs_str(self):
+        acc = "Register:\n"
+        for reg in self.regs.keys():
+            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+        return acc
 
-    def print_eprom(self):
-        return "EPROM:"
+    def eprom_str(self):
+        return "EPROM:\n" + self.cells_str(self.eprom.cells, 0)
 
-    def print_uart(self):
-        return "UART:"
+    def uart_str(self):
+        return "UART:\n" + self.cells_str(self.uart.cells, 2**30)
 
-    def print_sram(self):
-        return "SRAM:"
+    def sram_str(self):
+        return "SRAM:\n" + self.cells_str(self.sram.cells, 2**31)
+
+    def cells_str(self, cells, constant):
+        acc = ""
+        for addr in range(len(cells)):
+            acc += (
+                "\n  "
+                + (f"%05i " % addr)
+                + (
+                    ("(%010i): " % (addr + constant))
+                    if global_vars.args.double_verbose
+                    else ""
+                )
+                + str(cells[addr]).lstrip()
+                + (f" <- ACC" if addr == self.regs["ACC"] - constant else "")
+                + (f" <- IN1" if addr == self.regs["IN1"] - constant else "")
+                + (f" <- IN2" if addr == self.regs["IN2"] - constant else "")
+                + (f" <- PC" if addr == self.regs["PC"] - constant else "")
+                + (f" <- SP" if addr == self.regs["SP"] - constant else "")
+                + (f" <- BAF" if addr == self.regs["BAF"] - constant else "")
+                + (f" <- CS" if addr == self.regs["CS"] - constant else "")
+                + (f" <- DS" if addr == self.regs["DS"] - constant else "")
+            )
+        return acc
 
 
 class EPROM(ASTNode):
@@ -311,7 +337,7 @@ class SRAM(ASTNode):
                 if i >= start and i <= end
                 else term_process[i]
                 if i < len(term_process)
-                else rn.Im("0")
+                else 0
             )
             for i in range(min_sram_size)
         }
