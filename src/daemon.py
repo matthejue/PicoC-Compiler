@@ -28,10 +28,10 @@ class Deamon:
         os.unlink("/tmp/sram")
 
     def cont(self, reti: RETI):
-        _write_to_pipe("registers", reti.print_regs())
-        _write_to_pipe("eprom", reti.print_eprom())
-        _write_to_pipe("uart", reti.print_uart())
-        _write_to_pipe("sram", reti.print_sram())
+        _write_to_pipe("registers", reti.regs_str())
+        _write_to_pipe("eprom", reti.eprom_str())
+        _write_to_pipe("uart", reti.uart_str())
+        _write_to_pipe("sram", reti.sram_str())
 
         while True:
             command = _read_next_command()

@@ -60,9 +60,9 @@ class RETIInterpreter:
             # addressbus
             case rn.Im(val):
                 higher_bits = (
-                    self.reti.reg_get("DS") & 0b11111111_11000000_00000000_00000000
+                    self.reti.regs["DS"] & 0b11111111_11000000_00000000_00000000
                 )
-                memory_type = self.reti.reg_get("DS") >> 30
+                memory_type = self.reti.regs["DS"] >> 30
                 match memory_type:
                     case 0b00:
                         # error, eprom is readonly
@@ -109,9 +109,9 @@ class RETIInterpreter:
             # addressbus
             case rn.Im(val):
                 higher_bits = (
-                    self.reti.reg_get("DS") & 0b11111111_11000000_00000000_00000000
+                    self.reti.regs["DS"] & 0b11111111_11000000_00000000_00000000
                 )
-                memory_type = self.reti.reg_get("DS") >> 30
+                memory_type = self.reti.regs["DS"] >> 30
                 match memory_type:
                     case 0b00:
                         return self.reti.eprom_get(
@@ -132,7 +132,7 @@ class RETIInterpreter:
                         bug_in_interpreter(memory_type)
 
             case rn.Reg(reg):
-                return self.reti.reg_get(str(reg))
+                return self.reti.regs[str(reg)]
             # right databus
             case int():
                 source = c_uint32(source).value
@@ -225,27 +225,27 @@ class RETIInterpreter:
                 match rel:
                     case rn.Lt():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value < 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value < 0, int(val)
                         )
                     case rn.LtE():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value <= 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value <= 0, int(val)
                         )
                     case rn.Gt():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value > 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value > 0, int(val)
                         )
                     case rn.GtE():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value >= 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value >= 0, int(val)
                         )
                     case rn.Eq():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value == 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value == 0, int(val)
                         )
                     case rn.NEq():
                         self._jump_condition(
-                            c_int32(self.reti.reg_get("ACC")).value != 0, int(val)
+                            c_int32(self.reti.regs["ACC"]).value != 0, int(val)
                         )
                     case rn.Always():
                         self._jump_condition(True, int(val))
@@ -255,20 +255,20 @@ class RETIInterpreter:
                         bug_in_interpreter(rel)
             #  case rn.Int(rn.Im(val)):
             #      # save PC to stack
-            #      self.reti.sram_set(self.reti.reg_get("SP"), c_uint32(self.reti.reg_get("PC")).value)
-            #      self.reti.reg_set("SP", c_uint32(self.reti.reg_get("SP")).value - 1)
+            #      self.reti.sram_set(self.reti.regs["SP"], c_uint32(self.reti.regs["PC"]).value)
+            #      self.reti.reg_set("SP", c_uint32(self.reti.regs["SP"]).value - 1)
             #      # jump to start address of isr
             #      self.reti.reg_set("PC", self._memory_load(int(val) + 2**31))
             #  case rn.Rti():
             #      # restore PC
             #      self.reti.reg_set(
-            #          "PC", self.reti.sram_get(c_uint32(self.reti.reg_get("SP")).value + 1)
+            #          "PC", self.reti.sram_get(c_uint32(self.reti.regs["SP"]).value + 1)
             #      )
             #      # delete PC from stack
-            #      self.reti.reg_set("SP", c_uint32(self.reti.reg_get("SP")).value + 1)
+            #      self.reti.reg_set("SP", c_uint32(self.reti.regs["SP"]).value + 1)
             case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
                 print(
-                    f"{CM().GREEN}Output:{CM().RESET}\n\t{CM().RED}{c_int32(self.reti.reg_get(str(reg))).value}{CM().RESET}"
+                    f"{CM().GREEN}Output:{CM().RESET}\n\t{CM().RED}{c_int32(self.reti.regs[str(reg)]).value}{CM().RESET}"
                 )
                 if global_vars.path:
                     if self.first_out:
@@ -277,7 +277,7 @@ class RETIInterpreter:
                             "w",
                             encoding="utf-8",
                         ) as fout:
-                            fout.write(str(c_int32(self.reti.reg_get(str(reg))).value))
+                            fout.write(str(c_int32(self.reti.regs[str(reg)]).value))
                         self.first_out = False
                     else:
                         with open(
@@ -286,7 +286,7 @@ class RETIInterpreter:
                             encoding="utf-8",
                         ) as fout:
                             fout.write(
-                                " " + str(c_int32(self.reti.reg_get(str(reg))).value)
+                                " " + str(c_int32(self.reti.regs[str(reg)]).value)
                             )
                 self.reti.reg_increase("PC")
             case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
@@ -303,7 +303,7 @@ class RETIInterpreter:
             if global_vars.args.show_mode:
                 self.daemon.cont(self.reti)
 
-            addr = self.reti.reg_get("PC")
+            addr = self.reti.regs["PC"]
             if addr > 2**31:
                 i = addr - 2**31
                 next_instruction = self.reti.sram_get(i)
