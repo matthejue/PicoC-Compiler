@@ -403,9 +403,5 @@ class RETIInterpreter:
                 )
 
     def interp_reti(self):
-        try:
-            self.daemon.create_pipes()
-            self._preconfigs()
-            self._instrs()
-        finally:
-            self.daemon.remove_pipes()
+        self._preconfigs()
+        self._instrs()

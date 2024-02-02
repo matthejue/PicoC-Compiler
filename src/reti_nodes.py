@@ -46,7 +46,8 @@ class Instr(ASTNode):
                 case _:
                     instr_str += f" {arg}"
         global_vars.next_as_22 = False
-        return f"{instr_str}{'' if depth > 0 else ';'}"
+        # return f"{instr_str}{'' if depth > 0 else ';'}"
+        return instr_str
 
     __match_args__ = ("op", "args")
 
@@ -61,14 +62,16 @@ class Jump(ASTNode):
         match self.im_goto:
             case Im():
                 global_vars.next_as_normal = True
-                acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET};"
+                # acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET};"
+                acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET}"
                 global_vars.next_as_normal = False
                 return acc
             case pn.GoTo():
                 return (
                     f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} "
                     + f"{CM().RED}"
-                    + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
+                    # + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
+                    + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))}".lstrip()
                     + f"{CM().RESET}"
                 )
             case _:
@@ -91,7 +94,8 @@ class Call(ASTNode):
         self.reg = reg
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg};"
+        # return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg};"
+        return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg}"
 
     __match_args__ = ("name", "reg")
 
