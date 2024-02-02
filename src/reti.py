@@ -21,21 +21,21 @@ class RETI(ASTNode):
         self.round = 0
         self.regs = {
             "ACC": 0,
-            "ACC_SIMPLE": 0,
+            "ACC_Rel": 0,
             "IN1": 0,
-            "IN1_SIMPLE": 0,
+            "IN1_Rel": 0,
             "IN2": 0,
-            "IN2_SIMPLE": 0,
+            "IN2_Rel": 0,
             "PC": 0,
-            "PC_SIMPLE": 0,
+            "PC_Rel": 0,
             "SP": 0,
-            "SP_SIMPLE": 0,
+            "SP_Rel": 0,
             "BAF": 0,
-            "BAF_SIMPLE": 0,
+            "BAF_Rel": 0,
             "CS": 0,
-            "CS_SIMPLE": 0,
+            "CS_Rel": 0,
             "DS": 0,
-            "DS_SIMPLE": 0,
+            "DS_Rel": 0,
         }
         self.sram = SRAM(instrs)
         self.uart = UART()
@@ -82,21 +82,21 @@ class RETI(ASTNode):
     def reg_set(self, reg, val):
         self.regs[reg] = val
         if reg == "ACC":
-            self.regs["ACC_SIMPLE"] = val % 2**30
+            self.regs["ACC_Rel"] = val % 2**30
         if reg == "IN1":
-            self.regs["IN1_SIMPLE"] = val % 2**30
+            self.regs["IN1_Rel"] = val % 2**30
         if reg == "IN2":
-            self.regs["IN2_SIMPLE"] = val % 2**30
+            self.regs["IN2_Rel"] = val % 2**30
         if reg == "PC":
-            self.regs["PC_SIMPLE"] = val % 2**30
+            self.regs["PC_Rel"] = val % 2**30
         if reg == "SP":
-            self.regs["SP_SIMPLE"] = val % 2**30
+            self.regs["SP_Rel"] = val % 2**30
         if reg == "BAF":
-            self.regs["BAF_SIMPLE"] = val % 2**30
+            self.regs["BAF_Rel"] = val % 2**30
         if reg == "CS":
-            self.regs["CS_SIMPLE"] = val % 2**30
+            self.regs["CS_Rel"] = val % 2**30
         if reg == "DS":
-            self.regs["DS_SIMPLE"] = val % 2**30
+            self.regs["DS_Rel"] = val % 2**30
 
     def reg_increase(self, reg, offset=1):
         self.reg_set(reg, self.regs[reg] + offset)
@@ -162,15 +162,15 @@ class RETI(ASTNode):
         for reg in self.regs.keys():
             if reg in [
                 "PC",
-                "PC_SIMPLE",
+                "PC_Rel",
                 "SP",
-                "SP_SIMPLE",
+                "SP_Rel",
                 "BAF",
-                "BAF_SIMPLE",
+                "BAF_Rel",
                 "CS",
-                "CS_SIMPLE",
+                "CS_Rel",
                 "BAF",
-                "BAF_SIMPLE",
+                "BAF_Rel",
             ]:
                 global_vars.next_as_normal = True
             acc += f"\n{CM().GREEN}{reg}:{CM().RESET} {' ' * (11-len(reg))}{self.regs[reg]}"
@@ -196,7 +196,13 @@ class RETI(ASTNode):
 
     def regs_str(self):
         acc = ""
-        for reg in self.regs.keys():
+        for reg in filter(lambda s: "Rel" not in s, iter(self.regs.keys())):
+            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+        return acc
+
+    def regs_rel_str(self):
+        acc = ""
+        for reg in filter(lambda s: "Rel" in s, iter(self.regs.keys())):
             acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
         return acc
 

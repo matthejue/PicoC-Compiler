@@ -304,11 +304,11 @@ class RETIInterpreter:
                 self.daemon.cont(self.reti)
 
             addr = self.reti.regs["PC"]
-            if addr > 2**31:
+            if addr >= 2**31:
                 i = addr - 2**31
                 next_instruction = self.reti.sram_get(i)
             elif addr >= 2**30:
-                i = addr - 2**31
+                i = addr - 2**30
                 next_instruction = self.reti.uart_get(i)
             else:  # addr < 2**30
                 i = addr
