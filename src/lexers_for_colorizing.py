@@ -68,42 +68,39 @@ class RETILexer(RegexLexer):
         "root": [
             (r" *#[^\n]+\n", Comment),
             (
-                r" *(CALL)( )(INPUT|PRINT)( )([^ ]+)(;)(\n?)",
+                r" *(CALL)( )(INPUT|PRINT)( )([^ \n]+)(\n)",
                 bygroups(
                     Keyword,
                     Whitespace,
                     Name.Tag,
                     Whitespace,
                     Name,
-                    Punctuation,
                     Whitespace,
                 ),
             ),
             (
-                r" *(JUMP)([^ ]*)( )([^ ]+)(;)(\n?)",
+                r" *(JUMP)([^ \n]*)( )([^ \n]+)(\n)",
                 bygroups(
                     Keyword,
                     Operator,
                     Whitespace,
                     Number,
-                    Punctuation,
                     Whitespace,
                 ),
             ),
             (
-                r" *([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
+                r" *([^ \n]+)( )([^ \n]+)( )([^ \n]+)(\n)",
                 bygroups(
                     Keyword,
                     Whitespace,
                     Name,
                     Whitespace,
                     Number,
-                    Punctuation,
                     Whitespace,
                 ),
             ),
             (
-                r" *([^ ]+)( )([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
+                r" *([^ \n]+)( )([^ \n]+)( )([^ \n]+)( )([^ \n]+)(\n)",
                 bygroups(
                     Keyword,
                     Whitespace,
@@ -112,15 +109,86 @@ class RETILexer(RegexLexer):
                     Name,
                     Whitespace,
                     Number,
-                    Punctuation,
                     Whitespace,
                 ),
             ),
         ],
     }
+    # tokens = {
+    #     "root": [
+    #         (r" *#[^\n]+\n", Comment),
+    #         (
+    #             r" *(CALL)( )(INPUT|PRINT)( )([^ ]+)(;)(\n?)",
+    #             bygroups(
+    #                 Keyword,
+    #                 Whitespace,
+    #                 Name.Tag,
+    #                 Whitespace,
+    #                 Name,
+    #                 Punctuation,
+    #                 Whitespace,
+    #             ),
+    #         ),
+    #         (
+    #             r" *(JUMP)([^ ]*)( )([^ ]+)(;)(\n?)",
+    #             bygroups(
+    #                 Keyword,
+    #                 Operator,
+    #                 Whitespace,
+    #                 Number,
+    #                 Punctuation,
+    #                 Whitespace,
+    #             ),
+    #         ),
+    #         (
+    #             r" *([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
+    #             bygroups(
+    #                 Keyword,
+    #                 Whitespace,
+    #                 Name,
+    #                 Whitespace,
+    #                 Number,
+    #                 Punctuation,
+    #                 Whitespace,
+    #             ),
+    #         ),
+    #         (
+    #             r" *([^ ]+)( )([^ ]+)( )([^ ]+)( )([^ ]+)(;)(\n?)",
+    #             bygroups(
+    #                 Keyword,
+    #                 Whitespace,
+    #                 Name,
+    #                 Whitespace,
+    #                 Name,
+    #                 Whitespace,
+    #                 Number,
+    #                 Punctuation,
+    #                 Whitespace,
+    #             ),
+    #         ),
+    #     ],
+    # }
 
 
-#  if __name__ == "__main__":
+if __name__ == "__main__":
+    print(
+        highlight(
+            "LOADIN BAF PC 1\n",
+            RETILexer(),
+            TerminalFormatter(
+                colorscheme={
+                    Comment: ("magenta", "brightmagenta"),
+                    Whitespace: ("gray", "white"),
+                    Keyword: ("blue", "brightblue"),
+                    Punctuation: ("gray", "white"),
+                    Name: ("cyan", "brightcyan"),
+                    Number: ("red", "brightred"),
+                    Name.Tag: ("green", "brightgreen"),
+                    Operator: ("yellow", "brightyellow"),
+                }
+            ),
+        ),
+    )
 #      print(
 #          highlight(
 #              "[Token('FILENAME', './stdin.picoc'), Token('VOID_DT', 'void'), Token('NAME', 'main'), Token('LPAR', '('), Token('RPAR', ')'), Token('LBRACE', '{'), Token('WHILE', 'while'), Token('LPAR', '('), Token('NUM', '0'), Token('RPAR', ')'), Token('LBRACE', '{'), Token('PRINT', 'print'), Token('LPAR', '('), Token('NUM', '1'), Token('ADD', '+'), Token('NUM', '1'), Token('RPAR', ')'), Token('SEMICOLON', ';'), Token('RBRACE', '}'), Token('RBRACE', '}')]",
