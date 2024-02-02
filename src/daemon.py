@@ -1,33 +1,24 @@
 from reti import RETI
-import os
+import global_vars
 
 
 def _write_to_pipe(pipe_name, content):
-    pipe_path = "/tmp/" + pipe_name
+    pipe_path = "/tmp/reti-debugger/" + pipe_name
     with open(pipe_path, "w") as pipe:
         pipe.write(content)
 
 
 def _read_next_command():
-    pipe_path = "/tmp/command"
+    pipe_path = "/tmp/reti-debugger/command"
     with open(pipe_path, "r") as pipe:
         return pipe.read()
 
 
 class Deamon:
-    def create_pipes(self):
-        os.mkfifo("/tmp/registers")
-        os.mkfifo("/tmp/eprom")
-        os.mkfifo("/tmp/uart")
-        os.mkfifo("/tmp/sram")
-
-    def remove_pipes(self):
-        os.unlink("/tmp/registers")
-        os.unlink("/tmp/eprom")
-        os.unlink("/tmp/uart")
-        os.unlink("/tmp/sram")
-
     def cont(self, reti: RETI):
+        if global_vars.args.debug:
+            __import__("pudb").set_trace()
+
         _write_to_pipe("registers", reti.regs_str())
         _write_to_pipe("eprom", reti.eprom_str())
         _write_to_pipe("uart", reti.uart_str())

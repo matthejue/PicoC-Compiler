@@ -195,19 +195,19 @@ class RETI(ASTNode):
         return acc
 
     def regs_str(self):
-        acc = "Register:\n"
+        acc = ""
         for reg in self.regs.keys():
             acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
         return acc
 
     def eprom_str(self):
-        return "EPROM:\n" + self.cells_str(self.eprom.cells, 0)
+        return self.cells_str(self.eprom.cells, 0)
 
     def uart_str(self):
-        return "UART:\n" + self.cells_str(self.uart.cells, 2**30)
+        return self.cells_str(self.uart.cells, 2**30)
 
     def sram_str(self):
-        return "SRAM:\n" + self.cells_str(self.sram.cells, 2**31)
+        return self.cells_str(self.sram.cells, 2**31)
 
     def cells_str(self, cells, constant):
         acc = ""
