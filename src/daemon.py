@@ -27,6 +27,8 @@ class Deamon:
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
+        _write_to_pipe("acknowledge", "ack")
+
         _write_to_pipe("registers", reti.regs_str())
         _write_to_pipe("registers_rel", reti.regs_rel_str())
         _write_to_pipe("eprom", reti.eprom_str())
@@ -34,9 +36,16 @@ class Deamon:
         _write_to_pipe("sram", reti.sram_str())
 
         while True:
-            command = _read_next_command()
-            match command:
+            message = _read_next_command()
+            cmd, args = message.split(" ", 1)
+            match cmd:
                 case "next":
                     break
+                case "set":
+                    pass
                 case _:
                     pass
+
+
+    def finalize(self):
+        _write_to_pipe("acknowledge", "end")
