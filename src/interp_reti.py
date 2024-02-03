@@ -315,10 +315,10 @@ class RETIInterpreter:
                 next_instruction = self.reti.eprom_get(i)
             match next_instruction:
                 case rn.Jump(rn.Always(), rn.Im("0")):
-                    self._conclude()
+                    self._finalize()
                     break
                 case int():
-                    self._conclude()
+                    self._finalize()
                     break
                 case _:
                     self.reti.save_last_instruction()
@@ -328,7 +328,7 @@ class RETIInterpreter:
                     ):
                         self._reti_state_option()
 
-    def _conclude(self):
+    def _finalize(self):
         if global_vars.args.intermediate_stages and not (
             global_vars.args.verbose or global_vars.args.double_verbose
         ):
@@ -356,6 +356,8 @@ class RETIInterpreter:
                 encoding="utf-8",
             ) as fout:
                 fout.write("\n")
+        if global_vars.args.show_mode:
+            self.daemon.finalize()
 
     def _reti_state_option(self):
         self.reti.round = self.reti.round + 1
