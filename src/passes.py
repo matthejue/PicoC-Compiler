@@ -2,13 +2,13 @@ import picoc_nodes as pn
 import reti_nodes as rn
 import errors
 import symbol_table as st
-from global_funs import (
+from util_funs import (
     throw_error,
     remove_extension,
     convert_to_single_line,
     find_first_pos_in_node,
 )
-from global_classes import Pos
+from util_classes import Pos
 import global_vars
 import copy
 from bitstring import Bits

@@ -2,8 +2,8 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
 import reti_nodes as rn
-from global_classes import Pos
-from global_funs import throw_error, remove_extension, nodes_to_str
+from util_classes import Pos
+from util_funs import throw_error, remove_extension, nodes_to_str
 import errors
 
 

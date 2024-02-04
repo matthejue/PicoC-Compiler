@@ -14,7 +14,7 @@ from dt_visitors import (
 )
 from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
-from global_funs import remove_extension, subheading, throw_error, get_extension
+from util_funs import remove_extension, subheading, throw_error, get_extension
 from interp_reti import RETIInterpreter
 import subprocess, os, platform
 from lexers_for_colorizing import TokenLexer, DTLexer, RETILexer
@@ -22,6 +22,7 @@ from pygments import highlight
 from pygments.token import *
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.lexers.c_cpp import CLexer
+from util_funs import get_test_metadata
 
 
 class OptionHandler(cmd2.Cmd):
@@ -41,6 +42,7 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-s", "--supress_errors", action="store_true")
     cli_args_parser.add_argument("-b", "--binary", action="store_true")
     cli_args_parser.add_argument("-n", "--no_long_jumps", action="store_true")
+    cli_args_parser.add_argument("-m", "--metadata_comments", action="store_true")
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
@@ -162,7 +164,7 @@ class OptionHandler(cmd2.Cmd):
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        global_vars.args.infile = "stdin.picoc"
+        global_vars.args.infile = "term.picoc"
         global_vars.args.color = color
         global_vars.args.print = True
         self._compl("void main() {" + code + "}")
@@ -185,7 +187,7 @@ class OptionHandler(cmd2.Cmd):
         code = args.infile
         color = global_vars.args.color
         global_vars.args = args
-        global_vars.args.infile = "stdin.reti"
+        global_vars.args.infile = "term.reti"
         global_vars.args.color = color
         global_vars.args.print = True
         self._interp(code)
@@ -201,18 +203,35 @@ class OptionHandler(cmd2.Cmd):
         :returns: pico_c Code compiled in RETI Assembler
         """
         with open(global_vars.args.infile, encoding="utf-8") as fin:
-            picoc_in = fin.read()
+            code = fin.read()
 
-        global_vars.extension = get_extension(global_vars.args.infile)
-        match global_vars.extension:
+        global_vars.args.extension = get_extension(global_vars.args.infile)
+        match global_vars.args.extension:
             case "picoc":
-                self._compl(picoc_in)
+                self._compl(code)
             case "reti":
-                self._interp(picoc_in)
+                self._interp(code)
             case _:
                 print(
-                    f"File with extension '.{global_vars.extension}' cannot be compiled or interpreted."
+                    f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
+
+    def read_stdin(self):
+        code = sys.stdin.read()
+
+        match global_vars.args.extension:
+            case "picoc":
+                global_vars.args.infile = "stdin.picoc"
+                self._compl(code)
+            case "reti":
+                global_vars.args.infile = "stdin.reti"
+                self._interp(code)
+            case _:
+                print(
+                    f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
+                )
+        self._success_message()
+        
 
     def _compl(self, code):
         if global_vars.args.debug:
@@ -224,6 +243,9 @@ class OptionHandler(cmd2.Cmd):
             + f"{global_vars.args.infile}\n"
             + code
         )
+
+        if global_vars.args.metadata_comments or not sys.stdin.isatty():
+            get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
@@ -329,10 +351,13 @@ class OptionHandler(cmd2.Cmd):
 
         # add the filename to the start of the code
         code_with_file = (
-            ("./" if not global_vars.args.infile.startswith("./") else "")
+            ("./" if not global_vars.args.infile.startswith("./") and not global_vars.args.infile.startswith("/") else "")
             + f"{global_vars.args.infile}\n"
             + code
         )
+
+        if global_vars.args.metadata_comments or not sys.stdin.isatty():
+            get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
@@ -400,12 +425,37 @@ class OptionHandler(cmd2.Cmd):
             print(subheading("RETI Run", self.terminal_columns, "-"))
 
         reti_interp = RETIInterpreter(ast)
+
         # possiblity to supress error
         try:
             error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
             if not global_vars.args.supress_errors:
                 raise e
+
+
+    def _success_message(self):
+        if global_vars.args.run:
+            match global_vars.args.extension:
+                case "reti":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+                case _:
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+        else:
+            match global_vars.args.extension:
+                case "picoc":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+                case "reti":
+                    print(
+                        f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
+                    )
+
 
     def _tokens_option(self, code_with_file, heading, picoc_or_reti):
         parser = Lark.open(

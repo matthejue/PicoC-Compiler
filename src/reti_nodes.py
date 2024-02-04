@@ -1,6 +1,6 @@
 from ast_node import ASTNode
 import picoc_nodes as pn
-from global_funs import throw_error
+from util_funs import throw_error
 from colormanager import ColorManager as CM
 import global_vars
 from bitstring import Bits

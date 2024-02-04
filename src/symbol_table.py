@@ -1,7 +1,7 @@
 from ast_node import ASTNode
 import picoc_nodes as pn
 import global_vars
-from global_funs import convert_to_single_line
+from util_funs import convert_to_single_line
 from colormanager import ColorManager as CM
 
 # ------------------------------- L_Symbol_Table ------------------------------

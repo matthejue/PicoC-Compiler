@@ -3,9 +3,9 @@ import errors
 import itertools
 import global_vars
 import picoc_nodes as pn
-import sys
-import os
-from global_classes import Pos
+from util_classes import Pos
+import re
+
 
 def overwrite(old, replace_with, idx, color=""):
     return (
@@ -229,6 +229,16 @@ def wrap_text(text, terminal_width):
                     lines[l_idx] = line[:idx]
                     break
     return "\n".join(lines)
+
+
+def get_test_metadata(code):
+    regex = re.search(
+        r"((\/\/|#) +in(put)?: *(\d+( +\d+)*) *\n)?((\/\/|#) +exp(ected)?: *(\d+( +\d+)*) *\n)?((\/\/|#) +data(segment)?: *(\d+) *\n)?(.*(\n)?)*",
+        code,
+    )
+    global_vars.input = list(map(lambda x: int(x), regex.group(4).split())) if regex and regex.group(4) else []
+    global_vars.expected = list(map(lambda x: int(x), regex.group(9).split())) if regex and regex.group(9) else []
+    global_vars.datasegment = regex.group(14) if regex and regex.group(14) else 64
 
 
 #  def strip_multiline_string(multiline_str):
