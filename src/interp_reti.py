@@ -2,7 +2,7 @@ import reti_nodes as rn
 import picoc_nodes as pn
 from reti import RETI
 import global_vars
-from global_funs import (
+from util_funs import (
     bug_in_interpreter,
     filter_out_comments,
 )
@@ -10,6 +10,7 @@ import os
 from ctypes import c_int32, c_uint32
 from colormanager import ColorManager as CM
 from daemon import Deamon
+import sys
 
 
 class RETIInterpreter:
@@ -24,7 +25,6 @@ class RETIInterpreter:
                 bug_in_interpreter(self.program)
         self.first_out = True
         self.first_reti_state = True
-        self.test_input = []
         self.daemon = Deamon()
 
     def _jump_condition(self, condition, offset):
@@ -290,9 +290,12 @@ class RETIInterpreter:
                             )
                 self.reti.reg_increase("PC")
             case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
-                if self.test_input:
-                    self.reti.reg_set(str(reg), c_uint32(self.test_input.pop()).value)
+                if global_vars.input:
+                    self.reti.reg_set(str(reg), c_uint32(global_vars.input.pop()).value)
                 else:
+                    if not sys.stdin.isatty():
+                        print("No input for piped stdin code found")
+                        exit(1)
                     self.reti.reg_set(str(reg), c_uint32(int(input())).value)
                 self.reti.reg_increase("PC")
             case _:
@@ -394,7 +397,7 @@ class RETIInterpreter:
             with open(
                 global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
             ) as fin:
-                self.test_input = list(
+                global_vars.input = list(
                     reversed(
                         [
                             int(line)

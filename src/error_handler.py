@@ -1,9 +1,9 @@
 from sys import exit
 import errors
-from global_classes import Pos
+from util_classes import Pos
 import global_vars
 from colormanager import ColorManager as CM
-from global_funs import overwrite, tokennames_to_str
+from util_funs import overwrite, tokennames_to_str, subheading
 from lark.exceptions import (
     UnexpectedCharacters,
     UnexpectedToken,
@@ -11,7 +11,6 @@ from lark.exceptions import (
 )
 from lark.lexer import Token
 from lark.lark import Lark
-from global_funs import subheading
 import os
 import sys
 import traceback

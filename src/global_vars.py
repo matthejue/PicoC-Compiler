@@ -5,7 +5,7 @@ import picoc_nodes as pn
 class Args:
     def __init__(self):
         # --------------------------- PicoC_Compiler --------------------------
-        self.infile = "stdin.picoc"
+        self.infile = "term.picoc"
         # ----------------- PicoC_Compiler + RETI_Interpreter -----------------
         self.intermediate_stages = True
         self.print = True
@@ -18,6 +18,7 @@ class Args:
         self.example = False
         self.supress_errors = False
         self.no_long_jumps = False
+        self.metadata_comments = False
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3
@@ -46,7 +47,9 @@ next_as_normal = False
 
 max_print_out_elements = 5
 
-extension = "picoc"
+input = []
+expected = []
+datasegment = 64
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.

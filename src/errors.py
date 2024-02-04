@@ -1,7 +1,6 @@
 from colormanager import ColorManager as CM
 from lark.lexer import Token
-from global_classes import Pos
-import picoc_nodes as pn
+from util_classes import Pos
 
 
 class UnexpectedCharacter(Exception):

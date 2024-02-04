@@ -1,4 +1,4 @@
-from global_classes import Pos
+from util_classes import Pos
 import global_vars
 from colormanager import ColorManager as CM
 

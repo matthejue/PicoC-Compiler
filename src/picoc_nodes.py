@@ -1,8 +1,8 @@
 from ast_node import ASTNode
-from global_classes import Pos
+from util_classes import Pos
 import symbol_table as st
 import global_vars
-from global_funs import repr_single_line
+from util_funs import repr_single_line
 from colormanager import ColorManager as CM
 
 
