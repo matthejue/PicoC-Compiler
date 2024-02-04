@@ -12,13 +12,13 @@ class Args:
         self.lines = 2
         self.verbose = False
         self.double_verbose = False
-        self.color = True
+        self.color = False
         self.debug = False
         self.traceback = False
         self.example = False
         self.supress_errors = False
         self.no_long_jumps = False
-        self.metadata_comments = False
+        self.metadata_comments = True
         # -------------------------- RETI_Interpreter -------------------------
         self.run = True
         self.process_begin = 3

@@ -22,8 +22,7 @@ def main():
         sys.exit(compiler.cmdloop())
 
     if global_vars.args.color:
-        pass
-        # CM().color_on()
+        CM().color_on()
     else:
         CM().color_off()
 

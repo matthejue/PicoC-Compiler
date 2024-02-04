@@ -128,8 +128,7 @@ def convert_to_single_line(stmt, no_colors=False):
     global_vars.args.double_verbose = tmp
     if no_colors:
         if global_vars.args.color:
-            pass
-            # CM().color_on()
+            CM().color_on()
         else:
             CM().color_off()
     return single_line
