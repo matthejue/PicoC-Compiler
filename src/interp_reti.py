@@ -339,23 +339,10 @@ class RETIInterpreter:
             # in case of an print call as last instruction with the --verbose
             # option, the reti state was already printed
         # needs a newline at the end, else it differs from .out_expected
-        file_not_empty = True
-        if os.path.isfile(global_vars.path + global_vars.basename + ".out"):
-            with open(
-                global_vars.path + global_vars.basename + ".out", "r", encoding="utf-8"
-            ) as fin:
-                file_not_empty = fin.read().replace("\n", "")
-        if file_not_empty:
+        if global_vars.path:
             with open(
                 global_vars.path + global_vars.basename + ".out",
                 "a",
-                encoding="utf-8",
-            ) as fout:
-                fout.write("\n")
-        else:
-            with open(
-                global_vars.path + global_vars.basename + ".out",
-                "w",
                 encoding="utf-8",
             ) as fout:
                 fout.write("\n")
