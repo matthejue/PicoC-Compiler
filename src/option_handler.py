@@ -61,7 +61,7 @@ class OptionHandler(cmd2.Cmd):
         )
         self.terminal_lines = os.get_terminal_size().lines if sys.stdin.isatty() else 24
         global_vars.args = self.cli_args_parser.parse_args()
-        if not global_vars.args.infile:
+        if not global_vars.args.infile and sys.stdin.isatty():
             self._shell__init__()
 
     def _shell__init__(self):
@@ -130,8 +130,7 @@ class OptionHandler(cmd2.Cmd):
     def _color_for_prompt_and_intro(self):
         CM().color_off()
         if global_vars.args.color:
-            pass
-            # CM().color_on()
+            CM().color_on()
         else:
             CM().color_off()
 
@@ -285,8 +284,7 @@ class OptionHandler(cmd2.Cmd):
             self._dt_option(dt, "Derivation Tree Simple")
 
         if global_vars.args.color:
-            pass
-            # CM().color_on()
+            CM().color_on()
         else:
             CM().color_off()
 
@@ -411,8 +409,7 @@ class OptionHandler(cmd2.Cmd):
             self._dt_option(dt, "RETI Derivation Tree")
 
         if global_vars.args.color:
-            pass
-            # CM().color_on()
+            CM().color_on()
         else:
             CM().color_off()
 
@@ -542,8 +539,7 @@ class OptionHandler(cmd2.Cmd):
                 case _:
                     throw_error(ast)
             if global_vars.args.color:
-                pass
-                # CM().color_on()
+                CM().color_on()
             else:
                 CM().color_off()
 
@@ -564,8 +560,7 @@ class OptionHandler(cmd2.Cmd):
                 case _:
                     throw_error(pass_ast)
             if global_vars.args.color:
-                pass
-                # CM().color_on()
+                CM().color_on()
             else:
                 CM().color_off()
 
@@ -583,8 +578,7 @@ class OptionHandler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(symbol_table))
             if global_vars.args.color:
-                pass
-                # CM().color_on()
+                CM().color_on()
             else:
                 CM().color_off()
 
@@ -609,8 +603,7 @@ class OptionHandler(cmd2.Cmd):
                     acc += str(cell)
 
                 if global_vars.args.color:
-                    pass
-                    # CM().color_on()
+                    CM().color_on()
                 else:
                     CM().color_off()
 
