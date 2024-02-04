@@ -387,7 +387,8 @@ class RETIInterpreter:
                     fout.write("\n" + str(self.reti))
 
         if global_vars.args.color:
-            CM().color_on()
+            pass
+            # CM().color_on()
         else:
             CM().color_off()
 
