@@ -7,17 +7,6 @@ from colormanager import ColorManager as CM
 
 class RETI(ASTNode):
     def __init__(self, instrs):
-        # if a '<basename>.datasegment_size' file exists, the value should be
-        # taken from there
-        if os.path.isfile(
-            global_vars.path + global_vars.basename + ".datasegment_size"
-        ):
-            with open(
-                global_vars.path + global_vars.basename + ".datasegment_size",
-                "r",
-                encoding="utf-8",
-            ) as fin:
-                global_vars.args.datasegment_size = int(fin.read())
         self.round = 0
         self.regs = {
             "ACC": 0,
@@ -255,7 +244,7 @@ class EPROM(ASTNode):
                         str(
                             global_vars.args.process_begin
                             + len_instrs
-                            + global_vars.args.datasegment_size
+                            + global_vars.datasegment
                             - 1
                         )
                     ),
@@ -335,7 +324,7 @@ class SRAM(ASTNode):
         min_sram_size = (
             global_vars.args.process_begin
             + len(instrs)
-            + global_vars.args.datasegment_size
+            + global_vars.datasegment
         )
         self.cells = {
             i: (

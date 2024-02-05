@@ -26,7 +26,7 @@ fi
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
   ./src/main.py $(cat ./most_used_compile_opts.txt) $3 $4 "$test";
-  ./src/main.py $(cat ./most_used_interpret_opts.txt) $3 $4 "${test%.picoc}.reti";
+  ./src/main.py $(cat ./most_used_interpret_opts.txt) $3 $4 "${test%.picoc}_with_metadata.reti";
 
   if [[ $? != 0 ]]; then
     not_running_through+=("$test");

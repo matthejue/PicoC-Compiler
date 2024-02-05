@@ -340,12 +340,21 @@ class RETIInterpreter:
             # option, the reti state was already printed
         # needs a newline at the end, else it differs from .out_expected
         if global_vars.path:
-            with open(
-                global_vars.path + global_vars.basename + ".out",
-                "a",
-                encoding="utf-8",
-            ) as fout:
-                fout.write("\n")
+            if self.first_out:
+                with open(
+                    global_vars.path + global_vars.basename + ".out",
+                    "w",
+                    encoding="utf-8",
+                ) as fout:
+                    fout.write("\n")
+                    self.first_out = False
+            else:
+                with open(
+                    global_vars.path + global_vars.basename + ".out",
+                    "a",
+                    encoding="utf-8",
+                ) as fout:
+                    fout.write("\n")
         if global_vars.args.show_mode:
             self.daemon.finalize()
 
@@ -376,24 +385,7 @@ class RETIInterpreter:
         if global_vars.args.color:
             CM().color_on()
         else:
-            CM().color_off()
-
-    def _preconfigs(self):
-        # deal with input for tests
-        if os.path.isfile(global_vars.path + global_vars.basename + ".in"):
-            with open(
-                global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
-            ) as fin:
-                global_vars.input = list(
-                    reversed(
-                        [
-                            int(line)
-                            for line in fin.readline().replace("\n", "").split(" ")
-                            if line.lstrip("-").isdigit()
-                        ]
-                    )
-                )
+            CM().color_off() 
 
     def interp_reti(self):
-        self._preconfigs()
         self._instrs()

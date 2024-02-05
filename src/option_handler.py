@@ -22,7 +22,7 @@ from pygments import highlight
 from pygments.token import *
 from pygments.formatters.terminal import TerminalFormatter
 from pygments.lexers.c_cpp import CLexer
-from util_funs import get_test_metadata
+import re
 
 
 class OptionHandler(cmd2.Cmd):
@@ -46,7 +46,7 @@ class OptionHandler(cmd2.Cmd):
     # ---------------------------- RETI_Interpreter ---------------------------
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
-    cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=32)
+    cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=0)
     cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
     cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
     cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
@@ -216,7 +216,7 @@ class OptionHandler(cmd2.Cmd):
 
     def read_stdin(self):
         code = sys.stdin.read()
-
+        global_vars.args.metadata_comments = True
         match global_vars.args.extension:
             case "picoc":
                 global_vars.args.infile = "stdin.picoc"
@@ -229,21 +229,23 @@ class OptionHandler(cmd2.Cmd):
                     f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
         self._success_message()
-        
 
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
-        # add the filename to the start of the code
         code_with_file = (
-            ("./" if not global_vars.args.infile.startswith("./") else "")
+            (
+                "./"
+                if not global_vars.args.infile.startswith("./")
+                and not global_vars.args.infile.startswith("/")
+                else ""
+            )
             + f"{global_vars.args.infile}\n"
             + code
         )
 
-        if global_vars.args.metadata_comments or not sys.stdin.isatty():
-            get_test_metadata(code)
+        _get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
@@ -283,16 +285,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "Derivation Tree Simple")
 
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
-
         ast_transformer_picoc = TransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
 
         if global_vars.args.intermediate_stages:
-            self._ast_option(ast, "Abstract Syntax Tree")
+            self._output_pass(ast, "Abstract Syntax Tree")
 
         passes = Passes()
 
@@ -328,6 +325,8 @@ class OptionHandler(cmd2.Cmd):
 
         self._output_pass(reti, "RETI")
 
+        self._assembly_with_metadata(reti)
+
         if global_vars.args.intermediate_stages:
             reti_interp = RETIInterpreter(reti)
             self._eprom_write_startprogram_to_file(reti_interp, "EPROM")
@@ -347,15 +346,18 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
 
-        # add the filename to the start of the code
         code_with_file = (
-            ("./" if not global_vars.args.infile.startswith("./") and not global_vars.args.infile.startswith("/") else "")
+            (
+                "./"
+                if not global_vars.args.infile.startswith("./")
+                and not global_vars.args.infile.startswith("/")
+                else ""
+            )
             + f"{global_vars.args.infile}\n"
             + code
         )
 
-        if global_vars.args.metadata_comments or not sys.stdin.isatty():
-            get_test_metadata(code)
+        _get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", self.terminal_columns, "-"))
@@ -408,16 +410,11 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.intermediate_stages:
             self._dt_option(dt, "RETI Derivation Tree")
 
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
-
         ast_transformer_reti = ASTTransformerRETI()
         ast = error_handler.handle(ast_transformer_reti.transform, dt)
 
         if global_vars.args.intermediate_stages:
-            self._ast_option(ast, "RETI Abstract Syntax Tree")
+            self._output_pass(ast, "RETI Abstract Syntax Tree")
 
         if global_vars.args.print:
             print(subheading("RETI Run", self.terminal_columns, "-"))
@@ -429,8 +426,7 @@ class OptionHandler(cmd2.Cmd):
             error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
             if not global_vars.args.supress_errors:
-                raise e
-
+                raise e 
 
     def _success_message(self):
         if global_vars.args.run:
@@ -453,7 +449,6 @@ class OptionHandler(cmd2.Cmd):
                     print(
                         f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET}{CM().RESET_ALL}\n"
                     )
-
 
     def _tokens_option(self, code_with_file, heading, picoc_or_reti):
         parser = Lark.open(
@@ -522,27 +517,6 @@ class OptionHandler(cmd2.Cmd):
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _ast_option(self, ast: pn.File, heading):
-        if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
-            print(ast)
-
-        if global_vars.path:
-            CM().color_off()
-            match ast:
-                case pn.File(pn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(ast))
-                case rn.Program(rn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(ast))
-                case _:
-                    throw_error(ast)
-            if global_vars.args.color:
-                CM().color_on()
-            else:
-                CM().color_off()
-
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
@@ -563,6 +537,18 @@ class OptionHandler(cmd2.Cmd):
                 CM().color_on()
             else:
                 CM().color_off()
+
+    def _assembly_with_metadata(self, ast): 
+        metadata = (f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n")
+        match ast:
+            case rn.Program(rn.Name(val)):
+                # insert at the beginning of the file
+                with open(val, "r", encoding="utf-8") as fin, open(remove_extension(val) + "_with_metadata.reti", "w", encoding="utf-8") as fout:
+                    code = fin.read()
+                    fout.write(metadata + code)
+                pass
+            case _:
+                throw_error(ast)
 
     def _st_option(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
@@ -623,3 +609,52 @@ def _open_documentation():
         subprocess.call(("xdg-open", filepath))
     else:
         print("OS not supported.")
+
+def _get_test_metadata(code):
+        if global_vars.args.metadata_comments:
+            regex = re.search(
+                r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?(.*(\n)?)*",
+                code,
+            )
+            if regex:
+                global_vars.input = (
+                    list(map(lambda x: int(x), regex.group(4).split()))
+                    if regex.group(4)
+                    else []
+                )
+                global_vars.expected = (
+                    list(map(lambda x: int(x), regex.group(9).split()))
+                    if regex.group(9)
+                    else []
+                )
+
+                if global_vars.args.datasegment_size:  # defaults to 0
+                    global_vars.datasegment = global_vars.args.datasegment_size
+                else:
+                    global_vars.datasegment = int(regex.group(14)) if regex.group(14) else 64
+        else:
+            if global_vars.args.datasegment_size:  # defaults to 0
+                global_vars.datasegment = global_vars.args.datasegment_size
+            elif os.path.isfile(
+                global_vars.path + global_vars.basename + ".datasegment_size"
+            ):
+                with open(
+                    global_vars.path + global_vars.basename + ".datasegment_size",
+                    "r",
+                    encoding="utf-8",
+                ) as fin:
+                    global_vars.datasegment = int(fin.read())
+
+            if os.path.isfile(global_vars.path + global_vars.basename + ".in"):
+                with open(
+                    global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
+                ) as fin:
+                    global_vars.input = list(
+                        reversed(
+                            [
+                                int(line)
+                                for line in fin.readline().replace("\n", "").split(" ")
+                                if line.lstrip("-").isdigit()
+                            ]
+                        )
+                    )
