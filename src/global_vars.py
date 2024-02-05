@@ -1,36 +1,9 @@
 import reti_nodes as rn
 import picoc_nodes as pn
-
-
-class Args:
-    def __init__(self):
-        # --------------------------- PicoC_Compiler --------------------------
-        self.infile = "term.picoc"
-        # ----------------- PicoC_Compiler + RETI_Interpreter -----------------
-        self.intermediate_stages = True
-        self.print = True
-        self.lines = 2
-        self.verbose = False
-        self.double_verbose = False
-        self.color = False
-        self.debug = False
-        self.traceback = False
-        self.example = False
-        self.supress_errors = False
-        self.no_long_jumps = False
-        self.metadata_comments = True
-        # -------------------------- RETI_Interpreter -------------------------
-        self.run = True
-        self.process_begin = 3
-        self.datasegment_size = 32
-        self.show_mode = False
-        self.pages = 5
-        self.extension = "reti_states"
-        self.binary = False
-
+from argparse import Namespace
 
 # options from command-line arguments
-args = Args()
+args: Namespace
 
 # Name and path for the basename of all output files. If it stays empty this
 # means one is in shell mode
@@ -49,7 +22,7 @@ max_print_out_elements = 5
 
 input = []
 expected = []
-datasegment = 64
+datasegment = 32
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
