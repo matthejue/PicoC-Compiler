@@ -47,9 +47,8 @@ class OptionHandler(cmd2.Cmd):
     cli_args_parser.add_argument("-R", "--run", action="store_true")
     cli_args_parser.add_argument("-B", "--process_begin", type=int, default=3)
     cli_args_parser.add_argument("-D", "--datasegment_size", type=int, default=0)
-    cli_args_parser.add_argument("-S", "--show_mode", action="store_true")
-    cli_args_parser.add_argument("-P", "--pages", type=int, default=5)
     cli_args_parser.add_argument("-E", "--extension", type=str, default="reti_states")
+    cli_args_parser.add_argument("-P", "--plugin_support", action="store_true")
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/picoc_compiler/settings.conf"
@@ -215,8 +214,11 @@ class OptionHandler(cmd2.Cmd):
                 )
 
     def read_stdin(self):
-        code = sys.stdin.read()
-        global_vars.args.metadata_comments = True
+        if global_vars.args.plugin_support:
+            global_vars.args.metadata_comments = True
+            code = input()
+        else:
+            code = sys.stdin.read()
         match global_vars.args.extension:
             case "picoc":
                 global_vars.args.infile = "stdin.picoc"
@@ -429,6 +431,8 @@ class OptionHandler(cmd2.Cmd):
                 raise e 
 
     def _success_message(self):
+        if global_vars.args.plugin_support:
+            return
         if global_vars.args.run:
             match global_vars.args.extension:
                 case "reti":
@@ -627,7 +631,6 @@ def _get_test_metadata(code):
                     if regex.group(9)
                     else []
                 )
-
                 if global_vars.args.datasegment_size:  # defaults to 0
                     global_vars.datasegment = global_vars.args.datasegment_size
                 else:

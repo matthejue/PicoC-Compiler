@@ -6,7 +6,6 @@ from util_funs import (
     bug_in_interpreter,
     filter_out_comments,
 )
-import os
 from ctypes import c_int32, c_uint32
 from colormanager import ColorManager as CM
 from daemon import Deamon
@@ -303,7 +302,7 @@ class RETIInterpreter:
 
     def _instrs(self):
         while True:
-            if global_vars.args.show_mode:
+            if global_vars.args.plugin_support:
                 self.daemon.cont(self.reti)
 
             addr = self.reti.regs["PC"]
@@ -355,8 +354,6 @@ class RETIInterpreter:
                     encoding="utf-8",
                 ) as fout:
                     fout.write("\n")
-        if global_vars.args.show_mode:
-            self.daemon.finalize()
 
     def _reti_state_option(self):
         self.reti.round = self.reti.round + 1
