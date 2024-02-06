@@ -217,6 +217,7 @@ class OptionHandler(cmd2.Cmd):
         if global_vars.args.plugin_support:
             global_vars.args.metadata_comments = True
             code = input()
+            code = code.replace("newline", "\n")
         else:
             code = sys.stdin.read()
         match global_vars.args.extension:
