@@ -322,9 +322,7 @@ class SRAM(ASTNode):
         start = max(global_vars.args.process_begin, len(term_process))
         end = global_vars.args.process_begin + len(instrs) - 1
         min_sram_size = (
-            global_vars.args.process_begin
-            + len(instrs)
-            + global_vars.datasegment
+            global_vars.args.process_begin + len(instrs) + global_vars.datasegment
         )
         self.cells = {
             i: (
