@@ -1,7 +1,7 @@
 .PHONY: clean
 
 install:
-	@sudo bash -c "([[ ! -f /usr/local/bin/picoc_compiler ]] || rm /usr/local/bin/picoc_compiler) && echo -e \"#!/usr/bin/env bash\n$(realpath .)/.virtualenv/bin/python $(realpath .)/src/main.py\" > /usr/local/bin/picoc_compiler && chmod 755 /usr/local/bin/picoc_compiler"
+	@sudo bash -c "([[ -f /usr/local/bin/picoc_compiler ]] || rm /usr/local/bin/picoc_compiler) && sed -i \"s|#!.*|#!$(realpath .)/.virtualenv/bin/python|\" ./src/main.py && chmod 755 ./src/main.py && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
 
 clean: _clean-pycache _clean-files
 _clean-pycache:
