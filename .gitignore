@@ -38,4 +38,4 @@ README.txt
 *.cast
 *.gdb_history
 *.venv/
-virtual_env/
+.virtualenv/

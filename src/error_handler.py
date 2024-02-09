@@ -37,6 +37,7 @@ class ErrorHandler:
                 Pos(e.line - 1, e.column - 1),
             )
             error_header = self._error_header(e.description, e.found_pos)
+
             error_screen = AnnotationScreen(
                 self.split_code,
                 expected_pos.line,
@@ -380,6 +381,8 @@ class ErrorHandler:
         return tokens[-1]
 
     def _output_error(self, error_str, error_name):
+        if global_vars.args.plugin_support:
+            print("error\n")
         print(error_str)
         if global_vars.path:
             with open(
