@@ -6,7 +6,7 @@
     <img src="./doc/logo.png" alt="Logo" height="80px">
   </a>
   <p align="center">
-    Compiles the programming language <strong>PicoC</strong> (a subset of C) into the <strong>RETI</strong> machine language.
+    Compiles the programming language <strong>PicoC</strong> (a subset of C) into the <strong>RETI</strong> assembler.
     <br />
     <br />
     <a href="./LICENSE"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>

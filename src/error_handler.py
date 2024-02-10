@@ -349,40 +349,70 @@ class ErrorHandler:
         )
 
     def _find_prev_token(self, pos: Pos) -> Token:
-        parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
-            lexer="basic",
-            priority="invert",
-            parser="earley",
-            start="file",
-            maybe_placeholders=False,
-            propagate_positions=True,
-        )
+        match global_vars.args.extension:
+            case "picoc":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="file",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case "reti":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="program",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case _:
+                print("Error: No such extension")
+                exit(1)
+
         tokens = list(parser.lex(self.code_with_file))
 
         # find token with same position
-        for (i, token) in enumerate(tokens):
+        for i, token in enumerate(tokens):
             # -1 because Lark starts counting from 1
             if token.line - 1 == pos.line and token.column - 1 == pos.column:
                 break
         return tokens[i - 1]
 
     def _find_last_token(self) -> Token:
-        parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
-            lexer="basic",
-            priority="invert",
-            parser="earley",
-            start="file",
-            maybe_placeholders=False,
-            propagate_positions=True,
-        )
+        match global_vars.args.extension:
+            case "picoc":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="file",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case "reti":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="program",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case _:
+                print("Error: No such extension")
+                exit(1)
+
         tokens = list(parser.lex(self.code_with_file))
         return tokens[-1]
 
     def _output_error(self, error_str, error_name):
-        if global_vars.args.plugin_support:
-            print("error\n")
         print(error_str)
         if global_vars.path:
             with open(
