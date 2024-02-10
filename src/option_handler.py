@@ -167,6 +167,7 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args.infile = "term.picoc"
         global_vars.args.color = color
         global_vars.args.print = True
+        global_vars.args.extension = "picoc"
         self._compl("void main() {" + code + "}")
         print(f"\n{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET_ALL}\n")
 
@@ -177,6 +178,7 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args = global_vars.Args()
         global_vars.args.color = color
         global_vars.args.print = True
+        global_vars.args.extension = "picoc"
         self._compl("void main() {" + code + "}")
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Compilation and Interpretation successfull{CM().RESET_ALL}\n"
@@ -190,6 +192,7 @@ class OptionHandler(cmd2.Cmd):
         global_vars.args.infile = "term.reti"
         global_vars.args.color = color
         global_vars.args.print = True
+        global_vars.args.extension = "reti"
         self._interp(code)
         print(
             f"\n{CM().BRIGHT}{CM().WHITE}Interpretation successfull{CM().RESET_ALL}\n"
@@ -220,6 +223,9 @@ class OptionHandler(cmd2.Cmd):
             code = code.replace("newline", "\n")
         else:
             code = sys.stdin.read()
+        if not global_vars.args.extension:
+            print("Need extension option set if passing code via stdin.")
+            exit(1)
         match global_vars.args.extension:
             case "picoc":
                 global_vars.args.infile = "stdin.picoc"
@@ -405,6 +411,9 @@ class OptionHandler(cmd2.Cmd):
                 self._tokens_option, code_with_file, "RETI Tokens", "reti"
             )
 
+        # just for finding UnexpectedCharacters errors
+        self._find_unexpected_characters_errors(error_handler, code_with_file)
+
         dt = error_handler.handle(parser.parse, code_with_file)
 
         dt_visitor_reti = DTVisitorRETI()
@@ -429,7 +438,7 @@ class OptionHandler(cmd2.Cmd):
             error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
             if not global_vars.args.supress_errors:
-                raise e 
+                raise e
 
     def _success_message(self):
         if global_vars.args.plugin_support:
@@ -543,12 +552,14 @@ class OptionHandler(cmd2.Cmd):
             else:
                 CM().color_off()
 
-    def _assembly_with_metadata(self, ast): 
-        metadata = (f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n")
+    def _assembly_with_metadata(self, ast):
+        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
         match ast:
             case rn.Program(rn.Name(val)):
                 # insert at the beginning of the file
-                with open(val, "r", encoding="utf-8") as fin, open(remove_extension(val) + "_with_metadata.reti", "w", encoding="utf-8") as fout:
+                with open(val, "r", encoding="utf-8") as fin, open(
+                    remove_extension(val) + "_with_metadata.reti", "w", encoding="utf-8"
+                ) as fout:
                     code = fin.read()
                     fout.write(metadata + code)
                 pass
@@ -600,6 +611,35 @@ class OptionHandler(cmd2.Cmd):
 
                 fout.write(acc.lstrip())
 
+    def _find_unexpected_characters_errors(self, error_handler, code_with_file):
+        match global_vars.args.extension:
+            case "picoc":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="file",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case "reti":
+                parser = Lark.open(
+                    f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_reti.lark",
+                    lexer="basic",
+                    priority="invert",
+                    parser="earley",
+                    start="program",
+                    maybe_placeholders=False,
+                    propagate_positions=True,
+                )
+            case _:
+                print("Error: No such extension")
+                exit(1)
+
+
+        error_handler.handle(list, parser.lex(code_with_file))
+
 
 def _open_documentation():
     filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/Dokumentation.pdf"
@@ -615,50 +655,53 @@ def _open_documentation():
     else:
         print("OS not supported.")
 
+
 def _get_test_metadata(code):
-        if global_vars.args.metadata_comments:
-            regex = re.search(
-                r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?(.*(\n)?)*",
-                code,
+    if global_vars.args.metadata_comments:
+        regex = re.search(
+            r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?(.*(\n)?)*",
+            code,
+        )
+        if regex:
+            global_vars.input = (
+                list(map(lambda x: int(x), regex.group(4).split()))
+                if regex.group(4)
+                else []
             )
-            if regex:
-                global_vars.input = (
-                    list(map(lambda x: int(x), regex.group(4).split()))
-                    if regex.group(4)
-                    else []
-                )
-                global_vars.expected = (
-                    list(map(lambda x: int(x), regex.group(9).split()))
-                    if regex.group(9)
-                    else []
-                )
-                if global_vars.args.datasegment_size:  # defaults to 0
-                    global_vars.datasegment = global_vars.args.datasegment_size
-                else:
-                    global_vars.datasegment = int(regex.group(14)) if regex.group(14) else 64
-        else:
+            global_vars.expected = (
+                list(map(lambda x: int(x), regex.group(9).split()))
+                if regex.group(9)
+                else []
+            )
             if global_vars.args.datasegment_size:  # defaults to 0
                 global_vars.datasegment = global_vars.args.datasegment_size
-            elif os.path.isfile(
-                global_vars.path + global_vars.basename + ".datasegment_size"
-            ):
-                with open(
-                    global_vars.path + global_vars.basename + ".datasegment_size",
-                    "r",
-                    encoding="utf-8",
-                ) as fin:
-                    global_vars.datasegment = int(fin.read())
+            else:
+                global_vars.datasegment = (
+                    int(regex.group(14)) if regex.group(14) else 64
+                )
+    else:
+        if global_vars.args.datasegment_size:  # defaults to 0
+            global_vars.datasegment = global_vars.args.datasegment_size
+        elif os.path.isfile(
+            global_vars.path + global_vars.basename + ".datasegment_size"
+        ):
+            with open(
+                global_vars.path + global_vars.basename + ".datasegment_size",
+                "r",
+                encoding="utf-8",
+            ) as fin:
+                global_vars.datasegment = int(fin.read())
 
-            if os.path.isfile(global_vars.path + global_vars.basename + ".in"):
-                with open(
-                    global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
-                ) as fin:
-                    global_vars.input = list(
-                        reversed(
-                            [
-                                int(line)
-                                for line in fin.readline().replace("\n", "").split(" ")
-                                if line.lstrip("-").isdigit()
-                            ]
-                        )
+        if os.path.isfile(global_vars.path + global_vars.basename + ".in"):
+            with open(
+                global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
+            ) as fin:
+                global_vars.input = list(
+                    reversed(
+                        [
+                            int(line)
+                            for line in fin.readline().replace("\n", "").split(" ")
+                            if line.lstrip("-").isdigit()
+                        ]
                     )
+                )
