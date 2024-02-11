@@ -9,7 +9,6 @@ from util_funs import (
 from ctypes import c_int32, c_uint32
 from colormanager import ColorManager as CM
 from daemon import Deamon
-import sys
 
 
 class RETIInterpreter:
@@ -290,7 +289,9 @@ class RETIInterpreter:
                 self.reti.reg_increase("PC")
             case rn.Call(rn.Name("INPUT"), rn.Reg(reg)):
                 if global_vars.input:
-                    self.reti.reg_set(str(reg), c_uint32(global_vars.input.pop()).value)
+                    self.reti.reg_set(
+                        str(reg), c_uint32(global_vars.input.pop(0)).value
+                    )
                 else:
                     self.reti.reg_set(str(reg), c_uint32(int(input("Input:"))).value)
                 self.reti.reg_increase("PC")

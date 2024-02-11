@@ -1,3 +1,4 @@
+TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 .PHONY: clean
 
 install:
@@ -40,11 +41,13 @@ _clean-files:
 	find . -type f -wholename "./tests/*.c_out" -delete
 	find . -type f -wholename "./tests/*.res" -delete
 
-record:
-	asciinema rec -i 1 -t $(TESTNAME) --overwrite
-
-upload:
-	asciinema upload $(TESTNAME).cast
+test: _test _clean-pycache
+test-clean: _test clean
+_test:
+	# start with 'make test-arg ARG=file_basename'
+	# DEBUG=-d for debugging
+	-./export_environment_vars_for_makefile.sh;\
+	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

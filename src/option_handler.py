@@ -286,13 +286,13 @@ class OptionHandler(cmd2.Cmd):
         error_handler.handle(dt_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            self._dt_option(dt, "Derivation Tree")
+            self._dt_pass(dt, "Derivation Tree")
 
         dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
         error_handler.handle(dt_simple_visitor_picoc.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            self._dt_option(dt, "Derivation Tree Simple")
+            self._dt_pass(dt, "Derivation Tree Simple")
 
         ast_transformer_picoc = TransformerPicoC()
         ast = error_handler.handle(ast_transformer_picoc.transform, dt)
@@ -318,7 +318,7 @@ class OptionHandler(cmd2.Cmd):
             self._output_pass(picoc_mon, "PicoC ANF")
 
         if global_vars.args.intermediate_stages:
-            self._st_option(passes.symbol_table, "Symbol Table")
+            self._st_pass(passes.symbol_table, "Symbol Table")
 
         reti_blocks = error_handler.handle(passes.reti_blocks, picoc_mon)
 
@@ -332,9 +332,9 @@ class OptionHandler(cmd2.Cmd):
 
         reti = error_handler.handle(passes.reti, reti_patch)
 
-        self._output_pass(reti, "RETI")
+        # self._output_pass(reti, "RETI")
 
-        self._assembly_with_metadata(reti)
+        self._reti_with_metadata(reti, "RETI")
 
         if global_vars.args.intermediate_stages:
             reti_interp = RETIInterpreter(reti)
@@ -420,7 +420,7 @@ class OptionHandler(cmd2.Cmd):
         error_handler.handle(dt_visitor_reti.visit, dt)
 
         if global_vars.args.intermediate_stages:
-            self._dt_option(dt, "RETI Derivation Tree")
+            self._dt_pass(dt, "RETI Derivation Tree")
 
         ast_transformer_reti = ASTTransformerRETI()
         ast = error_handler.handle(ast_transformer_reti.transform, dt)
@@ -433,7 +433,7 @@ class OptionHandler(cmd2.Cmd):
 
         reti_interp = RETIInterpreter(ast)
 
-        # possiblity to supress error
+        # possibility to supress error
         try:
             error_handler.handle(reti_interp.interp_reti)
         except Exception as e:
@@ -507,7 +507,7 @@ class OptionHandler(cmd2.Cmd):
             ) as fout:
                 fout.write(str(tokens))
 
-    def _dt_option(self, dt, heading):
+    def _dt_pass(self, dt, heading):
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
             if global_vars.args.color:
@@ -552,21 +552,31 @@ class OptionHandler(cmd2.Cmd):
             else:
                 CM().color_off()
 
-    def _assembly_with_metadata(self, ast):
-        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
-        match ast:
-            case rn.Program(rn.Name(val)):
-                # insert at the beginning of the file
-                with open(val, "r", encoding="utf-8") as fin, open(
-                    remove_extension(val) + "_with_metadata.reti", "w", encoding="utf-8"
-                ) as fout:
-                    code = fin.read()
-                    fout.write(metadata + code)
-                pass
-            case _:
-                throw_error(ast)
+    def _reti_with_metadata(self, pass_ast, heading):
+        if global_vars.args.print:
+            print(subheading(heading, self.terminal_columns, "-"))
+            print(pass_ast)
 
-    def _st_option(self, symbol_table: st.SymbolTable, heading):
+        if global_vars.path:
+            CM().color_off()
+            metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
+            match pass_ast:
+                case rn.Program(rn.Name(val)):
+                    # insert at the beginning of the file
+                    with open(
+                        val,
+                        "w",
+                        encoding="utf-8",
+                    ) as fout:
+                        fout.write(metadata + str(pass_ast))
+                case _:
+                    throw_error(pass_ast)
+            if global_vars.args.color:
+                CM().color_on()
+            else:
+                CM().color_off()
+
+    def _st_pass(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
             print(symbol_table)
@@ -637,7 +647,6 @@ class OptionHandler(cmd2.Cmd):
                 print("Error: No such extension")
                 exit(1)
 
-
         error_handler.handle(list, parser.lex(code_with_file))
 
 
@@ -659,7 +668,7 @@ def _open_documentation():
 def _get_test_metadata(code):
     if global_vars.args.metadata_comments:
         regex = re.search(
-            r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?(.*(\n)?)*",
+            r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?",
             code,
         )
         if regex:
@@ -696,12 +705,8 @@ def _get_test_metadata(code):
             with open(
                 global_vars.path + global_vars.basename + ".in", "r", encoding="utf-8"
             ) as fin:
-                global_vars.input = list(
-                    reversed(
-                        [
-                            int(line)
-                            for line in fin.readline().replace("\n", "").split(" ")
-                            if line.lstrip("-").isdigit()
-                        ]
-                    )
-                )
+                global_vars.input = [
+                    int(line)
+                    for line in fin.readline().replace("\n", "").split(" ")
+                    if line.lstrip("-").isdigit()
+                ]
