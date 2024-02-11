@@ -22,7 +22,7 @@ max_print_out_elements = 5
 
 input = []
 expected = []
-datasegment = 32
+datasegment = 64
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.
