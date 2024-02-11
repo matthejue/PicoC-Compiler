@@ -267,7 +267,7 @@ class RETIInterpreter:
             #      self.reti.reg_set("SP", c_uint32(self.reti.regs["SP"]).value + 1)
             case rn.Call(rn.Name("PRINT"), rn.Reg(reg)):
                 print(
-                    f"{CM().GREEN}Output:{CM().RESET}\n\t{CM().RED}{c_int32(self.reti.regs[str(reg)]).value}{CM().RESET}"
+                    f"{CM().GREEN}Output:{CM().RESET} {CM().RED}{c_int32(self.reti.regs[str(reg)]).value}{CM().RESET}"
                 )
                 if global_vars.path:
                     if self.first_out:
@@ -292,10 +292,7 @@ class RETIInterpreter:
                 if global_vars.input:
                     self.reti.reg_set(str(reg), c_uint32(global_vars.input.pop()).value)
                 else:
-                    if not sys.stdin.isatty():
-                        print("No input for piped stdin code found")
-                        exit(1)
-                    self.reti.reg_set(str(reg), c_uint32(int(input())).value)
+                    self.reti.reg_set(str(reg), c_uint32(int(input("Input:"))).value)
                 self.reti.reg_increase("PC")
             case _:
                 bug_in_interpreter(instr)
@@ -382,7 +379,7 @@ class RETIInterpreter:
         if global_vars.args.color:
             CM().color_on()
         else:
-            CM().color_off() 
+            CM().color_off()
 
     def interp_reti(self):
         self._instrs()
