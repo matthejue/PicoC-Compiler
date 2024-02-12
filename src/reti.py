@@ -186,13 +186,13 @@ class RETI(ASTNode):
     def regs_str(self):
         acc = ""
         for reg in filter(lambda s: "Rel" not in s, iter(self.regs.keys())):
-            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+            acc += f"\n{reg}: {' ' * (3-len(reg))}{self.regs[reg]}"
         return acc
 
     def regs_rel_str(self):
         acc = ""
         for reg in filter(lambda s: "Rel" in s, iter(self.regs.keys())):
-            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
+            acc += f"\n{reg}: {' ' * (7-len(reg))}{self.regs[reg]}"
         return acc
 
     def eprom_str(self):
@@ -208,7 +208,7 @@ class RETI(ASTNode):
         acc = ""
         for addr in range(len(cells)):
             acc += (
-                "\n  "
+                "\n"
                 + (f"%05i " % addr)
                 + (
                     ("(%010i): " % (addr + constant))
