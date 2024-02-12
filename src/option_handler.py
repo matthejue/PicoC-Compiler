@@ -553,13 +553,14 @@ class OptionHandler(cmd2.Cmd):
                 CM().color_off()
 
     def _reti_with_metadata(self, pass_ast, heading):
+        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
+
         if global_vars.args.print:
             print(subheading(heading, self.terminal_columns, "-"))
-            print(pass_ast)
+            print(metadata + str(pass_ast))
 
         if global_vars.path:
             CM().color_off()
-            metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
             match pass_ast:
                 case rn.Program(rn.Name(val)):
                     # insert at the beginning of the file
