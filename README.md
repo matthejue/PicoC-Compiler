@@ -9,11 +9,6 @@
     Compiles the programming language <strong>PicoC</strong> (a subset of C) into the <strong>RETI</strong> assembler.
     <br />
     <br />
-    <a href="./LICENSE"><img src="https://img.shields.io/github/license/matthejue/PicoC-Compiler.svg"></a>
-    <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg">
-    <img height="20px" src="http://ForTheBadge.com/images/badges/made-with-python.svg">
-    <br />
-    <br />
     <a href="https://youtu.be/Y9PtgwD9vg4">Colloquium Presentation Video</a>
     ·
     <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">Colloquium Presentation Slides</a>
