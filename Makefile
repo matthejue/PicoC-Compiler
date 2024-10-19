@@ -1,6 +1,11 @@
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 .PHONY: clean
 
+full-install: install-dependencies install
+
+install-dependencies:
+	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt
+
 install:
 	@sudo bash -c "([[ ! -f /usr/local/bin/picoc_compiler ]] || rm /usr/local/bin/picoc_compiler) && sed -i \"s|#!.*|#!$(realpath .)/.virtualenv/bin/python|\" ./src/main.py && chmod 755 ./src/main.py && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
 
@@ -46,7 +51,7 @@ test-clean: _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
-	-./export_environment_vars_for_makefile.sh;\
+	./export_environment_vars_for_makefile.sh;\
 	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
 
 setup_pyinstaller_linux:
