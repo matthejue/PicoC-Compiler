@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+cleanup() {
+  echo "Termination signal received. Cleaning up..."
+  ./space_inserter.py
+  exit 1
+}
+
+trap cleanup SIGINT
+
 ./space_replacer.py
 ./extract_input_and_expected.sh $2
 ./convert_to_c.py $2
@@ -44,7 +52,7 @@ echo Not running through: ${not_running_through[*]} | tee -a ./tests/tests.res
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests | tee -a ./tests/tests.res
 echo Not passed: ${not_passed[*]} | tee -a ./tests/tests.res
 
-./space_inserter.py
+cleanup
 
 if [[ ${#not_passed[@]} != 0 ]]; then
     exit 1
