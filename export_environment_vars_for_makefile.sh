@@ -1,0 +1,2 @@
+export COLUMNS=$COLUMNS
+export LINES=$LINES
