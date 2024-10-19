@@ -52,7 +52,7 @@ echo Not running through: ${not_running_through[*]} | tee -a ./tests/tests.res
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests | tee -a ./tests/tests.res
 echo Not passed: ${not_passed[*]} | tee -a ./tests/tests.res
 
-cleanup
+./space_inserter.py
 
 if [[ ${#not_passed[@]} != 0 ]]; then
     exit 1
