@@ -1,8 +1,8 @@
 // in:
-// expected:-2147483646
+// expected:-1
 // it reads the return address form the stackframe of the main function
 
 void main() {
   int ar[3] = {1, 2, 3};
-  print(ar[4]);
+  print(ar[4]); // this jumps 2 cells to wide, ar[3] is already out of bounds
 }
