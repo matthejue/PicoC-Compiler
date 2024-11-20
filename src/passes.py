@@ -1113,6 +1113,7 @@ class Passes:
                         case _:
                             throw_error(current_datatype)
 
+                symbol, choosen_scope = self._resolve_name(var_name, var_pos)
                 match symbol:
                     case st.Symbol(_, _, _, val_addr):
                         addr = val_addr
@@ -1907,6 +1908,11 @@ class Passes:
                 blocks_anf = []
                 for decl_def in decls_defs:
                     blocks_anf += self._picoc_anf_def(decl_def)
+                # check if there even exists a main function
+                try:
+                    main_with_id = self.fun_name_to_block_name["main"]
+                except KeyError:
+                    raise errors.NoMainFunction()
                 var = pn.File(
                     pn.Name(remove_extension(val) + ".picoc_anf"),
                     [
@@ -2840,11 +2846,6 @@ class Passes:
     def reti_patch(self, file: pn.File):
         match file:
             case pn.File(pn.Name(val), blocks):
-                # jump to main function if main function isn't first function
-                try:
-                    main_with_id = self.fun_name_to_block_name["main"]
-                except KeyError:
-                    raise errors.NoMainFunction()
                 # goto_main = pn.Exp(pn.GoTo(pn.Name(main_with_id)))
                 # self.global_stmts_instrs += self._single_line_comment(
                 #     goto_main, "# //"

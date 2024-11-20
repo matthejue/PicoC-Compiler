@@ -1,6 +1,6 @@
 // in:40
 // expected:42
-// datasegment:8
+// datasegment:16
 
 void fun(int param);
 
