@@ -7,21 +7,19 @@ num_tests=0;
 not_verified=();
 
 if [[ $2 == "all" ]]; then
-  # paths=(./tests/!(error*|exclude*).c)
-  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.c)
+  paths+=(./sys_tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.c)
 elif [[ -n "$2" ]]; then
-  paths=(./tests/*$2*.c)
-elif [[ $2 == "default" ]]; then
-  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias}*.c)
+  paths=(./sys_tests/*$2*.c)
 else
-  paths+=(./tests/{basic,advanced,example,hard,thesis,tobias}*.c)
+  paths+=(./sys_tests/{basic,advanced,example,hard,thesis,tobias}*.c)
 fi
 
 for test in "${paths[@]}"; do
   echo $test
   gcc -Wno-incompatible-pointer-types $test
-  ./a.out | sed -e 's/^ //' | sed 's/$/\n/' > "${test%.c}.c_out"
-  diff "${test%.c}.out_expected" "${test%.c}.c_out"
+  # ./a.out | sed -e 's/^ //' | sed 's/$/\n/' > "${test%.c}.c_output"
+  ./a.out | sed -e 's/^ //' | sed 's/$/ /' > "${test%.c}.c_output"
+  diff "${test%.c}.expected_output" "${test%.c}.c_output"
   if [[ $? != 0 ]]; then
     not_verified+=("$test");
   fi

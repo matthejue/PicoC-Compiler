@@ -32,11 +32,12 @@ def only_keep_path(fname):
 
 PATTERN = r"_no_spaces.picoc"
 
-filenames = [f for f in os.listdir("./tests") if f.endswith(PATTERN)]
+filenames = [f for f in os.listdir("./sys_tests") if f.endswith(PATTERN)]
 
 for filename in filenames:
     filename_copy = filename.replace("_", " ")
 
+
     os.rename(
-        "./tests/" + filename, "./tests/" + remove_extension(filename_copy) + ".picoc"
+        "./sys_tests/" + filename, "./sys_tests/" + remove_extension(filename_copy) + ".picoc"
     )

@@ -416,9 +416,9 @@ class ErrorHandler:
         print(error_str)
         if global_vars.path:
             with open(
-                global_vars.path + global_vars.basename + ".out", "w", encoding="utf-8"
+                global_vars.path + global_vars.basename + ".output", "w", encoding="utf-8"
             ) as fout:
-                fout.write(error_name + "\n")
+                fout.write(error_name + " ")
             with open(
                 global_vars.path + global_vars.basename + ".error",
                 "w",

@@ -15,36 +15,36 @@ _clean-pycache:
 	find . -type d -name "__pycache__" -delete
 
 _clean-files:
-	find . -type f -wholename "./tests/*.tokens" -delete
-	find . -type f -wholename "./tests/*.rtokens" -delete
-	find . -type f -wholename "./tests/*.dt" -delete
-	find . -type f -wholename "./tests/*.rdt" -delete
-	find . -type f -wholename "./tests/*.dt_simple" -delete
-	find . -type f -wholename "./tests/*.ast" -delete
-	find . -type f -wholename "./tests/*.rast" -delete
-	find . -type f -wholename "./tests/*.st_mon" -delete
-	find . -type f -wholename "./tests/*.st" -delete
-	find . -type f -wholename "./tests/*.picoc_shrink" -delete
-	find . -type f -wholename "./tests/*.picoc_blocks" -delete
-	find . -type f -wholename "./tests/*.picoc_patch" -delete
-	find . -type f -wholename "./tests/*.picoc_anf" -delete
-	find . -type f -wholename "./tests/*.reti_blocks" -delete
-	find . -type f -wholename "./tests/*.reti_patch" -delete
-	find . -type f -wholename "./tests/*.reti" -delete
-	find . -type f -wholename "./tests/*.error" -delete
-	find . -type f -wholename "./tests/*.c" -delete
-	find . -type f -wholename "./tests/*.c_out" -delete
-	find . -type f -wholename "./tests/*.reti_tokens" -delete
-	find . -type f -wholename "./tests/*.reti_ast" -delete
-	find . -type f -wholename "./tests/*.in" -delete
-	find . -type f -wholename "./tests/*.out" -delete
-	find . -type f -wholename "./tests/*.out_expected" -delete
-	find . -type f -wholename "./tests/*.datasegment_size" -delete
-	find . -type f -wholename "./tests/*.reti_states" -delete
-	find . -type f -wholename "./tests/*.eprom" -delete
-	find . -type f -wholename "./tests/*.c" -delete
-	find . -type f -wholename "./tests/*.c_out" -delete
-	find . -type f -wholename "./tests/*.res" -delete
+	find . -type f -wholename "./sys_tests/*.tokens" -delete
+	find . -type f -wholename "./sys_tests/*.rtokens" -delete
+	find . -type f -wholename "./sys_tests/*.dt" -delete
+	find . -type f -wholename "./sys_tests/*.rdt" -delete
+	find . -type f -wholename "./sys_tests/*.dt_simple" -delete
+	find . -type f -wholename "./sys_tests/*.ast" -delete
+	find . -type f -wholename "./sys_tests/*.rast" -delete
+	find . -type f -wholename "./sys_tests/*.st_mon" -delete
+	find . -type f -wholename "./sys_tests/*.st" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_shrink" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_blocks" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_patch" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_anf" -delete
+	find . -type f -wholename "./sys_tests/*.reti_blocks" -delete
+	find . -type f -wholename "./sys_tests/*.reti_patch" -delete
+	find . -type f -wholename "./sys_tests/*.reti" -delete
+	find . -type f -wholename "./sys_tests/*.error" -delete
+	find . -type f -wholename "./sys_tests/*.c" -delete
+	find . -type f -wholename "./sys_tests/*.c_output" -delete
+	find . -type f -wholename "./sys_tests/*.reti_tokens" -delete
+	find . -type f -wholename "./sys_tests/*.reti_ast" -delete
+	find . -type f -wholename "./sys_tests/*.input" -delete
+	find . -type f -wholename "./sys_tests/*.output" -delete
+	# find . -type f -wholename "./sys_tests/*.out" -delete
+	find . -type f -wholename "./sys_tests/*.expected_output" -delete
+	find . -type f -wholename "./sys_tests/*.datasegment_size" -delete
+	find . -type f -wholename "./sys_tests/*.reti_states" -delete
+	find . -type f -wholename "./sys_tests/*.eprom" -delete
+	find . -type f -wholename "./sys_tests/*.c" -delete
+	find . -type f -wholename "./sys_tests/*.res" -delete
 
 test: _test _clean-pycache
 test-clean: _test clean
@@ -52,7 +52,7 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
-	./run_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(VERBOSE) $(DEBUG);
+	./run_sys_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(EXTRA_ARGS)
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

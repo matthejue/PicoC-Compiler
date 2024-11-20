@@ -2107,8 +2107,8 @@ class Passes:
                 ]
             case pn.Exp(pn.Call(pn.Name("input"), [])):
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Call(rn.Name("INPUT"), rn.Reg(rn.Acc())),
-                    # rn.Int(rn.Im("2")),
+                    # rn.Call(rn.Name("INPUT"), rn.Reg(rn.Acc())),
+                    rn.Int(rn.Im("2")),
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
@@ -2120,8 +2120,8 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    # rn.Int(rn.Im("0")),
-                    rn.Call(rn.Name("PRINT"), rn.Reg(rn.Acc())),
+                    rn.Int(rn.Im("0")),
+                    # rn.Call(rn.Name("PRINT"), rn.Reg(rn.Acc())),
                 ]
             case pn.Exit(pn.Num(val)):
                 return self._single_line_comment(stmt, "#") + [

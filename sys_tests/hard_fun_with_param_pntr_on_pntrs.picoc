@@ -19,11 +19,8 @@ void main() {
 
 void connect(int **pntr, int (*ar)[2], int len) {
   int i = 0;
-  //# condition
   while (i < len) {
-    // # assignment
     pntr[i] = ar[i];
-    //# increase
     i = i + 1;
   }
 }
