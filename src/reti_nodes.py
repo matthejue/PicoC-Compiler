@@ -81,23 +81,25 @@ class Jump(ASTNode):
 
 
 class Int(ASTNode):
+    def __init__(self, num):
+        self.num = num
+
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().BLUE}INT{CM().RESET} {CM().RED}{self.val}{CM().RESET};"
+        return f"\n{' ' * depth}{CM().BLUE}INT{CM().RESET} {CM().RED}{self.num}{CM().RESET}"
 
     __match_args__ = ("num",)
 
 
 # ---------------------------- Input and Print ----------------------------
-class Call(ASTNode):
-    def __init__(self, name, reg):
-        self.name = name
-        self.reg = reg
-
-    def __repr__(self, depth=0):
-        # return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg};"
-        return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg}"
-
-    __match_args__ = ("name", "reg")
+# class Call(ASTNode):
+#     def __init__(self, name, reg):
+#         self.name = name
+#         self.reg = reg
+#
+#     def __repr__(self, depth=0):
+#         return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg};"
+#
+#     __match_args__ = ("name", "reg")
 
 
 # =========================================================================

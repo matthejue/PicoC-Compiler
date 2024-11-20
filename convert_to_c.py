@@ -7,24 +7,24 @@ import os
 def find_all_paths(pattern, from_start):
     if from_start:
         return map(
-            lambda file: f"./tests/{file}",
+            lambda file: f"./sys_tests/{file}",
             filter(
                 lambda file: any([file.startswith(ptrn) for ptrn in pattern]),
-                os.listdir(os.curdir + "/tests/"),
+                os.listdir(os.curdir + "/sys_tests/"),
             ),
         )
     else:
         return map(
-            lambda file: f"./tests/{file}",
+            lambda file: f"./sys_tests/{file}",
             filter(
                 lambda file: any([ptrn in file for ptrn in pattern]),
-                os.listdir(os.curdir + "/tests/"),
+                os.listdir(os.curdir + "/sys_tests/"),
             ),
         )
 
 
 def main():
-    if len(sys.argv) == 1 or sys.argv[1] == "default":
+    if len(sys.argv) == 1:
         pattern = ["basic", "advanced", "example", "hard", "thesis", "tobias"]
         paths = find_all_paths(pattern, from_start=True)
     elif sys.argv[1] == "all":
@@ -39,7 +39,7 @@ def main():
         with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
             picoc_input = picoc_file.read()
         almost_c = picoc_input.replace("print(", 'printf(" %d", ')
-        with open(basename + ".in", "r", encoding="utf-8") as input_file:
+        with open(basename + ".input", "r", encoding="utf-8") as input_file:
             inputs = input_file.read().replace("\n", "").split(" ")
         while inputs:
             almost_c = almost_c.replace("input()", inputs.pop(0), 1)

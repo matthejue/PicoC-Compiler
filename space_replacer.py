@@ -31,13 +31,13 @@ def only_keep_path(fname):
 
 
 filenames = [
-    f for f in os.listdir("./tests") if f.endswith(".picoc") and f.find(" ") != -1
+    f for f in os.listdir("./sys_tests") if f.endswith(".picoc") and f.find(" ") != -1
 ]
 
 for filename in filenames:
     filename_copy = filename.replace(" ", "_")
 
     os.rename(
-        "./tests/" + filename,
-        "./tests/" + remove_extension(filename_copy) + "_no_spaces.picoc",
+        "./sys_tests/" + filename,
+        "./sys_tests/" + remove_extension(filename_copy) + "_no_spaces.picoc",
     )
