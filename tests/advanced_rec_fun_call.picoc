@@ -1,6 +1,6 @@
 // in:10 10 10 10 10 10 10 10 10 10
 // expected:10
-// datasegment:32
+// datasegment:64
 
 int rec_fun_call(int arg) {
   if (arg == input()) {

@@ -1,6 +1,6 @@
 // in:2 10
 // expected:1024
-// datasegment:8
+// datasegment:16
 // from the Introduction to Programming Lecture by Peter Thiemann
 
 int fast_efficient_iterative(int a, int n, int acc) {
