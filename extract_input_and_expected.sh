@@ -10,11 +10,10 @@ fi
 
 for test in "${paths[@]}"; do
   sed -n '1p' "$test" | sed -e 's/^\/\/ in://' > "${test%.picoc}.input"
-  if [[ $(sed -n "1p" "$test") =~ ^//\ expected: ]]; then
-    sed -n '1p' "$test" | sed -e 's/^\/\/ expected://' | tr '\n' ' ' > "${test%.picoc}.expected_output"
-  elif [[ $(sed -n "2p" "$test") =~ ^//\ expected: ]]; then
-    sed -n '2p' "$test" | sed -e 's/^\/\/ expected://' | tr '\n' ' ' > "${test%.picoc}.expected_output"
-  elif [[ $(sed -n "3p" "$test") =~ ^//\ expected: ]]; then
-    sed -n '3p' "$test" | sed -e 's/^\/\/ expected://' | tr '\n' ' ' > "${test%.picoc}.expected_output"
+  expected=$(sed -n '2p' "$test" | sed -e 's/^\/\/ expected://')
+  if [[ "$expected" == '' ]]; then
+    echo -n '' > "${test%.picoc}.expected_output"
+  else
+    echo "$expected" | tr '\n' ' ' > "${test%.picoc}.expected_output"
   fi
 done

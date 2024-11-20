@@ -25,12 +25,12 @@ README.txt
 *.reti
 *.error
 *.c
-*.c_out
+*.c_output
 *.reti_tokens
 *.reti_ast
-*.in
-*.out
-*.out_expected
+*.input
+*.output
+*.expected_output
 *.datasegment_size
 *.reti_states
 *.eprom
