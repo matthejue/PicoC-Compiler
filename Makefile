@@ -1,14 +1,14 @@
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
 .PHONY: clean
 
-full-install: install-dependencies install
+full-install: install-dependencies install-global
 
 SHELL := /bin/bash
 install-dependencies:
-	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt
+	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt && sed -i "s|#!.*|#!$(realpath .)/.virtualenv/bin/python|" ./src/main.py && chmod 500 ./src/main.py
 
-install:
-	@sudo bash -c "if [ -L /usr/local/bin/picoc_compiler ]; then rm -f /usr/local/bin/picoc_compiler; fi && sed -i \"s|#!.*|#!$(realpath .)/.virtualenv/bin/python|\" ./src/main.py && chmod 500 ./src/main.py && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
+install-global:
+	@sudo bash -c "if [ -L /usr/local/bin/picoc_compiler ]; then rm -f /usr/local/bin/picoc_compiler; fi && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
 
 clean: _clean-pycache _clean-files
 _clean-pycache:
