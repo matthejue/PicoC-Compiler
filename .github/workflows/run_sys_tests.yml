@@ -31,4 +31,5 @@ jobs:
         make install-linux-local
     - name: Test with Shellscript
       run: |
-        "${GITHUB_WORKSPACE}/run_sys_tests.sh" "79"
+        cd ${GITHUB_WORKSPACE}
+        ./run_sys_tests.sh 79
