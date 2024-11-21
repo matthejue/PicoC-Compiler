@@ -7,7 +7,7 @@ install-dependencies:
 	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt
 
 install:
-	@sudo bash -c "([[ ! -f /usr/local/bin/picoc_compiler ]] || rm /usr/local/bin/picoc_compiler) && sed -i \"s|#!.*|#!$(realpath .)/.virtualenv/bin/python|\" ./src/main.py && chmod 755 ./src/main.py && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
+	@sudo bash -c "if [ -L /usr/local/bin/picoc_compiler ]; then rm -f /usr/local/bin/picoc_compiler; fi && sed -i \"s|#!.*|#!$(realpath .)/.virtualenv/bin/python|\" ./src/main.py && chmod 500 ./src/main.py && sudo ln -s $(realpath .)/src/main.py /usr/local/bin/picoc_compiler"
 
 clean: _clean-pycache _clean-files
 _clean-pycache:
