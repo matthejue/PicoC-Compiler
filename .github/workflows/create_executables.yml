@@ -11,14 +11,6 @@ on:
   workflow_dispatch:
     tags:
       - "*"
-  # push:
-  #   branches: [ master ]
-  #   tags:
-  #     - "*"
-  # pull_request:
-  #   branches: [ master ]
-  #   tags:
-  #     - "*"
 
 jobs:
   build:
@@ -65,12 +57,6 @@ jobs:
         run: |
           cd dist
           tar -zcvf picoc_compiler.tar.gz picoc_compiler
-
-      # - name: Upload Artifact
-        # uses: actions/upload-artifact@v3
-        # with:
-          # name: ${{ matrix.artifact_name }}
-          # path: dist/picoc_compiler
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
