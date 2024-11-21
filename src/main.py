@@ -26,7 +26,8 @@ def main():
     else:
         CM().color_off()
 
-    if not sys.stdin.isatty():
+    # if not sys.stdin.isatty():
+    if global_vars.args.plugin_support:
         sys.exit(compiler.read_stdin())
 
     global_vars.path = only_keep_path(global_vars.args.infile)
