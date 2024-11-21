@@ -25,7 +25,7 @@ jobs:
           - os: windows-latest
             artifact_name: PicoC-Compiler-Windows
             asset_name: picoc_compiler_windows_amd64.tar.gz
-          - os: macos-11  # macos-latest
+          - os: macos-12  # macos-latest
             artifact_name: PicoC-Compiler-MacOs
             asset_name: picoc_compiler_macos_amd64.tar.gz
 
