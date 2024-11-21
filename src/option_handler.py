@@ -212,7 +212,7 @@ class OptionHandler(cmd2.Cmd):
             case "reti":
                 self._interp(code)
             case _:
-                print(global_vars.args.infile)
+                print("filename: " + global_vars.args.infile)
                 print(
                     f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
@@ -235,6 +235,7 @@ class OptionHandler(cmd2.Cmd):
                 global_vars.args.infile = "stdin.reti"
                 self._interp(code)
             case _:
+                print("filename: " + global_vars.args.infile)
                 print(
                     f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
