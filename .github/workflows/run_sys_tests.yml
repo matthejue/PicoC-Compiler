@@ -26,8 +26,8 @@ jobs:
         if [ -f "${GITHUB_WORKSPACE}/requirements.txt" ]; then pip install -r "${GITHUB_WORKSPACE}/requirements.txt"; fi
     - name: Install RETI-Interpeter
       run: |
-        git clone https://github.com/matthejue/PicoC-Compiler.git
-        cd PicoC-Compiler
+        git clone https://github.com/matthejue/RETI-Interpreter.git
+        cd RETI-Interpreter
         make install-linux-local
     - name: Test with Shellscript
       run: |
