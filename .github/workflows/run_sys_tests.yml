@@ -2,9 +2,13 @@ name: run system tests
 
 on:
   push:
-    branches: [ master, new_architecture ]
+    branches: [ master ]
+    tags:
+      - "*"
   pull_request:
-    branches: [ master, new_architecture ]
+    branches: [ master ]
+    tags:
+      - "*"
 
 permissions:
   contents: read
