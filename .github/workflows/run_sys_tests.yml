@@ -32,4 +32,5 @@ jobs:
     - name: Test with Shellscript
       run: |
         cd ${GITHUB_WORKSPACE}
-        make test
+        ./run_sys_tests.sh 79 all
+
