@@ -1,5 +1,5 @@
 // in:
-// expected:-4 3 -9
+// expected:-2147418116 3 -2147418121
 // datasegment: 16
 
 

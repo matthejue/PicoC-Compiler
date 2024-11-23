@@ -1,5 +1,5 @@
 // in:
-// expected:-1
+// expected:-2147418113
 // it reads the return address form the stackframe of the main function
 
 void main() {
