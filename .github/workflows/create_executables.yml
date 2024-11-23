@@ -8,9 +8,16 @@
 name: create executables
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     tags:
       - "*"
+
+permissions:
+  contents: write
+
 
 jobs:
   build:
@@ -25,7 +32,7 @@ jobs:
           - os: windows-latest
             artifact_name: PicoC-Compiler-Windows
             asset_name: picoc_compiler_windows_amd64.tar.gz
-          - os: macos-12  # macos-latest
+          - os: macos-latest  # macos-12
             artifact_name: PicoC-Compiler-MacOs
             asset_name: picoc_compiler_macos_amd64.tar.gz
 
@@ -56,14 +63,27 @@ jobs:
       - name: Tar files
         run: |
           cd dist
-          tar -zcvf picoc_compiler.tar.gz picoc_compiler
+          tar -zcvf ${{ matrix.asset_name }} picoc_compiler
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          repo_token: ${{ secrets.UPLOAD_TO_REPO }}
-          file: dist/picoc_compiler.tar.gz
-          asset_name: ${{ matrix.asset_name }}
-          tag: ${{ github.ref }}
-          overwrite: true
-          body: "Release for all platforms."
+          name: ${{ matrix.artifact_name }}
+          path: ./dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./PicoC-Compiler-Linux/picoc_compiler_linux_amd64.tar.gz
+          ./PicoC-Compiler-Windows/picoc_compiler_windows_amd64.tar.gz
+          ./PicoC-Compiler-MacOs/picoc_compiler_macos_amd64.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
