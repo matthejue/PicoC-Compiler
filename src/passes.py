@@ -37,6 +37,7 @@ class Passes:
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
+
     def _check_return_stmt(self, stmts, datatype):
         if global_vars.args.supress_errors:
             return ()
@@ -213,7 +214,7 @@ class Passes:
                                             fun_name,
                                             fun_pos,
                                             convert_to_single_line(
-                                                datatype, no_colors=True
+                                                datatype
                                             ),
                                             (
                                                 "IntType()"
@@ -277,7 +278,7 @@ class Passes:
             )
             node.visible = visible_emptied_lists
         return [
-            pn.SingleLineComment(prefix, convert_to_single_line(node, no_colors=True))
+            pn.SingleLineComment(prefix, convert_to_single_line(node))
         ]
 
     def _create_block(self, labelbase, stmts, blocks):
@@ -1337,11 +1338,11 @@ class Passes:
                     case st.Symbol(pn.Const(), datatype):
                         raise errors.DatatypeMismatch(
                             identifier_name,
-                            "const " + convert_to_single_line(datatype, no_colors=True),
+                            "const " + convert_to_single_line(datatype),
                             identifier_pos,
                             identifier_pos,
                             #  find_first_pos_in_node([exp])[1],
-                            convert_to_single_line(datatype, no_colors=True),
+                            convert_to_single_line(datatype),
                         )
                     case _:
                         throw_error(symbol)
@@ -1486,13 +1487,13 @@ class Passes:
                             (datatype3, exp3),
                             pn.Alloc(_, datatype4, pn.Name(name4, pos4)),
                         ):
-                            argument_exp = convert_to_single_line(exp3, no_colors=True)
+                            argument_exp = convert_to_single_line(exp3)
                             fun_param_name = name4
                             argument_datatype = convert_to_single_line(
-                                datatype3, no_colors=True
+                                datatype3
                             )
                             fun_param_datatype = convert_to_single_line(
-                                datatype4, no_colors=True
+                                datatype4
                             )
                             argument_pos = find_first_pos_in_node([exp3])[1]
                             fun_param_pos = pos4
@@ -1770,13 +1771,13 @@ class Passes:
                                             def_pos,
                                             def_param_name,
                                             convert_to_single_line(
-                                                def_param_datatype, no_colors=True
+                                                def_param_datatype
                                             ),
                                             def_param_pos,
                                             decl_pos,
                                             decl_param_name,
                                             convert_to_single_line(
-                                                decl_param_datatype, no_colors=True
+                                                decl_param_datatype
                                             ),
                                             decl_param_pos,
                                         )

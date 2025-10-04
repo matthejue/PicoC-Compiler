@@ -1,5 +1,5 @@
 TESTNAME_BASE = $(shell basename --suffix=.picoc $(TESTNAME))
-.PHONY: clean
+.PHONY: test run clean
 
 full-install: install-dependencies install-global
 
@@ -39,7 +39,6 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.reti_ast" -delete
 	find . -type f -wholename "./sys_tests/*.input" -delete
 	find . -type f -wholename "./sys_tests/*.output" -delete
-	# find . -type f -wholename "./sys_tests/*.out" -delete
 	find . -type f -wholename "./sys_tests/*.expected_output" -delete
 	find . -type f -wholename "./sys_tests/*.datasegment_size" -delete
 	find . -type f -wholename "./sys_tests/*.reti_states" -delete
@@ -53,7 +52,11 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh $${COLUMNS} $(TESTNAME_BASE) $(EXTRA_ARGS)
+	./run_sys_tests.sh $${COLUMNS} "$(TESTNAME_BASE)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+
+RUN_PRGRM := ./run/prgrm.picoc
+run:
+	./run.sh "$(RUN_PRGRM)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip

@@ -2,7 +2,6 @@ import global_vars
 from ast_node import ASTNode
 import reti_nodes as rn
 import os
-from colormanager import ColorManager as CM
 
 
 class RETI(ASTNode):
@@ -143,10 +142,10 @@ class RETI(ASTNode):
         global_vars.next_as_normal = True
         acc = (
             "\n" if self.round > 1 else ""
-        ) + f"{CM().GREEN}index:{CM().RESET}       {self.round}"
+        ) + f"index:       {self.round}"
         global_vars.next_as_normal = False
         acc += (
-            f"\n{CM().GREEN}instruction:{CM().RESET} " + str(self.last_instr).lstrip()
+            f"\ninstruction: " + str(self.last_instr).lstrip()
         )
         for reg in self.regs.keys():
             if reg in [
@@ -162,7 +161,7 @@ class RETI(ASTNode):
                 "BAF_Rel",
             ]:
                 global_vars.next_as_normal = True
-            acc += f"\n{CM().GREEN}{reg}:{CM().RESET} {' ' * (11-len(reg))}{self.regs[reg]}"
+            acc += f"\n{reg}: {' ' * (11-len(reg))}{self.regs[reg]}"
             global_vars.next_as_normal = False
         acc_addr = self.regs["ACC"]
         in1_addr = self.regs["IN1"]
@@ -269,7 +268,7 @@ class EPROM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
         # acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -295,7 +294,7 @@ class UART(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
         #  acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -338,7 +337,7 @@ class SRAM(ASTNode):
     def __repr__(
         self, acc_addr, in1_addr, in2_addr, pc_addr, sp_addr, baf_addr, cs_addr, ds_addr
     ):
-        acc = f"\n{CM().GREEN}{self.__class__.__name__}:{CM().RESET}"  # {'(' if global_vars.args.double_verbose else ' '}"
+        acc = f"\n{self.__class__.__name__}:"  # {'(' if global_vars.args.double_verbose else ' '}"
         #  acc += "\n{"
         acc += print_cells(
             self.cells,
@@ -372,7 +371,7 @@ def print_cells(
     for addr in range(len(cells)):
         acc += (
             "\n  "
-            + (f"{CM().GREEN}%05i{CM().RESET} " % addr)
+            + (f"%05i " % addr)
             + (
                 ("(%010i): " % (addr + constant))
                 if global_vars.args.double_verbose
@@ -380,28 +379,28 @@ def print_cells(
             )
             + str(cells[addr]).lstrip()
             + (
-                f" {CM().GREEN}<- ACC{CM().RESET}"
+                f" <- ACC"
                 if addr == acc_addr - constant
                 else ""
             )
             + (
-                f" {CM().GREEN}<- IN1{CM().RESET}"
+                f" <- IN1"
                 if addr == in1_addr - constant
                 else ""
             )
             + (
-                f" {CM().GREEN}<- IN2{CM().RESET}"
+                f" <- IN2"
                 if addr == in2_addr - constant
                 else ""
             )
-            + (f" {CM().GREEN}<- PC{CM().RESET}" if addr == pc_addr - constant else "")
-            + (f" {CM().GREEN}<- SP{CM().RESET}" if addr == sp_addr - constant else "")
+            + (f" <- PC" if addr == pc_addr - constant else "")
+            + (f" <- SP" if addr == sp_addr - constant else "")
             + (
-                f" {CM().GREEN}<- BAF{CM().RESET}"
+                f" <- BAF"
                 if addr == baf_addr - constant
                 else ""
             )
-            + (f" {CM().GREEN}<- CS{CM().RESET}" if addr == cs_addr - constant else "")
-            + (f" {CM().GREEN}<- DS{CM().RESET}" if addr == ds_addr - constant else "")
+            + (f" <- CS" if addr == cs_addr - constant else "")
+            + (f" <- DS" if addr == ds_addr - constant else "")
         )
     return acc

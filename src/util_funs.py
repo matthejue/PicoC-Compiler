@@ -1,4 +1,3 @@
-from colormanager import ColorManager as CM
 import errors
 import itertools
 import global_vars
@@ -6,12 +5,10 @@ import picoc_nodes as pn
 from util_classes import Pos
 
 
-def overwrite(old, replace_with, idx, color=""):
+def overwrite(old, replace_with, idx):
     return (
         old[:idx]
-        + color
         + replace_with
-        + (CM().RESET_ALL if color else "")
         + old[idx + len(replace_with) :]
     )
 
@@ -19,7 +16,7 @@ def overwrite(old, replace_with, idx, color=""):
 def tokennames_to_str(tokens: set):
     tokens = set(global_vars.TOKENNAME_TO_SYMBOL.get(elem, elem) for elem in tokens)
     return " or ".join(
-        CM().BLUE + elem + CM().RESET_ALL
+        elem
         for elem in (
             tokens
             if global_vars.args.double_verbose
@@ -32,7 +29,7 @@ def tokennames_to_str(tokens: set):
 def nodes_to_str(nodes: list):
     nodes = [global_vars.NODE_TO_Symbol.get(elem, elem) for elem in nodes]
     return " or ".join(
-        CM().BLUE + elem + CM().RESET_ALL
+        elem
         for elem in (
             nodes
             if global_vars.args.double_verbose
@@ -46,7 +43,7 @@ def args_to_str(args: list):
         # this function only gets called in case of an error, so the verbose
         # option doesn't have to be reset, because execution ends anyways
         return ("argument " if len(args) == 1 else "arguments ") + ", ".join(
-            f"{CM().BLUE}'" + convert_to_single_line(arg) + f"'{CM().RESET_ALL}"
+            f"'" + convert_to_single_line(arg) + f"'"
             for arg in args
         )
     else:
@@ -56,24 +53,24 @@ def args_to_str(args: list):
 def repr_single_line(self, depth=0):
     if not self.visible:
         if not self.val:
-            return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'()' if global_vars.args.double_verbose else ''}{CM().RESET}"
-        return f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}{CM().RED}'{self.val}'{CM().RESET}{CM().CYAN}{')' if global_vars.args.double_verbose else ''}{CM().RESET}"
+            return f"\n{' ' * depth}{self.__class__.__name__}{'()' if global_vars.args.double_verbose else ''}"
+        return f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}'{self.val}'{')' if global_vars.args.double_verbose else ''}"
 
     acc = ""
 
     if depth > 0:
-        acc += f"\n{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
+        acc += f"\n{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
     else:
-        acc += f"{' ' * depth}{CM().BLUE}{self.__class__.__name__}{CM().RESET}{CM().CYAN}{'(' if global_vars.args.double_verbose else ' '}{CM().RESET}"
+        acc += f"{' ' * depth}{self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
 
     for i, child in enumerate(self.visible):
         match child:
             case list():
                 if not child:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
                     continue
 
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
                 for i, list_child in enumerate(child):
                     match list_child:
                         case (
@@ -91,17 +88,17 @@ def repr_single_line(self, depth=0):
                             acc += f"\n{' ' * (depth + 4)}{convert_to_single_line(list_child)}"
                             continue
                     acc += f"{', ' if i > 0 else ''}{list_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
+                acc += f"\n{' ' * (depth + 2)}]"
                 continue
             case dict():
                 dict_children = child.values()
                 if not dict_children:
-                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}{CM().CYAN}[]{CM().RESET}"
+                    acc += f"{', ' if i > 0 else ''}\n{' ' * (depth+2)}[]"
                     continue
-                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}{CM().CYAN}[{CM().RESET}"
+                acc += f"{', ' if i > 0 else ''}\n{' ' * (depth + 2)}["
                 for i, dict_child in enumerate(dict_children):
                     acc += f"{', ' if i > 0 else ''}{dict_child.__repr__(depth+4)}"
-                acc += f"\n{' ' * (depth + 2)}{CM().CYAN}]{CM().RESET}"
+                acc += f"\n{' ' * (depth + 2)}]"
                 continue
             case pn.Atom():
                 acc += f"\n{' ' * (depth + 2)}{convert_to_single_line(child)}"
@@ -112,24 +109,17 @@ def repr_single_line(self, depth=0):
         acc += f"{', ' if i > 0 else ''}{child.__repr__(depth+2)}"
 
     return acc + (
-        f"\n{' ' * depth}{CM().CYAN}){CM().RESET}"
+        f"\n{' ' * depth})"
         if global_vars.args.double_verbose
         else ""
     )
 
 
-def convert_to_single_line(stmt, no_colors=False):
-    if no_colors:
-        CM().color_off()
+def convert_to_single_line(stmt):
     tmp = global_vars.args.double_verbose
     global_vars.args.double_verbose = True
     single_line = "".join(list(map(lambda line: line.lstrip(), str(stmt).split("\n"))))
     global_vars.args.double_verbose = tmp
-    if no_colors:
-        if global_vars.args.color:
-            CM().color_on()
-        else:
-            CM().color_off()
     return single_line
 
 

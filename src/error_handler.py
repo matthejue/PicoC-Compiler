@@ -2,7 +2,6 @@ from sys import exit
 import errors
 from util_classes import Pos
 import global_vars
-from colormanager import ColorManager as CM
 from util_funs import overwrite, tokennames_to_str, subheading
 from lark.exceptions import (
     UnexpectedCharacters,
@@ -332,15 +331,11 @@ class ErrorHandler:
         print(subheading("Error", terminal_width, "-"))
 
     def _error_header(self, description: str, pos=None):
-        # description has to contain a CM().RESET_ALL somewhere
         if not pos:
-            return CM().BRIGHT + global_vars.args.infile + ": " + description
+            return global_vars.args.infile + ": " + description
         return (
-            CM().BRIGHT
-            + CM().WHITE
             + global_vars.args.infile
             + ":"
-            + CM().MAGENTA
             + str(pos.line)
             + ":"
             + str(pos.column)
@@ -463,10 +458,10 @@ class AnnotationScreen:
     def point_at(self, pos: Pos, word):
         rel_row = pos.line - self.row_from
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "^", pos.column + self.color_offset, CM().RED
+            self.screen[3 * rel_row + 1], "^", pos.column + self.color_offset
         )
         self.screen[3 * rel_row + 2] = overwrite(
-            self.screen[3 * rel_row + 2], word, pos.column, CM().RED
+            self.screen[3 * rel_row + 2], word, pos.column
         )
         self.marked_lines += [3 * rel_row + 1, 3 * rel_row + 2]
 
@@ -476,7 +471,6 @@ class AnnotationScreen:
             self.screen[3 * rel_row + 1],
             "~" * width,
             pos.column + self.color_offset,
-            CM().BLUE,
         )
         self.marked_lines += [3 * rel_row + 1]
 
@@ -486,7 +480,7 @@ class AnnotationScreen:
         len_line_before = len(self.screen[3 * rel_row + 1])
 
         self.screen[3 * rel_row + 1] = overwrite(
-            self.screen[3 * rel_row + 1], "~" * width, pos.column, CM().BLUE
+            self.screen[3 * rel_row + 1], "~" * width, pos.column
         )
         self.marked_lines += [3 * rel_row + 1]
 

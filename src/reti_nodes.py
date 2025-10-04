@@ -1,7 +1,6 @@
 from ast_node import ASTNode
 import picoc_nodes as pn
 from util_funs import throw_error
-from colormanager import ColorManager as CM
 import global_vars
 from bitstring import Bits
 
@@ -38,7 +37,7 @@ class Instr(ASTNode):
 
     def __repr__(self, depth=0):
         global_vars.next_as_22 = True
-        instr_str = f"\n{' ' * depth}{CM().BLUE}{self.op}{CM().RESET}"
+        instr_str = f"\n{' ' * depth}{self.op}"
         for arg in self.args:
             match arg:
                 case pn.GoTo():
@@ -62,17 +61,17 @@ class Jump(ASTNode):
         match self.im_goto:
             case Im():
                 global_vars.next_as_normal = True
-                # acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET};"
-                acc = f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} {CM().RED}{self.im_goto}{CM().RESET}"
+                # acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto};"
+                acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
                 global_vars.next_as_normal = False
                 return acc
             case pn.GoTo():
                 return (
-                    f"\n{' ' * depth}{CM().BLUE}JUMP{CM().RESET}{CM().YELLOW}{self.rel}{CM().RESET} "
-                    + f"{CM().RED}"
+                    f"\n{' ' * depth}JUMP{self.rel} "
+                    + f""
                     # + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
                     + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))}".lstrip()
-                    + f"{CM().RESET}"
+                    + f""
                 )
             case _:
                 throw_error(self.im_goto)
@@ -85,7 +84,7 @@ class Int(ASTNode):
         self.num = num
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().BLUE}INT{CM().RESET} {CM().RED}{self.num}{CM().RESET}"
+        return f"\n{' ' * depth}INT {self.num}"
 
     __match_args__ = ("num",)
 
@@ -97,7 +96,7 @@ class Int(ASTNode):
 #         self.reg = reg
 #
 #     def __repr__(self, depth=0):
-#         return f"\n{' ' * depth}{CM().BLUE}CALL{CM().RESET} {self.name} {self.reg};"
+#         return f"\n{' ' * depth}CALL {self.name} {self.reg};"
 #
 #     __match_args__ = ("name", "reg")
 
@@ -109,7 +108,7 @@ class Int(ASTNode):
 class Name(ASTNode):
     # shorter then 'Identifier'
     def __repr__(self):
-        return f"{CM().GREEN}{self.val}{CM().RESET}"
+        return f"{self.val}"
 
 
 class Im(ASTNode):
@@ -120,9 +119,9 @@ class Im(ASTNode):
                 bin_val_with_gaps = (
                     bin_val[:6] + "_" + bin_val[6:14] + "_" + bin_val[14:]
                 )
-                return f"{CM().RED}{bin_val_with_gaps}{CM().RESET}"
+                return f"{bin_val_with_gaps}"
             elif global_vars.next_as_normal:
-                return f"{CM().RED}{self.val}{CM().RESET}"
+                return f"{self.val}"
             else:
                 bin_val = Bits(uint=int(self.val), length=32).bin
                 bin_val_with_gaps = (
@@ -134,8 +133,8 @@ class Im(ASTNode):
                     + "_"
                     + bin_val[24:]
                 )
-                return f"{CM().RED}{bin_val_with_gaps}{CM().RESET}"
-        return f"{CM().RED}{self.val}{CM().RESET}"
+                return f"{bin_val_with_gaps}"
+        return f"{self.val}"
 
 
 class Reg(ASTNode):
@@ -144,9 +143,9 @@ class Reg(ASTNode):
 
     def __repr__(self, depth=0):
         if depth == 0:
-            return f"{CM().CYAN}{self.reg}{CM().RESET}"
+            return f"{self.reg}"
         else:
-            return f"\n{' ' * depth}{CM().CYAN}{self.reg}{CM().RESET}"
+            return f"\n{' ' * depth}{self.reg}"
 
     __match_args__ = ("reg",)
 

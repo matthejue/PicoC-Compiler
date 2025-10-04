@@ -5,7 +5,6 @@ import global_vars
 from option_handler import OptionHandler, _open_documentation
 from util_funs import only_keep_path, basename
 from colorama import init
-from colormanager import ColorManager as CM
 import traceback
 
 
@@ -20,11 +19,6 @@ def main():
 
     if not global_vars.args.infile and sys.stdin.isatty():
         sys.exit(compiler.cmdloop())
-
-    if global_vars.args.color:
-        CM().color_on()
-    else:
-        CM().color_off()
 
     # if not sys.stdin.isatty():
     if global_vars.args.plugin_support:

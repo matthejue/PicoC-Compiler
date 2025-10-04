@@ -3,8 +3,6 @@ from util_classes import Pos
 import symbol_table as st
 import global_vars
 from util_funs import repr_single_line
-from colormanager import ColorManager as CM
-
 
 # =========================================================================
 # =                              Token Nodes                              =
@@ -137,7 +135,7 @@ class IntType(ASTNode):
     pass
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().BLUE}IntType{CM().RESET}{CM().CYAN}(){CM().RESET}"
+        return f"\n{' ' * depth}IntType()"
 
 
 class CharType(ASTNode):
@@ -145,7 +143,7 @@ class CharType(ASTNode):
 
     def __repr__(self, depth=0):
         return (
-            f"\n{' ' * depth}{CM().BLUE}CharType{CM().RESET}{CM().CYAN}(){CM().RESET}"
+            f"\n{' ' * depth}CharType()"
         )
 
 
@@ -154,7 +152,7 @@ class VoidType(ASTNode):
 
     def __repr__(self, depth=0):
         return (
-            f"\n{' ' * depth}{CM().BLUE}VoidType{CM().RESET}{CM().CYAN}(){CM().RESET}"
+            f"\n{' ' * depth}VoidType()"
         )
 
 
@@ -570,14 +568,14 @@ class SingleLineComment:
         self.content = content
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().MAGENTA}{self.prefix} {self.content}{CM().RESET}"
+        return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
 
 
 class RETIComment(ASTNode):
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{CM().MAGENTA}## {self.val}{CM().RESET}"
+        return f"\n{' ' * depth}## {self.val}"
 
 
 # ------------------------------- L_Placeholder -------------------------------
