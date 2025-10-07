@@ -1,6 +1,6 @@
 from ast_node import ASTNode
 import picoc_nodes as pn
-from util_funs import throw_error
+from util_funs import throw_type_error
 import global_vars
 from bitstring import Bits
 
@@ -74,7 +74,7 @@ class Jump(ASTNode):
                     + f""
                 )
             case _:
-                throw_error(self.im_goto)
+                throw_type_error(self.im_goto)
 
     __match_args__ = ("rel", "im_goto")
 

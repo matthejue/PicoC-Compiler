@@ -1,19 +1,17 @@
-from util_classes import Pos
 import global_vars
 
 
 class ASTNode:
-    def __init__(self, val="", pos=Pos(-1, -1), visible=[]):
+    def __init__(self, val="", visible=[]):
         """
         :tokentype: list of TT's, first entry will be the TT of the Node
         """
         # necesary for reti nodes and the symbol table
         self.val: str = val
         # TODO: reason for self.val: str = val if val else self.__class__.__name__.upper()?
-        self.pos: Pos = pos
         self.visible = visible
 
-    __match_args__ = ("val", "pos")
+    __match_args__ = ("val",)
 
     def __repr__(self, depth=0):
         if not self.visible:

@@ -4,7 +4,6 @@ import sys
 import global_vars
 from option_handler import OptionHandler, _open_documentation
 from util_funs import only_keep_path, basename
-from colorama import init
 import traceback
 
 
@@ -13,16 +12,7 @@ def main():
         _open_documentation()
         return
 
-    init(strip=False)
-
     compiler = OptionHandler()
-
-    if not global_vars.args.infile and sys.stdin.isatty():
-        sys.exit(compiler.cmdloop())
-
-    # if not sys.stdin.isatty():
-    if global_vars.args.plugin_support:
-        sys.exit(compiler.read_stdin())
 
     global_vars.path = only_keep_path(global_vars.args.infile)
     global_vars.basename = basename(global_vars.args.infile)
@@ -34,7 +24,7 @@ def main():
         if global_vars.args.traceback:
             traceback.print_exc()
     else:
-        compiler._success_message()
+        print("\nCompilation successfull\n")
 
 
 if __name__ == "__main__":

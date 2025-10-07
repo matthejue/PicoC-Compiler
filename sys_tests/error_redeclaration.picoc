@@ -1,7 +1,0 @@
-// in:
-// expected:ReDeclarationOrDefinition
-
-void main() {
-  int var = 42;
-  int var = 41;
-}

@@ -12,15 +12,6 @@ class BuiltIn(ASTNode):
     pass
 
 
-class Pos(ASTNode):
-    def __init__(self, line, column):
-        self.line = line
-        self.column = column
-        super().__init__(visible=[self.line, self.column])
-
-    __match_args__ = ("line", "column")
-
-
 class Symbol(ASTNode):
     def __init__(
         self,
@@ -28,7 +19,6 @@ class Symbol(ASTNode):
         datatype=None,
         name=None,
         val_addr=None,
-        pos=None,
         size=None,
     ):
         self.type_qual = type_qual if type_qual else Empty()
@@ -37,10 +27,9 @@ class Symbol(ASTNode):
         self.val_addr = (
             val_addr if val_addr else [] if isinstance(val_addr, list) else Empty()
         )
-        self.pos2 = pos if pos else Empty()
         self.size = size if size else Empty()
 
-    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "pos2", "size")
+    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "size")
 
     def __repr__(self, depth=0):
         acc = f"\n    {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
@@ -60,10 +49,6 @@ class Symbol(ASTNode):
         acc += (
             f"\n        value or address:       "
             + convert_to_single_line(self.val_addr)
-        )
-        acc += (
-            f"\n        position:               "
-            + convert_to_single_line(self.pos2)
         )
         acc += (
             f"\n        size:                   "

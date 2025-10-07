@@ -1,8 +1,6 @@
-import errors
 import itertools
 import global_vars
 import picoc_nodes as pn
-from util_classes import Pos
 
 
 def overwrite(old, replace_with, idx):
@@ -123,32 +121,8 @@ def convert_to_single_line(stmt):
     return single_line
 
 
-def find_first_pos_in_node(nodes):
-    res = []
-    for node in nodes:
-        if isinstance(node, list):
-            res += find_first_pos_in_node(node)
-        elif node.pos == Pos(-1, -1):
-            res += find_first_pos_in_node(node.visible)
-        else:  # node.pos != Pos(-1, -1):
-            return [node, node.pos]
-    return res
-
-
-def throw_error(*nodes):
-    node_name_and_node_pos = find_first_pos_in_node(nodes)
-    if node_name_and_node_pos:
-        node_name, node_pos = node_name_and_node_pos
-        raise errors.NodeError(convert_to_single_line(str(node_name)), node_pos)
-    else:
-        raise Exception
-
-
-def bug_in_interpreter(*args):
-    import inspect
-
-    # return name of caller of this function
-    raise errors.BugInInterpreter(inspect.stack()[1][3], args_to_str(args))
+def throw_type_error(node):
+    raise TypeError(f"Unexpected AST node: {type(node).__name__}({', '.join(type(c).__name__ for c in node.visible)})")
 
 
 def remove_extension(fname):

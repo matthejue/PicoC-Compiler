@@ -1,6 +1,0 @@
-// in:
-// expected:UnexpectedCharacter
-
-void main() {
-  int va@r = 10;
-}

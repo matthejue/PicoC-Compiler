@@ -1,6 +1,0 @@
-// in:
-// expected:TooLargeLiteral
-
-void main() {
-  print(-2147483649);
-}

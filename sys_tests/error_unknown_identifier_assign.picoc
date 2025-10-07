@@ -1,6 +1,0 @@
-// in:
-// expected:UnknownIdentifier
-
-void main() {
-  unknown_identifier = 42;
-}

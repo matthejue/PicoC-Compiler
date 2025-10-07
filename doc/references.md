@@ -25,7 +25,6 @@
 - **Bitstring** [[12]](#12)
 - **Cmd2** [[13]](#13)
 - **Tabulate** [[14]](#14)
-- **Colorama** [[15]](#15)
 - **Lark** [[20]](#20)
 
 # Misc
@@ -56,8 +55,6 @@
 
 - <a id="13">[13]</a> GitHub. “Cmd2/Index.Rst at Bef3c758829fe2aa82d58699d61fa78aa961f29d · Python-Cmd2/Cmd2,” January 28, 2022. https://github.com/python-cmd2/cmd2.
 - <a id="14">[14]</a> Astanin, Sergey. Python-Tabulate. Python, 2022. https://github.com/astanin/python-tabulate.
-
-- <a id="15">[15]</a> Hartley, Jonathan. Tartley/Colorama. Python, 2022. https://github.com/tartley/colorama.
 
 - <a id="16">[16]</a> Drew, Othneil. Othneildrew/Best-README-Template, 2022. https://github.com/othneildrew/Best-README-Template.
 

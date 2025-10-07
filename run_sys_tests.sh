@@ -22,7 +22,7 @@ if [[ $2 == "all" ]]; then
 elif [[ -n "$2" ]]; then
   paths=(./sys_tests/*$2*.picoc)
 else
-  paths=(./sys_tests/{basic,advanced,example,error,exclude,hard,thesis,tobias}*.picoc)
+  paths=(./sys_tests/{basic,advanced,example,exclude,hard,thesis,tobias}*.picoc)
 fi
 
 if [ ! -f "${paths[0]}" ]; then

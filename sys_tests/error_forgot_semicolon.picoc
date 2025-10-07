@@ -1,6 +1,0 @@
-// in:
-// expected:UnexpectedToken
-
-void main() {
-  int var = 42
-}

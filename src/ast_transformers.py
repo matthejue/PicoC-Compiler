@@ -2,9 +2,7 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
 import reti_nodes as rn
-from util_classes import Pos
-from util_funs import throw_error, remove_extension, nodes_to_str
-import errors
+from util_funs import throw_type_error, remove_extension, nodes_to_str
 
 
 class TransformerPicoC(Transformer):
@@ -15,21 +13,20 @@ class TransformerPicoC(Transformer):
     def RETI_COMMENT(self, token: Token):
         return pn.RETIComment(
             token.value[token.value.find("#") + 1 :].lstrip(),
-            Pos(token.line - 1, token.column - 1),
         )
 
     def NUM(self, token: Token):
-        return pn.Num(token.value, Pos(token.line - 1, token.column - 1))
+        return pn.Num(token.value)
 
     def CHAR(self, token: Token):
-        return pn.Char(token.value[1:-1], Pos(token.line - 1, token.column - 1))
+        return pn.Char(token.value[1:-1])
 
     def FILENAME(self, token: Token):
-        return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
+        return pn.Name(token.value)
 
     def name(self, tokens):
         token = tokens[0]
-        return pn.Name(token.value, Pos(token.line - 1, token.column - 1))
+        return pn.Name(token.value)
 
     def un_op(self, tokens: list[Token]):
         token = tokens[0]
@@ -37,27 +34,22 @@ class TransformerPicoC(Transformer):
             case "-":
                 return pn.Minus(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "!":
                 return pn.LogicNot(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "~":
                 return pn.Not(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "*":
                 return pn.DerefOp(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "&":
                 return pn.RefOp(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     def prec1_op(self, tokens: list[Token]):
@@ -66,17 +58,14 @@ class TransformerPicoC(Transformer):
             case "*":
                 return pn.Mul(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "/":
                 return pn.Div(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "%":
                 return pn.Mod(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     def prec2_op(self, tokens: list[Token]):
@@ -85,12 +74,10 @@ class TransformerPicoC(Transformer):
             case "+":
                 return pn.Add(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "-":
                 return pn.Sub(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     # --------------------------------- L_Logic -------------------------------
@@ -100,22 +87,18 @@ class TransformerPicoC(Transformer):
             case "<":
                 return pn.Lt(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "<=":
                 return pn.LtE(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case ">":
                 return pn.Gt(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case ">=":
                 return pn.GtE(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     def eq_op(self, tokens: list[Token]):
@@ -124,12 +107,10 @@ class TransformerPicoC(Transformer):
             case "==":
                 return pn.Eq(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "!=":
                 return pn.NEq(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     # ----------------------------- L_Assign_Alloc ----------------------------
@@ -139,17 +120,14 @@ class TransformerPicoC(Transformer):
             case "int":
                 return pn.IntType(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "char":
                 return pn.CharType(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "void":
                 return pn.VoidType(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     # =========================================================================
@@ -184,7 +162,7 @@ class TransformerPicoC(Transformer):
                 previous_bin_exp.left_exp = exp2
                 return exp1, bin_op, bin_exp
             case _:
-                throw_error(current_bin_exp)
+                throw_type_error(current_bin_exp)
 
     def un_exp(self, nodes):
         if len(nodes) == 1:
@@ -206,15 +184,12 @@ class TransformerPicoC(Transformer):
                     case None:
                         return pn.Deref(exp1, pn.Num("0"))
                     case _:
-                        raise errors.UnexpectedToken(
-                            nodes_to_str([pn.Add, pn.Sub]), bin_op.val, bin_op.pos
-                        )
+                        throw_type_error(bin_op)
             case pn.RefOp():
                 ref = pn.Ref(exp)
-                ref.pos = un_op.pos
                 return ref
             case _:
-                throw_error(nodes)
+                throw_type_error(nodes)
 
     # --------------------------------- L_Arith -------------------------------
     def input_exp(self, _):
@@ -281,7 +256,7 @@ class TransformerPicoC(Transformer):
             case pn.Char():
                 return pn.ToBool(node)
             case _:
-                throw_error(node)
+                throw_type_error(node)
 
     def logic_and(self, nodes):
         if len(nodes) == 1:
@@ -484,17 +459,16 @@ class ASTTransformerRETI(Transformer):
     def RETI_COMMENT(self, token: Token):
         return pn.RETIComment(
             token.value[2:].lstrip(),
-            Pos(token.line - 1, token.column - 1),
         )
 
     def IM(self, token: Token):
-        return rn.Im(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Im(token.value)
 
     def FILENAME(self, token: Token):
-        return rn.Name(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Name(token.value)
 
     def NAME(self, token: Token):
-        return rn.Name(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Name(token.value)
 
     def reg(self, tokens: list[Token]):
         token = tokens[0]
@@ -503,56 +477,48 @@ class ASTTransformerRETI(Transformer):
                 return rn.Reg(
                     rn.Acc(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "IN1":
                 return rn.Reg(
                     rn.In1(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "IN2":
                 return rn.Reg(
                     rn.In2(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "PC":
                 return rn.Reg(
                     rn.Pc(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "SP":
                 return rn.Reg(
                     rn.Sp(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "BAF":
                 return rn.Reg(
                     rn.Baf(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "CS":
                 return rn.Reg(
                     rn.Cs(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
             case "DS":
                 return rn.Reg(
                     rn.Ds(
                         token.value,
-                        Pos(token.line - 1, token.column - 1),
                     )
                 )
 
@@ -565,110 +531,103 @@ class ASTTransformerRETI(Transformer):
             case "<":
                 return rn.Lt(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "<=":
                 return rn.LtE(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case ">":
                 return rn.Gt(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case ">=":
                 return rn.GtE(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "==":
                 return rn.Eq(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "!=":
                 return rn.NEq(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
             case "_NOP":
                 return rn.NOp(
                     token.value,
-                    Pos(token.line - 1, token.column - 1),
                 )
 
     def ADD(self, token: Token):
-        return rn.Add(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Add(token.value)
 
     def ADDI(self, token: Token):
-        return rn.Addi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Addi(token.value)
 
     def SUB(self, token: Token):
-        return rn.Sub(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Sub(token.value)
 
     def SUBI(self, token: Token):
-        return rn.Subi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Subi(token.value)
 
     def MULT(self, token: Token):
-        return rn.Mult(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Mult(token.value)
 
     def MULTI(self, token: Token):
-        return rn.Multi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Multi(token.value)
 
     def DIV(self, token: Token):
-        return rn.Div(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Div(token.value)
 
     def DIVI(self, token: Token):
-        return rn.Divi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Divi(token.value)
 
     def MOD(self, token: Token):
-        return rn.Mod(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Mod(token.value)
 
     def MODI(self, token: Token):
-        return rn.Modi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Modi(token.value)
 
     def OPLUS(self, token: Token):
-        return rn.Oplus(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Oplus(token.value)
 
     def OPLUSI(self, token: Token):
-        return rn.Oplusi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Oplusi(token.value)
 
     def OR(self, token: Token):
-        return rn.Or(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Or(token.value)
 
     def ORI(self, token: Token):
-        return rn.Ori(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Ori(token.value)
 
     def AND(self, token: Token):
-        return rn.And(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.And(token.value)
 
     def ANDI(self, token: Token):
-        return rn.Andi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Andi(token.value)
 
     def LOAD(self, token: Token):
-        return rn.Load(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Load(token.value)
 
     def LOADIN(self, token: Token):
-        return rn.Loadin(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Loadin(token.value)
 
     def LOADI(self, token: Token):
-        return rn.Loadi(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Loadi(token.value)
 
     def STORE(self, token: Token):
-        return rn.Store(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Store(token.value)
 
     def STOREIN(self, token: Token):
-        return rn.Storein(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Storein(token.value)
 
     def MOVE(self, token: Token):
-        return rn.Move(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Move(token.value)
 
     def INT(self, token: Token):
-        return rn.Int(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Int(token.value)
 
     def RTI(self, token: Token):
-        return rn.Rti(token.value, Pos(token.line - 1, token.column - 1))
+        return rn.Rti(token.value)
 
     # =========================================================================
     # =                                 Parser                                =

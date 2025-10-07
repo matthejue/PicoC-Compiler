@@ -1,7 +1,0 @@
-// in:
-// expected:ConstAssign
-
-void main() {
-  const char const_var = 42;
-  const_var = 41;
-}

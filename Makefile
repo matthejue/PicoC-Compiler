@@ -66,7 +66,7 @@ setup_pyinstaller_linux:
 	pip install patchelf-wrapper
 
 create_bin_linux:
-	pyinstaller ./src/main.py --onefile --hidden-import=tabulate,cmd2,colorama,bitstring --distpath=./dist
+	pyinstaller ./src/main.py --onefile --hidden-import=tabulate,bitstring --distpath=./dist
 	staticx ./dist/main ./dist/pico_c_compiler_linux
 	rm ./dist/main
 

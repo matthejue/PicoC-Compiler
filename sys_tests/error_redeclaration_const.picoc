@@ -1,7 +1,0 @@
-// in:
-// expected:ReDeclarationOrDefinition
-
-void main() {
-  const int var = 42;
-  const int var = 41;
-}

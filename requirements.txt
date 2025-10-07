@@ -1,7 +1,6 @@
 pyinstaller
 bitstring
 cmd2
-colorama
 lark
 pygments
 pudb

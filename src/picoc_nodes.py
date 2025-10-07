@@ -1,5 +1,4 @@
 from ast_node import ASTNode
-from util_classes import Pos
 import symbol_table as st
 import global_vars
 from util_funs import repr_single_line
@@ -17,11 +16,10 @@ class Name(ASTNode):
 
 
 class Num(ASTNode):
-    def __init__(self, val, pos=Pos(-1, -1)):
+    def __init__(self, val):
         self.is_negative = Name("not_negative")
         super().__init__(
             val,
-            pos,
             #  visible=[str(val), self.is_negative]
             #  if global_vars.args.double_verbose
             #  else [str(val)],
@@ -30,7 +28,7 @@ class Num(ASTNode):
     def __eq__(self, other):
         return self.val == other.val
 
-    __match_args__ = ("val", "pos", "is_negative")
+    __match_args__ = ("val", "is_negative")
 
 
 class Char(ASTNode):
@@ -239,10 +237,9 @@ class Exp(ASTNode):
     def __init__(self, exp):
         self.exp = exp
         self.datatype: ASTNode
-        self.error_data: list
         super().__init__(visible=[self.exp])
 
-    __match_args__ = ("exp", "datatype", "error_data")
+    __match_args__ = ("exp", "datatype")
 
 
 class Stack(ASTNode):
@@ -291,10 +288,9 @@ class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
         self.datatype: ASTNode
-        self.error_data: list
         super().__init__(visible=[self.exp])
 
-    __match_args__ = ("exp", "datatype", "error_data")
+    __match_args__ = ("exp", "datatype")
 
 
 class Deref(ASTNode):
