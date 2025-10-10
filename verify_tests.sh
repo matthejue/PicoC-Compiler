@@ -17,7 +17,6 @@ fi
 for test in "${paths[@]}"; do
   echo $test
   gcc -Wno-incompatible-pointer-types $test
-  # ./a.out | sed -e 's/^ //' | sed 's/$/\n/' > "${test%.c}.c_output"
   ./a.out | sed -e 's/^ //' | sed 's/$/ /' > "${test%.c}.c_output"
   diff "${test%.c}.expected_output" "${test%.c}.c_output"
   if [[ $? != 0 ]]; then

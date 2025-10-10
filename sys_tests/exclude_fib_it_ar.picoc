@@ -1,6 +1,5 @@
 // in:10
 // expected:55
-// datasegment:32
 
 int fib(int num_fibs, int *ar) {
   int i = 2;

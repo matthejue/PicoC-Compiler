@@ -1,1 +1,0 @@
--f /tmp -i ./run/isrs.reti -v

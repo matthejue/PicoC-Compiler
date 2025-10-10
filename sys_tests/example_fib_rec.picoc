@@ -1,6 +1,5 @@
 // in:10
 // expected:55
-// datasegment:64
 
 int fib(int n) {
   int res_f; int a; int b;

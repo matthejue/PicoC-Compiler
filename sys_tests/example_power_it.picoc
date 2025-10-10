@@ -1,6 +1,5 @@
 // in:2 11
 // expected:2048
-// datasegment:8
 // from the Introduction to Programming Lecture by Peter Thiemann
 
 

@@ -3,8 +3,8 @@
 
 void main() {
   int var = 10;
-  int bool = 0 || 1 && var || (var < 10 && 1);
-  if (bool) {
+  int boolean = 0 || 1 && var || (var < 10 && 1);
+  if (boolean) {
     print(42);
   }
 }

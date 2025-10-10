@@ -22,7 +22,9 @@ max_print_out_elements = 5
 
 input = []
 expected = []
-datasegment = 64
+
+terminal_columns = 72
+terminal_lines = 24
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.

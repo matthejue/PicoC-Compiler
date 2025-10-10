@@ -369,7 +369,7 @@ class Passes:
                 struct_type_name = val
                 symbol = self.symbol_table.resolve(struct_type_name)
                 match symbol:
-                    case st.Symbol(_, _, _, _, _, pn.Num(val)):
+                    case st.Symbol(_, _, _, _, pn.Num(val)):
                         return int(val)
                     case _:
                         throw_type_error(symbol)
@@ -432,7 +432,7 @@ class Passes:
                 # TODO: undefinied identifier error
                 symbol, choosen_scope = self._resolve_name(var_name)
                 match symbol:
-                    case st.Symbol(_, datatype, _, _, _, _):
+                    case st.Symbol(_, datatype, _, _, _):
                         current_datatype = copy.deepcopy(datatype)
                     case _:
                         throw_type_error(symbol)
@@ -466,7 +466,7 @@ class Passes:
                                 datatype=copy.deepcopy(current_datatype),
                             )
                             current_datatype.nums.pop(0)
-                        case pn.StructSpec(pn.Name(val1, _)):
+                        case pn.StructSpec(pn.Name(val1)):
                             struct_type_name = val1
                             ref = prev_stmts.pop()
                             self._add_datatype(
@@ -484,7 +484,7 @@ class Passes:
                                 case _:
                                     throw_type_error(ref)
                             match symbol:
-                                case st.Symbol(_, datatype):
+                                case st.Symbol(_, datatype, _, _, _):
                                     current_datatype = copy.deepcopy(datatype)
                                 case _:
                                     throw_type_error(symbol)
@@ -493,7 +493,7 @@ class Passes:
 
                 symbol, choosen_scope = self._resolve_name(var_name)
                 match symbol:
-                    case st.Symbol(_, _, _, val_addr):
+                    case st.Symbol(_, _, _, val_addr, _):
                         addr = val_addr
                         match choosen_scope:
                             case "global!":
@@ -530,7 +530,7 @@ class Passes:
             case pn.Name(val):
                 symbol, choosen_scope = self._resolve_name(val)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), datatype, _, num):
+                    case st.Symbol(pn.Writeable(), datatype, _, num, _):
                         match choosen_scope, datatype:
                             case ("global!", pn.ArrayDecl()):
                                 # TODO: struct st1 st = {.ar_var=ar]
@@ -564,7 +564,7 @@ class Passes:
                                 return [pn.Exp(pn.Global(num))]
                             case (_, _):
                                 return [pn.Exp(pn.Stackframe(num))]
-                    case st.Symbol(pn.Const(), _, _, num):
+                    case st.Symbol(pn.Const(), _, _, num, _):
                         return [pn.Exp(num)]
                     case _:
                         throw_type_error(symbol)
@@ -683,7 +683,7 @@ class Passes:
                 identifier_name = val
                 symbol, choosen_scope = self._resolve_name(identifier_name)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), _, _, num):
+                    case st.Symbol(pn.Writeable(), _, _, num, _):
                         match choosen_scope:
                             case "global!":
                                 return [pn.Ref(pn.Global(num))]
@@ -715,7 +715,7 @@ class Passes:
 
                 symbol = self.symbol_table.resolve(fun_name)
                 match symbol:
-                    case st.Symbol(_, pn.FunDecl(datatype, pn.Name())):
+                    case st.Symbol(_, pn.FunDecl(datatype, pn.Name()), _, _, _):
                         return_type = datatype
                     case _:
                         throw_type_error(symbol)
@@ -777,7 +777,7 @@ class Passes:
                 exps_anf = self._picoc_anf_exp(exp)
                 symbol, choosen_scope = self._resolve_name(var_name)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), _, _, val_addr, _, size):
+                    case st.Symbol(pn.Writeable(), _, _, val_addr, size):
                         addr = val_addr
                         match choosen_scope:
                             case "global!":
@@ -874,7 +874,7 @@ class Passes:
     def _picoc_anf_def(self, decl_def):
         match decl_def:
             # ------------------------ L_Fun + L_Blocks -----------------------
-            case pn.FunDef(datatype, pn.Name(val1, _) as name, allocs, blocks):
+            case pn.FunDef(datatype, pn.Name(val1) as name, allocs, blocks):
                 def_name = val1
 
                 self.current_scope = def_name
@@ -895,6 +895,18 @@ class Passes:
                         local_vars_size = self._local_vars_size(stmts)
                         blocks[0].param_size = pn.Num(str(param_size))
                         blocks[0].local_vars_size = pn.Num(str(local_vars_size))
+
+                        try:
+                            symbol = self.symbol_table.resolve(def_name)
+                        except KeyError:
+                            symbol = st.Symbol(
+                                st.Empty(),
+                                pn.FunDecl(datatype, name, allocs),
+                                name,
+                                st.Empty(),
+                                st.Empty(),
+                            )
+                            self.symbol_table.declare(symbol)
 
                         blocks[0].stmts_instrs[:] = (
                             (
@@ -1477,14 +1489,14 @@ class Passes:
                         struct_name = val3
                         symbol = self.symbol_table.resolve(struct_name)
                         match symbol:
-                            case st.Symbol(_, _, _, val4):
+                            case st.Symbol(_, _, _, val4, _):
                                 attr_ids = val4
                                 for attr_id in attr_ids:
                                     if attr_id.val == f"{attr_name}@{struct_name}":
                                         break
                                     symbol = self.symbol_table.resolve(attr_id.val)
                                     match symbol:
-                                        case st.Symbol(_, _, _, _, _, pn.Num(val4)):
+                                        case st.Symbol(_, _, _, _, pn.Num(val4)):
                                             attr_size = val4
                                             rel_pos_in_struct += int(attr_size)
                                         case _:

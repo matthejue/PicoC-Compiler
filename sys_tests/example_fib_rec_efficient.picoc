@@ -1,6 +1,5 @@
 // in:10
 // expected:55
-// datasegment:64
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
 
 int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

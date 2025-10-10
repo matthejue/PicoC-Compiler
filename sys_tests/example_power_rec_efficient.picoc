@@ -1,6 +1,5 @@
 // in:2 9
 // expected:512
-// datasegment:32
 // from the Introduction to Programming Lecture by Peter Thiemann
 
 int power_efficient(int a, int n) {

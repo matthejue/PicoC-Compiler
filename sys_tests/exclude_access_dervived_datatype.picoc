@@ -1,6 +1,5 @@
 // in:
 // expected:-2147418116 3 -2147418121
-// datasegment: 16
 
 
 struct sub_double_st {int var1; int var2;};

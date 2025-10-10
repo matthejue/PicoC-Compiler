@@ -22,7 +22,7 @@ if [[ $2 == "all" ]]; then
 elif [[ -n "$2" ]]; then
   paths=(./sys_tests/*$2*.picoc)
 else
-  paths=(./sys_tests/{basic,advanced,example,exclude,hard,thesis,tobias}*.picoc)
+  paths=(./sys_tests/{basic,advanced,example,hard,thesis,tobias}*.picoc)
 fi
 
 if [ ! -f "${paths[0]}" ]; then
@@ -31,9 +31,9 @@ fi
 
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
-  ./src/main.py $(cat ./run/test_cpl_opts.txt) $3 "$test";
+  ./src/main.py $(cat ./opts/test_cpl_opts.txt) $3 "$test";
   if [ -f "${test%.picoc}.reti" ]; then
-    reti_emulator $(cat ./run/test_emu_opts.txt) $4 "${test%.picoc}.reti";
+    reti_emulator $(cat ./opts/test_emu_opts.txt) $4 "${test%.picoc}.reti";
   fi
 
   if [[ $? != 0 ]]; then

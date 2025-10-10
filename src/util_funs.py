@@ -169,48 +169,16 @@ def filter_out_comments(instrs):
     )
 
 
-def subheading(heading, terminal_width, symbol):
-    return f"{symbol * ((terminal_width - len(heading) - 2) // 2 + (1 if (terminal_width - len(heading)) % 2 else 0))} {heading} {symbol * ((terminal_width - len(heading) - 2) // 2)}"
+def subheading(heading, symbol):
+    return f"{symbol * ((global_vars.terminal_columns - len(heading) - 2) // 2 + (1 if (global_vars.terminal_columns - len(heading)) % 2 else 0))} {heading} {symbol * ((global_vars.terminal_columns - len(heading) - 2) // 2)}"
 
-
-#  def heading(heading, terminal_width, symbol):
-#      return f"""{symbol * terminal_width}
-#      {symbol + ' ' + ' ' * ((terminal_width - len(heading) - 6) // 2 +
-#      (1 if (terminal_width - len(heading) - 6) % 2 else 0))}`{heading}`{' ' *
-#      ((terminal_width - len(heading) - 6) // 2) + ' ' + symbol}
-#      {symbol * terminal_width}
-#      """
-
-
-def wrap_text(text, terminal_width):
+def wrap_text(text):
     lines = text.split("\n")
     for l_idx, line in enumerate(lines):
-        if len(line) > terminal_width:
-            for idx in range(terminal_width, -1, -1):
+        if len(line) > global_vars.terminal_columns:
+            for idx in range(global_vars.terminal_columns, -1, -1):
                 if line[idx] == " ":
                     lines.insert(l_idx + 1, line[idx + 1 :])
                     lines[l_idx] = line[:idx]
                     break
     return "\n".join(lines)
-
-
-#  def strip_multiline_string(multiline_str):
-#      """helper function to make mutlineline string usable on different
-#      indent levels
-#
-#      :grammar: grammar specification
-#      :returns: None
-#      """
-#      multiline_str = "".join([i.lstrip() + "\n" for i in multiline_str.split("\n")[:-1]])
-#      # every code piece ends with \n, so the last element can always be poped
-#      return multiline_str
-
-
-#  def get_most_used_interpret_opts():
-#      with open(
-#          f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/../most_used_compile_and_interpret_opts.txt",
-#          "r",
-#          encoding="utf-8",
-#      ) as fin:
-#          most_used_opts = fin.read()
-#      return most_used_opts

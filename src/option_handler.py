@@ -3,11 +3,11 @@ import symbol_table as st
 import picoc_nodes as pn
 import reti_nodes as rn
 import sys
+import shutil
 from lark.lark import Lark
 from dt_visitors import (
     DTVisitorPicoC,
     DTSimpleVisitorPicoC,
-    DTVisitorRETI,
 )
 from ast_transformers import TransformerPicoC, ASTTransformerRETI
 from passes import Passes
@@ -20,10 +20,7 @@ import argparse
 
 class OptionHandler:
     def __init__(self):
-        self.terminal_columns = (
-            os.get_terminal_size().columns if sys.stdin.isatty() else 72
-        )
-        self.terminal_lines = os.get_terminal_size().lines if sys.stdin.isatty() else 24
+        _set_terminal_size()
         _parse_cli_args()
         _print_args_if_verbose()
         if not global_vars.args.infile and sys.stdin.isatty():
@@ -62,7 +59,7 @@ class OptionHandler:
         _get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
-            print(subheading("Code", self.terminal_columns, "-"))
+            print(subheading("Code", "-"))
             inserted_code = f"// {global_vars.args.infile}:\n" + code
             print(inserted_code)
 
@@ -146,7 +143,7 @@ class OptionHandler:
         tokens = list(parser.lex(code_with_file))
 
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
+            print(subheading(heading, "-"))
             print(tokens)
 
         if global_vars.path:
@@ -160,7 +157,7 @@ class OptionHandler:
 
     def _dt_pass(self, dt, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
+            print(subheading(heading, "-"))
             print(dt.pretty().replace("\t", "    "))
 
         if global_vars.path:
@@ -169,7 +166,7 @@ class OptionHandler:
 
     def _output_pass(self, pass_ast, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
+            print(subheading(heading, "-"))
             print(pass_ast)
 
         match pass_ast:
@@ -183,10 +180,10 @@ class OptionHandler:
                 throw_type_error(pass_ast)
 
     def _reti_with_metadata(self, pass_ast, heading):
-        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n# datasegment: {global_vars.datasegment}\n"
+        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
 
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
+            print(subheading(heading, "-"))
             print(metadata + str(pass_ast))
 
         if global_vars.path:
@@ -204,7 +201,7 @@ class OptionHandler:
 
     def _st_pass(self, symbol_table: st.SymbolTable, heading):
         if global_vars.args.print:
-            print(subheading(heading, self.terminal_columns, "-"))
+            print(subheading(heading, "-"))
             print(symbol_table)
 
         if global_vars.path:
@@ -280,6 +277,12 @@ def _parse_cli_args():
     # Put parsed args into the shared global_vars namespace (compat with old code)
     global_vars.args = args
 
+
+def _set_terminal_size():
+    size = shutil.get_terminal_size(fallback=(72, 24))
+    if sys.stdin.isatty():
+        global_vars.terminal_columns, global_vars.terminal_lines = size.columns, size.lines
+
 def _print_args_if_verbose():
     from global_vars import args  # uses the shared args object
 
@@ -308,7 +311,6 @@ def _print_args_if_verbose():
         "print",
         "verbose",
         "double_verbose",
-        "color",
         "traceback",
         "debug",
         "supress_errors",
@@ -317,7 +319,7 @@ def _print_args_if_verbose():
         "metadata_comments",
     ]
 
-    print("=== CLI options ===")
+    print(subheading("CLI options", "-"))
     for name in fields:
         value = getattr(args, name, None)
         print(f"{name:20} [{kind(name, value):10}] = {fmt(value)}")

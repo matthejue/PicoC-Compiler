@@ -1,6 +1,5 @@
 // in:41 42
 // expected:-1 5
-// datasegment:64
 // from the Introduction to Programming Lecture by Peter Thiemann
 
 struct ar_with_lent {int len; int *ar;};
