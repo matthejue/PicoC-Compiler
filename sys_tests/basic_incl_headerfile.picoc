@@ -1,0 +1,6 @@
+#include "./include/basic_incl_headerfile.h"
+
+void main() {
+  struct ExStrc exstrc = {.attr1='c', .attr2=12};
+  print(exstrc.attr2);
+}

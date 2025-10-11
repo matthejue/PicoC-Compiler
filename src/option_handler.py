@@ -16,6 +16,7 @@ import subprocess, os, platform
 from pygments.lexers.c_cpp import CLexer
 import re
 import argparse
+from preprocessor import Preprocessor
 
 
 class OptionHandler:
@@ -40,10 +41,14 @@ class OptionHandler:
                     f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
 
-
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
+
+        _get_test_metadata(code)
+
+        preprocessor = Preprocessor(include_paths=global_vars.args.I, max_depth=global_vars.args.max_depth)
+        preprocessed_code = preprocessor.preprocess(code, global_vars.args.infile)
 
         code_with_file = (
             (
@@ -53,15 +58,12 @@ class OptionHandler:
                 else ""
             )
             + f"{global_vars.args.infile}\n"
-            + code
+            + preprocessed_code
         )
-
-        _get_test_metadata(code)
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
             print(subheading("Code", "-"))
-            inserted_code = f"// {global_vars.args.infile}:\n" + code
-            print(inserted_code)
+            print(code_with_file)
 
         parser = Lark.open(
             f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
@@ -218,10 +220,8 @@ def _parse_cli_args():
         prog="picoc-compiler",
         description="Plain CLI tool — no shell. Processes an input file with flags.",
     )
-    # Positional (optional) infile, as before
     parser.add_argument("infile", nargs="?", help="Path to the input file")
 
-    # Flags
     parser.add_argument(
         "-i",
         "--intermediate_stages",
@@ -236,23 +236,25 @@ def _parse_cli_args():
         help="Print output to stdout",
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Create comments for immediate stages"
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Create comments for immediate stages",
     )
     parser.add_argument(
-        "-vv", "--double_verbose", action="store_true", help="Additionaly makes formatting wider" # and adds datatype to ref and adds BuiltinTypes char and int to SymbolTable"
+        "-vv",
+        "--double_verbose",
+        action="store_true",
+        help="Additionaly makes formatting wider",  # and adds datatype to ref and adds BuiltinTypes char and int to SymbolTable"
     )
-    parser.add_argument(
-        "-e", "--example", action="store_true", help="Run example mode"
-    )
+    parser.add_argument("-e", "--example", action="store_true", help="Run example mode")
     parser.add_argument(
         "-t",
         "--traceback",
         action="store_true",
         help="Show full tracebacks on errors",
     )
-    parser.add_argument(
-        "-d", "--debug", action="store_true", help="Enable debug mode"
-    )
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
     parser.add_argument(
         "-s",
         "--supress_errors",
@@ -271,17 +273,23 @@ def _parse_cli_args():
         action="store_true",
         help="Include metadata comments",
     )
+    # ------------------------------- Preprocessor ----------------------------
+    parser.add_argument(
+        "-I", dest="I", action="append", default=[], help="include path (repeatable)"
+    )
+    parser.add_argument("--max-depth", type=int, default=200, help="max include depth")
 
-    args = parser.parse_args()
-
-    # Put parsed args into the shared global_vars namespace (compat with old code)
-    global_vars.args = args
+    global_vars.args = parser.parse_args()
 
 
 def _set_terminal_size():
     size = shutil.get_terminal_size(fallback=(72, 24))
     if sys.stdin.isatty():
-        global_vars.terminal_columns, global_vars.terminal_lines = size.columns, size.lines
+        global_vars.terminal_columns, global_vars.terminal_lines = (
+            size.columns,
+            size.lines,
+        )
+
 
 def _print_args_if_verbose():
     from global_vars import args  # uses the shared args object
@@ -323,6 +331,7 @@ def _print_args_if_verbose():
     for name in fields:
         value = getattr(args, name, None)
         print(f"{name:20} [{kind(name, value):10}] = {fmt(value)}")
+
 
 def _open_documentation():
     filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/Dokumentation.pdf"
