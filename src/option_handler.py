@@ -17,7 +17,7 @@ from pygments.lexers.c_cpp import CLexer
 import re
 import argparse
 from preprocessor import Preprocessor
-
+from typing import Iterable, List, Optional, Dict, Any, Sequence
 
 class OptionHandler:
     def __init__(self):
@@ -34,21 +34,28 @@ class OptionHandler:
         global_vars.args.extension = get_extension(global_vars.args.infile)
         match global_vars.args.extension:
             case "picoc":
-                self._compl(code)
+                _syntax_check([global_vars.args.infile])
+                preprocssed_code = self._preprocess(code)
+                self._compl(preprocssed_code)
             case _:
                 print("filename: " + global_vars.args.infile)
                 print(
                     f"File with extension '.{global_vars.args.extension}' cannot be compiled or interpreted."
                 )
 
+    def _preprocess(self, code):
+        _get_test_metadata(code)
+
+        if global_vars.args.intermediate_stages and global_vars.args.print:
+            print(subheading("Raw Code", "-"))
+            print(code)
+
+        preprocessor = Preprocessor(include_paths=global_vars.args.I, max_depth=global_vars.args.max_depth)
+        return preprocessor.preprocess(code, global_vars.args.infile)
+
     def _compl(self, code):
         if global_vars.args.debug:
             __import__("pudb").set_trace()
-
-        _get_test_metadata(code)
-
-        preprocessor = Preprocessor(include_paths=global_vars.args.I, max_depth=global_vars.args.max_depth)
-        preprocessed_code = preprocessor.preprocess(code, global_vars.args.infile)
 
         code_with_file = (
             (
@@ -58,11 +65,11 @@ class OptionHandler:
                 else ""
             )
             + f"{global_vars.args.infile}\n"
-            + preprocessed_code
+            + code
         )
 
         if global_vars.args.intermediate_stages and global_vars.args.print:
-            print(subheading("Code", "-"))
+            print(subheading("Preprocessed Code", "-"))
             print(code_with_file)
 
         parser = Lark.open(
@@ -375,3 +382,35 @@ def _get_test_metadata(code):
                     for line in fin.readline().replace("\n", "").split(" ")
                     if line.lstrip("-").isdigit()
                 ]
+
+def _syntax_check(
+    c_files: "Iterable[str]",
+    extra_flags: "Optional[Sequence[str]]" = None,
+    compiler: "Optional[str]" = None,
+    timeout: int = 60,
+) -> None:
+    c_files_list: List[str] = list(c_files)
+    if not c_files_list:
+        print("syntax_check: no C files provided", file=sys.stderr)
+        os._exit(2)
+
+    chosen = compiler or shutil.which("clang") or shutil.which("gcc")
+    if not chosen:
+        print("syntax_check: no suitable C compiler found (need clang or gcc)", file=sys.stderr)
+        os._exit(2)
+
+    flags: List[str] = ["-x", "c", "-fsyntax-only", "-Wall", "-Wextra", "-Wpedantic", "-std=c11"]
+    if extra_flags:
+        flags.extend(list(extra_flags))
+
+    cmd: List[str] = [chosen] + flags + c_files_list
+    try:
+        # Inherit stdout/stderr so compiler diagnostics stream to your terminal immediately.
+        p: subprocess.CompletedProcess[int] = subprocess.run(cmd, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        print(f"syntax_check: compiler timed out after {timeout}s", file=sys.stderr)
+        os._exit(124)
+
+    if p.returncode != 0:
+        # Diagnostics already printed by the compiler; exit the whole program.
+        os._exit(p.returncode)

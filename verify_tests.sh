@@ -2,7 +2,7 @@
 
 shopt -s extglob
 
-./heading_subheadings.py "heading" "Verification" "$1" "="
+./heading_subheadings.py "heading" "Verification" "${1:-72}" "="
 num_tests=0;
 not_verified=();
 
@@ -25,6 +25,6 @@ for test in "${paths[@]}"; do
   ((num_tests++));
   rm ./a.out
 done
-./heading_subheadings.py "heading" "Results" "$1" "="
+./heading_subheadings.py "heading" "Results" "${1:-72}" "="
 echo Verified: $(($num_tests-${#not_verified[@]})) / $num_tests;
 echo Not verified: ${not_verified[*]};

@@ -1,3 +1,5 @@
+// in:
+// expected:12
 #include "./include/basic_incl_headerfile.h"
 
 void main() {

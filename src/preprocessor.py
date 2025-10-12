@@ -193,6 +193,7 @@ class Preprocessor:
                         else:
                             inc_src = self._read_file(inc_path)
                             included = self.preprocess(inc_src, inc_path, depth + 1)
+
                         out.append(included)
 
                     elif kw == 'pragma':

@@ -1,1 +1,1 @@
-./sys_tests/basic_incl_headerfile.picoc
+./sys_tests/advanced_3_funs.picoc
