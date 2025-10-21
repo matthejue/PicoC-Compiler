@@ -1,1 +1,1 @@
--i -p -n -v -m
+-i -w -n -v -m -s -t

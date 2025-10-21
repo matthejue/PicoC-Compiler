@@ -3,7 +3,7 @@ import reti_nodes as rn
 import symbol_table as st
 from util_funs import (
     throw_type_error,
-    remove_extension,
+    remove_ext,
     convert_to_single_line,
 )
 import global_vars
@@ -21,7 +21,7 @@ class Passes:
         # PicoC_ANF
         self.argmode_on = False
         self.symbol_table = st.SymbolTable()
-        self.current_scope = "global!"
+        self.current_scope = "global"
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
         self.global_stmts_instrs = []
@@ -102,9 +102,6 @@ class Passes:
 
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
-            # --------------------------- L_Comment ---------------------------
-            case pn.RETIComment():
-                return stmt
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(lhs, exp):
                 return pn.Assign(
@@ -140,7 +137,7 @@ class Passes:
                     stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
                 return pn.DoWhile(self._picoc_shrink_exp(exp), stmts_shrinked)
             # ----------------------------- L_Fun -----------------------------
-            case pn.Return(st.Empty()):
+            case pn.Return(pn.Empty()):
                 return stmt
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
@@ -155,9 +152,7 @@ class Passes:
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
                     match decl_def:
-                        case pn.FunDef(
-                            datatype, pn.Name() as name, allocs, stmts
-                        ):
+                        case pn.FunDef(datatype, pn.Name() as name, allocs, stmts):
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
@@ -169,7 +164,7 @@ class Passes:
                         case _:
                             throw_type_error(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(filename) + ".picoc_shrink"),
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_shrink"),
                     decls_defs_shrinked,
                 )
             case _:
@@ -347,7 +342,7 @@ class Passes:
                 for decl_def in reversed(decls_defs):
                     decls_defs_blocks += self._picoc_blocks_def(decl_def)
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_blocks"),
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_blocks"),
                     list(reversed(decls_defs_blocks)),
                 )
             case _:
@@ -359,7 +354,7 @@ class Passes:
     # - bringt AST in A-Normalform:
     # - Funktionen werden aufgelöst
 
-    def _datatype_size(self, datatype):
+    def _datatype_size(self, datatype) -> int:
         match datatype:
             # ------------------------ L_Arith + L_Pntr -----------------------
             case pn.IntType() | pn.CharType() | pn.PntrDecl():
@@ -367,12 +362,10 @@ class Passes:
             # ---------------------------- L_Struct ---------------------------
             case pn.StructSpec(pn.Name(val)):
                 struct_type_name = val
-                symbol = self.symbol_table.resolve(struct_type_name)
-                match symbol:
-                    case st.Symbol(_, _, _, _, pn.Num(val)):
-                        return int(val)
-                    case _:
-                        throw_type_error(symbol)
+                symbol, _ = self.symbol_table.resolve(
+                    struct_type_name, scope=self.current_scope
+                )
+                return int(symbol["size"])
             # ---------------------------- L_Array ----------------------------
             case pn.ArrayDecl(nums, datatype2):
                 size = self._datatype_size(datatype2)
@@ -404,7 +397,7 @@ class Passes:
             match stmt:
                 case pn.Assign(pn.Alloc(_, datatype)) | pn.Exp(pn.Alloc(_, datatype)):
                     size += self._datatype_size(datatype)
-                case pn.SingleLineComment() | pn.RETIComment():
+                case pn.SingleLineComment():
                     # const init and normal assign get skipped
                     pass
                 case _:
@@ -415,24 +408,21 @@ class Passes:
         ref.datatype = datatype
         ref.visible += [ref.datatype] if global_vars.args.double_verbose else []
 
-    def _resolve_name(self, name):
-        try:
-            symbol = self.symbol_table.resolve(f"{name}@{self.current_scope}")
-            choosen_scope = self.current_scope
-        except KeyError:
-            symbol = self.symbol_table.resolve(f"{name}@global!")
-            choosen_scope = "global!"
-        return symbol, choosen_scope
-
     def _picoc_anf_ref(self, ref, prev_stmts):
         match ref:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val) as name:
                 var_name = val
                 # TODO: undefinied identifier error
-                symbol, choosen_scope = self._resolve_name(var_name)
+                symbol, _ = self.symbol_table.resolve(var_name, scope=self.current_scope)
                 match symbol:
-                    case st.Symbol(_, datatype, _, _, _):
+                    case {
+                        "type_qual": _,
+                        "datatype": datatype,
+                        "name": _,
+                        "addr": _,
+                        "size": _,
+                    }:
                         current_datatype = copy.deepcopy(datatype)
                     case _:
                         throw_type_error(symbol)
@@ -476,30 +466,31 @@ class Passes:
                             match ref:
                                 case pn.Ref(pn.Attr(_, pn.Name(val2))):
                                     attr_name = val2
-                                    symbol = self.symbol_table.resolve(
-                                        f"{attr_name}@{struct_type_name}"
+                                    symbol, _ = self.symbol_table.resolve(
+                                        attr_name, scope=struct_type_name
                                     )
                                 case pn.Exp():
                                     break
                                 case _:
                                     throw_type_error(ref)
-                            match symbol:
-                                case st.Symbol(_, datatype, _, _, _):
-                                    current_datatype = copy.deepcopy(datatype)
-                                case _:
-                                    throw_type_error(symbol)
+                            current_datatype = copy.deepcopy(symbol["datatype"])
                         case _:
                             throw_type_error(current_datatype)
 
-                symbol, choosen_scope = self._resolve_name(var_name)
+                symbol, choosen_scope = self.symbol_table.resolve(var_name, scope=self.current_scope)
                 match symbol:
-                    case st.Symbol(_, _, _, val_addr, _):
-                        addr = val_addr
+                    case {
+                        "type_qual": _,
+                        "datatype": _,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
                         match choosen_scope:
-                            case "global!":
-                                return [pn.Ref(pn.Global(addr))]
+                            case "global":
+                                return [pn.Ref(pn.Global(pn.Num(str(addr))))]
                             case _:
-                                return [pn.Ref(pn.Stackframe(addr))]
+                                return [pn.Ref(pn.Stackframe(pn.Num(str(addr))))]
                     case _:
                         throw_type_error(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
@@ -528,14 +519,21 @@ class Passes:
         match exp:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val):
-                symbol, choosen_scope = self._resolve_name(val)
+                symbol, choosen_scope = self.symbol_table.resolve(val, scope=self.current_scope)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), datatype, _, num, _):
+                    case {
+                        "type_qual": pn.Writeable(),
+                        "datatype": datatype,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
+                        num = pn.Num(addr)
                         match choosen_scope, datatype:
-                            case ("global!", pn.ArrayDecl()):
+                            case ("global", pn.ArrayDecl()):
                                 # TODO: struct st1 st = {.ar_var=ar]
                                 return [pn.Ref(pn.Global(num))]
-                            case ("global!", pn.StructSpec()):
+                            case ("global", pn.StructSpec()):
                                 if self.argmode_on:
                                     size = self._datatype_size(datatype)
                                     return [
@@ -560,13 +558,20 @@ class Passes:
                                     ]
                                 else:
                                     return [pn.Exp(pn.Stackframe(num))]
-                            case ("global!", _):
+                            case ("global", _):
                                 return [pn.Exp(pn.Global(num))]
                             case (_, _):
                                 return [pn.Exp(pn.Stackframe(num))]
-                    case st.Symbol(pn.Const(), _, _, num, _):
+                    case {
+                        "type_qual": pn.Const(),
+                        "datatype": _,
+                        "name": _,
+                        "val": num,
+                        "size": _,
+                    }:
                         return [pn.Exp(num)]
                     case _:
+                        __import__('pudb').set_trace()
                         throw_type_error(symbol)
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
@@ -627,16 +632,19 @@ class Passes:
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
                 match self.current_scope:
-                    case "global!":
+                    case "global":
                         size = self._datatype_size(datatype_copy)
-                        symbol = st.Symbol(
-                            type_qual,
-                            datatype_copy,
-                            pn.Name(f"{var_name}@{self.current_scope}"),
-                            pn.Num(str(self.rel_global_addr)),
-                            pn.Num(str(size)),
+                        self.symbol_table.declare(
+                            var_name,
+                            {
+                                "type_qual": type_qual,
+                                "datatype": datatype_copy,
+                                "name": var_name,
+                                "addr": self.rel_global_addr,
+                                "size": size,
+                            },
+                            scope=self.current_scope,
                         )
-                        self.symbol_table.declare(symbol)
                         self.rel_global_addr += size
                     case _:
                         match datatype_copy:
@@ -651,19 +659,22 @@ class Passes:
                             case _:
                                 pass
                         size = self._datatype_size(datatype)
-                        symbol = st.Symbol(
-                            type_qual,
-                            datatype,
-                            pn.Name(f"{var_name}@{self.current_scope}"),
-                            pn.Num(str(self.rel_fun_addr + size - 1)),
-                            (
-                                pn.Num("1")
-                                if local_var_or_param.val == "param"
-                                and isinstance(datatype, pn.PntrDecl)
-                                else pn.Num(str(size))
-                            ),
+                        self.symbol_table.declare(
+                            var_name,
+                            {
+                                "type_qual": type_qual,
+                                "datatype": datatype,
+                                "name": var_name,
+                                "addr": self.rel_fun_addr + size - 1,
+                                "size": (
+                                    1
+                                    if local_var_or_param.val == "param"
+                                    and isinstance(datatype, pn.PntrDecl)
+                                    else size
+                                ),
+                            },
+                            scope=self.current_scope,
                         )
-                        self.symbol_table.declare(symbol)
                         self.rel_fun_addr += (
                             1
                             if local_var_or_param.val == "param"
@@ -681,11 +692,18 @@ class Passes:
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val)):
                 identifier_name = val
-                symbol, choosen_scope = self._resolve_name(identifier_name)
+                symbol, choosen_scope = self.symbol_table.resolve(identifier_name, scope=self.current_scope)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), _, _, num, _):
+                    case {
+                        "type_qual": pn.Writeable(),
+                        "datatype": _,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
+                        num = pn.Num(addr)
                         match choosen_scope:
-                            case "global!":
+                            case "global":
                                 return [pn.Ref(pn.Global(num))]
                             case _:
                                 return [pn.Ref(pn.Stackframe(num))]
@@ -712,11 +730,11 @@ class Passes:
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val) as name, exps):
                 fun_name = val
-
-                symbol = self.symbol_table.resolve(fun_name)
-                match symbol:
-                    case st.Symbol(_, pn.FunDecl(datatype, pn.Name()), _, _, _):
-                        return_type = datatype
+                symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
+                datatype = symbol["datatype"]
+                match datatype:
+                    case pn.FunDecl(datatype2, pn.Name()):
+                        return_type = datatype2
                     case _:
                         throw_type_error(symbol)
 
@@ -726,9 +744,7 @@ class Passes:
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
-                block_name = pn.Name(
-                    self.fun_name_to_block_name[fun_name] 
-                )
+                block_name = pn.Name(self.fun_name_to_block_name[fun_name])
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
@@ -754,8 +770,6 @@ class Passes:
             # --------------------------- L_Comment ---------------------------
             case pn.SingleLineComment():
                 return [stmt]
-            case pn.RETIComment():
-                return [stmt]
             # ----------------------- L_Array + L_Struct ----------------------
             case pn.Assign(
                 pn.Alloc(_, datatype, name) as alloc,
@@ -775,19 +789,26 @@ class Passes:
             case pn.Assign(pn.Name(val), exp):
                 var_name = val
                 exps_anf = self._picoc_anf_exp(exp)
-                symbol, choosen_scope = self._resolve_name(var_name)
+                symbol, choosen_scope = self.symbol_table.resolve(var_name, scope=self.current_scope)
                 match symbol:
-                    case st.Symbol(pn.Writeable(), _, _, val_addr, size):
-                        addr = val_addr
+                    case {
+                        "type_qual": pn.Writeable(),
+                        "datatype": _,
+                        "name": _,
+                        "addr": num,
+                        "size": size,
+                    }:
+                        num = pn.Num(num)
+                        num_size = pn.Num(size)
                         match choosen_scope:
-                            case "global!":
+                            case "global":
                                 return (
                                     self._single_line_comment(stmt, "//")
                                     + exps_anf
                                     + [
                                         pn.Assign(
-                                            pn.Global(addr),
-                                            pn.Stack(size),
+                                            pn.Global(num),
+                                            pn.Stack(num_size),
                                         )
                                     ]
                                 )
@@ -797,8 +818,8 @@ class Passes:
                                     + exps_anf
                                     + [
                                         pn.Assign(
-                                            pn.Stackframe(addr),
-                                            pn.Stack(size),
+                                            pn.Stackframe(num),
+                                            pn.Stack(num_size),
                                         )
                                     ]
                                 )
@@ -808,14 +829,17 @@ class Passes:
                 pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1)), num
             ):
                 var_name = val1
-                symbol = st.Symbol(
-                    type_qual,
-                    datatype,
-                    pn.Name(f"{var_name}@{self.current_scope}"),
-                    num,
-                    st.Empty(),
+                self.symbol_table.declare(
+                    var_name,
+                    {
+                        "type_qual": type_qual,
+                        "datatype": datatype,
+                        "name": var_name,
+                        "val": num,
+                        "size": pn.Empty(),
+                    },
+                    scope=self.current_scope,
                 )
-                self.symbol_table.declare(symbol)
                 # Alloc isn't needed anymore after being evaluated
                 return self._single_line_comment(stmt, "//") + []
             case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
@@ -850,7 +874,7 @@ class Passes:
                     + [pn.IfElse(pn.Stack(pn.Num("1")), goto1_list, goto2_list)]
                 )
             # ----------------------------- L_Fun -----------------------------
-            case pn.Return(st.Empty()):
+            case pn.Return(pn.Empty()):
                 return [stmt]
             case pn.Return(exp):
                 exps_anf = self._picoc_anf_exp(exp)
@@ -875,9 +899,10 @@ class Passes:
         match decl_def:
             # ------------------------ L_Fun + L_Blocks -----------------------
             case pn.FunDef(datatype, pn.Name(val1) as name, allocs, blocks):
-                def_name = val1
+                fun_name = val1
 
-                self.current_scope = def_name
+                self.current_scope = fun_name
+                self.symbol_table.set_parent(fun_name, "global")
                 self.rel_fun_addr = 0
 
                 blocks_anf = []
@@ -885,7 +910,7 @@ class Passes:
                     case pn.Block(_, stmts):
                         # attach param or not information to alloc
                         # TODO: irgendwann in der Zukunft wird main Argumente haben
-                        if def_name not in ["main", "global!"]:
+                        if fun_name not in ["main", "global"]:
                             for alloc in allocs:
                                 alloc.local_var_or_param = pn.Name("param")
                                 if global_vars.args.double_verbose:
@@ -896,17 +921,18 @@ class Passes:
                         blocks[0].param_size = pn.Num(str(param_size))
                         blocks[0].local_vars_size = pn.Num(str(local_vars_size))
 
-                        try:
-                            symbol = self.symbol_table.resolve(def_name)
-                        except KeyError:
-                            symbol = st.Symbol(
-                                st.Empty(),
-                                pn.FunDecl(datatype, name, allocs),
-                                name,
-                                st.Empty(),
-                                st.Empty(),
+                        if not self.symbol_table.contains(fun_name, scope="global"):
+                            self.symbol_table.declare(
+                                fun_name,
+                                {
+                                    "type_qual": pn.Empty(),
+                                    "datatype": pn.FunDecl(datatype, name, allocs),
+                                    "name": fun_name,
+                                    "addr": pn.Empty(),
+                                    "size": pn.Empty(),
+                                },
+                                scope="global",
                             )
-                            self.symbol_table.declare(symbol)
 
                         blocks[0].stmts_instrs[:] = (
                             (
@@ -948,18 +974,22 @@ class Passes:
                     case _:
                         throw_type_error(blocks[-1])
                 return blocks_anf
-            case pn.FunDecl(datatype, pn.Name() as name, allocs):
-                symbol = st.Symbol(
-                    st.Empty(),
-                    decl_def,
-                    name,
-                    st.Empty(),
-                    st.Empty(),
+            case pn.FunDecl(datatype, pn.Name(val1), allocs):
+                fun_name = val1
+                self.symbol_table.declare(
+                    fun_name,
+                    {
+                        "type_qual": pn.Empty(),
+                        "datatype": decl_def,
+                        "name": fun_name,
+                        "addr": pn.Empty(),
+                        "size": pn.Empty(),
+                    },
+                    scope="global",
                 )
-                self.symbol_table.declare(symbol)
                 # Function declaration isn't needed anymore after being evaluated
                 return []
-            case pn.StructDecl(pn.Name(val1) as name, allocs):
+            case pn.StructDecl(pn.Name(val1), allocs):
                 struct_name = val1
                 attrs = []
                 struct_size = 0
@@ -968,34 +998,37 @@ class Passes:
                         case pn.Alloc(pn.Writeable(), datatype, pn.Name(val2)):
                             attr_name = val2
                             attr_size = self._datatype_size(datatype)
-                            self.copy_old_scope = self.current_scope
-                            self.current_scope = struct_name
-                            self.current_scope = self.copy_old_scope
-                            symbol = st.Symbol(
-                                st.Empty(),
-                                datatype,
-                                pn.Name(f"{attr_name}@{struct_name}"),
-                                st.Empty(),
-                                pn.Num(str(attr_size)),
+                            self.symbol_table.declare(
+                                attr_name,
+                                {
+                                    "type_qual": pn.Empty(),
+                                    "datatype": datatype,
+                                    "name": attr_name,
+                                    "addr": pn.Empty(),
+                                    "size": attr_size,
+                                },
+                                scope=struct_name,
                             )
-                            self.symbol_table.declare(symbol)
-                            attrs += [pn.Name(f"{attr_name}@{struct_name}")]
+                            attrs += [pn.Name(attr_name)]
                             struct_size += attr_size
                         case _:
                             throw_type_error(alloc)
 
-                symbol = st.Symbol(
-                    st.Empty(),
-                    decl_def,
-                    name,
-                    attrs,
-                    pn.Num(str(struct_size)),
+                self.symbol_table.declare(
+                    struct_name,
+                    {
+                        "type_qual": pn.Empty(),
+                        "datatype": decl_def,
+                        "name": struct_name,
+                        "attrs": attrs,
+                        "size": struct_size,
+                    },
+                    scope=self.current_scope,
                 )
-                self.symbol_table.declare(symbol)
                 # Struct declaration isn't needed anymore after being evaluated
                 return []
             case pn.Exp() | pn.Assign():
-                self.current_scope = "global!"
+                self.current_scope = "global"
                 self.global_stmts_instrs += self._picoc_anf_stmt(decl_def)
                 return []
             case _:
@@ -1011,7 +1044,7 @@ class Passes:
                 # check if there even exists a main function
                 main_with_id = self.fun_name_to_block_name["main"]
                 var = pn.File(
-                    pn.Name(remove_extension(val) + ".picoc_anf"),
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
                     [
                         pn.Block(
                             pn.Name(f"_start.{self.block_id}"),
@@ -1042,8 +1075,6 @@ class Passes:
                     #      return [pn.SingleLineComment("# // //", content)]
                     case _:
                         throw_type_error(prefix)
-            case pn.RETIComment():
-                return [stmt]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(
                 pn.BinOp(
@@ -1089,7 +1120,7 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
-                    case pn.Num(val, _):
+                    case pn.Num(val):
                         reti_instrs += [
                             rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)])
                         ]
@@ -1391,7 +1422,7 @@ class Passes:
                             ]
                         case _:
                             throw_type_error(mem, tmp)
-                    tmp.num.val = str(int(tmp.num.val) + 1)
+                    tmp.num.val = int(tmp.num.val) + 1
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
@@ -1487,22 +1518,18 @@ class Passes:
                 match datatype:
                     case pn.StructSpec(pn.Name(val3)):
                         struct_name = val3
-                        symbol = self.symbol_table.resolve(struct_name)
-                        match symbol:
-                            case st.Symbol(_, _, _, val4, _):
-                                attr_ids = val4
-                                for attr_id in attr_ids:
-                                    if attr_id.val == f"{attr_name}@{struct_name}":
-                                        break
-                                    symbol = self.symbol_table.resolve(attr_id.val)
-                                    match symbol:
-                                        case st.Symbol(_, _, _, _, pn.Num(val4)):
-                                            attr_size = val4
-                                            rel_pos_in_struct += int(attr_size)
-                                        case _:
-                                            throw_type_error(symbol)
-                            case _:
-                                throw_type_error(symbol)
+                        symbol, _ = self.symbol_table.resolve(
+                            struct_name, scope=self.current_scope
+                        )
+                        attr_ids = symbol["attrs"]
+                        for attr_id in attr_ids:
+                            if attr_id.val == attr_name:
+                                break
+                            symbol, _ = self.symbol_table.resolve(
+                                attr_id.val, scope=struct_name
+                            )
+                            attr_size = symbol["size"]
+                            rel_pos_in_struct += int(attr_size)
                     case _:
                         throw_type_error(datatype)
                 return self._single_line_comment(stmt, "#") + [
@@ -1628,7 +1655,7 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
                     ),
                 ]
-            case pn.Return(st.Empty()):
+            case pn.Return(pn.Empty()):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
@@ -1653,7 +1680,8 @@ class Passes:
                             throw_type_error(block)
                 reti_blocks = blocks
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".reti_blocks"), reti_blocks
+                    pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
+                    reti_blocks,
                 )
             case _:
                 throw_type_error(file)
@@ -1796,7 +1824,7 @@ class Passes:
                     self._reti_patch_block(block)
                 patched_blocks = blocks
                 return pn.File(
-                    pn.Name(remove_extension(val) + ".reti_patch"),
+                    pn.Name(global_vars.tstate.path_without_ext + ".reti_patch"),
                     patched_blocks,
                 )
             case _:
@@ -1893,7 +1921,8 @@ class Passes:
                         case _:
                             throw_type_error(block)
                 return rn.Program(
-                    rn.Name(remove_extension(val) + ".reti"), instrs_block_free
+                    rn.Name(global_vars.tstate.path_without_ext + ".reti"),
+                    instrs_block_free,
                 )
             case _:
                 throw_type_error(file)

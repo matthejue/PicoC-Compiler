@@ -1,1 +1,1 @@
-./sys_tests/advanced_3_funs.picoc
+./sys_tests/thesis_call_by_value_struct.picoc

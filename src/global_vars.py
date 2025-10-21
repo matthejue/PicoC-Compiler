@@ -1,14 +1,19 @@
 import reti_nodes as rn
 import picoc_nodes as pn
 from argparse import Namespace
+import threading
 
 # options from command-line arguments
 args: Namespace
 
 # Name and path for the basename of all output files. If it stays empty this
 # means one is in shell mode
-path = ""
-basename = ""
+class ThreadState(threading.local):
+    def __init__(self) -> None:
+        # runs once per thread (on first access in that thread)
+        self.path_without_ext: str = ""   # or Optional[str] if it can be unset
+
+tstate = ThreadState()
 
 reti_states = ""
 

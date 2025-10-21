@@ -2,7 +2,8 @@ from lark.visitors import Transformer
 from lark.lexer import Token
 import picoc_nodes as pn
 import reti_nodes as rn
-from util_funs import throw_type_error, remove_extension, nodes_to_str
+from util_funs import throw_type_error, remove_ext, nodes_to_str
+import global_vars
 
 
 class TransformerPicoC(Transformer):
@@ -10,11 +11,6 @@ class TransformerPicoC(Transformer):
     # =                                 Lexer                                 =
     # =========================================================================
     # --------------------------------- L_Arith -------------------------------
-    def RETI_COMMENT(self, token: Token):
-        return pn.RETIComment(
-            token.value[token.value.find("#") + 1 :].lstrip(),
-        )
-
     def NUM(self, token: Token):
         return pn.Num(token.value)
 
@@ -447,7 +443,8 @@ class TransformerPicoC(Transformer):
         return nodes
 
     def file(self, nodes):
-        nodes[0].val = remove_extension(nodes[0].val) + ".ast"
+        # nodes[0].val = remove_ext(nodes[0].val) + ".ast"
+        nodes[0].val = global_vars.tstate.path_without_ext + ".ast"
         return pn.File(nodes[0], nodes[1])
 
 
@@ -456,11 +453,6 @@ class ASTTransformerRETI(Transformer):
     # =                                 Lexer                                 =
     # =========================================================================
     # ------------------------------- L_Program -------------------------------
-    def RETI_COMMENT(self, token: Token):
-        return pn.RETIComment(
-            token.value[2:].lstrip(),
-        )
-
     def IM(self, token: Token):
         return rn.Im(token.value)
 
@@ -646,5 +638,5 @@ class ASTTransformerRETI(Transformer):
         return rn.Call(nodes[0], nodes[1])
 
     def program(self, nodes):
-        nodes[0].val = remove_extension(nodes[0].val) + ".rast"
+        nodes[0].val = global_vars.tstate.path_without_ext + ".rast"
         return rn.Program(nodes[0], nodes[1:])

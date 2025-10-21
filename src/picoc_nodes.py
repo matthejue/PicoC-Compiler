@@ -1,5 +1,4 @@
 from ast_node import ASTNode
-import symbol_table as st
 import global_vars
 from util_funs import repr_single_line
 
@@ -9,30 +8,42 @@ from util_funs import repr_single_line
 # -------------------------------- L_Arith --------------------------------
 class Name(ASTNode):
     # shorter then 'Identifier'
-    pass
-
-    def __eq__(self, other):
-        return self.val == other.val
-
-
-class Num(ASTNode):
     def __init__(self, val):
-        self.is_negative = Name("not_negative")
+        self.val = val
         super().__init__(
-            val,
-            #  visible=[str(val), self.is_negative]
-            #  if global_vars.args.double_verbose
-            #  else [str(val)],
+            visible=[self.val]
         )
 
     def __eq__(self, other):
         return self.val == other.val
 
-    __match_args__ = ("val", "is_negative")
+    __match_args__ = ("val",)
+
+
+class Num(ASTNode):
+    def __init__(self, val):
+        self.val = val
+        self.is_negative = "not_negative"
+        super().__init__(
+            visible=[str(val), self.is_negative]
+            if global_vars.args.double_verbose
+            else [str(val)],
+        )
+
+    def __eq__(self, other):
+        return self.val == other.val
+
+    __match_args__ = ("val",)
 
 
 class Char(ASTNode):
-    pass
+    def __init__(self, val):
+        self.val = val
+        super().__init__(
+            visible=[str(val)],
+        )
+
+    __match_args__ = ("val",)
 
 
 class Minus(ASTNode):
@@ -444,9 +455,11 @@ class Call(ASTNode):
 
     __match_args__ = ("name", "exps")
 
+class Empty(ASTNode):
+    pass
 
 class Return(ASTNode):
-    def __init__(self, exp=st.Empty()):
+    def __init__(self, exp=Empty()):
         self.exp = exp
         super().__init__(visible=[self.exp])
 
@@ -498,7 +511,6 @@ class NewStackframe(ASTNode):
 
 class RemoveStackframe(ASTNode):
     pass
-
 
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):
@@ -567,12 +579,6 @@ class SingleLineComment:
         return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
-
-
-class RETIComment(ASTNode):
-    def __repr__(self, depth=0):
-        return f"\n{' ' * depth}## {self.val}"
-
 
 # ------------------------------- L_Placeholder -------------------------------
 class Placeholder(ASTNode):

@@ -107,11 +107,33 @@ class Int(ASTNode):
 # ------------------- Identifier, Immediate and Register ------------------
 class Name(ASTNode):
     # shorter then 'Identifier'
+    def __init__(self, val):
+        self.val = val
+        super().__init__(
+            visible=[self.val]
+        )
+
+    def __eq__(self, other):
+        return self.val == other.val
+
+    # shorter then 'Identifier'
     def __repr__(self):
         return f"{self.val}"
 
+    __match_args__ = ("val",)
+
 
 class Im(ASTNode):
+    # shorter then 'Identifier'
+    def __init__(self, val):
+        self.val = val
+        super().__init__(
+            visible=[self.val]
+        )
+
+    def __eq__(self, other):
+        return self.val == other.val
+
     def __repr__(self):
         if global_vars.args.binary:
             if global_vars.next_as_22:
@@ -135,6 +157,8 @@ class Im(ASTNode):
                 )
                 return f"{bin_val_with_gaps}"
         return f"{self.val}"
+
+    __match_args__ = ("val",)
 
 
 class Reg(ASTNode):

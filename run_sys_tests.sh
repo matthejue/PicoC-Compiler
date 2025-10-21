@@ -32,6 +32,11 @@ fi
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
   ./src/main.py $(cat ./opts/test_cpl_opts.txt) $3 "$test";
+
+  if [[ $? != 0 ]]; then
+    not_running_through+=("$test");
+  fi
+
   if [ -f "${test%.picoc}.reti" ]; then
     reti_emulator $(cat ./opts/test_emu_opts.txt) $4 "${test%.picoc}.reti";
   fi

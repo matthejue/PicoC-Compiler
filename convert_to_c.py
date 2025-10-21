@@ -35,22 +35,22 @@ def main():
         paths = find_all_paths(pattern, from_start=False)
 
     for filepath in paths:
-        basename = remove_extension(filepath)
-        with open(basename + ".picoc", "r", encoding="utf-8") as picoc_file:
+        path_without_ext = remove_ext(filepath)
+        with open(path_without_ext + ".picoc", "r", encoding="utf-8") as picoc_file:
             picoc_input = picoc_file.read()
         almost_c = picoc_input.replace("print(", 'printf(" %d", ')
-        with open(basename + ".input", "r", encoding="utf-8") as input_file:
+        with open(path_without_ext + ".input", "r", encoding="utf-8") as input_file:
             inputs = input_file.read().replace("\n", "").split(" ")
         while inputs:
             almost_c = almost_c.replace("input()", inputs.pop(0), 1)
         finally_c = almost_c.split("\n")
         finally_c.insert(2, "#include<stdio.h>")
-        with open(basename + ".c", "w", encoding="utf-8") as c_file:
+        with open(path_without_ext + ".c", "w", encoding="utf-8") as c_file:
             for line in finally_c:
                 c_file.write(line + "\n")
 
 
-def remove_extension(fname):
+def remove_ext(fname):
     """stips of the file extension
     :fname: filename
     :returns: basename of the file

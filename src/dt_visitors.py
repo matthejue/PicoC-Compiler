@@ -1,14 +1,15 @@
 from lark.visitors import Visitor
 from lark.tree import Tree
 from lark.lexer import Token
-from util_funs import remove_extension
+from util_funs import remove_ext
+import global_vars
 
 
 class DTVisitorPicoC(Visitor):
     def file(self, tree: Tree):
         tree.children[0] = Token(
             tree.children[0].type,
-            remove_extension(tree.children[0].value) + ".dt",
+            global_vars.tstate.path_without_ext + ".dt",
             tree.children[0].line,
             tree.children[0].column,
             tree.children[0].end_line,
@@ -20,7 +21,7 @@ class DTVisitorRETI(Visitor):
     def program(self, tree: Tree):
         tree.children[0] = Token(
             tree.children[0].type,
-            remove_extension(tree.children[0].value) + ".rdt",
+            global_vars.tstate.path_without_ext + ".rdt",
             tree.children[0].line,
             tree.children[0].column,
             tree.children[0].end_line,
@@ -54,7 +55,7 @@ class DTSimpleVisitorPicoC(Visitor):
     def file(self, tree: Tree):
         tree.children[0] = Token(
             tree.children[0].type,
-            remove_extension(tree.children[0].value) + ".dt_simple",
+            global_vars.tstate.path_without_ext + ".dt_simple",
             tree.children[0].line,
             tree.children[0].column,
             tree.children[0].end_line,

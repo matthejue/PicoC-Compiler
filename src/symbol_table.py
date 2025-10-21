@@ -1,79 +1,93 @@
-from ast_node import ASTNode
-import picoc_nodes as pn
-import global_vars
+from __future__ import annotations
+from typing import Dict, Any, Optional, Tuple
+from pathlib import Path
+import json
 from util_funs import convert_to_single_line
 
-# ------------------------------- L_Symbol_Table ------------------------------
-class Empty(ASTNode):
-    pass
+Symbol = Dict[str, Any]  # e.g. {"kind": "var", "type": "int", ...}
+Scope = Dict[str, Symbol]  # symbol_name -> Symbol
 
 
-class BuiltIn(ASTNode):
-    pass
+class SymbolTable:
+    def __init__(self) -> None:
+        self._table: Dict[str, Scope] = {"global": {}}
+        self._parents: Dict[str, Optional[str]] = {"global": None}
 
+    # ----- core, minimal helpers -----
+    def _ensure_scope(self, scope: str) -> None:
+        self._table.setdefault(scope, {})
 
-class Symbol(ASTNode):
-    def __init__(
-        self,
-        type_qual=None,
-        datatype=None,
-        name=None,
-        val_addr=None,
-        size=None,
-    ):
-        self.type_qual = type_qual if type_qual else Empty()
-        self.datatype = datatype if datatype else Empty()
-        self.name = name if name else Empty()
-        self.val_addr = (
-            val_addr if val_addr else [] if isinstance(val_addr, list) else Empty()
+    def set_parent(self, scope: str, parent: Optional[str]) -> None:
+        if scope == parent:
+            raise ValueError("A scope cannot be its own parent.")
+        self._ensure_scope(scope)
+        if parent is not None:
+            self._ensure_scope(parent)
+        self._parents[scope] = parent
+
+    def contains(self, symbol_name: str, *, scope: str) -> bool:
+        """Return True if 'symbol_name' exists in exactly this scope."""
+        bucket = self._table.get(scope)
+        return bucket is not None and symbol_name in bucket
+
+    def declare(self, symbol_name: str, symbol: Symbol, scope: str) -> None:
+        """Add (or overwrite) a symbol in the given scope."""
+        self._ensure_scope(scope)
+        self._table[scope][symbol_name] = dict(symbol)
+
+    def resolve(self, symbol_name: str, *, scope: str) -> Tuple[Optional[Symbol], Optional[str]]:
+        """
+        Look up 'symbol_name' starting at 'scope' and walking parents outward.
+        Returns (symbol_dict, found_scope) or (None, None) if not found.
+        """
+        cur = scope
+        while cur is not None:
+            bucket = self._table.get(cur)
+            if bucket and symbol_name in bucket:
+                return bucket[symbol_name], cur
+            cur = self._parents.get(cur)  # None ends the walk
+        return None, None
+
+    # ----- JSON (pretty print, save/load) -----
+    def to_json_str(self, *, pretty: bool = True) -> str:
+        payload = dict(self._table)
+        payload["__parents__"] = dict(self._parents)
+        return json.dumps(
+            payload,
+            indent=2 if pretty else None,
+            sort_keys=pretty,
+            ensure_ascii=False,
+            default=_json_default,  # stringify unknown/custom types
         )
-        self.size = size if size else Empty()
 
-    __match_args__ = ("type_qual", "datatype", "name", "val_addr", "size")
+    def save_json(self, path: str | Path, *, pretty: bool = True) -> None:
+        Path(path).write_text(self.to_json_str(pretty=pretty), encoding="utf-8")
 
-    def __repr__(self, depth=0):
-        acc = f"\n    {self.__class__.__name__}{'(' if global_vars.args.double_verbose else ' '}"
-        acc += f"\n      {{"
-        acc += (
-            f"\n        type qualifier:         "
-            + convert_to_single_line(self.type_qual)
-        )
-        acc += (
-            f"\n        datatype:               "
-            + convert_to_single_line(self.datatype)
-        )
-        acc += (
-            f"\n        name:                   "
-            + convert_to_single_line(self.name)
-        )
-        acc += (
-            f"\n        value or address:       "
-            + convert_to_single_line(self.val_addr)
-        )
-        acc += (
-            f"\n        size:                   "
-            + convert_to_single_line(self.size)
-        )
-        acc += f"\n      }}"
-        return acc + ("\n    )" if global_vars.args.double_verbose else "")
+    @classmethod
+    def load_json(cls, path: str | Path) -> "SymbolTable":
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        st = cls()
+        st._table.clear()
+        st._parents.clear()
+        for k, v in data.items():
+            if k == "__parents__":
+                st._parents.update(v)
+            else:
+                st._table[k] = {
+                    name: (dict(sym) if isinstance(sym, dict) else sym)
+                    for name, sym in v.items()
+                }
+        # Make sure every scope in parents exists and vice versa
+        for s in list(st._parents.keys()):
+            st._ensure_scope(s)
+        for s in list(st._table.keys()):
+            if s not in st._parents:
+                st._parents[s] = None if s == "global" else None
+        return st
+
+    def __repr__(self) -> str:
+        return self.to_json_str(pretty=True)
 
 
-class SymbolTable(ASTNode):
-    def __init__(self):
-        self.symbols = dict()
-        self._init_type_sytem()
-        super().__init__(visible=[self.symbols])
-
-    def _init_type_sytem(self):
-        if global_vars.args.double_verbose:
-            self.declare(Symbol(datatype=BuiltIn(), name=pn.Name("char")))
-            self.declare(Symbol(datatype=BuiltIn(), name=pn.Name("int")))
-
-    def exists(self, name):
-        return self.symbols.get(name)
-
-    def declare(self, symbol):
-        self.symbols[symbol.name.val] = symbol
-
-    def resolve(self, name):
-        return self.symbols[name]
+def _json_default(ast):
+    return convert_to_single_line(ast)

@@ -3,7 +3,7 @@
 import os
 
 
-def remove_extension(fname):
+def remove_ext(fname):
     # if there's no '.' rindex raises a exception, rfind returns -1
     index_of_extension_start = fname.rfind(" no spaces.")
     if index_of_extension_start == -1:
@@ -18,8 +18,8 @@ def _remove_path(fname):
     return fname[index_of_path_end + 1 :]
 
 
-def basename(fname):
-    fname = remove_extension(fname)
+def filename_without_ext(fname):
+    fname = remove_ext(fname)
     return _remove_path(fname)
 
 
@@ -39,5 +39,5 @@ for filename in filenames:
 
 
     os.rename(
-        "./sys_tests/" + filename, "./sys_tests/" + remove_extension(filename_copy) + ".picoc"
+        "./sys_tests/" + filename, "./sys_tests/" + remove_ext(filename_copy) + ".picoc"
     )
