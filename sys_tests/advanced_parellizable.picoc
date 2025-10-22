@@ -1,0 +1,21 @@
+int compute(int x) {
+    return x * 2;  // simple arithmetic expression
+}
+
+int main() {
+    int i;
+    int sum;
+    int value; 
+    i = 0;
+    sum = 0;
+
+    while (i < 8) {
+        value = i * 3 + i * 2;
+        sum = sum + compute(value);
+        i = i + 1;
+    }
+
+    sum = sum * sum;
+
+    return 0;
+}

@@ -1,0 +1,31 @@
+// in:21 2 6 7
+// expected:42 42
+
+#include "./include/basic_pragma_once_a.h"
+#include "./include/basic_pragma_once_b.h"
+
+
+int main() {
+    int x;
+    int y;
+    int arr[2];
+    struct str_b b;
+
+    b.ptr = &b.a.value;
+    x = input();
+    y = input();
+    arr[0] = input();
+    arr[1] = input();
+    b.ptr = &b.a.value;
+    b.a.value = x + y + arr[0] + arr[1];
+
+    if (*b.ptr > 10) {
+        while (*b.ptr < 42) {
+            *b.ptr = *b.ptr + 1;
+        }
+    } 
+
+    print(*b.ptr);
+    print(b.a.value);
+    return 0;
+}

@@ -629,6 +629,7 @@ class Passes:
                 return exps_anf + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
+                # __import__('pudb').set_trace()
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
                 match self.current_scope:
