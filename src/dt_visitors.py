@@ -1,8 +1,7 @@
 from lark.visitors import Visitor
 from lark.tree import Tree
 from lark.lexer import Token
-from util_funs import remove_ext
-import global_vars
+from src import global_vars
 
 
 class DTVisitorPicoC(Visitor):

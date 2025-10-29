@@ -1,6 +1,62 @@
-from ast_node import ASTNode
-import global_vars
-from util_funs import repr_single_line
+from src.ast_node import ASTNode
+from src import global_vars
+from src.utils.util_funs_independent import convert_to_single_line
+
+def repr_single_line(self, depth=0):
+    """Single-line variant of __repr__, used for compact code-like formatting."""
+    if not self.visible:
+        return f"\n{' ' * depth}{self.__class__.__name__}()"
+
+    acc = ""
+    if depth > 0:
+        acc += "\n"
+    acc += f"{' ' * depth}{self.__class__.__name__}("
+
+    for i, child in enumerate(self.visible):
+        sep = ", " if i > 0 else ""
+        indent = " " * (depth + 2)
+        indentmore = " " * (depth + 4)
+
+        match child:
+            # Empty list
+            case list() if not child:
+                acc += f"{sep}\n{indent}[]"
+
+            # Non-empty list
+            case list():
+                acc += f"{sep}\n{indent}["
+                for j, list_child in enumerate(child):
+                    sub_sep = ", " if j > 0 else ""
+
+                    match list_child:
+                        # Nested control-flow / structure nodes
+                        case (
+                            If()
+                            | IfElse()
+                            | While()
+                            | DoWhile()
+                            | Block()
+                            | FunDef()
+                            | FunDecl()
+                            | StructDecl()
+                        ):
+                            acc += f"{sub_sep}{list_child.__repr__(depth + 4)}"
+
+                        # Everything else gets converted to a single line
+                        case _:
+                            acc += f"\n{indentmore}{convert_to_single_line(list_child)}"
+                acc += f"\n{indent}]"
+
+            # Primitive types (string or int)
+            case str() | int() | ASTNode():
+                acc += f"{sep}'{child}'"
+
+            # Fallback case for general children
+            case _:
+                acc += f"{sep}{child.__repr__(depth + 2)}"
+
+    return acc + ")"
+
 
 # =========================================================================
 # =                              Token Nodes                              =
@@ -10,9 +66,7 @@ class Name(ASTNode):
     # shorter then 'Identifier'
     def __init__(self, val):
         self.val = val
-        super().__init__(
-            visible=[self.val]
-        )
+        super().__init__(visible=[self.val])
 
     def __eq__(self, other):
         return self.val == other.val
@@ -25,9 +79,11 @@ class Num(ASTNode):
         self.val = val
         self.is_negative = "not_negative"
         super().__init__(
-            visible=[str(val), self.is_negative]
-            if global_vars.args.double_verbose
-            else [str(val)],
+            visible=(
+                [str(val), self.is_negative]
+                if global_vars.args.double_verbose
+                else [str(val)]
+            ),
         )
 
     def __eq__(self, other):
@@ -151,18 +207,14 @@ class CharType(ASTNode):
     pass
 
     def __repr__(self, depth=0):
-        return (
-            f"\n{' ' * depth}CharType()"
-        )
+        return f"\n{' ' * depth}CharType()"
 
 
 class VoidType(ASTNode):
     pass
 
     def __repr__(self, depth=0):
-        return (
-            f"\n{' ' * depth}VoidType()"
-        )
+        return f"\n{' ' * depth}VoidType()"
 
 
 # =========================================================================
@@ -455,8 +507,10 @@ class Call(ASTNode):
 
     __match_args__ = ("name", "exps")
 
+
 class Empty(ASTNode):
     pass
+
 
 class Return(ASTNode):
     def __init__(self, exp=Empty()):
@@ -512,6 +566,7 @@ class NewStackframe(ASTNode):
 class RemoveStackframe(ASTNode):
     pass
 
+
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):
     def __init__(self, name, decls_defs_blocks):
@@ -548,7 +603,8 @@ class Block(ASTNode):
         if global_vars.args.double_verbose:
             return super().__repr__(depth)
         else:
-            return repr_single_line(self, depth)
+            # __import__('pudb').set_trace()
+            return f"{self.name}:\n" + "\n".join(repr_single_line(stmt_instr) for stmt_instr in self.stmts_instrs)
 
     __match_args__ = (
         "name",
@@ -569,16 +625,17 @@ class GoTo(ASTNode):
 
 
 # ------------------------------- L_Comment -------------------------------
-class SingleLineComment:
+class SingleLineComment(ASTNode):
     def __init__(self, prefix, content):
         self.prefix = prefix
-
         self.content = content
+        super().__init__(visible=[self.prefix, self.content])
 
     def __repr__(self, depth=0):
         return f"\n{' ' * depth}{self.prefix} {self.content}"
 
     __match_args__ = ("prefix", "content")
+
 
 # ------------------------------- L_Placeholder -------------------------------
 class Placeholder(ASTNode):

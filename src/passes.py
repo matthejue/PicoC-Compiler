@@ -1,12 +1,14 @@
-import picoc_nodes as pn
-import reti_nodes as rn
-import symbol_table as st
-from util_funs import (
+from src import picoc_nodes as pn
+from src import reti_nodes as rn
+from src.symbol_table import SymbolTable
+from src.utils.util_funs_dependent import (
     throw_type_error,
     remove_ext,
+)
+from src.utils.util_funs_independent import (
     convert_to_single_line,
 )
-import global_vars
+from src import global_vars
 import copy
 from bitstring import Bits
 from inspect import isclass
@@ -20,7 +22,7 @@ class Passes:
         self.fun_name_to_block_name = dict()
         # PicoC_ANF
         self.argmode_on = False
-        self.symbol_table = st.SymbolTable()
+        self.symbol_table = SymbolTable()
         self.current_scope = "global"
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
@@ -176,12 +178,48 @@ class Passes:
     # -  If(exp, stmts), IfElse(exp, stmts1, stmts2), While(exp, stmts) und
     # DoWhile(exp, stmts) durch Block(name, stmts instrs-, GoTo(lable)- und
     # IfElse(exp, stmts1, stmts2) ersetzt.
+    
+    IMPORTANT_STMTS_INSTRS = [
+        pn.Ref,
+        #  pn.Assign,
+        pn.Assign(pn.Stack, pn.Global),
+        pn.Assign(pn.Stack, pn.Stackframe),
+        pn.Assign(pn.Global, pn.Stack),
+        pn.Assign(pn.Stackframe, pn.Stack),
+        pn.Assign(pn.Name, object),
+        pn.Assign(pn.Attr, object),
+        pn.Assign(pn.Subscr, object),
+        pn.Assign(pn.Stack, pn.Stack),
+        #  pn.Exp,
+        pn.Exp(pn.Num),
+        pn.Exp(pn.Name),
+        pn.Exp(pn.BinOp),
+        pn.Exp(pn.Stack),
+        pn.Exp(pn.Global),
+        pn.Exp(pn.Stackframe),
+        pn.Exp(pn.Subscr),
+        pn.Exp(pn.Attr),
+        pn.Exp(pn.Deref),
+        pn.Exp(pn.Ref),
+        pn.Exp(pn.GoTo),
+        pn.Exp(rn.Reg),
+        pn.StackMalloc,
+        pn.NewStackframe,
+        pn.RemoveStackframe,
+        pn.Return,
+        pn.Exit,
+        pn.If,
+        pn.IfElse,
+        pn.While,
+        pn.DoWhile,
+        pn.StackMalloc,
+]
 
     def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
             return []
         if global_vars.args.example:
-            for stmt_instr in global_vars.IMPORTANT_STMTS_INSTRS:
+            for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
                 if isclass(stmt_instr):
                     if isinstance(node, stmt_instr):
                         break  # success
@@ -1836,13 +1874,22 @@ class Passes:
     # =========================================================================
     # - keine Blöcke mehr, Knoten genauso zusammengefügt, wie sie in entfernten Blöcken angeordnet waren
     # - GoTo(Name(str)) werden duch einen Immediate mit passender Distanz / Adresse oder einen Sprungbefehl mit passender Distanz Jump(Always(), Im(str(distance))) ersetzt.
+    NEG_RELS = {
+        "": rn.Always(),
+        "==": rn.Eq(),
+        "!=": rn.NEq(),
+        "<": rn.GtE(),
+        "<=": rn.Gt(),
+        ">": rn.LtE(),
+        ">=": rn.Lt(),
+    }
 
     def _patch_too_large_jumps(self, rel, distance, instr):
         if global_vars.args.no_long_jumps:
             #  if (
             #  distance < -(2**21) and distance > 2**21 - 1
             #  ) or global_vars.args.no_jump:
-            neg_rel = global_vars.NEG_RELS[str(rel)]
+            neg_rel = self.NEG_RELS[str(rel)]
             instrs_for_immediate = self._write_large_immediate_in_register(
                 rn.Reg(rn.Acc()), distance
             )

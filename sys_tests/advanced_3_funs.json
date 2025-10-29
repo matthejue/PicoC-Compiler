@@ -1,0 +1,86 @@
+{
+  "__parents__": {
+    "fun": "global",
+    "fun2": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun": {
+    "local_var1": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "local_var1",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "local_var2": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "local_var2",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "param": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "fun2": {
+    "local_var": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "local_var",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "param": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun": {
+      "addr": "Empty()",
+      "datatype": "FunDecl(IntType(), Name('fun'), [Alloc(Writeable(), IntType(), Name('param'))])",
+      "name": "fun",
+      "size": "Empty()",
+      "type_qual": "Empty()"
+    },
+    "fun2": {
+      "addr": "Empty()",
+      "datatype": "FunDecl(IntType(), Name('fun2'), [Alloc(Writeable(), IntType(), Name('param'))])",
+      "name": "fun2",
+      "size": "Empty()",
+      "type_qual": "Empty()"
+    },
+    "main": {
+      "addr": "Empty()",
+      "datatype": "FunDecl(IntType(), Name('main'), [])",
+      "name": "main",
+      "size": "Empty()",
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "local_var1": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "local_var1",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "local_var2": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "local_var2",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

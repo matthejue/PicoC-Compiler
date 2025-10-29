@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Dict, Any, Optional, Tuple
 from pathlib import Path
 import json
-from util_funs import convert_to_single_line
+from src.utils.util_funs_independent import convert_to_single_line
 
 Symbol = Dict[str, Any]  # e.g. {"kind": "var", "type": "int", ...}
 Scope = Dict[str, Symbol]  # symbol_name -> Symbol

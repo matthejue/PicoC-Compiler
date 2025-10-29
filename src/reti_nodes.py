@@ -1,7 +1,7 @@
-from ast_node import ASTNode
-import picoc_nodes as pn
-from util_funs import throw_type_error
-import global_vars
+from src.ast_node import ASTNode
+from src import picoc_nodes as pn
+from src.utils.util_funs_dependent import throw_type_error
+from src import global_vars
 from bitstring import Bits
 
 # =========================================================================
@@ -34,6 +34,7 @@ class Instr(ASTNode):
     def __init__(self, op, args):
         self.op = op
         self.args = args
+        super().__init__(visible=[self.op, self.args])
 
     def __repr__(self, depth=0):
         global_vars.next_as_22 = True
@@ -56,6 +57,7 @@ class Jump(ASTNode):
     def __init__(self, rel, im_goto):
         self.rel = rel
         self.im_goto = im_goto
+        super().__init__(visible=[self.rel, self.im_goto])
 
     def __repr__(self, depth=0):
         match self.im_goto:

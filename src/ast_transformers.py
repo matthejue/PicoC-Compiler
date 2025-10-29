@@ -1,9 +1,9 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
-import picoc_nodes as pn
-import reti_nodes as rn
-from util_funs import throw_type_error, remove_ext, nodes_to_str
-import global_vars
+from src import picoc_nodes as pn
+from src import reti_nodes as rn
+from src.utils.util_funs_dependent import throw_type_error, remove_ext, nodes_to_str
+from src import global_vars
 
 
 class TransformerPicoC(Transformer):

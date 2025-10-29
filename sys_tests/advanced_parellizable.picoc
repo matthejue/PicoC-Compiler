@@ -1,3 +1,6 @@
+// in:
+// expected:
+
 int compute(int x) {
     return x * 2;  // simple arithmetic expression
 }

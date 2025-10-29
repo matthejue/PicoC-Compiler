@@ -1,23 +1,23 @@
 from sre_constants import FAILURE, SUCCESS
-import global_vars
-import symbol_table as st
-import picoc_nodes as pn
-import reti_nodes as rn
+from src import global_vars
+from src import symbol_table as st
+from src import picoc_nodes as pn
+from src import reti_nodes as rn
 import sys
 import shutil
 from lark.lark import Lark
-from dt_visitors import (
+from src.dt_visitors import (
     DTVisitorPicoC,
     DTSimpleVisitorPicoC,
 )
-from ast_transformers import TransformerPicoC, ASTTransformerRETI
-from passes import Passes
-from util_funs import remove_ext, throw_type_error, subheading, get_ext
+from src.ast_transformers import TransformerPicoC, ASTTransformerRETI
+from src.passes import Passes
+from src.utils.util_funs_dependent import remove_ext, throw_type_error, subheading, get_ext
 import subprocess, os, platform
 from pygments.lexers.c_cpp import CLexer
 import re
 import argparse
-from preprocessor import Preprocessor
+from src.preprocessor import Preprocessor
 from typing import Iterable, List, Optional, Dict, Any, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -31,7 +31,7 @@ class OptionHandler:
         _parse_cli_args()
         _print_args_if_verbose()
         if not global_vars.args.infiles and sys.stdin.isatty():
-            _open_documentation()
+            open_documentation()
 
     def build_all(self, max_workers=None):
         files = list(global_vars.args.infiles)  # strings, as passed on CLI
@@ -70,7 +70,10 @@ class OptionHandler:
                     + preprocessed_code
                 )
                 self._compl(preprocessed_code_with_filename)
-            case "picoc_blocks":
+            case "reti_blocks":
+                # convert reti_blocks to ast
+                # lock for .json_file
+                # convert datatype to string with build_ast_from_string
                 pass
             case _:
                 print(f"filename: {path}")
@@ -100,7 +103,7 @@ class OptionHandler:
             print(code)
 
         parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",
@@ -150,7 +153,7 @@ class OptionHandler:
 
     def _tokens_option(self, code_with_file, heading):
         parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/concrete_syntax_picoc.lark",
+            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/src/concrete_syntax_picoc.lark",
             lexer="basic",
             priority="normal",
             parser="earley",
@@ -228,7 +231,7 @@ class OptionHandler:
 
         if at_least_one_file:
             with open(
-                global_vars.tstate.path_without_ext + ".st",
+                global_vars.tstate.path_without_ext + ".json",
                 "w",
                 encoding="utf-8",
             ) as fout:
@@ -314,7 +317,7 @@ def _set_terminal_size():
 
 
 def _print_args_if_verbose():
-    from global_vars import args  # uses the shared args object
+    from src.global_vars import args  # uses the shared args object
 
     if not getattr(args, "verbose", False):
         return  # quiet unless -v/--verbose is on
@@ -355,7 +358,7 @@ def _print_args_if_verbose():
         print(f"{name:20} [{kind(name, value):10}] = {fmt(value)}")
 
 
-def _open_documentation():
+def open_documentation():
     filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "/Dokumentation.pdf"
 
     #  https://stackoverflow.com/questions/7343388/open-pdf-with-default-program-in-windows-7

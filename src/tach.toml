@@ -1,0 +1,71 @@
+interfaces = []
+exclude = [
+    "**/*__pycache__",
+    "**/*egg-info",
+    "**/docs",
+    "**/tests",
+    "**/venv",
+]
+source_roots = [
+    ".",
+]
+
+[[modules ]]
+path = "ast_transformers"
+depends_on = ["picoc_nodes", "global_vars", "reti_nodes", "util_funs"]
+
+[[modules ]]
+path = "picoc_nodes"
+depends_on = ["global_vars", "ast_node", "util_funs"]
+
+[[modules ]]
+path = "reti_nodes"
+depends_on = ["picoc_nodes", "ast_node", "util_funs", "global_vars"]
+
+[[modules ]]
+path = "passes"
+depends_on = ["util_funs", "global_vars", "picoc_nodes", "reti_nodes", "symbol_table"]
+
+[[modules ]]
+path = "ast_node"
+depends_on = ["global_vars"]
+
+[[modules ]]
+path = "preprocessor"
+depends_on = []
+
+[[modules ]]
+path = "picoc_nodes2"
+depends_on = ["ast_node"]
+
+[[modules ]]
+path = "symbol_table"
+depends_on = ["util_funs"]
+
+[[modules ]]
+path = "test"
+depends_on = ["picoc_nodes2"]
+
+[[modules ]]
+path = "option_handler"
+depends_on = ["util_funs", "symbol_table", "reti_nodes", "picoc_nodes", "passes", "preprocessor", "dt_visitors", "global_vars", "ast_transformers"]
+
+[[modules ]]
+path = "main"
+depends_on = ["option_handler", "util_funs"]
+
+[[modules ]]
+path = "dt_visitors"
+depends_on = ["util_funs", "global_vars"]
+
+[[modules ]]
+path = "global_vars"
+depends_on = []
+
+[[modules ]]
+path = "utils.util_funs2"
+depends_on = []
+
+[[modules ]]
+path = "utils.util_funs"
+depends_on = []
