@@ -8,26 +8,13 @@ from bitstring import Bits
 # =                            Container Nodes                            =
 # =========================================================================
 # -------------------------------- Program --------------------------------
-class Program(ASTNode):
-    def __init__(self, name, instrs):
-        self.name = name
-        self.instrs = instrs
-        super().__init__(visible=[self.name, self.instrs])
-
-    def __repr__(self):
-        if not self.instrs:
-            return ""
-        match self.instrs[0]:
-            case pn.Block():
-                return super().__repr__()
-            case _:
-                instrs_str = str(self.instrs[0]).replace("\n", "")
-                for instr in self.instrs[1:]:
-                    instrs_str += f"{instr}"
-                return instrs_str
-
-    __match_args__ = ("name", "instrs")
-
+# class Program(ASTNode):
+#     def __init__(self, name, instrs):
+#         self.name = name
+#         self.instrs = instrs
+#         super().__init__(visible=[self.name, self.instrs])
+#
+# __match_args__ = ("name", "instrs")
 
 # ------------------------- Load / Store / Compute ------------------------
 class Instr(ASTNode):
@@ -37,15 +24,9 @@ class Instr(ASTNode):
         super().__init__(visible=[self.op, self.args])
 
     def __repr__(self, depth=0):
-        global_vars.next_as_22 = True
         instr_str = f"\n{' ' * depth}{self.op}"
         for arg in self.args:
-            match arg:
-                case pn.GoTo():
-                    instr_str += " " + arg.__repr__(len(instr_str)).lstrip()
-                case _:
-                    instr_str += f" {arg}"
-        global_vars.next_as_22 = False
+            instr_str += f" {arg}"
         # return f"{instr_str}{'' if depth > 0 else ';'}"
         return instr_str
 
@@ -62,10 +43,8 @@ class Jump(ASTNode):
     def __repr__(self, depth=0):
         match self.im_goto:
             case Im():
-                global_vars.next_as_normal = True
                 # acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto};"
                 acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
-                global_vars.next_as_normal = False
                 return acc
             case pn.GoTo():
                 return (
@@ -107,22 +86,22 @@ class Int(ASTNode):
 # =                              Token Nodes                              =
 # =========================================================================
 # ------------------- Identifier, Immediate and Register ------------------
-class Name(ASTNode):
-    # shorter then 'Identifier'
-    def __init__(self, val):
-        self.val = val
-        super().__init__(
-            visible=[self.val]
-        )
-
-    def __eq__(self, other):
-        return self.val == other.val
-
-    # shorter then 'Identifier'
-    def __repr__(self):
-        return f"{self.val}"
-
-    __match_args__ = ("val",)
+# class Name(ASTNode):
+#     # shorter then 'Identifier'
+#     def __init__(self, val):
+#         self.val = val
+#         super().__init__(
+#             visible=[self.val]
+#         )
+#
+#     def __eq__(self, other):
+#         return self.val == other.val
+#
+#     # shorter then 'Identifier'
+#     def __repr__(self, depth):
+#         return f"{self.val}"
+#
+#     __match_args__ = ("val",)
 
 
 class Im(ASTNode):
@@ -137,27 +116,6 @@ class Im(ASTNode):
         return self.val == other.val
 
     def __repr__(self):
-        if global_vars.args.binary:
-            if global_vars.next_as_22:
-                bin_val = Bits(int=int(self.val), length=22).bin
-                bin_val_with_gaps = (
-                    bin_val[:6] + "_" + bin_val[6:14] + "_" + bin_val[14:]
-                )
-                return f"{bin_val_with_gaps}"
-            elif global_vars.next_as_normal:
-                return f"{self.val}"
-            else:
-                bin_val = Bits(uint=int(self.val), length=32).bin
-                bin_val_with_gaps = (
-                    bin_val[:8]
-                    + "_"
-                    + bin_val[8:16]
-                    + "_"
-                    + bin_val[16:24]
-                    + "_"
-                    + bin_val[24:]
-                )
-                return f"{bin_val_with_gaps}"
         return f"{self.val}"
 
     __match_args__ = ("val",)

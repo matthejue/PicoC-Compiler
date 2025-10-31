@@ -457,10 +457,10 @@ class ASTTransformerRETI(Transformer):
         return rn.Im(token.value)
 
     def FILENAME(self, token: Token):
-        return rn.Name(token.value)
+        return pn.Name(token.value)
 
     def NAME(self, token: Token):
-        return rn.Name(token.value)
+        return pn.Name(token.value)
 
     def reg(self, tokens: list[Token]):
         token = tokens[0]

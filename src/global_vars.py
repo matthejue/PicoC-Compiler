@@ -17,10 +17,6 @@ reti_states = ""
 
 uart_size = 3
 
-next_as_22 = False
-
-next_as_normal = False
-
 max_print_out_elements = 5
 
 input = []

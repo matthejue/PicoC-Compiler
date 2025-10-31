@@ -1,3 +1,7 @@
+from src import picoc_nodes as pn
+from src.utils.util_funs_independent import convert_to_single_line
+from src.log import log
+
 class ASTNode:
     def __init__(self, visible=[]):
         # val="", 
@@ -17,30 +21,55 @@ class ASTNode:
 
         acc = ""
 
-        if depth > 0:
-            acc += "\n"
-        acc += f"{' ' * depth}{self.__class__.__name__}("
+        acc += f"\n{' ' * depth}{self.__class__.__name__}("
 
         for i, child in enumerate(self.visible):
-            sep = ", " if i > 0 else ""
-            indent = " " * (depth + 2)
-
-            match child:
-                case list() if not child:
-                    acc += f"{sep}\n{indent}[]"
-
-                case list():
-                    acc += f"{sep}\n{indent}["
-                    for j, list_child in enumerate(child):
-                        sub_sep = ", " if j > 0 else ""
-                        acc += f"{sub_sep}{list_child.__repr__(depth + 4)}"
-                    acc += f"\n{indent}]"
-
-                case str() | int():
-                    acc += f"{sep}'{child}'"
-
-                case _:
-                    acc += f"{sep}{child.__repr__(depth + 2)}"
-
+            acc = repr_arg_types(i, child, depth, acc)
 
         return acc + ")"
+
+
+def repr_arg_types(i, arg, depth, acc, *, is_block=False):
+    sep = ", " if i > 0 else ""
+    depth2 = depth + 2
+    indent2 = " " * (depth2)
+    depth4 = depth + 4
+    indent4 = " " * (depth4)
+
+    match arg:
+        case list() if not arg:
+            acc += sep if is_block else f"{sep}\n{indent2}[]"
+
+        case list():
+            acc += sep if is_block else f"{sep}\n{indent2}["
+            for j, list_child in enumerate(arg):
+                sub_sep = ", " if j > 0 else ""
+                subindent = indent2 if is_block else indent4
+                subdepth = depth2 if is_block else depth4
+
+                match list_child:
+                    # Nested control-flow / structure nodes
+                    case (
+                        pn.If()
+                        | pn.IfElse()
+                        | pn.While()
+                        | pn.DoWhile()
+                        | pn.Block()
+                        | pn.FunDef()
+                        | pn.FunDecl()
+                        | pn.StructDecl()
+                    ):
+                        acc += f"{sub_sep}{list_child.__repr__(subdepth)}"
+
+                    # Everything else gets converted to a single line
+                    case _:
+                        # log("list_child", convert_to_single_line(list_child))
+                        acc += f"\n{subindent}{convert_to_single_line(list_child)}"
+            acc += "" if is_block else f"\n{indent2}]"
+        case str() | int():
+            acc += f"{sep}'{arg}'"
+
+        case _:
+            acc += f"{sep}{arg.__repr__(depth2)}"
+
+    return acc

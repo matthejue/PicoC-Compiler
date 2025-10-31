@@ -1,62 +1,5 @@
-from src.ast_node import ASTNode
+from src.ast_node import ASTNode, repr_arg_types
 from src import global_vars
-from src.utils.util_funs_independent import convert_to_single_line
-
-def repr_single_line(self, depth=0):
-    """Single-line variant of __repr__, used for compact code-like formatting."""
-    if not self.visible:
-        return f"\n{' ' * depth}{self.__class__.__name__}()"
-
-    acc = ""
-    if depth > 0:
-        acc += "\n"
-    acc += f"{' ' * depth}{self.__class__.__name__}("
-
-    for i, child in enumerate(self.visible):
-        sep = ", " if i > 0 else ""
-        indent = " " * (depth + 2)
-        indentmore = " " * (depth + 4)
-
-        match child:
-            # Empty list
-            case list() if not child:
-                acc += f"{sep}\n{indent}[]"
-
-            # Non-empty list
-            case list():
-                acc += f"{sep}\n{indent}["
-                for j, list_child in enumerate(child):
-                    sub_sep = ", " if j > 0 else ""
-
-                    match list_child:
-                        # Nested control-flow / structure nodes
-                        case (
-                            If()
-                            | IfElse()
-                            | While()
-                            | DoWhile()
-                            | Block()
-                            | FunDef()
-                            | FunDecl()
-                            | StructDecl()
-                        ):
-                            acc += f"{sub_sep}{list_child.__repr__(depth + 4)}"
-
-                        # Everything else gets converted to a single line
-                        case _:
-                            acc += f"\n{indentmore}{convert_to_single_line(list_child)}"
-                acc += f"\n{indent}]"
-
-            # Primitive types (string or int)
-            case str() | int() | ASTNode():
-                acc += f"{sep}'{child}'"
-
-            # Fallback case for general children
-            case _:
-                acc += f"{sep}{child.__repr__(depth + 2)}"
-
-    return acc + ")"
-
 
 # =========================================================================
 # =                              Token Nodes                              =
@@ -428,25 +371,12 @@ class StructDecl(ASTNode):
 
     __match_args__ = ("name", "allocs")
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
-
-
 # ------------------------------- L_If_Else -------------------------------
 class If(ASTNode):
     def __init__(self, exp, stmts):
         self.exp = exp
         self.stmts = stmts
         super().__init__(visible=[self.exp, self.stmts])
-
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts")
 
@@ -458,12 +388,6 @@ class IfElse(ASTNode):
         self.stmts2 = stmts2
         super().__init__(visible=[self.exp, self.stmts1, self.stmts2])
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
-
     __match_args__ = ("exp", "stmts1", "stmts2")
 
 
@@ -474,12 +398,6 @@ class While(ASTNode):
         self.stmts = stmts
         super().__init__(visible=[self.exp, self.stmts])
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
-
     __match_args__ = ("exp", "stmts")
 
 
@@ -488,12 +406,6 @@ class DoWhile(ASTNode):
         self.exp = exp
         self.stmts = stmts
         super().__init__(visible=[self.exp, self.stmts])
-
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
 
     __match_args__ = ("exp", "stmts")
 
@@ -545,12 +457,6 @@ class FunDef(ASTNode):
             ]
         )
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            return repr_single_line(self, depth)
-
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
 
@@ -569,18 +475,23 @@ class RemoveStackframe(ASTNode):
 
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):
-    def __init__(self, name, decls_defs_blocks):
+    def __init__(self, name, decls_defs_blocks_instrs):
         self.name = name
-        self.decls_defs_blocks = decls_defs_blocks
-        super().__init__(visible=[self.name, self.decls_defs_blocks])
+        self.decls_defs_blocks_instrs = decls_defs_blocks_instrs
+        super().__init__(visible=[self.name, self.decls_defs_blocks_instrs])
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
+    def __repr__(self, incl_filenode=False):
+        if not self.decls_defs_blocks_instrs:
+            return ""
+        if incl_filenode:
+            return super().__repr__()
         else:
-            return repr_single_line(self, depth)
+            instrs_str = str(self.decls_defs_blocks_instrs[0])
+            for instr in self.decls_defs_blocks_instrs[1:]:
+                instrs_str += str(instr)
+            return instrs_str
 
-    __match_args__ = ("name", "decls_defs_blocks")
+    __match_args__ = ("name", "decls_defs_blocks_instrs")
 
 
 # -------------------------------- L_Block --------------------------------
@@ -599,12 +510,8 @@ class Block(ASTNode):
             ]
         )
 
-    def __repr__(self, depth=0):
-        if global_vars.args.double_verbose:
-            return super().__repr__(depth)
-        else:
-            # __import__('pudb').set_trace()
-            return f"{self.name}:\n" + "\n".join(repr_single_line(stmt_instr) for stmt_instr in self.stmts_instrs)
+    def __repr__(self, depth=0): 
+        return f"\n{depth * " "}{self.name}:" + repr_arg_types(0, self.stmts_instrs, depth, "", is_block=True)
 
     __match_args__ = (
         "name",

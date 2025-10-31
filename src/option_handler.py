@@ -6,6 +6,7 @@ from src import reti_nodes as rn
 import sys
 import shutil
 from lark.lark import Lark
+from src.ast_node import ASTNode
 from src.dt_visitors import (
     DTVisitorPicoC,
     DTSimpleVisitorPicoC,
@@ -185,38 +186,39 @@ class OptionHandler:
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _output_pass(self, pass_ast, heading):
+    def _output_pass(self, pass_ast: pn.File, heading):
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(pass_ast)
+            print(pass_ast.__repr__(incl_filenode=True)[1:])
 
         if global_vars.args.write_files:
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(pass_ast))
-                case rn.Program(rn.Name(val)):
-                    with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(pass_ast))
+                        fout.write(str(pass_ast)[1:])
                 case _:
                     throw_type_error(pass_ast)
 
-    def _reti_with_metadata(self, pass_ast, heading):
-        metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
+    def _reti_with_metadata(self, pass_ast: pn.File, heading):
+        pass_ast.decls_defs_blocks_instrs[:0] = [pn.SingleLineComment("#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"), pn.SingleLineComment("#", f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}")]
+
 
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(metadata + str(pass_ast))
+            # print(pass_ast.decls_defs_blocks_instrs[0])
+            # print(type(pass_ast.decls_defs_blocks_instrs[0]))
+            print(pass_ast.__repr__(incl_filenode=True)[1:])
 
         match pass_ast:
-            case rn.Program(rn.Name(val)):
+            case pn.File(pn.Name(val)):
                 # insert at the beginning of the file
                 with open(
                     val,
                     "w",
                     encoding="utf-8",
                 ) as fout:
-                    fout.write(metadata + str(pass_ast))
+                    # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
+                    fout.write(str(pass_ast)[1:])
             case _:
                 throw_type_error(pass_ast)
 

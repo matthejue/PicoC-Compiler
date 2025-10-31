@@ -248,7 +248,7 @@ class Passes:
     def _create_block(self, labelbase, stmts, blocks):
         label = f"{labelbase}.{self.block_id}"
         new_block = pn.Block(
-            pn.Name(label),
+            label,
             stmts,
         )
         blocks[label] = new_block
@@ -361,7 +361,7 @@ class Passes:
                             sorted(
                                 blocks.values(),
                                 key=lambda block: -int(
-                                    block.name.val[block.name.val.rfind(".") + 1 :]
+                                    block.name[block.name.rfind(".") + 1 :]
                                 ),
                             )
                         ),
@@ -1086,7 +1086,7 @@ class Passes:
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
                     [
                         pn.Block(
-                            pn.Name(f"_start.{self.block_id}"),
+                            f"_start.{self.block_id}",
                             self.global_stmts_instrs
                             + self._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
                             + self._picoc_anf_stmt(pn.Exp(pn.Exit(pn.Num("0")))),
@@ -1768,7 +1768,7 @@ class Passes:
                 goto_block_name = val
                 goto_block = self.all_blocks[goto_block_name]
                 goto_block_idx = int(
-                    goto_block.name.val[goto_block.name.val.rindex(".") + 1 :]
+                    goto_block.name[goto_block.name.rindex(".") + 1 :]
                 )
                 if current_block_idx - 1 == goto_block_idx:
                     return self._single_line_comment(instr, "# // not included")
@@ -1831,8 +1831,8 @@ class Passes:
 
     def _reti_patch_block(self, block):
         match block:
-            case pn.Block(pn.Name(val), instrs):
-                current_block_name = val
+            case pn.Block(name, instrs):
+                current_block_name = name
                 patched_instrs = []
                 for instr in instrs:
                     patched_instrs += self._reti_patch_instr(
@@ -1968,8 +1968,8 @@ class Passes:
                                         idx += 1
                         case _:
                             throw_type_error(block)
-                return rn.Program(
-                    rn.Name(global_vars.tstate.path_without_ext + ".reti"),
+                return pn.File(
+                    pn.Name(global_vars.tstate.path_without_ext + ".reti"),
                     instrs_block_free,
                 )
             case _:
