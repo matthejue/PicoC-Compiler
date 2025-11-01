@@ -1,3 +1,10 @@
 * ( ) Todo
   - ( ) die ganzen unnötigen Name, Num entfernen, wo man einfach direkt die Zahl pasten könnte
   - ( ) die ganzen Stack und Atom über multiple line bei while und if else fixen
+  - ( ) schauen, ob thread pool das ganze überhaupt schneller macht
+  - ( ) NEG_RELS genauer betrachten
+  - ( ) das placeholder Problem lösen
+
+  - ( ) funktionsaufruf prozedere schöner machen
+  - ( ) überall zuerst lesen und dann stackpointer ändern
+  - ( ) Token() das Token wegmachen

@@ -1,6 +1,7 @@
 from src.ast_node import ASTNode, repr_arg_types
 from src import global_vars
 
+
 # =========================================================================
 # =                              Token Nodes                              =
 # =========================================================================
@@ -9,7 +10,10 @@ class Name(ASTNode):
     # shorter then 'Identifier'
     def __init__(self, val):
         self.val = val
-        super().__init__(visible=[self.val])
+
+    @property
+    def visible(self):
+        return [self.val]
 
     def __eq__(self, other):
         return self.val == other.val
@@ -20,14 +24,10 @@ class Name(ASTNode):
 class Num(ASTNode):
     def __init__(self, val):
         self.val = val
-        self.is_negative = "not_negative"
-        super().__init__(
-            visible=(
-                [str(val), self.is_negative]
-                if global_vars.args.double_verbose
-                else [str(val)]
-            ),
-        )
+
+    @property
+    def visible(self):
+        return [self.val]
 
     def __eq__(self, other):
         return self.val == other.val
@@ -38,9 +38,10 @@ class Num(ASTNode):
 class Char(ASTNode):
     def __init__(self, val):
         self.val = val
-        super().__init__(
-            visible=[str(val)],
-        )
+
+    @property
+    def visible(self):
+        return [self.val]
 
     __match_args__ = ("val",)
 
@@ -169,7 +170,10 @@ class BinOp(ASTNode):
         self.left_exp = left_exp
         self.bin_op = bin_op
         self.right_exp = right_exp
-        super().__init__(visible=[self.left_exp, self.bin_op, self.right_exp])
+
+    @property
+    def visible(self):
+        return [self.left_exp, self.bin_op, self.right_exp]
 
     __match_args__ = ("left_exp", "bin_op", "right_exp")
 
@@ -178,7 +182,10 @@ class UnOp(ASTNode):
     def __init__(self, un_op, exp):
         self.un_op = un_op
         self.exp = exp
-        super().__init__(visible=[self.un_op, self.exp])
+
+    @property
+    def visible(self):
+        return [self.un_op, self.exp]
 
     __match_args__ = ("un_op", "exp")
 
@@ -186,7 +193,10 @@ class UnOp(ASTNode):
 class Exit(ASTNode):
     def __init__(self, num):
         self.num = num
-        super().__init__(visible=[self.num])
+
+    @property
+    def visible(self):
+        return [self.num]
 
     __match_args__ = ("num",)
 
@@ -197,7 +207,10 @@ class Atom(ASTNode):
         self.left_exp = left_exp
         self.rel = rel
         self.right_exp = right_exp
-        super().__init__(visible=[self.left_exp, self.rel, self.right_exp])
+
+    @property
+    def visible(self):
+        return [self.left_exp, self.rel, self.right_exp]
 
     __match_args__ = ("left_exp", "rel", "right_exp")
 
@@ -205,7 +218,10 @@ class Atom(ASTNode):
 class ToBool(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        super().__init__(visible=[self.exp])
+
+    @property
+    def visible(self):
+        return [self.exp]
 
     __match_args__ = ("exp",)
 
@@ -218,14 +234,14 @@ class Alloc(ASTNode):
         self.name = name
         # default is LocalVar()
         self.local_var_or_param = Name("local_var")
-        super().__init__(
-            visible=[
-                self.type_qual,
-                self.datatype,
-                self.name,
-            ]
-            + ([self.local_var_or_param] if global_vars.args.double_verbose else [])
-        )
+
+    @property
+    def visible(self):
+        return [
+            self.type_qual,
+            self.datatype,
+            self.name,
+        ] + ([self.local_var_or_param] if global_vars.args.double_verbose else [])
 
     __match_args__ = ("type_qual", "datatype", "name", "local_var_or_param")
 
@@ -234,7 +250,10 @@ class Assign(ASTNode):
     def __init__(self, lhs, exp):
         self.lhs = lhs
         self.exp = exp
-        super().__init__(visible=[self.lhs, self.exp])
+
+    @property
+    def visible(self):
+        return [self.lhs, self.exp]
 
     __match_args__ = ("lhs", "exp")
 
@@ -242,8 +261,11 @@ class Assign(ASTNode):
 class Exp(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        self.datatype: ASTNode
-        super().__init__(visible=[self.exp])
+        self.datatype = Empty()
+
+    @property
+    def visible(self):
+        return [self.exp] + ([self.datatype] if global_vars.args.double_verbose else [])
 
     __match_args__ = ("exp", "datatype")
 
@@ -251,7 +273,10 @@ class Exp(ASTNode):
 class Stack(ASTNode):
     def __init__(self, num):
         self.num = num
-        super().__init__(visible=[self.num])
+
+    @property
+    def visible(self):
+        return [self.num]
 
     __match_args__ = ("num",)
 
@@ -259,7 +284,10 @@ class Stack(ASTNode):
 class Stackframe(ASTNode):
     def __init__(self, num):
         self.num = num
-        super().__init__(visible=[self.num])
+
+    @property
+    def visible(self):
+        return [self.num]
 
     __match_args__ = ("num",)
 
@@ -267,7 +295,10 @@ class Stackframe(ASTNode):
 class Global(ASTNode):
     def __init__(self, num):
         self.num = num
-        super().__init__(visible=[self.num])
+
+    @property
+    def visible(self):
+        return [self.num]
 
     __match_args__ = ("num",)
 
@@ -275,7 +306,10 @@ class Global(ASTNode):
 class StackMalloc(ASTNode):
     def __init__(self, num):
         self.num = num
-        super().__init__(visible=[self.num])
+
+    @property
+    def visible(self):
+        return [self.num]
 
     __match_args__ = ("num",)
 
@@ -285,7 +319,10 @@ class PntrDecl(ASTNode):
     def __init__(self, num, datatype):
         self.num = num
         self.datatype = datatype
-        super().__init__(visible=[self.num, self.datatype])
+
+    @property
+    def visible(self):
+        return [self.num, self.datatype]
 
     __match_args__ = ("num", "datatype")
 
@@ -294,7 +331,10 @@ class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
         self.datatype: ASTNode
-        super().__init__(visible=[self.exp])
+
+    @property
+    def visible(self):
+        return [self.exp]
 
     __match_args__ = ("exp", "datatype")
 
@@ -303,7 +343,10 @@ class Deref(ASTNode):
     def __init__(self, exp1, exp2):
         self.exp1 = exp1
         self.exp2 = exp2
-        super().__init__(visible=[self.exp1, self.exp2])
+
+    @property
+    def visible(self):
+        return [self.exp1, self.exp2]
 
     __match_args__ = ("exp1", "exp2")
 
@@ -313,7 +356,10 @@ class ArrayDecl(ASTNode):
     def __init__(self, nums, datatype):
         self.nums = nums
         self.datatype = datatype
-        super().__init__(visible=[self.nums, self.datatype])
+
+    @property
+    def visible(self):
+        return [self.nums, self.datatype]
 
     __match_args__ = ("nums", "datatype")
 
@@ -322,7 +368,10 @@ class Array(ASTNode):
     def __init__(self, exps):
         self.exps = exps
         self.datatype: ASTNode
-        super().__init__(visible=[self.exps])
+
+    @property
+    def visible(self):
+        return [self.exps]
 
     __match_args__ = ("exps", "datatype")
 
@@ -331,7 +380,10 @@ class Subscr(ASTNode):
     def __init__(self, exp1, exp2):
         self.exp1 = exp1
         self.exp2 = exp2
-        super().__init__(visible=[self.exp1, self.exp2])
+
+    @property
+    def visible(self):
+        return [self.exp1, self.exp2]
 
     __match_args__ = ("exp1", "exp2")
 
@@ -340,7 +392,10 @@ class Subscr(ASTNode):
 class StructSpec(ASTNode):
     def __init__(self, name):
         self.name = name
-        super().__init__(visible=[self.name])
+
+    @property
+    def visible(self):
+        return [self.name]
 
     __match_args__ = ("name",)
 
@@ -349,7 +404,10 @@ class Attr(ASTNode):
     def __init__(self, exp, name):
         self.exp = exp
         self.name = name
-        super().__init__(visible=[self.exp, self.name])
+
+    @property
+    def visible(self):
+        return [self.exp, self.name]
 
     __match_args__ = ("exp", "name")
 
@@ -358,7 +416,10 @@ class Struct(ASTNode):
     def __init__(self, assigns):
         self.assigns = assigns
         self.datatype: ASTNode
-        super().__init__(visible=[self.assigns])
+
+    @property
+    def visible(self):
+        return [self.assigns]
 
     __match_args__ = ("assigns", "datatype")
 
@@ -367,16 +428,23 @@ class StructDecl(ASTNode):
     def __init__(self, name, allocs):
         self.name = name
         self.allocs = allocs
-        super().__init__(visible=[self.name, self.allocs])
+
+    @property
+    def visible(self):
+        return [self.name, self.allocs]
 
     __match_args__ = ("name", "allocs")
+
 
 # ------------------------------- L_If_Else -------------------------------
 class If(ASTNode):
     def __init__(self, exp, stmts):
         self.exp = exp
         self.stmts = stmts
-        super().__init__(visible=[self.exp, self.stmts])
+
+    @property
+    def visible(self):
+        return [self.exp, self.stmts]
 
     __match_args__ = ("exp", "stmts")
 
@@ -386,7 +454,10 @@ class IfElse(ASTNode):
         self.exp = exp
         self.stmts1 = stmts1
         self.stmts2 = stmts2
-        super().__init__(visible=[self.exp, self.stmts1, self.stmts2])
+
+    @property
+    def visible(self):
+        return [self.exp, self.stmts1, self.stmts2]
 
     __match_args__ = ("exp", "stmts1", "stmts2")
 
@@ -396,7 +467,10 @@ class While(ASTNode):
     def __init__(self, exp, stmts):
         self.exp = exp
         self.stmts = stmts
-        super().__init__(visible=[self.exp, self.stmts])
+
+    @property
+    def visible(self):
+        return [self.exp, self.stmts]
 
     __match_args__ = ("exp", "stmts")
 
@@ -405,7 +479,10 @@ class DoWhile(ASTNode):
     def __init__(self, exp, stmts):
         self.exp = exp
         self.stmts = stmts
-        super().__init__(visible=[self.exp, self.stmts])
+
+    @property
+    def visible(self):
+        return [self.exp, self.stmts]
 
     __match_args__ = ("exp", "stmts")
 
@@ -415,7 +492,10 @@ class Call(ASTNode):
     def __init__(self, name, exps):
         self.name = name
         self.exps = exps
-        super().__init__(visible=[self.name, self.exps])
+
+    @property
+    def visible(self):
+        return [self.name, self.exps]
 
     __match_args__ = ("name", "exps")
 
@@ -427,7 +507,10 @@ class Empty(ASTNode):
 class Return(ASTNode):
     def __init__(self, exp=Empty()):
         self.exp = exp
-        super().__init__(visible=[self.exp])
+
+    @property
+    def visible(self):
+        return [self.exp]
 
     __match_args__ = ("exp",)
 
@@ -437,7 +520,10 @@ class FunDecl(ASTNode):
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
-        super().__init__(visible=[self.datatype, self.name, self.allocs])
+
+    @property
+    def visible(self):
+        return [self.datatype, self.name, self.allocs]
 
     __match_args__ = ("datatype", "name", "allocs")
 
@@ -448,14 +534,10 @@ class FunDef(ASTNode):
         self.name = name
         self.allocs = allocs
         self.stmts_blocks = stmts_blocks
-        super().__init__(
-            visible=[
-                self.datatype,
-                self.name,
-                self.allocs,
-                self.stmts_blocks,
-            ]
-        )
+
+    @property
+    def visible(self):
+        return [self.datatype, self.name, self.allocs, self.stmts_blocks]
 
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 
@@ -464,7 +546,10 @@ class NewStackframe(ASTNode):
     def __init__(self, fun_name, goto_after_call):
         self.fun_name = fun_name
         self.goto_after_call = goto_after_call
-        super().__init__(visible=[self.fun_name, self.goto_after_call])
+
+    @property
+    def visible(self):
+        return [self.fun_name, self.goto_after_call]
 
     __match_args__ = ("fun_name", "goto_after_call")
 
@@ -478,13 +563,16 @@ class File(ASTNode):
     def __init__(self, name, decls_defs_blocks_instrs):
         self.name = name
         self.decls_defs_blocks_instrs = decls_defs_blocks_instrs
-        super().__init__(visible=[self.name, self.decls_defs_blocks_instrs])
+
+    @property
+    def visible(self):
+        return [self.name, self.decls_defs_blocks_instrs]
 
     def __repr__(self, incl_filenode=False):
         if not self.decls_defs_blocks_instrs:
             return ""
         if incl_filenode:
-            return super().__repr__()
+            return super().__repr__(is_file=True)
         else:
             instrs_str = str(self.decls_defs_blocks_instrs[0])
             for instr in self.decls_defs_blocks_instrs[1:]:
@@ -499,19 +587,23 @@ class Block(ASTNode):
     def __init__(self, name, stmts_instrs):
         self.name = name
         self.stmts_instrs = stmts_instrs
-        self.instrs_before: Num
-        self.num_instrs: Num
+        self.instrs_before: Num = Num(-1)
+        self.num_instrs: Num = Num(-1)
         self.param_size: Num
         self.local_vars_size: Num
-        super().__init__(
-            visible=[
-                self.name,
-                self.stmts_instrs,
-            ]
+
+    @property
+    def visible(self):
+        return [self.name, self.stmts_instrs] + (
+            [self.instrs_before, self.num_instrs]
+            if global_vars.args.double_verbose
+            else []
         )
 
-    def __repr__(self, depth=0): 
-        return f"\n{depth * " "}{self.name}:" + repr_arg_types(0, self.stmts_instrs, depth, "", is_block=True)
+    def __repr__(self, depth=0):
+        return f"\n{depth * ' '}{self.name}:" + repr_arg_types(
+            0, self.stmts_instrs, depth, "", is_block=True
+        )
 
     __match_args__ = (
         "name",
@@ -525,8 +617,11 @@ class Block(ASTNode):
 
 class GoTo(ASTNode):
     def __init__(self, name):
-        self.name = name
-        super().__init__(visible=[self.name])
+        self.name: Name = name
+
+    @property
+    def visible(self):
+        return [self.name]
 
     __match_args__ = ("name",)
 
@@ -536,7 +631,10 @@ class SingleLineComment(ASTNode):
     def __init__(self, prefix, content):
         self.prefix = prefix
         self.content = content
-        super().__init__(visible=[self.prefix, self.content])
+
+    @property
+    def visible(self):
+        return [self.prefix, self.content]
 
     def __repr__(self, depth=0):
         return f"\n{' ' * depth}{self.prefix} {self.content}"

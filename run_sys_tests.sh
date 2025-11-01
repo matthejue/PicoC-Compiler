@@ -31,7 +31,7 @@ fi
 
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
-  ./src/main.py $(cat ./opts/test_cpl_opts.txt) $3 "$test";
+  ./run.py $(cat ./opts/test_cpl_opts.txt) $3 "$test";
 
   if [[ $? != 0 ]]; then
     not_running_through+=("$test");

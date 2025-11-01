@@ -15,7 +15,7 @@ class ASTNode:
 
     # __match_args__ = ("val",)
 
-    def __repr__(self, depth=0):
+    def __repr__(self, depth=0, is_file=False):
         if not self.visible:
             return f"\n{' ' * depth}{self.__class__.__name__}()"
 
@@ -24,12 +24,12 @@ class ASTNode:
         acc += f"\n{' ' * depth}{self.__class__.__name__}("
 
         for i, child in enumerate(self.visible):
-            acc = repr_arg_types(i, child, depth, acc)
+            acc = repr_arg_types(i, child, depth, acc, is_file=is_file)
 
         return acc + ")"
 
 
-def repr_arg_types(i, arg, depth, acc, *, is_block=False):
+def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
     sep = ", " if i > 0 else ""
     depth2 = depth + 2
     indent2 = " " * (depth2)
@@ -64,7 +64,7 @@ def repr_arg_types(i, arg, depth, acc, *, is_block=False):
                     # Everything else gets converted to a single line
                     case _:
                         # log("list_child", convert_to_single_line(list_child))
-                        acc += f"\n{subindent}{convert_to_single_line(list_child)}"
+                        acc += f"{"" if is_block or is_file else sub_sep}\n{subindent}{convert_to_single_line(list_child)}"
             acc += "" if is_block else f"\n{indent2}]"
         case str() | int():
             acc += f"{sep}'{arg}'"

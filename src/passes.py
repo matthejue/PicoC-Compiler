@@ -178,7 +178,7 @@ class Passes:
     # -  If(exp, stmts), IfElse(exp, stmts1, stmts2), While(exp, stmts) und
     # DoWhile(exp, stmts) durch Block(name, stmts instrs-, GoTo(lable)- und
     # IfElse(exp, stmts1, stmts2) ersetzt.
-    
+
     IMPORTANT_STMTS_INSTRS = [
         pn.Ref,
         #  pn.Assign,
@@ -213,7 +213,7 @@ class Passes:
         pn.While,
         pn.DoWhile,
         pn.StackMalloc,
-]
+    ]
 
     def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
@@ -233,16 +233,9 @@ class Passes:
             else:
                 return []
         if hasattr(node, "visible"):
-            visible_emptied_lists = list(
-                map(
-                    lambda node, i: (
-                        [] if isinstance(node, list) and i in filtr else node
-                    ),
-                    node.visible,
-                    range(0, len(node.visible)),
-                )
-            )
-            node.visible = visible_emptied_lists
+            for i, visible_list_item in enumerate(node.visible):
+                if isinstance(visible_list_item, list) and i in filtr:
+                    node.visible[i] = []
         return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
     def _create_block(self, labelbase, stmts, blocks):
@@ -444,7 +437,6 @@ class Passes:
 
     def _add_datatype(self, ref, datatype):
         ref.datatype = datatype
-        ref.visible += [ref.datatype] if global_vars.args.double_verbose else []
 
     def _picoc_anf_ref(self, ref, prev_stmts):
         match ref:
@@ -452,7 +444,9 @@ class Passes:
             case pn.Name(val) as name:
                 var_name = val
                 # TODO: undefinied identifier error
-                symbol, _ = self.symbol_table.resolve(var_name, scope=self.current_scope)
+                symbol, _ = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
                 match symbol:
                     case {
                         "type_qual": _,
@@ -515,7 +509,9 @@ class Passes:
                         case _:
                             throw_type_error(current_datatype)
 
-                symbol, choosen_scope = self.symbol_table.resolve(var_name, scope=self.current_scope)
+                symbol, choosen_scope = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
                 match symbol:
                     case {
                         "type_qual": _,
@@ -557,7 +553,9 @@ class Passes:
         match exp:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val):
-                symbol, choosen_scope = self.symbol_table.resolve(val, scope=self.current_scope)
+                symbol, choosen_scope = self.symbol_table.resolve(
+                    val, scope=self.current_scope
+                )
                 match symbol:
                     case {
                         "type_qual": pn.Writeable(),
@@ -609,7 +607,7 @@ class Passes:
                     }:
                         return [pn.Exp(num)]
                     case _:
-                        __import__('pudb').set_trace()
+                        __import__("pudb").set_trace()
                         throw_type_error(symbol)
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
@@ -643,7 +641,6 @@ class Passes:
                     case pn.Num(val):
                         if val == "2147483648":
                             return [pn.Exp(pn.Num("-2147483648"))]
-                        exp.is_negative = pn.Name("negative")
                 return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
@@ -731,7 +728,9 @@ class Passes:
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(pn.Name(val)):
                 identifier_name = val
-                symbol, choosen_scope = self.symbol_table.resolve(identifier_name, scope=self.current_scope)
+                symbol, choosen_scope = self.symbol_table.resolve(
+                    identifier_name, scope=self.current_scope
+                )
                 match symbol:
                     case {
                         "type_qual": pn.Writeable(),
@@ -828,7 +827,9 @@ class Passes:
             case pn.Assign(pn.Name(val), exp):
                 var_name = val
                 exps_anf = self._picoc_anf_exp(exp)
-                symbol, choosen_scope = self.symbol_table.resolve(var_name, scope=self.current_scope)
+                symbol, choosen_scope = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
                 match symbol:
                     case {
                         "type_qual": pn.Writeable(),
@@ -1767,9 +1768,7 @@ class Passes:
                     return [instr]
                 goto_block_name = val
                 goto_block = self.all_blocks[goto_block_name]
-                goto_block_idx = int(
-                    goto_block.name[goto_block.name.rindex(".") + 1 :]
-                )
+                goto_block_idx = int(goto_block.name[goto_block.name.rindex(".") + 1 :])
                 if current_block_idx - 1 == goto_block_idx:
                     return self._single_line_comment(instr, "# // not included")
                 else:
@@ -1849,11 +1848,6 @@ class Passes:
                 block.instrs_before = pn.Num(str(self.instrs_cnt))
                 num_instrs = self.count_instrs(block.stmts_instrs)
                 block.num_instrs = pn.Num(str(num_instrs))
-                block.visible += (
-                    [block.instrs_before, block.num_instrs]
-                    if global_vars.args.double_verbose
-                    else []
-                )
                 self.instrs_cnt += num_instrs
 
     def reti_patch(self, file: pn.File):
@@ -1874,10 +1868,20 @@ class Passes:
     # =========================================================================
     # - keine Blöcke mehr, Knoten genauso zusammengefügt, wie sie in entfernten Blöcken angeordnet waren
     # - GoTo(Name(str)) werden duch einen Immediate mit passender Distanz / Adresse oder einen Sprungbefehl mit passender Distanz Jump(Always(), Im(str(distance))) ersetzt.
+
+    # NEG_RELS = {
+    #     "": rn.Always(),
+    #     "==": rn.Eq(),
+    #     "!=": rn.NEq(),
+    #     "<": rn.GtE(),
+    #     "<=": rn.Gt(),
+    #     ">": rn.LtE(),
+    #     ">=": rn.Lt(),
+    # }
     NEG_RELS = {
         "": rn.Always(),
-        "==": rn.Eq(),
-        "!=": rn.NEq(),
+        "==": rn.NEq(),
+        "!=": rn.Eq(),
         "<": rn.GtE(),
         "<=": rn.Gt(),
         ">": rn.LtE(),
