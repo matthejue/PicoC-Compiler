@@ -41,21 +41,7 @@ class Jump(ASTNode):
         super().__init__(visible=[self.rel, self.im_goto])
 
     def __repr__(self, depth=0):
-        match self.im_goto:
-            case Im():
-                # acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto};"
-                acc = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
-                return acc
-            case pn.GoTo():
-                return (
-                    f"\n{' ' * depth}JUMP{self.rel} "
-                    + f""
-                    # + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))};".lstrip()
-                    + f"{self.im_goto.__repr__(depth + 4 + 1 + len(str(self.rel)))}".lstrip()
-                    + f""
-                )
-            case _:
-                throw_type_error(self.im_goto)
+        return f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
 
     __match_args__ = ("rel", "im_goto")
 
@@ -132,6 +118,35 @@ class Reg(ASTNode):
             return f"\n{' ' * depth}{self.reg}"
 
     __match_args__ = ("reg",)
+
+
+class Name(ASTNode):
+    # shorter then 'Identifier'
+    def __init__(self, val):
+        self.val = val
+
+    def __repr__(self):
+        return self.val
+
+    __match_args__ = ("val",)
+
+
+class BinOp(ASTNode):
+    def __init__(self, left_exp, bin_op, right_exp):
+        self.left_exp = left_exp
+        self.bin_op = bin_op
+        self.right_exp = right_exp
+
+    def __repr__(self, depth=0):
+        instr_str = f"{' ' * depth}{self.left_exp}"
+        match self.bin_op:
+            case Add():
+                instr_str += " + "
+            case Sub():
+                instr_str += " - "
+        return instr_str + str(self.right_exp)
+
+    __match_args__ = ("left_exp", "bin_op", "right_exp")
 
 
 # ----------------------- Compute Memory / Register -----------------------

@@ -4,7 +4,11 @@
   - ( ) schauen, ob thread pool das ganze überhaupt schneller macht
   - ( ) NEG_RELS genauer betrachten
   - ( ) das placeholder Problem lösen
+  - ( ) _create_block einfach nur string return lassen und diesen dann in Exp(GoTo) hüllen
+  - ( ) Problem lösen, dass bei mehr als 2^10 Instructions das ganze nicht mehr funktioniert bei LOADI ACC rn.NAME(_next_instruction)
 
-  - ( ) funktionsaufruf prozedere schöner machen
+  - ( ) _single_line_comment das \[\] nach außen
+
+  - ( ) funktionsaufruf prozedere schöner machen wie scholl wollte
   - ( ) überall zuerst lesen und dann stackpointer ändern
   - ( ) Token() das Token wegmachen

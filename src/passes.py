@@ -335,14 +335,7 @@ class Passes:
                         stmt, processed_stmts, blocks
                     )
 
-                # check for redefinition
-                if not self.fun_name_to_block_name.get(fun_name):
-                    self.fun_name_to_block_name[fun_name] = (
-                        f"{fun_name}.{self.block_id}"
-                    )
-                else:
-                    if fun_name not in self.marked_funs_for_error:
-                        self.marked_funs_for_error += [fun_name]
+                self.fun_name_to_block_name[fun_name] = f"{fun_name}.{self.block_id}"
                 self._create_block(fun_name, processed_stmts, blocks)
                 self.all_blocks |= blocks
                 return [
@@ -370,11 +363,11 @@ class Passes:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
                 decls_defs_blocks = []
-                for decl_def in reversed(decls_defs):
+                for decl_def in decls_defs:
                     decls_defs_blocks += self._picoc_blocks_def(decl_def)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_blocks"),
-                    list(reversed(decls_defs_blocks)),
+                    decls_defs_blocks,
                 )
             case _:
                 throw_type_error(file)
@@ -443,7 +436,6 @@ class Passes:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val) as name:
                 var_name = val
-                # TODO: undefinied identifier error
                 symbol, _ = self.symbol_table.resolve(
                     var_name, scope=self.current_scope
                 )
@@ -522,9 +514,9 @@ class Passes:
                     }:
                         match choosen_scope:
                             case "global":
-                                return [pn.Ref(pn.Global(pn.Num(str(addr))))]
+                                return [pn.Ref(pn.Global(pn.Name(var_name)))]
                             case _:
-                                return [pn.Ref(pn.Stackframe(pn.Num(str(addr))))]
+                                return [pn.Ref(pn.Stackframe(pn.Num(addr)))]
                     case _:
                         throw_type_error(symbol)
             # ------------------------ L_Pntr + L_Array -----------------------
@@ -553,8 +545,9 @@ class Passes:
         match exp:
             # ---------------------------- L_Arith ----------------------------
             case pn.Name(val):
+                var_name = val
                 symbol, choosen_scope = self.symbol_table.resolve(
-                    val, scope=self.current_scope
+                    var_name, scope=self.current_scope
                 )
                 match symbol:
                     case {
@@ -564,23 +557,24 @@ class Passes:
                         "addr": addr,
                         "size": _,
                     }:
+                        name = pn.Name(var_name)
                         num = pn.Num(addr)
                         match choosen_scope, datatype:
                             case ("global", pn.ArrayDecl()):
                                 # TODO: struct st1 st = {.ar_var=ar]
-                                return [pn.Ref(pn.Global(num))]
+                                return [pn.Ref(pn.Global(name))]
                             case ("global", pn.StructSpec()):
                                 if self.argmode_on:
                                     size = self._datatype_size(datatype)
                                     return [
                                         pn.Assign(
                                             pn.Stack(pn.Num(str(size))),
-                                            pn.Global(num),
+                                            pn.Global(name),
                                         )
                                     ]
                                 else:
                                     # TODO: struct st2 st = {.st_var=st1]
-                                    return [pn.Exp(pn.Global(num))]
+                                    return [pn.Exp(pn.Global(name))]
                             case (_, pn.ArrayDecl()):
                                 return [pn.Ref(pn.Stackframe(num))]
                             case (_, pn.StructSpec()):
@@ -595,7 +589,7 @@ class Passes:
                                 else:
                                     return [pn.Exp(pn.Stackframe(num))]
                             case ("global", _):
-                                return [pn.Exp(pn.Global(num))]
+                                return [pn.Exp(pn.Global(name))]
                             case (_, _):
                                 return [pn.Exp(pn.Stackframe(num))]
                     case {
@@ -607,7 +601,6 @@ class Passes:
                     }:
                         return [pn.Exp(num)]
                     case _:
-                        __import__("pudb").set_trace()
                         throw_type_error(symbol)
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
@@ -664,7 +657,6 @@ class Passes:
                 return exps_anf + [pn.Exp(pn.ToBool(pn.Stack(pn.Num("1"))))]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
-                # __import__('pudb').set_trace()
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
                 match self.current_scope:
@@ -726,28 +718,18 @@ class Passes:
                 refs_anf = self._picoc_anf_ref(exp, [final_exp])
                 return refs_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Ref(pn.Name(val)):
-                identifier_name = val
-                symbol, choosen_scope = self.symbol_table.resolve(
-                    identifier_name, scope=self.current_scope
-                )
-                match symbol:
-                    case {
-                        "type_qual": pn.Writeable(),
-                        "datatype": _,
-                        "name": _,
-                        "addr": addr,
-                        "size": _,
-                    }:
-                        num = pn.Num(addr)
-                        match choosen_scope:
-                            case "global":
-                                return [pn.Ref(pn.Global(num))]
-                            case _:
-                                return [pn.Ref(pn.Stackframe(num))]
-                    case _:
-                        throw_type_error(symbol)
-            case pn.Ref((pn.Subscr() | pn.Attr()) as ref):
+            # case pn.Ref(pn.Name(val)):
+            #     var_name = val
+            #     _, choosen_scope = self.symbol_table.resolve(
+            #         var_name, scope=self.current_scope
+            #     )
+            #     name = pn.Name(var_name)
+            #     match choosen_scope:
+            #         case "global":
+            #             return [pn.Ref(pn.Global(name))]
+            #         case _:
+            #             return [pn.Ref(pn.Stackframe(name))]
+            case pn.Ref((pn.Subscr() | pn.Attr() | pn.Name()) as ref):
                 return self._picoc_anf_ref(ref, [])
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps):
@@ -788,9 +770,7 @@ class Passes:
                     + [pn.StackMalloc(pn.Num("2"))]
                     + exps_anf
                     + [
-                        pn.NewStackframe(
-                            block_name, pn.GoTo(pn.Name("addr@next_instr"))
-                        ),
+                        pn.NewStackframe(block_name),
                         pn.Exp(pn.GoTo(block_name)),
                         pn.RemoveStackframe(),
                     ]
@@ -835,24 +815,25 @@ class Passes:
                         "type_qual": pn.Writeable(),
                         "datatype": _,
                         "name": _,
-                        "addr": num,
+                        "addr": addr,
                         "size": size,
                     }:
-                        num = pn.Num(num)
                         num_size = pn.Num(size)
                         match choosen_scope:
                             case "global":
+                                name = pn.Name(var_name)
                                 return (
                                     self._single_line_comment(stmt, "//")
                                     + exps_anf
                                     + [
                                         pn.Assign(
-                                            pn.Global(num),
+                                            pn.Global(name),
                                             pn.Stack(num_size),
                                         )
                                     ]
                                 )
                             case _:
+                                num = pn.Num(addr)
                                 return (
                                     self._single_line_comment(stmt, "//")
                                     + exps_anf
@@ -923,12 +904,6 @@ class Passes:
                     + exps_anf
                     + [pn.Return(pn.Stack(pn.Num("1")))]
                 )
-            case pn.StackMalloc():
-                return [stmt]
-            case pn.NewStackframe():
-                return [stmt]
-            case pn.RemoveStackframe():
-                return [stmt]
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
                 return [pn.Exp(stmt)]
@@ -1187,11 +1162,12 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
-                    case pn.Global(pn.Num(val2)):
+                    case pn.Global(pn.Name(val2)):
+                        name = rn.Name(val2)
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
-                                [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), rn.Im(val2)],
+                                [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), name],
                             ),
                             rn.Instr(
                                 rn.Storein(),
@@ -1345,7 +1321,7 @@ class Passes:
                 (pn.Global() | pn.Stackframe()) as exp,
             ):
                 tmp_max = lhs.num.val
-                tmp = pn.Stack(pn.Num("0"))
+                tmp = pn.Stack(pn.Num(0))
                 mem = copy.deepcopy(exp)
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val1)])
@@ -1354,14 +1330,21 @@ class Passes:
                     match (tmp, mem):
                         case (pn.Stack(pn.Num(val)), _) if val == tmp_max:
                             break
-                        case (pn.Stack(pn.Num(val1)), pn.Global(pn.Num(val2))):
+                        case (pn.Stack(pn.Num(val1)), pn.Global(pn.Name(val2))):
+                            name = rn.Name(val2)
+                            constant = int(val1)  # TODO: Int not needed?
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
                                     [
                                         rn.Reg(rn.Ds()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(int(val2) + int(val1))),
+                                        # rn.Im(str(int(val2) + int(val1))),
+                                        (
+                                            name
+                                            if constant == 0
+                                            else rn.BinOp(name, rn.Add(), constant)
+                                        ),
                                     ],
                                 ),
                                 rn.Instr(
@@ -1400,7 +1383,7 @@ class Passes:
             ):
                 tmp_max = tmp.num.val
                 mem = copy.deepcopy(lhs)
-                tmp = pn.Stack(pn.Num("0"))
+                tmp = pn.Stack(pn.Num(0))
                 reti_instrs = []
                 stack_offset = val2
                 reti_instrs = self._single_line_comment(stmt, "#")
@@ -1408,7 +1391,9 @@ class Passes:
                     match (mem, tmp):
                         case (_, pn.Stack(pn.Num(val))) if val == tmp_max:
                             break
-                        case (pn.Global(pn.Num(val1)), pn.Stack(pn.Num(val2))):
+                        case (pn.Global(pn.Name(val1)), pn.Stack(pn.Num(val2))):
+                            name = rn.Name(val1)
+                            constant = int(tmp_max) - 1 - int(val2)
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -1423,10 +1408,14 @@ class Passes:
                                     [
                                         rn.Reg(rn.Ds()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(
-                                            str(
-                                                int(val1) + int(tmp_max) - 1 - int(val2)
-                                            )
+                                        # rn.Im(
+                                        #     str(
+                                        #         int(val1) + int(tmp_max) - 1 - int(val2)
+                                        #     )
+                                        (
+                                            name
+                                            if constant == 0
+                                            else rn.BinOp(name, rn.Add(), constant)
                                         ),
                                     ],
                                 ),
@@ -1472,9 +1461,10 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
                 ]
                 match exp:
-                    case pn.Global(pn.Num(val)):
+                    case pn.Global(pn.Name(val)):
+                        name = rn.Name(val)
                         reti_instrs += [
-                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In1()), rn.Im(val)]),
+                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In1()), name]),
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
                         ]
                     case pn.Stackframe(pn.Num(val)):
@@ -1630,16 +1620,19 @@ class Passes:
                         rn.Jump(rn.Eq(), goto2),
                     ]
                     + self._single_line_comment(goto1, "#")
-                    + [pn.Exp(goto1)]
+                    + self._reti_blocks_stmt(pn.Exp(goto1))
                 )
             case pn.Exp(pn.GoTo(pn.Name(val))):
-                return [stmt]
+                block_name = val
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Jump(rn.Always(), rn.Name(block_name))
+                ]
             # ----------------------------- L_Fun -----------------------------
             case pn.StackMalloc(pn.Num(val)):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
                 ]
-            case pn.NewStackframe(pn.Name(val), pn.GoTo() as goto):
+            case pn.NewStackframe(pn.Name(val)):
                 fun_block_name = val
                 fun_block = self.all_blocks[fun_block_name]
                 num1 = fun_block.param_size
@@ -1668,7 +1661,10 @@ class Passes:
                                 rn.Storein(),
                                 [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
                             ),
-                            rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), goto]),
+                            rn.Instr(
+                                rn.Loadi(),
+                                [rn.Reg(rn.Acc()), rn.Name("_next_instruction")],
+                            ),
                             rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                             rn.Instr(
                                 rn.Storein(),
@@ -1677,6 +1673,7 @@ class Passes:
                         ]
                     case _:
                         throw_type_error(num1, num2)
+
             case pn.RemoveStackframe():
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
@@ -1707,7 +1704,7 @@ class Passes:
     def reti_blocks(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
-            case pn.File(pn.Name(val), blocks):
+            case pn.File(_, blocks):
                 reti_blocks = []
                 for block in blocks:
                     match block:
@@ -1743,7 +1740,7 @@ class Passes:
                     pass
                 case rn.Jump(rn.Eq(), pn.GoTo()) if global_vars.args.no_long_jumps:
                     cnt += 5
-                case pn.Exp(pn.GoTo()) if global_vars.args.no_long_jumps:
+                case rn.Jump(rn.Always(), rn.Name()) if global_vars.args.no_long_jumps:
                     cnt += 4
                 case _:
                     cnt += 1
@@ -1763,7 +1760,8 @@ class Passes:
 
     def _reti_patch_instr(self, instr, current_block_idx, is_last_instr):
         match instr:
-            case pn.Exp(pn.GoTo(pn.Name(val))):
+            # case pn.Exp(pn.GoTo(pn.Name(val))):
+            case rn.Jump(rn.Always(), rn.Name(val)):
                 if not is_last_instr:
                     return [instr]
                 goto_block_name = val
@@ -1919,7 +1917,7 @@ class Passes:
 
     def _reti_instr(self, instr, idx, current_block):
         match instr:
-            case pn.Exp(pn.GoTo(pn.Name(val))):
+            case rn.Jump(rn.Always(), rn.Name(val)):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
                 return self._patch_too_large_jumps(rn.Always(), distance, instr)
@@ -1927,7 +1925,45 @@ class Passes:
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
                 return self._patch_too_large_jumps(rel, distance, instr)
-            case rn.Instr(rn.Loadi(), [reg, pn.GoTo(_)]):
+            case rn.Instr((rn.Loadin() | rn.Storein()), [_, _, rn.Name(val)]):
+                var_name = val
+                symbol, _ = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
+                match symbol:
+                    case {
+                        "type_qual": _,
+                        "datatype": _,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
+                        instr.args[2] = rn.Im(addr)
+                        return [instr]
+            case rn.Instr(
+                (rn.Loadin() | rn.Storein()), [_, _, rn.BinOp(rn.Name(val), op, num)]
+            ):
+                var_name = val
+                symbol, _ = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
+                match symbol:
+                    case {
+                        "type_qual": _,
+                        "datatype": _,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
+                        match op:
+                            case rn.Add():
+                                instr.args[2] = rn.Im(addr + num)
+                            case rn.Sub():
+                                instr.args[2] = rn.Im(addr - num)
+                        return [instr]
+            case rn.Instr(
+                rn.Loadi(), [rn.Reg(rn.Acc()) as reg, rn.Name("_next_instruction")]
+            ):
                 rel_addr = str(
                     int(current_block.instrs_before.val)
                     + idx
@@ -1937,6 +1973,21 @@ class Passes:
                 return self._single_line_comment(instr, "#") + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
+            case rn.Instr(rn.Loadi(), [_, rn.Name(val)]):
+                var_name = val
+                symbol, _ = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
+                match symbol:
+                    case {
+                        "type_qual": _,
+                        "datatype": _,
+                        "name": _,
+                        "addr": addr,
+                        "size": _,
+                    }:
+                        instr.args[1] = rn.Im(addr)
+                        return [instr]
             case _:
                 return [instr]
 
@@ -1954,8 +2005,8 @@ class Passes:
                             )
                             for instr in instrs:
                                 match instr:
-                                    case pn.Exp(
-                                        pn.GoTo()
+                                    case rn.Jump(
+                                        rn.Always(), rn.Name()
                                     ) if global_vars.args.no_long_jumps:
                                         idx += 3
                                     case rn.Jump(

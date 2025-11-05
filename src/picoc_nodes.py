@@ -543,15 +543,14 @@ class FunDef(ASTNode):
 
 
 class NewStackframe(ASTNode):
-    def __init__(self, fun_name, goto_after_call):
+    def __init__(self, fun_name):
         self.fun_name = fun_name
-        self.goto_after_call = goto_after_call
 
     @property
     def visible(self):
-        return [self.fun_name, self.goto_after_call]
+        return [self.fun_name]
 
-    __match_args__ = ("fun_name", "goto_after_call")
+    __match_args__ = ("fun_name",)
 
 
 class RemoveStackframe(ASTNode):
