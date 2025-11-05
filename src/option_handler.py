@@ -13,7 +13,12 @@ from src.dt_visitors import (
 )
 from src.ast_transformers import TransformerPicoC, ASTTransformerRETI
 from src.passes import Passes
-from src.utils.util_funs_dependent import remove_ext, throw_type_error, subheading, get_ext
+from src.utils.util_funs_dependent import (
+    remove_ext,
+    throw_type_error,
+    subheading,
+    get_ext,
+)
 import subprocess, os, platform
 from pygments.lexers.c_cpp import CLexer
 import re
@@ -39,18 +44,36 @@ class OptionHandler:
         if not files:
             return
 
-        with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="builder") as ex:
-            fut_for = {ex.submit(self.build_file, f): f for f in files}
-            for fut in as_completed(fut_for):
-                f = fut_for[fut]
+        results = []
+
+        if global_vars.args.intermediate_stages:
+            for f in files:
                 try:
-                    fut.result()
+                    result = self.build_file(f)
+                    results.append(result)  # store filename + return value
                 except Exception as e:
                     print(f"[ERROR] {f}: {e}")
                     if global_vars.args.traceback:
                         traceback.print_exc()
                     exit(FAILURE)
+        else:
+            with ThreadPoolExecutor(
+                max_workers=max_workers, thread_name_prefix="builder"
+            ) as ex:
+                fut_for = {ex.submit(self.build_file, f): f for f in files}
+                for fut in as_completed(fut_for):
+                    f = fut_for[fut]
+                    try:
+                        result = fut.result()
+                        results.append(result)
+                    except Exception as e:
+                        print(f"[ERROR] {f}: {e}")
+                        if global_vars.args.traceback:
+                            traceback.print_exc()
+                        exit(FAILURE)
 
+        asts, symbol_tables, all_file_blocks = zip(*results) if results else ([], [])
+        self._link(asts, symbol_tables, all_file_blocks)
 
     def build_file(self, path: str):
         global_vars.tstate.path_without_ext = remove_ext(path)
@@ -58,19 +81,18 @@ class OptionHandler:
         extension = get_ext(path)  # still a string
         match extension:
             case "picoc":
-                _syntax_check([path])                 # use the actual file string
+                _syntax_check([path])  # use the actual file string
                 preprocessed_code = self._preprocess(path)
                 preprocessed_code_with_filename = (
                     (
                         "./"
-                        if not path.startswith("./")
-                        and not path.startswith("/")
+                        if not path.startswith("./") and not path.startswith("/")
                         else ""
                     )
                     + f"{path}\n"
                     + preprocessed_code
                 )
-                self._compl(preprocessed_code_with_filename)
+                return self._compl(preprocessed_code_with_filename)
             case "reti_blocks":
                 # convert reti_blocks to ast
                 # lock for .json_file
@@ -79,6 +101,7 @@ class OptionHandler:
             case _:
                 print(f"filename: {path}")
                 print(f"File with extension '.{extension}' is not supported")
+                exit(FAILURE)
 
     def _preprocess(self, path):
         with open(path, encoding="utf-8") as fin:
@@ -130,8 +153,8 @@ class OptionHandler:
         ast = ast_transformer_picoc.transform(dt)
 
         self._output_pass(ast, "Abstract Syntax Tree")
-        passes = Passes()
 
+        passes = Passes()
         picoc_shrink = passes.picoc_shrink(ast)
         self._output_pass(picoc_shrink, "PicoC Shrink")
 
@@ -147,10 +170,69 @@ class OptionHandler:
 
         reti_patch = passes.reti_patch(reti_blocks)
         self._output_pass(reti_patch, "RETI Patch")
+        return reti_patch, passes.symbol_table, passes.all_blocks
 
-        reti = passes.reti(reti_patch)
+    def _link(self, asts, symbol_tables, all_file_blocks):
+        merged_ast = self._merge_asts(asts)
+        passes = Passes()
+        passes.all_blocks = {k: v for d in all_file_blocks for k, v in d.items()}
+        passes.symbol_table = self._merge_symbol_tables(symbol_tables)
 
+        reti = passes.reti(merged_ast)
         self._reti_with_metadata(reti, "RETI")
+
+    def _merge_asts(self, asts):
+        # determine output name
+        output_name = getattr(global_vars.args, "output_name", "")
+        if not output_name:
+            output_name = "a.reti"
+
+        if not asts:
+            return pn.File(pn.Name(output_name), [])
+
+        # collect all decls_defs_blocks_instrs into one list
+        merged_decls_defs_blocks_instrs = []
+        for ast in asts:
+            merged_decls_defs_blocks_instrs.extend(ast.decls_defs_blocks_instrs)
+
+        # return a new merged File node
+        return pn.File(pn.Name(output_name), merged_decls_defs_blocks_instrs)
+
+    def _merge_symbol_tables(self, symbol_tables):
+        if not symbol_tables:
+            symbol_table = st.SymbolTable()
+            return symbol_table
+
+        merged_table = {}
+        merged_parents = {}
+
+        # Merge all symbol tables
+        for symbol_table in symbol_tables:
+            for scope, symbols in symbol_table.items():
+                if scope == "__parents__":
+                    for k, v in symbols.items():
+                        merged_parents[k] = v
+                else:
+                    merged_table.setdefault(scope, {})
+                    merged_table[scope].update(symbols)
+
+        # Ensure global scope exists
+        merged_table.setdefault("global", {})
+        merged_parents.setdefault("global", None)
+
+        # Assign distinct addresses only for globals that have BOTH 'addr' and 'size'
+        current_addr = 0
+        for sym_name, sym in merged_table["global"].items():
+            if "addr" in sym and "size" in sym:
+                sym["addr"] = current_addr
+                current_addr += sym["size"]
+
+        # Build final merged SymbolTable object
+        merged_st = st.SymbolTable()
+        merged_st._table = merged_table
+        merged_st._parents = merged_parents
+        return merged_st 
+
 
     def _tokens_option(self, code_with_file, heading):
         parser = Lark.open(
@@ -170,8 +252,7 @@ class OptionHandler:
 
         if global_vars.args.write_files:
             with open(
-                global_vars.tstate.path_without_ext
-                + ".tokens",
+                global_vars.tstate.path_without_ext + ".tokens",
                 "w",
                 encoding="utf-8",
             ) as fout:
@@ -200,8 +281,15 @@ class OptionHandler:
                     throw_type_error(pass_ast)
 
     def _reti_with_metadata(self, pass_ast: pn.File, heading):
-        pass_ast.decls_defs_blocks_instrs[:0] = [pn.SingleLineComment("#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"), pn.SingleLineComment("#", f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}")]
-
+        pass_ast.decls_defs_blocks_instrs[:0] = [
+            pn.SingleLineComment(
+                "#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"
+            ),
+            pn.SingleLineComment(
+                "#",
+                f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}",
+            ),
+        ]
 
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
@@ -238,6 +326,7 @@ class OptionHandler:
                 encoding="utf-8",
             ) as fout:
                 fout.write(str(json_symbol_table))
+
 
 def _parse_cli_args():
     parser = argparse.ArgumentParser(
@@ -302,9 +391,26 @@ def _parse_cli_args():
     )
     # ------------------------------- Preprocessor ----------------------------
     parser.add_argument(
-        "-I", dest="I", action="append", default=[], help="include path (repeatable)"
+        "-I",
+        "--include",
+        dest="I",
+        action="append",
+        default=[],
+        help="Add an include path (can be used multiple times)",
     )
-    parser.add_argument("--max-depth", type=int, default=200, help="max include depth")
+    parser.add_argument(
+        "-M",
+        "--max-depth",
+        type=int,
+        default=200,
+        help="Maximum include depth",
+    )
+    # ---------------------------------- Linker -------------------------------
+    parser.add_argument(
+        "-o",
+        "--output_name",
+        help="Name of the output binary (default: a.reti)",
+    )
 
     global_vars.args = parser.parse_args()
 

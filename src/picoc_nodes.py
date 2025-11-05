@@ -590,6 +590,7 @@ class Block(ASTNode):
         self.num_instrs: Num = Num(-1)
         self.param_size: Num
         self.local_vars_size: Num
+        self.block_idx: int
 
     @property
     def visible(self):

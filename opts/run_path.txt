@@ -1,1 +1,1 @@
-./sys_tests/basic_else_if.picoc
+./sys_tests/basic_while.picoc

@@ -17,9 +17,8 @@ from inspect import isclass
 class Passes:
     def __init__(self):
         # PicoC_Blocks
-        self.block_id = 0
+        self.block_idx = 0
         self.all_blocks = dict()
-        self.fun_name_to_block_name = dict()
         # PicoC_ANF
         self.argmode_on = False
         self.symbol_table = SymbolTable()
@@ -238,14 +237,15 @@ class Passes:
                     node.visible[i] = []
         return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
-    def _create_block(self, labelbase, stmts, blocks):
-        label = f"{labelbase}.{self.block_id}"
+    def _create_block(self, labelbase, stmts, blocks, *, add_id=True):
+        label = labelbase + (f".{self.block_idx}" if add_id else "")
         new_block = pn.Block(
             label,
             stmts,
         )
+        new_block.block_idx = self.block_idx
         blocks[label] = new_block
-        self.block_id += 1
+        self.block_idx += 1
         return pn.GoTo(pn.Name(label))
 
     def _picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
@@ -335,8 +335,7 @@ class Passes:
                         stmt, processed_stmts, blocks
                     )
 
-                self.fun_name_to_block_name[fun_name] = f"{fun_name}.{self.block_id}"
-                self._create_block(fun_name, processed_stmts, blocks)
+                self._create_block(fun_name, processed_stmts, blocks, add_id=False)
                 self.all_blocks |= blocks
                 return [
                     pn.FunDef(
@@ -346,9 +345,7 @@ class Passes:
                         list(
                             sorted(
                                 blocks.values(),
-                                key=lambda block: -int(
-                                    block.name[block.name.rfind(".") + 1 :]
-                                ),
+                                key=lambda block: -int(block.block_idx),
                             )
                         ),
                     )
@@ -764,7 +761,7 @@ class Passes:
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
-                block_name = pn.Name(self.fun_name_to_block_name[fun_name])
+                block_name = pn.Name(fun_name)
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(pn.Num("2"))]
@@ -940,11 +937,8 @@ class Passes:
                             self.symbol_table.declare(
                                 fun_name,
                                 {
-                                    "type_qual": pn.Empty(),
                                     "datatype": pn.FunDecl(datatype, name, allocs),
                                     "name": fun_name,
-                                    "addr": pn.Empty(),
-                                    "size": pn.Empty(),
                                 },
                                 scope="global",
                             )
@@ -994,11 +988,8 @@ class Passes:
                 self.symbol_table.declare(
                     fun_name,
                     {
-                        "type_qual": pn.Empty(),
                         "datatype": decl_def,
                         "name": fun_name,
-                        "addr": pn.Empty(),
-                        "size": pn.Empty(),
                     },
                     scope="global",
                 )
@@ -1057,12 +1048,11 @@ class Passes:
                 for decl_def in decls_defs:
                     blocks_anf += self._picoc_anf_def(decl_def)
                 # check if there even exists a main function
-                main_with_id = self.fun_name_to_block_name["main"]
                 var = pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
                     [
                         pn.Block(
-                            f"_start.{self.block_id}",
+                            f"_start",
                             self.global_stmts_instrs
                             + self._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
                             + self._picoc_anf_stmt(pn.Exp(pn.Exit(pn.Num("0")))),
@@ -1663,7 +1653,15 @@ class Passes:
                             ),
                             rn.Instr(
                                 rn.Loadi(),
-                                [rn.Reg(rn.Acc()), rn.Name("_next_instruction")],
+                                [
+                                    rn.Reg(rn.Acc()),
+                                    rn.BinOp(
+                                        rn.Name("_this_instruction"),
+                                        rn.Add(),
+                                        4
+                                        + (3 if global_vars.args.no_long_jumps else 0),
+                                    ),
+                                ],
                             ),
                             rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                             rn.Instr(
@@ -1758,15 +1756,15 @@ class Passes:
             rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
         ]
 
-    def _reti_patch_instr(self, instr, current_block_idx, is_last_instr):
+    def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
             # case pn.Exp(pn.GoTo(pn.Name(val))):
             case rn.Jump(rn.Always(), rn.Name(val)):
                 if not is_last_instr:
                     return [instr]
                 goto_block_name = val
-                goto_block = self.all_blocks[goto_block_name]
-                goto_block_idx = int(goto_block.name[goto_block.name.rindex(".") + 1 :])
+                goto_block_idx = self.all_blocks[goto_block_name].block_idx
+                current_block_idx = self.all_blocks[current_block_name].block_idx
                 if current_block_idx - 1 == goto_block_idx:
                     return self._single_line_comment(instr, "# // not included")
                 else:
@@ -1834,7 +1832,7 @@ class Passes:
                 for instr in instrs:
                     patched_instrs += self._reti_patch_instr(
                         instr,
-                        int(current_block_name[current_block_name.rindex(".") + 1 :]),
+                        current_block_name,
                         instr == instrs[-1],
                     )
                 block.stmts_instrs[:] = patched_instrs
@@ -1962,14 +1960,13 @@ class Passes:
                                 instr.args[2] = rn.Im(addr - num)
                         return [instr]
             case rn.Instr(
-                rn.Loadi(), [rn.Reg(rn.Acc()) as reg, rn.Name("_next_instruction")]
+                rn.Loadi(),
+                [
+                    rn.Reg(rn.Acc()) as reg,
+                    rn.BinOp(rn.Name("_this_instruction"), rn.Add(), constant),
+                ],
             ):
-                rel_addr = str(
-                    int(current_block.instrs_before.val)
-                    + idx
-                    + 4
-                    + (3 if global_vars.args.no_long_jumps else 0)
-                )
+                rel_addr = str(int(current_block.instrs_before.val) + idx + constant)
                 return self._single_line_comment(instr, "#") + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]

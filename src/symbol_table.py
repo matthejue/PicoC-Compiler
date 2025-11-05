@@ -13,6 +13,12 @@ class SymbolTable:
         self._table: Dict[str, Scope] = {"global": {}}
         self._parents: Dict[str, Optional[str]] = {"global": None}
 
+    def items(self):
+        """Iterate over (scope_name, symbols_dict) pairs, plus '__parents__'."""
+        for k, v in self._table.items():
+            yield k, v
+        yield "__parents__", self._parents
+
     # ----- core, minimal helpers -----
     def _ensure_scope(self, scope: str) -> None:
         self._table.setdefault(scope, {})
