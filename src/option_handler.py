@@ -41,6 +41,7 @@ class OptionHandler:
 
     def build_all(self, max_workers=None):
         files = list(global_vars.args.infiles)  # strings, as passed on CLI
+        _syntax_check(files)
         if not files:
             return
 
@@ -72,8 +73,15 @@ class OptionHandler:
                             traceback.print_exc()
                         exit(FAILURE)
 
-        asts, symbol_tables, all_file_blocks = zip(*results) if results else ([], [])
-        self._link(asts, symbol_tables, all_file_blocks)
+        asts, symbol_tables, all_file_blocks = (
+            map(list, zip(*results)) if results else ([], [], [])
+        )
+
+        _get_test_metadata()
+
+        if not global_vars.args.compile:
+            self._insert_start_fun(asts, symbol_tables, all_file_blocks)
+            self._link(asts, symbol_tables, all_file_blocks)
 
     def build_file(self, path: str):
         global_vars.tstate.path_without_ext = remove_ext(path)
@@ -81,7 +89,6 @@ class OptionHandler:
         extension = get_ext(path)  # still a string
         match extension:
             case "picoc":
-                _syntax_check([path])  # use the actual file string
                 preprocessed_code = self._preprocess(path)
                 preprocessed_code_with_filename = (
                     (
@@ -106,8 +113,6 @@ class OptionHandler:
     def _preprocess(self, path):
         with open(path, encoding="utf-8") as fin:
             code = fin.read()
-
-        _get_test_metadata(code)
 
         if global_vars.args.intermediate_stages:
             print(subheading("Raw Code", "-"))
@@ -163,14 +168,17 @@ class OptionHandler:
 
         picoc_anf = passes.picoc_anf(picoc_blocks)
         self._output_pass(picoc_anf, "PicoC ANF")
-        self._st_pass(passes.symbol_table, "Symbol Table")
+        self._st_pass(
+            passes.symbol_table,
+            "Symbol Table",
+            compl_opt_active=global_vars.args.compile,
+        )
 
         reti_blocks = passes.reti_blocks(picoc_anf)
-        self._output_pass(reti_blocks, "RETI Blocks")
-
-        reti_patch = passes.reti_patch(reti_blocks)
-        self._output_pass(reti_patch, "RETI Patch")
-        return reti_patch, passes.symbol_table, passes.all_blocks
+        self._output_pass(
+            reti_blocks, "RETI Blocks", compl_opt_active=global_vars.args.compile
+        )
+        return reti_blocks, passes.symbol_table, passes.all_blocks
 
     def _link(self, asts, symbol_tables, all_file_blocks):
         merged_ast = self._merge_asts(asts)
@@ -178,17 +186,84 @@ class OptionHandler:
         passes.all_blocks = {k: v for d in all_file_blocks for k, v in d.items()}
         passes.symbol_table = self._merge_symbol_tables(symbol_tables)
 
-        reti = passes.reti(merged_ast)
+        self._st_pass(passes.symbol_table, "Combined Symbol Table", is_global_st=True)
+
+        reti_patch = passes.reti_patch(merged_ast)
+        self._output_pass(
+            reti_patch,
+            "RETI Patch",
+        )
+        reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI")
 
+    def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
+        passes = Passes()
+        global_inits = []
+
+        for file_ast in asts:
+            match file_ast:
+                case pn.File(filename, blocks):
+                    # iterate safely (copy, since we remove in place)
+                    for block in blocks[:]:
+                        match block:
+                            case pn.Block("_global_inits", inits):
+                                global_inits.extend(inits)
+                                blocks.remove(block)
+                            case pn.Block(_, _):
+                                continue
+                            case _:
+                                print(
+                                    f"[error] Unexpected block type in file '{filename}': {type(block).__name__}",
+                                    file=sys.stderr,
+                                )
+                                sys.exit(FAILURE)
+
+                case _:
+                    print(
+                        f"[error] Unexpected AST node (expected File), got: {type(file_ast).__name__}",
+                        file=sys.stderr,
+                    )
+                    sys.exit(FAILURE)
+
+        main_func = None
+        for symbol_table in symbol_tables:
+            if symbol_table.contains("main", scope="global"):
+                main_func = symbol_table._table["global"]["main"]
+                break
+
+        if main_func is None:
+            print(
+                "[error] No 'main' function found in any symbol table.", file=sys.stderr
+            )
+            sys.exit(FAILURE)
+
+        passes.symbol_table.declare("main", main_func, scope="global")
+
+        start_ast = pn.File(
+            pn.Name("start"),
+            [
+                pn.Block(
+                    "_start",
+                    passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
+                    + [pn.Exit(pn.Num("0"))],
+                )
+            ],
+        )
+
+        reti_blocks: pn.File = passes.reti_blocks(start_ast)
+
+        reti_blocks.decls_defs_blocks_instrs[0].stmts_instrs[:0] = global_inits
+
+        # Insert at the beginning so _start comes first
+        asts.insert(0, reti_blocks)
+        symbol_tables.insert(0, passes.symbol_table)
+        all_file_blocks.insert(0, passes.all_blocks)
+
     def _merge_asts(self, asts):
-        # determine output name
-        output_name = getattr(global_vars.args, "output_name", "")
-        if not output_name:
-            output_name = "a.reti"
+        global_vars.tstate.path_without_ext = remove_ext(global_vars.args.output_name)
 
         if not asts:
-            return pn.File(pn.Name(output_name), [])
+            return pn.File(pn.Name(global_vars.args.output_name), [])
 
         # collect all decls_defs_blocks_instrs into one list
         merged_decls_defs_blocks_instrs = []
@@ -196,7 +271,7 @@ class OptionHandler:
             merged_decls_defs_blocks_instrs.extend(ast.decls_defs_blocks_instrs)
 
         # return a new merged File node
-        return pn.File(pn.Name(output_name), merged_decls_defs_blocks_instrs)
+        return pn.File(pn.Name(global_vars.args.output_name), merged_decls_defs_blocks_instrs)
 
     def _merge_symbol_tables(self, symbol_tables):
         if not symbol_tables:
@@ -231,8 +306,7 @@ class OptionHandler:
         merged_st = st.SymbolTable()
         merged_st._table = merged_table
         merged_st._parents = merged_parents
-        return merged_st 
-
+        return merged_st
 
     def _tokens_option(self, code_with_file, heading):
         parser = Lark.open(
@@ -267,18 +341,38 @@ class OptionHandler:
             with open(dt.children[0].value, "w", encoding="utf-8") as fout:
                 fout.write(dt.pretty())
 
-    def _output_pass(self, pass_ast: pn.File, heading):
+    def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
             print(pass_ast.__repr__(incl_filenode=True)[1:])
 
-        if global_vars.args.write_files:
+        if global_vars.args.write_files or compl_opt_active:
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(pass_ast)[1:])
                 case _:
                     throw_type_error(pass_ast)
+
+    def _st_pass(self, symbol_table: st.SymbolTable, heading, compl_opt_active=False, is_global_st=False):
+        if (
+            global_vars.args.intermediate_stages
+            or global_vars.args.write_files
+            or compl_opt_active
+        ):
+            json_symbol_table = symbol_table.to_json_str(pretty=True)
+
+        if global_vars.args.intermediate_stages:
+            print(subheading(heading, "-"))
+            print(json_symbol_table)
+
+        if global_vars.args.write_files or compl_opt_active:
+            with open(
+                global_vars.tstate.path_without_ext + ("_combined" if is_global_st else "") + ".json",
+                "w",
+                encoding="utf-8",
+            ) as fout:
+                fout.write(str(json_symbol_table))
 
     def _reti_with_metadata(self, pass_ast: pn.File, heading):
         pass_ast.decls_defs_blocks_instrs[:0] = [
@@ -309,23 +403,6 @@ class OptionHandler:
                     fout.write(str(pass_ast)[1:])
             case _:
                 throw_type_error(pass_ast)
-
-    def _st_pass(self, symbol_table: st.SymbolTable, heading):
-        at_least_one_file = len(global_vars.args.infiles) > 1
-        if global_vars.args.intermediate_stages or at_least_one_file:
-            json_symbol_table = symbol_table.to_json_str(pretty=True)
-
-        if global_vars.args.intermediate_stages:
-            print(subheading(heading, "-"))
-            print(json_symbol_table)
-
-        if at_least_one_file:
-            with open(
-                global_vars.tstate.path_without_ext + ".json",
-                "w",
-                encoding="utf-8",
-            ) as fout:
-                fout.write(str(json_symbol_table))
 
 
 def _parse_cli_args():
@@ -366,6 +443,12 @@ def _parse_cli_args():
     parser.add_argument("-e", "--example", action="store_true", help="Run example mode")
     parser.add_argument(
         "-t",
+        "--testmode",
+        action="store_true",
+        help="Read input and expected output from .input and .expected_output files",
+    )
+    parser.add_argument(
+        "-T",
         "--traceback",
         action="store_true",
         help="Show full tracebacks on errors",
@@ -387,7 +470,7 @@ def _parse_cli_args():
         "-m",
         "--metadata_comments",
         action="store_true",
-        help="Include metadata comments",
+        help="Include metadata comments from first specified .picoc file into final .reti file",
     )
     # ------------------------------- Preprocessor ----------------------------
     parser.add_argument(
@@ -409,7 +492,15 @@ def _parse_cli_args():
     parser.add_argument(
         "-o",
         "--output_name",
+        type=str,
+        default="a.reti",
         help="Name of the output binary (default: a.reti)",
+    )
+    parser.add_argument(
+        "-c",
+        "--compile",
+        action="store_true",
+        help="Compile source files without linking (like gcc -c)",
     )
 
     global_vars.args = parser.parse_args()
@@ -481,8 +572,12 @@ def open_documentation():
         print("OS not supported.")
 
 
-def _get_test_metadata(code):
+def _get_test_metadata():
     if global_vars.args.metadata_comments:
+        # the first specified .picoc file needs to inlcude the metadata comment
+        with open(global_vars.args.infiles[0], encoding="utf-8") as fin:
+            code = fin.read()
+
         regex = re.search(
             r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?",
             code,
@@ -498,12 +593,21 @@ def _get_test_metadata(code):
                 if regex.group(9)
                 else []
             )
-    else:
-        if os.path.isfile(global_vars.tstate.path_without_ext + ".in"):
+    elif global_vars.args.testmode:
+        if os.path.isfile(global_vars.tstate.path_without_ext + ".input"):
             with open(
-                global_vars.tstate.path_without_ext + ".in", "r", encoding="utf-8"
+                global_vars.tstate.path_without_ext + ".input", "r", encoding="utf-8"
             ) as fin:
                 global_vars.input = [
+                    int(line)
+                    for line in fin.readline().replace("\n", "").split(" ")
+                    if line.lstrip("-").isdigit()
+                ]
+        if os.path.isfile(global_vars.tstate.path_without_ext + ".expected_output"):
+            with open(
+                global_vars.tstate.path_without_ext + ".expected_output", "r", encoding="utf-8"
+            ) as fin:
+                global_vars.expected = [
                     int(line)
                     for line in fin.readline().replace("\n", "").split(" ")
                     if line.lstrip("-").isdigit()

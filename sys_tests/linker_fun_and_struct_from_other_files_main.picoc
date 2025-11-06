@@ -1,0 +1,15 @@
+// input:2 3
+// expected:5
+
+#include "./include/linker_fun_and_struct_from_other_files_a.h"
+#include "./include/linker_fun_and_struct_from_other_files_b.h"
+
+int main() {
+    struct Data d;
+    int r; 
+    make_data(&d, input(), input());
+    r = add(d.x, d.y);
+    print(r);
+    return 1;
+}
+

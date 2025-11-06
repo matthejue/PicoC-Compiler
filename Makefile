@@ -22,8 +22,7 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.dt_simple" -delete
 	find . -type f -wholename "./sys_tests/*.ast" -delete
 	find . -type f -wholename "./sys_tests/*.rast" -delete
-	find . -type f -wholename "./sys_tests/*.st_mon" -delete
-	find . -type f -wholename "./sys_tests/*.st" -delete
+	find . -type f -wholename "./sys_tests/*.json" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_shrink" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_blocks" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_patch" -delete

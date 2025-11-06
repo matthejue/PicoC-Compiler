@@ -1,0 +1,6 @@
+#include "./include/linker_fun_and_struct_from_other_files_a.h"
+
+void make_data(struct Data *d, int x, int y) {
+  (*d).x = x;
+  (*d).y = y;
+}

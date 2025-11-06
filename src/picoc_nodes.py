@@ -552,10 +552,8 @@ class NewStackframe(ASTNode):
 
     __match_args__ = ("fun_name",)
 
-
 class RemoveStackframe(ASTNode):
     pass
-
 
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):
@@ -588,8 +586,6 @@ class Block(ASTNode):
         self.stmts_instrs = stmts_instrs
         self.instrs_before: Num = Num(-1)
         self.num_instrs: Num = Num(-1)
-        self.param_size: Num
-        self.local_vars_size: Num
         self.block_idx: int
 
     @property

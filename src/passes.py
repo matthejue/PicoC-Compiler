@@ -3,7 +3,6 @@ from src import reti_nodes as rn
 from src.symbol_table import SymbolTable
 from src.utils.util_funs_dependent import (
     throw_type_error,
-    remove_ext,
 )
 from src.utils.util_funs_independent import (
     convert_to_single_line,
@@ -23,9 +22,9 @@ class Passes:
         self.argmode_on = False
         self.symbol_table = SymbolTable()
         self.current_scope = "global"
+        self.global_stmts_instrs = []
         self.rel_global_addr = 0
         self.rel_fun_addr = 0
-        self.global_stmts_instrs = []
         # RETI_Blocks
         self.instrs_cnt = 0
 
@@ -764,7 +763,7 @@ class Passes:
                 block_name = pn.Name(fun_name)
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
-                    + [pn.StackMalloc(pn.Num("2"))]
+                    + [pn.StackMalloc(2)]
                     + exps_anf
                     + [
                         pn.NewStackframe(block_name),
@@ -892,6 +891,8 @@ class Passes:
                     + [pn.IfElse(pn.Stack(pn.Num("1")), goto1_list, goto2_list)]
                 )
             # ----------------------------- L_Fun -----------------------------
+            case pn.StackMalloc():
+                return [stmt]
             case pn.Return(pn.Empty()):
                 return [stmt]
             case pn.Return(exp):
@@ -922,7 +923,10 @@ class Passes:
                     case pn.Block(_, stmts):
                         # attach param or not information to alloc
                         # TODO: irgendwann in der Zukunft wird main Argumente haben
-                        if fun_name not in ["main", "global"]:
+                        if fun_name not in [
+                            "main",
+                            "global",
+                        ]:  # TODO: später ändern sobald main tatsächlich Argumente hat
                             for alloc in allocs:
                                 alloc.local_var_or_param = pn.Name("param")
                                 if global_vars.args.double_verbose:
@@ -930,8 +934,6 @@ class Passes:
 
                         param_size = self._param_size(allocs)
                         local_vars_size = self._local_vars_size(stmts)
-                        blocks[0].param_size = pn.Num(str(param_size))
-                        blocks[0].local_vars_size = pn.Num(str(local_vars_size))
 
                         if not self.symbol_table.contains(fun_name, scope="global"):
                             self.symbol_table.declare(
@@ -939,6 +941,7 @@ class Passes:
                                 {
                                     "datatype": pn.FunDecl(datatype, name, allocs),
                                     "name": fun_name,
+                                    "param_size": param_size,
                                 },
                                 scope="global",
                             )
@@ -949,6 +952,7 @@ class Passes:
                                 if global_vars.args.double_verbose
                                 else []
                             )
+                            + [pn.StackMalloc(local_vars_size)]
                             + [pn.Exp(alloc) for alloc in allocs]
                             + stmts
                         )
@@ -985,12 +989,11 @@ class Passes:
                 return blocks_anf
             case pn.FunDecl(datatype, pn.Name(val1), allocs):
                 fun_name = val1
+
+                param_size = self._param_size(allocs)
                 self.symbol_table.declare(
                     fun_name,
-                    {
-                        "datatype": decl_def,
-                        "name": fun_name,
-                    },
+                    {"datatype": decl_def, "name": fun_name, "param_size": param_size},
                     scope="global",
                 )
                 # Function declaration isn't needed anymore after being evaluated
@@ -1048,19 +1051,11 @@ class Passes:
                 for decl_def in decls_defs:
                     blocks_anf += self._picoc_anf_def(decl_def)
                 # check if there even exists a main function
-                var = pn.File(
+                return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
-                    [
-                        pn.Block(
-                            f"_start",
-                            self.global_stmts_instrs
-                            + self._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
-                            + self._picoc_anf_stmt(pn.Exp(pn.Exit(pn.Num("0")))),
-                        )
-                    ]
+                    [pn.Block("_global_inits", self.global_stmts_instrs)]
                     + blocks_anf,
                 )
-                return var
             case _:
                 throw_type_error(file)
 
@@ -1618,59 +1613,49 @@ class Passes:
                     rn.Jump(rn.Always(), rn.Name(block_name))
                 ]
             # ----------------------------- L_Fun -----------------------------
-            case pn.StackMalloc(pn.Num(val)):
+            case pn.StackMalloc(val):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
                 ]
             case pn.NewStackframe(pn.Name(val)):
                 fun_block_name = val
-                fun_block = self.all_blocks[fun_block_name]
-                num1 = fun_block.param_size
-                num2 = fun_block.local_vars_size
-                match (num1, num2):
-                    case (pn.Num(val1), pn.Num(val2)):
-                        param_size = val1
-                        local_vars_size = val2
-                        return self._single_line_comment(stmt, "#") + [
-                            rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
-                            rn.Instr(
-                                rn.Addi(),
-                                [rn.Reg(rn.Sp()), rn.Im(str(2 + int(param_size)))],
+                symbol, _ = self.symbol_table.resolve(fun_block_name, scope="global")
+                param_size = symbol["param_size"]
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
+                    rn.Instr(
+                        rn.Addi(),
+                        [rn.Reg(rn.Sp()), rn.Im(str(2 + int(param_size)))],
+                    ),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
+                    rn.Instr(
+                        rn.Subi(),
+                        [
+                            rn.Reg(rn.Sp()),
+                            rn.Im(str(2 + int(param_size))),
+                        ],
+                    ),
+                    rn.Instr(
+                        rn.Storein(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
+                    ),
+                    rn.Instr(
+                        rn.Loadi(),
+                        [
+                            rn.Reg(rn.Acc()),
+                            rn.BinOp(
+                                rn.Name("_this_instruction"),
+                                rn.Add(),
+                                4 + (3 if global_vars.args.no_long_jumps else 0),
                             ),
-                            rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
-                            rn.Instr(
-                                rn.Subi(),
-                                [
-                                    rn.Reg(rn.Sp()),
-                                    rn.Im(
-                                        str(2 + int(param_size) + int(local_vars_size))
-                                    ),
-                                ],
-                            ),
-                            rn.Instr(
-                                rn.Storein(),
-                                [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
-                            ),
-                            rn.Instr(
-                                rn.Loadi(),
-                                [
-                                    rn.Reg(rn.Acc()),
-                                    rn.BinOp(
-                                        rn.Name("_this_instruction"),
-                                        rn.Add(),
-                                        4
-                                        + (3 if global_vars.args.no_long_jumps else 0),
-                                    ),
-                                ],
-                            ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
-                            rn.Instr(
-                                rn.Storein(),
-                                [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")],
-                            ),
-                        ]
-                    case _:
-                        throw_type_error(num1, num2)
+                        ],
+                    ),
+                    rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
+                    rn.Instr(
+                        rn.Storein(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")],
+                    ),
+                ]
 
             case pn.RemoveStackframe():
                 return self._single_line_comment(stmt, "#") + [

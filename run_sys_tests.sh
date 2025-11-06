@@ -14,7 +14,7 @@ trap cleanup SIGINT
 verification_res=$(./verify_tests.sh $1 $2)
 
 num_tests=0;
-not_running_through=();
+failing=();
 not_passed=();
 
 if [[ $2 == "all" ]]; then
@@ -31,10 +31,10 @@ fi
 
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
-  ./run.py $(cat ./opts/test_cpl_opts.txt) $3 "$test";
+  ./run.py $(cat ./opts/test_cpl_opts.txt) $3 "$test" -o "${test%.picoc}.reti";
 
   if [[ $? != 0 ]]; then
-    not_running_through+=("$test");
+    failing+=("$test");
   fi
 
   if [ -f "${test%.picoc}.reti" ]; then
@@ -42,7 +42,7 @@ for test in "${paths[@]}"; do
   fi
 
   if [[ $? != 0 ]]; then
-    not_running_through+=("$test");
+    failing+=("$test");
   fi
 
   diff "${test%.picoc}.expected_output" "${test%.picoc}.output"
@@ -52,8 +52,8 @@ for test in "${paths[@]}"; do
   ((num_tests++));
 done;
 echo "$verification_res" | tee ./sys_tests/tests.res
-echo Running through: $(($num_tests-${#not_running_through[@]})) / $num_tests | tee -a ./sys_tests/tests.res
-echo Not running through: ${not_running_through[*]} | tee -a ./sys_tests/tests.res
+echo Not failing: $(($num_tests-${#failing[@]})) / $num_tests | tee -a ./sys_tests/tests.res
+echo Failing: ${failing[*]} | tee -a ./sys_tests/tests.res
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests | tee -a ./sys_tests/tests.res
 echo Not passed: ${not_passed[*]} | tee -a ./sys_tests/tests.res
 

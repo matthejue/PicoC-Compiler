@@ -8,6 +8,10 @@
   - ( ) Problem lösen, dass bei mehr als 2^10 Instructions das ganze nicht mehr funktioniert bei LOADI ACC rn.NAME(_next_instruction)
   - ( ) Für jede \{\} ein Namespace bei while, do while, for und if else
   - ( ) Unnötige Symboltabelleneinträge bei z.B. Funtkionen und Structs
+  - ( ) alloc.local_var_or_param = pn.Name("param") ist Kacke
+  - ( ) rel_global_addr und "addr" konkreter berechneter value usw. entfernen, ist unnötig, da später eh ersetzt und nicht genutzt
+  - ( ) den Misst mit getrenntem Definitionsteil und Anweisungsteil entfernen
+  - ( ) struct returnen zum funktionieren bringen
 
   - ( ) Strings
   - ( ) void pointer

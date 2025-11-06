@@ -1,1 +1,1 @@
-./sys_tests/basic_while.picoc
+./sys_tests/advanced_fun_def_return_and_param_char_int_array_void_call_by_sharing.picoc
