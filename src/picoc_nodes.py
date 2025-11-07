@@ -233,7 +233,7 @@ class Alloc(ASTNode):
         self.datatype = datatype
         self.name = name
         # default is LocalVar()
-        self.local_var_or_param = Name("local_var")
+        self.local_var_or_param = "local_var"
 
     @property
     def visible(self):

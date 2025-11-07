@@ -368,7 +368,7 @@ class OptionHandler:
 
         if global_vars.args.write_files or compl_opt_active:
             with open(
-                global_vars.tstate.path_without_ext + ("_combined" if is_global_st else "") + ".json",
+                global_vars.tstate.path_without_ext + ".json",
                 "w",
                 encoding="utf-8",
             ) as fout:

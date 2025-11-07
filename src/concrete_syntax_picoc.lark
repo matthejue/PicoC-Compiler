@@ -46,11 +46,12 @@ prim_dt: INT_DT|CHAR_DT|VOID_DT
 // ============================================================================
 // --------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun --------------
 prim_exp: name|NUM|CHAR|"("logic_or")"
-post_exp: array_subscr|struct_attr|fun_call|input_exp|print_exp|prim_exp
+post_exp: array_subscr|struct_attr|fun_call|input_exp|print_exp|break_exp|prim_exp
 un_exp: un_op un_exp|post_exp
 // ---------------------------------- L_Arith ---------------------------------
 input_exp: "input""("")"
 print_exp: "print""("logic_or")"
+break_exp: "break""("")"
 arith_prec1: arith_prec1 prec1_op un_exp|un_exp
 arith_prec2: arith_prec2 prec2_op arith_prec1|arith_prec1
 arith_and: arith_and "&" arith_prec2|arith_prec2

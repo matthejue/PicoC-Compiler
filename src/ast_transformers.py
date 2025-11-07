@@ -194,6 +194,9 @@ class TransformerPicoC(Transformer):
     def print_exp(self, nodes):
         return pn.Call(pn.Name("print"), [nodes[0]])
 
+    def break_exp(self, _):
+        return pn.Call(pn.Name("break"), [])
+
     def arith_prec1(self, nodes):
         if len(nodes) == 1:
             return nodes[0]

@@ -12,6 +12,8 @@
   - ( ) rel_global_addr und "addr" konkreter berechneter value usw. entfernen, ist unnötig, da später eh ersetzt und nicht genutzt
   - ( ) den Misst mit getrenntem Definitionsteil und Anweisungsteil entfernen
   - ( ) struct returnen zum funktionieren bringen
+  - ( ) case pn.Call(pn.Name("input"), []): return [pn.Exp(exp)], wieso nicht gleich mit Exp()?
+
 
   - ( ) Strings
   - ( ) void pointer

@@ -23,7 +23,6 @@ class Passes:
         self.symbol_table = SymbolTable()
         self.current_scope = "global"
         self.global_stmts_instrs = []
-        self.rel_global_addr = 0
         self.rel_fun_addr = 0
         # RETI_Blocks
         self.instrs_cnt = 0
@@ -403,7 +402,7 @@ class Passes:
         size = 0
         for alloc in allocs:
             match alloc:
-                case pn.Alloc(_, pn.ArrayDecl(), _, pn.Name("param")):
+                case pn.Alloc(_, pn.ArrayDecl()):
                     size += 1
                 case pn.Alloc(_, datatype):
                     size += self._datatype_size(datatype)
@@ -605,6 +604,8 @@ class Passes:
                 return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
                 return [pn.Exp(exp)]
+            case pn.Call(pn.Name("break"), []):
+                return [pn.Exp(exp)]
             case pn.Exit(pn.Num(val)):
                 return [exp]
             # ----------------------- L_Arith + L_Logic -----------------------
@@ -664,16 +665,15 @@ class Passes:
                                 "type_qual": type_qual,
                                 "datatype": datatype_copy,
                                 "name": var_name,
-                                "addr": self.rel_global_addr,
+                                "addr": pn.Empty(),
                                 "size": size,
                             },
                             scope=self.current_scope,
                         )
-                        self.rel_global_addr += size
                     case _:
                         match datatype_copy:
                             case pn.ArrayDecl(nums, datatype2) if (
-                                local_var_or_param.val == "param"
+                                local_var_or_param == "param"
                             ):
                                 if len(nums) > 1:
                                     datatype_copy.nums.pop(0)
@@ -692,7 +692,7 @@ class Passes:
                                 "addr": self.rel_fun_addr + size - 1,
                                 "size": (
                                     1
-                                    if local_var_or_param.val == "param"
+                                    if local_var_or_param == "param"
                                     and isinstance(datatype, pn.PntrDecl)
                                     else size
                                 ),
@@ -701,7 +701,7 @@ class Passes:
                         )
                         self.rel_fun_addr += (
                             1
-                            if local_var_or_param.val == "param"
+                            if local_var_or_param == "param"
                             and isinstance(datatype, pn.PntrDecl)
                             else size
                         )
@@ -928,7 +928,7 @@ class Passes:
                             "global",
                         ]:  # TODO: später ändern sobald main tatsächlich Argumente hat
                             for alloc in allocs:
-                                alloc.local_var_or_param = pn.Name("param")
+                                alloc.local_var_or_param = "param"
                                 if global_vars.args.double_verbose:
                                     alloc.visible[3] = alloc.local_var_or_param
 
@@ -1248,7 +1248,10 @@ class Passes:
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Int(rn.Im("0")),
-                    # rn.Call(rn.Name("PRINT"), rn.Reg(rn.Acc())),
+                ]
+            case pn.Exp(pn.Call(pn.Name("break"), [])):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Int(rn.Im("3")),
                 ]
             case pn.Exit(pn.Num(val)):
                 return self._single_line_comment(stmt, "#") + [
