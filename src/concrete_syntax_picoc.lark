@@ -84,29 +84,28 @@ struct_decl: "struct" name "{"struct_params"}"
 struct_init: "{""."name"="bug_initializer ("," "."name"="bug_initializer)*"}"
 struct_attr: post_exp"."name
 // --------------------------------- L_If_Else --------------------------------
-if_stmt: "if""("logic_or")" exec_part
-if_else_stmt: "if""("logic_or")" exec_part "else" exec_part
+if_stmt: "if""("logic_or")" stmt
+if_else_stmt: "if""("logic_or")" stmt "else" stmt
 // ---------------------------------- L_Loop ----------------------------------
-while_stmt: "while""("logic_or")" exec_part
-do_while_stmt: "do" exec_part "while""("logic_or")"
+while_stmt: "while""("logic_or")" stmt
+do_while_stmt: "do" stmt "while""("logic_or")"
 // ---------------------------------- L_Stmt ----------------------------------
 decl_exp_stmt: alloc";"
 decl_direct_stmt: (init_stmt|const_init_stmt)";"
-decl_part: decl_exp_stmt|decl_direct_stmt
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-compound_stmt: "{" exec_part* "}"
+compound_stmt: "{" stmts "}"
 exec_exp_stmt: logic_or";"
 exec_direct_stmt: if_stmt|if_else_stmt|while_stmt|do_while_stmt";"|assign_stmt";"|fun_return_stmt";"
-exec_part: compound_stmt|exec_exp_stmt|exec_direct_stmt
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-decl_exec_stmts: decl_part* exec_part*
+stmt: decl_exp_stmt|decl_direct_stmt|compound_stmt|exec_exp_stmt|exec_direct_stmt
+stmts: stmt*
 // ----------------------------------- L_Fun ----------------------------------
 fun_args: [logic_or("," logic_or)*]
 fun_call: name"("fun_args")"
 fun_return_stmt: "return" [logic_or]
 fun_params: [alloc("," alloc)*]
 fun_decl: type_spec pntr_deg name"("fun_params")"
-fun_def: type_spec pntr_deg name"("fun_params")" "{" decl_exec_stmts "}"
+fun_def: type_spec pntr_deg name"("fun_params")" "{" stmts "}"
 // ---------------------------------- L_File ----------------------------------
 global_var_decl: decl_exp_stmt|decl_direct_stmt
 decl_def: global_var_decl|(struct_decl|fun_decl)";"|fun_def

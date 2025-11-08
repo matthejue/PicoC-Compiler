@@ -385,12 +385,9 @@ class TransformerPicoC(Transformer):
     def decl_direct_stmt(self, nodes):
         return nodes[0]
 
-    def decl_part(self, nodes):
-        return nodes[0]
-
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def compound_stmt(self, nodes):
-        return nodes
+        return nodes[0]
 
     def exec_exp_stmt(self, nodes):
         return pn.Exp(nodes[0])
@@ -398,10 +395,10 @@ class TransformerPicoC(Transformer):
     def exec_direct_stmt(self, nodes):
         return nodes[0]
 
-    def exec_part(self, nodes):
+    def stmt(self, nodes):
         return nodes[0]
 
-    def decl_exec_stmts(self, nodes):
+    def stmts(self, nodes):
         return nodes
 
     # ---------------------------------- L_Fun --------------------------------

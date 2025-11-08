@@ -241,7 +241,8 @@ class Alloc(ASTNode):
             self.type_qual,
             self.datatype,
             self.name,
-        ] + ([self.local_var_or_param] if global_vars.args.double_verbose else [])
+            self.local_var_or_param
+        ]
 
     __match_args__ = ("type_qual", "datatype", "name", "local_var_or_param")
 

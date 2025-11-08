@@ -11,6 +11,7 @@ from src import global_vars
 import copy
 from bitstring import Bits
 from inspect import isclass
+import sys
 
 
 class Passes:
@@ -23,6 +24,7 @@ class Passes:
         self.symbol_table = SymbolTable()
         self.current_scope = "global"
         self.global_stmts_instrs = []
+        self.current_fun_local_vars_size = 0
         self.rel_fun_addr = 0
         # RETI_Blocks
         self.instrs_cnt = 0
@@ -141,6 +143,9 @@ class Passes:
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
             case _:
+                import pudb
+
+                pudb.set_trace()
                 throw_type_error(stmt)
 
     def picoc_shrink(self, file: pn.File):
@@ -373,6 +378,18 @@ class Passes:
     # - bringt AST in A-Normalform:
     # - Funktionen werden aufgelöst
 
+    def _param_size(self, allocs) -> int:
+        size = 0
+        for alloc in allocs:
+            match alloc:
+                case pn.Alloc(_, pn.ArrayDecl()):
+                    size += 1
+                case pn.Alloc(_, datatype):
+                    size += self._datatype_size(datatype)
+                case _:
+                    throw_type_error(alloc)
+        return size
+
     def _datatype_size(self, datatype) -> int:
         match datatype:
             # ------------------------ L_Arith + L_Pntr -----------------------
@@ -397,31 +414,6 @@ class Passes:
                 return size
             case _:
                 throw_type_error(datatype)
-
-    def _param_size(self, allocs):
-        size = 0
-        for alloc in allocs:
-            match alloc:
-                case pn.Alloc(_, pn.ArrayDecl()):
-                    size += 1
-                case pn.Alloc(_, datatype):
-                    size += self._datatype_size(datatype)
-                case _:
-                    throw_type_error(alloc)
-        return size
-
-    def _local_vars_size(self, stmts):
-        size = 0
-        for stmt in stmts:
-            match stmt:
-                case pn.Assign(pn.Alloc(_, datatype)) | pn.Exp(pn.Alloc(_, datatype)):
-                    size += self._datatype_size(datatype)
-                case pn.SingleLineComment():
-                    # const init and normal assign get skipped
-                    pass
-                case _:
-                    break
-        return size
 
     def _add_datatype(self, ref, datatype):
         ref.datatype = datatype
@@ -680,8 +672,6 @@ class Passes:
                                     datatype = pn.PntrDecl(pn.Num("1"), datatype_copy)
                                 else:
                                     datatype = pn.PntrDecl(pn.Num("1"), datatype2)
-                            case _:
-                                pass
                         size = self._datatype_size(datatype)
                         self.symbol_table.declare(
                             var_name,
@@ -690,20 +680,25 @@ class Passes:
                                 "datatype": datatype,
                                 "name": var_name,
                                 "addr": self.rel_fun_addr + size - 1,
-                                "size": (
-                                    1
-                                    if local_var_or_param == "param"
-                                    and isinstance(datatype, pn.PntrDecl)
-                                    else size
-                                ),
+                                "size": size,
+                                # (
+                                #     1
+                                #     if local_var_or_param == "param"
+                                #     and isinstance(datatype, pn.PntrDecl)
+                                #     else size
+                                # ),
                             },
                             scope=self.current_scope,
                         )
-                        self.rel_fun_addr += (
-                            1
-                            if local_var_or_param == "param"
-                            and isinstance(datatype, pn.PntrDecl)
-                            else size
+                        self.rel_fun_addr += size
+                        # (
+                        #     1
+                        #     if local_var_or_param == "param"
+                        #     and isinstance(datatype, pn.PntrDecl)
+                        #     else size
+                        # )
+                        self.current_fun_local_vars_size += (
+                            size if local_var_or_param == "local_var" else 0
                         )
                 # Alloc isn't needed anymore after being evaluated
                 return []
@@ -917,6 +912,7 @@ class Passes:
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
                 self.rel_fun_addr = 0
+                self.current_fun_local_vars_size = 0
 
                 blocks_anf = []
                 match blocks[0]:
@@ -929,11 +925,8 @@ class Passes:
                         ]:  # TODO: später ändern sobald main tatsächlich Argumente hat
                             for alloc in allocs:
                                 alloc.local_var_or_param = "param"
-                                if global_vars.args.double_verbose:
-                                    alloc.visible[3] = alloc.local_var_or_param
 
                         param_size = self._param_size(allocs)
-                        local_vars_size = self._local_vars_size(stmts)
 
                         if not self.symbol_table.contains(fun_name, scope="global"):
                             self.symbol_table.declare(
@@ -941,26 +934,27 @@ class Passes:
                                 {
                                     "datatype": pn.FunDecl(datatype, name, allocs),
                                     "name": fun_name,
-                                    "param_size": param_size,
+                                    "param_size": param_size,  # important for function calls
                                 },
                                 scope="global",
                             )
 
-                        blocks[0].stmts_instrs[:] = (
-                            (
-                                self._single_line_comment(decl_def, "//", filtr=[3])
-                                if global_vars.args.double_verbose
-                                else []
-                            )
-                            + [pn.StackMalloc(local_vars_size)]
-                            + [pn.Exp(alloc) for alloc in allocs]
-                            + stmts
-                        )
+                        blocks[0].stmts_instrs[:0] = [pn.Exp(alloc) for alloc in allocs]
 
                         stmts_anf = []
                         for stmt in blocks[0].stmts_instrs:
                             stmts_anf += self._picoc_anf_stmt(stmt)
                         blocks[0].stmts_instrs[:] = stmts_anf
+
+                        blocks[0].stmts_instrs[:0] = (
+                            (
+                                self._single_line_comment(decl_def, "//", filtr=[3])
+                                if global_vars.args.double_verbose
+                                else []
+                            )
+                            # Other important part of function call
+                            + [pn.StackMalloc(self.current_fun_local_vars_size)]
+                        )
 
                         blocks_anf += [blocks[0]]
                     case _:
@@ -1053,8 +1047,7 @@ class Passes:
                 # check if there even exists a main function
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
-                    [pn.Block("_global_inits", self.global_stmts_instrs)]
-                    + blocks_anf,
+                    [pn.Block("_global_inits", self.global_stmts_instrs)] + blocks_anf,
                 )
             case _:
                 throw_type_error(file)
