@@ -51,6 +51,8 @@ class Passes:
                 )
             case pn.UnOp(un_op, exp):
                 return pn.UnOp(un_op, self._picoc_shrink_exp(exp))
+            case pn.SizeOf():
+                return exp
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
                 return pn.Atom(
@@ -143,9 +145,6 @@ class Passes:
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
             case _:
-                import pudb
-
-                pudb.set_trace()
                 throw_type_error(stmt)
 
     def picoc_shrink(self, file: pn.File):
@@ -598,8 +597,21 @@ class Passes:
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("break"), []):
                 return [pn.Exp(exp)]
+            case pn.SizeOf(exp_datatype):
+                size = 1
+                match exp_datatype:
+                    case pn.Name(val):
+                        symbol, _ = self.symbol_table.resolve(
+                            val, scope=self.current_scope
+                        )
+                        size = self._datatype_size(symbol["datatype"])
+                    case (pn.BinOp() | pn.Num() | pn.Char() | pn.UnOp() | pn.Ref()):
+                        pass
+                    case _:
+                        size = self._datatype_size(exp_datatype)
+                return [pn.Exp(pn.SizeOf(size))]
             case pn.Exit(pn.Num(val)):
-                return [exp]
+                return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp):
                 exps1_anf = self._picoc_anf_exp(left_exp)
@@ -1250,6 +1262,14 @@ class Passes:
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
                     rn.Jump(rn.Always(), rn.Im("0")),
+                ]
+            case pn.Exp(pn.SizeOf(val)):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
+                    rn.Instr(
+                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
+                    ),
                 ]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(pn.ToBool(pn.Stack(pn.Num(val)))):

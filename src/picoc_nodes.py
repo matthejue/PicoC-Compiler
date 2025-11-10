@@ -201,6 +201,16 @@ class Exit(ASTNode):
     __match_args__ = ("num",)
 
 
+class SizeOf(ASTNode):
+    def __init__(self, exp_datatype):
+        self.exp_datatype = exp_datatype
+
+    @property
+    def visible(self):
+        return [self.exp_datatype]
+
+    __match_args__ = ("exp_datatype",)
+
 # -------------------------------- L_Logic --------------------------------
 class Atom(ASTNode):
     def __init__(self, left_exp, rel, right_exp):

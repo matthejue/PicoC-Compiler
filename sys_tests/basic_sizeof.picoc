@@ -1,0 +1,21 @@
+// in:
+// expected:42 2
+
+struct Point {
+    int x;
+    int y;
+};
+
+int main() {
+    int a = 42;
+    struct Point p = {10, 20};
+
+    break();
+    print(sizeof(a) + 41);
+    break();
+    print(sizeof(p));
+    break();
+    print(sizeof(struct Point));
+
+    return 0;
+}

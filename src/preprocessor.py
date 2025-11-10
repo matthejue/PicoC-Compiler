@@ -18,8 +18,8 @@ class Mode(Enum):
 
 
 class IncludeKind(Enum):
-    QUOTED = auto()   # #include "file.h"
-    ANGLED = auto()   # #include <file.h>
+    QUOTED = auto()  # #include "file.h"
+    ANGLED = auto()  # #include <file.h>
 
 
 @dataclass
@@ -60,12 +60,14 @@ class Preprocessor:
             else self._default_system_include_paths()
         )
         self.state = _State(once_marked=set(), max_depth=max_depth)
+        self.macros: dict[str, str] = {}
 
     # -------- Public API --------
 
     def reset_once(self) -> None:
         """Clear #pragma once state (useful if reusing the instance)."""
         self.state.once_marked.clear()
+        self.macros.clear()
 
     def preprocess_file(self, file_path: str, depth: int = 0) -> str:
         """Load source from disk and preprocess it (follows #include by filesystem)."""
@@ -96,8 +98,8 @@ class Preprocessor:
             c = s[i]
 
             # Line splicing: "\" + newline keeps same logical line
-            if mode is Mode.OUT and c == '\\' and (i + 1 < n) and s[i + 1] in '\n\r':
-                if s[i + 1] == '\r' and (i + 2 < n) and s[i + 2] == '\n':
+            if mode is Mode.OUT and c == "\\" and (i + 1 < n) and s[i + 1] in "\n\r":
+                if s[i + 1] == "\r" and (i + 2 < n) and s[i + 2] == "\n":
                     i += 3
                 else:
                     i += 2
@@ -106,87 +108,132 @@ class Preprocessor:
 
             # Comment/string/char handling
             if mode is Mode.OUT:
-                if c == '/':
-                    if i + 1 < n and s[i + 1] == '/':
-                        mode = Mode.LINE_COMMENT; i += 2
+                if c == "/":
+                    if i + 1 < n and s[i + 1] == "/":
+                        mode = Mode.LINE_COMMENT
+                        i += 2
                         continue
-                    if i + 1 < n and s[i + 1] == '*':
-                        mode = Mode.BLOCK_COMMENT; i += 2
+                    if i + 1 < n and s[i + 1] == "*":
+                        mode = Mode.BLOCK_COMMENT
+                        i += 2
                         continue
                 if c == '"':
-                    mode = Mode.STR; linebuf.append(c); i += 1; at_bol = False; continue
+                    mode = Mode.STR
+                    linebuf.append(c)
+                    i += 1
+                    at_bol = False
+                    continue
                 if c == "'":
-                    mode = Mode.CHAR; linebuf.append(c); i += 1; at_bol = False; continue
+                    mode = Mode.CHAR
+                    linebuf.append(c)
+                    i += 1
+                    at_bol = False
+                    continue
 
             if mode is Mode.LINE_COMMENT:
-                if c == '\n':
-                    linebuf.append(c); out.append(''.join(linebuf)); linebuf.clear()
-                    i += 1; phys_line += 1; mode = Mode.OUT; at_bol = True
+                if c == "\n":
+                    linebuf.append(c)
+                    out.append("".join(linebuf))
+                    linebuf.clear()
+                    i += 1
+                    phys_line += 1
+                    mode = Mode.OUT
+                    at_bol = True
                 else:
                     i += 1
                 continue
 
             if mode is Mode.BLOCK_COMMENT:
-                if c == '*' and (i + 1 < n) and s[i + 1] == '/':
-                    mode = Mode.OUT; i += 2
+                if c == "*" and (i + 1 < n) and s[i + 1] == "/":
+                    mode = Mode.OUT
+                    i += 2
                 else:
-                    if c == '\n': phys_line += 1
+                    if c == "\n":
+                        phys_line += 1
                     i += 1
                 continue
 
             if mode is Mode.STR:
-                if c == '\\':
-                    linebuf.append(c); i += 1
-                    if i < n: linebuf.append(s[i]); i += 1
+                if c == "\\":
+                    linebuf.append(c)
+                    i += 1
+                    if i < n:
+                        linebuf.append(s[i])
+                        i += 1
                     continue
                 if c == '"':
-                    linebuf.append(c); i += 1; mode = Mode.OUT; at_bol = False; continue
+                    linebuf.append(c)
+                    i += 1
+                    mode = Mode.OUT
+                    at_bol = False
+                    continue
                 linebuf.append(c)
-                if c == '\n': phys_line += 1; at_bol = True
+                if c == "\n":
+                    phys_line += 1
+                    at_bol = True
                 i += 1
                 continue
 
             if mode is Mode.CHAR:
-                if c == '\\':
-                    linebuf.append(c); i += 1
-                    if i < n: linebuf.append(s[i]); i += 1
+                if c == "\\":
+                    linebuf.append(c)
+                    i += 1
+                    if i < n:
+                        linebuf.append(s[i])
+                        i += 1
                     continue
                 if c == "'":
-                    linebuf.append(c); i += 1; mode = Mode.OUT; at_bol = False; continue
+                    linebuf.append(c)
+                    i += 1
+                    mode = Mode.OUT
+                    at_bol = False
+                    continue
                 linebuf.append(c)
-                if c == '\n': phys_line += 1; at_bol = True
+                if c == "\n":
+                    phys_line += 1
+                    at_bol = True
                 i += 1
                 continue
 
             # Detect directives only at beginning-of-line (after optional whitespace)
             if at_bol:
-                if c in ' \t\f\v\r':
-                    linebuf.append(c); i += 1; continue
+                if c in " \t\f\v\r":
+                    linebuf.append(c)
+                    i += 1
+                    continue
 
-                if c == '#':
+                if c == "#":
                     i += 1
                     # keyword
-                    while i < n and s[i] in ' \t\f\v': i += 1
+                    while i < n and s[i] in " \t\f\v":
+                        i += 1
                     kstart = i
-                    while i < n and (s[i].isalnum() or s[i] == '_'): i += 1
+                    while i < n and (s[i].isalnum() or s[i] == "_"):
+                        i += 1
                     kw = s[kstart:i]
-                    while i < n and s[i] in ' \t\f\v': i += 1
+                    while i < n and s[i] in " \t\f\v":
+                        i += 1
                     # rest of the logical line
                     arg_start = i
-                    while i < n and s[i] != '\n': i += 1
+                    while i < n and s[i] != "\n":
+                        i += 1
                     arg = s[arg_start:i]
 
                     # directive → drop buffered leading whitespace
                     linebuf.clear()
 
-                    if kw == 'include':
+                    if kw == "include":
                         try:
                             kind, name = self._parse_include_arg(arg)
                         except ValueError as e:
-                            self._error(f"malformed #include: {e}", file_path, phys_line)
+                            self._error(
+                                f"malformed #include: {e}", file_path, phys_line
+                            )
                         inc_path = self._resolve_include(kind, name, file_path)
                         if inc_path is None:
-                            self._error(f"header not found: {name}", file_path, phys_line)
+                            self._error(
+                                f"header not found: {name}", file_path, phys_line
+                            )
                         # Skip if that header was marked with #pragma once already
                         if inc_path in self.state.once_marked:
                             included = ""
@@ -196,34 +243,65 @@ class Preprocessor:
 
                         out.append(included)
 
-                    elif kw == 'pragma':
-                        if arg.strip() == 'once':
+                    elif kw == "pragma":
+                        if arg.strip() == "once":
                             self.state.once_marked.add(file_path)
                         else:
                             out.append(f"#pragma{arg}\n")  # preserve unknown pragmas
+
+                    elif kw == "define":
+                        # handle simple object-like macros
+                        parts = arg.strip().split(None, 1)
+                        if not parts:
+                            self._error(
+                                "missing macro name in #define", file_path, phys_line
+                            )
+                        name = parts[0]
+                        value = parts[1].strip() if len(parts) > 1 else "1"
+                        self.macros[name] = value
+
                     else:
-                        out.append(f"#{kw}{arg}\n")      # preserve unknown directives
+                        out.append(f"#{kw}{arg}\n")  # preserve unknown directives
 
                     # consume newline (don’t emit)
-                    if i < n and s[i] == '\n':
-                        i += 1; phys_line += 1; at_bol = True
+                    if i < n and s[i] == "\n":
+                        i += 1
+                        phys_line += 1
+                        at_bol = True
                     continue
 
                 # first non-space, non-# at BOL → normal code
                 at_bol = False
 
+            # Normal code — perform macro substitution
+            if mode is Mode.OUT and c.isalpha() or c == '_':
+                start = i
+                while i < n and (s[i].isalnum() or s[i] == '_'):
+                    i += 1
+                ident = s[start:i]
+                if ident in self.macros:
+                    linebuf.append(self.macros[ident])
+                else:
+                    linebuf.append(ident)
+                continue
+
             # Normal character emission
-            if c == '\n':
-                linebuf.append(c); out.append(''.join(linebuf)); linebuf.clear()
-                i += 1; phys_line += 1; at_bol = True
+            if c == "\n":
+                linebuf.append(c)
+                out.append("".join(linebuf))
+                linebuf.clear()
+                i += 1
+                phys_line += 1
+                at_bol = True
             else:
-                linebuf.append(c); i += 1
+                linebuf.append(c)
+                i += 1
 
         # flush trailing line
         if linebuf:
-            out.append(''.join(linebuf))
+            out.append("".join(linebuf))
 
-        return ''.join(out)
+        return "".join(out)
 
     # -------- Helpers --------
 
@@ -237,32 +315,36 @@ class Preprocessor:
             raise ValueError("missing header name")
 
         if s[0] == '"':
-            i = 1; start = i
+            i = 1
+            start = i
             while i < len(s) and s[i] != '"':
                 i += 1
             if i >= len(s):
                 raise ValueError('unterminated "..."')
             name = s[start:i]
-            tail = s[i+1:].strip()
+            tail = s[i + 1 :].strip()
             if tail:
                 raise ValueError(f"unexpected extra tokens after header name: {tail!r}")
             return (IncludeKind.QUOTED, name)
 
-        if s[0] == '<':
-            i = 1; start = i
-            while i < len(s) and s[i] != '>':
+        if s[0] == "<":
+            i = 1
+            start = i
+            while i < len(s) and s[i] != ">":
                 i += 1
             if i >= len(s):
                 raise ValueError("unterminated <...>")
             name = s[start:i]
-            tail = s[i+1:].strip()
+            tail = s[i + 1 :].strip()
             if tail:
                 raise ValueError(f"unexpected extra tokens after header name: {tail!r}")
             return (IncludeKind.ANGLED, name)
 
         raise ValueError('expected one header name: either "file" or <file>')
 
-    def _resolve_include(self, kind: IncludeKind, name: str, including_file: str) -> Optional[str]:
+    def _resolve_include(
+        self, kind: IncludeKind, name: str, including_file: str
+    ) -> Optional[str]:
         """Filesystem search for an include according to kind and configured paths."""
         # Absolute path?
         if os.path.isabs(name):
@@ -305,7 +387,8 @@ class Preprocessor:
             inc_env = os.environ.get("INCLUDE")
             if inc_env:
                 for p in inc_env.split(os.pathsep):
-                    if p: paths.append(os.path.normpath(p))
+                    if p:
+                        paths.append(os.path.normpath(p))
         else:
             # Typical Unix defaults (order matters)
             for p in ("/usr/local/include", "/usr/include"):

@@ -1,0 +1,16 @@
+// in:42
+// expected:42
+
+#define true 1
+#define false 0
+#define NULL 0
+
+int main() {
+    int x = input();
+
+    if (true == 1 && false == 0 && NULL == 0) {
+        print(x);
+    }
+
+    return 0;
+}

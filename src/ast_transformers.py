@@ -160,6 +160,9 @@ class TransformerPicoC(Transformer):
             case _:
                 throw_type_error(current_bin_exp)
 
+    def sizeof_exp(self, nodes):
+        return pn.SizeOf(nodes[0])
+
     def un_exp(self, nodes):
         if len(nodes) == 1:
             return nodes[0]
@@ -182,8 +185,7 @@ class TransformerPicoC(Transformer):
                     case _:
                         throw_type_error(bin_op)
             case pn.RefOp():
-                ref = pn.Ref(exp)
-                return ref
+                return pn.Ref(exp)
             case _:
                 throw_type_error(nodes)
 
