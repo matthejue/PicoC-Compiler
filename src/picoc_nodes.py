@@ -190,6 +190,17 @@ class UnOp(ASTNode):
     __match_args__ = ("un_op", "exp")
 
 
+class Cast(ASTNode):
+    def __init__(self, datatype):
+        self.datatype = datatype
+
+    @property
+    def visible(self):
+        return [self.datatype]
+
+    __match_args__ = ("datatype",)
+
+
 class Exit(ASTNode):
     def __init__(self, num):
         self.num = num

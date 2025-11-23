@@ -163,6 +163,17 @@ class TransformerPicoC(Transformer):
     def sizeof_exp(self, nodes):
         return pn.SizeOf(nodes[0])
 
+    def cast_exp(self, nodes):
+        if len(nodes) == 1:
+            return nodes[0]
+        else:
+            # datatype = nodes[0][0]
+            # for node in nodes[0][:0:-1]:
+            #     node.datatype = datatype
+            #     datatype = node
+            # return pn.UnOp(pn.Cast(datatype), nodes[1])
+            return pn.UnOp(pn.Cast(nodes[0]), nodes[1])
+
     def un_exp(self, nodes):
         if len(nodes) == 1:
             return nodes[0]
@@ -286,7 +297,6 @@ class TransformerPicoC(Transformer):
             datatype = nodes[0][0]
             for node in nodes[0][:0:-1]:
                 node.datatype = datatype
-                node.visible[1] = datatype
                 datatype = node
             return pn.Alloc(pn.Writeable(), datatype, nodes[1])
         else:
@@ -295,7 +305,7 @@ class TransformerPicoC(Transformer):
     def assign_stmt(self, nodes):
         return pn.Assign(nodes[0], nodes[1])
 
-    def bug_initializer(self, nodes):
+    def initializer(self, nodes):
         return nodes[0]
 
     def init_stmt(self, nodes):
@@ -306,6 +316,12 @@ class TransformerPicoC(Transformer):
             pn.Alloc(pn.Const(), nodes[0], nodes[1]),
             nodes[2],
         )
+
+    # ------------------------ L_Assign_Alloc_Abstract ------------------------
+    
+    def type_name(self, nodes):
+        if len(nodes) == 1:
+            return pn.PntrDecl(pn.Num(1), nodes[0])
 
     # --------------------------------- L_Array -------------------------------
     def array_dims(self, nodes):

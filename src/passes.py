@@ -605,7 +605,7 @@ class Passes:
                             val, scope=self.current_scope
                         )
                         size = self._datatype_size(symbol["datatype"])
-                    case (pn.BinOp() | pn.Num() | pn.Char() | pn.UnOp() | pn.Ref()):
+                    case pn.BinOp() | pn.Num() | pn.Char() | pn.UnOp() | pn.Ref():
                         pass
                     case _:
                         size = self._datatype_size(exp_datatype)

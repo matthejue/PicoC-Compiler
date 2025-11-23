@@ -1,0 +1,25 @@
+// input:
+// expected:42
+
+struct BlockHeader {
+    int size;
+    int free;
+    struct BlockHeader *next;
+};
+
+int main() {
+    struct BlockHeader block = {
+        .size = 39,
+        .free = 1,
+        .next = NULL
+    };
+
+    struct BlockHeader *current = &block;
+    int *data_start = (int *)(current + 1);
+    struct BlockHeader *new_block = (struct BlockHeader *)(data_start + (*current).size);
+
+    print(current - new_block);
+
+    return 0;
+}
+

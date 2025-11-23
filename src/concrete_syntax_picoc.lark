@@ -48,12 +48,13 @@ prim_dt: INT_DT|CHAR_DT|VOID_DT
 prim_exp: name|NUM|CHAR|"("logic_or")"
 sizeof_exp: "sizeof" "(" (type_spec | logic_or)  ")"
 post_exp: array_subscr|struct_attr|fun_call|input_exp|print_exp|break_exp|prim_exp|sizeof_exp
-un_exp: un_op un_exp|post_exp
+un_exp: un_op cast_exp|post_exp
+cast_exp: un_exp|"(" type_name ")" cast_exp
 // ---------------------------------- L_Arith ---------------------------------
 input_exp: "input""("")"
 print_exp: "print""("logic_or")"
 break_exp: "break""("")"
-arith_prec1: arith_prec1 prec1_op un_exp|un_exp
+arith_prec1: arith_prec1 prec1_op cast_exp|cast_exp
 arith_prec2: arith_prec2 prec2_op arith_prec1|arith_prec1
 arith_and: arith_and "&" arith_prec2|arith_prec2
 arith_oplus: arith_oplus "^" arith_and|arith_and
@@ -63,12 +64,18 @@ rel_exp: rel_exp rel_op arith_or|arith_or
 eq_exp: eq_exp eq_op rel_exp|rel_exp
 logic_and: logic_and "&&" eq_exp|eq_exp
 logic_or: logic_or "||" logic_and|logic_and
+// -------------------------- L_Assign_Alloc_Abstract -------------------------
+type_name: type_spec "*"
+// abstr_pntr_decl?
+// abstr_pntr_decl: pntr_deg? abstr_array_decl?
+// abstr_pntr_deg: "*" abstr_pntr_deg?
+// abstr_array_decl: "(" abstr_pntr_decl ")"|abstr_array_decl? "[" NUM? "]"
 // ------------------------------ L_Assign_Alloc ------------------------------
 type_spec: prim_dt|struct_spec
 alloc: type_spec pntr_decl
 assign_stmt: un_exp "=" logic_or
-bug_initializer: logic_or|array_init|struct_init
-init_stmt: alloc "=" bug_initializer
+initializer: logic_or|array_init|struct_init
+init_stmt: alloc "=" initializer
 const_init_stmt: "const" type_spec name "=" NUM
 // ---------------------------------- L_Pntr ----------------------------------
 !pntr_deg: "*"*
@@ -76,13 +83,13 @@ pntr_decl: pntr_deg array_decl|array_decl
 // ---------------------------------- L_Array ---------------------------------
 array_dims: ("["NUM"]")*
 array_decl: name array_dims|"("pntr_decl")" array_dims
-array_init: "{"bug_initializer("," bug_initializer)*"}"
+array_init: "{" initializer ("," initializer )* "}"
 array_subscr: post_exp"["logic_or"]"
 // --------------------------------- L_Struct ---------------------------------
 struct_spec: "struct" name
 struct_params: (alloc";")+
 struct_decl: "struct" name "{"struct_params"}"
-struct_init: "{""."name"="bug_initializer ("," "."name"="bug_initializer)*"}"
+struct_init: "{""."name "=" initializer ("," "."name "=" initializer)*"}"
 struct_attr: post_exp"."name
 // --------------------------------- L_If_Else --------------------------------
 if_stmt: "if""("logic_or")" stmt
