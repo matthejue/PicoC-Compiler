@@ -8,9 +8,12 @@ cleanup() {
 
 trap cleanup SIGINT
 
+MAX_EMULATOR_DURATION_SECONDS=5
+
 ./space_replacer.py
 ./extract_input_and_expected.sh $2
 ./convert_to_c.py $2
+
 verification_res=$(./verify_tests.sh $1 $2)
 
 num_tests=0;
@@ -33,20 +36,33 @@ for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$1" "="
   ./run.py $(cat ./opts/test_cpl_opts.txt) $3 "$test" -o "${test%.picoc}.reti";
 
-  if [[ $? != 0 ]]; then
+  compile_status=$?
+  if [[ $compile_status != 0 ]]; then
     failing+=("$test");
   fi
 
+  emulator_status=0
   if [ -f "${test%.picoc}.reti" ]; then
-    reti_emulator $(cat ./opts/test_emu_opts.txt) $4 "${test%.picoc}.reti";
+    timeout --preserve-status "${MAX_EMULATOR_DURATION_SECONDS}s" reti_emulator $(cat ./opts/test_emu_opts.txt) $4 "${test%.picoc}.reti";
+    emulator_status=$?
+    if [[ $emulator_status == 124 ]]; then
+      echo "Emulator timed out after ${MAX_EMULATOR_DURATION_SECONDS}s for $test"
+    fi
   fi
 
-  if [[ $? != 0 ]]; then
+  if [[ $emulator_status != 0 ]]; then
     failing+=("$test");
   fi
 
-  diff "${test%.picoc}.expected_output" "${test%.picoc}.output"
-  if [[ $? != 0 ]]; then
+  output_status=0
+  if [[ $emulator_status == 0 ]]; then
+    diff "${test%.picoc}.expected_output" "${test%.picoc}.output"
+    output_status=$?
+  else
+    output_status=1
+  fi
+
+  if [[ $output_status != 0 ]]; then
     not_passed+=("$test");
   fi
   ((num_tests++));

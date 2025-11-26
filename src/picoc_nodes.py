@@ -352,11 +352,11 @@ class PntrDecl(ASTNode):
 class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        self.datatype: ASTNode
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exp]
+        return [self.exp, self.datatype]
 
     __match_args__ = ("exp", "datatype")
 
@@ -606,6 +606,7 @@ class Block(ASTNode):
     def __init__(self, name, stmts_instrs):
         self.name = name
         self.stmts_instrs = stmts_instrs
+        self.scope: str
         self.instrs_before: Num = Num(-1)
         self.num_instrs: Num = Num(-1)
         self.block_idx: int
@@ -613,7 +614,7 @@ class Block(ASTNode):
     @property
     def visible(self):
         return [self.name, self.stmts_instrs] + (
-            [self.instrs_before, self.num_instrs]
+            [self.scope, self.instrs_before, self.num_instrs]
             if global_vars.args.double_verbose
             else []
         )

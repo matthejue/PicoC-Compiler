@@ -26,13 +26,14 @@ class Passes:
         self.global_stmts_instrs = []
         self.current_fun_local_vars_size = 0
         self.rel_fun_addr = 0
+        self.stack_type_hints = {}
         # RETI_Blocks
         self.instrs_cnt = 0
 
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
-    # - Ersetzen von Deref(exp, i) durch Subscr(exp, i)
+    # - Ersetzt Array-Zugriffe durch Pointer-Arithmetik (arr[i] -> *(arr + i))
 
     def _picoc_shrink_exp(self, exp):
         match exp:
@@ -67,17 +68,16 @@ class Passes:
                 return exp
             # ----------------------------- L_Pntr ----------------------------
             case pn.Deref(ref, exp):
-                # shrink: Deref gets replaced by Subscr
-                return pn.Subscr(
+                return pn.Deref(
                     self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
                 )
             case pn.Ref(ref):
                 return pn.Ref(self._picoc_shrink_exp(ref))
             # ---------------------------- L_Array ----------------------------
             case pn.Subscr(ref, exp):
-                return pn.Subscr(
-                    self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
-                )
+                ref_shrunk = self._picoc_shrink_exp(ref)
+                exp_shrunk = self._picoc_shrink_exp(exp)
+                return pn.Deref(ref_shrunk, exp_shrunk)
             case pn.Array(exps):
                 return pn.Array([self._picoc_shrink_exp(exp) for exp in exps])
             # ---------------------------- L_Struct ---------------------------
@@ -189,7 +189,7 @@ class Passes:
         pn.Assign(pn.Stackframe, pn.Stack),
         pn.Assign(pn.Name, object),
         pn.Assign(pn.Attr, object),
-        pn.Assign(pn.Subscr, object),
+        pn.Assign(pn.Deref, object),
         pn.Assign(pn.Stack, pn.Stack),
         #  pn.Exp,
         pn.Exp(pn.Num),
@@ -198,7 +198,7 @@ class Passes:
         pn.Exp(pn.Stack),
         pn.Exp(pn.Global),
         pn.Exp(pn.Stackframe),
-        pn.Exp(pn.Subscr),
+        pn.Exp(pn.Deref),
         pn.Exp(pn.Attr),
         pn.Exp(pn.Deref),
         pn.Exp(pn.Ref),
@@ -414,118 +414,39 @@ class Passes:
             case _:
                 throw_type_error(datatype)
 
-    def _add_datatype(self, ref, datatype):
-        ref.datatype = datatype
-
-    def _picoc_anf_ref(self, ref, prev_stmts):
+    def _anf_ref_nodes(self, ref):
         match ref:
             # ---------------------------- L_Arith ----------------------------
-            case pn.Name(val) as name:
+            case pn.Name(val):
                 var_name = val
-                symbol, _ = self.symbol_table.resolve(
+                symbol, chosen_scope = self.symbol_table.resolve(
                     var_name, scope=self.current_scope
                 )
-                match symbol:
-                    case {
-                        "type_qual": _,
-                        "datatype": datatype,
-                        "name": _,
-                        "addr": _,
-                        "size": _,
-                    }:
-                        current_datatype = copy.deepcopy(datatype)
+                if symbol is None:
+                    throw_type_error(var_name)
+                match chosen_scope:
+                    case "global":
+                        return [pn.Ref(pn.Global(pn.Name(var_name)))]
                     case _:
-                        throw_type_error(symbol)
-                while prev_stmts:
-                    match current_datatype:
-                        case pn.CharType() | pn.IntType():
-                            self._add_datatype(
-                                prev_stmts.pop(),
-                                datatype=current_datatype,
-                            )
-                        case pn.PntrDecl(pn.Num(val), datatype):
-                            if int(val) == 0:
-                                current_datatype = datatype
-                                continue
-                            self._add_datatype(
-                                prev_stmts.pop(),
-                                datatype=copy.deepcopy(current_datatype),
-                            )
-                            current_datatype.num.val = int(val) - 1
-                        case pn.ArrayDecl(nums, datatype):
-                            if len(nums) == 0:
-                                # TODO: man sollte die Information,
-                                # dass am Ende nen CharType dranhängt auch
-                                # gesondert betrachten und bei Ref(Name) was dranhängen
-                                current_datatype = datatype
-                                continue
-                            # TODO: think bit about if add_dadatype should be
-                            # before or after the pop
-                            self._add_datatype(
-                                prev_stmts.pop(),
-                                datatype=copy.deepcopy(current_datatype),
-                            )
-                            current_datatype.nums.pop(0)
-                        case pn.StructSpec(pn.Name(val1)):
-                            struct_type_name = val1
-                            ref = prev_stmts.pop()
-                            self._add_datatype(
-                                ref,
-                                datatype=current_datatype,
-                            )
-                            match ref:
-                                case pn.Ref(pn.Attr(_, pn.Name(val2))):
-                                    attr_name = val2
-                                    symbol, _ = self.symbol_table.resolve(
-                                        attr_name, scope=struct_type_name
-                                    )
-                                case pn.Exp():
-                                    break
-                                case _:
-                                    throw_type_error(ref)
-                            current_datatype = copy.deepcopy(symbol["datatype"])
-                        case _:
-                            throw_type_error(current_datatype)
-
-                symbol, choosen_scope = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
-                )
-                match symbol:
-                    case {
-                        "type_qual": _,
-                        "datatype": _,
-                        "name": _,
-                        "addr": addr,
-                        "size": _,
-                    }:
-                        match choosen_scope:
-                            case "global":
-                                return [pn.Ref(pn.Global(pn.Name(var_name)))]
-                            case _:
-                                return [pn.Ref(pn.Stackframe(pn.Num(addr)))]
-                    case _:
-                        throw_type_error(symbol)
+                        return [pn.Ref(pn.Stackframe(pn.Num(symbol["addr"])))]
             # ------------------------ L_Pntr + L_Array -----------------------
-            case pn.Subscr(ref2, exp):
-                ref3 = pn.Ref(pn.Subscr(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))
-                refs_anf = self._picoc_anf_ref(ref2, prev_stmts + [ref3])
-                exps_anf = self._picoc_anf_exp(exp)
-                return refs_anf + exps_anf + [ref3]
+            case pn.Deref(ptr_exp, idx_exp):
+                ptr_nodes = self._anf_ref_nodes(ptr_exp)
+                idx_nodes = self._picoc_anf_exp(idx_exp)
+                return (
+                    ptr_nodes
+                    + idx_nodes
+                    + [pn.Ref(pn.Deref(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))))]
+                )
             # ---------------------------- L_Struct ---------------------------
-            case pn.Attr(ref2, pn.Name() as name):
-                ref3 = pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))
-                refs_anf = self._picoc_anf_ref(ref2, prev_stmts + [ref3])
-                return refs_anf + [ref3]
-            case pn.Ref(ref2):
-                # TODO: Fehlermeldung, und das nur Placeholder
-                last_ref = prev_stmts[-1]
-                refs_anf = self._picoc_anf_ref(ref2, prev_stmts)
-                last_ref.datatype = pn.ArrayDecl([pn.Num("1")], last_ref.datatype)
-                if global_vars.args.double_verbose:
-                    last_ref.visible[1] = last_ref.datatype
-                return refs_anf
+            case pn.Attr(inner_exp, pn.Name() as name):
+                exp_nodes = self._anf_ref_nodes(inner_exp)
+                return exp_nodes + [pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name))]
+            case pn.Ref(inner):
+                return self._anf_ref_nodes(inner)
             case _:
                 throw_type_error(ref)
+
 
     def _picoc_anf_exp(self, exp):
         match exp:
@@ -715,10 +636,9 @@ class Passes:
                 # Alloc isn't needed anymore after being evaluated
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Subscr() | pn.Attr():
+            case pn.Deref() | pn.Attr():
                 final_exp = pn.Exp(pn.Stack(pn.Num("1")))
-                # in case of *&var
-                refs_anf = self._picoc_anf_ref(exp, [final_exp])
+                refs_anf = self._anf_ref_nodes(exp)
                 return refs_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             # case pn.Ref(pn.Name(val)):
@@ -732,8 +652,8 @@ class Passes:
             #             return [pn.Ref(pn.Global(name))]
             #         case _:
             #             return [pn.Ref(pn.Stackframe(name))]
-            case pn.Ref((pn.Subscr() | pn.Attr() | pn.Name()) as ref):
-                return self._picoc_anf_ref(ref, [])
+            case pn.Ref((pn.Deref() | pn.Attr() | pn.Name()) as ref):
+                return self._anf_ref_nodes(ref)
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps):
                 exps_anf = []
@@ -873,7 +793,7 @@ class Passes:
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
                 exps_anf = self._picoc_anf_exp(exp)
-                refs_anf = self._picoc_anf_ref(ref, [])
+                refs_anf = self._anf_ref_nodes(ref)
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_anf
@@ -968,6 +888,7 @@ class Passes:
                             + [pn.StackMalloc(self.current_fun_local_vars_size)]
                         )
 
+                        blocks[0].scope = fun_name
                         blocks_anf += [blocks[0]]
                     case _:
                         throw_type_error(blocks[0])
@@ -978,6 +899,7 @@ class Passes:
                             for stmt in stmts:
                                 stmts_anf += self._picoc_anf_stmt(stmt)
                             block.stmts_instrs[:] = stmts_anf
+                            block.scope = fun_name
                             blocks_anf += [block]
                         case _:
                             throw_type_error(block)
@@ -1057,9 +979,274 @@ class Passes:
                 for decl_def in decls_defs:
                     blocks_anf += self._picoc_anf_def(decl_def)
                 # check if there even exists a main function
+                global_block = pn.Block("_global_inits", self.global_stmts_instrs)
+                global_block.scope = "global"
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
-                    [pn.Block("_global_inits", self.global_stmts_instrs)] + blocks_anf,
+                    [global_block] + blocks_anf,
+                )
+            case _:
+                throw_type_error(file)
+
+    # =========================================================================
+    # =                            PicoC_Typing                               =
+    # =========================================================================
+    # - annotates the PicoC AST with datatype information collected during ANF
+
+    def _resolve_stackframe_datatype(self, addr):
+        bucket = self.symbol_table._table.get(self.current_scope, {})
+        for sym in bucket.values():
+            if isinstance(sym, dict) and sym.get("addr") == addr:
+                return copy.deepcopy(sym.get("datatype"))
+        return None
+
+    def _pointer_like_datatype(self, datatype):
+        """Return pointer-view of datatype for arithmetic (arrays decay one level)."""
+        match datatype:
+            case pn.ArrayDecl(nums, inner_dt):
+                # Arrays decay to a pointer to their first element, i.e. drop only
+                # the outermost dimension but keep the remaining shape intact.
+                if len(nums) > 1:
+                    return pn.PntrDecl(
+                        pn.Num("1"),
+                        pn.ArrayDecl(copy.deepcopy(nums[1:]), copy.deepcopy(inner_dt)),
+                    )
+                return pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
+            case pn.PntrDecl():
+                return copy.deepcopy(datatype)
+            case _:
+                return None
+
+    def _deref_result_datatype(self, pointer_dt):
+        match pointer_dt:
+            case pn.PntrDecl(pn.Num(val), inner_dt):
+                if int(val) > 1:
+                    return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
+                return copy.deepcopy(inner_dt)
+            case pn.ArrayDecl(nums, inner_dt):
+                if len(nums) > 1:
+                    return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
+                return copy.deepcopy(inner_dt)
+            case _:
+                return None
+
+    def _lvalue_datatype(self, ref_obj):
+        match ref_obj:
+            # TODO: Problem with linking, if function defined in other file
+            case pn.Global(pn.Name(val)):
+                symbol, _ = self.symbol_table.resolve(val, scope="global")
+                return copy.deepcopy(symbol["datatype"]) if symbol else None
+            case pn.Stackframe(pn.Num(val)):
+                return self._resolve_stackframe_datatype(int(val))
+            case pn.Deref(ptr_exp, idx_exp):
+                base_dt = self._annotate_exp(ptr_exp)
+                self._annotate_exp(idx_exp)
+                pointer_dt = self._pointer_like_datatype(base_dt) or base_dt
+                return self._deref_result_datatype(pointer_dt) if pointer_dt else None
+            case pn.Attr(exp1, pn.Name(attr_name)):
+                base_dt = self._annotate_exp(exp1)
+                match base_dt:
+                    case pn.StructSpec(pn.Name(struct_name)):
+                        symbol, _ = self.symbol_table.resolve(
+                            attr_name, scope=struct_name
+                        )
+                        return copy.deepcopy(symbol["datatype"]) if symbol else None
+                return None
+            case pn.Name(val):
+                symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
+                return copy.deepcopy(symbol["datatype"]) if symbol else None
+            case _:
+                return None
+
+    def _annotate_ref(self, ref):
+        match ref:
+            case pn.Ref(ref_obj):
+                lvalue_dt = self._lvalue_datatype(ref_obj)
+                ref.datatype = lvalue_dt if lvalue_dt else pn.Empty()
+                pointer_hint = None
+                if lvalue_dt:
+                    pointer_hint = self._pointer_like_datatype(
+                        copy.deepcopy(lvalue_dt)
+                    ) or pn.PntrDecl(pn.Num("1"), copy.deepcopy(lvalue_dt))
+                # remember stack-produced values to annotate following Exp(Stack())
+                match ref_obj:
+                    case pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))):
+                        if pointer_hint:
+                            # pointer to element lives below the index on the stack
+                            self.stack_type_hints[str(val1)] = pointer_hint
+                        # index is always an int
+                        self.stack_type_hints[str(val2)] = pn.IntType()
+                        if lvalue_dt:
+                            # deref result is produced on top of the stack
+                            self.stack_type_hints["1"] = copy.deepcopy(lvalue_dt)
+                    case pn.Attr(pn.Stack(pn.Num(val1)), _):
+                        if lvalue_dt:
+                            self.stack_type_hints[str(val1)] = lvalue_dt
+                    case _:
+                        if pointer_hint:
+                            # Ref pushes a pointer onto the stack; keep a hint for
+                            # the top couple of slots so follow-up Stack() accesses
+                            # can be annotated even after one more push.
+                            self.stack_type_hints["1"] = pointer_hint
+                            self.stack_type_hints["2"] = pointer_hint
+                return lvalue_dt
+            case _:
+                return None
+
+    def _annotate_exp(self, exp):
+        match exp:
+            # ---------------------------- L_Assign_Alloc ------------------------
+            case pn.Exp(inner_exp):
+                dtype = self._annotate_exp(inner_exp)
+                exp.datatype = dtype if dtype else pn.Empty()
+                return exp.datatype
+            # ----------------------------- L_Arith ------------------------------
+            case pn.Num():
+                return pn.IntType()
+            case pn.Char():
+                return pn.CharType()
+            case pn.Name(val):
+                symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
+                return copy.deepcopy(symbol["datatype"]) if symbol else None
+            case pn.BinOp(left_exp, bin_op, right_exp):
+                l_dt = self._annotate_exp(left_exp)
+                r_dt = self._annotate_exp(right_exp)
+                left_ptr = self._pointer_like_datatype(l_dt) if l_dt else None
+                right_ptr = self._pointer_like_datatype(r_dt) if r_dt else None
+                if isinstance(bin_op, (pn.Add, pn.Sub)) and (left_ptr or right_ptr):
+                    return left_ptr or right_ptr
+                return pn.IntType()
+            case pn.UnOp(un_op, inner_exp):
+                _ = self._annotate_exp(inner_exp)
+                match un_op:
+                    case pn.Cast(datatype):
+                        return datatype
+                    case _:
+                        return pn.IntType()
+            case pn.SizeOf():
+                return pn.IntType()
+            # ----------------------------- L_Logic ------------------------------
+            case pn.Atom(left_exp, _, right_exp):
+                self._annotate_exp(left_exp)
+                self._annotate_exp(right_exp)
+                return pn.IntType()
+            case pn.ToBool(inner_exp):
+                self._annotate_exp(inner_exp)
+                return pn.IntType()
+            # ------------------------ L_Pntr + L_Array -------------------------
+            case pn.Ref():
+                lvalue_dt = self._annotate_ref(exp)
+                if lvalue_dt:
+                    return pn.PntrDecl(pn.Num("1"), copy.deepcopy(lvalue_dt))
+                return None
+            case pn.Deref(ptr_exp, idx_exp):
+                base_dt = self._annotate_exp(ptr_exp)
+                self._annotate_exp(idx_exp)
+                pointer_dt = self._pointer_like_datatype(base_dt) or base_dt
+                return self._deref_result_datatype(pointer_dt) if pointer_dt else None
+            case pn.Array(exps):
+                # assume homogeneous, use first
+                elem_dt = self._annotate_exp(exps[0]) if exps else None
+                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt) if elem_dt else None
+            # ----------------------------- L_Struct ----------------------------
+            case pn.Struct(assigns):
+                for assign in assigns:
+                    self._picoc_typing_stmt(assign)
+                return None
+            case pn.Attr(inner_exp, pn.Name(attr_name)):
+                base_dt = self._annotate_exp(inner_exp)
+                match base_dt:
+                    case pn.StructSpec(pn.Name(struct_name)):
+                        symbol, _ = self.symbol_table.resolve(
+                            attr_name, scope=struct_name
+                        )
+                        return copy.deepcopy(symbol["datatype"]) if symbol else None
+                return None
+            # ------------------------------ L_Fun ------------------------------
+            # TODO: Problem with linking, if function defined in other file
+            case pn.Call(pn.Name(fun_name), exps):
+                for inner_exp in exps:
+                    self._annotate_exp(inner_exp)
+                symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
+                match symbol:
+                    case {"datatype": pn.FunDecl(ret_dt, _, _)}:
+                        return copy.deepcopy(ret_dt)
+                return None
+            case pn.GoTo():
+                return None
+            case rn.Reg():
+                return None
+            case pn.Stack(pn.Num(val)):
+                hint = self.stack_type_hints.get(str(val))
+                return copy.deepcopy(hint) if hint else None
+            case pn.Stackframe(pn.Num(val)):
+                return self._resolve_stackframe_datatype(int(val))
+            case pn.Global(pn.Name(val)):
+                symbol, _ = self.symbol_table.resolve(val, scope="global")
+                return copy.deepcopy(symbol["datatype"]) if symbol else None
+            case pn.Exit():
+                return None
+            case pn.Empty():
+                return None
+            case _:
+                throw_type_error(exp)
+
+    def _picoc_typing_stmt(self, stmt):
+        match stmt:
+            # ------------------------- L_Assign_Alloc ------------------------
+            case pn.Assign(lhs, exp):
+                self._annotate_exp(lhs)
+                self._annotate_exp(exp)
+            case pn.Ref():
+                self._annotate_ref(stmt)
+            case pn.Exp(exp):
+                self._annotate_exp(stmt)
+            # --------------------------- L_If_Else ---------------------------
+            case pn.If(exp, stmts):
+                self._annotate_exp(exp)
+                for inner_stmt in stmts:
+                    self._picoc_typing_stmt(inner_stmt)
+            case pn.IfElse(exp, stmts1, stmts2):
+                self._annotate_exp(exp)
+                for inner_stmt in stmts1:
+                    self._picoc_typing_stmt(inner_stmt)
+                for inner_stmt in stmts2:
+                    self._picoc_typing_stmt(inner_stmt)
+            # ----------------------------- L_Loop ----------------------------
+            case pn.While(exp, stmts):
+                self._annotate_exp(exp)
+                for inner_stmt in stmts:
+                    self._picoc_typing_stmt(inner_stmt)
+            case pn.DoWhile(exp, stmts):
+                self._annotate_exp(exp)
+                for inner_stmt in stmts:
+                    self._picoc_typing_stmt(inner_stmt)
+            # ----------------------------- L_Fun -----------------------------
+            case pn.Return(exp):
+                self._annotate_exp(exp)
+            case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
+                pass
+            case pn.GoTo() | pn.SingleLineComment():
+                pass
+            case _:
+                throw_type_error(stmt)
+
+    def picoc_typing(self, file: pn.File):
+        match file:
+            # ----------------------------- L_File ----------------------------
+            case pn.File(_, decls_defs_blocks):
+                for block in decls_defs_blocks:
+                    self.current_scope = getattr(block, "scope", "global")
+                    match block:
+                        case pn.Block(_, stmts_instrs):
+                            self.stack_type_hints = {}
+                            for stmt in stmts_instrs:
+                                self._picoc_typing_stmt(stmt)
+                        case _:
+                            throw_type_error(block)
+                return pn.File(
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_typing"),
+                    decls_defs_blocks,
                 )
             case _:
                 throw_type_error(file)
@@ -1484,19 +1671,15 @@ class Passes:
                     )
                 ]
             case pn.Ref(
-                pn.Subscr(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))),
+                pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))),
                 datatype,
             ):
                 reti_instrs = self._single_line_comment(stmt, "#")
+                # Scale the index by the full size of the referenced datatype
+                # (arrays keep their complete shape here, pointers stay size 1).
+                help_const = self._datatype_size(datatype)
                 match datatype:
-                    case pn.ArrayDecl(nums, datatype2):
-                        help_const = self._datatype_size(datatype2)
-                        for num in nums[1:]:
-                            match num:
-                                case pn.Num(val3):
-                                    help_const *= int(val3)
-                                case _:
-                                    throw_type_error(num)
+                    case pn.ArrayDecl() | pn.IntType() | pn.CharType() | pn.StructSpec():
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
@@ -1513,7 +1696,6 @@ class Passes:
                         ]
                     case pn.PntrDecl(_, datatype2):
                         # for ArrayDecl only 'if local_var_or_parameter.val == "parameter"' keep left
-                        help_const = self._datatype_size(datatype2)
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),

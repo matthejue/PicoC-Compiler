@@ -174,7 +174,10 @@ class OptionHandler:
             compl_opt_active=global_vars.args.compile,
         )
 
-        reti_blocks = passes.reti_blocks(picoc_anf)
+        picoc_typing = passes.picoc_typing(picoc_anf)
+        self._output_pass(picoc_typing, "PicoC Typing")
+
+        reti_blocks = passes.reti_blocks(picoc_typing)
         self._output_pass(
             reti_blocks, "RETI Blocks", compl_opt_active=global_vars.args.compile
         )
