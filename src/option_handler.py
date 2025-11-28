@@ -166,7 +166,10 @@ class OptionHandler:
         picoc_blocks = passes.picoc_blocks(picoc_shrink)
         self._output_pass(picoc_blocks, "PicoC Blocks")
 
-        picoc_anf = passes.picoc_anf(picoc_blocks)
+        picoc_typing = passes.picoc_typing(picoc_blocks)
+        self._output_pass(picoc_typing, "PicoC Typing")
+
+        picoc_anf = passes.picoc_anf(picoc_typing)
         self._output_pass(picoc_anf, "PicoC ANF")
         self._st_pass(
             passes.symbol_table,
@@ -174,10 +177,7 @@ class OptionHandler:
             compl_opt_active=global_vars.args.compile,
         )
 
-        picoc_typing = passes.picoc_typing(picoc_anf)
-        self._output_pass(picoc_typing, "PicoC Typing")
-
-        reti_blocks = passes.reti_blocks(picoc_typing)
+        reti_blocks = passes.reti_blocks(picoc_anf)
         self._output_pass(
             reti_blocks, "RETI Blocks", compl_opt_active=global_vars.args.compile
         )
