@@ -510,7 +510,10 @@ class Passes:
                 base_dt = self._annotate_exp(ptr_exp)
                 self._annotate_exp(idx_exp)
                 pointer_dt = self._pointer_like_datatype(base_dt) or base_dt
-                return self._deref_result_datatype(pointer_dt) if pointer_dt else None
+                ref_dt = self._deref_result_datatype(pointer_dt) if pointer_dt else None
+                if ref_dt is not None:
+                    ref.datatype = copy.deepcopy(ref_dt)
+                return ref_dt
             case pn.Attr(exp1, pn.Name(attr_name)):
                 base_dt = self._annotate_exp(exp1)
                 match base_dt:
@@ -518,8 +521,27 @@ class Passes:
                         symbol, _ = self.symbol_table.resolve(
                             attr_name, scope=struct_name
                         )
-                        return copy.deepcopy(symbol["datatype"]) if symbol else None
+                        ref_dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+                        if ref_dt is not None:
+                            ref.datatype = copy.deepcopy(ref_dt)
+                        return ref_dt
+                ref.datatype = pn.Empty()
                 return None
+            case pn.Global(pn.Name(val)):
+                symbol, _ = self.symbol_table.resolve(val, scope="global")
+                ref_dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(ref, "datatype", None)
+                if ref_dt is not None:
+                    ref.datatype = copy.deepcopy(ref_dt)
+                return ref_dt
+            case pn.Stackframe():
+                symbol_name = getattr(ref, "symbol_name", None)
+                symbol, _ = self.symbol_table.resolve(
+                    symbol_name, scope=self.current_scope
+                ) if symbol_name else (None, None)
+                ref_dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(ref, "datatype", None)
+                if ref_dt is not None:
+                    ref.datatype = copy.deepcopy(ref_dt)
+                return ref_dt
             case pn.Name(val):
                 symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
                 return copy.deepcopy(symbol["datatype"]) if symbol else None
@@ -533,9 +555,28 @@ class Passes:
                 return pn.IntType()
             case pn.Char():
                 return pn.CharType()
+            case pn.Global(pn.Name(val)):
+                symbol, _ = self.symbol_table.resolve(val, scope="global")
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
+                if dt is not None:
+                    exp.datatype = copy.deepcopy(dt)
+                    exp.symbol_name = val
+                    exp.scope = "global"
+                return dt
+            case pn.Stackframe():
+                symbol_name = getattr(exp, "symbol_name", None)
+                symbol, _ = self.symbol_table.resolve(
+                    symbol_name, scope=self.current_scope
+                ) if symbol_name else (None, None)
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
+                if dt is not None:
+                    exp.datatype = copy.deepcopy(dt)
+                    exp.scope = self.current_scope
+                return dt
             case pn.Name(val):
                 symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
-                return copy.deepcopy(symbol["datatype"]) if symbol else None
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+                return dt
             case pn.BinOp(left_exp, bin_op, right_exp):
                 l_dt = self._annotate_exp(left_exp)
                 r_dt = self._annotate_exp(right_exp)
@@ -566,7 +607,10 @@ class Passes:
                 base_dt = self._annotate_exp(ptr_exp)
                 self._annotate_exp(idx_exp)
                 pointer_dt = self._pointer_like_datatype(base_dt) or base_dt
-                return self._deref_result_datatype(pointer_dt) if pointer_dt else None
+                dt = self._deref_result_datatype(pointer_dt) if pointer_dt else None
+                if dt is not None:
+                    exp.datatype = copy.deepcopy(dt)
+                return dt
             case pn.Array(exps):
                 elem_dt = self._annotate_exp(exps[0]) if exps else None
                 return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt) if elem_dt else None
@@ -582,7 +626,11 @@ class Passes:
                         symbol, _ = self.symbol_table.resolve(
                             attr_name, scope=struct_name
                         )
-                        return copy.deepcopy(symbol["datatype"]) if symbol else None
+                        dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+                        if dt is not None:
+                            exp.datatype = copy.deepcopy(dt)
+                        return dt
+                exp.datatype = pn.Empty()
                 return None
             case pn.Exit():
                 return None
@@ -600,6 +648,145 @@ class Passes:
                 return None
             case _:
                 throw_type_error(exp)
+
+    def _resolve_name_to_storage(self, name_node):
+        match name_node:
+            case pn.Name(var_name):
+                symbol, chosen_scope = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                )
+                if symbol is None:
+                    return name_node
+                match symbol.get("type_qual"):
+                    case pn.Const():
+                        return copy.deepcopy(symbol.get("val", name_node))
+                    case _:
+                        if chosen_scope == "global":
+                            loc = pn.Global(copy.deepcopy(name_node))
+                        else:
+                            loc = pn.Stackframe(pn.Num(symbol["addr"]))
+                        loc.datatype = copy.deepcopy(symbol.get("datatype"))
+                        loc.symbol_name = var_name
+                        loc.scope = chosen_scope
+                        return loc
+            case _:
+                return name_node
+
+    def _rewrite_names_exp(self, exp):
+        match exp:
+            case pn.Name():
+                return self._resolve_name_to_storage(exp)
+            case pn.Num() | pn.Char() | pn.Empty() | pn.Stack():
+                return exp
+            case pn.Stackframe() | pn.Global():
+                self._annotate_exp(exp)
+                return exp
+            case pn.BinOp(left_exp, bin_op, right_exp):
+                return pn.BinOp(
+                    self._rewrite_names_exp(left_exp),
+                    bin_op,
+                    self._rewrite_names_exp(right_exp),
+                )
+            case pn.UnOp(un_op, inner_exp):
+                return pn.UnOp(un_op, self._rewrite_names_exp(inner_exp))
+            case pn.ToBool(inner_exp):
+                return pn.ToBool(self._rewrite_names_exp(inner_exp))
+            case pn.Atom(left_exp, rel, right_exp):
+                return pn.Atom(
+                    self._rewrite_names_exp(left_exp),
+                    rel,
+                    self._rewrite_names_exp(right_exp),
+                )
+            case pn.Ref(inner):
+                return pn.Ref(self._rewrite_names_exp(inner))
+            case pn.Deref(ref, idx):
+                rewritten = pn.Deref(
+                    self._rewrite_names_exp(ref),
+                    self._rewrite_names_exp(idx),
+                )
+                self._annotate_exp(rewritten)
+                return rewritten
+            case pn.Subscr(ref, idx):
+                return pn.Subscr(
+                    self._rewrite_names_exp(ref),
+                    self._rewrite_names_exp(idx),
+                )
+            case pn.Attr(inner_exp, pn.Name() as attr_name):
+                rewritten = pn.Attr(self._rewrite_names_exp(inner_exp), attr_name)
+                self._annotate_exp(rewritten)
+                return rewritten
+            case pn.Array(exps):
+                return pn.Array([self._rewrite_names_exp(inner) for inner in exps])
+            case pn.Struct(assigns):
+                assigns_out = []
+                for assign in assigns:
+                    match assign:
+                        case pn.Assign(lhs, inner_exp):
+                            assigns_out.append(
+                                pn.Assign(lhs, self._rewrite_names_exp(inner_exp))
+                            )
+                        case _:
+                            throw_type_error(assign)
+                return pn.Struct(assigns_out)
+            case pn.Call(pn.Name() as fun_name, exps):
+                return pn.Call(fun_name, [self._rewrite_names_exp(inner) for inner in exps])
+            case pn.Call(fun_exp, exps):
+                return pn.Call(
+                    self._rewrite_names_exp(fun_exp),
+                    [self._rewrite_names_exp(inner) for inner in exps],
+                )
+            case pn.SizeOf():
+                return exp
+            case pn.Exit():
+                return exp
+            case pn.Alloc():
+                return exp
+            case _:
+                throw_type_error(exp)
+
+    def _rewrite_names_stmt(self, stmt):
+        match stmt:
+            case pn.Assign(pn.Alloc() as alloc, exp):
+                return pn.Assign(alloc, self._rewrite_names_exp(exp))
+            case pn.Assign(lhs, exp):
+                return pn.Assign(
+                    self._rewrite_names_exp(lhs), self._rewrite_names_exp(exp)
+                )
+            case pn.Exp(exp):
+                return pn.Exp(self._rewrite_names_exp(exp))
+            case pn.If(exp, stmts):
+                return pn.If(
+                    self._rewrite_names_exp(exp),
+                    [self._rewrite_names_stmt(inner) for inner in stmts],
+                )
+            case pn.IfElse(exp, stmts1, stmts2):
+                return pn.IfElse(
+                    self._rewrite_names_exp(exp),
+                    [self._rewrite_names_stmt(inner) for inner in stmts1],
+                    [self._rewrite_names_stmt(inner) for inner in stmts2],
+                )
+            case pn.While(exp, stmts):
+                return pn.While(
+                    self._rewrite_names_exp(exp),
+                    [self._rewrite_names_stmt(inner) for inner in stmts],
+                )
+            case pn.DoWhile(exp, stmts):
+                return pn.DoWhile(
+                    self._rewrite_names_exp(exp),
+                    [self._rewrite_names_stmt(inner) for inner in stmts],
+                )
+            case pn.Return(pn.Empty()):
+                return stmt
+            case pn.Return(exp):
+                return pn.Return(self._rewrite_names_exp(exp))
+            case pn.GoTo():
+                return stmt
+            case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
+                return stmt
+            case pn.SingleLineComment():
+                return stmt
+            case _:
+                throw_type_error(stmt)
 
     def _picoc_typing_stmt(self, stmt):
         match stmt:
@@ -767,7 +954,10 @@ class Passes:
                             self.stack_type_hints = {}
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
-                                rewritten_stmts_instrs += self._picoc_typing_stmt(stmt)
+                                typed_out = self._picoc_typing_stmt(stmt)
+                                rewritten_stmts_instrs += [
+                                    self._rewrite_names_stmt(inner) for inner in typed_out
+                                ]
                             block.stmts_instrs = rewritten_stmts_instrs
                             fun_blocks_out.append(block)
                             self.block_scopes[getattr(block.name, "val", block.name)] = fun_name
@@ -788,6 +978,7 @@ class Passes:
             case pn.Exp() | pn.Assign():
                 self.current_scope = "global"
                 rewritten = self._picoc_typing_stmt(decl_def)
+                rewritten = [self._rewrite_names_stmt(stmt) for stmt in rewritten]
                 self.global_decl_stmts += copy.deepcopy(rewritten)
                 return []
             case _:
@@ -823,38 +1014,32 @@ class Passes:
     def _picoc_anf_ref(self, ref):
         match ref:
             # ---------------------------- L_Arith ----------------------------
-            case pn.Name(val):
-                var_name = val
-                symbol, chosen_scope = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
-                )
-                if symbol is None:
-                    throw_type_error(var_name)
-                match chosen_scope:
-                    case "global":
-                        return [pn.Ref(pn.Global(pn.Name(var_name)))]
-                    case _:
-                        return [pn.Ref(pn.Stackframe(pn.Num(symbol["addr"])))]
+            case pn.Global() | pn.Stackframe():
+                return [pn.Ref(ref)]
             # ------------------------ L_Pntr + L_Array -----------------------
             case pn.Deref(ptr_exp, idx_exp):
                 ptr_nodes = self._picoc_anf_ref(ptr_exp)
                 idx_nodes = self._picoc_anf_exp(idx_exp)
-                ref_dt = self._annotate_ref(pn.Deref(ptr_exp, idx_exp))
+                deref_dt = copy.deepcopy(getattr(ref, "datatype", None))
+                new_deref = pn.Deref(
+                    pn.Stack(pn.Num("2")),
+                    pn.Stack(pn.Num("1")),
+                )
+                if deref_dt is not None:
+                    new_deref.datatype = deref_dt
                 return (
                     ptr_nodes
                     + idx_nodes
-                    + [
-                        pn.Ref(
-                            pn.Deref(pn.Stack(pn.Num("2")), pn.Stack(pn.Num("1"))),
-                            ref_dt,
-                        )
-                    ]
+                    + [pn.Ref(new_deref)]
                 )
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(inner_exp, pn.Name() as name):
                 exp_nodes = self._picoc_anf_ref(inner_exp)
-                ref_dt = self._annotate_ref(pn.Attr(inner_exp, name))
-                return exp_nodes + [pn.Ref(pn.Attr(pn.Stack(pn.Num("1")), name), ref_dt)]
+                attr_dt = copy.deepcopy(getattr(ref, "datatype", None))
+                new_attr = pn.Attr(pn.Stack(pn.Num("1")), name)
+                if attr_dt is not None:
+                    new_attr.datatype = attr_dt
+                return exp_nodes + [pn.Ref(new_attr)]
             case pn.Ref(inner):
                 return self._picoc_anf_ref(inner)
             case _:
@@ -864,54 +1049,32 @@ class Passes:
     def _picoc_anf_exp(self, exp):
         match exp:
             # ---------------------------- L_Arith ----------------------------
-            case pn.Name(val):
-                var_name = val
-                symbol, choosen_scope = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
+            case pn.Global(pn.Name(var_name)) as loc:
+                symbol, chosen_scope = self.symbol_table.resolve(
+                    var_name, scope="global"
                 )
+                datatype = getattr(loc, "datatype", None)
+                if symbol:
+                    datatype = copy.deepcopy(symbol.get("datatype"))
                 match symbol:
                     case {
                         "type_qual": pn.Writeable(),
-                        "datatype": datatype,
+                        "datatype": _ as datatype_sym,
                         "name": _,
-                        "addr": addr,
-                        "size": _,
+                        "addr": _,
+                        "size": size,
                     }:
-                        name = pn.Name(var_name)
-                        num = pn.Num(addr)
-                        match choosen_scope, datatype:
+                        datatype = datatype or datatype_sym
+                        match ("global", datatype):
                             case ("global", pn.ArrayDecl()):
-                                # TODO: struct st1 st = {.ar_var=ar]
-                                return [pn.Ref(pn.Global(name))]
+                                return [pn.Ref(loc)]
                             case ("global", pn.StructSpec()):
                                 if self.argmode_on:
-                                    size = self._datatype_size(datatype)
-                                    return [
-                                        pn.Assign(
-                                            pn.Stack(pn.Num(str(size))),
-                                            pn.Global(name),
-                                        )
-                                    ]
-                                else:
-                                    # TODO: struct st2 st = {.st_var=st1]
-                                    return [pn.Exp(pn.Global(name))]
-                            case (_, pn.ArrayDecl()):
-                                return [pn.Ref(pn.Stackframe(num))]
-                            case (_, pn.StructSpec()):
-                                if self.argmode_on:
-                                    size = self._datatype_size(datatype)
-                                    return [
-                                        pn.Assign(
-                                            pn.Stack(pn.Num(str(size))),
-                                            pn.Stackframe(num),
-                                        )
-                                    ]
-                                else:
-                                    return [pn.Exp(pn.Stackframe(num))]
+                                    size_val = self._datatype_size(datatype)
+                                    return [pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)]
+                                return [pn.Exp(loc)]
                             case ("global", _):
-                                return [pn.Exp(pn.Global(name))]
-                            case (_, _):
-                                return [pn.Exp(pn.Stackframe(num))]
+                                return [pn.Exp(loc)]
                     case {
                         "type_qual": pn.Const(),
                         "datatype": _,
@@ -919,9 +1082,46 @@ class Passes:
                         "val": num,
                         "size": _,
                     }:
-                        return [pn.Exp(num)]
+                        return [pn.Exp(copy.deepcopy(num))]
                     case _:
-                        throw_type_error(symbol)
+                        throw_type_error(loc)
+            case pn.Stackframe() as loc:
+                var_name = getattr(loc, "symbol_name", None)
+                symbol, chosen_scope = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                ) if var_name else (None, None)
+                datatype = getattr(loc, "datatype", None)
+                if symbol:
+                    datatype = copy.deepcopy(symbol.get("datatype"))
+                match symbol:
+                    case {
+                        "type_qual": pn.Writeable(),
+                        "datatype": _ as datatype_sym,
+                        "name": _,
+                        "addr": _,
+                        "size": size,
+                    }:
+                        datatype = datatype or datatype_sym
+                        match (chosen_scope, datatype):
+                            case (_, pn.ArrayDecl()):
+                                return [pn.Ref(loc)]
+                            case (_, pn.StructSpec()):
+                                if self.argmode_on:
+                                    size_val = self._datatype_size(datatype)
+                                    return [pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)]
+                                return [pn.Exp(loc)]
+                            case (_, _):
+                                return [pn.Exp(loc)]
+                    case {
+                        "type_qual": pn.Const(),
+                        "datatype": _,
+                        "name": _,
+                        "val": num,
+                        "size": _,
+                    }:
+                        return [pn.Exp(copy.deepcopy(num))]
+                    case _:
+                        throw_type_error(loc)
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
@@ -1010,7 +1210,9 @@ class Passes:
             #             return [pn.Ref(pn.Global(name))]
             #         case _:
             #             return [pn.Ref(pn.Stackframe(name))]
-            case pn.Ref((pn.Deref() | pn.Attr() | pn.Name()) as ref):
+            case pn.Ref(
+                (pn.Deref() | pn.Attr() | pn.Global() | pn.Stackframe()) as ref
+            ):
                 return self._picoc_anf_ref(ref)
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps):
@@ -1082,15 +1284,43 @@ class Passes:
                 #  array_struct.visible += (
                 #      [array_struct.datatype] if global_vars.args.double_verbose else []
                 #  )
-                stmt_anf = self._picoc_anf_stmt(pn.Assign(name, array_struct))
+                stmt_anf = self._picoc_anf_stmt(
+                    pn.Assign(self._rewrite_names_exp(name), array_struct)
+                )
                 return self._single_line_comment(stmt, "//") + stmt_anf
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Assign(pn.Name(val), exp):
-                var_name = val
+            case pn.Assign(pn.Global(pn.Name(var_name)) as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 symbol, choosen_scope = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
+                    var_name, scope="global"
                 )
+                match symbol:
+                    case {
+                        "type_qual": pn.Writeable(),
+                        "datatype": _,
+                        "name": _,
+                        "addr": _,
+                        "size": size,
+                    }:
+                        num_size = pn.Num(size)
+                        return (
+                            self._single_line_comment(stmt, "//")
+                            + exps_anf
+                            + [
+                                pn.Assign(
+                                    lhs,
+                                    pn.Stack(num_size),
+                                )
+                            ]
+                        )
+                    case _:
+                        throw_type_error(symbol)
+            case pn.Assign(pn.Stackframe() as lhs, exp):
+                exps_anf = self._picoc_anf_exp(exp)
+                var_name = getattr(lhs, "symbol_name", None)
+                symbol, choosen_scope = self.symbol_table.resolve(
+                    var_name, scope=self.current_scope
+                ) if var_name else (None, None)
                 match symbol:
                     case {
                         "type_qual": pn.Writeable(),
@@ -1100,31 +1330,19 @@ class Passes:
                         "size": size,
                     }:
                         num_size = pn.Num(size)
-                        match choosen_scope:
-                            case "global":
-                                name = pn.Name(var_name)
-                                return (
-                                    self._single_line_comment(stmt, "//")
-                                    + exps_anf
-                                    + [
-                                        pn.Assign(
-                                            pn.Global(name),
-                                            pn.Stack(num_size),
-                                        )
-                                    ]
+                        target = pn.Stackframe(pn.Num(addr))
+                        setattr(target, "symbol_name", getattr(lhs, "symbol_name", None))
+                        setattr(target, "datatype", getattr(lhs, "datatype", None))
+                        return (
+                            self._single_line_comment(stmt, "//")
+                            + exps_anf
+                            + [
+                                pn.Assign(
+                                    target,
+                                    pn.Stack(num_size),
                                 )
-                            case _:
-                                num = pn.Num(addr)
-                                return (
-                                    self._single_line_comment(stmt, "//")
-                                    + exps_anf
-                                    + [
-                                        pn.Assign(
-                                            pn.Stackframe(num),
-                                            pn.Stack(num_size),
-                                        )
-                                    ]
-                                )
+                            ]
+                        )
                     case _:
                         throw_type_error(symbol)
             case pn.Assign(
@@ -1134,7 +1352,9 @@ class Passes:
                 return self._single_line_comment(stmt, "//") + []
             case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
                 self._picoc_anf_exp(alloc)
-                stmt_anf = self._picoc_anf_stmt(pn.Assign(name, exp))
+                stmt_anf = self._picoc_anf_stmt(
+                    pn.Assign(self._rewrite_names_exp(name), exp)
+                )
                 return self._single_line_comment(stmt, "//") + stmt_anf
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
@@ -1629,10 +1849,12 @@ class Passes:
                     )
                 ]
             case pn.Ref(
-                pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))),
-                datatype,
+                pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))) as ref_node
             ):
+                datatype = getattr(ref_node, "datatype", None)
                 reti_instrs = self._single_line_comment(stmt, "#")
+                if datatype is None:
+                    throw_type_error(ref_node)
                 # Scale the index by the full size of the referenced datatype
                 # (arrays keep their complete shape here, pointers stay size 1).
                 help_const = self._datatype_size(datatype)
@@ -1681,9 +1903,11 @@ class Passes:
                     ),
                 ]
             case pn.Ref(
-                pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2)),
-                datatype,
+                pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2)) as ref_node,
             ):
+                datatype = getattr(ref_node, "datatype", None)
+                if datatype is None:
+                    throw_type_error(ref_node)
                 attr_name = val2
                 rel_pos_in_struct = 0
                 match datatype:

@@ -306,10 +306,15 @@ class Stack(ASTNode):
 class Stackframe(ASTNode):
     def __init__(self, num):
         self.num = num
+        self.datatype: ASTNode = Empty()
+        self.symbol_name = None
+        self.scope = None
 
     @property
     def visible(self):
-        return [self.num]
+        return [self.num] + (
+            [self.datatype] if global_vars.args.double_verbose else []
+        )
 
     __match_args__ = ("num",)
 
@@ -317,10 +322,15 @@ class Stackframe(ASTNode):
 class Global(ASTNode):
     def __init__(self, num):
         self.num = num
+        self.datatype: ASTNode = Empty()
+        self.symbol_name = None
+        self.scope = None
 
     @property
     def visible(self):
-        return [self.num]
+        return [self.num] + (
+            [self.datatype] if global_vars.args.double_verbose else []
+        )
 
     __match_args__ = ("num",)
 
@@ -352,23 +362,25 @@ class PntrDecl(ASTNode):
 class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exp, self.datatype]
+        return [self.exp]
 
-    __match_args__ = ("exp", "datatype")
+    __match_args__ = ("exp",)
 
 
 class Deref(ASTNode):
     def __init__(self, exp1, exp2):
         self.exp1 = exp1
         self.exp2 = exp2
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exp1, self.exp2]
+        return [self.exp1, self.exp2] + (
+            [self.datatype] if global_vars.args.double_verbose else []
+        )
 
     __match_args__ = ("exp1", "exp2")
 
@@ -426,10 +438,13 @@ class Attr(ASTNode):
     def __init__(self, exp, name):
         self.exp = exp
         self.name = name
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exp, self.name]
+        return [self.exp, self.name] + (
+            [self.datatype] if global_vars.args.double_verbose else []
+        )
 
     __match_args__ = ("exp", "name")
 
