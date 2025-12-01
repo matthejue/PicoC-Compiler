@@ -1,8 +1,10 @@
 import itertools
+import sys
+import traceback
+from typing import Any, Dict, List, Optional, Type
+
 from src import global_vars
 import src.picoc_nodes as pn
-import sys
-from typing import Any, Dict, List, Optional, Type
 from src.utils.util_funs_independent import convert_to_single_line
 
 def overwrite(old, replace_with, idx):
@@ -46,10 +48,13 @@ def args_to_str(args: list):
         return "no arguments"
 
 
-def throw_type_error(node):
-    raise TypeError(
-        f"Unexpected AST node: {type(node).__name__}({', '.join(type(c).__name__ for c in node.visible)})"
+def throw_error(node):
+    print(
+        f"Unexpected value ({type(node).__name__}): {node!r}",
+        file=sys.stderr,
     )
+    traceback.print_stack(file=sys.stderr)
+    sys.exit(1)
 
 
 def remove_ext(fname):

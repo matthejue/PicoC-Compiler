@@ -1,6 +1,5 @@
 from src.ast_node import ASTNode
 from src import picoc_nodes as pn
-from src.utils.util_funs_dependent import throw_type_error
 from src import global_vars
 from bitstring import Bits
 

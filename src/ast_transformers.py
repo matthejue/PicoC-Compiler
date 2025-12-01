@@ -1,8 +1,9 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
+import sys
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
-from src.utils.util_funs_dependent import throw_type_error, remove_ext, nodes_to_str
+from src.utils.util_funs_dependent import remove_ext, nodes_to_str, throw_error
 from src import global_vars
 
 
@@ -158,7 +159,7 @@ class TransformerPicoC(Transformer):
                 previous_bin_exp.left_exp = exp2
                 return exp1, bin_op, bin_exp
             case _:
-                throw_type_error(current_bin_exp)
+                throw_error(current_bin_exp)
 
     def sizeof_exp(self, nodes):
         return pn.SizeOf(nodes[0])
@@ -194,11 +195,11 @@ class TransformerPicoC(Transformer):
                     case None:
                         return pn.Deref(exp1, pn.Num("0"))
                     case _:
-                        throw_type_error(bin_op)
+                        throw_error(bin_op)
             case pn.RefOp():
                 return pn.Ref(exp)
             case _:
-                throw_type_error(nodes)
+                throw_error(un_op)
 
     # --------------------------------- L_Arith -------------------------------
     def input_exp(self, _):
@@ -268,7 +269,7 @@ class TransformerPicoC(Transformer):
             case pn.Char():
                 return pn.ToBool(node)
             case _:
-                throw_type_error(node)
+                throw_error(node)
 
     def logic_and(self, nodes):
         if len(nodes) == 1:

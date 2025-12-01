@@ -1,9 +1,7 @@
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.symbol_table import SymbolTable
-from src.utils.util_funs_dependent import (
-    throw_type_error,
-)
+from src.utils.util_funs_dependent import throw_error
 from src.utils.util_funs_independent import (
     convert_to_single_line,
 )
@@ -98,13 +96,13 @@ class Passes:
                                 )
                             ]
                         case _:
-                            throw_type_error(assign)
+                            throw_error(assign)
                 return pn.Struct(assigns_shrinked)
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(name, exps):
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case _:
-                throw_type_error(exp)
+                throw_error(exp)
 
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
@@ -148,7 +146,7 @@ class Passes:
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
             case _:
-                throw_type_error(stmt)
+                throw_error(stmt)
 
     def picoc_shrink(self, file: pn.File):
         match file:
@@ -168,13 +166,13 @@ class Passes:
                         case pn.StructDecl() | pn.FunDecl() | pn.Exp() | pn.Assign():
                             decls_defs_shrinked += [decl_def]
                         case _:
-                            throw_type_error(decl_def)
+                            throw_error(decl_def)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_shrink"),
                     decls_defs_shrinked,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                              PicoC_Blocks                             =
@@ -358,7 +356,7 @@ class Passes:
             case pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign():
                 return [decl_def]
             case _:
-                throw_type_error(decl_def)
+                throw_error(decl_def)
 
     def picoc_blocks(self, file: pn.File):
         match file:
@@ -372,7 +370,7 @@ class Passes:
                     decls_defs_blocks,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                            PicoC_Typing                               =
@@ -388,7 +386,7 @@ class Passes:
                 case pn.Alloc(_, datatype):
                     size += self._datatype_size(datatype)
                 case _:
-                    throw_type_error(alloc)
+                    throw_error(alloc)
         return size
 
     def _datatype_size(self, datatype) -> int:
@@ -411,10 +409,10 @@ class Passes:
                         case pn.Num(val):
                             size *= int(val)
                         case _:
-                            throw_type_error(num)
+                            throw_error(num)
                 return size
             case _:
-                throw_type_error(datatype)
+                throw_error(datatype)
 
     def _declare_alloc(self, alloc, *, initial_val=None):
         match alloc:
@@ -472,7 +470,7 @@ class Passes:
                             size if local_var_or_param == "local_var" else 0
                         )
             case _:
-                throw_type_error(alloc)
+                throw_error(alloc)
 
     def _deref_result_datatype(self, pointer_dt):
         match pointer_dt:
@@ -565,7 +563,7 @@ class Passes:
                                 pn.Assign(lhs, self._picoc_rewrite_exp(inner_exp))
                             )
                         case _:
-                            throw_type_error(assign)
+                            throw_error(assign)
                 return pn.Struct(assigns_out)
             case pn.Call(pn.Name() as fun_name, exps):
                 return pn.Call(fun_name, [self._picoc_rewrite_exp(inner) for inner in exps])
@@ -581,7 +579,7 @@ class Passes:
             case pn.Alloc():
                 return exp
             case _:
-                throw_type_error(exp)
+                throw_error(exp)
 
     def _picoc_rewrite_stmt(self, stmt):
         match stmt:
@@ -625,7 +623,7 @@ class Passes:
             case pn.SingleLineComment():
                 return stmt
             case _:
-                throw_type_error(stmt)
+                throw_error(stmt)
 
     def _picoc_annotate_exp(self, exp):
         match exp:
@@ -731,7 +729,7 @@ class Passes:
             case pn.Empty():
                 return None
             case _:
-                throw_type_error(exp)
+                throw_error(exp)
 
     def _picoc_annotate_stmt(self, stmt):
         match stmt:
@@ -807,7 +805,7 @@ class Passes:
             case pn.GoTo() | pn.SingleLineComment():
                 return [stmt]
             case _:
-                throw_type_error(stmt)
+                throw_error(stmt)
 
     def _picoc_typing_decl_def(self, decl_def):
         match decl_def:
@@ -832,7 +830,7 @@ class Passes:
                             attrs += [pn.Name(attr_name)]
                             struct_size += attr_size
                         case _:
-                            throw_type_error(alloc)
+                            throw_error(alloc)
 
                 self.symbol_table.declare(
                     struct_name,
@@ -898,7 +896,7 @@ class Passes:
                             fun_blocks_out.append(block)
                             self.block_scopes[getattr(block.name, "val", block.name)] = fun_name
                         case _:
-                            throw_type_error(block)
+                            throw_error(block)
 
                 match blocks:
                     case [pn.Block(_, entry_stmts), *_]:
@@ -909,7 +907,7 @@ class Passes:
                             else []
                         ) + [pn.StackMalloc(self.current_fun_local_vars_size)]
                     case _:
-                        throw_type_error(blocks)
+                        throw_error(blocks)
 
                 match blocks[-1]:
                     case pn.Block(_, stmts) if stmts and isinstance(stmts[-1], pn.Return):
@@ -917,7 +915,7 @@ class Passes:
                     case pn.Block(_, stmts):
                         stmts.append(pn.Return())
                     case _:
-                        throw_type_error(blocks[-1])
+                        throw_error(blocks[-1])
 
                 self.fun_local_sizes[fun_name] = self.current_fun_local_vars_size
                 self.current_scope = "global"
@@ -929,7 +927,7 @@ class Passes:
                 self.global_decl_stmts += copy.deepcopy(rewritten)
                 return []
             case _:
-                throw_type_error(decl_def)
+                throw_error(decl_def)
 
     def picoc_typing(self, file: pn.File):
         match file:
@@ -951,7 +949,7 @@ class Passes:
                     blocks_out,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                               PicoC_ANF                               =
@@ -969,7 +967,7 @@ class Passes:
                 idx_nodes = self._picoc_anf_exp(idx_exp)
                 deref_dt = copy.deepcopy(getattr(ref, "datatype", None))
                 if deref_dt is None:
-                    throw_type_error(ref)
+                    sys.exit(1)
                 new_deref = pn.Deref(
                     pn.Stack(pn.Num("2")),
                     pn.Stack(pn.Num("1")),
@@ -985,14 +983,14 @@ class Passes:
                 exp_nodes = self._picoc_anf_ref(inner_exp)
                 attr_dt = copy.deepcopy(getattr(ref, "datatype", None))
                 if attr_dt is None:
-                    throw_type_error(ref)
+                    sys.exit(1)
                 new_attr = pn.Attr(pn.Stack(pn.Num("1")), name)
                 new_attr.datatype = attr_dt
                 return exp_nodes + [pn.Ref(new_attr)]
             case pn.Ref(inner):
                 return self._picoc_anf_ref(inner)
             case _:
-                throw_type_error(ref)
+                throw_error(ref)
 
 
     def _picoc_anf_exp(self, exp):
@@ -1033,7 +1031,7 @@ class Passes:
                     }:
                         return [pn.Exp(copy.deepcopy(num))]
                     case _:
-                        throw_type_error(loc)
+                        throw_error(symbol)
             case pn.Stackframe() as loc:
                 var_name = getattr(loc, "symbol_name", None)
                 symbol, chosen_scope = self.symbol_table.resolve(
@@ -1070,7 +1068,7 @@ class Passes:
                     }:
                         return [pn.Exp(copy.deepcopy(num))]
                     case _:
-                        throw_type_error(loc)
+                        throw_error(symbol)
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
@@ -1180,7 +1178,7 @@ class Passes:
                         case pn.Assign(_, exp):
                             exps_anf += self._picoc_anf_exp(exp)
                         case _:
-                            throw_type_error(assign)
+                            throw_error(assign)
                 return exps_anf
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val) as name, exps):
@@ -1191,7 +1189,7 @@ class Passes:
                     case pn.FunDecl(datatype2, pn.Name()):
                         return_type = datatype2
                     case _:
-                        throw_type_error(symbol)
+                        throw_error(datatype)
 
                 exps_anf = []
                 self.argmode_on = True
@@ -1216,7 +1214,7 @@ class Passes:
                     )
                 )
             case _:
-                throw_type_error(exp)
+                throw_error(exp)
 
     def _picoc_anf_stmt(self, stmt):
         match stmt:
@@ -1266,7 +1264,7 @@ class Passes:
                             ]
                         )
                     case _:
-                        throw_type_error(symbol)
+                        throw_error(symbol)
             case pn.Assign(pn.Stackframe() as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 var_name = getattr(lhs, "symbol_name", None)
@@ -1296,7 +1294,7 @@ class Passes:
                             ]
                         )
                     case _:
-                        throw_type_error(symbol)
+                        throw_error(symbol)
             case pn.Assign(
                 pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1)), num
             ):
@@ -1351,7 +1349,7 @@ class Passes:
             case pn.GoTo(pn.Name(val)):
                 return [pn.Exp(stmt)]
             case _:
-                throw_type_error(stmt)
+                throw_error(stmt)
 
     def picoc_anf(self, file: pn.File):
         match file:
@@ -1373,13 +1371,13 @@ class Passes:
                             block.stmts_instrs[:] = stmts_anf
                             blocks_anf.append(block)
                         case _:
-                            throw_type_error(block)
+                            throw_error(block)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
                     blocks_anf,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                              RETI_Blocks                              =
@@ -1396,7 +1394,7 @@ class Passes:
                     #  case "// //":
                     #      return [pn.SingleLineComment("# // //", content)]
                     case _:
-                        throw_type_error(prefix)
+                        throw_error(prefix)
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(
                 pn.BinOp(
@@ -1411,7 +1409,7 @@ class Passes:
                     case pn.LogicOr():
                         lop = rn.Or()
                     case _:
-                        throw_type_error(bin_lop)
+                        throw_error(bin_lop)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1457,7 +1455,7 @@ class Passes:
                             rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), exp, rn.Im("1")]),
                         ]
                     case _:
-                        throw_type_error(exp)
+                        throw_error(exp)
 
                 return reti_instrs + [
                     rn.Instr(
@@ -1518,7 +1516,7 @@ class Passes:
                     case pn.Or():
                         aop = rn.Or()
                     case _:
-                        throw_type_error(bin_aop)
+                        throw_error(bin_aop)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1548,7 +1546,7 @@ class Passes:
                     case pn.Minus():
                         pass
                     case _:
-                        throw_type_error(un_op)
+                        throw_error(un_op)
                 return reti_instrs + [
                     rn.Instr(
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
@@ -1615,7 +1613,7 @@ class Passes:
                     case pn.GtE():
                         rel = rn.GtE()
                     case _:
-                        throw_type_error(rel)
+                        throw_error(rel)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
@@ -1768,7 +1766,7 @@ class Passes:
                                 ),
                             ]
                         case _:
-                            throw_type_error(mem, tmp)
+                            throw_error((mem, tmp))
                     tmp.num.val = int(tmp.num.val) + 1
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
@@ -1793,7 +1791,7 @@ class Passes:
                             ),
                         ]
                     case _:
-                        throw_type_error(exp)
+                        throw_error(exp)
                 return reti_instrs + [
                     rn.Instr(
                         rn.Storein(),
@@ -1805,7 +1803,7 @@ class Passes:
             ):
                 datatype = getattr(ref_node, "datatype", None)
                 if datatype is None:
-                    throw_type_error(ref_node)
+                    sys.exit(1)
                 reti_instrs = self._single_line_comment(stmt, "#")
                 # Scale the index by the size of a single element of the referenced type.
                 match datatype:
@@ -1816,11 +1814,11 @@ class Passes:
                                 case pn.Num(val3):
                                     help_const *= int(val3)
                                 case _:
-                                    throw_type_error(num)
+                                    throw_error(num)
                     case pn.PntrDecl(_, datatype2):
                         help_const = self._datatype_size(datatype2)
                     case _:
-                        throw_type_error(datatype)
+                        throw_error(datatype)
                 match datatype:
                     case pn.ArrayDecl() | pn.IntType() | pn.CharType() | pn.StructSpec():
                         reti_instrs += [
@@ -1858,7 +1856,7 @@ class Passes:
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
                     case _:
-                        throw_type_error(datatype)
+                        throw_error(datatype)
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(
@@ -1870,7 +1868,7 @@ class Passes:
             ):
                 datatype = getattr(ref_node, "datatype", None)
                 if datatype is None:
-                    throw_type_error(ref_node)
+                    sys.exit(1)
                 attr_name = val2
                 rel_pos_in_struct = 0
                 match datatype:
@@ -1889,7 +1887,7 @@ class Passes:
                             attr_size = symbol["size"]
                             rel_pos_in_struct += int(attr_size)
                     case _:
-                        throw_type_error(datatype)
+                        throw_error(datatype)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
@@ -1922,7 +1920,7 @@ class Passes:
                     case pn.ArrayDecl():
                         return self._single_line_comment(stmt, "# // not included")
                     case _:
-                        throw_type_error(datatype)
+                        throw_error(datatype)
             case pn.Assign(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
@@ -2025,7 +2023,7 @@ class Passes:
                     ),
                 ]
             case _:
-                throw_type_error(stmt)
+                throw_error(stmt)
 
     def reti_blocks(self, file: pn.File):
         match file:
@@ -2040,14 +2038,14 @@ class Passes:
                                 instrs += self._reti_blocks_stmt(stmt)
                             block.stmts_instrs[:] = instrs
                         case _:
-                            throw_type_error(block)
+                            throw_error(block)
                 reti_blocks = blocks
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
                     reti_blocks,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                               RETI_Patch                              =
@@ -2138,13 +2136,13 @@ class Passes:
                                 rn.Instr(rn.Storein(), [reg1, reg2, rn.Im("0")]),
                             ]
                         case _:
-                            throw_type_error()
+                            throw_error(op)
                 else:
                     return [instr]
             case rn.Instr(rn.Loadi(), [reg, rn.Im(val)]):
                 s_num = int(val)
                 if s_num < -(2**31) or s_num > 2**31:
-                    throw_type_error(instr)
+                    sys.exit(1)
                 elif s_num < -(2**21) or s_num > 2**21 - 1:
                     return self._write_large_immediate_in_register(reg, s_num)
                 else:
@@ -2185,7 +2183,7 @@ class Passes:
                     patched_blocks,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)
 
     # =========================================================================
     # =                                  RETI                                 =
@@ -2347,10 +2345,10 @@ class Passes:
                                     case _:
                                         idx += 1
                         case _:
-                            throw_type_error(block)
+                            throw_error(block)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti"),
                     instrs_block_free,
                 )
             case _:
-                throw_type_error(file)
+                throw_error(file)

@@ -15,7 +15,7 @@ from src.ast_transformers import TransformerPicoC, ASTTransformerRETI
 from src.passes import Passes
 from src.utils.util_funs_dependent import (
     remove_ext,
-    throw_type_error,
+    throw_error,
     subheading,
     get_ext,
 )
@@ -355,7 +355,7 @@ class OptionHandler:
                     with open(val, "w", encoding="utf-8") as fout:
                         fout.write(str(pass_ast)[1:])
                 case _:
-                    throw_type_error(pass_ast)
+                    throw_error(pass_ast)
 
     def _st_pass(self, symbol_table: st.SymbolTable, heading, compl_opt_active=False, is_global_st=False):
         if (
@@ -405,7 +405,7 @@ class OptionHandler:
                     # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
                     fout.write(str(pass_ast)[1:])
             case _:
-                throw_type_error(pass_ast)
+                throw_error(pass_ast)
 
 
 def _parse_cli_args():
