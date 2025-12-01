@@ -1,6 +1,11 @@
 from src.ast_node import ASTNode, repr_arg_types
 from src import global_vars
 
+# Helper: include datatype fields in visible output only when double-verbose is on.
+def _add_if_double_verbose(base_list, datatype):
+    show_dt = global_vars.args.double_verbose
+    return base_list + ([datatype] if show_dt else [])
+
 
 # =========================================================================
 # =                              Token Nodes                              =
@@ -196,7 +201,7 @@ class Cast(ASTNode):
 
     @property
     def visible(self):
-        return [self.datatype]
+        return self.datatype
 
     __match_args__ = ("datatype",)
 
@@ -258,12 +263,8 @@ class Alloc(ASTNode):
 
     @property
     def visible(self):
-        return [
-            self.type_qual,
-            self.datatype,
-            self.name,
-            self.local_var_or_param
-        ]
+        return [self.type_qual, self.datatype, self.name, self.local_var_or_param]
+            
 
     __match_args__ = ("type_qual", "datatype", "name", "local_var_or_param")
 
@@ -287,7 +288,7 @@ class Exp(ASTNode):
 
     @property
     def visible(self):
-        return [self.exp] + ([self.datatype] if global_vars.args.double_verbose else [])
+        return _add_if_double_verbose([self.exp], self.datatype)
 
     __match_args__ = ("exp", "datatype")
 
@@ -312,9 +313,7 @@ class Stackframe(ASTNode):
 
     @property
     def visible(self):
-        return [self.num] + (
-            [self.datatype] if global_vars.args.double_verbose else []
-        )
+        return _add_if_double_verbose([self.num], self.datatype)
 
     __match_args__ = ("num",)
 
@@ -328,9 +327,7 @@ class Global(ASTNode):
 
     @property
     def visible(self):
-        return [self.num] + (
-            [self.datatype] if global_vars.args.double_verbose else []
-        )
+        return _add_if_double_verbose([self.num], self.datatype)
 
     __match_args__ = ("num",)
 
@@ -378,9 +375,7 @@ class Deref(ASTNode):
 
     @property
     def visible(self):
-        return [self.exp1, self.exp2] + (
-            [self.datatype] if global_vars.args.double_verbose else []
-        )
+        return _add_if_double_verbose([self.exp1, self.exp2], self.datatype)
 
     __match_args__ = ("exp1", "exp2")
 
@@ -401,11 +396,11 @@ class ArrayDecl(ASTNode):
 class Array(ASTNode):
     def __init__(self, exps):
         self.exps = exps
-        self.datatype: ASTNode
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exps]
+        return [self.exps, self.datatype]
 
     __match_args__ = ("exps", "datatype")
 
@@ -442,9 +437,7 @@ class Attr(ASTNode):
 
     @property
     def visible(self):
-        return [self.exp, self.name] + (
-            [self.datatype] if global_vars.args.double_verbose else []
-        )
+        return _add_if_double_verbose([self.exp, self.name], self.datatype)
 
     __match_args__ = ("exp", "name")
 
@@ -456,7 +449,7 @@ class Struct(ASTNode):
 
     @property
     def visible(self):
-        return [self.assigns]
+        return [self.assigns, self.datatype]
 
     __match_args__ = ("assigns", "datatype")
 
