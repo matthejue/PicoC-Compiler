@@ -686,6 +686,13 @@ class Passes:
                 self._picoc_annotate_exp(inner_exp)
                 return pn.IntType()
             # ------------------------ L_Pntr + L_Array -------------------------
+            case pn.Ref(inner_exp):
+                inner_dt = self._picoc_annotate_exp(inner_exp)
+                if inner_dt is None:
+                    return None
+                pointer_dt = pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
+                exp.datatype = copy.deepcopy(pointer_dt)
+                return pointer_dt
             case pn.Deref(ptr_exp, idx_exp):
                 base_dt = self._picoc_annotate_exp(ptr_exp)
                 self._picoc_annotate_exp(idx_exp)
