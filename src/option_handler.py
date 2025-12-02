@@ -3,6 +3,7 @@ from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src import debug as db
 import sys
 import shutil
 from lark.lark import Lark
@@ -35,6 +36,7 @@ class OptionHandler:
     def __init__(self):
         _set_terminal_size()
         _parse_cli_args()
+        _install_post_mortem_hook()
         _print_args_if_verbose()
         if not global_vars.args.infiles and sys.stdin.isatty():
             open_documentation()
@@ -53,6 +55,8 @@ class OptionHandler:
                     result = self.build_file(f)
                     results.append(result)  # store filename + return value
                 except Exception as e:
+                    if global_vars.args.debug:
+                        raise  # let the post-mortem hook handle it
                     print(f"[ERROR] {f}: {e}")
                     if global_vars.args.traceback:
                         traceback.print_exc()
@@ -68,6 +72,8 @@ class OptionHandler:
                         result = fut.result()
                         results.append(result)
                     except Exception as e:
+                        if global_vars.args.debug:
+                            raise  # let the post-mortem hook handle it
                         print(f"[ERROR] {f}: {e}")
                         if global_vars.args.traceback:
                             traceback.print_exc()
@@ -124,8 +130,8 @@ class OptionHandler:
         return preprocessor.preprocess(code, path)
 
     def _compl(self, code):
-        if global_vars.args.debug:
-            __import__("pudb").set_trace()
+        # db.activate_debug()
+        # db.debug()
 
         if global_vars.args.intermediate_stages:
             print(subheading("Preprocessed Code", "-"))
@@ -166,6 +172,7 @@ class OptionHandler:
         picoc_blocks = passes.picoc_blocks(picoc_shrink)
         self._output_pass(picoc_blocks, "PicoC Blocks")
 
+        db.activate_debug()
         picoc_typing = passes.picoc_typing(picoc_blocks)
         self._output_pass(picoc_typing, "PicoC Typing")
 
@@ -516,6 +523,14 @@ def _set_terminal_size():
             size.columns,
             size.lines,
         )
+
+
+def _install_post_mortem_hook():
+    if not global_vars.args.debug:
+        return
+
+    # Ensure unhandled exceptions drop into the debugger directly.
+    sys.excepthook = db.debug_excepthook
 
 
 def _print_args_if_verbose():

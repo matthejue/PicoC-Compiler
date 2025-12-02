@@ -483,7 +483,7 @@ class Passes:
                     return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
                 return copy.deepcopy(inner_dt)
             case _:
-                return None
+                return pn.Empty()
 
     def _resolve_name_to_storage(self, name_node):
         match name_node:
@@ -712,8 +712,7 @@ class Passes:
                         symbol, _ = self.symbol_table.resolve(
                             attr_name, scope=struct_name
                         )
-                        dt = copy.deepcopy(symbol["datatype"]) if symbol else None
-                        return dt
+                        return copy.deepcopy(symbol["datatype"])
             case pn.Exit():
                 return None
             # ------------------------------ L_Fun ------------------------------
@@ -889,6 +888,7 @@ class Passes:
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
                                 typed_out = self._picoc_annotate_stmt(stmt)
+                                db.debug()
                                 rewritten_stmts_instrs += [
                                     self._picoc_rewrite_stmt(inner) for inner in typed_out
                                 ]
@@ -1902,7 +1902,12 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Exp(pn.Stack(pn.Num(val1)), datatype):
                 match datatype:
-                    case pn.StructSpec() | pn.PntrDecl() | pn.IntType() | pn.CharType():
+                    case (
+                        pn.StructSpec()
+                        | pn.PntrDecl()
+                        | pn.IntType()
+                        | pn.CharType()
+                    ):
                         return self._single_line_comment(stmt, "#") + [
                             rn.Instr(
                                 rn.Loadin(),

@@ -445,7 +445,7 @@ class Attr(ASTNode):
 class Struct(ASTNode):
     def __init__(self, assigns):
         self.assigns = assigns
-        self.datatype: ASTNode
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):

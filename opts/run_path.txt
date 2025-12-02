@@ -1,1 +1,1 @@
-./sys_tests/basic_array_of_pntrs_and_pntr_of_arrays.picoc
+./sys_tests/basic_struct_init.picoc
