@@ -173,16 +173,19 @@ class OptionHandler:
         self._output_pass(picoc_blocks, "PicoC Blocks")
 
         db.activate_debug()
-        picoc_typing = passes.picoc_typing(picoc_blocks)
-        self._output_pass(picoc_typing, "PicoC Typing")
-
-        picoc_anf = passes.picoc_anf(picoc_typing)
-        self._output_pass(picoc_anf, "PicoC ANF")
+        picoc_symbol = passes.picoc_symbol(picoc_blocks)
+        self._output_pass(picoc_symbol, "PicoC Symbol")
         self._st_pass(
             passes.symbol_table,
             "Symbol Table",
             compl_opt_active=global_vars.args.compile,
         )
+
+        picoc_typing = passes.picoc_typing(picoc_symbol)
+        self._output_pass(picoc_typing, "PicoC Typing")
+
+        picoc_anf = passes.picoc_anf(picoc_typing)
+        self._output_pass(picoc_anf, "PicoC ANF")
 
         reti_blocks = passes.reti_blocks(picoc_anf)
         self._output_pass(

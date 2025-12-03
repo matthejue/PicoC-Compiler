@@ -1,5 +1,6 @@
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src import debug as db
 from src.symbol_table import SymbolTable
 from src.utils.util_funs_dependent import throw_error
 from src.utils.util_funs_independent import (
@@ -373,9 +374,9 @@ class Passes:
                 throw_error(file)
 
     # =========================================================================
-    # =                            PicoC_Typing                               =
+    # =                            PicoC_Symbol                               =
     # =========================================================================
-    # - annotates the PicoC AST with datatype information collected before ANF
+    # - builds the symbol table and rewrites PicoC AST nodes ahead of typing
 
     def _param_size(self, allocs) -> int:
         size = 0
@@ -470,20 +471,7 @@ class Passes:
                             size if local_var_or_param == "local_var" else 0
                         )
             case _:
-                throw_error(alloc)
-
-    def _deref_result_datatype(self, pointer_dt):
-        match pointer_dt:
-            case pn.PntrDecl(pn.Num(val), inner_dt):
-                if int(val) > 1:
-                    return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
-                return copy.deepcopy(inner_dt)
-            case pn.ArrayDecl(nums, inner_dt):
-                if len(nums) > 1:
-                    return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
-                return copy.deepcopy(inner_dt)
-            case _:
-                return pn.Empty()
+                throw_error(alloc) 
 
     def _resolve_name_to_storage(self, name_node):
         match name_node:
@@ -516,7 +504,6 @@ class Passes:
             case pn.Num() | pn.Char() | pn.Empty() | pn.Stack():
                 return exp
             case pn.Stackframe() | pn.Global():
-                self._picoc_annotate_exp(exp)
                 return exp
             case pn.BinOp(left_exp, bin_op, right_exp):
                 return pn.BinOp(
@@ -537,21 +524,17 @@ class Passes:
             case pn.Ref(inner):
                 return pn.Ref(self._picoc_rewrite_exp(inner))
             case pn.Deref(ref, idx):
-                rewritten = pn.Deref(
+                return pn.Deref(
                     self._picoc_rewrite_exp(ref),
                     self._picoc_rewrite_exp(idx),
                 )
-                self._picoc_annotate_exp(rewritten)
-                return rewritten
             # case pn.Subscr(ref, idx):
             #     return pn.Subscr(
             #         self._rewrite_names_exp(ref),
             #         self._rewrite_names_exp(idx),
             #     )
             case pn.Attr(inner_exp, pn.Name() as attr_name):
-                rewritten = pn.Attr(self._picoc_rewrite_exp(inner_exp), attr_name)
-                self._picoc_annotate_exp(rewritten)
-                return rewritten
+                return pn.Attr(self._picoc_rewrite_exp(inner_exp), attr_name)
             case pn.Array(exps):
                 return pn.Array([self._picoc_rewrite_exp(inner) for inner in exps])
             case pn.Struct(assigns):
@@ -625,188 +608,70 @@ class Passes:
             case _:
                 throw_error(stmt)
 
-    def _picoc_annotate_exp(self, exp):
-        match exp:
-            # ----------------------------- L_Arith ------------------------------
-            case pn.Num():
-                return pn.IntType()
-            case pn.Char():
-                return pn.CharType()
-            case pn.Global(pn.Name(val)):
-                symbol, _ = self.symbol_table.resolve(val, scope="global")
-                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
-                if dt is not None:
-                    exp.datatype = copy.deepcopy(dt)
-                    exp.symbol_name = val
-                    exp.scope = "global"
-                return dt
-            case pn.Stackframe():
-                symbol_name = getattr(exp, "symbol_name", None)
-                symbol, _ = self.symbol_table.resolve(
-                    symbol_name, scope=self.current_scope
-                ) if symbol_name else (None, None)
-                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
-                if dt is not None:
-                    exp.datatype = copy.deepcopy(dt)
-                    exp.scope = self.current_scope
-                return dt
-            case pn.Name(val):
-                symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
-                dt = copy.deepcopy(symbol["datatype"]) if symbol else None
-                return dt
-            case pn.BinOp(left_exp, bin_op, right_exp):
-                l_dt = self._picoc_annotate_exp(left_exp)
-                r_dt = self._picoc_annotate_exp(right_exp)
-                if isinstance(bin_op, (pn.Add, pn.Sub)):
-                    if isinstance(l_dt, (pn.PntrDecl, pn.ArrayDecl)):
-                        exp.datatype = copy.deepcopy(l_dt)
-                        return copy.deepcopy(l_dt)
-                    if isinstance(r_dt, (pn.PntrDecl, pn.ArrayDecl)):
-                        exp.datatype = copy.deepcopy(r_dt)
-                        return copy.deepcopy(r_dt)
-                exp.datatype = pn.IntType()
-                return pn.IntType()
-            case pn.UnOp(un_op, inner_exp):
-                _ = self._picoc_annotate_exp(inner_exp)
-                match un_op:
-                    case pn.Cast(datatype):
-                        return datatype
-                    case _:
-                        return pn.IntType()
-            case pn.SizeOf():
-                return pn.IntType()
-            # ----------------------------- L_Logic ------------------------------
-            case pn.Atom(left_exp, _, right_exp):
-                self._picoc_annotate_exp(left_exp)
-                self._picoc_annotate_exp(right_exp)
-                return pn.IntType()
-            case pn.ToBool(inner_exp):
-                self._picoc_annotate_exp(inner_exp)
-                return pn.IntType()
-            # ------------------------ L_Pntr + L_Array -------------------------
-            case pn.Ref(inner_exp):
-                inner_dt = self._picoc_annotate_exp(inner_exp)
-                if inner_dt is None:
-                    return None
-                pointer_dt = pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
-                exp.datatype = copy.deepcopy(pointer_dt)
-                return pointer_dt
-            case pn.Deref(ptr_exp, idx_exp):
-                base_dt = self._picoc_annotate_exp(ptr_exp)
-                self._picoc_annotate_exp(idx_exp)
-                exp.datatype = copy.deepcopy(base_dt)
-                return self._deref_result_datatype(base_dt) if base_dt else None
-            case pn.Array(exps):
-                elem_dt = self._picoc_annotate_exp(exps[0]) if exps else None
-                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt) if elem_dt else None
-            # ----------------------------- L_Struct ----------------------------
-            case pn.Struct(assigns):
-                for assign in assigns:
-                    self._picoc_annotate_stmt(assign)
-                return None
-            case pn.Attr(inner_exp, pn.Name(attr_name)):
-                base_dt = self._picoc_annotate_exp(inner_exp)
-                exp.datatype = copy.deepcopy(base_dt)
-                match base_dt:
-                    case pn.StructSpec(pn.Name(struct_name)):
-                        symbol, _ = self.symbol_table.resolve(
-                            attr_name, scope=struct_name
-                        )
-                        return copy.deepcopy(symbol["datatype"])
-            case pn.Exit():
-                return None
-            # ------------------------------ L_Fun ------------------------------
-            # TODO: Problem with linking, if function defined in other file
-            case pn.Call(pn.Name(fun_name), exps):
-                for inner_exp in exps:
-                    self._picoc_annotate_exp(inner_exp)
-                symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
-                match symbol:
-                    case {"datatype": pn.FunDecl(ret_dt, _, _)}:
-                        return copy.deepcopy(ret_dt)
-                return None
-            case pn.Empty():
-                return None
-            case _:
-                throw_error(exp)
-
-    def _picoc_annotate_stmt(self, stmt):
+    def _picoc_symbol_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(
                 pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1)), num
             ):
-                var_name = val1
-                # Annotate for consistency/future proofing (currently pn.Num only).
-                self._picoc_annotate_exp(num)
                 self._declare_alloc(
-                    pn.Alloc(type_qual, datatype, pn.Name(var_name)),
+                    pn.Alloc(type_qual, datatype, pn.Name(val1)),
                     initial_val=copy.deepcopy(num),
                 )
                 return self._single_line_comment(stmt, "//")
             case pn.Assign(pn.Alloc(type_qual, _, pn.Name() as name) as alloc, exp):
-                self._picoc_annotate_exp(exp)
                 initial_val = copy.deepcopy(exp) if isinstance(type_qual, pn.Const) else None
                 self._declare_alloc(alloc, initial_val=initial_val)
                 new_stmt = pn.Assign(name, exp)
-                # annotate rewritten assignment
-                return self._single_line_comment(stmt, "//") + self._picoc_annotate_stmt(new_stmt)
+                return self._single_line_comment(stmt, "//") + self._picoc_symbol_stmt(new_stmt)
             case pn.Exp(pn.Alloc() as alloc):
                 self._declare_alloc(alloc)
                 return self._single_line_comment(stmt, "//")
             case pn.Assign(lhs, exp):
-                self._picoc_annotate_exp(lhs)
-                self._picoc_annotate_exp(exp)
-                return [stmt]
+                return [pn.Assign(lhs, exp)]
             case pn.Exp(exp):
-                self._picoc_annotate_exp(exp)
-                return [stmt]
+                return [pn.Exp(exp)]
             # --------------------------- L_If_Else ---------------------------
             case pn.If(exp, stmts):
-                self._picoc_annotate_exp(exp)
                 new_stmts = []
                 for inner_stmt in stmts:
-                    new_stmts += self._picoc_annotate_stmt(inner_stmt)
+                    new_stmts += self._picoc_symbol_stmt(inner_stmt)
                 stmt.stmts = new_stmts
                 return [stmt]
             case pn.IfElse(exp, stmts1, stmts2):
-                self._picoc_annotate_exp(exp)
                 new_stmts1 = []
                 for inner_stmt in stmts1:
-                    new_stmts1 += self._picoc_annotate_stmt(inner_stmt)
+                    new_stmts1 += self._picoc_symbol_stmt(inner_stmt)
                 new_stmts2 = []
                 for inner_stmt in stmts2:
-                    new_stmts2 += self._picoc_annotate_stmt(inner_stmt)
+                    new_stmts2 += self._picoc_symbol_stmt(inner_stmt)
                 stmt.stmts1 = new_stmts1
                 stmt.stmts2 = new_stmts2
                 return [stmt]
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
-                self._picoc_annotate_exp(exp)
                 new_stmts = []
                 for inner_stmt in stmts:
-                    new_stmts += self._picoc_annotate_stmt(inner_stmt)
+                    new_stmts += self._picoc_symbol_stmt(inner_stmt)
                 stmt.stmts = new_stmts
                 return [stmt]
             case pn.DoWhile(exp, stmts):
-                self._picoc_annotate_exp(exp)
                 new_stmts = []
                 for inner_stmt in stmts:
-                    new_stmts += self._picoc_annotate_stmt(inner_stmt)
+                    new_stmts += self._picoc_symbol_stmt(inner_stmt)
                 stmt.stmts = new_stmts
                 return [stmt]
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(exp):
-                self._picoc_annotate_exp(exp)
                 return [stmt]
-            case pn.StackMalloc():
+            case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
                 return [stmt]
             case pn.GoTo() | pn.SingleLineComment():
                 return [stmt]
             case _:
                 throw_error(stmt)
 
-    def _picoc_typing_decl_def(self, decl_def):
+    def _picoc_symbol_decl_def(self, decl_def):
         match decl_def:
             case pn.StructDecl(pn.Name(struct_name), allocs):
                 attrs = []
@@ -887,8 +752,7 @@ class Passes:
                             self.stack_type_hints = {}
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
-                                typed_out = self._picoc_annotate_stmt(stmt)
-                                db.debug()
+                                typed_out = self._picoc_symbol_stmt(stmt)
                                 rewritten_stmts_instrs += [
                                     self._picoc_rewrite_stmt(inner) for inner in typed_out
                                 ]
@@ -922,14 +786,14 @@ class Passes:
                 return fun_blocks_out
             case pn.Exp() | pn.Assign():
                 self.current_scope = "global"
-                rewritten = self._picoc_annotate_stmt(decl_def)
+                rewritten = self._picoc_symbol_stmt(decl_def)
                 rewritten = [self._picoc_rewrite_stmt(stmt) for stmt in rewritten]
                 self.global_decl_stmts += copy.deepcopy(rewritten)
                 return []
             case _:
                 throw_error(decl_def)
 
-    def picoc_typing(self, file: pn.File):
+    def picoc_symbol(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(_, decls_defs_blocks):
@@ -940,13 +804,222 @@ class Passes:
                 self.block_scopes = {}
                 fun_blocks_out = []
                 for decl_def in decls_defs_blocks:
-                    fun_blocks_out += self._picoc_typing_decl_def(decl_def)
+                    fun_blocks_out += self._picoc_symbol_decl_def(decl_def)
 
                 blocks_out = [pn.Block("_global_inits", self.global_decl_stmts)] + fun_blocks_out
                 self.block_scopes["_global_inits"] = "global"
                 return pn.File(
-                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_typing"),
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_symbol"),
                     blocks_out,
+                )
+            case _:
+                throw_error(file)
+
+    # =========================================================================
+    # =                            PicoC_Typing                               =
+    # =========================================================================
+    # - annotates the PicoC AST with datatype information collected before ANF
+
+    def _deref_result_datatype(self, pointer_dt):
+            match pointer_dt:
+                case pn.PntrDecl(pn.Num(val), inner_dt):
+                    if int(val) > 1:
+                        return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
+                    return copy.deepcopy(inner_dt)
+                case pn.ArrayDecl(nums, inner_dt):
+                    if len(nums) > 1:
+                        return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
+                    return copy.deepcopy(inner_dt)
+                case _:
+                    return pn.Empty()
+
+    def _picoc_type_exp(self, exp):
+        match exp:
+            # ----------------------------- L_Arith ------------------------------
+            case pn.Num():
+                return pn.IntType()
+            case pn.Char():
+                return pn.CharType()
+            case pn.Global(pn.Name(val)):
+                symbol, _ = self.symbol_table.resolve(val, scope="global")
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
+                if dt is not None:
+                    exp.datatype = copy.deepcopy(dt)
+                    exp.symbol_name = val
+                    exp.scope = "global"
+                return dt
+            case pn.Stackframe():
+                symbol_name = getattr(exp, "symbol_name", None)
+                symbol, _ = self.symbol_table.resolve(
+                    symbol_name, scope=self.current_scope
+                ) if symbol_name else (None, None)
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else getattr(exp, "datatype", None)
+                if dt is not None:
+                    exp.datatype = copy.deepcopy(dt)
+                    exp.scope = self.current_scope
+                return dt
+            case pn.Name(val):
+                symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
+                dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+                return dt
+            case pn.BinOp(left_exp, bin_op, right_exp):
+                l_dt = self._picoc_type_exp(left_exp)
+                r_dt = self._picoc_type_exp(right_exp)
+                if isinstance(bin_op, (pn.Add, pn.Sub)):
+                    if isinstance(l_dt, (pn.PntrDecl, pn.ArrayDecl)):
+                        exp.datatype = copy.deepcopy(l_dt)
+                        return copy.deepcopy(l_dt)
+                    if isinstance(r_dt, (pn.PntrDecl, pn.ArrayDecl)):
+                        exp.datatype = copy.deepcopy(r_dt)
+                        return copy.deepcopy(r_dt)
+                exp.datatype = pn.IntType()
+                return pn.IntType()
+            case pn.UnOp(un_op, inner_exp):
+                _ = self._picoc_type_exp(inner_exp)
+                match un_op:
+                    case pn.Cast(datatype):
+                        return datatype
+                    case _:
+                        return pn.IntType()
+            case pn.SizeOf():
+                return pn.IntType()
+            # ----------------------------- L_Logic ------------------------------
+            case pn.Atom(left_exp, _, right_exp):
+                self._picoc_type_exp(left_exp)
+                self._picoc_type_exp(right_exp)
+                return pn.IntType()
+            case pn.ToBool(inner_exp):
+                self._picoc_type_exp(inner_exp)
+                return pn.IntType()
+            # ------------------------ L_Pntr + L_Array -------------------------
+            case pn.Ref(inner_exp):
+                inner_dt = self._picoc_type_exp(inner_exp)
+                if inner_dt is None:
+                    return None
+                pointer_dt = pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
+                exp.datatype = copy.deepcopy(pointer_dt)
+                return pointer_dt
+            case pn.Deref(ptr_exp, idx_exp):
+                base_dt = self._picoc_type_exp(ptr_exp)
+                self._picoc_type_exp(idx_exp)
+                exp.datatype = copy.deepcopy(base_dt)
+                return self._deref_result_datatype(base_dt) if base_dt else None
+            case pn.Array(exps):
+                elem_dt = self._picoc_type_exp(exps[0]) if exps else None
+                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt) if elem_dt else None
+            # ----------------------------- L_Struct ----------------------------
+            case pn.Struct(assigns):
+                for assign in assigns:
+                    self._picoc_type_stmt(assign)
+                return None
+            case pn.Attr(inner_exp, pn.Name(attr_name)):
+                base_dt = self._picoc_type_exp(inner_exp)
+                exp.datatype = copy.deepcopy(base_dt)
+                match base_dt:
+                    case pn.StructSpec(pn.Name(struct_name)):
+                        symbol, _ = self.symbol_table.resolve(
+                            attr_name, scope=struct_name
+                        )
+                        return copy.deepcopy(symbol["datatype"])
+            case pn.Exit():
+                return None
+            # ------------------------------ L_Fun ------------------------------
+            # TODO: Problem with linking, if function defined in other file
+            case pn.Call(pn.Name(fun_name), exps):
+                for inner_exp in exps:
+                    self._picoc_type_exp(inner_exp)
+                symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
+                match symbol:
+                    case {"datatype": pn.FunDecl(ret_dt, _, _)}:
+                        return copy.deepcopy(ret_dt)
+                return None
+            case pn.Empty():
+                return None
+            case _:
+                throw_error(exp)
+
+    def _picoc_type_stmt(self, stmt):
+        match stmt:
+            case pn.Assign(pn.Alloc(), exp):
+                self._picoc_type_exp(exp)
+                return [stmt]
+            case pn.Assign(lhs, exp):
+                self._picoc_type_exp(lhs)
+                self._picoc_type_exp(exp)
+                return [stmt]
+            case pn.Exp(pn.Alloc()):
+                return [stmt]
+            case pn.Exp(exp):
+                self._picoc_type_exp(exp)
+                return [stmt]
+            # --------------------------- L_If_Else ---------------------------
+            case pn.If(exp, stmts):
+                self._picoc_type_exp(exp)
+                new_stmts = []
+                for inner_stmt in stmts:
+                    new_stmts += self._picoc_type_stmt(inner_stmt)
+                stmt.stmts = new_stmts
+                return [stmt]
+            case pn.IfElse(exp, stmts1, stmts2):
+                self._picoc_type_exp(exp)
+                new_stmts1 = []
+                for inner_stmt in stmts1:
+                    new_stmts1 += self._picoc_type_stmt(inner_stmt)
+                new_stmts2 = []
+                for inner_stmt in stmts2:
+                    new_stmts2 += self._picoc_type_stmt(inner_stmt)
+                stmt.stmts1 = new_stmts1
+                stmt.stmts2 = new_stmts2
+                return [stmt]
+            # ----------------------------- L_Loop ----------------------------
+            case pn.While(exp, stmts):
+                self._picoc_type_exp(exp)
+                new_stmts = []
+                for inner_stmt in stmts:
+                    new_stmts += self._picoc_type_stmt(inner_stmt)
+                stmt.stmts = new_stmts
+                return [stmt]
+            case pn.DoWhile(exp, stmts):
+                self._picoc_type_exp(exp)
+                new_stmts = []
+                for inner_stmt in stmts:
+                    new_stmts += self._picoc_type_stmt(inner_stmt)
+                stmt.stmts = new_stmts
+                return [stmt]
+            # ----------------------------- L_Fun -----------------------------
+            case pn.Return(pn.Empty()):
+                return [stmt]
+            case pn.Return(exp):
+                self._picoc_type_exp(exp)
+                return [stmt]
+            case pn.StackMalloc():
+                return [stmt]
+            case pn.GoTo() | pn.SingleLineComment():
+                return [stmt]
+            case _:
+                throw_error(stmt)
+
+    def picoc_typing(self, file: pn.File):
+        match file:
+            # ----------------------------- L_File ----------------------------
+            case pn.File(_, blocks):
+                self.current_scope = "global"
+                typed_blocks = []
+                for block in blocks:
+                    label = getattr(block.name, "val", block.name)
+                    self.current_scope = self.block_scopes.get(label, "global")
+                    match block:
+                        case pn.Block(_, stmts):
+                            new_stmts = []
+                            for stmt in stmts:
+                                new_stmts += self._picoc_type_stmt(stmt)
+                            block.stmts_instrs = new_stmts
+                            typed_blocks.append(block)
+                        case _:
+                            throw_error(block)
+                return pn.File(
+                    pn.Name(global_vars.tstate.path_without_ext + ".picoc_typing"),
+                    typed_blocks,
                 )
             case _:
                 throw_error(file)
