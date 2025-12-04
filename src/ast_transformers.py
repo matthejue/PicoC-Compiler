@@ -5,138 +5,338 @@ from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import remove_ext, nodes_to_str, throw_error
 from src import global_vars
+from tree_sitter import Language, Parser
+import tree_sitter_c
+from typing import Optional, Sequence
 
 
-class TransformerPicoC(Transformer):
-    # =========================================================================
-    # =                                 Lexer                                 =
-    # =========================================================================
-    # --------------------------------- L_Arith -------------------------------
-    def NUM(self, token: Token):
-        return pn.Num(token.value)
+_TS_LANGUAGE = Language(tree_sitter_c.language())
 
-    def CHAR(self, token: Token):
-        return pn.Char(token.value[1:-1])
 
-    def FILENAME(self, token: Token):
-        return pn.Name(token.value)
+class TransformerPicoC:
+    """
+    Tree-sitter backed transformer that builds the PicoC AST using the
+    upstream C grammar.
+    """
 
-    def name(self, tokens):
-        token = tokens[0]
-        return pn.Name(token.value)
+    def __init__(self):
+        self.parser = Parser()
+        self.parser.language = _TS_LANGUAGE
 
-    def un_op(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "-":
-                return pn.Minus(
-                    token.value,
-                )
-            case "!":
-                return pn.LogicNot(
-                    token.value,
-                )
-            case "~":
-                return pn.Not(
-                    token.value,
-                )
-            case "*":
-                return pn.DerefOp(
-                    token.value,
-                )
-            case "&":
-                return pn.RefOp(
-                    token.value,
-                )
+    # ------------------------------------------------------------------ public
+    def parse_tree(self, code: str):
+        return self.parser.parse(code.encode("utf-8"))
 
-    def prec1_op(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "*":
-                return pn.Mul(
-                    token.value,
-                )
-            case "/":
-                return pn.Div(
-                    token.value,
-                )
-            case "%":
-                return pn.Mod(
-                    token.value,
-                )
+    def transform(self, code: str):
+        tree = self.parse_tree(code)
+        ast = self._translation_unit(tree.root_node, code)
+        return tree, ast
 
-    def prec2_op(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "+":
-                return pn.Add(
-                    token.value,
-                )
-            case "-":
-                return pn.Sub(
-                    token.value,
-                )
+    # ----------------------------------------------------------------- helpers
+    def _text(self, node, code: str) -> str:
+        return code[node.start_byte : node.end_byte]
 
-    # --------------------------------- L_Logic -------------------------------
-    def rel_op(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "<":
-                return pn.Lt(
-                    token.value,
-                )
-            case "<=":
-                return pn.LtE(
-                    token.value,
-                )
-            case ">":
-                return pn.Gt(
-                    token.value,
-                )
-            case ">=":
-                return pn.GtE(
-                    token.value,
-                )
-
-    def eq_op(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "==":
-                return pn.Eq(
-                    token.value,
-                )
-            case "!=":
-                return pn.NEq(
-                    token.value,
-                )
-
-    # ----------------------------- L_Assign_Alloc ----------------------------
-    def prim_dt(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
+    def _prim_type(self, node, code: str):
+        text = self._text(node, code)
+        match text:
             case "int":
-                return pn.IntType(
-                    token.value,
-                )
+                return pn.IntType()
             case "char":
-                return pn.CharType(
-                    token.value,
-                )
+                return pn.CharType()
             case "void":
-                return pn.VoidType(
-                    token.value,
+                return pn.VoidType()
+        throw_error(text)
+
+    def _bin_op_node(self, op: str):
+        match op:
+            case "+":
+                return pn.Add()
+            case "-":
+                return pn.Sub()
+            case "*":
+                return pn.Mul()
+            case "/":
+                return pn.Div()
+            case "%":
+                return pn.Mod()
+            case "^":
+                return pn.Oplus()
+            case "&":
+                return pn.And()
+            case "|":
+                return pn.Or()
+            case "&&":
+                return pn.LogicAnd()
+            case "||":
+                return pn.LogicOr()
+            case "<":
+                return pn.Lt()
+            case "<=":
+                return pn.LtE()
+            case ">":
+                return pn.Gt()
+            case ">=":
+                return pn.GtE()
+            case "==":
+                return pn.Eq()
+            case "!=":
+                return pn.NEq()
+        throw_error(op)
+
+    def _wrap_pointers(self, base_dt, count: int):
+        datatype = base_dt
+        for _ in range(count):
+            datatype = pn.PntrDecl(pn.Num("1"), datatype)
+        return datatype
+
+    def _wrap_arrays(self, base_dt, dims: Sequence[pn.Num]):
+        datatype = base_dt
+        for dim in dims:
+            datatype = pn.ArrayDecl([dim], datatype)
+        return datatype
+
+    # ----------------------------------------------------------------- parsing
+    def _translation_unit(self, node, code: str):
+        decls_defs = []
+        for child in node.children:
+            if not child.is_named:
+                continue
+            match child.type:
+                case "function_definition":
+                    decls_defs.append(self._function_definition(child, code))
+                case "declaration":
+                    decls_defs.extend(self._declaration(child, code))
+                case _:
+                    continue
+
+        return pn.File(
+            pn.Name(global_vars.tstate.path_without_ext + ".ast"), decls_defs
+        )
+
+    # ------------------------------ declarators ------------------------------
+    def _apply_declarator(self, node, base_type, code: str):
+        match node.type:
+            case "identifier":
+                return base_type, pn.Name(self._text(node, code))
+            case "parenthesized_declarator":
+                inner = next(c for c in node.children if c.is_named)
+                return self._apply_declarator(inner, base_type, code)
+            case "pointer_declarator":
+                pointer_count = sum(1 for c in node.children if not c.is_named and self._text(c, code) == "*")
+                inner = next(c for c in node.children if c.is_named)
+                inner_type, name = self._apply_declarator(inner, base_type, code)
+                return self._wrap_pointers(inner_type, pointer_count), name
+            case "array_declarator":
+                inner = node.child_by_field_name("declarator")
+                size_node = node.child_by_field_name("size")
+                dims = []
+                if size_node:
+                    dims.append(pn.Num(self._text(size_node, code)))
+                inner_type, name = self._apply_declarator(inner, base_type, code)
+                return self._wrap_arrays(inner_type, dims), name
+            case "function_declarator":
+                # We handle parameters separately when building FunDecl/FunDef
+                inner = node.child_by_field_name("declarator")
+                return self._apply_declarator(inner, base_type, code)
+        throw_error(node.type)
+
+    def _parameter_declaration(self, node, code: str):
+        type_node = node.child_by_field_name("type")
+        dt = self._prim_type(type_node, code)
+        declarator = node.child_by_field_name("declarator")
+        datatype, name = self._apply_declarator(declarator, dt, code)
+        return pn.Alloc(pn.Writeable(), datatype, name)
+
+    def _parameter_list(self, node, code: str):
+        params = []
+        for child in node.children:
+            if child.type == "parameter_declaration":
+                params.append(self._parameter_declaration(child, code))
+        return params
+
+    # ------------------------------ functions -------------------------------
+    def _function_definition(self, node, code: str):
+        type_node = node.child_by_field_name("type")
+        dt = self._prim_type(type_node, code)
+
+        decl_node = node.child_by_field_name("declarator")
+        params_node = decl_node.child_by_field_name("parameters")
+        params = self._parameter_list(params_node, code) if params_node else []
+        datatype, name = self._apply_declarator(
+            decl_node.child_by_field_name("declarator"), dt, code
+        )
+
+        body_node = node.child_by_field_name("body")
+        stmts = self._compound_statement(body_node, code)
+
+        return pn.FunDef(datatype, name, params, stmts)
+
+    # ----------------------------- declarations -----------------------------
+    def _declaration(self, node, code: str):
+        type_node = node.child_by_field_name("type")
+        if type_node is None:
+            return []
+        base_type = self._prim_type(type_node, code)
+        results = []
+
+        for child in node.children:
+            if child.type != "init_declarator":
+                continue
+            declarator = child.child_by_field_name("declarator")
+            value_node = child.child_by_field_name("value")
+
+            if declarator.type == "function_declarator":
+                params_node = declarator.child_by_field_name("parameters")
+                params = self._parameter_list(params_node, code) if params_node else []
+                datatype, name = self._apply_declarator(
+                    declarator.child_by_field_name("declarator"), base_type, code
                 )
+                results.append(pn.FunDecl(datatype, name, params))
+                continue
 
-    # =========================================================================
-    # =                                 Parser                                =
-    # =========================================================================
-    # ------------- L_Arith + L_Array + L_Pntr + L_Struct + L_Fun -------------
-    def prim_exp(self, nodes):
-        return nodes[0]
+            datatype, name = self._apply_declarator(declarator, base_type, code)
+            alloc = pn.Alloc(pn.Writeable(), datatype, name)
+            if value_node:
+                init_val = self._expression(value_node, code)
+                results.append(pn.Assign(alloc, init_val))
+            else:
+                results.append(pn.Exp(alloc))
 
-    def post_exp(self, nodes):
-        return nodes[0]
+        return results
 
+    # ------------------------------- statements -----------------------------
+    def _compound_statement(self, node, code: str):
+        stmts = []
+        for child in node.children:
+            if not child.is_named:
+                continue
+            stmts.extend(self._statement(child, code))
+        return stmts
+
+    def _statement(self, node, code: str):
+        match node.type:
+            case "declaration":
+                return self._declaration(node, code)
+            case "expression_statement":
+                # empty statements return []
+                expr_child = next((c for c in node.children if c.is_named), None)
+                if expr_child is None:
+                    return []
+                expr = self._expression(expr_child, code)
+                if isinstance(expr, pn.Assign):
+                    return [expr]
+                return [pn.Exp(expr)]
+            case "return_statement":
+                expr_child = next((c for c in node.children if c.is_named), None)
+                return [pn.Return(self._expression(expr_child, code) if expr_child else pn.Empty())]
+            case "if_statement":
+                cond = self._expression(node.child_by_field_name("condition"), code)
+                cons = self._statement(node.child_by_field_name("consequence"), code)
+                alt_node = node.child_by_field_name("alternative")
+                if alt_node:
+                    alt = self._statement(alt_node, code)
+                    return [pn.IfElse(cond, cons, alt)]
+                return [pn.If(cond, cons)]
+            case "while_statement":
+                cond = self._expression(node.child_by_field_name("condition"), code)
+                body = self._statement(node.child_by_field_name("body"), code)
+                return [pn.While(cond, body)]
+            case "do_statement":
+                body = self._statement(node.child_by_field_name("body"), code)
+                cond = self._expression(node.child_by_field_name("condition"), code)
+                return [pn.DoWhile(cond, body)]
+            case "compound_statement":
+                return self._compound_statement(node, code)
+            case "break_statement":
+                return [pn.Exp(pn.Call(pn.Name("break"), []))]
+        return []
+
+    # ------------------------------- expressions ----------------------------
+    def _expression(self, node, code: str):
+        if node is None:
+            return pn.Empty()
+
+        match node.type:
+            case "identifier":
+                return pn.Name(self._text(node, code))
+            case "number_literal":
+                return pn.Num(self._text(node, code))
+            case "char_literal":
+                literal = self._text(node, code)
+                return pn.Char(literal[1:-1])
+            case "string_literal":
+                return pn.Name(self._text(node, code))
+            case "parenthesized_expression":
+                inner = next(c for c in node.children if c.is_named)
+                return self._expression(inner, code)
+            case "call_expression":
+                func = self._expression(node.child_by_field_name("function"), code)
+                args_node = node.child_by_field_name("arguments")
+                args = []
+                if args_node:
+                    for child in args_node.children:
+                        if child.is_named:
+                            args.append(self._expression(child, code))
+                return pn.Call(func, args)
+            case "binary_expression":
+                left = self._expression(node.child_by_field_name("left"), code)
+                right = self._expression(node.child_by_field_name("right"), code)
+                op = next(self._text(c, code) for c in node.children if not c.is_named)
+                bin_node = self._bin_op_node(op)
+                if isinstance(bin_node, (pn.Lt, pn.LtE, pn.Gt, pn.GtE, pn.Eq, pn.NEq)):
+                    return pn.Atom(left, bin_node, right)
+                if isinstance(bin_node, (pn.LogicAnd, pn.LogicOr)):
+                    return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
+                return pn.BinOp(left, bin_node, right)
+            case "assignment_expression":
+                left = self._expression(node.child_by_field_name("left"), code)
+                right = self._expression(node.child_by_field_name("right"), code)
+                return pn.Assign(left, right)
+            case "unary_expression":
+                op = next(self._text(c, code) for c in node.children if not c.is_named)
+                exp = self._expression(next(c for c in node.children if c.is_named), code)
+                match op:
+                    case "-":
+                        return pn.UnOp(pn.Minus(), exp)
+                    case "!":
+                        return pn.UnOp(pn.LogicNot(), self._to_bool(exp))
+                    case "~":
+                        return pn.UnOp(pn.Not(), exp)
+                throw_error(op)
+            case "pointer_expression":
+                op = self._text(next(c for c in node.children if not c.is_named), code)
+                exp = self._expression(next(c for c in node.children if c.is_named), code)
+                match op:
+                    case "&":
+                        return pn.Ref(exp)
+                    case "*":
+                        base, bin_op, rest = self._leftmost_node(exp)
+                        match bin_op:
+                            case pn.Add():
+                                return pn.Deref(base, rest)
+                            case pn.Sub():
+                                return pn.Deref(base, pn.UnOp(pn.Minus(), rest))
+                            case None:
+                                return pn.Deref(exp, pn.Num("0"))
+                        throw_error(bin_op)
+                throw_error(op)
+            case "sizeof_expression":
+                target = node.child_by_field_name("type") or node.child_by_field_name("value")
+                return pn.SizeOf(self._expression(target, code))
+            case "subscript_expression":
+                base = self._expression(node.child_by_field_name("argument"), code)
+                index = self._expression(node.child_by_field_name("index"), code)
+                return pn.Subscr(base, index)
+            case "field_expression":
+                argument = self._expression(node.child_by_field_name("argument"), code)
+                field = node.child_by_field_name("field")
+                return pn.Attr(argument, pn.Name(self._text(field, code)))
+            case "initializer_list":
+                exps = [self._expression(c, code) for c in node.children if c.is_named]
+                return pn.Array(exps)
+        throw_error(node.type)
+
+    # ------------------------------ expression utils ------------------------
     def _leftmost_node(self, bin_exp):
         current_bin_exp = bin_exp
         previous_bin_exp = None
@@ -161,100 +361,9 @@ class TransformerPicoC(Transformer):
             case _:
                 throw_error(current_bin_exp)
 
-    def sizeof_exp(self, nodes):
-        return pn.SizeOf(nodes[0])
-
-    def cast_exp(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        else:
-            # datatype = nodes[0][0]
-            # for node in nodes[0][:0:-1]:
-            #     node.datatype = datatype
-            #     datatype = node
-            # return pn.UnOp(pn.Cast(datatype), nodes[1])
-            return pn.UnOp(pn.Cast(nodes[0]), nodes[1])
-
-    def un_exp(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        un_op = nodes[0]
-        exp = nodes[1]
-        match un_op:
-            case (pn.Minus() | pn.Not()):
-                return pn.UnOp(un_op, exp)
-            case pn.LogicNot():
-                return pn.UnOp(un_op, self._insert_to_bool(exp))
-            case pn.DerefOp():
-                exp1, bin_op, exp2 = self._leftmost_node(exp)
-                match bin_op:
-                    case pn.Add():
-                        return pn.Deref(exp1, exp2)
-                    case pn.Sub():
-                        return pn.Deref(exp1, pn.UnOp(pn.Minus(), exp2))
-                    case None:
-                        return pn.Deref(exp1, pn.Num("0"))
-                    case _:
-                        throw_error(bin_op)
-            case pn.RefOp():
-                return pn.Ref(exp)
-            case _:
-                throw_error(un_op)
-
-    # --------------------------------- L_Arith -------------------------------
-    def input_exp(self, _):
-        return pn.Call(pn.Name("input"), [])
-
-    def print_exp(self, nodes):
-        return pn.Call(pn.Name("print"), [nodes[0]])
-
-    def break_exp(self, _):
-        return pn.Call(pn.Name("break"), [])
-
-    def arith_prec1(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(nodes[0], nodes[1], nodes[2])
-
-    def arith_prec2(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(nodes[0], nodes[1], nodes[2])
-
-    def arith_and(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(nodes[0], pn.And(), nodes[1])
-
-    def arith_oplus(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(nodes[0], pn.Oplus(), nodes[1])
-
-    def arith_or(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(nodes[0], pn.Or(), nodes[1])
-
-    # --------------------------------- L_Logic -------------------------------
-    def rel_exp(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.Atom(nodes[0], nodes[1], nodes[2])
-
-    def eq_exp(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.Atom(nodes[0], nodes[1], nodes[2])
-
-    def _insert_to_bool(self, node):
+    def _to_bool(self, node):
         match node:
-            # exclude all possible logic nodes
-            case pn.BinOp(_, pn.LogicAnd(), _):
-                return node
-            case pn.BinOp(_, pn.LogicOr(), _):
-                return node
-            case pn.Atom():
+            case pn.BinOp(_, pn.LogicAnd(), _) | pn.BinOp(_, pn.LogicOr(), _) | pn.Atom():
                 return node
             case pn.UnOp(pn.LogicNot(), _):
                 return node
@@ -262,209 +371,9 @@ class TransformerPicoC(Transformer):
                 return pn.ToBool(node)
             case pn.UnOp():
                 return pn.ToBool(node)
-            case pn.Num():
+            case pn.Num() | pn.Name() | pn.Char():
                 return pn.ToBool(node)
-            case pn.Name():
-                return pn.ToBool(node)
-            case pn.Char():
-                return pn.ToBool(node)
-            case _:
-                throw_error(node)
-
-    def logic_and(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(
-            self._insert_to_bool(nodes[0]),
-            pn.LogicAnd(),
-            self._insert_to_bool(nodes[1]),
-        )
-
-    def logic_or(self, nodes):
-        if len(nodes) == 1:
-            return nodes[0]
-        return pn.BinOp(
-            self._insert_to_bool(nodes[0]),
-            pn.LogicOr(),
-            self._insert_to_bool(nodes[1]),
-        )
-
-    # ----------------------------- L_Assign_Alloc ----------------------------
-    def type_spec(self, nodes):
-        return nodes[0]
-
-    def alloc(self, nodes):
-        if isinstance(nodes[0], list):
-            datatype = nodes[0][0]
-            for node in nodes[0][:0:-1]:
-                node.datatype = datatype
-                datatype = node
-            return pn.Alloc(pn.Writeable(), datatype, nodes[1])
-        else:
-            return pn.Alloc(pn.Writeable(), nodes[0], nodes[1])
-
-    def assign_stmt(self, nodes):
-        return pn.Assign(nodes[0], nodes[1])
-
-    def initializer(self, nodes):
-        return nodes[0]
-
-    def init_stmt(self, nodes):
-        return pn.Assign(nodes[0], nodes[1])
-
-    def const_init_stmt(self, nodes):
-        return pn.Assign(
-            pn.Alloc(pn.Const(), nodes[0], nodes[1]),
-            nodes[2],
-        )
-
-    # ------------------------ L_Assign_Alloc_Abstract ------------------------
-    
-    def type_name(self, nodes):
-        if len(nodes) == 1:
-            return pn.PntrDecl(pn.Num(1), nodes[0])
-
-    # --------------------------------- L_Array -------------------------------
-    def array_dims(self, nodes):
-        return nodes
-
-    def array_decl(self, nodes):
-        match nodes[0]:
-            case []:
-                return nodes[1]
-            case _:
-                if isinstance(nodes[1], list):
-                    return nodes[1] + [pn.ArrayDecl(nodes[0], pn.Placeholder())]
-                else:
-                    return [nodes[1], pn.ArrayDecl(nodes[0], pn.Placeholder())]
-
-    def array_init(self, nodes):
-        return pn.Array(nodes)
-
-    def array_subscr(self, nodes):
-        # TODO: Fehlermeldungen, wenn da eine Num ist
-        return pn.Subscr(nodes[0], nodes[1])
-
-    # --------------------------------- L_Pntr --------------------------------
-    def pntr_deg(self, nodes):
-        return pn.Num(str(len(nodes)))
-
-    def pntr_decl(self, nodes):
-        match nodes[0]:
-            case pn.Num("0"):
-                return nodes[1]
-            case _:
-                if isinstance(nodes[1], list):
-                    return nodes[1] + [pn.PntrDecl(nodes[0], pn.Placeholder())]
-                else:
-                    return [nodes[1], pn.PntrDecl(nodes[0], pn.Placeholder())]
-
-    # -------------------------------- L_Struct -------------------------------
-    def struct_spec(self, nodes):
-        return pn.StructSpec(nodes[0])
-
-    def struct_params(self, nodes):
-        return nodes
-
-    def struct_decl(self, nodes):
-        return pn.StructDecl(nodes[0], nodes[1])
-
-    def struct_init(self, nodes):
-        assigns = []
-        for node1, node2 in zip(nodes[0::2], nodes[1::2]):
-            assigns += [pn.Assign(node1, node2)]
-        return pn.Struct(assigns)
-
-    def struct_attr(self, nodes):
-        return pn.Attr(nodes[0], nodes[1])
-
-    # -------------------------------- L_If_Else ------------------------------
-    def if_stmt(self, nodes):
-        node1 = nodes[1] if isinstance(nodes[1], list) else [nodes[1]]
-        return pn.If(nodes[0], node1)
-
-    def if_else_stmt(self, nodes):
-        node1 = nodes[1] if isinstance(nodes[1], list) else [nodes[1]]
-        node2 = nodes[2] if isinstance(nodes[2], list) else [nodes[2]]
-        return pn.IfElse(nodes[0], node1, node2)
-
-    # --------------------------------- L_Loop --------------------------------
-    def while_stmt(self, nodes):
-        node1 = nodes[1] if isinstance(nodes[1], list) else [nodes[1]]
-        return pn.While(nodes[0], node1)
-
-    def do_while_stmt(self, nodes):
-        node0 = nodes[0] if isinstance(nodes[0], list) else [nodes[0]]
-        return pn.DoWhile(nodes[1], node0)
-
-    # --------------------------------- L_Stmt --------------------------------
-    def decl_exp_stmt(self, nodes):
-        return pn.Exp(nodes[0])
-
-    def decl_direct_stmt(self, nodes):
-        return nodes[0]
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def compound_stmt(self, nodes):
-        return nodes[0]
-
-    def exec_exp_stmt(self, nodes):
-        return pn.Exp(nodes[0])
-
-    def exec_direct_stmt(self, nodes):
-        return nodes[0]
-
-    def stmt(self, nodes):
-        return nodes[0]
-
-    def stmts(self, nodes):
-        return nodes
-
-    # ---------------------------------- L_Fun --------------------------------
-    def fun_args(self, nodes):
-        return nodes
-
-    def fun_call(self, nodes):
-        return pn.Call(nodes[0], nodes[1])
-
-    def fun_return_stmt(self, nodes):
-        if len(nodes) == 0:
-            return pn.Return()
-        return pn.Return(nodes[0])
-
-    def fun_params(self, nodes):
-        return nodes
-
-    def fun_decl(self, nodes):
-        match nodes[1]:
-            case pn.Num("0"):
-                return pn.FunDecl(nodes[0], nodes[2], nodes[3])
-            case _:
-                return pn.FunDecl(pn.PntrDecl(nodes[1], nodes[0]), nodes[2], nodes[3])
-
-    def fun_def(self, nodes):
-        match nodes[1]:
-            case pn.Num("0"):
-                return pn.FunDef(nodes[0], nodes[2], nodes[3], nodes[4])
-            case _:
-                return pn.FunDef(
-                    pn.PntrDecl(nodes[1], nodes[0]), nodes[2], nodes[3], nodes[4]
-                )
-
-    # --------------------------------- L_File --------------------------------
-    def global_var_decl(self, nodes):
-        return nodes[0]
-
-    def decl_def(self, nodes):
-        return nodes[0]
-
-    def decls_defs(self, nodes):
-        return nodes
-
-    def file(self, nodes):
-        # nodes[0].val = remove_ext(nodes[0].val) + ".ast"
-        nodes[0].val = global_vars.tstate.path_without_ext + ".ast"
-        return pn.File(nodes[0], nodes[1])
+        throw_error(node)
 
 
 class ASTTransformerRETI(Transformer):

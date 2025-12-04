@@ -6,12 +6,7 @@ from src import reti_nodes as rn
 from src import debug as db
 import sys
 import shutil
-from lark.lark import Lark
 from src.ast_node import ASTNode
-from src.dt_visitors import (
-    DTVisitorPicoC,
-    DTSimpleVisitorPicoC,
-)
 from src.ast_transformers import TransformerPicoC, ASTTransformerRETI
 from src.passes import Passes
 from src.utils.util_funs_dependent import (
@@ -96,16 +91,7 @@ class OptionHandler:
         match extension:
             case "picoc":
                 preprocessed_code = self._preprocess(path)
-                preprocessed_code_with_filename = (
-                    (
-                        "./"
-                        if not path.startswith("./") and not path.startswith("/")
-                        else ""
-                    )
-                    + f"{path}\n"
-                    + preprocessed_code
-                )
-                return self._compl(preprocessed_code_with_filename)
+                return self._compl(preprocessed_code)
             case "reti_blocks":
                 # convert reti_blocks to ast
                 # lock for .json_file
@@ -137,31 +123,11 @@ class OptionHandler:
             print(subheading("Preprocessed Code", "-"))
             print(code)
 
-        parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/src/concrete_syntax_picoc.lark",
-            lexer="basic",
-            priority="normal",
-            parser="earley",
-            start="file",
-            maybe_placeholders=False,
-            # propagate_positions=True,
-        )
+        transformer = TransformerPicoC()
+        tree, ast = transformer.transform(code)
 
-        self._tokens_option(code, "Tokens")
-        dt = parser.parse(code)
-
-        dt_visitor_picoc = DTVisitorPicoC()
-        dt_visitor_picoc.visit(dt)
-
-        self._dt_pass(dt, "Derivation Tree")
-
-        dt_simple_visitor_picoc = DTSimpleVisitorPicoC()
-        dt_simple_visitor_picoc.visit(dt)
-
-        self._dt_pass(dt, "Derivation Tree Simple")
-
-        ast_transformer_picoc = TransformerPicoC()
-        ast = ast_transformer_picoc.transform(dt)
+        self._tokens_option(tree, code, "Tokens")
+        self._dt_pass(tree, code, "Parse Tree")
 
         self._output_pass(ast, "Abstract Syntax Tree")
 
@@ -320,21 +286,12 @@ class OptionHandler:
         merged_st._parents = merged_parents
         return merged_st
 
-    def _tokens_option(self, code_with_file, heading):
-        parser = Lark.open(
-            f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/src/concrete_syntax_picoc.lark",
-            lexer="basic",
-            priority="normal",
-            parser="earley",
-            start="file",
-            maybe_placeholders=False,
-            # propagate_positions=True,
-        )
-        tokens = list(parser.lex(code_with_file))
+    def _tokens_option(self, ts_tree, code, heading):
+        leaf_tokens = list(_iter_tokens(ts_tree, code))
 
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(tokens)
+            print(leaf_tokens)
 
         if global_vars.args.write_files:
             with open(
@@ -342,16 +299,20 @@ class OptionHandler:
                 "w",
                 encoding="utf-8",
             ) as fout:
-                fout.write(str(tokens))
+                fout.write(str(leaf_tokens))
 
-    def _dt_pass(self, dt, heading):
+    def _dt_pass(self, ts_tree, code, heading):
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(dt.pretty().replace("\t", "    "))
+            print(_format_tree(ts_tree.root_node, code))
 
         if global_vars.args.write_files:
-            with open(dt.children[0].value, "w", encoding="utf-8") as fout:
-                fout.write(dt.pretty())
+            with open(
+                global_vars.tstate.path_without_ext + ".ts_tree",
+                "w",
+                encoding="utf-8",
+            ) as fout:
+                fout.write(_format_tree(ts_tree.root_node, code))
 
     def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
         if global_vars.args.intermediate_stages:
@@ -415,6 +376,32 @@ class OptionHandler:
                     fout.write(str(pass_ast)[1:])
             case _:
                 throw_error(pass_ast)
+
+
+def _iter_tokens(tree, code):
+    def dfs(node):
+        if not node.children:
+            # Only emit token type and value to keep debug output concise
+            yield (node.type, code[node.start_byte : node.end_byte])
+        else:
+            for child in node.children:
+                yield from dfs(child)
+
+    yield from dfs(tree.root_node)
+
+
+def _format_tree(node, code, depth: int = 0):
+    lines = []
+
+    def walk(n, d):
+        snippet = code[n.start_byte : n.end_byte].replace("\n", "\\n")
+        lines.append(f"{'  '*d}{n.type}: {snippet}")
+        for child in n.children:
+            if child.is_named:
+                walk(child, d + 1)
+
+    walk(node, depth)
+    return "\n".join(lines)
 
 
 def _parse_cli_args():

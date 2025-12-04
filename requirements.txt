@@ -4,3 +4,5 @@ cmd2
 lark
 pygments
 pudb
+tree-sitter
+tree-sitter-c @ file:vendor/tree-sitter-c
