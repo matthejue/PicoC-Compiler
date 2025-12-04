@@ -359,10 +359,11 @@ class PntrDecl(ASTNode):
 class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return [self.exp]
+        return _add_if_double_verbose([self.exp], self.datatype)
 
     __match_args__ = ("exp",)
 

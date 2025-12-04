@@ -219,27 +219,83 @@ class Passes:
     ]
 
     def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
-        if not (global_vars.args.verbose or global_vars.args.double_verbose):
-            return []
-        if global_vars.args.example:
-            for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
-                if isclass(stmt_instr):
-                    if isinstance(node, stmt_instr):
-                        break  # success
-                else:
-                    if type(node) is type(stmt_instr):
-                        for i in range(len(stmt_instr.visible)):
-                            if not isinstance(node.visible[i], stmt_instr.visible[i]):
-                                break
-                        else:
-                            break  # success
-            else:
+            if not (global_vars.args.verbose or global_vars.args.double_verbose):
                 return []
-        if hasattr(node, "visible"):
-            for i, visible_list_item in enumerate(node.visible):
-                if isinstance(visible_list_item, list) and i in filtr:
-                    node.visible[i] = []
-        return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
+            if global_vars.args.example:
+                for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
+                    if isclass(stmt_instr):
+                        if isinstance(node, stmt_instr):
+                            break  # success
+                    else:
+                        if type(node) is type(stmt_instr):
+                            for i in range(len(stmt_instr.visible)):
+                                if not isinstance(node.visible[i], stmt_instr.visible[i]):
+                                    break
+                            else:
+                                break  # success
+                else:
+                    return []
+            if hasattr(node, "visible"):
+                for i, visible_list_item in enumerate(node.visible):
+                    if isinstance(visible_list_item, list) and i in filtr:
+                        node.visible[i] = []
+            return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
+
+    # def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
+    #     if not (global_vars.args.verbose or global_vars.args.double_verbose):
+    #         return []
+    #     if global_vars.args.example:
+    #         for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
+    #             if isclass(stmt_instr):
+    #                 if isinstance(node, stmt_instr):
+    #                     break  # success
+    #             else:
+    #                 if type(node) is type(stmt_instr):
+    #                     for i in range(len(stmt_instr.visible)):
+    #                         if not isinstance(node.visible[i], stmt_instr.visible[i]):
+    #                             break
+    #                     else:
+    #                         break  # success
+    #         else:
+    #             return []
+    #
+    #     def _repr_with_visible(node_for_repr, visible):
+    #         if not visible:
+    #             return f"\n{node_for_repr.__class__.__name__}()"
+    #         parts = []
+    #         for child in visible:
+    #             match child:
+    #                 case list() as lst:
+    #                     if not lst:
+    #                         parts.append("[]")
+    #                     else:
+    #                         lst_parts = []
+    #                         for item in lst:
+    #                             try:
+    #                                 lst_parts.append(convert_to_single_line(item))
+    #                             except Exception:
+    #                                 lst_parts.append(repr(item))
+    #                         parts.append("[" + ", ".join(lst_parts) + "]")
+    #                 case str() as s:
+    #                     parts.append(f"'{s}'")
+    #                 case int() as i:
+    #                     parts.append(str(i))
+    #                 case _:
+    #                     try:
+    #                         parts.append(child.__repr__())
+    #                     except Exception:
+    #                         parts.append(repr(child))
+    #         return f"\n{node_for_repr.__class__.__name__}(" + ", ".join(parts) + ")"
+    #
+    #     if hasattr(node, "visible"):
+    #         visible_copy = copy.deepcopy(list(node.visible))
+    #         for i, visible_list_item in enumerate(visible_copy):
+    #             if isinstance(visible_list_item, list) and i in filtr:
+    #                 visible_copy[i] = []
+    #         node_repr = _repr_with_visible(node, visible_copy)
+    #         return [pn.SingleLineComment(prefix, convert_to_single_line(node_repr))]
+    #
+    #     return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
     def _create_block(self, labelbase, stmts, blocks, *, add_id=True):
         label = labelbase + (f".{self.block_idx}" if add_id else "")
@@ -618,15 +674,17 @@ class Passes:
                     pn.Alloc(type_qual, datatype, pn.Name(val1)),
                     initial_val=copy.deepcopy(num),
                 )
-                return self._single_line_comment(stmt, "//")
+                return [stmt] # self._single_line_comment(stmt, "//")
             case pn.Assign(pn.Alloc(type_qual, _, pn.Name() as name) as alloc, exp):
                 initial_val = copy.deepcopy(exp) if isinstance(type_qual, pn.Const) else None
                 self._declare_alloc(alloc, initial_val=initial_val)
                 new_stmt = pn.Assign(name, exp)
-                return self._single_line_comment(stmt, "//") + self._picoc_symbol_stmt(new_stmt)
+                # return self._single_line_comment(stmt, "//") + self._picoc_symbol_stmt(new_stmt)
+                return self._picoc_symbol_stmt(new_stmt)
             case pn.Exp(pn.Alloc() as alloc):
                 self._declare_alloc(alloc)
-                return self._single_line_comment(stmt, "//")
+                # return self._single_line_comment(stmt, "//")
+                return [stmt]
             case pn.Assign(lhs, exp):
                 return [pn.Assign(lhs, exp)]
             case pn.Exp(exp):
@@ -765,11 +823,12 @@ class Passes:
                 match blocks:
                     case [pn.Block(_, entry_stmts), *_]:
                         entry_stmts[:0] = [pn.Exp(alloc) for alloc in allocs]
-                        entry_stmts[:0] = (
-                            self._single_line_comment(blocks[0], "//", filtr=[3])
-                            if global_vars.args.double_verbose
-                            else []
-                        ) + [pn.StackMalloc(self.current_fun_local_vars_size)]
+                        entry_stmts[:0] = [pn.StackMalloc(self.current_fun_local_vars_size)]
+                        # entry_stmts[:0] = (
+                        #     self._single_line_comment(blocks[0], "//", filtr=[2])
+                        #     if global_vars.args.double_verbose
+                        #     else []
+                        # ) + [pn.StackMalloc(self.current_fun_local_vars_size)]
                     case _:
                         throw_error(blocks)
 
@@ -821,17 +880,33 @@ class Passes:
     # - annotates the PicoC AST with datatype information collected before ANF
 
     def _deref_result_datatype(self, pointer_dt):
-            match pointer_dt:
-                case pn.PntrDecl(pn.Num(val), inner_dt):
-                    if int(val) > 1:
-                        return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
-                    return copy.deepcopy(inner_dt)
-                case pn.ArrayDecl(nums, inner_dt):
-                    if len(nums) > 1:
-                        return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
-                    return copy.deepcopy(inner_dt)
-                case _:
-                    return pn.Empty()
+        match pointer_dt:
+            case pn.PntrDecl(pn.Num(val), inner_dt):
+                if int(val) > 1:
+                    return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
+                return copy.deepcopy(inner_dt)
+            case pn.ArrayDecl(nums, inner_dt):
+                if len(nums) > 1:
+                    return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
+                return copy.deepcopy(inner_dt)
+            case _:
+                return pn.Empty()
+
+    def _attr_result_datatype(self, struct_dt, attr_name):
+        if isinstance(attr_name, pn.Name):
+            attr_name = attr_name.val
+        match struct_dt:
+            case pn.StructSpec(pn.Name(struct_name)):
+                symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
+                if symbol:
+                    return copy.deepcopy(symbol.get("datatype", pn.Empty()))
+            case pn.StructDecl(pn.Name(struct_name), _):
+                symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
+                if symbol:
+                    return copy.deepcopy(symbol.get("datatype", pn.Empty()))
+            case pn.PntrDecl(_, inner_dt) | pn.ArrayDecl(_, inner_dt):
+                return self._attr_result_datatype(inner_dt, attr_name)
+        return pn.Empty()
 
     def _picoc_type_exp(self, exp):
         match exp:
@@ -894,10 +969,8 @@ class Passes:
             # ------------------------ L_Pntr + L_Array -------------------------
             case pn.Ref(inner_exp):
                 inner_dt = self._picoc_type_exp(inner_exp)
-                if inner_dt is None:
-                    return None
+                exp.datatype = copy.deepcopy(inner_dt)
                 pointer_dt = pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
-                exp.datatype = copy.deepcopy(pointer_dt)
                 return pointer_dt
             case pn.Deref(ptr_exp, idx_exp):
                 base_dt = self._picoc_type_exp(ptr_exp)
@@ -905,8 +978,12 @@ class Passes:
                 exp.datatype = copy.deepcopy(base_dt)
                 return self._deref_result_datatype(base_dt) if base_dt else None
             case pn.Array(exps):
-                elem_dt = self._picoc_type_exp(exps[0]) if exps else None
-                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt) if elem_dt else None
+                for i, exp in enumerate(exps):
+                    if i == 0:
+                        elem_dt = self._picoc_type_exp(exp)
+                    else:
+                        self._picoc_type_exp(exp)
+                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt)
             # ----------------------------- L_Struct ----------------------------
             case pn.Struct(assigns):
                 for assign in assigns:
@@ -915,12 +992,7 @@ class Passes:
             case pn.Attr(inner_exp, pn.Name(attr_name)):
                 base_dt = self._picoc_type_exp(inner_exp)
                 exp.datatype = copy.deepcopy(base_dt)
-                match base_dt:
-                    case pn.StructSpec(pn.Name(struct_name)):
-                        symbol, _ = self.symbol_table.resolve(
-                            attr_name, scope=struct_name
-                        )
-                        return copy.deepcopy(symbol["datatype"])
+                return self._attr_result_datatype(base_dt, attr_name)
             case pn.Exit():
                 return None
             # ------------------------------ L_Fun ------------------------------
@@ -1214,12 +1286,17 @@ class Passes:
             case pn.Alloc():
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Deref() | pn.Attr():
+            case pn.Deref():
                 refs_anf = self._picoc_anf_ref(exp)
                 final_exp = pn.Exp(pn.Stack(pn.Num("1")))
                 datatype = getattr(exp, "datatype", None)
-                if datatype is not None:
-                    final_exp.datatype = self._deref_result_datatype(datatype)
+                final_exp.datatype = self._deref_result_datatype(datatype)
+                return refs_anf + [final_exp]
+            case pn.Attr(_, pn.Name(attr_name)):
+                refs_anf = self._picoc_anf_ref(exp)
+                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
+                datatype = getattr(exp, "datatype", None)
+                final_exp.datatype = self._attr_result_datatype(datatype, attr_name)
                 return refs_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             # case pn.Ref(pn.Name(val)):
@@ -1874,9 +1951,11 @@ class Passes:
             case pn.Ref(
                 pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))) as ref_node
             ):
-                datatype = getattr(ref_node, "datatype", None)
+                db.activate_debug()
+                db.debug()
+                datatype = ref_node.datatype
                 if datatype is None:
-                    sys.exit(1)
+                    throw_error(datatype)
                 reti_instrs = self._single_line_comment(stmt, "#")
                 # Scale the index by the size of a single element of the referenced type.
                 match datatype:
@@ -1888,7 +1967,7 @@ class Passes:
                                     help_const *= int(val3)
                                 case _:
                                     throw_error(num)
-                    case pn.PntrDecl(_, datatype2):
+                    case pn.PntrDecl(pn.Num('1'), datatype2):
                         help_const = self._datatype_size(datatype2)
                     case _:
                         throw_error(datatype)
@@ -1908,7 +1987,7 @@ class Passes:
                             ),
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
-                    case pn.PntrDecl(_, datatype2):
+                    case pn.PntrDecl():
                         # for ArrayDecl only 'if local_var_or_parameter.val == "parameter"' keep left
                         reti_instrs += [
                             rn.Instr(

@@ -172,7 +172,6 @@ class OptionHandler:
         picoc_blocks = passes.picoc_blocks(picoc_shrink)
         self._output_pass(picoc_blocks, "PicoC Blocks")
 
-        db.activate_debug()
         picoc_symbol = passes.picoc_symbol(picoc_blocks)
         self._output_pass(picoc_symbol, "PicoC Symbol")
         self._st_pass(

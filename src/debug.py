@@ -9,7 +9,7 @@ Call `install_post_mortem_hook()` to have unhandled exceptions drop into pdb.
 """
 
 import sys
-import pdb
+import pudb
 from src import global_vars
 
 _debug_enabled = False
@@ -35,9 +35,4 @@ def debug():
 
 
 def debug_excepthook(exc_type, value, tb):
-    try:
-        import pudb  # type: ignore
-
-        pudb.post_mortem(tb)
-    except ImportError:
-        pdb.post_mortem(tb)
+    pudb.post_mortem(tb)
