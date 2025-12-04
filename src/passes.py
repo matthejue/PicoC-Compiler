@@ -70,11 +70,24 @@ class Passes:
                 return exp
             # ----------------------------- L_Pntr ----------------------------
             case pn.Deref(ref, exp):
-                return pn.Deref(
-                    self._picoc_shrink_exp(ref), self._picoc_shrink_exp(exp)
-                )
+                ref_shrunk = self._picoc_shrink_exp(ref)
+                exp_shrunk = self._picoc_shrink_exp(exp)
+                match ref_shrunk:
+                    # *&x (optionally with offset) -> x (or x with offset)
+                    case pn.Ref(inner):
+                        if isinstance(exp_shrunk, pn.Num) and exp_shrunk.val == "0":
+                            return inner
+                        return pn.Deref(inner, exp_shrunk)
+                return pn.Deref(ref_shrunk, exp_shrunk)
             case pn.Ref(ref):
-                return pn.Ref(self._picoc_shrink_exp(ref))
+                ref_shrunk = self._picoc_shrink_exp(ref)
+                match ref_shrunk:
+                    # &( *(ptr + idx) ) cancels to ptr + idx (or just ptr if idx==0)
+                    case pn.Deref(ptr_exp, idx_exp):
+                        if isinstance(idx_exp, pn.Num) and idx_exp.val == "0":
+                            return ptr_exp
+                        return pn.BinOp(ptr_exp, pn.Add(), idx_exp)
+                return pn.Ref(ref_shrunk)
             # ---------------------------- L_Array ----------------------------
             case pn.Subscr(ref, exp):
                 ref_shrunk = self._picoc_shrink_exp(ref)
@@ -1951,8 +1964,8 @@ class Passes:
             case pn.Ref(
                 pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))) as ref_node
             ):
-                db.activate_debug()
-                db.debug()
+                # db.activate_debug()
+                # db.debug()
                 datatype = ref_node.datatype
                 if datatype is None:
                     throw_error(datatype)
@@ -1969,6 +1982,9 @@ class Passes:
                                     throw_error(num)
                     case pn.PntrDecl(pn.Num('1'), datatype2):
                         help_const = self._datatype_size(datatype2)
+                    case pn.PntrDecl(_, datatype2):
+                        pass
+                        help_const = 1
                     case _:
                         throw_error(datatype)
                 match datatype:
