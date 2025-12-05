@@ -5,6 +5,7 @@ from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import remove_ext, nodes_to_str, throw_error
 from src import global_vars
+from src import debug as db
 from tree_sitter import Language, Parser
 import tree_sitter_c
 from typing import Optional, Sequence
@@ -173,17 +174,33 @@ class TransformerPicoC:
 
     # ----------------------------- declarations -----------------------------
     def _declaration(self, node, code: str):
+        db.activate_debug()
+        db.debug()
         type_node = node.child_by_field_name("type")
         if type_node is None:
             return []
         base_type = self._prim_type(type_node, code)
         results = []
 
-        for child in node.children:
-            if child.type != "init_declarator":
+        # Accept both wrapped (init_declarator) and bare declarator children.
+        declarator_nodes = [child for child in node.children if child.is_named]
+        if declarator_nodes and declarator_nodes[0] is type_node:
+            declarator_nodes = declarator_nodes[1:]
+
+        for child in declarator_nodes:
+            # tree-sitter may emit an intervening primitive_type before the actual
+            # declarator; skip anything that is not a declarator/init_declarator.
+            if child.type not in {"init_declarator", "function_declarator",
+                                  "pointer_declarator", "array_declarator",
+                                  "parenthesized_declarator", "identifier"}:
                 continue
-            declarator = child.child_by_field_name("declarator")
-            value_node = child.child_by_field_name("value")
+
+            if child.type == "init_declarator":
+                declarator = child.child_by_field_name("declarator")
+                value_node = child.child_by_field_name("value")
+            else:
+                declarator = child
+                value_node = None
 
             if declarator.type == "function_declarator":
                 params_node = declarator.child_by_field_name("parameters")
