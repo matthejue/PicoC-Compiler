@@ -1,14 +1,12 @@
 from lark.visitors import Transformer
 from lark.lexer import Token
-import sys
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
-from src.utils.util_funs_dependent import remove_ext, nodes_to_str, throw_error
+from src.utils.util_funs_dependent import throw_error
 from src import global_vars
-from src import debug as db
 from tree_sitter import Language, Parser
 import tree_sitter_c
-from typing import Optional, Sequence
+from typing import Sequence
 
 
 _TS_LANGUAGE = Language(tree_sitter_c.language())
@@ -24,6 +22,10 @@ class TransformerPicoC:
         self.parser = Parser()
         self.parser.language = _TS_LANGUAGE
         # Dispatch maps for fast, explicit node handling
+        self._tu_dispatch = {
+            "function_definition": self._tu_function_definition,
+            "declaration": self._tu_declaration,
+        }
         self._stmt_dispatch = {
             "declaration": self._statement_declaration,
             "expression_statement": self._statement_expression,
@@ -49,6 +51,14 @@ class TransformerPicoC:
             "subscript_expression": self._subscript_expression,
             "field_expression": self._field_expression,
             "initializer_list": self._initializer_list,
+        }
+        self._decl_node_dispatch = {
+            "init_declarator": self._decl_node_init,
+            "function_declarator": self._decl_node_bare,
+            "pointer_declarator": self._decl_node_bare,
+            "array_declarator": self._decl_node_bare,
+            "parenthesized_declarator": self._decl_node_bare,
+            "identifier": self._decl_node_bare,
         }
         self._declarator_dispatch = {
             "identifier": self._decl_identifier,
@@ -136,17 +146,19 @@ class TransformerPicoC:
         for child in node.children:
             if not child.is_named:
                 continue
-            match child.type:
-                case "function_definition":
-                    decls_defs.append(self._function_definition(child, code))
-                case "declaration":
-                    decls_defs.extend(self._declaration(child, code))
-                case _:
-                    continue
+            handler = self._tu_dispatch.get(child.type)
+            if handler:
+                handler(child, code, decls_defs)
 
         return pn.File(
             pn.Name(global_vars.tstate.path_without_ext + ".ast"), decls_defs
         )
+
+    def _tu_function_definition(self, node, code: str, decls_defs: list):
+        decls_defs.append(self._function_definition(node, code))
+
+    def _tu_declaration(self, node, code: str, decls_defs: list):
+        decls_defs.extend(self._declaration(node, code))
 
     # ------------------------------ declarators ------------------------------
     def _apply_declarator(self, node, base_type, code: str):
@@ -226,8 +238,6 @@ class TransformerPicoC:
 
     # ----------------------------- declarations -----------------------------
     def _declaration(self, node, code: str):
-        db.activate_debug()
-        db.debug()
         type_node = node.child_by_field_name("type")
         if type_node is None:
             return []
@@ -240,38 +250,38 @@ class TransformerPicoC:
             declarator_nodes = declarator_nodes[1:]
 
         for child in declarator_nodes:
-            # tree-sitter may emit an intervening primitive_type before the actual
-            # declarator; skip anything that is not a declarator/init_declarator.
-            if child.type not in {"init_declarator", "function_declarator",
-                                  "pointer_declarator", "array_declarator",
-                                  "parenthesized_declarator", "identifier"}:
-                continue
-
-            if child.type == "init_declarator":
-                declarator = child.child_by_field_name("declarator")
-                value_node = child.child_by_field_name("value")
-            else:
-                declarator = child
-                value_node = None
-
-            if declarator.type == "function_declarator":
-                params_node = declarator.child_by_field_name("parameters")
-                params = self._parameter_list(params_node, code) if params_node else []
-                datatype, name = self._apply_declarator(
-                    declarator.child_by_field_name("declarator"), base_type, code
-                )
-                results.append(pn.FunDecl(datatype, name, params))
-                continue
-
-            datatype, name = self._apply_declarator(declarator, base_type, code)
-            alloc = pn.Alloc(pn.Writeable(), datatype, name)
-            if value_node:
-                init_val = self._expression(value_node, code)
-                results.append(pn.Assign(alloc, init_val))
-            else:
-                results.append(pn.Exp(alloc))
+            handler = self._decl_node_dispatch.get(child.type)
+            if handler:
+                handler(child, base_type, code, results)
 
         return results
+
+    # declaration handlers ----------------------------------------------------
+    def _decl_node_init(self, child, base_type, code: str, results: list):
+        declarator = child.child_by_field_name("declarator")
+        value_node = child.child_by_field_name("value")
+        self._decl_process(declarator, value_node, base_type, code, results)
+
+    def _decl_node_bare(self, child, base_type, code: str, results: list):
+        self._decl_process(child, None, base_type, code, results)
+
+    def _decl_process(self, declarator, value_node, base_type, code: str, results: list):
+        if declarator.type == "function_declarator":
+            params_node = declarator.child_by_field_name("parameters")
+            params = self._parameter_list(params_node, code) if params_node else []
+            datatype, name = self._apply_declarator(
+                declarator.child_by_field_name("declarator"), base_type, code
+            )
+            results.append(pn.FunDecl(datatype, name, params))
+            return
+
+        datatype, name = self._apply_declarator(declarator, base_type, code)
+        alloc = pn.Alloc(pn.Writeable(), datatype, name)
+        if value_node:
+            init_val = self._expression(value_node, code)
+            results.append(pn.Assign(alloc, init_val))
+        else:
+            results.append(pn.Exp(alloc))
 
     # ------------------------------- statements -----------------------------
     def _compound_statement(self, node, code: str):
