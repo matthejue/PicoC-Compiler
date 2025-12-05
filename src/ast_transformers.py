@@ -23,6 +23,40 @@ class TransformerPicoC:
     def __init__(self):
         self.parser = Parser()
         self.parser.language = _TS_LANGUAGE
+        # Dispatch maps for fast, explicit node handling
+        self._stmt_dispatch = {
+            "declaration": self._statement_declaration,
+            "expression_statement": self._statement_expression,
+            "return_statement": self._statement_return,
+            "if_statement": self._statement_if,
+            "while_statement": self._statement_while,
+            "do_statement": self._statement_do,
+            "compound_statement": self._compound_statement,
+            "break_statement": self._statement_break,
+        }
+        self._expr_dispatch = {
+            "identifier": self._expr_identifier,
+            "number_literal": self._expr_number,
+            "char_literal": self._expr_char,
+            "string_literal": self._expr_string,
+            "parenthesized_expression": self._expr_parenthesized,
+            "call_expression": self._call_expression,
+            "binary_expression": self._binary_expression,
+            "assignment_expression": self._assignment_expression,
+            "unary_expression": self._unary_expression,
+            "pointer_expression": self._pointer_expression,
+            "sizeof_expression": self._sizeof_expression,
+            "subscript_expression": self._subscript_expression,
+            "field_expression": self._field_expression,
+            "initializer_list": self._initializer_list,
+        }
+        self._declarator_dispatch = {
+            "identifier": self._decl_identifier,
+            "parenthesized_declarator": self._decl_parenthesized,
+            "pointer_declarator": self._decl_pointer,
+            "array_declarator": self._decl_array,
+            "function_declarator": self._decl_function,
+        }
 
     # ------------------------------------------------------------------ public
     def parse_tree(self, code: str):
@@ -116,30 +150,48 @@ class TransformerPicoC:
 
     # ------------------------------ declarators ------------------------------
     def _apply_declarator(self, node, base_type, code: str):
-        match node.type:
-            case "identifier":
-                return base_type, pn.Name(self._text(node, code))
-            case "parenthesized_declarator":
-                inner = next(c for c in node.children if c.is_named)
-                return self._apply_declarator(inner, base_type, code)
-            case "pointer_declarator":
-                pointer_count = sum(1 for c in node.children if not c.is_named and self._text(c, code) == "*")
-                inner = next(c for c in node.children if c.is_named)
-                inner_type, name = self._apply_declarator(inner, base_type, code)
-                return self._wrap_pointers(inner_type, pointer_count), name
-            case "array_declarator":
-                inner = node.child_by_field_name("declarator")
-                size_node = node.child_by_field_name("size")
-                dims = []
-                if size_node:
-                    dims.append(pn.Num(self._text(size_node, code)))
-                inner_type, name = self._apply_declarator(inner, base_type, code)
-                return self._wrap_arrays(inner_type, dims), name
-            case "function_declarator":
-                # We handle parameters separately when building FunDecl/FunDef
-                inner = node.child_by_field_name("declarator")
-                return self._apply_declarator(inner, base_type, code)
-        throw_error(node.type)
+        """
+        Walks a declarator chain using dispatch handlers. Each handler unwraps
+        one layer and returns the next node to examine.
+        """
+        current_type = base_type
+        current_node = node
+
+        while True:
+            handler = self._declarator_dispatch.get(current_node.type)
+            if handler is None:
+                throw_error(current_node.type)
+            next_node, current_type, name, done = handler(current_node, current_type, code)
+            if done:
+                return current_type, name
+            current_node = next_node
+
+    # declarator handlers -----------------------------------------------------
+    def _decl_identifier(self, node, current_type, code: str):
+        return None, current_type, pn.Name(self._text(node, code)), True
+
+    def _decl_parenthesized(self, node, current_type, code: str):
+        inner = next(c for c in node.children if c.is_named)
+        return inner, current_type, None, False
+
+    def _decl_pointer(self, node, current_type, code: str):
+        pointer_count = sum(
+            1 for c in node.children if not c.is_named and self._text(c, code) == "*"
+        )
+        wrapped_type = self._wrap_pointers(current_type, pointer_count)
+        inner = next(c for c in node.children if c.is_named)
+        return inner, wrapped_type, None, False
+
+    def _decl_array(self, node, current_type, code: str):
+        size_node = node.child_by_field_name("size")
+        dims = [pn.Num(self._text(size_node, code))] if size_node else []
+        wrapped_type = self._wrap_arrays(current_type, dims)
+        inner = node.child_by_field_name("declarator")
+        return inner, wrapped_type, None, False
+
+    def _decl_function(self, node, current_type, code: str):
+        inner = node.child_by_field_name("declarator")
+        return inner, current_type, None, False
 
     def _parameter_declaration(self, node, code: str):
         type_node = node.child_by_field_name("type")
@@ -231,127 +283,155 @@ class TransformerPicoC:
         return stmts
 
     def _statement(self, node, code: str):
-        match node.type:
-            case "declaration":
-                return self._declaration(node, code)
-            case "expression_statement":
-                # empty statements return []
-                expr_child = next((c for c in node.children if c.is_named), None)
-                if expr_child is None:
-                    return []
-                expr = self._expression(expr_child, code)
-                if isinstance(expr, pn.Assign):
-                    return [expr]
-                return [pn.Exp(expr)]
-            case "return_statement":
-                expr_child = next((c for c in node.children if c.is_named), None)
-                return [pn.Return(self._expression(expr_child, code) if expr_child else pn.Empty())]
-            case "if_statement":
-                cond = self._expression(node.child_by_field_name("condition"), code)
-                cons = self._statement(node.child_by_field_name("consequence"), code)
-                alt_node = node.child_by_field_name("alternative")
-                if alt_node:
-                    alt = self._statement(alt_node, code)
-                    return [pn.IfElse(cond, cons, alt)]
-                return [pn.If(cond, cons)]
-            case "while_statement":
-                cond = self._expression(node.child_by_field_name("condition"), code)
-                body = self._statement(node.child_by_field_name("body"), code)
-                return [pn.While(cond, body)]
-            case "do_statement":
-                body = self._statement(node.child_by_field_name("body"), code)
-                cond = self._expression(node.child_by_field_name("condition"), code)
-                return [pn.DoWhile(cond, body)]
-            case "compound_statement":
-                return self._compound_statement(node, code)
-            case "break_statement":
-                return [pn.Exp(pn.Call(pn.Name("break"), []))]
-        return []
+        handler = self._stmt_dispatch.get(node.type)
+        if handler is None:
+            return []
+        return handler(node, code)
+
+    def _statement_declaration(self, node, code: str):
+        return self._declaration(node, code)
+
+    def _statement_expression(self, node, code: str):
+        expr_child = next((c for c in node.children if c.is_named), None)
+        if expr_child is None:
+            return []
+        expr = self._expression(expr_child, code)
+        if isinstance(expr, pn.Assign):
+            return [expr]
+        return [pn.Exp(expr)]
+
+    def _statement_return(self, node, code: str):
+        expr_child = next((c for c in node.children if c.is_named), None)
+        return [pn.Return(self._expression(expr_child, code) if expr_child else pn.Empty())]
+
+    def _statement_if(self, node, code: str):
+        cond = self._expression(node.child_by_field_name("condition"), code)
+        cons = self._statement(node.child_by_field_name("consequence"), code)
+        alt_node = node.child_by_field_name("alternative")
+        if alt_node:
+            alt = self._statement(alt_node, code)
+            return [pn.IfElse(cond, cons, alt)]
+        return [pn.If(cond, cons)]
+
+    def _statement_while(self, node, code: str):
+        cond = self._expression(node.child_by_field_name("condition"), code)
+        body = self._statement(node.child_by_field_name("body"), code)
+        return [pn.While(cond, body)]
+
+    def _statement_do(self, node, code: str):
+        body = self._statement(node.child_by_field_name("body"), code)
+        cond = self._expression(node.child_by_field_name("condition"), code)
+        return [pn.DoWhile(cond, body)]
+
+    def _statement_break(self, node, code: str):
+        return [pn.Exp(pn.Call(pn.Name("break"), []))]
 
     # ------------------------------- expressions ----------------------------
     def _expression(self, node, code: str):
         if node is None:
             return pn.Empty()
+        handler = self._expr_dispatch.get(node.type)
+        if handler is None:
+            throw_error(node.type)
+        return handler(node, code)
 
-        match node.type:
-            case "identifier":
-                return pn.Name(self._text(node, code))
-            case "number_literal":
-                return pn.Num(self._text(node, code))
-            case "char_literal":
-                literal = self._text(node, code)
-                return pn.Char(literal[1:-1])
-            case "string_literal":
-                return pn.Name(self._text(node, code))
-            case "parenthesized_expression":
-                inner = next(c for c in node.children if c.is_named)
-                return self._expression(inner, code)
-            case "call_expression":
-                func = self._expression(node.child_by_field_name("function"), code)
-                args_node = node.child_by_field_name("arguments")
-                args = []
-                if args_node:
-                    for child in args_node.children:
-                        if child.is_named:
-                            args.append(self._expression(child, code))
-                return pn.Call(func, args)
-            case "binary_expression":
-                left = self._expression(node.child_by_field_name("left"), code)
-                right = self._expression(node.child_by_field_name("right"), code)
-                op = next(self._text(c, code) for c in node.children if not c.is_named)
-                bin_node = self._bin_op_node(op)
-                if isinstance(bin_node, (pn.Lt, pn.LtE, pn.Gt, pn.GtE, pn.Eq, pn.NEq)):
-                    return pn.Atom(left, bin_node, right)
-                if isinstance(bin_node, (pn.LogicAnd, pn.LogicOr)):
-                    return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
-                return pn.BinOp(left, bin_node, right)
-            case "assignment_expression":
-                left = self._expression(node.child_by_field_name("left"), code)
-                right = self._expression(node.child_by_field_name("right"), code)
-                return pn.Assign(left, right)
-            case "unary_expression":
-                op = next(self._text(c, code) for c in node.children if not c.is_named)
-                exp = self._expression(next(c for c in node.children if c.is_named), code)
-                match op:
-                    case "-":
-                        return pn.UnOp(pn.Minus(), exp)
-                    case "!":
-                        return pn.UnOp(pn.LogicNot(), self._to_bool(exp))
-                    case "~":
-                        return pn.UnOp(pn.Not(), exp)
-                throw_error(op)
-            case "pointer_expression":
-                op = self._text(next(c for c in node.children if not c.is_named), code)
-                exp = self._expression(next(c for c in node.children if c.is_named), code)
-                match op:
-                    case "&":
-                        return pn.Ref(exp)
-                    case "*":
-                        base, bin_op, rest = self._leftmost_node(exp)
-                        match bin_op:
-                            case pn.Add():
-                                return pn.Deref(base, rest)
-                            case pn.Sub():
-                                return pn.Deref(base, pn.UnOp(pn.Minus(), rest))
-                            case None:
-                                return pn.Deref(exp, pn.Num("0"))
-                        throw_error(bin_op)
-                throw_error(op)
-            case "sizeof_expression":
-                target = node.child_by_field_name("type") or node.child_by_field_name("value")
-                return pn.SizeOf(self._expression(target, code))
-            case "subscript_expression":
-                base = self._expression(node.child_by_field_name("argument"), code)
-                index = self._expression(node.child_by_field_name("index"), code)
-                return pn.Subscr(base, index)
-            case "field_expression":
-                argument = self._expression(node.child_by_field_name("argument"), code)
-                field = node.child_by_field_name("field")
-                return pn.Attr(argument, pn.Name(self._text(field, code)))
-            case "initializer_list":
-                exps = [self._expression(c, code) for c in node.children if c.is_named]
-                return pn.Array(exps)
-        throw_error(node.type)
+    def _expr_identifier(self, node, code: str):
+        return pn.Name(self._text(node, code))
+
+    def _expr_number(self, node, code: str):
+        return pn.Num(self._text(node, code))
+
+    def _expr_char(self, node, code: str):
+        literal = self._text(node, code)
+        return pn.Char(literal[1:-1])
+
+    def _expr_string(self, node, code: str):
+        return pn.Name(self._text(node, code))
+
+    def _expr_parenthesized(self, node, code: str):
+        inner = next(c for c in node.children if c.is_named)
+        return self._expression(inner, code)
+
+    def _call_expression(self, node, code: str):
+        # call_expression -> function "(" arguments? ")"
+        func = self._expression(node.child_by_field_name("function"), code)
+        args_node = node.child_by_field_name("arguments")
+        args = [
+            self._expression(child, code)
+            for child in args_node.children
+            if child.is_named
+        ] if args_node else []
+        return pn.Call(func, args)
+
+    def _binary_expression(self, node, code: str):
+        # binary_expression -> left operator right
+        left = self._expression(node.child_by_field_name("left"), code)
+        right = self._expression(node.child_by_field_name("right"), code)
+        op = next(self._text(c, code) for c in node.children if not c.is_named)
+        bin_node = self._bin_op_node(op)
+        if isinstance(bin_node, (pn.Lt, pn.LtE, pn.Gt, pn.GtE, pn.Eq, pn.NEq)):
+            return pn.Atom(left, bin_node, right)
+        if isinstance(bin_node, (pn.LogicAnd, pn.LogicOr)):
+            return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
+        return pn.BinOp(left, bin_node, right)
+
+    def _assignment_expression(self, node, code: str):
+        # assignment_expression -> left "=" right
+        left = self._expression(node.child_by_field_name("left"), code)
+        right = self._expression(node.child_by_field_name("right"), code)
+        return pn.Assign(left, right)
+
+    def _unary_expression(self, node, code: str):
+        # unary_expression -> ("-" | "!" | "~") expression
+        op = next(self._text(c, code) for c in node.children if not c.is_named)
+        exp = self._expression(next(c for c in node.children if c.is_named), code)
+        match op:
+            case "-":
+                return pn.UnOp(pn.Minus(), exp)
+            case "!":
+                return pn.UnOp(pn.LogicNot(), self._to_bool(exp))
+            case "~":
+                return pn.UnOp(pn.Not(), exp)
+        throw_error(op)
+
+    def _pointer_expression(self, node, code: str):
+        # pointer_expression -> ("&" | "*") expression
+        op = self._text(next(c for c in node.children if not c.is_named), code)
+        exp = self._expression(next(c for c in node.children if c.is_named), code)
+        match op:
+            case "&":
+                return pn.Ref(exp)
+            case "*":
+                base, bin_op, rest = self._leftmost_node(exp)
+                match bin_op:
+                    case pn.Add():
+                        return pn.Deref(base, rest)
+                    case pn.Sub():
+                        return pn.Deref(base, pn.UnOp(pn.Minus(), rest))
+                    case None:
+                        return pn.Deref(exp, pn.Num("0"))
+        throw_error(op)
+
+    def _sizeof_expression(self, node, code: str):
+        # sizeof_expression -> "sizeof" (type | value)
+        target = node.child_by_field_name("type") or node.child_by_field_name("value")
+        return pn.SizeOf(self._expression(target, code))
+
+    def _subscript_expression(self, node, code: str):
+        # subscript_expression -> argument "[" index "]"
+        base = self._expression(node.child_by_field_name("argument"), code)
+        index = self._expression(node.child_by_field_name("index"), code)
+        return pn.Subscr(base, index)
+
+    def _field_expression(self, node, code: str):
+        # field_expression -> argument "." field
+        argument = self._expression(node.child_by_field_name("argument"), code)
+        field = node.child_by_field_name("field")
+        return pn.Attr(argument, pn.Name(self._text(field, code)))
+
+    def _initializer_list(self, node, code: str):
+        exps = [self._expression(c, code) for c in node.children if c.is_named]
+        return pn.Array(exps)
 
     # ------------------------------ expression utils ------------------------
     def _leftmost_node(self, bin_exp):
