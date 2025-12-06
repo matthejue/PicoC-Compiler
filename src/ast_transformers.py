@@ -21,51 +21,52 @@ class TransformerPicoC:
     def __init__(self):
         self.parser = Parser()
         self.parser.language = _TS_LANGUAGE
-        # Dispatch maps for fast, explicit node handling
+        # Dispatch maps for fast, explicit node handling. Handler names mirror
+        # the upstream tree-sitter C grammar rules in ../vendor/tree-sitter-c/grammar.js.
         self._tu_dispatch = {
-            "function_definition": self._tu_function_definition,
-            "declaration": self._tu_declaration,
+            "function_definition": self.function_definition,
+            "declaration": self.declaration,
         }
         self._stmt_dispatch = {
-            "declaration": self._statement_declaration,
-            "expression_statement": self._statement_expression,
-            "return_statement": self._statement_return,
-            "if_statement": self._statement_if,
-            "while_statement": self._statement_while,
-            "do_statement": self._statement_do,
-            "compound_statement": self._compound_statement,
-            "break_statement": self._statement_break,
+            "declaration": self.declaration,
+            "expression_statement": self.expression_statement,
+            "return_statement": self.return_statement,
+            "if_statement": self.if_statement,
+            "while_statement": self.while_statement,
+            "do_statement": self.do_statement,
+            "compound_statement": self.compound_statement,
+            "break_statement": self.break_statement,
         }
         self._expr_dispatch = {
-            "identifier": self._expr_identifier,
-            "number_literal": self._expr_number,
-            "char_literal": self._expr_char,
-            "string_literal": self._expr_string,
-            "parenthesized_expression": self._expr_parenthesized,
-            "call_expression": self._call_expression,
-            "binary_expression": self._binary_expression,
-            "assignment_expression": self._assignment_expression,
-            "unary_expression": self._unary_expression,
-            "pointer_expression": self._pointer_expression,
-            "sizeof_expression": self._sizeof_expression,
-            "subscript_expression": self._subscript_expression,
-            "field_expression": self._field_expression,
-            "initializer_list": self._initializer_list,
+            "identifier": self.identifier,
+            "number_literal": self.number_literal,
+            "char_literal": self.char_literal,
+            "string_literal": self.string_literal,
+            "parenthesized_expression": self.parenthesized_expression,
+            "call_expression": self.call_expression,
+            "binary_expression": self.binary_expression,
+            "assignment_expression": self.assignment_expression,
+            "unary_expression": self.unary_expression,
+            "pointer_expression": self.pointer_expression,
+            "sizeof_expression": self.sizeof_expression,
+            "subscript_expression": self.subscript_expression,
+            "field_expression": self.field_expression,
+            "initializer_list": self.initializer_list,
         }
         self._decl_node_dispatch = {
-            "init_declarator": self._decl_node_init,
-            "function_declarator": self._decl_node_bare,
-            "pointer_declarator": self._decl_node_bare,
-            "array_declarator": self._decl_node_bare,
-            "parenthesized_declarator": self._decl_node_bare,
-            "identifier": self._decl_node_bare,
+            "init_declarator": self.init_declarator,
+            "function_declarator": self.function_declarator_node,
+            "pointer_declarator": self.pointer_declarator_node,
+            "array_declarator": self.array_declarator_node,
+            "parenthesized_declarator": self.parenthesized_declarator_node,
+            "identifier": self.identifier_declarator_node,
         }
         self._declarator_dispatch = {
-            "identifier": self._decl_identifier,
-            "parenthesized_declarator": self._decl_parenthesized,
-            "pointer_declarator": self._decl_pointer,
-            "array_declarator": self._decl_array,
-            "function_declarator": self._decl_function,
+            "identifier": self.identifier_declarator,
+            "parenthesized_declarator": self.parenthesized_declarator,
+            "pointer_declarator": self.pointer_declarator,
+            "array_declarator": self.array_declarator,
+            "function_declarator": self.function_declarator,
         }
 
     # ------------------------------------------------------------------ public
@@ -74,7 +75,7 @@ class TransformerPicoC:
 
     def transform(self, code: str):
         tree = self.parse_tree(code)
-        ast = self._translation_unit(tree.root_node, code)
+        ast = self.translation_unit(tree.root_node, code)
         return tree, ast
 
     # ----------------------------------------------------------------- helpers
@@ -141,24 +142,24 @@ class TransformerPicoC:
         return datatype
 
     # ----------------------------------------------------------------- parsing
-    def _translation_unit(self, node, code: str):
+    def translation_unit(self, node, code: str):
         decls_defs = []
         for child in node.children:
             if not child.is_named:
                 continue
             handler = self._tu_dispatch.get(child.type)
             if handler:
-                handler(child, code, decls_defs)
+                result = handler(child, code)
+                if result is None:
+                    continue
+                if isinstance(result, list):
+                    decls_defs.extend(result)
+                else:
+                    decls_defs.append(result)
 
         return pn.File(
             pn.Name(global_vars.tstate.path_without_ext + ".ast"), decls_defs
         )
-
-    def _tu_function_definition(self, node, code: str, decls_defs: list):
-        decls_defs.append(self._function_definition(node, code))
-
-    def _tu_declaration(self, node, code: str, decls_defs: list):
-        decls_defs.extend(self._declaration(node, code))
 
     # ------------------------------ declarators ------------------------------
     def _apply_declarator(self, node, base_type, code: str):
@@ -179,14 +180,14 @@ class TransformerPicoC:
             current_node = next_node
 
     # declarator handlers -----------------------------------------------------
-    def _decl_identifier(self, node, current_type, code: str):
+    def identifier_declarator(self, node, current_type, code: str):
         return None, current_type, pn.Name(self._text(node, code)), True
 
-    def _decl_parenthesized(self, node, current_type, code: str):
+    def parenthesized_declarator(self, node, current_type, code: str):
         inner = next(c for c in node.children if c.is_named)
         return inner, current_type, None, False
 
-    def _decl_pointer(self, node, current_type, code: str):
+    def pointer_declarator(self, node, current_type, code: str):
         pointer_count = sum(
             1 for c in node.children if not c.is_named and self._text(c, code) == "*"
         )
@@ -194,50 +195,50 @@ class TransformerPicoC:
         inner = next(c for c in node.children if c.is_named)
         return inner, wrapped_type, None, False
 
-    def _decl_array(self, node, current_type, code: str):
+    def array_declarator(self, node, current_type, code: str):
         size_node = node.child_by_field_name("size")
         dims = [pn.Num(self._text(size_node, code))] if size_node else []
         wrapped_type = self._wrap_arrays(current_type, dims)
         inner = node.child_by_field_name("declarator")
         return inner, wrapped_type, None, False
 
-    def _decl_function(self, node, current_type, code: str):
+    def function_declarator(self, node, current_type, code: str):
         inner = node.child_by_field_name("declarator")
         return inner, current_type, None, False
 
-    def _parameter_declaration(self, node, code: str):
+    def parameter_declaration(self, node, code: str):
         type_node = node.child_by_field_name("type")
         dt = self._prim_type(type_node, code)
         declarator = node.child_by_field_name("declarator")
         datatype, name = self._apply_declarator(declarator, dt, code)
         return pn.Alloc(pn.Writeable(), datatype, name)
 
-    def _parameter_list(self, node, code: str):
+    def parameter_list(self, node, code: str):
         params = []
         for child in node.children:
             if child.type == "parameter_declaration":
-                params.append(self._parameter_declaration(child, code))
+                params.append(self.parameter_declaration(child, code))
         return params
 
     # ------------------------------ functions -------------------------------
-    def _function_definition(self, node, code: str):
+    def function_definition(self, node, code: str):
         type_node = node.child_by_field_name("type")
         dt = self._prim_type(type_node, code)
 
         decl_node = node.child_by_field_name("declarator")
         params_node = decl_node.child_by_field_name("parameters")
-        params = self._parameter_list(params_node, code) if params_node else []
+        params = self.parameter_list(params_node, code) if params_node else []
         datatype, name = self._apply_declarator(
             decl_node.child_by_field_name("declarator"), dt, code
         )
 
         body_node = node.child_by_field_name("body")
-        stmts = self._compound_statement(body_node, code)
+        stmts = self.compound_statement(body_node, code)
 
         return pn.FunDef(datatype, name, params, stmts)
 
     # ----------------------------- declarations -----------------------------
-    def _declaration(self, node, code: str):
+    def declaration(self, node, code: str):
         type_node = node.child_by_field_name("type")
         if type_node is None:
             return []
@@ -257,18 +258,30 @@ class TransformerPicoC:
         return results
 
     # declaration handlers ----------------------------------------------------
-    def _decl_node_init(self, child, base_type, code: str, results: list):
+    def init_declarator(self, child, base_type, code: str, results: list):
         declarator = child.child_by_field_name("declarator")
         value_node = child.child_by_field_name("value")
         self._decl_process(declarator, value_node, base_type, code, results)
 
-    def _decl_node_bare(self, child, base_type, code: str, results: list):
+    def function_declarator_node(self, child, base_type, code: str, results: list):
+        self._decl_process(child, None, base_type, code, results)
+
+    def pointer_declarator_node(self, child, base_type, code: str, results: list):
+        self._decl_process(child, None, base_type, code, results)
+
+    def array_declarator_node(self, child, base_type, code: str, results: list):
+        self._decl_process(child, None, base_type, code, results)
+
+    def parenthesized_declarator_node(self, child, base_type, code: str, results: list):
+        self._decl_process(child, None, base_type, code, results)
+
+    def identifier_declarator_node(self, child, base_type, code: str, results: list):
         self._decl_process(child, None, base_type, code, results)
 
     def _decl_process(self, declarator, value_node, base_type, code: str, results: list):
         if declarator.type == "function_declarator":
             params_node = declarator.child_by_field_name("parameters")
-            params = self._parameter_list(params_node, code) if params_node else []
+            params = self.parameter_list(params_node, code) if params_node else []
             datatype, name = self._apply_declarator(
                 declarator.child_by_field_name("declarator"), base_type, code
             )
@@ -278,66 +291,63 @@ class TransformerPicoC:
         datatype, name = self._apply_declarator(declarator, base_type, code)
         alloc = pn.Alloc(pn.Writeable(), datatype, name)
         if value_node:
-            init_val = self._expression(value_node, code)
+            init_val = self.expression(value_node, code)
             results.append(pn.Assign(alloc, init_val))
         else:
             results.append(pn.Exp(alloc))
 
     # ------------------------------- statements -----------------------------
-    def _compound_statement(self, node, code: str):
+    def compound_statement(self, node, code: str):
         stmts = []
         for child in node.children:
             if not child.is_named:
                 continue
-            stmts.extend(self._statement(child, code))
+            stmts.extend(self.statement(child, code))
         return stmts
 
-    def _statement(self, node, code: str):
+    def statement(self, node, code: str):
         handler = self._stmt_dispatch.get(node.type)
         if handler is None:
             return []
         return handler(node, code)
 
-    def _statement_declaration(self, node, code: str):
-        return self._declaration(node, code)
-
-    def _statement_expression(self, node, code: str):
+    def expression_statement(self, node, code: str):
         expr_child = next((c for c in node.children if c.is_named), None)
         if expr_child is None:
             return []
-        expr = self._expression(expr_child, code)
+        expr = self.expression(expr_child, code)
         if isinstance(expr, pn.Assign):
             return [expr]
         return [pn.Exp(expr)]
 
-    def _statement_return(self, node, code: str):
+    def return_statement(self, node, code: str):
         expr_child = next((c for c in node.children if c.is_named), None)
-        return [pn.Return(self._expression(expr_child, code) if expr_child else pn.Empty())]
+        return [pn.Return(self.expression(expr_child, code) if expr_child else pn.Empty())]
 
-    def _statement_if(self, node, code: str):
-        cond = self._expression(node.child_by_field_name("condition"), code)
-        cons = self._statement(node.child_by_field_name("consequence"), code)
+    def if_statement(self, node, code: str):
+        cond = self.expression(node.child_by_field_name("condition"), code)
+        cons = self.statement(node.child_by_field_name("consequence"), code)
         alt_node = node.child_by_field_name("alternative")
         if alt_node:
-            alt = self._statement(alt_node, code)
+            alt = self.statement(alt_node, code)
             return [pn.IfElse(cond, cons, alt)]
         return [pn.If(cond, cons)]
 
-    def _statement_while(self, node, code: str):
-        cond = self._expression(node.child_by_field_name("condition"), code)
-        body = self._statement(node.child_by_field_name("body"), code)
+    def while_statement(self, node, code: str):
+        cond = self.expression(node.child_by_field_name("condition"), code)
+        body = self.statement(node.child_by_field_name("body"), code)
         return [pn.While(cond, body)]
 
-    def _statement_do(self, node, code: str):
-        body = self._statement(node.child_by_field_name("body"), code)
-        cond = self._expression(node.child_by_field_name("condition"), code)
+    def do_statement(self, node, code: str):
+        body = self.statement(node.child_by_field_name("body"), code)
+        cond = self.expression(node.child_by_field_name("condition"), code)
         return [pn.DoWhile(cond, body)]
 
-    def _statement_break(self, node, code: str):
+    def break_statement(self, node, code: str):
         return [pn.Exp(pn.Call(pn.Name("break"), []))]
 
     # ------------------------------- expressions ----------------------------
-    def _expression(self, node, code: str):
+    def expression(self, node, code: str):
         if node is None:
             return pn.Empty()
         handler = self._expr_dispatch.get(node.type)
@@ -345,38 +355,38 @@ class TransformerPicoC:
             throw_error(node.type)
         return handler(node, code)
 
-    def _expr_identifier(self, node, code: str):
+    def identifier(self, node, code: str):
         return pn.Name(self._text(node, code))
 
-    def _expr_number(self, node, code: str):
+    def number_literal(self, node, code: str):
         return pn.Num(self._text(node, code))
 
-    def _expr_char(self, node, code: str):
+    def char_literal(self, node, code: str):
         literal = self._text(node, code)
         return pn.Char(literal[1:-1])
 
-    def _expr_string(self, node, code: str):
+    def string_literal(self, node, code: str):
         return pn.Name(self._text(node, code))
 
-    def _expr_parenthesized(self, node, code: str):
+    def parenthesized_expression(self, node, code: str):
         inner = next(c for c in node.children if c.is_named)
-        return self._expression(inner, code)
+        return self.expression(inner, code)
 
-    def _call_expression(self, node, code: str):
+    def call_expression(self, node, code: str):
         # call_expression -> function "(" arguments? ")"
-        func = self._expression(node.child_by_field_name("function"), code)
+        func = self.expression(node.child_by_field_name("function"), code)
         args_node = node.child_by_field_name("arguments")
         args = [
-            self._expression(child, code)
+            self.expression(child, code)
             for child in args_node.children
             if child.is_named
         ] if args_node else []
         return pn.Call(func, args)
 
-    def _binary_expression(self, node, code: str):
+    def binary_expression(self, node, code: str):
         # binary_expression -> left operator right
-        left = self._expression(node.child_by_field_name("left"), code)
-        right = self._expression(node.child_by_field_name("right"), code)
+        left = self.expression(node.child_by_field_name("left"), code)
+        right = self.expression(node.child_by_field_name("right"), code)
         op = next(self._text(c, code) for c in node.children if not c.is_named)
         bin_node = self._bin_op_node(op)
         if isinstance(bin_node, (pn.Lt, pn.LtE, pn.Gt, pn.GtE, pn.Eq, pn.NEq)):
@@ -385,16 +395,16 @@ class TransformerPicoC:
             return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
         return pn.BinOp(left, bin_node, right)
 
-    def _assignment_expression(self, node, code: str):
+    def assignment_expression(self, node, code: str):
         # assignment_expression -> left "=" right
-        left = self._expression(node.child_by_field_name("left"), code)
-        right = self._expression(node.child_by_field_name("right"), code)
+        left = self.expression(node.child_by_field_name("left"), code)
+        right = self.expression(node.child_by_field_name("right"), code)
         return pn.Assign(left, right)
 
-    def _unary_expression(self, node, code: str):
+    def unary_expression(self, node, code: str):
         # unary_expression -> ("-" | "!" | "~") expression
         op = next(self._text(c, code) for c in node.children if not c.is_named)
-        exp = self._expression(next(c for c in node.children if c.is_named), code)
+        exp = self.expression(next(c for c in node.children if c.is_named), code)
         match op:
             case "-":
                 return pn.UnOp(pn.Minus(), exp)
@@ -404,10 +414,10 @@ class TransformerPicoC:
                 return pn.UnOp(pn.Not(), exp)
         throw_error(op)
 
-    def _pointer_expression(self, node, code: str):
+    def pointer_expression(self, node, code: str):
         # pointer_expression -> ("&" | "*") expression
         op = self._text(next(c for c in node.children if not c.is_named), code)
-        exp = self._expression(next(c for c in node.children if c.is_named), code)
+        exp = self.expression(next(c for c in node.children if c.is_named), code)
         match op:
             case "&":
                 return pn.Ref(exp)
@@ -422,25 +432,25 @@ class TransformerPicoC:
                         return pn.Deref(exp, pn.Num("0"))
         throw_error(op)
 
-    def _sizeof_expression(self, node, code: str):
+    def sizeof_expression(self, node, code: str):
         # sizeof_expression -> "sizeof" (type | value)
         target = node.child_by_field_name("type") or node.child_by_field_name("value")
-        return pn.SizeOf(self._expression(target, code))
+        return pn.SizeOf(self.expression(target, code))
 
-    def _subscript_expression(self, node, code: str):
+    def subscript_expression(self, node, code: str):
         # subscript_expression -> argument "[" index "]"
-        base = self._expression(node.child_by_field_name("argument"), code)
-        index = self._expression(node.child_by_field_name("index"), code)
+        base = self.expression(node.child_by_field_name("argument"), code)
+        index = self.expression(node.child_by_field_name("index"), code)
         return pn.Subscr(base, index)
 
-    def _field_expression(self, node, code: str):
+    def field_expression(self, node, code: str):
         # field_expression -> argument "." field
-        argument = self._expression(node.child_by_field_name("argument"), code)
+        argument = self.expression(node.child_by_field_name("argument"), code)
         field = node.child_by_field_name("field")
         return pn.Attr(argument, pn.Name(self._text(field, code)))
 
-    def _initializer_list(self, node, code: str):
-        exps = [self._expression(c, code) for c in node.children if c.is_named]
+    def initializer_list(self, node, code: str):
+        exps = [self.expression(c, code) for c in node.children if c.is_named]
         return pn.Array(exps)
 
     # ------------------------------ expression utils ------------------------
