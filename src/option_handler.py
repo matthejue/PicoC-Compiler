@@ -124,10 +124,21 @@ class OptionHandler:
             print(code)
 
         transformer = TransformerPicoC()
-        tree, ast = transformer.transform(code)
+        ts_tree = transformer.parse_tree(code)
 
-        self._tokens_option(tree, code, "Tokens")
-        self._dt_pass(tree, code, "Parse Tree")
+        # Always emit tokens/parse tree even if AST construction fails
+        self._tokens_option(ts_tree, code, "Tokens")
+        self._dt_pass(ts_tree, code, "Parse Tree")
+
+        try:
+            ast = transformer.translation_unit(ts_tree.root_node, code)
+        except Exception as exc:
+            if global_vars.args.debug:
+                raise
+            print(f"[ERROR] AST transform failed: {exc}")
+            if global_vars.args.traceback:
+                traceback.print_exc()
+            exit(FAILURE)
 
         self._output_pass(ast, "Abstract Syntax Tree")
 
