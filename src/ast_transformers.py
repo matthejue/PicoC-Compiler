@@ -21,53 +21,6 @@ class TransformerPicoC:
     def __init__(self):
         self.parser = Parser()
         self.parser.language = _TS_LANGUAGE
-        # Dispatch maps for fast, explicit node handling. Handler names mirror
-        # the upstream tree-sitter C grammar rules in ../vendor/tree-sitter-c/grammar.js.
-        self._tu_dispatch = {
-            "function_definition": self.function_definition,
-            "declaration": self.declaration,
-        }
-        self._stmt_dispatch = {
-            "declaration": self.declaration,
-            "expression_statement": self.expression_statement,
-            "return_statement": self.return_statement,
-            "if_statement": self.if_statement,
-            "while_statement": self.while_statement,
-            "do_statement": self.do_statement,
-            "compound_statement": self.compound_statement,
-            "break_statement": self.break_statement,
-        }
-        self._expr_dispatch = {
-            "identifier": self.identifier,
-            "number_literal": self.number_literal,
-            "char_literal": self.char_literal,
-            "string_literal": self.string_literal,
-            "parenthesized_expression": self.parenthesized_expression,
-            "call_expression": self.call_expression,
-            "binary_expression": self.binary_expression,
-            "assignment_expression": self.assignment_expression,
-            "unary_expression": self.unary_expression,
-            "pointer_expression": self.pointer_expression,
-            "sizeof_expression": self.sizeof_expression,
-            "subscript_expression": self.subscript_expression,
-            "field_expression": self.field_expression,
-            "initializer_list": self.initializer_list,
-        }
-        self._decl_node_dispatch = {
-            "init_declarator": self.init_declarator,
-            "function_declarator": self.function_declarator_node,
-            "pointer_declarator": self.pointer_declarator_node,
-            "array_declarator": self.array_declarator_node,
-            "parenthesized_declarator": self.parenthesized_declarator_node,
-            "identifier": self.identifier_declarator_node,
-        }
-        self._declarator_dispatch = {
-            "identifier": self.identifier_declarator,
-            "parenthesized_declarator": self.parenthesized_declarator,
-            "pointer_declarator": self.pointer_declarator,
-            "array_declarator": self.array_declarator,
-            "function_declarator": self.function_declarator,
-        }
 
     # ------------------------------------------------------------------ public
     def parse_tree(self, code: str):
@@ -141,21 +94,19 @@ class TransformerPicoC:
             datatype = pn.ArrayDecl([dim], datatype)
         return datatype
 
-    # ----------------------------------------------------------------- parsing
+    # -------------------------------- parsing --------------------------------
     def translation_unit(self, node, code: str):
         decls_defs = []
         for child in node.children:
             if not child.is_named:
                 continue
-            handler = self._tu_dispatch.get(child.type)
-            if handler:
-                result = handler(child, code)
-                if result is None:
-                    continue
-                if isinstance(result, list):
-                    decls_defs.extend(result)
-                else:
-                    decls_defs.append(result)
+            match child.type:
+                case "function_definition":
+                    decls_defs.append(self.function_definition(child, code))
+                case "declaration":
+                    decls_defs.extend(self.declaration(child, code))
+                case _:
+                    pass
 
         return pn.File(
             pn.Name(global_vars.tstate.path_without_ext + ".ast"), decls_defs
@@ -164,17 +115,36 @@ class TransformerPicoC:
     # ------------------------------ declarators ------------------------------
     def _apply_declarator(self, node, base_type, code: str):
         """
-        Walks a declarator chain using dispatch handlers. Each handler unwraps
-        one layer and returns the next node to examine.
+        Walks a declarator chain using rule-specific handlers. Each handler
+        unwraps one layer and returns the next node to examine.
         """
         current_type = base_type
         current_node = node
 
         while True:
-            handler = self._declarator_dispatch.get(current_node.type)
-            if handler is None:
-                throw_error(current_node.type)
-            next_node, current_type, name, done = handler(current_node, current_type, code)
+            match current_node.type:
+                case "identifier":
+                    next_node, current_type, name, done = self.identifier_declarator(
+                        current_node, current_type, code
+                    )
+                case "parenthesized_declarator":
+                    next_node, current_type, name, done = self.parenthesized_declarator(
+                        current_node, current_type, code
+                    )
+                case "pointer_declarator":
+                    next_node, current_type, name, done = self.pointer_declarator(
+                        current_node, current_type, code
+                    )
+                case "array_declarator":
+                    next_node, current_type, name, done = self.array_declarator(
+                        current_node, current_type, code
+                    )
+                case "function_declarator":
+                    next_node, current_type, name, done = self.function_declarator(
+                        current_node, current_type, code
+                    )
+                case _:
+                    throw_error(current_node.type)
             if done:
                 return current_type, name
             current_node = next_node
@@ -251,9 +221,21 @@ class TransformerPicoC:
             declarator_nodes = declarator_nodes[1:]
 
         for child in declarator_nodes:
-            handler = self._decl_node_dispatch.get(child.type)
-            if handler:
-                handler(child, base_type, code, results)
+            match child.type:
+                case "init_declarator":
+                    self.init_declarator(child, base_type, code, results)
+                case "function_declarator":
+                    self.function_declarator_node(child, base_type, code, results)
+                case "pointer_declarator":
+                    self.pointer_declarator_node(child, base_type, code, results)
+                case "array_declarator":
+                    self.array_declarator_node(child, base_type, code, results)
+                case "parenthesized_declarator":
+                    self.parenthesized_declarator_node(child, base_type, code, results)
+                case "identifier":
+                    self.identifier_declarator_node(child, base_type, code, results)
+                case _:
+                    pass
 
         return results
 
@@ -306,10 +288,25 @@ class TransformerPicoC:
         return stmts
 
     def statement(self, node, code: str):
-        handler = self._stmt_dispatch.get(node.type)
-        if handler is None:
-            return []
-        return handler(node, code)
+        match node.type:
+            case "declaration":
+                return self.declaration(node, code)
+            case "expression_statement":
+                return self.expression_statement(node, code)
+            case "return_statement":
+                return self.return_statement(node, code)
+            case "if_statement":
+                return self.if_statement(node, code)
+            case "while_statement":
+                return self.while_statement(node, code)
+            case "do_statement":
+                return self.do_statement(node, code)
+            case "compound_statement":
+                return self.compound_statement(node, code)
+            case "break_statement":
+                return self.break_statement(node, code)
+            case _:
+                return []
 
     def expression_statement(self, node, code: str):
         expr_child = next((c for c in node.children if c.is_named), None)
@@ -350,10 +347,37 @@ class TransformerPicoC:
     def expression(self, node, code: str):
         if node is None:
             return pn.Empty()
-        handler = self._expr_dispatch.get(node.type)
-        if handler is None:
-            throw_error(node.type)
-        return handler(node, code)
+        match node.type:
+            case "identifier":
+                return self.identifier(node, code)
+            case "number_literal":
+                return self.number_literal(node, code)
+            case "char_literal":
+                return self.char_literal(node, code)
+            case "string_literal":
+                return self.string_literal(node, code)
+            case "parenthesized_expression":
+                return self.parenthesized_expression(node, code)
+            case "call_expression":
+                return self.call_expression(node, code)
+            case "binary_expression":
+                return self.binary_expression(node, code)
+            case "assignment_expression":
+                return self.assignment_expression(node, code)
+            case "unary_expression":
+                return self.unary_expression(node, code)
+            case "pointer_expression":
+                return self.pointer_expression(node, code)
+            case "sizeof_expression":
+                return self.sizeof_expression(node, code)
+            case "subscript_expression":
+                return self.subscript_expression(node, code)
+            case "field_expression":
+                return self.field_expression(node, code)
+            case "initializer_list":
+                return self.initializer_list(node, code)
+            case _:
+                throw_error(node.type)
 
     def identifier(self, node, code: str):
         return pn.Name(self._text(node, code))
