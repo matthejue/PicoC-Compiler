@@ -55,8 +55,13 @@ class TransformerPicoC:
         Returns a mapping of field_name -> list of child ASTs for quick lookup.
         """
         mapping: dict[str | None, list[object]] = {}
-        for child_node, child_ast in zip(self._named_children(node), children):
-            mapping.setdefault(child_node.field_name, []).append(child_ast)
+        field_names = [
+            node.field_name_for_child(i)
+            for i, child in enumerate(node.children)
+            if child.is_named
+        ]
+        for field_name, child_ast in zip(field_names, children):
+            mapping.setdefault(field_name, []).append(child_ast)
         return mapping
 
     def walk(self, root):
@@ -264,41 +269,41 @@ class TransformerPicoC:
         for child in declarator_nodes:
             match child.type:
                 case "init_declarator":
-                    self.init_declarator(child, base_type, results)
+                    self._init_declarator(child, base_type, results)
                 case "function_declarator":
-                    self.function_declarator_node(child, base_type, results)
+                    self._function_declarator_node(child, base_type, results)
                 case "pointer_declarator":
-                    self.pointer_declarator_node(child, base_type, results)
+                    self._pointer_declarator_node(child, base_type, results)
                 case "array_declarator":
-                    self.array_declarator_node(child, base_type, results)
+                    self._array_declarator_node(child, base_type, results)
                 case "parenthesized_declarator":
-                    self.parenthesized_declarator_node(child, base_type, results)
+                    self._parenthesized_declarator_node(child, base_type, results)
                 case "identifier":
-                    self.identifier_declarator_node(child, base_type, results)
+                    self._identifier_declarator_node(child, base_type, results)
                 case _:
                     pass
 
         return results
 
     # declaration handlers ----------------------------------------------------
-    def init_declarator(self, child, base_type, results: list):
+    def _init_declarator(self, child, base_type, results: list):
         declarator = child.child_by_field_name("declarator")
         value_node = child.child_by_field_name("value")
         self._decl_process(declarator, value_node, base_type, results)
 
-    def function_declarator_node(self, child, base_type, results: list):
+    def _function_declarator_node(self, child, base_type, results: list):
         self._decl_process(child, None, base_type, results)
 
-    def pointer_declarator_node(self, child, base_type, results: list):
+    def _pointer_declarator_node(self, child, base_type, results: list):
         self._decl_process(child, None, base_type, results)
 
-    def array_declarator_node(self, child, base_type, results: list):
+    def _array_declarator_node(self, child, base_type, results: list):
         self._decl_process(child, None, base_type, results)
 
-    def parenthesized_declarator_node(self, child, base_type, results: list):
+    def _parenthesized_declarator_node(self, child, base_type, results: list):
         self._decl_process(child, None, base_type, results)
 
-    def identifier_declarator_node(self, child, base_type, results: list):
+    def _identifier_declarator_node(self, child, base_type, results: list):
         self._decl_process(child, None, base_type, results)
 
     def _decl_process(self, declarator, value_node, base_type, results: list):
@@ -458,7 +463,12 @@ class TransformerPicoC:
         # field_expression -> argument "." field
         fields = self._field_children(node, children)
         argument = fields.get("argument", [pn.Empty()])[0]
-        field_nodes = [c for c in self._named_children(node) if c.field_name == "field"]
+        named_indices = [i for i, ch in enumerate(node.children) if ch.is_named]
+        field_nodes = [
+            c
+            for idx, c in enumerate(self._named_children(node))
+            if node.field_name_for_child(named_indices[idx]) == "field"
+        ]
         if field_nodes:
             return pn.Attr(argument, pn.Name(self._text(field_nodes[0])))
         throw_error(node)
