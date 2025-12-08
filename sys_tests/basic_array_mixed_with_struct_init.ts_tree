@@ -1,0 +1,160 @@
+translation_unit: struct str {int attr1; char attr2[3];};\n\nvoid main() {\n  struct str ar[2][2] = {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}};\n  print(ar[0][0].attr2[0]);\n  print(ar[0][1].attr1);\n  print(ar[1][0].attr2[1]);\n  print(ar[1][1].attr2[2]);\n  print(ar[1][0].attr1);\n  print(ar[0][1].attr2[1]);\n}\n
+  struct_specifier: struct str {int attr1; char attr2[3];}
+    type_identifier: str
+    field_declaration_list: {int attr1; char attr2[3];}
+      field_declaration: int attr1;
+        primitive_type: int
+        field_identifier: attr1
+      field_declaration: char attr2[3];
+        primitive_type: char
+        array_declarator: attr2[3]
+          field_identifier: attr2
+          number_literal: 3
+  function_definition: void main() {\n  struct str ar[2][2] = {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}};\n  print(ar[0][0].attr2[0]);\n  print(ar[0][1].attr1);\n  print(ar[1][0].attr2[1]);\n  print(ar[1][1].attr2[2]);\n  print(ar[1][0].attr1);\n  print(ar[0][1].attr2[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+    compound_statement: {\n  struct str ar[2][2] = {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}};\n  print(ar[0][0].attr2[0]);\n  print(ar[0][1].attr1);\n  print(ar[1][0].attr2[1]);\n  print(ar[1][1].attr2[2]);\n  print(ar[1][0].attr1);\n  print(ar[0][1].attr2[1]);\n}
+      declaration: struct str ar[2][2] = {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}};
+        struct_specifier: struct str
+          type_identifier: str
+        init_declarator: ar[2][2] = {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}}
+          array_declarator: ar[2][2]
+            array_declarator: ar[2]
+              identifier: ar
+              number_literal: 2
+            number_literal: 2
+          initializer_list: {{{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}, {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}}
+            initializer_list: {{.attr1=12, .attr2={input(), 2, 3}}, {.attr1=input(), .attr2={4, 5, 6}}}
+              initializer_list: {.attr1=12, .attr2={input(), 2, 3}}
+                initializer_pair: .attr1=12
+                  field_designator: .attr1
+                    field_identifier: attr1
+                  number_literal: 12
+                initializer_pair: .attr2={input(), 2, 3}
+                  field_designator: .attr2
+                    field_identifier: attr2
+                  initializer_list: {input(), 2, 3}
+                    call_expression: input()
+                      identifier: input
+                      argument_list: ()
+                    number_literal: 2
+                    number_literal: 3
+              initializer_list: {.attr1=input(), .attr2={4, 5, 6}}
+                initializer_pair: .attr1=input()
+                  field_designator: .attr1
+                    field_identifier: attr1
+                  call_expression: input()
+                    identifier: input
+                    argument_list: ()
+                initializer_pair: .attr2={4, 5, 6}
+                  field_designator: .attr2
+                    field_identifier: attr2
+                  initializer_list: {4, 5, 6}
+                    number_literal: 4
+                    number_literal: 5
+                    number_literal: 6
+            initializer_list: {{.attr1=78, .attr2={7, input(), 9}}, {.attr1=1011, .attr2={10, 11, input()}}}
+              initializer_list: {.attr1=78, .attr2={7, input(), 9}}
+                initializer_pair: .attr1=78
+                  field_designator: .attr1
+                    field_identifier: attr1
+                  number_literal: 78
+                initializer_pair: .attr2={7, input(), 9}
+                  field_designator: .attr2
+                    field_identifier: attr2
+                  initializer_list: {7, input(), 9}
+                    number_literal: 7
+                    call_expression: input()
+                      identifier: input
+                      argument_list: ()
+                    number_literal: 9
+              initializer_list: {.attr1=1011, .attr2={10, 11, input()}}
+                initializer_pair: .attr1=1011
+                  field_designator: .attr1
+                    field_identifier: attr1
+                  number_literal: 1011
+                initializer_pair: .attr2={10, 11, input()}
+                  field_designator: .attr2
+                    field_identifier: attr2
+                  initializer_list: {10, 11, input()}
+                    number_literal: 10
+                    number_literal: 11
+                    call_expression: input()
+                      identifier: input
+                      argument_list: ()
+      expression_statement: print(ar[0][0].attr2[0]);
+        call_expression: print(ar[0][0].attr2[0])
+          identifier: print
+          argument_list: (ar[0][0].attr2[0])
+            subscript_expression: ar[0][0].attr2[0]
+              field_expression: ar[0][0].attr2
+                subscript_expression: ar[0][0]
+                  subscript_expression: ar[0]
+                    identifier: ar
+                    number_literal: 0
+                  number_literal: 0
+                field_identifier: attr2
+              number_literal: 0
+      expression_statement: print(ar[0][1].attr1);
+        call_expression: print(ar[0][1].attr1)
+          identifier: print
+          argument_list: (ar[0][1].attr1)
+            field_expression: ar[0][1].attr1
+              subscript_expression: ar[0][1]
+                subscript_expression: ar[0]
+                  identifier: ar
+                  number_literal: 0
+                number_literal: 1
+              field_identifier: attr1
+      expression_statement: print(ar[1][0].attr2[1]);
+        call_expression: print(ar[1][0].attr2[1])
+          identifier: print
+          argument_list: (ar[1][0].attr2[1])
+            subscript_expression: ar[1][0].attr2[1]
+              field_expression: ar[1][0].attr2
+                subscript_expression: ar[1][0]
+                  subscript_expression: ar[1]
+                    identifier: ar
+                    number_literal: 1
+                  number_literal: 0
+                field_identifier: attr2
+              number_literal: 1
+      expression_statement: print(ar[1][1].attr2[2]);
+        call_expression: print(ar[1][1].attr2[2])
+          identifier: print
+          argument_list: (ar[1][1].attr2[2])
+            subscript_expression: ar[1][1].attr2[2]
+              field_expression: ar[1][1].attr2
+                subscript_expression: ar[1][1]
+                  subscript_expression: ar[1]
+                    identifier: ar
+                    number_literal: 1
+                  number_literal: 1
+                field_identifier: attr2
+              number_literal: 2
+      expression_statement: print(ar[1][0].attr1);
+        call_expression: print(ar[1][0].attr1)
+          identifier: print
+          argument_list: (ar[1][0].attr1)
+            field_expression: ar[1][0].attr1
+              subscript_expression: ar[1][0]
+                subscript_expression: ar[1]
+                  identifier: ar
+                  number_literal: 1
+                number_literal: 0
+              field_identifier: attr1
+      expression_statement: print(ar[0][1].attr2[1]);
+        call_expression: print(ar[0][1].attr2[1])
+          identifier: print
+          argument_list: (ar[0][1].attr2[1])
+            subscript_expression: ar[0][1].attr2[1]
+              field_expression: ar[0][1].attr2
+                subscript_expression: ar[0][1]
+                  subscript_expression: ar[0]
+                    identifier: ar
+                    number_literal: 0
+                  number_literal: 1
+                field_identifier: attr2
+              number_literal: 1

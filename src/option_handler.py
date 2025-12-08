@@ -131,7 +131,7 @@ class OptionHandler:
         self._dt_pass(ts_tree, code, "Parse Tree")
 
         try:
-            ast = transformer.translation_unit(ts_tree.root_node, code)
+            ast = transformer.build_ast(ts_tree, code)
         except Exception as exc:
             if global_vars.args.debug:
                 raise
