@@ -1,0 +1,9 @@
+// in:32
+// expected:0 0
+
+void main() {
+  int ex1 = 12 * 3 + 6;
+  int ex1 = 12 * 3 * 6;
+  int ex2 = 6 + 12 * 3;
+  int ex2 = 6 * 12 * 3;
+}

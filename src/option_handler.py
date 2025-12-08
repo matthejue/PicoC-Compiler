@@ -313,9 +313,14 @@ class OptionHandler:
                 fout.write(str(leaf_tokens))
 
     def _dt_pass(self, ts_tree, code, heading):
+        include_unnamed = bool(global_vars.args.double_verbose)
+        formatted_tree = _format_tree(
+            ts_tree.root_node, code, include_unnamed=include_unnamed
+        )
+
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(_format_tree(ts_tree.root_node, code))
+            print(formatted_tree)
 
         if global_vars.args.write_files:
             with open(
@@ -323,7 +328,7 @@ class OptionHandler:
                 "w",
                 encoding="utf-8",
             ) as fout:
-                fout.write(_format_tree(ts_tree.root_node, code))
+                fout.write(formatted_tree)
 
     def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
         if global_vars.args.intermediate_stages:
@@ -401,14 +406,17 @@ def _iter_tokens(tree, code):
     yield from dfs(tree.root_node)
 
 
-def _format_tree(node, code, depth: int = 0):
+def _format_tree(node, code, depth: int = 0, *, include_unnamed: bool = False):
     lines = []
+    code_bytes = code if isinstance(code, (bytes, bytearray)) else code.encode("utf-8")
 
     def walk(n, d):
-        snippet = code[n.start_byte : n.end_byte].replace("\n", "\\n")
+        snippet = code_bytes[n.start_byte : n.end_byte].decode("utf-8").replace(
+            "\n", "\\n"
+        )
         lines.append(f"{'  '*d}{n.type}: {snippet}")
         for child in n.children:
-            if child.is_named:
+            if include_unnamed or child.is_named:
                 walk(child, d + 1)
 
     walk(node, depth)

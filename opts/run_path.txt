@@ -1,1 +1,1 @@
-./sys_tests/basic_do_while.picoc
+./sys_tests/basic_prec_rules.picoc
