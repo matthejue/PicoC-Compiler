@@ -1,1 +1,1 @@
-./sys_tests/basic_prec_rules.picoc
+./sys_tests/basic_array_init.picoc

@@ -226,7 +226,24 @@ class TransformerPicoC:
         if isinstance(bin_node, (pn.LogicAnd, pn.LogicOr)):
             return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
         return pn.BinOp(left, bin_node, right)
+
+    def expression_statement(self, _, children):
+        return pn.Exp(children[0])
+
+    def call_expression(self, _, children):
+        return pn.Call(children[0], children[1])
         
+    def argument_list(self, _, children):
+        return children
+
+    def array_declarator(self, _, children):
+        match children[0]:
+            case pn.ArrayDecl(nums, datatype):
+                return pn.ArrayDecl([children[1]] + nums, datatype)
+            case _:
+                return pn.ArrayDecl([children[1]], children[0])
+        
+
     # # ------------------------------ declarators ------------------------------
     # def _apply_declarator(self, node, base_type):
     #     """

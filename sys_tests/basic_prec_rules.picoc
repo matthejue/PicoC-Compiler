@@ -1,9 +1,13 @@
 // in:32
-// expected:0 0
+// expected:42 216 42 216
 
 void main() {
   int ex1 = 12 * 3 + 6;
-  int ex1 = 12 * 3 * 6;
-  int ex2 = 6 + 12 * 3;
-  int ex2 = 6 * 12 * 3;
+  int ex2 = 12 * 3 * 6;
+  int ex3 = 6 + 12 * 3;
+  int ex4 = 6 * 12 * 3;
+  print(ex1);
+  print(ex2);
+  print(ex3);
+  print(ex4);
 }
