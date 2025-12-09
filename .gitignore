@@ -39,3 +39,4 @@ README.txt
 *.gdb_history
 *.venv/
 .virtualenv/
+vendor/

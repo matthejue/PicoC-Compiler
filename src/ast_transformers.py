@@ -1,22 +1,47 @@
-from lark.visitors import Transformer
+import ctypes
+from pathlib import Path
+from typing import Sequence
+
 from lark.lexer import Token
+from lark.visitors import Transformer
+from tree_sitter import Language, Parser
+
+from src import global_vars
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
-from src import global_vars
-from tree_sitter import Language, Parser
-import tree_sitter_c
-from typing import Sequence
-from src.utils.util_funs_dependent import throw_error
 
 
-_TS_LANGUAGE = Language(tree_sitter_c.language())
+def _load_ts_language() -> Language:
+    """
+    Load the vendored Tree-sitter C grammar (../vendor/tree-sitter-c/c.so)
+    so local grammar changes are used instead of the PyPI wheel.
+    """
+    grammar_lib = (
+        Path(__file__).resolve().parent.parent
+        / "vendor"
+        / "tree-sitter-c"
+        / "c.so"
+    )
+    if not grammar_lib.exists():
+        raise FileNotFoundError(
+            f"Tree-sitter C grammar not found at {grammar_lib}. "
+            "Build the grammar in vendor/tree-sitter-c."
+        )
+    lib = ctypes.CDLL(str(grammar_lib))
+    if not hasattr(lib, "tree_sitter_c"):
+        raise AttributeError(f"'tree_sitter_c' symbol missing in {grammar_lib}")
+    lib.tree_sitter_c.restype = ctypes.c_void_p
+    return Language(lib.tree_sitter_c())
+
+
+_TS_LANGUAGE = _load_ts_language()
 
 
 class TransformerPicoC:
     """
     Tree-sitter backed transformer that builds the PicoC AST using the
-    upstream C grammar.
+    vendored C grammar from ../vendor/tree-sitter-c.
     """
 
     def __init__(self):
@@ -207,9 +232,6 @@ class TransformerPicoC:
     def number_literal(self, node, _):
         return pn.Num(self.value(node))
 
-    def do_statement(self, _, children):
-        return pn.DoWhile(children[0], children[1])
-
     def parenthesized_expression(self, _, children):
         return children
 
@@ -229,6 +251,12 @@ class TransformerPicoC:
 
     def expression_statement(self, _, children):
         return pn.Exp(children[0])
+    
+    # --------------------------------- Loops ---------------------------------
+    def do_statement(self, _, children):
+        return pn.DoWhile(children[0], children[1])
+
+    # ------------------------------- Functions -------------------------------
 
     def call_expression(self, _, children):
         return pn.Call(children[0], children[1])
@@ -236,14 +264,21 @@ class TransformerPicoC:
     def argument_list(self, _, children):
         return children
 
+    # --------------------------------- Array ---------------------------------
+
     def array_declarator(self, _, children):
         match children[0]:
             case pn.ArrayDecl(nums, datatype):
                 return pn.ArrayDecl([children[1]] + nums, datatype)
             case _:
                 return pn.ArrayDecl([children[1]], children[0])
-        
 
+    def initializer_list(self, _, children):
+        return pn.Array(children)
+
+    def debug_statement(self, *_):
+        return pn.Debug()
+        
     # # ------------------------------ declarators ------------------------------
     # def _apply_declarator(self, node, base_type):
     #     """

@@ -654,7 +654,7 @@ class GoTo(ASTNode):
     __match_args__ = ("name",)
 
 
-# ------------------------------- L_Comment -------------------------------
+# ---------------------------------- L_Misc -----------------------------------
 class SingleLineComment(ASTNode):
     def __init__(self, prefix, content):
         self.prefix = prefix
@@ -669,6 +669,8 @@ class SingleLineComment(ASTNode):
 
     __match_args__ = ("prefix", "content")
 
+class Debug(ASTNode):
+    pass
 
 # ------------------------------- L_Placeholder -------------------------------
 class Placeholder(ASTNode):

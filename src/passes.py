@@ -159,6 +159,9 @@ class Passes:
                 return stmt
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
+             # ---------------------------- L_Misc ----------------------------
+            case pn.Debug():
+                return stmt
             case _:
                 throw_error(stmt)
 
@@ -1234,7 +1237,7 @@ class Passes:
                 return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
                 return [pn.Exp(exp)]
-            case pn.Call(pn.Name("break"), []):
+            case pn.Debug():
                 return [pn.Exp(exp)]
             case pn.SizeOf(exp_datatype):
                 size = 1
@@ -1732,7 +1735,7 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Int(rn.Im("0")),
                 ]
-            case pn.Exp(pn.Call(pn.Name("break"), [])):
+            case pn.Exp(pn.Debug()):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Int(rn.Im("3")),
                 ]
