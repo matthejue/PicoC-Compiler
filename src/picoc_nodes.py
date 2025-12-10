@@ -672,6 +672,9 @@ class SingleLineComment(ASTNode):
 class Debug(ASTNode):
     pass
 
+class Error(ASTNode):
+    pass
+
 # ------------------------------- L_Placeholder -------------------------------
 class Placeholder(ASTNode):
     pass

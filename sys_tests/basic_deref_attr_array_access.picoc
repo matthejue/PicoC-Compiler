@@ -1,0 +1,16 @@
+// in:42
+// expected:42
+
+struct Data {
+    int arr0[2];
+    int arr1[2];
+};
+
+void main() {
+    struct Data obj = {.arr1={1, 2}, .arr2={3, input()}};
+    struct Data *ptr = &obj;
+
+    int x = (*ptr).arr1[2];
+
+    print(x);
+}
