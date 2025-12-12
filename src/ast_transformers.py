@@ -127,19 +127,22 @@ class TransformerPicoC:
             throw_error(f"No unnamed children found in node '{node.type}'")
         return self.value(unnamed[0])
 
-    def _field_children(self, node, children):
-        """
-        Returns a mapping of field_name -> list of child ASTs for quick lookup.
-        """
-        mapping: dict[str | None, list[object]] = {}
-        field_names = [
-            node.field_name_for_child(i)
-            for i, child in enumerate(node.children)
-            if child.is_named
-        ]
-        for field_name, child_ast in zip(field_names, children):
-            mapping.setdefault(field_name, []).append(child_ast)
-        return mapping
+    def _seperate_name_and_datatype(self, base_datatype, declarator):
+            if isinstance(declarator, pn.Name):
+                return base_datatype, declarator
+            if isinstance(declarator, list) and declarator:
+                *fragmented_datatypes, name = declarator
+                datatype = base_datatype
+                for fragmented_datatype in reversed(fragmented_datatypes):
+                    match fragmented_datatype:
+                        case pn.ArrayDecl(nums, _):
+                            datatype = pn.ArrayDecl(nums, datatype)
+                        case pn.PntrDecl(pn.Num(val), _):
+                            datatype = pn.PntrDecl(pn.Num(val), datatype)
+                        case _:
+                            throw_error(fragmented_datatype)
+                return datatype, name
+            throw_error(declarator)
 
     def walk(self, root):
         """
@@ -185,7 +188,10 @@ class TransformerPicoC:
                 return pn.VoidType()
             case "int":
                 return pn.IntType()
-        return
+            case "char":
+                return pn.CharType()
+            case _:
+                return pn.Error()
 
     def parameter_list(self, _, children):
         return children
@@ -195,19 +201,21 @@ class TransformerPicoC:
 
     def declaration(self, _, children):
         if len(children) == 2:
-            match children[1]:
-                case pn.Assign(pn.Alloc(_, _, identifier), val):
-                    return pn.Assign(pn.Alloc(pn.Writeable(), children[0], identifier), val)
-                case _:
-                    throw_error(children[1])
-        elif len(children == 3):
-            match children[2]:
-                case pn.Assign(pn.Alloc(_, _, identifier), val):
-                    return pn.Assign(pn.Alloc(children[0], children[1], identifier), val)
-                case _:
-                    throw_error(children[2])
+            type_qual = pn.Writeable()
+            datatype, init_or_decl = children
+        elif len(children) == 3:
+            type_qual, datatype, init_or_decl = children
         else:
             throw_error(len(children))
+
+        match init_or_decl:
+            case pn.Assign(pn.Alloc(_, _, declarator), val):
+                full_dt, name = self._seperate_name_and_datatype(datatype, declarator)
+                return pn.Assign(pn.Alloc(type_qual, full_dt, name), val)
+            case [pn.PntrDecl() | pn.ArrayDecl() | pn.Name(), *_]:
+                full_dt, name = self._seperate_name_and_datatype(datatype, init_or_decl)
+                return pn.Exp(pn.Alloc(type_qual, full_dt, name))
+        throw_error(init_or_decl) 
 
     def type_qualifier(self, node, _):
         match self.value(node):
@@ -217,15 +225,16 @@ class TransformerPicoC:
                 throw_error(self.value(node))
 
     def init_declarator(self, _, children):
+        declarator, initializer = children
         return pn.Assign(
-            pn.Alloc(pn.Placeholder(), pn.Placeholder(), children[0]), children[1]
-        )
+            pn.Alloc(pn.Placeholder(), pn.Placeholder(), declarator), initializer
+        ) 
 
     def number_literal(self, node, _):
         return pn.Num(self.value(node))
 
     def parenthesized_expression(self, _, children):
-        return children
+        return children[0]
 
     def binary_expression(self, node, children):
         if len(children) != 2:
@@ -243,6 +252,9 @@ class TransformerPicoC:
 
     def expression_statement(self, _, children):
         return pn.Exp(children[0])
+
+    def assignment_expression(self, _, children):
+        pass
     
     # --------------------------------- Loops ---------------------------------
     def do_statement(self, _, children):
@@ -257,20 +269,22 @@ class TransformerPicoC:
 
     # --------------------------------- Array ---------------------------------
     def array_declarator(self, _, children):
-        match children[0]:
-            case pn.ArrayDecl(nums, datatype):
-                return pn.ArrayDecl([children[1]] + nums, datatype)
-            case _:
-                return pn.ArrayDecl([children[1]], children[0])
+        declarator, size = children
+        base = declarator if isinstance(declarator, list) else [declarator]
+        return [pn.ArrayDecl([size], pn.Placeholder()), *base]
+
+    def pointer_declarator(self, _, children):
+        declarator = children[0]
+        base = declarator if isinstance(declarator, list) else [declarator]
+        return [pn.PntrDecl(pn.Num("1"), pn.Placeholder()), *base]
 
     def initializer_list(self, _, children):
-        match children[0]:
-            case pn.Assign():
+            """
+            Distinguish struct-style initializer pairs from array/aggregate expressions.
+            """
+            if children and isinstance(children[0], pn.Assign):
                 return pn.Struct(children)
-            case pn.Num():
-                return pn.Array(children)
-            case _:
-                return pn.Error()
+            return pn.Array(children)
 
     def debug_statement(self, *_):
         return pn.Debug()
@@ -300,14 +314,39 @@ class TransformerPicoC:
     def field_declaration_list(self, _, children):
         return children
 
+    def subscript_expression(self, _, children):
+        return pn.Subscr(children[0], children[1])
+
+    def field_expression(self, node, children):
+        op = self.operator(node)
+        base = children[0]
+        if op == "->":
+            base = pn.Deref(base, pn.Num("0"))
+        elif op != ".":
+            throw_error(op)
+        return pn.Attr(base, children[1])
+
+    def pointer_expression(self, node, children):
+        op = self.operator(node)
+        match op:
+            case "*":
+                return pn.Deref(children[0], pn.Num("0"))
+            case "&":
+                return pn.Ref(children[0])
+        throw_error(op)
+
     def field_declaration(self, _, children):
         if len(children) == 2:
-            return pn.Alloc(pn.Writeable(), children[0], children[1])
-        # elif len(children) == 3:
-        #     return pn.Alloc(children[0], children[1], children[2])
+            type_qual = pn.Writeable()
+            base_datatype, declarator = children
+        elif len(children) == 3:
+            type_qual, base_datatype, declarator = children
         else:
             throw_error(len(children))
-        
+
+        datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
+        return pn.Alloc(type_qual, datatype, name)
+
     # HERE START
     # HERE END
 

@@ -1,1 +1,1 @@
-./sys_tests/basic_deref_attr_array_access.picoc
+./sys_tests/basic_assign_pntr_to_array.picoc

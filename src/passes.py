@@ -159,7 +159,7 @@ class Passes:
                 return stmt
             case pn.Return(exp):
                 return pn.Return(self._picoc_shrink_exp(exp))
-             # ---------------------------- L_Misc ----------------------------
+            # ---------------------------- L_Misc -----------------------------
             case pn.Debug():
                 return stmt
             case _:
@@ -675,7 +675,8 @@ class Passes:
                 return stmt
             case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
                 return stmt
-            case pn.SingleLineComment():
+            # ---------------------------- L_Misc -----------------------------
+            case pn.SingleLineComment() | pn.Debug():
                 return stmt
             case _:
                 throw_error(stmt)
@@ -740,7 +741,10 @@ class Passes:
                 return [stmt]
             case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
                 return [stmt]
-            case pn.GoTo() | pn.SingleLineComment():
+            case pn.GoTo():
+                return [stmt]
+            # ---------------------------- L_Misc -----------------------------
+            case pn.SingleLineComment() | pn.Debug():
                 return [stmt]
             case _:
                 throw_error(stmt)
@@ -1082,7 +1086,10 @@ class Passes:
                 return [stmt]
             case pn.StackMalloc():
                 return [stmt]
-            case pn.GoTo() | pn.SingleLineComment():
+            case pn.GoTo():
+                return [stmt]
+            # ---------------------------- L_Misc -----------------------------
+            case pn.Debug() | pn.SingleLineComment():
                 return [stmt]
             case _:
                 throw_error(stmt)
@@ -1237,8 +1244,6 @@ class Passes:
                 return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
                 return [pn.Exp(exp)]
-            case pn.Debug():
-                return [pn.Exp(exp)]
             case pn.SizeOf(exp_datatype):
                 size = 1
                 match exp_datatype:
@@ -1379,6 +1384,9 @@ class Passes:
                         else []
                     )
                 )
+            # ---------------------------- L_Misc -----------------------------
+            case pn.Debug():
+                return [pn.Exp(exp)]
             case _:
                 throw_error(exp)
 
@@ -1513,6 +1521,9 @@ class Passes:
                 )
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
+                return [pn.Exp(stmt)]
+            # ---------------------------- L_Misc -----------------------------
+            case pn.Debug():
                 return [pn.Exp(stmt)]
             case _:
                 throw_error(stmt)
