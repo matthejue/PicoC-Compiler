@@ -251,10 +251,14 @@ class TransformerPicoC:
         return pn.BinOp(left, bin_node, right)
 
     def expression_statement(self, _, children):
+        match children[0]:
+            case pn.Assign():
+                return children[0]
         return pn.Exp(children[0])
 
     def assignment_expression(self, _, children):
-        pass
+        lhs, rhs = children
+        return pn.Assign(lhs, rhs)
     
     # --------------------------------- Loops ---------------------------------
     def do_statement(self, _, children):
@@ -330,6 +334,9 @@ class TransformerPicoC:
         op = self.operator(node)
         match op:
             case "*":
+                match children[0]:
+                    case pn.BinOp(name, pn.Add(), pn.Num('1')):
+                        return pn.Deref(name, pn.Num('1'))
                 return pn.Deref(children[0], pn.Num("0"))
             case "&":
                 return pn.Ref(children[0])
@@ -347,8 +354,14 @@ class TransformerPicoC:
         datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
         return pn.Alloc(type_qual, datatype, name)
 
-    # HERE START
-    # HERE END
+    # ------------------------------- L_If_Else -------------------------------
+
+    def if_statement(self, _, children):
+        return pn.If()
+
+    def else_clause(self, _, children):
+        return pn.Else()
+
 
 class ASTTransformerRETI(Transformer):
     # =========================================================================

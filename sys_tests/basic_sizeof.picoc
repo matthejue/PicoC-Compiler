@@ -10,11 +10,11 @@ int main() {
     int a = 42;
     struct Point p = {10, 20};
 
-    break();
+    debug;
     print(sizeof(a) + 41);
-    break();
+    debug;
     print(sizeof(p));
-    break();
+    debug;
     print(sizeof(struct Point));
 
     return 0;

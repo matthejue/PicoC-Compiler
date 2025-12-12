@@ -1,1 +1,1 @@
-./sys_tests/basic_assign_pntr_to_array.picoc
+./sys_tests/basic_else_if.picoc
