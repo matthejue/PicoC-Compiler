@@ -128,21 +128,45 @@ class TransformerPicoC:
         return self.value(unnamed[0])
 
     def _seperate_name_and_datatype(self, base_datatype, declarator):
-            if isinstance(declarator, pn.Name):
-                return base_datatype, declarator
-            if isinstance(declarator, list) and declarator:
-                *fragmented_datatypes, name = declarator
-                datatype = base_datatype
-                for fragmented_datatype in reversed(fragmented_datatypes):
-                    match fragmented_datatype:
-                        case pn.ArrayDecl(nums, _):
-                            datatype = pn.ArrayDecl(nums, datatype)
-                        case pn.PntrDecl(pn.Num(val), _):
-                            datatype = pn.PntrDecl(pn.Num(val), datatype)
-                        case _:
-                            throw_error(fragmented_datatype)
-                return datatype, name
-            throw_error(declarator)
+        if isinstance(declarator, pn.Name):
+            return base_datatype, declarator
+        if isinstance(declarator, list) and declarator:
+            *fragmented_datatypes, name = declarator
+            datatype = base_datatype
+            for fragmented_datatype in reversed(fragmented_datatypes):
+                match fragmented_datatype:
+                    case pn.ArrayDecl(nums, _):
+                        datatype = pn.ArrayDecl(nums, datatype)
+                    case pn.PntrDecl(pn.Num(val), _):
+                        datatype = pn.PntrDecl(pn.Num(val), datatype)
+                    case _:
+                        throw_error(fragmented_datatype)
+            return datatype, name
+        throw_error(declarator)
+
+    def _params_to_allocs(self, params):
+        allocs = []
+        for param in params:
+            match param:
+                case pn.VoidType():
+                    continue
+                case pn.Alloc():
+                    allocs.append(param)
+                case list() as param_parts:
+                    if len(param_parts) == 2:
+                        type_qual = pn.Writeable()
+                        base_datatype, declarator = param_parts
+                    elif len(param_parts) == 3:
+                        type_qual, base_datatype, declarator = param_parts
+                    else:
+                        throw_error(param_parts)
+                    datatype, name = self._seperate_name_and_datatype(
+                        base_datatype, declarator
+                    )
+                    allocs.append(pn.Alloc(type_qual, datatype, name))
+                case _:
+                    throw_error(param)
+        return allocs
 
     def walk(self, root):
         """
@@ -212,10 +236,13 @@ class TransformerPicoC:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_dt, name = self._seperate_name_and_datatype(datatype, declarator)
                 return pn.Assign(pn.Alloc(type_qual, full_dt, name), val)
+            case [pn.Name() as name, params]:
+                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
+                return pn.FunDecl(datatype, name, allocs)
             case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_dt, name = self._seperate_name_and_datatype(datatype, init_or_decl)
                 return pn.Exp(pn.Alloc(type_qual, full_dt, name))
-        throw_error(init_or_decl) 
+        throw_error(init_or_decl)
 
     def type_qualifier(self, node, _):
         match self.value(node):
@@ -228,7 +255,7 @@ class TransformerPicoC:
         declarator, initializer = children
         return pn.Assign(
             pn.Alloc(pn.Placeholder(), pn.Placeholder(), declarator), initializer
-        ) 
+        )
 
     def number_literal(self, node, _):
         return pn.Num(self.value(node))
