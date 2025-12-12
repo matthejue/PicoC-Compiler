@@ -212,7 +212,7 @@ class TransformerPicoC:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_dt, name = self._seperate_name_and_datatype(datatype, declarator)
                 return pn.Assign(pn.Alloc(type_qual, full_dt, name), val)
-            case [pn.PntrDecl() | pn.ArrayDecl() | pn.Name(), *_]:
+            case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_dt, name = self._seperate_name_and_datatype(datatype, init_or_decl)
                 return pn.Exp(pn.Alloc(type_qual, full_dt, name))
         throw_error(init_or_decl) 
@@ -264,12 +264,18 @@ class TransformerPicoC:
     def do_statement(self, _, children):
         return pn.DoWhile(children[0], children[1])
 
+    def while_statement(self, _, children):
+        return pn.While(children[0], children[1])
+
     # ------------------------------- Functions -------------------------------
     def call_expression(self, _, children):
         return pn.Call(children[0], children[1])
         
     def argument_list(self, _, children):
         return children
+
+    def return_statement(self, _, children):
+        return pn.Return(children[0])
 
     # --------------------------------- Array ---------------------------------
     def array_declarator(self, _, children):
@@ -357,11 +363,18 @@ class TransformerPicoC:
     # ------------------------------- L_If_Else -------------------------------
 
     def if_statement(self, _, children):
-        return pn.If()
+        match children:
+            case [exp, then_branch]:
+                then_stmts = then_branch if isinstance(then_branch, list) else [then_branch]
+                return pn.If(self._to_bool(exp), then_stmts)
+            case [exp, then_branch, else_branch]:
+                then_stmts = then_branch if isinstance(then_branch, list) else [then_branch]
+                else_stmts = else_branch if isinstance(else_branch, list) else [else_branch]
+                return pn.IfElse(self._to_bool(exp), then_stmts, else_stmts)
+        throw_error(children)
 
     def else_clause(self, _, children):
-        return pn.Else()
-
+        return children[0]
 
 class ASTTransformerRETI(Transformer):
     # =========================================================================
