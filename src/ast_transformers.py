@@ -133,7 +133,7 @@ class TransformerPicoC:
         if isinstance(declarator, list) and declarator:
             *fragmented_datatypes, name = declarator
             datatype = base_datatype
-            for fragmented_datatype in reversed(fragmented_datatypes):
+            for fragmented_datatype in fragmented_datatypes:
                 match fragmented_datatype:
                     case pn.ArrayDecl(nums, _):
                         datatype = pn.ArrayDecl(nums, datatype)
