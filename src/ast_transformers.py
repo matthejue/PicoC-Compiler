@@ -258,6 +258,9 @@ class TransformerPicoC:
     def number_literal(self, node, _):
         return pn.Num(self.value(node))
 
+    def char_literal(self, node, _):
+        return pn.Char(self.value(node))
+
     def parenthesized_expression(self, _, children):
         return children[0]
 
@@ -400,6 +403,11 @@ class TransformerPicoC:
 
     def else_clause(self, _, children):
         return children[0]
+
+    # HERE start
+    def sizeof_expression(self, _, children):
+        return pn.SizeOf(children[0])
+    # HERE end
 
 class ASTTransformerRETI(Transformer):
     # =========================================================================
