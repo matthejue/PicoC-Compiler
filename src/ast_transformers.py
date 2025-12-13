@@ -259,7 +259,7 @@ class TransformerPicoC:
         return pn.Num(self.value(node))
 
     def char_literal(self, node, _):
-        return pn.Char(self.value(node))
+        return pn.Char(self.value(node)[1:-1])
 
     def parenthesized_expression(self, _, children):
         return children[0]
@@ -369,7 +369,9 @@ class TransformerPicoC:
         match op:
             case "*":
                 match children[0]:
-                    case pn.BinOp(exp, pn.Add(), num):
+                    case pn.BinOp(pn.BinOp(exp, _, num1), pn.Add() | pn.Sub() as op, num2):
+                        return pn.Deref(exp, pn.BinOp(num1, op, num2))
+                    case pn.BinOp(exp, pn.Add() | pn.Sub(), num):
                         return pn.Deref(exp, num)
                 return pn.Deref(children[0], pn.Num("0"))
             case "&":
