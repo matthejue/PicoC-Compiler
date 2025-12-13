@@ -1722,6 +1722,8 @@ class Passes:
                         ]
                     case pn.Minus():
                         pass
+                    case pn.Cast():
+                        pass
                     case _:
                         throw_error(un_op)
                 return reti_instrs + [

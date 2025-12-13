@@ -201,7 +201,7 @@ class Cast(ASTNode):
 
     @property
     def visible(self):
-        return self.datatype
+        return [self.datatype]
 
     __match_args__ = ("datatype",)
 

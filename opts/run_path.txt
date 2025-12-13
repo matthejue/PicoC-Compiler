@@ -1,1 +1,1 @@
-./sys_tests/basic_typecast.picoc
+./sys_tests/basic_array_init.picoc

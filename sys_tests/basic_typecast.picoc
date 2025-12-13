@@ -1,6 +1,8 @@
 // input:
 // expected:42
 
+#define NULL 0
+
 struct BlockHeader {
     int size;
     int free;

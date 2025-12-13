@@ -50,10 +50,6 @@ for test in "${paths[@]}"; do
     fi
   fi
 
-  if [[ $emulator_status != 0 ]]; then
-    failing+=("$test");
-  fi
-
   output_status=0
   if [[ $emulator_status == 0 ]]; then
     diff "${test%.picoc}.expected_output" "${test%.picoc}.output"

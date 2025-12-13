@@ -409,6 +409,20 @@ class TransformerPicoC:
     # HERE start
     def sizeof_expression(self, _, children):
         return pn.SizeOf(children[0])
+
+    def cast_expression(self, _, children):
+        datatype, exp = children
+        return pn.UnOp(pn.Cast(datatype), exp)
+
+    def type_descriptor(self, _, children):
+        base_datatype = children[0]
+        pointer_depth = children[1] if len(children) > 1 else 0
+        for _ in range(pointer_depth):
+            base_datatype = pn.PntrDecl(pn.Num("1"), base_datatype)
+        return base_datatype
+
+    def abstract_pointer_declarator(self, node, _):
+        return len(self._unnamed_children(node))
     # HERE end
 
 class ASTTransformerRETI(Transformer):
