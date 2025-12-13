@@ -152,18 +152,6 @@ class TransformerPicoC:
                     continue
                 case pn.Alloc():
                     allocs.append(param)
-                case list() as param_parts:
-                    if len(param_parts) == 2:
-                        type_qual = pn.Writeable()
-                        base_datatype, declarator = param_parts
-                    elif len(param_parts) == 3:
-                        type_qual, base_datatype, declarator = param_parts
-                    else:
-                        throw_error(param_parts)
-                    datatype, name = self._seperate_name_and_datatype(
-                        base_datatype, declarator
-                    )
-                    allocs.append(pn.Alloc(type_qual, datatype, name))
                 case _:
                     throw_error(param)
         return allocs
@@ -219,6 +207,20 @@ class TransformerPicoC:
 
     def parameter_list(self, _, children):
         return children
+
+    def parameter_declaration(self, _, children):
+        match children:
+            case [pn.VoidType() as void_type]:
+                return void_type
+            case [base_datatype, declarator]:
+                type_qual = pn.Writeable()
+            case [type_qual, base_datatype, declarator]:
+                pass
+            case _:
+                throw_error(children)
+
+        datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
+        return pn.Alloc(type_qual, datatype, name)
 
     def compound_statement(self, _, children):
         return children
