@@ -1,1 +1,1 @@
-./sys_tests/basic_fun_return.picoc
+./sys_tests/basic_sizeof.picoc

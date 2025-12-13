@@ -144,18 +144,6 @@ class TransformerPicoC:
             return datatype, name
         throw_error(declarator)
 
-    def _params_to_allocs(self, params):
-        allocs = []
-        for param in params:
-            match param:
-                case pn.VoidType():
-                    continue
-                case pn.Alloc():
-                    allocs.append(param)
-                case _:
-                    throw_error(param)
-        return allocs
-
     def walk(self, root):
         """
         Iterative post-order walk that dispatches to methods named after
@@ -191,15 +179,13 @@ class TransformerPicoC:
             case pn.FunDecl(_, name, allocs):
                 return pn.FunDef(children[0], name, allocs, children[2])
             case [pn.Name() as name, params]:
-                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
-                return pn.FunDef(children[0], name, allocs, children[2])
+                return pn.FunDef(children[0], name, params, children[2])
         throw_error(declarator)
 
     def function_declarator(self, _, children):
         match children:
             case [pn.Name() as name, params]:
-                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
-                return pn.FunDecl(pn.Placeholder(), name, allocs)
+                return pn.FunDecl(pn.Placeholder(), name, params)
         return children
 
     def identifier(self, node, _):
@@ -380,8 +366,8 @@ class TransformerPicoC:
         match op:
             case "*":
                 match children[0]:
-                    case pn.BinOp(name, pn.Add(), pn.Num('1')):
-                        return pn.Deref(name, pn.Num('1'))
+                    case pn.BinOp(exp, pn.Add(), num):
+                        return pn.Deref(exp, num)
                 return pn.Deref(children[0], pn.Num("0"))
             case "&":
                 return pn.Ref(children[0])
