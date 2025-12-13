@@ -186,9 +186,20 @@ class TransformerPicoC:
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
     def function_definition(self, _, children):
-        return pn.FunDef(children[0], children[1][0], children[1][1], children[2])
+        declarator = children[1]
+        match declarator:
+            case pn.FunDecl(_, name, allocs):
+                return pn.FunDef(children[0], name, allocs, children[2])
+            case [pn.Name() as name, params]:
+                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
+                return pn.FunDef(children[0], name, allocs, children[2])
+        throw_error(declarator)
 
     def function_declarator(self, _, children):
+        match children:
+            case [pn.Name() as name, params]:
+                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
+                return pn.FunDecl(pn.Placeholder(), name, allocs)
         return children
 
     def identifier(self, node, _):
@@ -238,8 +249,7 @@ class TransformerPicoC:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_dt, name = self._seperate_name_and_datatype(datatype, declarator)
                 return pn.Assign(pn.Alloc(type_qual, full_dt, name), val)
-            case [pn.Name() as name, params]:
-                allocs = self._params_to_allocs(params if isinstance(params, list) else [])
+            case pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs):
                 return pn.FunDecl(datatype, name, allocs)
             case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_dt, name = self._seperate_name_and_datatype(datatype, init_or_decl)
