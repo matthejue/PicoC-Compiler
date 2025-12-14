@@ -264,6 +264,21 @@ class TransformerPicoC:
     def parenthesized_expression(self, _, children):
         return children[0]
 
+    def unary_expression(self, node, children):
+        operand = children[0]
+        op = self.operator(node)
+
+        match op:
+            case "-":
+                return pn.UnOp(pn.Minus(), operand)
+            case "+":
+                return operand
+            case "!":
+                return pn.UnOp(pn.LogicNot(), self._to_bool(operand))
+            case "~":
+                return pn.UnOp(pn.Not(), operand)
+        throw_error(f"Unsupported unary operator '{op}'")
+
     def binary_expression(self, node, children):
         if len(children) != 2:
             throw_error(f"Expected 2 operands for binary_expression, got {len(children)}")
@@ -303,6 +318,8 @@ class TransformerPicoC:
         return children
 
     def return_statement(self, _, children):
+        if not children:
+            return pn.Return(pn.Empty())
         return pn.Return(children[0])
 
     # --------------------------------- Array ---------------------------------

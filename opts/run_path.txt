@@ -1,1 +1,1 @@
-./sys_tests/basic_minus_subscript.picoc
+./sys_tests/thesis_3_funs.picoc

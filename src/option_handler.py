@@ -1,4 +1,3 @@
-from sre_constants import FAILURE, SUCCESS
 from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
@@ -100,7 +99,7 @@ class OptionHandler:
             case _:
                 print(f"filename: {path}")
                 print(f"File with extension '.{extension}' is not supported")
-                exit(FAILURE)
+                exit(1)
 
     def _preprocess(self, path):
         with open(path, encoding="utf-8") as fin:
@@ -138,7 +137,7 @@ class OptionHandler:
             print(f"[ERROR] AST transform failed: {exc}")
             if global_vars.args.traceback:
                 traceback.print_exc()
-            exit(FAILURE)
+            exit(1)
 
         self._output_pass(ast, "Abstract Syntax Tree")
 
@@ -205,14 +204,14 @@ class OptionHandler:
                                     f"[error] Unexpected block type in file '{filename}': {type(block).__name__}",
                                     file=sys.stderr,
                                 )
-                                sys.exit(FAILURE)
+                                sys.exit(1)
 
                 case _:
                     print(
                         f"[error] Unexpected AST node (expected File), got: {type(file_ast).__name__}",
                         file=sys.stderr,
                     )
-                    sys.exit(FAILURE)
+                    sys.exit(1)
 
         main_func = None
         for symbol_table in symbol_tables:
@@ -224,7 +223,7 @@ class OptionHandler:
             print(
                 "[error] No 'main' function found in any symbol table.", file=sys.stderr
             )
-            sys.exit(FAILURE)
+            sys.exit(1)
 
         passes.symbol_table.declare("main", main_func, scope="global")
 
