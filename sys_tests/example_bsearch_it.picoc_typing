@@ -1,0 +1,104 @@
+_global_inits:
+  Assign(Global(Name('ar'), ArrayDecl(Num('10'), IntType())), Array([Num('1'), Num('3'), Num('4'), Num('7'), Num('19'), Num('42'), Num('128'), Num('314'), Num('512'), Num('1024')], Empty()))
+  Assign(Global(Name('ar_with_len'), StructSpec(Name('ar_with_lent'))), Struct([Assign(Name('len'), Num('10')), Assign(Name('ar'), Global(Name('ar'), ArrayDecl(Num('10'), IntType())))], Empty()))
+bsearch_it:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), StructSpec(Name('ar_with_lent')), Name('ar_with_len'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('key'), 'param'), Empty())
+  Assign(Stackframe(Num('3'), IntType()), Num('0'))
+  Assign(Stackframe(Num('4'), IntType()), Attr(Stackframe(Num('1'), StructSpec(Name('ar_with_lent'))), Name('len'), StructSpec(Name('ar_with_lent'))))
+  Exp(Alloc(Writeable(), IntType(), Name('m'), 'local_var'), Empty())
+  // While(Atom(Name('lo'), NEq(), Name('hi')), [Assign(Name('m'), BinOp(BinOp(Name('lo'), Add(), Name('hi')), Div(), Num('2'))), IfElse(Atom(Deref(Attr(Name('ar_with_len'), Name('ar'), Empty()), Name('m'), Empty()), Eq(), Name('key')), [Return(Name('m'))], [IfElse(Atom(Deref(Attr(Name('ar_with_len'), Name('ar'), Empty()), Name('m'), Empty()), Gt(), Name('key')), [Assign(Name('hi'), Name('m'))], [Assign(Name('lo'), BinOp(Name('m'), Add(), Num('1')))])])])
+  GoTo(Name('condition_check.8'))
+condition_check.8:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      NEq(), 
+      Stackframe(
+        Num('4'), 
+        IntType())), 
+    [
+      GoTo(Name('while_branch.7'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.7:
+  Assign(Stackframe(Num('5'), IntType()), BinOp(BinOp(Stackframe(Num('3'), IntType()), Add(), Stackframe(Num('4'), IntType())), Div(), Num('2')))
+  // Return(Name('m')), 
+  IfElse(
+    Atom(
+      Deref(
+        Attr(
+          Stackframe(
+            Num('1'), 
+            StructSpec(
+              Name('ar_with_lent'))), 
+          Name('ar'), 
+          StructSpec(
+            Name('ar_with_lent'))), 
+        Stackframe(
+          Num('5'), 
+          IntType()), 
+        PntrDecl(
+          IntType())), 
+      Eq(), 
+      Stackframe(
+        Num('2'), 
+        IntType())), 
+    [
+      GoTo(Name('if.6'))
+    ], 
+    [
+      GoTo(Name('else.5'))
+    ])
+if.6:
+  Return(Stackframe(Num('5'), IntType()))
+else.5:
+  // Assign(Name('hi'), Name('m')), 
+  IfElse(
+    Atom(
+      Deref(
+        Attr(
+          Stackframe(
+            Num('1'), 
+            StructSpec(
+              Name('ar_with_lent'))), 
+          Name('ar'), 
+          StructSpec(
+            Name('ar_with_lent'))), 
+        Stackframe(
+          Num('5'), 
+          IntType()), 
+        PntrDecl(
+          IntType())), 
+      Gt(), 
+      Stackframe(
+        Num('2'), 
+        IntType())), 
+    [
+      GoTo(Name('if.4'))
+    ], 
+    [
+      GoTo(Name('else.3'))
+    ])
+if.4:
+  Assign(Stackframe(Num('4'), IntType()), Stackframe(Num('5'), IntType()))
+  GoTo(Name('if_else_after.2'))
+else.3:
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('5'), IntType()), Add(), Num('1')))
+  GoTo(Name('if_else_after.2'))
+if_else_after.2:
+  GoTo(Name('if_else_after.1'))
+if_else_after.1:
+  GoTo(Name('condition_check.8'))
+while_after.0:
+  Return(Num('-1'))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('bsearch_it'), [Global(Name('ar_with_len'), StructSpec(Name('ar_with_lent'))), Call(Name('input'), [])])]), Empty())
+  Exp(Call(Name('print'), [Call(Name('bsearch_it'), [Global(Name('ar_with_len'), StructSpec(Name('ar_with_lent'))), Call(Name('input'), [])])]), Empty())
+  Return(Empty())

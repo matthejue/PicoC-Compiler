@@ -1,0 +1,74 @@
+translation_unit: void main() {\n  \n  int var = input();\n  int *pntr;\n  var = *&var;\n  print(var);\n  \n  pntr = &var;\n  pntr = &*pntr;\n  print(*pntr);\n}\n
+  function_definition: void main() {\n  \n  int var = input();\n  int *pntr;\n  var = *&var;\n  print(var);\n  \n  pntr = &var;\n  pntr = &*pntr;\n  print(*pntr);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  int var = input();\n  int *pntr;\n  var = *&var;\n  print(var);\n  \n  pntr = &var;\n  pntr = &*pntr;\n  print(*pntr);\n}
+      {: {
+      declaration: int var = input();
+        primitive_type: int
+        init_declarator: var = input()
+          identifier: var
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      declaration: int *pntr;
+        primitive_type: int
+        pointer_declarator: *pntr
+          *: *
+          identifier: pntr
+        ;: ;
+      expression_statement: var = *&var;
+        assignment_expression: var = *&var
+          identifier: var
+          =: =
+          pointer_expression: *&var
+            *: *
+            pointer_expression: &var
+              &: &
+              identifier: var
+        ;: ;
+      expression_statement: print(var);
+        call_expression: print(var)
+          identifier: print
+          argument_list: (var)
+            (: (
+            identifier: var
+            ): )
+        ;: ;
+      expression_statement: pntr = &var;
+        assignment_expression: pntr = &var
+          identifier: pntr
+          =: =
+          pointer_expression: &var
+            &: &
+            identifier: var
+        ;: ;
+      expression_statement: pntr = &*pntr;
+        assignment_expression: pntr = &*pntr
+          identifier: pntr
+          =: =
+          pointer_expression: &*pntr
+            &: &
+            pointer_expression: *pntr
+              *: *
+              identifier: pntr
+        ;: ;
+      expression_statement: print(*pntr);
+        call_expression: print(*pntr)
+          identifier: print
+          argument_list: (*pntr)
+            (: (
+            pointer_expression: *pntr
+              *: *
+              identifier: pntr
+            ): )
+        ;: ;
+      }: }

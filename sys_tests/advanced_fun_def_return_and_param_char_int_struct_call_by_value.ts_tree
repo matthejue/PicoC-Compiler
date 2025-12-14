@@ -1,0 +1,218 @@
+translation_unit: struct array_with_len {int ar[3]; int len;};\n\nint print_all(struct array_with_len st_ar_copy);\n\nvoid main() {\n  \n  struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};\n  int success;\n  success = print_all(st_ar);\n  print(st_ar.ar[2]);\n  \n  if (success) {\n    print(-1);\n  }\n}\n\nint print_all(struct array_with_len st_ar_copy) {\n  int i = 0;\n  while (i < st_ar_copy.len) {\n    print(st_ar_copy.ar[i]);\n    i = i + 1;\n  }\n  st_ar_copy.ar[2] = input();\n  print(st_ar_copy.ar[2]);\n  return 1;\n}\n
+  struct_specifier: struct array_with_len {int ar[3]; int len;}
+    struct: struct
+    type_identifier: array_with_len
+    field_declaration_list: {int ar[3]; int len;}
+      {: {
+      field_declaration: int ar[3];
+        primitive_type: int
+        array_declarator: ar[3]
+          field_identifier: ar
+          [: [
+          number_literal: 3
+          ]: ]
+        ;: ;
+      field_declaration: int len;
+        primitive_type: int
+        field_identifier: len
+        ;: ;
+      }: }
+  ;: ;
+  declaration: int print_all(struct array_with_len st_ar_copy);
+    primitive_type: int
+    function_declarator: print_all(struct array_with_len st_ar_copy)
+      identifier: print_all
+      parameter_list: (struct array_with_len st_ar_copy)
+        (: (
+        parameter_declaration: struct array_with_len st_ar_copy
+          struct_specifier: struct array_with_len
+            struct: struct
+            type_identifier: array_with_len
+          identifier: st_ar_copy
+        ): )
+    ;: ;
+  function_definition: void main() {\n  \n  struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};\n  int success;\n  success = print_all(st_ar);\n  print(st_ar.ar[2]);\n  \n  if (success) {\n    print(-1);\n  }\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};\n  int success;\n  success = print_all(st_ar);\n  print(st_ar.ar[2]);\n  \n  if (success) {\n    print(-1);\n  }\n}
+      {: {
+      declaration: struct array_with_len st_ar = {.ar={4, 5, 6}, .len=3};
+        struct_specifier: struct array_with_len
+          struct: struct
+          type_identifier: array_with_len
+        init_declarator: st_ar = {.ar={4, 5, 6}, .len=3}
+          identifier: st_ar
+          =: =
+          initializer_list: {.ar={4, 5, 6}, .len=3}
+            {: {
+            initializer_pair: .ar={4, 5, 6}
+              field_designator: .ar
+                .: .
+                field_identifier: ar
+              =: =
+              initializer_list: {4, 5, 6}
+                {: {
+                number_literal: 4
+                ,: ,
+                number_literal: 5
+                ,: ,
+                number_literal: 6
+                }: }
+            ,: ,
+            initializer_pair: .len=3
+              field_designator: .len
+                .: .
+                field_identifier: len
+              =: =
+              number_literal: 3
+            }: }
+        ;: ;
+      declaration: int success;
+        primitive_type: int
+        identifier: success
+        ;: ;
+      expression_statement: success = print_all(st_ar);
+        assignment_expression: success = print_all(st_ar)
+          identifier: success
+          =: =
+          call_expression: print_all(st_ar)
+            identifier: print_all
+            argument_list: (st_ar)
+              (: (
+              identifier: st_ar
+              ): )
+        ;: ;
+      expression_statement: print(st_ar.ar[2]);
+        call_expression: print(st_ar.ar[2])
+          identifier: print
+          argument_list: (st_ar.ar[2])
+            (: (
+            subscript_expression: st_ar.ar[2]
+              field_expression: st_ar.ar
+                identifier: st_ar
+                .: .
+                field_identifier: ar
+              [: [
+              number_literal: 2
+              ]: ]
+            ): )
+        ;: ;
+      if_statement: if (success) {\n    print(-1);\n  }
+        if: if
+        parenthesized_expression: (success)
+          (: (
+          identifier: success
+          ): )
+        compound_statement: {\n    print(-1);\n  }
+          {: {
+          expression_statement: print(-1);
+            call_expression: print(-1)
+              identifier: print
+              argument_list: (-1)
+                (: (
+                number_literal: -1
+                ): )
+            ;: ;
+          }: }
+      }: }
+  function_definition: int print_all(struct array_with_len st_ar_copy) {\n  int i = 0;\n  while (i < st_ar_copy.len) {\n    print(st_ar_copy.ar[i]);\n    i = i + 1;\n  }\n  st_ar_copy.ar[2] = input();\n  print(st_ar_copy.ar[2]);\n  return 1;\n}
+    primitive_type: int
+    function_declarator: print_all(struct array_with_len st_ar_copy)
+      identifier: print_all
+      parameter_list: (struct array_with_len st_ar_copy)
+        (: (
+        parameter_declaration: struct array_with_len st_ar_copy
+          struct_specifier: struct array_with_len
+            struct: struct
+            type_identifier: array_with_len
+          identifier: st_ar_copy
+        ): )
+    compound_statement: {\n  int i = 0;\n  while (i < st_ar_copy.len) {\n    print(st_ar_copy.ar[i]);\n    i = i + 1;\n  }\n  st_ar_copy.ar[2] = input();\n  print(st_ar_copy.ar[2]);\n  return 1;\n}
+      {: {
+      declaration: int i = 0;
+        primitive_type: int
+        init_declarator: i = 0
+          identifier: i
+          =: =
+          number_literal: 0
+        ;: ;
+      while_statement: while (i < st_ar_copy.len) {\n    print(st_ar_copy.ar[i]);\n    i = i + 1;\n  }
+        while: while
+        parenthesized_expression: (i < st_ar_copy.len)
+          (: (
+          binary_expression: i < st_ar_copy.len
+            identifier: i
+            <: <
+            field_expression: st_ar_copy.len
+              identifier: st_ar_copy
+              .: .
+              field_identifier: len
+          ): )
+        compound_statement: {\n    print(st_ar_copy.ar[i]);\n    i = i + 1;\n  }
+          {: {
+          expression_statement: print(st_ar_copy.ar[i]);
+            call_expression: print(st_ar_copy.ar[i])
+              identifier: print
+              argument_list: (st_ar_copy.ar[i])
+                (: (
+                subscript_expression: st_ar_copy.ar[i]
+                  field_expression: st_ar_copy.ar
+                    identifier: st_ar_copy
+                    .: .
+                    field_identifier: ar
+                  [: [
+                  identifier: i
+                  ]: ]
+                ): )
+            ;: ;
+          expression_statement: i = i + 1;
+            assignment_expression: i = i + 1
+              identifier: i
+              =: =
+              binary_expression: i + 1
+                identifier: i
+                +: +
+                number_literal: 1
+            ;: ;
+          }: }
+      expression_statement: st_ar_copy.ar[2] = input();
+        assignment_expression: st_ar_copy.ar[2] = input()
+          subscript_expression: st_ar_copy.ar[2]
+            field_expression: st_ar_copy.ar
+              identifier: st_ar_copy
+              .: .
+              field_identifier: ar
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print(st_ar_copy.ar[2]);
+        call_expression: print(st_ar_copy.ar[2])
+          identifier: print
+          argument_list: (st_ar_copy.ar[2])
+            (: (
+            subscript_expression: st_ar_copy.ar[2]
+              field_expression: st_ar_copy.ar
+                identifier: st_ar_copy
+                .: .
+                field_identifier: ar
+              [: [
+              number_literal: 2
+              ]: ]
+            ): )
+        ;: ;
+      return_statement: return 1;
+        return: return
+        number_literal: 1
+        ;: ;
+      }: }

@@ -1,0 +1,41 @@
+_global_inits:
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  // If(Atom(Name('var'), Gt(), Num('10')), [Exp(Call(Name('print'), [Num('42')]), Empty())]), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Gt(), 
+      Num('10')), 
+    [
+      GoTo(Name('if.3'))
+    ], 
+    [
+      GoTo(Name('if_else_after.2'))
+    ])
+if.3:
+  Exp(Call(Name('print'), [Num('42')]), Empty())
+  GoTo(Name('if_else_after.2'))
+if_else_after.2:
+  // If(Atom(Name('var'), Eq(), Num('10')), [Exp(Call(Name('print'), [Num('42')]), Empty())]), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Eq(), 
+      Num('10')), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Exp(Call(Name('print'), [Num('42')]), Empty())
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())

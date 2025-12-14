@@ -1,0 +1,16 @@
+_global_inits:
+fun_defined:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), IntType(), Name('param'), 'param'), Empty())
+  Return(BinOp(Stackframe(Num('0'), IntType()), Add(), Num('10')))
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('fun_defined'), [Num('22')]))
+  Exp(Call(Name('fun_declared_before'), [Ref(Stackframe(Num('0'), IntType()), IntType())]), Empty())
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Return(Empty())
+fun_declared_before:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('param'), 'param'), Empty())
+  Assign(Deref(Stackframe(Num('0'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())), BinOp(Deref(Stackframe(Num('0'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())), Add(), Num('10')))
+  Return(Empty())

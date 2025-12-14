@@ -1,0 +1,67 @@
+translation_unit: int fun_with_return_value() {\n  return 21 * 2;\n}\n\nvoid fun_no_return_value() {\n  return;\n}\n\nvoid main() {\n  int var = fun_with_return_value();\n  print(var);\n  fun_no_return_value();\n}\n
+  function_definition: int fun_with_return_value() {\n  return 21 * 2;\n}
+    primitive_type: int
+    function_declarator: fun_with_return_value()
+      identifier: fun_with_return_value
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  return 21 * 2;\n}
+      {: {
+      return_statement: return 21 * 2;
+        return: return
+        binary_expression: 21 * 2
+          number_literal: 21
+          *: *
+          number_literal: 2
+        ;: ;
+      }: }
+  function_definition: void fun_no_return_value() {\n  return;\n}
+    primitive_type: void
+    function_declarator: fun_no_return_value()
+      identifier: fun_no_return_value
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  return;\n}
+      {: {
+      return_statement: return;
+        return: return
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int var = fun_with_return_value();\n  print(var);\n  fun_no_return_value();\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int var = fun_with_return_value();\n  print(var);\n  fun_no_return_value();\n}
+      {: {
+      declaration: int var = fun_with_return_value();
+        primitive_type: int
+        init_declarator: var = fun_with_return_value()
+          identifier: var
+          =: =
+          call_expression: fun_with_return_value()
+            identifier: fun_with_return_value
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print(var);
+        call_expression: print(var)
+          identifier: print
+          argument_list: (var)
+            (: (
+            identifier: var
+            ): )
+        ;: ;
+      expression_statement: fun_no_return_value();
+        call_expression: fun_no_return_value()
+          identifier: fun_no_return_value
+          argument_list: ()
+            (: (
+            ): )
+        ;: ;
+      }: }

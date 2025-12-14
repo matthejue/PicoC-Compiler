@@ -1,0 +1,80 @@
+translation_unit: void main() {\n  \n  int x;\n  int y;\n  const int z = 5;\n\n  \n  y = input();\n  x = input();\n\n  x = (x + ((y * z) + 10)); \n  print(x);\n}\n
+  function_definition: void main() {\n  \n  int x;\n  int y;\n  const int z = 5;\n\n  \n  y = input();\n  x = input();\n\n  x = (x + ((y * z) + 10)); \n  print(x);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  int x;\n  int y;\n  const int z = 5;\n\n  \n  y = input();\n  x = input();\n\n  x = (x + ((y * z) + 10)); \n  print(x);\n}
+      {: {
+      declaration: int x;
+        primitive_type: int
+        identifier: x
+        ;: ;
+      declaration: int y;
+        primitive_type: int
+        identifier: y
+        ;: ;
+      declaration: const int z = 5;
+        type_qualifier: const
+          const: const
+        primitive_type: int
+        init_declarator: z = 5
+          identifier: z
+          =: =
+          number_literal: 5
+        ;: ;
+      expression_statement: y = input();
+        assignment_expression: y = input()
+          identifier: y
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: x = input();
+        assignment_expression: x = input()
+          identifier: x
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: x = (x + ((y * z) + 10));
+        assignment_expression: x = (x + ((y * z) + 10))
+          identifier: x
+          =: =
+          parenthesized_expression: (x + ((y * z) + 10))
+            (: (
+            binary_expression: x + ((y * z) + 10)
+              identifier: x
+              +: +
+              parenthesized_expression: ((y * z) + 10)
+                (: (
+                binary_expression: (y * z) + 10
+                  parenthesized_expression: (y * z)
+                    (: (
+                    binary_expression: y * z
+                      identifier: y
+                      *: *
+                      identifier: z
+                    ): )
+                  +: +
+                  number_literal: 10
+                ): )
+            ): )
+        ;: ;
+      expression_statement: print(x);
+        call_expression: print(x)
+          identifier: print
+          argument_list: (x)
+            (: (
+            identifier: x
+            ): )
+        ;: ;
+      }: }

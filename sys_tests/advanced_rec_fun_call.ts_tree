@@ -1,0 +1,69 @@
+translation_unit: int rec_fun_call(int arg) {\n  if (arg == input()) {\n    return arg;\n  }\n  return rec_fun_call(arg + 1);\n}\n\nvoid main() {\n  print(rec_fun_call(1));\n}\n
+  function_definition: int rec_fun_call(int arg) {\n  if (arg == input()) {\n    return arg;\n  }\n  return rec_fun_call(arg + 1);\n}
+    primitive_type: int
+    function_declarator: rec_fun_call(int arg)
+      identifier: rec_fun_call
+      parameter_list: (int arg)
+        (: (
+        parameter_declaration: int arg
+          primitive_type: int
+          identifier: arg
+        ): )
+    compound_statement: {\n  if (arg == input()) {\n    return arg;\n  }\n  return rec_fun_call(arg + 1);\n}
+      {: {
+      if_statement: if (arg == input()) {\n    return arg;\n  }
+        if: if
+        parenthesized_expression: (arg == input())
+          (: (
+          binary_expression: arg == input()
+            identifier: arg
+            ==: ==
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+          ): )
+        compound_statement: {\n    return arg;\n  }
+          {: {
+          return_statement: return arg;
+            return: return
+            identifier: arg
+            ;: ;
+          }: }
+      return_statement: return rec_fun_call(arg + 1);
+        return: return
+        call_expression: rec_fun_call(arg + 1)
+          identifier: rec_fun_call
+          argument_list: (arg + 1)
+            (: (
+            binary_expression: arg + 1
+              identifier: arg
+              +: +
+              number_literal: 1
+            ): )
+        ;: ;
+      }: }
+  function_definition: void main() {\n  print(rec_fun_call(1));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(rec_fun_call(1));\n}
+      {: {
+      expression_statement: print(rec_fun_call(1));
+        call_expression: print(rec_fun_call(1))
+          identifier: print
+          argument_list: (rec_fun_call(1))
+            (: (
+            call_expression: rec_fun_call(1)
+              identifier: rec_fun_call
+              argument_list: (1)
+                (: (
+                number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      }: }

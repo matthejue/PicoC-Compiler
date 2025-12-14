@@ -1,0 +1,51 @@
+_global_inits:
+power_efficient:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), IntType(), Name('a'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('n'), 'param'), Empty())
+  // Return(Num('1')), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('1'), 
+        IntType()), 
+      Eq(), 
+      Num('0')), 
+    [
+      GoTo(Name('if.5'))
+    ], 
+    [
+      GoTo(Name('else.4'))
+    ])
+if.5:
+  Return(Num('1'))
+else.4:
+  // Return(Call(Name('power_efficient'), [BinOp(Name('a'), Mul(), Name('a')), BinOp(Name('n'), Div(), Num('2'))])), 
+  IfElse(
+    Atom(
+      BinOp(
+        Stackframe(
+          Num('1'), 
+          IntType()), 
+        Mod(), 
+        Num('2')), 
+      Eq(), 
+      Num('0')), 
+    [
+      GoTo(Name('if.3'))
+    ], 
+    [
+      GoTo(Name('else.2'))
+    ])
+if.3:
+  Return(Call(Name('power_efficient'), [BinOp(Stackframe(Num('0'), IntType()), Mul(), Stackframe(Num('0'), IntType())), BinOp(Stackframe(Num('1'), IntType()), Div(), Num('2'))]))
+else.2:
+  Return(BinOp(Stackframe(Num('0'), IntType()), Mul(), Call(Name('power_efficient'), [BinOp(Stackframe(Num('0'), IntType()), Mul(), Stackframe(Num('0'), IntType())), BinOp(Stackframe(Num('1'), IntType()), Div(), Num('2'))])))
+if_else_after.1:
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('power_efficient'), [Call(Name('input'), []), Call(Name('input'), [])])]), Empty())
+  Return(Empty())

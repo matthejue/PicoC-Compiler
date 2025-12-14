@@ -345,15 +345,14 @@ class StackMalloc(ASTNode):
 
 # --------------------------------- L_Pntr --------------------------------
 class PntrDecl(ASTNode):
-    def __init__(self, num, datatype):
-        self.num = num
+    def __init__(self, datatype):
         self.datatype = datatype
 
     @property
     def visible(self):
-        return [self.num, self.datatype]
+        return [self.datatype]
 
-    __match_args__ = ("num", "datatype")
+    __match_args__ = ("datatype",)
 
 
 class Ref(ASTNode):
@@ -383,15 +382,15 @@ class Deref(ASTNode):
 
 # -------------------------------- L_Array --------------------------------
 class ArrayDecl(ASTNode):
-    def __init__(self, nums, datatype):
-        self.nums = nums
+    def __init__(self, num, datatype):
+        self.num = num
         self.datatype = datatype
 
     @property
     def visible(self):
-        return [self.nums, self.datatype]
+        return [self.num, self.datatype]
 
-    __match_args__ = ("nums", "datatype")
+    __match_args__ = ("num", "datatype")
 
 
 class Array(ASTNode):

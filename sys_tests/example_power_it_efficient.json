@@ -1,0 +1,50 @@
+{
+  "__parents__": {
+    "fast_efficient_iterative": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fast_efficient_iterative": {
+    "a": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "a",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "acc": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "acc",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "n": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "n",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "tmp": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "tmp",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fast_efficient_iterative": {
+      "datatype": "FunDecl(IntType(), Name('fast_efficient_iterative'), [Alloc(Writeable(), IntType(), Name('a'), 'param'), Alloc(Writeable(), IntType(), Name('n'), 'param'), Alloc(Writeable(), IntType(), Name('acc'), 'param')])",
+      "name": "fast_efficient_iterative",
+      "param_size": 3
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {}
+}

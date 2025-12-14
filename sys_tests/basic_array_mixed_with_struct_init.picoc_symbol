@@ -1,0 +1,11 @@
+_global_inits:
+main:
+  StackMalloc('16')
+  Assign(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Array([Array([Struct([Assign(Name('attr1'), Num('12')), Assign(Name('attr2'), Array([Call(Name('input'), []), Num('2'), Num('3')], Empty()))], Empty()), Struct([Assign(Name('attr1'), Call(Name('input'), [])), Assign(Name('attr2'), Array([Num('4'), Num('5'), Num('6')], Empty()))], Empty())], Empty()), Array([Struct([Assign(Name('attr1'), Num('78')), Assign(Name('attr2'), Array([Num('7'), Call(Name('input'), []), Num('9')], Empty()))], Empty()), Struct([Assign(Name('attr1'), Num('1011')), Assign(Name('attr2'), Array([Num('10'), Num('11'), Call(Name('input'), [])], Empty()))], Empty())], Empty())], Empty()))
+  Exp(Call(Name('print'), [Deref(Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('0'), Empty()), Num('0'), Empty()), Name('attr2'), Empty()), Num('0'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('0'), Empty()), Num('1'), Empty()), Name('attr1'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('1'), Empty()), Num('0'), Empty()), Name('attr2'), Empty()), Num('1'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('1'), Empty()), Num('1'), Empty()), Name('attr2'), Empty()), Num('2'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('1'), Empty()), Num('0'), Empty()), Name('attr1'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Deref(Deref(Stackframe(Num('15'), ArrayDecl(Num('2'), ArrayDecl(Num('2'), StructSpec(Name('str'))))), Num('0'), Empty()), Num('1'), Empty()), Name('attr2'), Empty()), Num('1'), Empty())]), Empty())
+  Return(Empty())

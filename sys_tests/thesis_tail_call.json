@@ -1,0 +1,43 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global",
+    "ret0": "global",
+    "ret1": "global",
+    "tail_call_fun": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "ret0": {
+      "datatype": "FunDecl(IntType(), Name('ret0'), [])",
+      "name": "ret0",
+      "param_size": 0
+    },
+    "ret1": {
+      "datatype": "FunDecl(IntType(), Name('ret1'), [])",
+      "name": "ret1",
+      "param_size": 0
+    },
+    "tail_call_fun": {
+      "datatype": "FunDecl(IntType(), Name('tail_call_fun'), [Alloc(Writeable(), IntType(), Name('bool_val'), 'param')])",
+      "name": "tail_call_fun",
+      "param_size": 1
+    }
+  },
+  "main": {},
+  "ret0": {},
+  "ret1": {},
+  "tail_call_fun": {
+    "bool_val": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "bool_val",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

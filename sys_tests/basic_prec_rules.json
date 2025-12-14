@@ -1,0 +1,43 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "ex1": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "ex1",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "ex2": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "ex2",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "ex3": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "ex3",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "ex4": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "ex4",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

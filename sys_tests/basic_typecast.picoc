@@ -1,6 +1,5 @@
 // input:
 // expected:42
-#include<stdio.h>
 
 #define NULL ((void *)0)
 

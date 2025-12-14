@@ -1,0 +1,36 @@
+{
+  "__parents__": {
+    "fun_with_local_var": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun_with_local_var": {
+    "var": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "var",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun_with_local_var": {
+      "datatype": "FunDecl(VoidType(), Name('fun_with_local_var'), [])",
+      "name": "fun_with_local_var",
+      "param_size": 0
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "var": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "var",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "main": {}
+}

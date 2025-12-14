@@ -1,0 +1,59 @@
+_global_inits:
+fast_efficient_iterative:
+  StackMalloc('1')
+  Exp(Alloc(Writeable(), IntType(), Name('a'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('n'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('acc'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('tmp'), 'local_var'), Empty())
+  // While(Atom(Name('n'), NEq(), Num('0')), [IfElse(Atom(BinOp(Name('n'), Mod(), Num('2')), Eq(), Num('0')), [Assign(Name('a'), BinOp(Name('a'), Mul(), Name('a'))), Assign(Name('n'), BinOp(Name('n'), Div(), Num('2')))], [Assign(Name('tmp'), Name('a')), Assign(Name('a'), BinOp(Name('a'), Mul(), Name('a'))), Assign(Name('n'), BinOp(Name('n'), Div(), Num('2'))), Assign(Name('acc'), BinOp(Name('acc'), Mul(), Name('tmp')))])])
+  GoTo(Name('condition_check.5'))
+condition_check.5:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('1'), 
+        IntType()), 
+      NEq(), 
+      Num('0')), 
+    [
+      GoTo(Name('while_branch.4'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.4:
+  // Assign(Name('a'), BinOp(Name('a'), Mul(), Name('a'))), 
+  IfElse(
+    Atom(
+      BinOp(
+        Stackframe(
+          Num('1'), 
+          IntType()), 
+        Mod(), 
+        Num('2')), 
+      Eq(), 
+      Num('0')), 
+    [
+      GoTo(Name('if.3'))
+    ], 
+    [
+      GoTo(Name('else.2'))
+    ])
+if.3:
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Mul(), Stackframe(Num('0'), IntType())))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('1'), IntType()), Div(), Num('2')))
+  GoTo(Name('if_else_after.1'))
+else.2:
+  Assign(Stackframe(Num('3'), IntType()), Stackframe(Num('0'), IntType()))
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Mul(), Stackframe(Num('0'), IntType())))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('1'), IntType()), Div(), Num('2')))
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Stackframe(Num('2'), IntType()), Mul(), Stackframe(Num('3'), IntType())))
+  GoTo(Name('if_else_after.1'))
+if_else_after.1:
+  GoTo(Name('condition_check.5'))
+while_after.0:
+  Return(Stackframe(Num('2'), IntType()))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('fast_efficient_iterative'), [Call(Name('input'), []), Call(Name('input'), []), Num('1')])]), Empty())
+  Return(Empty())

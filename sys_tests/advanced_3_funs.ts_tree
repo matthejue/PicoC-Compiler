@@ -1,0 +1,142 @@
+translation_unit: int fun(int param);\n\nint main() {\n  int local_var1 = input();\n  int local_var2 = fun(local_var1);\n  print(local_var2 + 2);\n  return 0;\n}\n\nint fun2(int param)\n{\n  int local_var = 2;\n  return param + local_var;\n}\n\nint fun(int param) {\n  int local_var1 = 2;\n  int local_var2 = param + local_var1;\n  print(local_var2);\n  print(fun2(local_var2));\n  return local_var2;\n}\n
+  declaration: int fun(int param);
+    primitive_type: int
+    function_declarator: fun(int param)
+      identifier: fun
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    ;: ;
+  function_definition: int main() {\n  int local_var1 = input();\n  int local_var2 = fun(local_var1);\n  print(local_var2 + 2);\n  return 0;\n}
+    primitive_type: int
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int local_var1 = input();\n  int local_var2 = fun(local_var1);\n  print(local_var2 + 2);\n  return 0;\n}
+      {: {
+      declaration: int local_var1 = input();
+        primitive_type: int
+        init_declarator: local_var1 = input()
+          identifier: local_var1
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      declaration: int local_var2 = fun(local_var1);
+        primitive_type: int
+        init_declarator: local_var2 = fun(local_var1)
+          identifier: local_var2
+          =: =
+          call_expression: fun(local_var1)
+            identifier: fun
+            argument_list: (local_var1)
+              (: (
+              identifier: local_var1
+              ): )
+        ;: ;
+      expression_statement: print(local_var2 + 2);
+        call_expression: print(local_var2 + 2)
+          identifier: print
+          argument_list: (local_var2 + 2)
+            (: (
+            binary_expression: local_var2 + 2
+              identifier: local_var2
+              +: +
+              number_literal: 2
+            ): )
+        ;: ;
+      return_statement: return 0;
+        return: return
+        number_literal: 0
+        ;: ;
+      }: }
+  function_definition: int fun2(int param)\n{\n  int local_var = 2;\n  return param + local_var;\n}
+    primitive_type: int
+    function_declarator: fun2(int param)
+      identifier: fun2
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  int local_var = 2;\n  return param + local_var;\n}
+      {: {
+      declaration: int local_var = 2;
+        primitive_type: int
+        init_declarator: local_var = 2
+          identifier: local_var
+          =: =
+          number_literal: 2
+        ;: ;
+      return_statement: return param + local_var;
+        return: return
+        binary_expression: param + local_var
+          identifier: param
+          +: +
+          identifier: local_var
+        ;: ;
+      }: }
+  function_definition: int fun(int param) {\n  int local_var1 = 2;\n  int local_var2 = param + local_var1;\n  print(local_var2);\n  print(fun2(local_var2));\n  return local_var2;\n}
+    primitive_type: int
+    function_declarator: fun(int param)
+      identifier: fun
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  int local_var1 = 2;\n  int local_var2 = param + local_var1;\n  print(local_var2);\n  print(fun2(local_var2));\n  return local_var2;\n}
+      {: {
+      declaration: int local_var1 = 2;
+        primitive_type: int
+        init_declarator: local_var1 = 2
+          identifier: local_var1
+          =: =
+          number_literal: 2
+        ;: ;
+      declaration: int local_var2 = param + local_var1;
+        primitive_type: int
+        init_declarator: local_var2 = param + local_var1
+          identifier: local_var2
+          =: =
+          binary_expression: param + local_var1
+            identifier: param
+            +: +
+            identifier: local_var1
+        ;: ;
+      expression_statement: print(local_var2);
+        call_expression: print(local_var2)
+          identifier: print
+          argument_list: (local_var2)
+            (: (
+            identifier: local_var2
+            ): )
+        ;: ;
+      expression_statement: print(fun2(local_var2));
+        call_expression: print(fun2(local_var2))
+          identifier: print
+          argument_list: (fun2(local_var2))
+            (: (
+            call_expression: fun2(local_var2)
+              identifier: fun2
+              argument_list: (local_var2)
+                (: (
+                identifier: local_var2
+                ): )
+            ): )
+        ;: ;
+      return_statement: return local_var2;
+        return: return
+        identifier: local_var2
+        ;: ;
+      }: }

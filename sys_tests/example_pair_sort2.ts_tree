@@ -1,0 +1,191 @@
+translation_unit: int b;\nint x;\n\nint ps(int *x, int *y) {\n  int h;\n  int getauscht;\n  getauscht = 0;\n  if (*x > *y) {\n    h = *x; *x = *y;\n    *y = h; getauscht = 1;\n  }\n  return getauscht;\n}\nvoid main() {\n  int b; int res;\n  x = input(); b = input();\n  print(x);\n  print(b);\n  res = ps(&x, &b);\n  print(res);\n  print(x);\n  print(b);\n}\n
+  declaration: int b;
+    primitive_type: int
+    identifier: b
+    ;: ;
+  declaration: int x;
+    primitive_type: int
+    identifier: x
+    ;: ;
+  function_definition: int ps(int *x, int *y) {\n  int h;\n  int getauscht;\n  getauscht = 0;\n  if (*x > *y) {\n    h = *x; *x = *y;\n    *y = h; getauscht = 1;\n  }\n  return getauscht;\n}
+    primitive_type: int
+    function_declarator: ps(int *x, int *y)
+      identifier: ps
+      parameter_list: (int *x, int *y)
+        (: (
+        parameter_declaration: int *x
+          primitive_type: int
+          pointer_declarator: *x
+            *: *
+            identifier: x
+        ,: ,
+        parameter_declaration: int *y
+          primitive_type: int
+          pointer_declarator: *y
+            *: *
+            identifier: y
+        ): )
+    compound_statement: {\n  int h;\n  int getauscht;\n  getauscht = 0;\n  if (*x > *y) {\n    h = *x; *x = *y;\n    *y = h; getauscht = 1;\n  }\n  return getauscht;\n}
+      {: {
+      declaration: int h;
+        primitive_type: int
+        identifier: h
+        ;: ;
+      declaration: int getauscht;
+        primitive_type: int
+        identifier: getauscht
+        ;: ;
+      expression_statement: getauscht = 0;
+        assignment_expression: getauscht = 0
+          identifier: getauscht
+          =: =
+          number_literal: 0
+        ;: ;
+      if_statement: if (*x > *y) {\n    h = *x; *x = *y;\n    *y = h; getauscht = 1;\n  }
+        if: if
+        parenthesized_expression: (*x > *y)
+          (: (
+          binary_expression: *x > *y
+            pointer_expression: *x
+              *: *
+              identifier: x
+            >: >
+            pointer_expression: *y
+              *: *
+              identifier: y
+          ): )
+        compound_statement: {\n    h = *x; *x = *y;\n    *y = h; getauscht = 1;\n  }
+          {: {
+          expression_statement: h = *x;
+            assignment_expression: h = *x
+              identifier: h
+              =: =
+              pointer_expression: *x
+                *: *
+                identifier: x
+            ;: ;
+          expression_statement: *x = *y;
+            assignment_expression: *x = *y
+              pointer_expression: *x
+                *: *
+                identifier: x
+              =: =
+              pointer_expression: *y
+                *: *
+                identifier: y
+            ;: ;
+          expression_statement: *y = h;
+            assignment_expression: *y = h
+              pointer_expression: *y
+                *: *
+                identifier: y
+              =: =
+              identifier: h
+            ;: ;
+          expression_statement: getauscht = 1;
+            assignment_expression: getauscht = 1
+              identifier: getauscht
+              =: =
+              number_literal: 1
+            ;: ;
+          }: }
+      return_statement: return getauscht;
+        return: return
+        identifier: getauscht
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int b; int res;\n  x = input(); b = input();\n  print(x);\n  print(b);\n  res = ps(&x, &b);\n  print(res);\n  print(x);\n  print(b);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int b; int res;\n  x = input(); b = input();\n  print(x);\n  print(b);\n  res = ps(&x, &b);\n  print(res);\n  print(x);\n  print(b);\n}
+      {: {
+      declaration: int b;
+        primitive_type: int
+        identifier: b
+        ;: ;
+      declaration: int res;
+        primitive_type: int
+        identifier: res
+        ;: ;
+      expression_statement: x = input();
+        assignment_expression: x = input()
+          identifier: x
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: b = input();
+        assignment_expression: b = input()
+          identifier: b
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print(x);
+        call_expression: print(x)
+          identifier: print
+          argument_list: (x)
+            (: (
+            identifier: x
+            ): )
+        ;: ;
+      expression_statement: print(b);
+        call_expression: print(b)
+          identifier: print
+          argument_list: (b)
+            (: (
+            identifier: b
+            ): )
+        ;: ;
+      expression_statement: res = ps(&x, &b);
+        assignment_expression: res = ps(&x, &b)
+          identifier: res
+          =: =
+          call_expression: ps(&x, &b)
+            identifier: ps
+            argument_list: (&x, &b)
+              (: (
+              pointer_expression: &x
+                &: &
+                identifier: x
+              ,: ,
+              pointer_expression: &b
+                &: &
+                identifier: b
+              ): )
+        ;: ;
+      expression_statement: print(res);
+        call_expression: print(res)
+          identifier: print
+          argument_list: (res)
+            (: (
+            identifier: res
+            ): )
+        ;: ;
+      expression_statement: print(x);
+        call_expression: print(x)
+          identifier: print
+          argument_list: (x)
+            (: (
+            identifier: x
+            ): )
+        ;: ;
+      expression_statement: print(b);
+        call_expression: print(b)
+          identifier: print
+          argument_list: (b)
+            (: (
+            identifier: b
+            ): )
+        ;: ;
+      }: }

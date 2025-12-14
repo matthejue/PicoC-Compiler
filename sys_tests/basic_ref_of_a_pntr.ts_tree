@@ -1,0 +1,68 @@
+translation_unit: void main() {\n  int var = input();\n  int *pntr1 = &var;\n  int **pntr2 = &pntr1;\n  print(*pntr1);\n  print(**pntr2);\n}\n
+  function_definition: void main() {\n  int var = input();\n  int *pntr1 = &var;\n  int **pntr2 = &pntr1;\n  print(*pntr1);\n  print(**pntr2);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int var = input();\n  int *pntr1 = &var;\n  int **pntr2 = &pntr1;\n  print(*pntr1);\n  print(**pntr2);\n}
+      {: {
+      declaration: int var = input();
+        primitive_type: int
+        init_declarator: var = input()
+          identifier: var
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      declaration: int *pntr1 = &var;
+        primitive_type: int
+        init_declarator: *pntr1 = &var
+          pointer_declarator: *pntr1
+            *: *
+            identifier: pntr1
+          =: =
+          pointer_expression: &var
+            &: &
+            identifier: var
+        ;: ;
+      declaration: int **pntr2 = &pntr1;
+        primitive_type: int
+        init_declarator: **pntr2 = &pntr1
+          pointer_declarator: **pntr2
+            *: *
+            pointer_declarator: *pntr2
+              *: *
+              identifier: pntr2
+          =: =
+          pointer_expression: &pntr1
+            &: &
+            identifier: pntr1
+        ;: ;
+      expression_statement: print(*pntr1);
+        call_expression: print(*pntr1)
+          identifier: print
+          argument_list: (*pntr1)
+            (: (
+            pointer_expression: *pntr1
+              *: *
+              identifier: pntr1
+            ): )
+        ;: ;
+      expression_statement: print(**pntr2);
+        call_expression: print(**pntr2)
+          identifier: print
+          argument_list: (**pntr2)
+            (: (
+            pointer_expression: **pntr2
+              *: *
+              pointer_expression: *pntr2
+                *: *
+                identifier: pntr2
+            ): )
+        ;: ;
+      }: }

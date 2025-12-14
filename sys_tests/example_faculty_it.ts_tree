@@ -1,0 +1,67 @@
+translation_unit: void main() {\n  int n = input();\n  int res = 1;\n  while (n != 1) {\n    res = n * res;\n    n = n - 1;\n  }\n  print(res);\n}\n
+  function_definition: void main() {\n  int n = input();\n  int res = 1;\n  while (n != 1) {\n    res = n * res;\n    n = n - 1;\n  }\n  print(res);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int n = input();\n  int res = 1;\n  while (n != 1) {\n    res = n * res;\n    n = n - 1;\n  }\n  print(res);\n}
+      {: {
+      declaration: int n = input();
+        primitive_type: int
+        init_declarator: n = input()
+          identifier: n
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      declaration: int res = 1;
+        primitive_type: int
+        init_declarator: res = 1
+          identifier: res
+          =: =
+          number_literal: 1
+        ;: ;
+      while_statement: while (n != 1) {\n    res = n * res;\n    n = n - 1;\n  }
+        while: while
+        parenthesized_expression: (n != 1)
+          (: (
+          binary_expression: n != 1
+            identifier: n
+            !=: !=
+            number_literal: 1
+          ): )
+        compound_statement: {\n    res = n * res;\n    n = n - 1;\n  }
+          {: {
+          expression_statement: res = n * res;
+            assignment_expression: res = n * res
+              identifier: res
+              =: =
+              binary_expression: n * res
+                identifier: n
+                *: *
+                identifier: res
+            ;: ;
+          expression_statement: n = n - 1;
+            assignment_expression: n = n - 1
+              identifier: n
+              =: =
+              binary_expression: n - 1
+                identifier: n
+                -: -
+                number_literal: 1
+            ;: ;
+          }: }
+      expression_statement: print(res);
+        call_expression: print(res)
+          identifier: print
+          argument_list: (res)
+            (: (
+            identifier: res
+            ): )
+        ;: ;
+      }: }

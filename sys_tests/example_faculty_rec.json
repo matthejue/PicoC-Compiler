@@ -1,0 +1,51 @@
+{
+  "__parents__": {
+    "fakul": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fakul": {
+    "h": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "h",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "n": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "n",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "res_f": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "res_f",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fakul": {
+      "datatype": "FunDecl(IntType(), Name('fakul'), [Alloc(Writeable(), IntType(), Name('n'), 'param')])",
+      "name": "fakul",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "res": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "res",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

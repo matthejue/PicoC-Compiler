@@ -1,0 +1,79 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global",
+    "ps": "global"
+  },
+  "global": {
+    "b": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "b",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "ps": {
+      "datatype": "FunDecl(IntType(), Name('ps'), [Alloc(Writeable(), PntrDecl(IntType()), Name('x'), 'param'), Alloc(Writeable(), PntrDecl(IntType()), Name('y'), 'param')])",
+      "name": "ps",
+      "param_size": 2
+    },
+    "x": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "main": {
+    "b": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "b",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "res": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "res",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "ps": {
+    "getauscht": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "getauscht",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "h": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "h",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "x": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "y": {
+      "addr": 1,
+      "datatype": "PntrDecl(IntType())",
+      "name": "y",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

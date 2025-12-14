@@ -1,0 +1,50 @@
+{
+  "__parents__": {
+    "fib": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fib": {
+    "fib_i": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "fib_i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "fib_i_1": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "fib_i_1",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "fib_i_2": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "fib_i_2",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "fib_nr": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "fib_nr",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fib": {
+      "datatype": "FunDecl(IntType(), Name('fib'), [Alloc(Writeable(), IntType(), Name('fib_nr'), 'param')])",
+      "name": "fib",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {}
+}

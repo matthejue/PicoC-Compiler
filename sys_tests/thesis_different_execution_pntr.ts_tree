@@ -1,0 +1,104 @@
+translation_unit: void main() {\n  int ar[1][2] = {{314, 42}};\n  int (*pntr)[2] = &ar[0];\n  print(*(*(ar+0)+1));\n  print(*(*(pntr+0)+1));\n}\n\n
+  function_definition: void main() {\n  int ar[1][2] = {{314, 42}};\n  int (*pntr)[2] = &ar[0];\n  print(*(*(ar+0)+1));\n  print(*(*(pntr+0)+1));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[1][2] = {{314, 42}};\n  int (*pntr)[2] = &ar[0];\n  print(*(*(ar+0)+1));\n  print(*(*(pntr+0)+1));\n}
+      {: {
+      declaration: int ar[1][2] = {{314, 42}};
+        primitive_type: int
+        init_declarator: ar[1][2] = {{314, 42}}
+          array_declarator: ar[1][2]
+            array_declarator: ar[1]
+              identifier: ar
+              [: [
+              number_literal: 1
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {{314, 42}}
+            {: {
+            initializer_list: {314, 42}
+              {: {
+              number_literal: 314
+              ,: ,
+              number_literal: 42
+              }: }
+            }: }
+        ;: ;
+      declaration: int (*pntr)[2] = &ar[0];
+        primitive_type: int
+        init_declarator: (*pntr)[2] = &ar[0]
+          array_declarator: (*pntr)[2]
+            parenthesized_declarator: (*pntr)
+              (: (
+              pointer_declarator: *pntr
+                *: *
+                identifier: pntr
+              ): )
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          pointer_expression: &ar[0]
+            &: &
+            subscript_expression: ar[0]
+              identifier: ar
+              [: [
+              number_literal: 0
+              ]: ]
+        ;: ;
+      expression_statement: print(*(*(ar+0)+1));
+        call_expression: print(*(*(ar+0)+1))
+          identifier: print
+          argument_list: (*(*(ar+0)+1))
+            (: (
+            pointer_expression: *(*(ar+0)+1)
+              *: *
+              parenthesized_expression: (*(ar+0)+1)
+                (: (
+                binary_expression: *(ar+0)+1
+                  pointer_expression: *(ar+0)
+                    *: *
+                    parenthesized_expression: (ar+0)
+                      (: (
+                      binary_expression: ar+0
+                        identifier: ar
+                        +: +
+                        number_literal: 0
+                      ): )
+                  +: +
+                  number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      expression_statement: print(*(*(pntr+0)+1));
+        call_expression: print(*(*(pntr+0)+1))
+          identifier: print
+          argument_list: (*(*(pntr+0)+1))
+            (: (
+            pointer_expression: *(*(pntr+0)+1)
+              *: *
+              parenthesized_expression: (*(pntr+0)+1)
+                (: (
+                binary_expression: *(pntr+0)+1
+                  pointer_expression: *(pntr+0)
+                    *: *
+                    parenthesized_expression: (pntr+0)
+                      (: (
+                      binary_expression: pntr+0
+                        identifier: pntr
+                        +: +
+                        number_literal: 0
+                      ): )
+                  +: +
+                  number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      }: }

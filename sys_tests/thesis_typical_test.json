@@ -1,0 +1,14 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {}
+}

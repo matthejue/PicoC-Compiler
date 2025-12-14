@@ -1,0 +1,76 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "compl_dt": {
+    "ar": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('1'), ArrayDecl(Num('2'), PntrDecl(ArrayDecl(Num('2'), IntType()))))",
+      "name": "ar",
+      "size": 2,
+      "type_qual": "Empty()"
+    },
+    "waste_space": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "waste_space",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "global": {
+    "compl_dt": {
+      "attrs": [
+        "Name('waste_space')",
+        "Name('ar')"
+      ],
+      "datatype": "StructDecl(Name('compl_dt'), [Alloc(Writeable(), IntType(), Name('waste_space'), 'local_var'), Alloc(Writeable(), ArrayDecl(Num('1'), ArrayDecl(Num('2'), PntrDecl(ArrayDecl(Num('2'), IntType())))), Name('ar'), 'local_var')])",
+      "name": "compl_dt",
+      "size": 3,
+      "type_qual": "Empty()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "ar1": {
+      "addr": 1,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar1",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "ar2": {
+      "addr": 3,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar2",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "ar3": {
+      "addr": 5,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar3",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "ar4": {
+      "addr": 7,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar4",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "compl_datastructure": {
+      "addr": 13,
+      "datatype": "ArrayDecl(Num('2'), ArrayDecl(Num('1'), StructSpec(Name('compl_dt'))))",
+      "name": "compl_datastructure",
+      "size": 6,
+      "type_qual": "Writeable()"
+    }
+  }
+}

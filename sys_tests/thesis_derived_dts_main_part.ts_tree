@@ -1,0 +1,87 @@
+translation_unit: struct st {int (*ar)[1];};\n\nvoid main() {\n  int var[1] = {42};\n  struct st complex_var = {.ar=&var};\n  print((*complex_var.ar)[2-2]);\n}\n
+  struct_specifier: struct st {int (*ar)[1];}
+    struct: struct
+    type_identifier: st
+    field_declaration_list: {int (*ar)[1];}
+      {: {
+      field_declaration: int (*ar)[1];
+        primitive_type: int
+        array_declarator: (*ar)[1]
+          parenthesized_declarator: (*ar)
+            (: (
+            pointer_declarator: *ar
+              *: *
+              field_identifier: ar
+            ): )
+          [: [
+          number_literal: 1
+          ]: ]
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  int var[1] = {42};\n  struct st complex_var = {.ar=&var};\n  print((*complex_var.ar)[2-2]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int var[1] = {42};\n  struct st complex_var = {.ar=&var};\n  print((*complex_var.ar)[2-2]);\n}
+      {: {
+      declaration: int var[1] = {42};
+        primitive_type: int
+        init_declarator: var[1] = {42}
+          array_declarator: var[1]
+            identifier: var
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          initializer_list: {42}
+            {: {
+            number_literal: 42
+            }: }
+        ;: ;
+      declaration: struct st complex_var = {.ar=&var};
+        struct_specifier: struct st
+          struct: struct
+          type_identifier: st
+        init_declarator: complex_var = {.ar=&var}
+          identifier: complex_var
+          =: =
+          initializer_list: {.ar=&var}
+            {: {
+            initializer_pair: .ar=&var
+              field_designator: .ar
+                .: .
+                field_identifier: ar
+              =: =
+              pointer_expression: &var
+                &: &
+                identifier: var
+            }: }
+        ;: ;
+      expression_statement: print((*complex_var.ar)[2-2]);
+        call_expression: print((*complex_var.ar)[2-2])
+          identifier: print
+          argument_list: ((*complex_var.ar)[2-2])
+            (: (
+            subscript_expression: (*complex_var.ar)[2-2]
+              parenthesized_expression: (*complex_var.ar)
+                (: (
+                pointer_expression: *complex_var.ar
+                  *: *
+                  field_expression: complex_var.ar
+                    identifier: complex_var
+                    .: .
+                    field_identifier: ar
+                ): )
+              [: [
+              binary_expression: 2-2
+                number_literal: 2
+                -: -
+                number_literal: 2
+              ]: ]
+            ): )
+        ;: ;
+      }: }

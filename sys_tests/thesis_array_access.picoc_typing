@@ -1,0 +1,12 @@
+_global_inits:
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), ArrayDecl(Num('1'), IntType())), Array([Num('42')], Empty()))
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('0'), ArrayDecl(Num('1'), IntType())), Num('0'), ArrayDecl(Num('1'), IntType()))]), Empty())
+  Exp(Call(Name('fun'), []), Empty())
+  Return(Empty())
+fun:
+  StackMalloc('3')
+  Assign(Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())), Array([Num('1'), Num('2'), Num('3')], Empty()))
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())), BinOp(Num('1'), Add(), Num('1')), ArrayDecl(Num('3'), IntType()))]), Empty())
+  Return(Empty())

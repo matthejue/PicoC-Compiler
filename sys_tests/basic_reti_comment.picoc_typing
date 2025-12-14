@@ -1,0 +1,6 @@
+_global_inits:
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Return(Empty())

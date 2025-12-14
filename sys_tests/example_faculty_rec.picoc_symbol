@@ -1,0 +1,36 @@
+_global_inits:
+fakul:
+  StackMalloc('2')
+  Exp(Alloc(Writeable(), IntType(), Name('n'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('res_f'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('h'), 'local_var'), Empty())
+  // Assign(Name('res_f'), Num('1')), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Eq(), 
+      Num('1')), 
+    [
+      GoTo(Name('if.2'))
+    ], 
+    [
+      GoTo(Name('else.1'))
+    ])
+if.2:
+  Assign(Stackframe(Num('1'), IntType()), Num('1'))
+  GoTo(Name('if_else_after.0'))
+else.1:
+  Assign(Stackframe(Num('2'), IntType()), Call(Name('fakul'), [BinOp(Stackframe(Num('0'), IntType()), Sub(), Num('1'))]))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Mul(), Stackframe(Num('2'), IntType())))
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Stackframe(Num('1'), IntType()))
+main:
+  StackMalloc('1')
+  Exp(Alloc(Writeable(), IntType(), Name('res'), 'local_var'), Empty())
+  Exp(Call(Name('print'), [Call(Name('fakul'), [Call(Name('input'), [])])]), Empty())
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('fakul'), [Call(Name('input'), [])]))
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Return(Empty())

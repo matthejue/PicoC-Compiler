@@ -1,0 +1,64 @@
+translation_unit: struct ExStrc {\n    char attr1;\n    int attr2;\n};\n\nvoid main() {\n  struct ExStrc exstrc = {.attr1='c', .attr2=12};\n  print(exstrc.attr2);\n}\n
+  struct_specifier: struct ExStrc {\n    char attr1;\n    int attr2;\n}
+    struct: struct
+    type_identifier: ExStrc
+    field_declaration_list: {\n    char attr1;\n    int attr2;\n}
+      {: {
+      field_declaration: char attr1;
+        primitive_type: char
+        field_identifier: attr1
+        ;: ;
+      field_declaration: int attr2;
+        primitive_type: int
+        field_identifier: attr2
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  struct ExStrc exstrc = {.attr1='c', .attr2=12};\n  print(exstrc.attr2);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  struct ExStrc exstrc = {.attr1='c', .attr2=12};\n  print(exstrc.attr2);\n}
+      {: {
+      declaration: struct ExStrc exstrc = {.attr1='c', .attr2=12};
+        struct_specifier: struct ExStrc
+          struct: struct
+          type_identifier: ExStrc
+        init_declarator: exstrc = {.attr1='c', .attr2=12}
+          identifier: exstrc
+          =: =
+          initializer_list: {.attr1='c', .attr2=12}
+            {: {
+            initializer_pair: .attr1='c'
+              field_designator: .attr1
+                .: .
+                field_identifier: attr1
+              =: =
+              char_literal: 'c'
+                ': '
+                character: c
+                ': '
+            ,: ,
+            initializer_pair: .attr2=12
+              field_designator: .attr2
+                .: .
+                field_identifier: attr2
+              =: =
+              number_literal: 12
+            }: }
+        ;: ;
+      expression_statement: print(exstrc.attr2);
+        call_expression: print(exstrc.attr2)
+          identifier: print
+          argument_list: (exstrc.attr2)
+            (: (
+            field_expression: exstrc.attr2
+              identifier: exstrc
+              .: .
+              field_identifier: attr2
+            ): )
+        ;: ;
+      }: }

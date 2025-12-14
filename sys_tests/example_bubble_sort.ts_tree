@@ -1,0 +1,300 @@
+translation_unit: struct stt {int len; int *ar;};\n\nint ar[6] = {314, 42, 4, 42, -2, 5};\n\nstruct stt st_ar = {.len=6, .ar=ar};\n\nint swap(int *x, int *y) {\n  \n  int h;\n  int swapped = 0;\n  if (*x > *y) {\n    h = *x; *x = *y; *y = h; swapped = 1;\n  }\n  return swapped;\n}\n\nvoid main() {\n  int swapped;\n  int i;\n  int n = st_ar.len-1;\n  do {\n    i = 0;\n    while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }\n    n = n - 1;\n  } while(swapped);\n  print(st_ar.ar[input()]);\n  print(st_ar.ar[input()]);\n}\n
+  struct_specifier: struct stt {int len; int *ar;}
+    struct: struct
+    type_identifier: stt
+    field_declaration_list: {int len; int *ar;}
+      {: {
+      field_declaration: int len;
+        primitive_type: int
+        field_identifier: len
+        ;: ;
+      field_declaration: int *ar;
+        primitive_type: int
+        pointer_declarator: *ar
+          *: *
+          field_identifier: ar
+        ;: ;
+      }: }
+  ;: ;
+  declaration: int ar[6] = {314, 42, 4, 42, -2, 5};
+    primitive_type: int
+    init_declarator: ar[6] = {314, 42, 4, 42, -2, 5}
+      array_declarator: ar[6]
+        identifier: ar
+        [: [
+        number_literal: 6
+        ]: ]
+      =: =
+      initializer_list: {314, 42, 4, 42, -2, 5}
+        {: {
+        number_literal: 314
+        ,: ,
+        number_literal: 42
+        ,: ,
+        number_literal: 4
+        ,: ,
+        number_literal: 42
+        ,: ,
+        number_literal: -2
+        ,: ,
+        number_literal: 5
+        }: }
+    ;: ;
+  declaration: struct stt st_ar = {.len=6, .ar=ar};
+    struct_specifier: struct stt
+      struct: struct
+      type_identifier: stt
+    init_declarator: st_ar = {.len=6, .ar=ar}
+      identifier: st_ar
+      =: =
+      initializer_list: {.len=6, .ar=ar}
+        {: {
+        initializer_pair: .len=6
+          field_designator: .len
+            .: .
+            field_identifier: len
+          =: =
+          number_literal: 6
+        ,: ,
+        initializer_pair: .ar=ar
+          field_designator: .ar
+            .: .
+            field_identifier: ar
+          =: =
+          identifier: ar
+        }: }
+    ;: ;
+  function_definition: int swap(int *x, int *y) {\n  \n  int h;\n  int swapped = 0;\n  if (*x > *y) {\n    h = *x; *x = *y; *y = h; swapped = 1;\n  }\n  return swapped;\n}
+    primitive_type: int
+    function_declarator: swap(int *x, int *y)
+      identifier: swap
+      parameter_list: (int *x, int *y)
+        (: (
+        parameter_declaration: int *x
+          primitive_type: int
+          pointer_declarator: *x
+            *: *
+            identifier: x
+        ,: ,
+        parameter_declaration: int *y
+          primitive_type: int
+          pointer_declarator: *y
+            *: *
+            identifier: y
+        ): )
+    compound_statement: {\n  \n  int h;\n  int swapped = 0;\n  if (*x > *y) {\n    h = *x; *x = *y; *y = h; swapped = 1;\n  }\n  return swapped;\n}
+      {: {
+      declaration: int h;
+        primitive_type: int
+        identifier: h
+        ;: ;
+      declaration: int swapped = 0;
+        primitive_type: int
+        init_declarator: swapped = 0
+          identifier: swapped
+          =: =
+          number_literal: 0
+        ;: ;
+      if_statement: if (*x > *y) {\n    h = *x; *x = *y; *y = h; swapped = 1;\n  }
+        if: if
+        parenthesized_expression: (*x > *y)
+          (: (
+          binary_expression: *x > *y
+            pointer_expression: *x
+              *: *
+              identifier: x
+            >: >
+            pointer_expression: *y
+              *: *
+              identifier: y
+          ): )
+        compound_statement: {\n    h = *x; *x = *y; *y = h; swapped = 1;\n  }
+          {: {
+          expression_statement: h = *x;
+            assignment_expression: h = *x
+              identifier: h
+              =: =
+              pointer_expression: *x
+                *: *
+                identifier: x
+            ;: ;
+          expression_statement: *x = *y;
+            assignment_expression: *x = *y
+              pointer_expression: *x
+                *: *
+                identifier: x
+              =: =
+              pointer_expression: *y
+                *: *
+                identifier: y
+            ;: ;
+          expression_statement: *y = h;
+            assignment_expression: *y = h
+              pointer_expression: *y
+                *: *
+                identifier: y
+              =: =
+              identifier: h
+            ;: ;
+          expression_statement: swapped = 1;
+            assignment_expression: swapped = 1
+              identifier: swapped
+              =: =
+              number_literal: 1
+            ;: ;
+          }: }
+      return_statement: return swapped;
+        return: return
+        identifier: swapped
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int swapped;\n  int i;\n  int n = st_ar.len-1;\n  do {\n    i = 0;\n    while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }\n    n = n - 1;\n  } while(swapped);\n  print(st_ar.ar[input()]);\n  print(st_ar.ar[input()]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int swapped;\n  int i;\n  int n = st_ar.len-1;\n  do {\n    i = 0;\n    while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }\n    n = n - 1;\n  } while(swapped);\n  print(st_ar.ar[input()]);\n  print(st_ar.ar[input()]);\n}
+      {: {
+      declaration: int swapped;
+        primitive_type: int
+        identifier: swapped
+        ;: ;
+      declaration: int i;
+        primitive_type: int
+        identifier: i
+        ;: ;
+      declaration: int n = st_ar.len-1;
+        primitive_type: int
+        init_declarator: n = st_ar.len-1
+          identifier: n
+          =: =
+          binary_expression: st_ar.len-1
+            field_expression: st_ar.len
+              identifier: st_ar
+              .: .
+              field_identifier: len
+            -: -
+            number_literal: 1
+        ;: ;
+      do_statement: do {\n    i = 0;\n    while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }\n    n = n - 1;\n  } while(swapped);
+        do: do
+        compound_statement: {\n    i = 0;\n    while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }\n    n = n - 1;\n  }
+          {: {
+          expression_statement: i = 0;
+            assignment_expression: i = 0
+              identifier: i
+              =: =
+              number_literal: 0
+            ;: ;
+          while_statement: while (i < n) {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }
+            while: while
+            parenthesized_expression: (i < n)
+              (: (
+              binary_expression: i < n
+                identifier: i
+                <: <
+                identifier: n
+              ): )
+            compound_statement: {\n      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);\n      i = i + 1;\n    }
+              {: {
+              expression_statement: swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);
+                assignment_expression: swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1])
+                  identifier: swapped
+                  =: =
+                  call_expression: swap(&st_ar.ar[i], &st_ar.ar[i+1])
+                    identifier: swap
+                    argument_list: (&st_ar.ar[i], &st_ar.ar[i+1])
+                      (: (
+                      pointer_expression: &st_ar.ar[i]
+                        &: &
+                        subscript_expression: st_ar.ar[i]
+                          field_expression: st_ar.ar
+                            identifier: st_ar
+                            .: .
+                            field_identifier: ar
+                          [: [
+                          identifier: i
+                          ]: ]
+                      ,: ,
+                      pointer_expression: &st_ar.ar[i+1]
+                        &: &
+                        subscript_expression: st_ar.ar[i+1]
+                          field_expression: st_ar.ar
+                            identifier: st_ar
+                            .: .
+                            field_identifier: ar
+                          [: [
+                          binary_expression: i+1
+                            identifier: i
+                            +: +
+                            number_literal: 1
+                          ]: ]
+                      ): )
+                ;: ;
+              expression_statement: i = i + 1;
+                assignment_expression: i = i + 1
+                  identifier: i
+                  =: =
+                  binary_expression: i + 1
+                    identifier: i
+                    +: +
+                    number_literal: 1
+                ;: ;
+              }: }
+          expression_statement: n = n - 1;
+            assignment_expression: n = n - 1
+              identifier: n
+              =: =
+              binary_expression: n - 1
+                identifier: n
+                -: -
+                number_literal: 1
+            ;: ;
+          }: }
+        while: while
+        parenthesized_expression: (swapped)
+          (: (
+          identifier: swapped
+          ): )
+        ;: ;
+      expression_statement: print(st_ar.ar[input()]);
+        call_expression: print(st_ar.ar[input()])
+          identifier: print
+          argument_list: (st_ar.ar[input()])
+            (: (
+            subscript_expression: st_ar.ar[input()]
+              field_expression: st_ar.ar
+                identifier: st_ar
+                .: .
+                field_identifier: ar
+              [: [
+              call_expression: input()
+                identifier: input
+                argument_list: ()
+                  (: (
+                  ): )
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: print(st_ar.ar[input()]);
+        call_expression: print(st_ar.ar[input()])
+          identifier: print
+          argument_list: (st_ar.ar[input()])
+            (: (
+            subscript_expression: st_ar.ar[input()]
+              field_expression: st_ar.ar
+                identifier: st_ar
+                .: .
+                field_identifier: ar
+              [: [
+              call_expression: input()
+                identifier: input
+                argument_list: ()
+                  (: (
+                  ): )
+              ]: ]
+            ): )
+        ;: ;
+      }: }

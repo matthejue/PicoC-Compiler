@@ -1,0 +1,43 @@
+{
+  "__parents__": {
+    "gcd": "global",
+    "global": null,
+    "main": "global"
+  },
+  "gcd": {
+    "a": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "a",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "b": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "b",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "c": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "c",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "gcd": {
+      "datatype": "FunDecl(IntType(), Name('gcd'), [Alloc(Writeable(), IntType(), Name('a'), 'param'), Alloc(Writeable(), IntType(), Name('b'), 'param')])",
+      "name": "gcd",
+      "param_size": 2
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {}
+}

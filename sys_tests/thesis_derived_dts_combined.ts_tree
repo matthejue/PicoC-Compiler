@@ -1,0 +1,146 @@
+translation_unit: struct st1 {int (*ar)[1];};\nstruct st2 {struct st1 *st;};\n\nvoid main() {\n  int var[1] = {42};\n  struct st1 st_first = {.ar=&var};\n  struct st2 st_second = {.st=&st_first};\n  print((*st_first.ar)[0]);\n  print((*(*st_second.st).ar)[0]);\n}\n\n\n
+  struct_specifier: struct st1 {int (*ar)[1];}
+    struct: struct
+    type_identifier: st1
+    field_declaration_list: {int (*ar)[1];}
+      {: {
+      field_declaration: int (*ar)[1];
+        primitive_type: int
+        array_declarator: (*ar)[1]
+          parenthesized_declarator: (*ar)
+            (: (
+            pointer_declarator: *ar
+              *: *
+              field_identifier: ar
+            ): )
+          [: [
+          number_literal: 1
+          ]: ]
+        ;: ;
+      }: }
+  ;: ;
+  struct_specifier: struct st2 {struct st1 *st;}
+    struct: struct
+    type_identifier: st2
+    field_declaration_list: {struct st1 *st;}
+      {: {
+      field_declaration: struct st1 *st;
+        struct_specifier: struct st1
+          struct: struct
+          type_identifier: st1
+        pointer_declarator: *st
+          *: *
+          field_identifier: st
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  int var[1] = {42};\n  struct st1 st_first = {.ar=&var};\n  struct st2 st_second = {.st=&st_first};\n  print((*st_first.ar)[0]);\n  print((*(*st_second.st).ar)[0]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int var[1] = {42};\n  struct st1 st_first = {.ar=&var};\n  struct st2 st_second = {.st=&st_first};\n  print((*st_first.ar)[0]);\n  print((*(*st_second.st).ar)[0]);\n}
+      {: {
+      declaration: int var[1] = {42};
+        primitive_type: int
+        init_declarator: var[1] = {42}
+          array_declarator: var[1]
+            identifier: var
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          initializer_list: {42}
+            {: {
+            number_literal: 42
+            }: }
+        ;: ;
+      declaration: struct st1 st_first = {.ar=&var};
+        struct_specifier: struct st1
+          struct: struct
+          type_identifier: st1
+        init_declarator: st_first = {.ar=&var}
+          identifier: st_first
+          =: =
+          initializer_list: {.ar=&var}
+            {: {
+            initializer_pair: .ar=&var
+              field_designator: .ar
+                .: .
+                field_identifier: ar
+              =: =
+              pointer_expression: &var
+                &: &
+                identifier: var
+            }: }
+        ;: ;
+      declaration: struct st2 st_second = {.st=&st_first};
+        struct_specifier: struct st2
+          struct: struct
+          type_identifier: st2
+        init_declarator: st_second = {.st=&st_first}
+          identifier: st_second
+          =: =
+          initializer_list: {.st=&st_first}
+            {: {
+            initializer_pair: .st=&st_first
+              field_designator: .st
+                .: .
+                field_identifier: st
+              =: =
+              pointer_expression: &st_first
+                &: &
+                identifier: st_first
+            }: }
+        ;: ;
+      expression_statement: print((*st_first.ar)[0]);
+        call_expression: print((*st_first.ar)[0])
+          identifier: print
+          argument_list: ((*st_first.ar)[0])
+            (: (
+            subscript_expression: (*st_first.ar)[0]
+              parenthesized_expression: (*st_first.ar)
+                (: (
+                pointer_expression: *st_first.ar
+                  *: *
+                  field_expression: st_first.ar
+                    identifier: st_first
+                    .: .
+                    field_identifier: ar
+                ): )
+              [: [
+              number_literal: 0
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: print((*(*st_second.st).ar)[0]);
+        call_expression: print((*(*st_second.st).ar)[0])
+          identifier: print
+          argument_list: ((*(*st_second.st).ar)[0])
+            (: (
+            subscript_expression: (*(*st_second.st).ar)[0]
+              parenthesized_expression: (*(*st_second.st).ar)
+                (: (
+                pointer_expression: *(*st_second.st).ar
+                  *: *
+                  field_expression: (*st_second.st).ar
+                    parenthesized_expression: (*st_second.st)
+                      (: (
+                      pointer_expression: *st_second.st
+                        *: *
+                        field_expression: st_second.st
+                          identifier: st_second
+                          .: .
+                          field_identifier: st
+                      ): )
+                    .: .
+                    field_identifier: ar
+                ): )
+              [: [
+              number_literal: 0
+              ]: ]
+            ): )
+        ;: ;
+      }: }

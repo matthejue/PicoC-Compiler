@@ -1,0 +1,55 @@
+{
+  "__parents__": {
+    "fun": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun": {
+    "copyable_ar": {
+      "addr": 1,
+      "datatype": "StructSpec(Name('st'))",
+      "name": "copyable_ar",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun": {
+      "datatype": "FunDecl(VoidType(), Name('fun'), [Alloc(Writeable(), StructSpec(Name('st')), Name('copyable_ar'), 'param')])",
+      "name": "fun",
+      "param_size": 2
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "st": {
+      "attrs": [
+        "Name('ar')"
+      ],
+      "datatype": "StructDecl(Name('st'), [Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('ar'), 'local_var')])",
+      "name": "st",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "copyable_ar": {
+      "addr": 1,
+      "datatype": "StructSpec(Name('st'))",
+      "name": "copyable_ar",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  },
+  "st": {
+    "ar": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  }
+}

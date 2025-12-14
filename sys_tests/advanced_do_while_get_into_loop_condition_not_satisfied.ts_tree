@@ -1,0 +1,55 @@
+translation_unit: void main() {\n  const int min = 0;\n  int i = input();\n  do {\n    print(-i);\n  } while (i > min);\n}\n
+  function_definition: void main() {\n  const int min = 0;\n  int i = input();\n  do {\n    print(-i);\n  } while (i > min);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  const int min = 0;\n  int i = input();\n  do {\n    print(-i);\n  } while (i > min);\n}
+      {: {
+      declaration: const int min = 0;
+        type_qualifier: const
+          const: const
+        primitive_type: int
+        init_declarator: min = 0
+          identifier: min
+          =: =
+          number_literal: 0
+        ;: ;
+      declaration: int i = input();
+        primitive_type: int
+        init_declarator: i = input()
+          identifier: i
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      do_statement: do {\n    print(-i);\n  } while (i > min);
+        do: do
+        compound_statement: {\n    print(-i);\n  }
+          {: {
+          expression_statement: print(-i);
+            call_expression: print(-i)
+              identifier: print
+              argument_list: (-i)
+                (: (
+                unary_expression: -i
+                  -: -
+                  identifier: i
+                ): )
+            ;: ;
+          }: }
+        while: while
+        parenthesized_expression: (i > min)
+          (: (
+          binary_expression: i > min
+            identifier: i
+            >: >
+            identifier: min
+          ): )
+        ;: ;
+      }: }

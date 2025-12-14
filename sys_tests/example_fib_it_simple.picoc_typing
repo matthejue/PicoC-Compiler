@@ -1,0 +1,32 @@
+_global_inits:
+fib:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), IntType(), Name('fib_nr'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('fib_i'), 'local_var'), Empty())
+  Assign(Stackframe(Num('2'), IntType()), Num('0'))
+  Assign(Stackframe(Num('3'), IntType()), Num('1'))
+  // While(Name('fib_nr'), [Assign(Name('fib_i'), BinOp(Name('fib_i_1'), Add(), Name('fib_i_2'))), Assign(Name('fib_i_2'), Name('fib_i_1')), Assign(Name('fib_i_1'), Name('fib_i')), Assign(Name('fib_nr'), BinOp(Name('fib_nr'), Sub(), Num('1')))])
+  GoTo(Name('condition_check.2'))
+condition_check.2:
+  IfElse(
+    Stackframe(
+      Num('0'), 
+      IntType()), 
+    [
+      GoTo(Name('while_branch.1'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.1:
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('2'), IntType()), Add(), Stackframe(Num('3'), IntType())))
+  Assign(Stackframe(Num('3'), IntType()), Stackframe(Num('2'), IntType()))
+  Assign(Stackframe(Num('2'), IntType()), Stackframe(Num('1'), IntType()))
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Sub(), Num('1')))
+  GoTo(Name('condition_check.2'))
+while_after.0:
+  Return(Stackframe(Num('1'), IntType()))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('fib'), [Call(Name('input'), [])])]), Empty())
+  Return(Empty())

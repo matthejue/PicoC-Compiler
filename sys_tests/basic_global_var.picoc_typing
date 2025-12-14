@@ -1,0 +1,13 @@
+_global_inits:
+  Exp(Alloc(Writeable(), IntType(), Name('global_var'), 'local_var'), Empty())
+  Assign(Global(Name('global_var2'), IntType()), Num('42'))
+fun:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Global(Name('global_var'), IntType())]), Empty())
+  Return(Empty())
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Global(Name('global_var2'), IntType())]), Empty())
+  Assign(Global(Name('global_var'), IntType()), Num('314'))
+  Exp(Call(Name('fun'), []), Empty())
+  Return(Empty())

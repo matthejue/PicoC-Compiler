@@ -1,0 +1,72 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global",
+    "pairsort": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "pairsort": {
+      "datatype": "FunDecl(IntType(), Name('pairsort'), [Alloc(Writeable(), PntrDecl(IntType()), Name('x'), 'param'), Alloc(Writeable(), PntrDecl(IntType()), Name('y'), 'param')])",
+      "name": "pairsort",
+      "param_size": 2
+    }
+  },
+  "main": {
+    "a": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "a",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "b": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "b",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "res": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "res",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "pairsort": {
+    "getauscht": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "getauscht",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "h": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "h",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "x": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "y": {
+      "addr": 1,
+      "datatype": "PntrDecl(IntType())",
+      "name": "y",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

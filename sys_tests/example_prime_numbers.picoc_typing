@@ -1,0 +1,151 @@
+_global_inits:
+  Assign(Global(Name('ar'), ArrayDecl(Num('10'), IntType())), Array([Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0'), Num('0')], Empty()))
+  Assign(Global(Name('len'), IntType()), Num('10'))
+primes:
+  StackMalloc('4')
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('primes'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('n'), 'param'), Empty())
+  Assign(Stackframe(Num('2'), IntType()), Num('3'))
+  Exp(Alloc(Writeable(), IntType(), Name('j'), 'local_var'), Empty())
+  Assign(Stackframe(Num('4'), IntType()), Num('1'))
+  Assign(Stackframe(Num('5'), CharType()), Num('1'))
+  // If(Atom(Name('n'), LtE(), Num('1')), [Return(Empty())]), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('1'), 
+        IntType()), 
+      LtE(), 
+      Num('1')), 
+    [
+      GoTo(Name('if.11'))
+    ], 
+    [
+      GoTo(Name('if_else_after.10'))
+    ])
+if.11:
+  Return(Empty())
+if_else_after.10:
+  Assign(Deref(Stackframe(Num('0'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())), Num('2'))
+  // While(Atom(Name('i'), LtE(), Name('n')), [Assign(Name('j'), Num('0')), While(Atom(Name('j'), Lt(), Name('idx')), [If(Atom(BinOp(Name('i'), Mod(), Deref(Name('primes'), Name('j'), Empty())), Eq(), Num('0')), [Assign(Name('undividable'), Num('0'))]), Assign(Name('j'), BinOp(Name('j'), Add(), Num('1')))]), If(ToBool(Name('undividable')), [Assign(Deref(Name('primes'), Name('idx'), Empty()), Name('i')), Assign(Name('idx'), BinOp(Name('idx'), Add(), Num('1')))]), Assign(Name('undividable'), Num('1')), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.9'))
+condition_check.9:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('2'), 
+        IntType()), 
+      LtE(), 
+      Stackframe(
+        Num('1'), 
+        IntType())), 
+    [
+      GoTo(Name('while_branch.8'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.8:
+  Assign(Stackframe(Num('3'), IntType()), Num('0'))
+  // While(Atom(Name('j'), Lt(), Name('idx')), [If(Atom(BinOp(Name('i'), Mod(), Deref(Name('primes'), Name('j'), Empty())), Eq(), Num('0')), [Assign(Name('undividable'), Num('0'))]), Assign(Name('j'), BinOp(Name('j'), Add(), Num('1')))])
+  GoTo(Name('condition_check.7'))
+condition_check.7:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      Lt(), 
+      Stackframe(
+        Num('4'), 
+        IntType())), 
+    [
+      GoTo(Name('while_branch.6'))
+    ], 
+    [
+      GoTo(Name('while_after.3'))
+    ])
+while_branch.6:
+  // If(Atom(BinOp(Name('i'), Mod(), Deref(Name('primes'), Name('j'), Empty())), Eq(), Num('0')), [Assign(Name('undividable'), Num('0'))]), 
+  IfElse(
+    Atom(
+      BinOp(
+        Stackframe(
+          Num('2'), 
+          IntType()), 
+        Mod(), 
+        Deref(
+          Stackframe(
+            Num('0'), 
+            PntrDecl(
+              IntType())), 
+          Stackframe(
+            Num('3'), 
+            IntType()), 
+          PntrDecl(
+            IntType()))), 
+      Eq(), 
+      Num('0')), 
+    [
+      GoTo(Name('if.5'))
+    ], 
+    [
+      GoTo(Name('if_else_after.4'))
+    ])
+if.5:
+  Assign(Stackframe(Num('5'), CharType()), Num('0'))
+  GoTo(Name('if_else_after.4'))
+if_else_after.4:
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('3'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.7'))
+while_after.3:
+  // If(ToBool(Name('undividable')), [Assign(Deref(Name('primes'), Name('idx'), Empty()), Name('i')), Assign(Name('idx'), BinOp(Name('idx'), Add(), Num('1')))]), 
+  IfElse(
+    ToBool(
+      Stackframe(
+        Num('5'), 
+        CharType())), 
+    [
+      GoTo(Name('if.2'))
+    ], 
+    [
+      GoTo(Name('if_else_after.1'))
+    ])
+if.2:
+  Assign(Deref(Stackframe(Num('0'), PntrDecl(IntType())), Stackframe(Num('4'), IntType()), PntrDecl(IntType())), Stackframe(Num('2'), IntType()))
+  Assign(Stackframe(Num('4'), IntType()), BinOp(Stackframe(Num('4'), IntType()), Add(), Num('1')))
+  GoTo(Name('if_else_after.1'))
+if_else_after.1:
+  Assign(Stackframe(Num('5'), CharType()), Num('1'))
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Stackframe(Num('2'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.9'))
+while_after.0:
+  Return(Empty())
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), Num('0'))
+  Exp(Call(Name('primes'), [Global(Name('ar'), ArrayDecl(Num('10'), IntType())), Call(Name('input'), [])]), Empty())
+  // While(Atom(Name('i'), Lt(), Name('len')), [Exp(Call(Name('print'), [Deref(Name('ar'), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.15'))
+condition_check.15:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Lt(), 
+      Global(
+        Name('len'), 
+        IntType())), 
+    [
+      GoTo(Name('while_branch.14'))
+    ], 
+    [
+      GoTo(Name('while_after.13'))
+    ])
+while_branch.14:
+  Exp(Call(Name('print'), [Deref(Global(Name('ar'), ArrayDecl(Num('10'), IntType())), Stackframe(Num('0'), IntType()), ArrayDecl(Num('10'), IntType()))]), Empty())
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.15'))
+while_after.13:
+  Return(Empty())

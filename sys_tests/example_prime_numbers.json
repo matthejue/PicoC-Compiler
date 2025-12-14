@@ -1,0 +1,86 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global",
+    "primes": "global"
+  },
+  "global": {
+    "ar": {
+      "addr": 0,
+      "datatype": "ArrayDecl(Num('10'), IntType())",
+      "name": "ar",
+      "size": 10,
+      "type_qual": "Writeable()"
+    },
+    "len": {
+      "addr": 10,
+      "datatype": "IntType()",
+      "name": "len",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "primes": {
+      "datatype": "FunDecl(VoidType(), Name('primes'), [Alloc(Writeable(), PntrDecl(IntType()), Name('primes'), 'param'), Alloc(Writeable(), IntType(), Name('n'), 'param')])",
+      "name": "primes",
+      "param_size": 2
+    }
+  },
+  "main": {
+    "i": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "primes": {
+    "i": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "idx": {
+      "addr": 4,
+      "datatype": "IntType()",
+      "name": "idx",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "j": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "j",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "n": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "n",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "primes": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "primes",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "undividable": {
+      "addr": 5,
+      "datatype": "CharType()",
+      "name": "undividable",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

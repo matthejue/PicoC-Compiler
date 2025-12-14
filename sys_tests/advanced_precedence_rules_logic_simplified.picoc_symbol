@@ -1,0 +1,11 @@
+_global_inits:
+main:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), IntType(), Name('or_exp_false'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('and_exp_false'), 'local_var'), Empty())
+  Assign(Stackframe(Num('2'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('0'), IntType()), BinOp(BinOp(ToBool(Num('0')), LogicOr(), ToBool(BinOp(Num('0'), Add(), UnOp(LogicNot(), ToBool(Char('A')))))), LogicOr(), UnOp(LogicNot(), ToBool(Stackframe(Num('2'), IntType())))))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(BinOp(ToBool(Num('1')), LogicAnd(), ToBool(Stackframe(Num('2'), IntType()))), LogicAnd(), UnOp(LogicNot(), ToBool(Stackframe(Num('2'), IntType())))))
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Exp(Call(Name('print'), [Stackframe(Num('1'), IntType())]), Empty())
+  Return(Empty())

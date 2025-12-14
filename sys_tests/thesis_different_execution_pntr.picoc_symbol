@@ -1,0 +1,8 @@
+_global_inits:
+main:
+  StackMalloc('3')
+  Assign(Stackframe(Num('1'), ArrayDecl(Num('1'), ArrayDecl(Num('2'), IntType()))), Array([Array([Num('314'), Num('42')], Empty())], Empty()))
+  Assign(Stackframe(Num('2'), PntrDecl(ArrayDecl(Num('2'), IntType()))), Stackframe(Num('1'), ArrayDecl(Num('1'), ArrayDecl(Num('2'), IntType()))))
+  Exp(Call(Name('print'), [Deref(Deref(Stackframe(Num('1'), ArrayDecl(Num('1'), ArrayDecl(Num('2'), IntType()))), Num('0'), Empty()), Num('1'), Empty())]), Empty())
+  Exp(Call(Name('print'), [Deref(Deref(Stackframe(Num('2'), PntrDecl(ArrayDecl(Num('2'), IntType()))), Num('0'), Empty()), Num('1'), Empty())]), Empty())
+  Return(Empty())

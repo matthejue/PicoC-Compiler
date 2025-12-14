@@ -1,0 +1,21 @@
+{
+  "__parents__": {
+    "global": null,
+    "int_while_if": "global",
+    "main": "global"
+  },
+  "global": {
+    "int_while_if": {
+      "datatype": "FunDecl(VoidType(), Name('int_while_if'), [])",
+      "name": "int_while_if",
+      "param_size": 0
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "int_while_if": {},
+  "main": {}
+}

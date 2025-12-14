@@ -1,0 +1,22 @@
+_global_inits:
+main:
+  StackMalloc('2')
+  Assign(Stackframe(Num('0'), IntType()), Num('10'))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(BinOp(ToBool(Num('0')), LogicOr(), BinOp(ToBool(Num('1')), LogicAnd(), ToBool(Stackframe(Num('0'), IntType())))), LogicOr(), BinOp(Atom(Stackframe(Num('0'), IntType()), Lt(), Num('10')), LogicAnd(), ToBool(Num('1')))))
+  // If(ToBool(Name('boolean')), [Exp(Call(Name('print'), [Num('42')]), Empty())]), 
+  IfElse(
+    ToBool(
+      Stackframe(
+        Num('1'), 
+        IntType())), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Exp(Call(Name('print'), [Num('42')]), Empty())
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())

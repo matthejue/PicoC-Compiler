@@ -1,0 +1,86 @@
+translation_unit: void fun(int ar[2]) {\n  ar[1] = 42;\n}\n\nvoid main() {\n  int ar[2] = {314, 314};\n  print(ar[1]);\n  fun(ar);\n  print(ar[1]);\n}\n
+  function_definition: void fun(int ar[2]) {\n  ar[1] = 42;\n}
+    primitive_type: void
+    function_declarator: fun(int ar[2])
+      identifier: fun
+      parameter_list: (int ar[2])
+        (: (
+        parameter_declaration: int ar[2]
+          primitive_type: int
+          array_declarator: ar[2]
+            identifier: ar
+            [: [
+            number_literal: 2
+            ]: ]
+        ): )
+    compound_statement: {\n  ar[1] = 42;\n}
+      {: {
+      expression_statement: ar[1] = 42;
+        assignment_expression: ar[1] = 42
+          subscript_expression: ar[1]
+            identifier: ar
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          number_literal: 42
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int ar[2] = {314, 314};\n  print(ar[1]);\n  fun(ar);\n  print(ar[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[2] = {314, 314};\n  print(ar[1]);\n  fun(ar);\n  print(ar[1]);\n}
+      {: {
+      declaration: int ar[2] = {314, 314};
+        primitive_type: int
+        init_declarator: ar[2] = {314, 314}
+          array_declarator: ar[2]
+            identifier: ar
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {314, 314}
+            {: {
+            number_literal: 314
+            ,: ,
+            number_literal: 314
+            }: }
+        ;: ;
+      expression_statement: print(ar[1]);
+        call_expression: print(ar[1])
+          identifier: print
+          argument_list: (ar[1])
+            (: (
+            subscript_expression: ar[1]
+              identifier: ar
+              [: [
+              number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: fun(ar);
+        call_expression: fun(ar)
+          identifier: fun
+          argument_list: (ar)
+            (: (
+            identifier: ar
+            ): )
+        ;: ;
+      expression_statement: print(ar[1]);
+        call_expression: print(ar[1])
+          identifier: print
+          argument_list: (ar[1])
+            (: (
+            subscript_expression: ar[1]
+              identifier: ar
+              [: [
+              number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      }: }

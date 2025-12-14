@@ -1,0 +1,12 @@
+_global_inits:
+main:
+  StackMalloc('3')
+  Assign(Stackframe(Num('0'), IntType()), Num('42'))
+  Assign(Stackframe(Num('2'), StructSpec(Name('Point'))), Array([Num('10'), Num('20')], Empty()))
+  Debug()
+  Exp(Call(Name('print'), [BinOp(SizeOf(Name('a')), Add(), Num('41'))]), Empty())
+  Debug()
+  Exp(Call(Name('print'), [SizeOf(Name('p'))]), Empty())
+  Debug()
+  Exp(Call(Name('print'), [SizeOf(StructSpec(Name('Point')))]), Empty())
+  Return(Num('0'))

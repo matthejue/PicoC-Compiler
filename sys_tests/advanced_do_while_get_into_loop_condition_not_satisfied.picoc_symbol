@@ -1,0 +1,24 @@
+_global_inits:
+main:
+  StackMalloc('2')
+  Assign(Alloc(Const(), IntType(), Name('min'), 'local_var'), Num('0'))
+  Assign(Stackframe(Num('1'), IntType()), Call(Name('input'), []))
+  // DoWhile(Atom(Name('i'), Gt(), Name('min')), [Exp(Call(Name('print'), [UnOp(Minus(), Name('i'))]), Empty())])
+  GoTo(Name('do_while_branch.1'))
+do_while_branch.1:
+  Exp(Call(Name('print'), [UnOp(Minus(), Stackframe(Num('1'), IntType()))]), Empty()), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('1'), 
+        IntType()), 
+      Gt(), 
+      Num('0')), 
+    [
+      GoTo(Name('do_while_branch.1'))
+    ], 
+    [
+      GoTo(Name('do_while_after.0'))
+    ])
+do_while_after.0:
+  Return(Empty())

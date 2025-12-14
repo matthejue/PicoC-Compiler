@@ -1,0 +1,104 @@
+translation_unit: void main() {\n  \n  int *pntr_on_int;\n  \n  int (*pntr_on_array)[3];\n\n  \n  int ar[3] = {1, input(), 3};\n\n  \n  pntr_on_int = &*ar;\n  \n  \n  print(*(pntr_on_int + 1));\n\n  \n  pntr_on_array = &ar;\n  print(*(*pntr_on_array + 1));\n}\n
+  function_definition: void main() {\n  \n  int *pntr_on_int;\n  \n  int (*pntr_on_array)[3];\n\n  \n  int ar[3] = {1, input(), 3};\n\n  \n  pntr_on_int = &*ar;\n  \n  \n  print(*(pntr_on_int + 1));\n\n  \n  pntr_on_array = &ar;\n  print(*(*pntr_on_array + 1));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  int *pntr_on_int;\n  \n  int (*pntr_on_array)[3];\n\n  \n  int ar[3] = {1, input(), 3};\n\n  \n  pntr_on_int = &*ar;\n  \n  \n  print(*(pntr_on_int + 1));\n\n  \n  pntr_on_array = &ar;\n  print(*(*pntr_on_array + 1));\n}
+      {: {
+      declaration: int *pntr_on_int;
+        primitive_type: int
+        pointer_declarator: *pntr_on_int
+          *: *
+          identifier: pntr_on_int
+        ;: ;
+      declaration: int (*pntr_on_array)[3];
+        primitive_type: int
+        array_declarator: (*pntr_on_array)[3]
+          parenthesized_declarator: (*pntr_on_array)
+            (: (
+            pointer_declarator: *pntr_on_array
+              *: *
+              identifier: pntr_on_array
+            ): )
+          [: [
+          number_literal: 3
+          ]: ]
+        ;: ;
+      declaration: int ar[3] = {1, input(), 3};
+        primitive_type: int
+        init_declarator: ar[3] = {1, input(), 3}
+          array_declarator: ar[3]
+            identifier: ar
+            [: [
+            number_literal: 3
+            ]: ]
+          =: =
+          initializer_list: {1, input(), 3}
+            {: {
+            number_literal: 1
+            ,: ,
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            ,: ,
+            number_literal: 3
+            }: }
+        ;: ;
+      expression_statement: pntr_on_int = &*ar;
+        assignment_expression: pntr_on_int = &*ar
+          identifier: pntr_on_int
+          =: =
+          pointer_expression: &*ar
+            &: &
+            pointer_expression: *ar
+              *: *
+              identifier: ar
+        ;: ;
+      expression_statement: print(*(pntr_on_int + 1));
+        call_expression: print(*(pntr_on_int + 1))
+          identifier: print
+          argument_list: (*(pntr_on_int + 1))
+            (: (
+            pointer_expression: *(pntr_on_int + 1)
+              *: *
+              parenthesized_expression: (pntr_on_int + 1)
+                (: (
+                binary_expression: pntr_on_int + 1
+                  identifier: pntr_on_int
+                  +: +
+                  number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      expression_statement: pntr_on_array = &ar;
+        assignment_expression: pntr_on_array = &ar
+          identifier: pntr_on_array
+          =: =
+          pointer_expression: &ar
+            &: &
+            identifier: ar
+        ;: ;
+      expression_statement: print(*(*pntr_on_array + 1));
+        call_expression: print(*(*pntr_on_array + 1))
+          identifier: print
+          argument_list: (*(*pntr_on_array + 1))
+            (: (
+            pointer_expression: *(*pntr_on_array + 1)
+              *: *
+              parenthesized_expression: (*pntr_on_array + 1)
+                (: (
+                binary_expression: *pntr_on_array + 1
+                  pointer_expression: *pntr_on_array
+                    *: *
+                    identifier: pntr_on_array
+                  +: +
+                  number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      }: }

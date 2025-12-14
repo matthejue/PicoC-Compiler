@@ -1,0 +1,115 @@
+translation_unit: int gcd(int a, int b) {\n  int c;\n  while (b != 0) {\n    c = a % b;\n    a = b;\n    b = c;\n  }\n  return a;\n}\n\nvoid main() {\n  print(gcd(input(), input()));\n  print(gcd(input(), input()));\n}\n
+  function_definition: int gcd(int a, int b) {\n  int c;\n  while (b != 0) {\n    c = a % b;\n    a = b;\n    b = c;\n  }\n  return a;\n}
+    primitive_type: int
+    function_declarator: gcd(int a, int b)
+      identifier: gcd
+      parameter_list: (int a, int b)
+        (: (
+        parameter_declaration: int a
+          primitive_type: int
+          identifier: a
+        ,: ,
+        parameter_declaration: int b
+          primitive_type: int
+          identifier: b
+        ): )
+    compound_statement: {\n  int c;\n  while (b != 0) {\n    c = a % b;\n    a = b;\n    b = c;\n  }\n  return a;\n}
+      {: {
+      declaration: int c;
+        primitive_type: int
+        identifier: c
+        ;: ;
+      while_statement: while (b != 0) {\n    c = a % b;\n    a = b;\n    b = c;\n  }
+        while: while
+        parenthesized_expression: (b != 0)
+          (: (
+          binary_expression: b != 0
+            identifier: b
+            !=: !=
+            number_literal: 0
+          ): )
+        compound_statement: {\n    c = a % b;\n    a = b;\n    b = c;\n  }
+          {: {
+          expression_statement: c = a % b;
+            assignment_expression: c = a % b
+              identifier: c
+              =: =
+              binary_expression: a % b
+                identifier: a
+                %: %
+                identifier: b
+            ;: ;
+          expression_statement: a = b;
+            assignment_expression: a = b
+              identifier: a
+              =: =
+              identifier: b
+            ;: ;
+          expression_statement: b = c;
+            assignment_expression: b = c
+              identifier: b
+              =: =
+              identifier: c
+            ;: ;
+          }: }
+      return_statement: return a;
+        return: return
+        identifier: a
+        ;: ;
+      }: }
+  function_definition: void main() {\n  print(gcd(input(), input()));\n  print(gcd(input(), input()));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(gcd(input(), input()));\n  print(gcd(input(), input()));\n}
+      {: {
+      expression_statement: print(gcd(input(), input()));
+        call_expression: print(gcd(input(), input()))
+          identifier: print
+          argument_list: (gcd(input(), input()))
+            (: (
+            call_expression: gcd(input(), input())
+              identifier: gcd
+              argument_list: (input(), input())
+                (: (
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ,: ,
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      expression_statement: print(gcd(input(), input()));
+        call_expression: print(gcd(input(), input()))
+          identifier: print
+          argument_list: (gcd(input(), input()))
+            (: (
+            call_expression: gcd(input(), input())
+              identifier: gcd
+              argument_list: (input(), input())
+                (: (
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ,: ,
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      }: }

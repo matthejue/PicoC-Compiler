@@ -1,0 +1,100 @@
+_global_inits:
+main:
+  StackMalloc('9')
+  Assign(Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())), Array([Num('1'), Call(Name('input'), []), Num('3')], Empty()))
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('ar2'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('i'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('ar3'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), ArrayDecl(Num('3'), IntType()), Name('ar_assign'), 'local_var'), Empty())
+  Assign(Stackframe(Num('3'), PntrDecl(IntType())), Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())))
+  Assign(Stackframe(Num('4'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Num('3')), [Exp(Call(Name('print'), [Deref(Name('ar2'), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.11'))
+condition_check.11:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('4'), 
+        IntType()), 
+      Lt(), 
+      Num('3')), 
+    [
+      GoTo(Name('while_branch.10'))
+    ], 
+    [
+      GoTo(Name('while_after.9'))
+    ])
+while_branch.10:
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('3'), PntrDecl(IntType())), Stackframe(Num('4'), IntType()), Empty())]), Empty())
+  Assign(Stackframe(Num('4'), IntType()), BinOp(Stackframe(Num('4'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.11'))
+while_after.9:
+  Assign(Stackframe(Num('5'), PntrDecl(IntType())), Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())))
+  Assign(Stackframe(Num('4'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Num('3')), [Exp(Call(Name('print'), [Deref(Name('ar3'), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.8'))
+condition_check.8:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('4'), 
+        IntType()), 
+      Lt(), 
+      Num('3')), 
+    [
+      GoTo(Name('while_branch.7'))
+    ], 
+    [
+      GoTo(Name('while_after.6'))
+    ])
+while_branch.7:
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('5'), PntrDecl(IntType())), Stackframe(Num('4'), IntType()), Empty())]), Empty())
+  Assign(Stackframe(Num('4'), IntType()), BinOp(Stackframe(Num('4'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.8'))
+while_after.6:
+  Assign(Deref(Stackframe(Num('8'), ArrayDecl(Num('3'), IntType())), Num('0'), Empty()), Deref(Stackframe(Num('5'), PntrDecl(IntType())), Num('0'), Empty()))
+  Assign(Stackframe(Num('4'), IntType()), Num('1'))
+  // While(Atom(Name('i'), Lt(), Num('3')), [Assign(Deref(Name('ar_assign'), Name('i'), Empty()), Deref(Name('ar3'), Name('i'), Empty())), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.5'))
+condition_check.5:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('4'), 
+        IntType()), 
+      Lt(), 
+      Num('3')), 
+    [
+      GoTo(Name('while_branch.4'))
+    ], 
+    [
+      GoTo(Name('while_after.3'))
+    ])
+while_branch.4:
+  Assign(Deref(Stackframe(Num('8'), ArrayDecl(Num('3'), IntType())), Stackframe(Num('4'), IntType()), Empty()), Deref(Stackframe(Num('5'), PntrDecl(IntType())), Stackframe(Num('4'), IntType()), Empty()))
+  Assign(Stackframe(Num('4'), IntType()), BinOp(Stackframe(Num('4'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.5'))
+while_after.3:
+  Assign(Stackframe(Num('4'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Num('3')), [Exp(Call(Name('print'), [Deref(Name('ar3'), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.2'))
+condition_check.2:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('4'), 
+        IntType()), 
+      Lt(), 
+      Num('3')), 
+    [
+      GoTo(Name('while_branch.1'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.1:
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('5'), PntrDecl(IntType())), Stackframe(Num('4'), IntType()), Empty())]), Empty())
+  Assign(Stackframe(Num('4'), IntType()), BinOp(Stackframe(Num('4'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.2'))
+while_after.0:
+  Return(Empty())

@@ -1,0 +1,48 @@
+{
+  "ExStrc": {
+    "attr1": {
+      "addr": "Empty()",
+      "datatype": "CharType()",
+      "name": "attr1",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "attr2": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "attr2",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "ExStrc": {
+      "attrs": [
+        "Name('attr1')",
+        "Name('attr2')"
+      ],
+      "datatype": "StructDecl(Name('ExStrc'), [Alloc(Writeable(), CharType(), Name('attr1'), 'local_var'), Alloc(Writeable(), IntType(), Name('attr2'), 'local_var')])",
+      "name": "ExStrc",
+      "size": 2,
+      "type_qual": "Empty()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "exstrc": {
+      "addr": 1,
+      "datatype": "StructSpec(Name('ExStrc'))",
+      "name": "exstrc",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  }
+}

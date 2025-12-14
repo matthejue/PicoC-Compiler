@@ -1,0 +1,102 @@
+translation_unit: void fun_declared_before(int *param);\n\nint fun_defined(int param) {\n  return param + 10;\n}\n\nvoid main() {\n  int res = fun_defined(22);\n  fun_declared_before(&res);\n  print(res);\n}\n\nvoid fun_declared_before(int *param) {\n  *param = *param + 10;\n}\n
+  declaration: void fun_declared_before(int *param);
+    primitive_type: void
+    function_declarator: fun_declared_before(int *param)
+      identifier: fun_declared_before
+      parameter_list: (int *param)
+        (: (
+        parameter_declaration: int *param
+          primitive_type: int
+          pointer_declarator: *param
+            *: *
+            identifier: param
+        ): )
+    ;: ;
+  function_definition: int fun_defined(int param) {\n  return param + 10;\n}
+    primitive_type: int
+    function_declarator: fun_defined(int param)
+      identifier: fun_defined
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  return param + 10;\n}
+      {: {
+      return_statement: return param + 10;
+        return: return
+        binary_expression: param + 10
+          identifier: param
+          +: +
+          number_literal: 10
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int res = fun_defined(22);\n  fun_declared_before(&res);\n  print(res);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int res = fun_defined(22);\n  fun_declared_before(&res);\n  print(res);\n}
+      {: {
+      declaration: int res = fun_defined(22);
+        primitive_type: int
+        init_declarator: res = fun_defined(22)
+          identifier: res
+          =: =
+          call_expression: fun_defined(22)
+            identifier: fun_defined
+            argument_list: (22)
+              (: (
+              number_literal: 22
+              ): )
+        ;: ;
+      expression_statement: fun_declared_before(&res);
+        call_expression: fun_declared_before(&res)
+          identifier: fun_declared_before
+          argument_list: (&res)
+            (: (
+            pointer_expression: &res
+              &: &
+              identifier: res
+            ): )
+        ;: ;
+      expression_statement: print(res);
+        call_expression: print(res)
+          identifier: print
+          argument_list: (res)
+            (: (
+            identifier: res
+            ): )
+        ;: ;
+      }: }
+  function_definition: void fun_declared_before(int *param) {\n  *param = *param + 10;\n}
+    primitive_type: void
+    function_declarator: fun_declared_before(int *param)
+      identifier: fun_declared_before
+      parameter_list: (int *param)
+        (: (
+        parameter_declaration: int *param
+          primitive_type: int
+          pointer_declarator: *param
+            *: *
+            identifier: param
+        ): )
+    compound_statement: {\n  *param = *param + 10;\n}
+      {: {
+      expression_statement: *param = *param + 10;
+        assignment_expression: *param = *param + 10
+          pointer_expression: *param
+            *: *
+            identifier: param
+          =: =
+          binary_expression: *param + 10
+            pointer_expression: *param
+              *: *
+              identifier: param
+            +: +
+            number_literal: 10
+        ;: ;
+      }: }

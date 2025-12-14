@@ -1,0 +1,77 @@
+_global_inits:
+main:
+  StackMalloc('8')
+  Assign(Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())), Array([Num('1'), Num('2'), Num('3')], Empty()))
+  Assign(Stackframe(Num('6'), StructSpec(Name('array_with_len'))), Struct([Assign(Name('ar'), Array([Num('4'), Num('5'), Num('6')], Empty())), Assign(Name('len'), Num('3'))], Empty()))
+  Exp(Alloc(Writeable(), IntType(), Name('len'), 'local_var'), Empty())
+  Assign(Stackframe(Num('7'), IntType()), Num('3'))
+  Exp(Call(Name('print_all_pntr'), [Ref(Stackframe(Num('7'), IntType()), Empty()), Stackframe(Num('2'), ArrayDecl(Num('3'), IntType())), Ref(Stackframe(Num('6'), StructSpec(Name('array_with_len'))), Empty())]), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Stackframe(Num('6'), StructSpec(Name('array_with_len'))), Name('ar'), Empty()), Num('2'), Empty())]), Empty())
+  Return(Empty())
+print_all_pntr:
+  StackMalloc('1')
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('len_ref'), 'param'), Empty())
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('ar_ref'), 'param'), Empty())
+  Exp(Alloc(Writeable(), PntrDecl(StructSpec(Name('array_with_len'))), Name('st_ar_ref'), 'param'), Empty())
+  Assign(Stackframe(Num('3'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Deref(Name('len_ref'), Num('0'), Empty())), [Exp(Call(Name('print'), [Deref(Name('ar_ref'), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.6'))
+condition_check.6:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      Lt(), 
+      Deref(
+        Stackframe(
+          Num('0'), 
+          PntrDecl(
+            IntType())), 
+        Num('0'), 
+        Empty())), 
+    [
+      GoTo(Name('while_branch.5'))
+    ], 
+    [
+      GoTo(Name('while_after.4'))
+    ])
+while_branch.5:
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('1'), PntrDecl(IntType())), Stackframe(Num('3'), IntType()), Empty())]), Empty())
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('3'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.6'))
+while_after.4:
+  Assign(Stackframe(Num('3'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Attr(Deref(Name('st_ar_ref'), Num('0'), Empty()), Name('len'), Empty())), [Exp(Call(Name('print'), [Deref(Attr(Deref(Name('st_ar_ref'), Num('0'), Empty()), Name('ar'), Empty()), Name('i'), Empty())]), Empty()), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.3'))
+condition_check.3:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      Lt(), 
+      Attr(
+        Deref(
+          Stackframe(
+            Num('2'), 
+            PntrDecl(
+              StructSpec(
+                Name('array_with_len')))), 
+          Num('0'), 
+          Empty()), 
+        Name('len'), 
+        Empty())), 
+    [
+      GoTo(Name('while_branch.2'))
+    ], 
+    [
+      GoTo(Name('while_after.1'))
+    ])
+while_branch.2:
+  Exp(Call(Name('print'), [Deref(Attr(Deref(Stackframe(Num('2'), PntrDecl(StructSpec(Name('array_with_len')))), Num('0'), Empty()), Name('ar'), Empty()), Stackframe(Num('3'), IntType()), Empty())]), Empty())
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('3'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.3'))
+while_after.1:
+  Assign(Deref(Attr(Deref(Stackframe(Num('2'), PntrDecl(StructSpec(Name('array_with_len')))), Num('0'), Empty()), Name('ar'), Empty()), Num('2'), Empty()), Call(Name('input'), []))
+  Return(Empty())

@@ -1,0 +1,72 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "st1": {
+      "attrs": [
+        "Name('ar')"
+      ],
+      "datatype": "StructDecl(Name('st1'), [Alloc(Writeable(), PntrDecl(ArrayDecl(Num('1'), IntType())), Name('ar'), 'local_var')])",
+      "name": "st1",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "st2": {
+      "attrs": [
+        "Name('st')"
+      ],
+      "datatype": "StructDecl(Name('st2'), [Alloc(Writeable(), PntrDecl(StructSpec(Name('st1'))), Name('st'), 'local_var')])",
+      "name": "st2",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "st_first": {
+      "addr": 1,
+      "datatype": "StructSpec(Name('st1'))",
+      "name": "st_first",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "st_second": {
+      "addr": 2,
+      "datatype": "StructSpec(Name('st2'))",
+      "name": "st_second",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "var": {
+      "addr": 0,
+      "datatype": "ArrayDecl(Num('1'), IntType())",
+      "name": "var",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "st1": {
+    "ar": {
+      "addr": "Empty()",
+      "datatype": "PntrDecl(ArrayDecl(Num('1'), IntType()))",
+      "name": "ar",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "st2": {
+    "st": {
+      "addr": "Empty()",
+      "datatype": "PntrDecl(StructSpec(Name('st1')))",
+      "name": "st",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  }
+}

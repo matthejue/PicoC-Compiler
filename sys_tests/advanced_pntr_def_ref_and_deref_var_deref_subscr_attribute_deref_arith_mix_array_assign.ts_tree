@@ -1,0 +1,249 @@
+translation_unit: struct array_with_len {int *ar; int len;};\n\nvoid main() {\n  \n  int *pntr_on_int;  \n  int **pntr_on_pntr;  \n  \n  int var = input();\n  int ar[3] = {4, 2, input()};\n  struct array_with_len st_ar = {.ar=ar, .len=3};\n  pntr_on_int = &var;\n  print(*pntr_on_int);\n  \n  pntr_on_int = &*(ar + 1 + 1);\n  print(*pntr_on_int);\n  \n  pntr_on_int = &ar[1 + 1];\n  print(*pntr_on_int);\n  \n  pntr_on_pntr = &st_ar.ar;\n  print(*(*pntr_on_pntr + st_ar.len - 1));\n  \n  print(*(pntr_on_pntr[0] + 2));\n  \n  *pntr_on_int = var * 2;\n  print(ar[2]);\n}\n
+  struct_specifier: struct array_with_len {int *ar; int len;}
+    struct: struct
+    type_identifier: array_with_len
+    field_declaration_list: {int *ar; int len;}
+      {: {
+      field_declaration: int *ar;
+        primitive_type: int
+        pointer_declarator: *ar
+          *: *
+          field_identifier: ar
+        ;: ;
+      field_declaration: int len;
+        primitive_type: int
+        field_identifier: len
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  \n  int *pntr_on_int;  \n  int **pntr_on_pntr;  \n  \n  int var = input();\n  int ar[3] = {4, 2, input()};\n  struct array_with_len st_ar = {.ar=ar, .len=3};\n  pntr_on_int = &var;\n  print(*pntr_on_int);\n  \n  pntr_on_int = &*(ar + 1 + 1);\n  print(*pntr_on_int);\n  \n  pntr_on_int = &ar[1 + 1];\n  print(*pntr_on_int);\n  \n  pntr_on_pntr = &st_ar.ar;\n  print(*(*pntr_on_pntr + st_ar.len - 1));\n  \n  print(*(pntr_on_pntr[0] + 2));\n  \n  *pntr_on_int = var * 2;\n  print(ar[2]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  int *pntr_on_int;  \n  int **pntr_on_pntr;  \n  \n  int var = input();\n  int ar[3] = {4, 2, input()};\n  struct array_with_len st_ar = {.ar=ar, .len=3};\n  pntr_on_int = &var;\n  print(*pntr_on_int);\n  \n  pntr_on_int = &*(ar + 1 + 1);\n  print(*pntr_on_int);\n  \n  pntr_on_int = &ar[1 + 1];\n  print(*pntr_on_int);\n  \n  pntr_on_pntr = &st_ar.ar;\n  print(*(*pntr_on_pntr + st_ar.len - 1));\n  \n  print(*(pntr_on_pntr[0] + 2));\n  \n  *pntr_on_int = var * 2;\n  print(ar[2]);\n}
+      {: {
+      declaration: int *pntr_on_int;
+        primitive_type: int
+        pointer_declarator: *pntr_on_int
+          *: *
+          identifier: pntr_on_int
+        ;: ;
+      declaration: int **pntr_on_pntr;
+        primitive_type: int
+        pointer_declarator: **pntr_on_pntr
+          *: *
+          pointer_declarator: *pntr_on_pntr
+            *: *
+            identifier: pntr_on_pntr
+        ;: ;
+      declaration: int var = input();
+        primitive_type: int
+        init_declarator: var = input()
+          identifier: var
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      declaration: int ar[3] = {4, 2, input()};
+        primitive_type: int
+        init_declarator: ar[3] = {4, 2, input()}
+          array_declarator: ar[3]
+            identifier: ar
+            [: [
+            number_literal: 3
+            ]: ]
+          =: =
+          initializer_list: {4, 2, input()}
+            {: {
+            number_literal: 4
+            ,: ,
+            number_literal: 2
+            ,: ,
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            }: }
+        ;: ;
+      declaration: struct array_with_len st_ar = {.ar=ar, .len=3};
+        struct_specifier: struct array_with_len
+          struct: struct
+          type_identifier: array_with_len
+        init_declarator: st_ar = {.ar=ar, .len=3}
+          identifier: st_ar
+          =: =
+          initializer_list: {.ar=ar, .len=3}
+            {: {
+            initializer_pair: .ar=ar
+              field_designator: .ar
+                .: .
+                field_identifier: ar
+              =: =
+              identifier: ar
+            ,: ,
+            initializer_pair: .len=3
+              field_designator: .len
+                .: .
+                field_identifier: len
+              =: =
+              number_literal: 3
+            }: }
+        ;: ;
+      expression_statement: pntr_on_int = &var;
+        assignment_expression: pntr_on_int = &var
+          identifier: pntr_on_int
+          =: =
+          pointer_expression: &var
+            &: &
+            identifier: var
+        ;: ;
+      expression_statement: print(*pntr_on_int);
+        call_expression: print(*pntr_on_int)
+          identifier: print
+          argument_list: (*pntr_on_int)
+            (: (
+            pointer_expression: *pntr_on_int
+              *: *
+              identifier: pntr_on_int
+            ): )
+        ;: ;
+      expression_statement: pntr_on_int = &*(ar + 1 + 1);
+        assignment_expression: pntr_on_int = &*(ar + 1 + 1)
+          identifier: pntr_on_int
+          =: =
+          pointer_expression: &*(ar + 1 + 1)
+            &: &
+            pointer_expression: *(ar + 1 + 1)
+              *: *
+              parenthesized_expression: (ar + 1 + 1)
+                (: (
+                binary_expression: ar + 1 + 1
+                  binary_expression: ar + 1
+                    identifier: ar
+                    +: +
+                    number_literal: 1
+                  +: +
+                  number_literal: 1
+                ): )
+        ;: ;
+      expression_statement: print(*pntr_on_int);
+        call_expression: print(*pntr_on_int)
+          identifier: print
+          argument_list: (*pntr_on_int)
+            (: (
+            pointer_expression: *pntr_on_int
+              *: *
+              identifier: pntr_on_int
+            ): )
+        ;: ;
+      expression_statement: pntr_on_int = &ar[1 + 1];
+        assignment_expression: pntr_on_int = &ar[1 + 1]
+          identifier: pntr_on_int
+          =: =
+          pointer_expression: &ar[1 + 1]
+            &: &
+            subscript_expression: ar[1 + 1]
+              identifier: ar
+              [: [
+              binary_expression: 1 + 1
+                number_literal: 1
+                +: +
+                number_literal: 1
+              ]: ]
+        ;: ;
+      expression_statement: print(*pntr_on_int);
+        call_expression: print(*pntr_on_int)
+          identifier: print
+          argument_list: (*pntr_on_int)
+            (: (
+            pointer_expression: *pntr_on_int
+              *: *
+              identifier: pntr_on_int
+            ): )
+        ;: ;
+      expression_statement: pntr_on_pntr = &st_ar.ar;
+        assignment_expression: pntr_on_pntr = &st_ar.ar
+          identifier: pntr_on_pntr
+          =: =
+          pointer_expression: &st_ar.ar
+            &: &
+            field_expression: st_ar.ar
+              identifier: st_ar
+              .: .
+              field_identifier: ar
+        ;: ;
+      expression_statement: print(*(*pntr_on_pntr + st_ar.len - 1));
+        call_expression: print(*(*pntr_on_pntr + st_ar.len - 1))
+          identifier: print
+          argument_list: (*(*pntr_on_pntr + st_ar.len - 1))
+            (: (
+            pointer_expression: *(*pntr_on_pntr + st_ar.len - 1)
+              *: *
+              parenthesized_expression: (*pntr_on_pntr + st_ar.len - 1)
+                (: (
+                binary_expression: *pntr_on_pntr + st_ar.len - 1
+                  binary_expression: *pntr_on_pntr + st_ar.len
+                    pointer_expression: *pntr_on_pntr
+                      *: *
+                      identifier: pntr_on_pntr
+                    +: +
+                    field_expression: st_ar.len
+                      identifier: st_ar
+                      .: .
+                      field_identifier: len
+                  -: -
+                  number_literal: 1
+                ): )
+            ): )
+        ;: ;
+      expression_statement: print(*(pntr_on_pntr[0] + 2));
+        call_expression: print(*(pntr_on_pntr[0] + 2))
+          identifier: print
+          argument_list: (*(pntr_on_pntr[0] + 2))
+            (: (
+            pointer_expression: *(pntr_on_pntr[0] + 2)
+              *: *
+              parenthesized_expression: (pntr_on_pntr[0] + 2)
+                (: (
+                binary_expression: pntr_on_pntr[0] + 2
+                  subscript_expression: pntr_on_pntr[0]
+                    identifier: pntr_on_pntr
+                    [: [
+                    number_literal: 0
+                    ]: ]
+                  +: +
+                  number_literal: 2
+                ): )
+            ): )
+        ;: ;
+      expression_statement: *pntr_on_int = var * 2;
+        assignment_expression: *pntr_on_int = var * 2
+          pointer_expression: *pntr_on_int
+            *: *
+            identifier: pntr_on_int
+          =: =
+          binary_expression: var * 2
+            identifier: var
+            *: *
+            number_literal: 2
+        ;: ;
+      expression_statement: print(ar[2]);
+        call_expression: print(ar[2])
+          identifier: print
+          argument_list: (ar[2])
+            (: (
+            subscript_expression: ar[2]
+              identifier: ar
+              [: [
+              number_literal: 2
+              ]: ]
+            ): )
+        ;: ;
+      }: }

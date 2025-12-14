@@ -1,0 +1,62 @@
+translation_unit: void main() {\n  print(42);\n  return;\n}\n\nvoid fun1() {\n  print(42);\n}\n\nint fun2() {\n  print(42);\n  return 1;\n}\n
+  function_definition: void main() {\n  print(42);\n  return;\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(42);\n  return;\n}
+      {: {
+      expression_statement: print(42);
+        call_expression: print(42)
+          identifier: print
+          argument_list: (42)
+            (: (
+            number_literal: 42
+            ): )
+        ;: ;
+      return_statement: return;
+        return: return
+        ;: ;
+      }: }
+  function_definition: void fun1() {\n  print(42);\n}
+    primitive_type: void
+    function_declarator: fun1()
+      identifier: fun1
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(42);\n}
+      {: {
+      expression_statement: print(42);
+        call_expression: print(42)
+          identifier: print
+          argument_list: (42)
+            (: (
+            number_literal: 42
+            ): )
+        ;: ;
+      }: }
+  function_definition: int fun2() {\n  print(42);\n  return 1;\n}
+    primitive_type: int
+    function_declarator: fun2()
+      identifier: fun2
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(42);\n  return 1;\n}
+      {: {
+      expression_statement: print(42);
+        call_expression: print(42)
+          identifier: print
+          argument_list: (42)
+            (: (
+            number_literal: 42
+            ): )
+        ;: ;
+      return_statement: return 1;
+        return: return
+        number_literal: 1
+        ;: ;
+      }: }

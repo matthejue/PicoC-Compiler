@@ -1,0 +1,112 @@
+translation_unit: struct Data {\n    int arr0[2];\n    int arr1[2];\n};\n\nvoid main() {\n    struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};\n    struct Data *ptr = &obj;\n\n    int x = (*ptr).arr1[1];\n\n    print(x);\n}\n
+  struct_specifier: struct Data {\n    int arr0[2];\n    int arr1[2];\n}
+    struct: struct
+    type_identifier: Data
+    field_declaration_list: {\n    int arr0[2];\n    int arr1[2];\n}
+      {: {
+      field_declaration: int arr0[2];
+        primitive_type: int
+        array_declarator: arr0[2]
+          field_identifier: arr0
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      field_declaration: int arr1[2];
+        primitive_type: int
+        array_declarator: arr1[2]
+          field_identifier: arr1
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n    struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};\n    struct Data *ptr = &obj;\n\n    int x = (*ptr).arr1[1];\n\n    print(x);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n    struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};\n    struct Data *ptr = &obj;\n\n    int x = (*ptr).arr1[1];\n\n    print(x);\n}
+      {: {
+      declaration: struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};
+        struct_specifier: struct Data
+          struct: struct
+          type_identifier: Data
+        init_declarator: obj = {.arr0={1, 2}, .arr1={3, input()}}
+          identifier: obj
+          =: =
+          initializer_list: {.arr0={1, 2}, .arr1={3, input()}}
+            {: {
+            initializer_pair: .arr0={1, 2}
+              field_designator: .arr0
+                .: .
+                field_identifier: arr0
+              =: =
+              initializer_list: {1, 2}
+                {: {
+                number_literal: 1
+                ,: ,
+                number_literal: 2
+                }: }
+            ,: ,
+            initializer_pair: .arr1={3, input()}
+              field_designator: .arr1
+                .: .
+                field_identifier: arr1
+              =: =
+              initializer_list: {3, input()}
+                {: {
+                number_literal: 3
+                ,: ,
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                }: }
+            }: }
+        ;: ;
+      declaration: struct Data *ptr = &obj;
+        struct_specifier: struct Data
+          struct: struct
+          type_identifier: Data
+        init_declarator: *ptr = &obj
+          pointer_declarator: *ptr
+            *: *
+            identifier: ptr
+          =: =
+          pointer_expression: &obj
+            &: &
+            identifier: obj
+        ;: ;
+      declaration: int x = (*ptr).arr1[1];
+        primitive_type: int
+        init_declarator: x = (*ptr).arr1[1]
+          identifier: x
+          =: =
+          subscript_expression: (*ptr).arr1[1]
+            field_expression: (*ptr).arr1
+              parenthesized_expression: (*ptr)
+                (: (
+                pointer_expression: *ptr
+                  *: *
+                  identifier: ptr
+                ): )
+              .: .
+              field_identifier: arr1
+            [: [
+            number_literal: 1
+            ]: ]
+        ;: ;
+      expression_statement: print(x);
+        call_expression: print(x)
+          identifier: print
+          argument_list: (x)
+            (: (
+            identifier: x
+            ): )
+        ;: ;
+      }: }

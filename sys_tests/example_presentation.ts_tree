@@ -1,0 +1,213 @@
+translation_unit: struct stt {int attr1; int attr2[2];};\n\nstruct stt ar_of_sts[3][2];\n\nint fun(struct stt (*param)[3][2]);\n\nvoid main() {\n  struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;\n  int res = fun(pntr_on_ar_of_sts);\n  if (res) {\n    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);\n  }\n}\n\nint fun(struct stt (*param)[3][2]){\n  (*(*param+2))[1].attr2[input()] = 42;\n  return 1;\n}\n\n
+  struct_specifier: struct stt {int attr1; int attr2[2];}
+    struct: struct
+    type_identifier: stt
+    field_declaration_list: {int attr1; int attr2[2];}
+      {: {
+      field_declaration: int attr1;
+        primitive_type: int
+        field_identifier: attr1
+        ;: ;
+      field_declaration: int attr2[2];
+        primitive_type: int
+        array_declarator: attr2[2]
+          field_identifier: attr2
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      }: }
+  ;: ;
+  declaration: struct stt ar_of_sts[3][2];
+    struct_specifier: struct stt
+      struct: struct
+      type_identifier: stt
+    array_declarator: ar_of_sts[3][2]
+      array_declarator: ar_of_sts[3]
+        identifier: ar_of_sts
+        [: [
+        number_literal: 3
+        ]: ]
+      [: [
+      number_literal: 2
+      ]: ]
+    ;: ;
+  declaration: int fun(struct stt (*param)[3][2]);
+    primitive_type: int
+    function_declarator: fun(struct stt (*param)[3][2])
+      identifier: fun
+      parameter_list: (struct stt (*param)[3][2])
+        (: (
+        parameter_declaration: struct stt (*param)[3][2]
+          struct_specifier: struct stt
+            struct: struct
+            type_identifier: stt
+          array_declarator: (*param)[3][2]
+            array_declarator: (*param)[3]
+              parenthesized_declarator: (*param)
+                (: (
+                pointer_declarator: *param
+                  *: *
+                  identifier: param
+                ): )
+              [: [
+              number_literal: 3
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+        ): )
+    ;: ;
+  function_definition: void main() {\n  struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;\n  int res = fun(pntr_on_ar_of_sts);\n  if (res) {\n    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);\n  }\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;\n  int res = fun(pntr_on_ar_of_sts);\n  if (res) {\n    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);\n  }\n}
+      {: {
+      declaration: struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;
+        struct_specifier: struct stt
+          struct: struct
+          type_identifier: stt
+        init_declarator: (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts
+          array_declarator: (*pntr_on_ar_of_sts)[3][2]
+            array_declarator: (*pntr_on_ar_of_sts)[3]
+              parenthesized_declarator: (*pntr_on_ar_of_sts)
+                (: (
+                pointer_declarator: *pntr_on_ar_of_sts
+                  *: *
+                  identifier: pntr_on_ar_of_sts
+                ): )
+              [: [
+              number_literal: 3
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          pointer_expression: &ar_of_sts
+            &: &
+            identifier: ar_of_sts
+        ;: ;
+      declaration: int res = fun(pntr_on_ar_of_sts);
+        primitive_type: int
+        init_declarator: res = fun(pntr_on_ar_of_sts)
+          identifier: res
+          =: =
+          call_expression: fun(pntr_on_ar_of_sts)
+            identifier: fun
+            argument_list: (pntr_on_ar_of_sts)
+              (: (
+              identifier: pntr_on_ar_of_sts
+              ): )
+        ;: ;
+      if_statement: if (res) {\n    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);\n  }
+        if: if
+        parenthesized_expression: (res)
+          (: (
+          identifier: res
+          ): )
+        compound_statement: {\n    print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);\n  }
+          {: {
+          expression_statement: print((*(*pntr_on_ar_of_sts+2))[1].attr2[1]);
+            call_expression: print((*(*pntr_on_ar_of_sts+2))[1].attr2[1])
+              identifier: print
+              argument_list: ((*(*pntr_on_ar_of_sts+2))[1].attr2[1])
+                (: (
+                subscript_expression: (*(*pntr_on_ar_of_sts+2))[1].attr2[1]
+                  field_expression: (*(*pntr_on_ar_of_sts+2))[1].attr2
+                    subscript_expression: (*(*pntr_on_ar_of_sts+2))[1]
+                      parenthesized_expression: (*(*pntr_on_ar_of_sts+2))
+                        (: (
+                        pointer_expression: *(*pntr_on_ar_of_sts+2)
+                          *: *
+                          parenthesized_expression: (*pntr_on_ar_of_sts+2)
+                            (: (
+                            binary_expression: *pntr_on_ar_of_sts+2
+                              pointer_expression: *pntr_on_ar_of_sts
+                                *: *
+                                identifier: pntr_on_ar_of_sts
+                              +: +
+                              number_literal: 2
+                            ): )
+                        ): )
+                      [: [
+                      number_literal: 1
+                      ]: ]
+                    .: .
+                    field_identifier: attr2
+                  [: [
+                  number_literal: 1
+                  ]: ]
+                ): )
+            ;: ;
+          }: }
+      }: }
+  function_definition: int fun(struct stt (*param)[3][2]){\n  (*(*param+2))[1].attr2[input()] = 42;\n  return 1;\n}
+    primitive_type: int
+    function_declarator: fun(struct stt (*param)[3][2])
+      identifier: fun
+      parameter_list: (struct stt (*param)[3][2])
+        (: (
+        parameter_declaration: struct stt (*param)[3][2]
+          struct_specifier: struct stt
+            struct: struct
+            type_identifier: stt
+          array_declarator: (*param)[3][2]
+            array_declarator: (*param)[3]
+              parenthesized_declarator: (*param)
+                (: (
+                pointer_declarator: *param
+                  *: *
+                  identifier: param
+                ): )
+              [: [
+              number_literal: 3
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+        ): )
+    compound_statement: {\n  (*(*param+2))[1].attr2[input()] = 42;\n  return 1;\n}
+      {: {
+      expression_statement: (*(*param+2))[1].attr2[input()] = 42;
+        assignment_expression: (*(*param+2))[1].attr2[input()] = 42
+          subscript_expression: (*(*param+2))[1].attr2[input()]
+            field_expression: (*(*param+2))[1].attr2
+              subscript_expression: (*(*param+2))[1]
+                parenthesized_expression: (*(*param+2))
+                  (: (
+                  pointer_expression: *(*param+2)
+                    *: *
+                    parenthesized_expression: (*param+2)
+                      (: (
+                      binary_expression: *param+2
+                        pointer_expression: *param
+                          *: *
+                          identifier: param
+                        +: +
+                        number_literal: 2
+                      ): )
+                  ): )
+                [: [
+                number_literal: 1
+                ]: ]
+              .: .
+              field_identifier: attr2
+            [: [
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            ]: ]
+          =: =
+          number_literal: 42
+        ;: ;
+      return_statement: return 1;
+        return: return
+        number_literal: 1
+        ;: ;
+      }: }

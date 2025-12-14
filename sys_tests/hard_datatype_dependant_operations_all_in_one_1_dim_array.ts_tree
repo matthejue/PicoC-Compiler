@@ -1,0 +1,299 @@
+translation_unit: struct compl_dt {int waste_space; int (*ar[1][2])[2];};\n\nvoid main() {\n  int ar1[2] = {1, 2};\n  int ar2[2] = {3, 4};\n  int ar3[2] = {5, 6};\n  int ar4[2] = {7, 8};\n  struct compl_dt compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}};\n  (*compl_datastructure[1][0].ar[0][1])[1] = input();\n  print((*compl_datastructure[1][0].ar[0][1])[0]);\n  print((*compl_datastructure[1][0].ar[0][1])[1]);\n}\n
+  struct_specifier: struct compl_dt {int waste_space; int (*ar[1][2])[2];}
+    struct: struct
+    type_identifier: compl_dt
+    field_declaration_list: {int waste_space; int (*ar[1][2])[2];}
+      {: {
+      field_declaration: int waste_space;
+        primitive_type: int
+        field_identifier: waste_space
+        ;: ;
+      field_declaration: int (*ar[1][2])[2];
+        primitive_type: int
+        array_declarator: (*ar[1][2])[2]
+          parenthesized_declarator: (*ar[1][2])
+            (: (
+            pointer_declarator: *ar[1][2]
+              *: *
+              array_declarator: ar[1][2]
+                array_declarator: ar[1]
+                  field_identifier: ar
+                  [: [
+                  number_literal: 1
+                  ]: ]
+                [: [
+                number_literal: 2
+                ]: ]
+            ): )
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  int ar1[2] = {1, 2};\n  int ar2[2] = {3, 4};\n  int ar3[2] = {5, 6};\n  int ar4[2] = {7, 8};\n  struct compl_dt compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}};\n  (*compl_datastructure[1][0].ar[0][1])[1] = input();\n  print((*compl_datastructure[1][0].ar[0][1])[0]);\n  print((*compl_datastructure[1][0].ar[0][1])[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar1[2] = {1, 2};\n  int ar2[2] = {3, 4};\n  int ar3[2] = {5, 6};\n  int ar4[2] = {7, 8};\n  struct compl_dt compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}};\n  (*compl_datastructure[1][0].ar[0][1])[1] = input();\n  print((*compl_datastructure[1][0].ar[0][1])[0]);\n  print((*compl_datastructure[1][0].ar[0][1])[1]);\n}
+      {: {
+      declaration: int ar1[2] = {1, 2};
+        primitive_type: int
+        init_declarator: ar1[2] = {1, 2}
+          array_declarator: ar1[2]
+            identifier: ar1
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {1, 2}
+            {: {
+            number_literal: 1
+            ,: ,
+            number_literal: 2
+            }: }
+        ;: ;
+      declaration: int ar2[2] = {3, 4};
+        primitive_type: int
+        init_declarator: ar2[2] = {3, 4}
+          array_declarator: ar2[2]
+            identifier: ar2
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {3, 4}
+            {: {
+            number_literal: 3
+            ,: ,
+            number_literal: 4
+            }: }
+        ;: ;
+      declaration: int ar3[2] = {5, 6};
+        primitive_type: int
+        init_declarator: ar3[2] = {5, 6}
+          array_declarator: ar3[2]
+            identifier: ar3
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {5, 6}
+            {: {
+            number_literal: 5
+            ,: ,
+            number_literal: 6
+            }: }
+        ;: ;
+      declaration: int ar4[2] = {7, 8};
+        primitive_type: int
+        init_declarator: ar4[2] = {7, 8}
+          array_declarator: ar4[2]
+            identifier: ar4
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {7, 8}
+            {: {
+            number_literal: 7
+            ,: ,
+            number_literal: 8
+            }: }
+        ;: ;
+      declaration: struct compl_dt compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}};
+        struct_specifier: struct compl_dt
+          struct: struct
+          type_identifier: compl_dt
+        init_declarator: compl_datastructure[2][1] = {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}}
+          array_declarator: compl_datastructure[2][1]
+            array_declarator: compl_datastructure[2]
+              identifier: compl_datastructure
+              [: [
+              number_literal: 2
+              ]: ]
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          initializer_list: {{{.waste_space=0, .ar={{&ar1, &ar2}}}}, {{.waste_space=1, .ar={{&ar3, &ar4}}}}}
+            {: {
+            initializer_list: {{.waste_space=0, .ar={{&ar1, &ar2}}}}
+              {: {
+              initializer_list: {.waste_space=0, .ar={{&ar1, &ar2}}}
+                {: {
+                initializer_pair: .waste_space=0
+                  field_designator: .waste_space
+                    .: .
+                    field_identifier: waste_space
+                  =: =
+                  number_literal: 0
+                ,: ,
+                initializer_pair: .ar={{&ar1, &ar2}}
+                  field_designator: .ar
+                    .: .
+                    field_identifier: ar
+                  =: =
+                  initializer_list: {{&ar1, &ar2}}
+                    {: {
+                    initializer_list: {&ar1, &ar2}
+                      {: {
+                      pointer_expression: &ar1
+                        &: &
+                        identifier: ar1
+                      ,: ,
+                      pointer_expression: &ar2
+                        &: &
+                        identifier: ar2
+                      }: }
+                    }: }
+                }: }
+              }: }
+            ,: ,
+            initializer_list: {{.waste_space=1, .ar={{&ar3, &ar4}}}}
+              {: {
+              initializer_list: {.waste_space=1, .ar={{&ar3, &ar4}}}
+                {: {
+                initializer_pair: .waste_space=1
+                  field_designator: .waste_space
+                    .: .
+                    field_identifier: waste_space
+                  =: =
+                  number_literal: 1
+                ,: ,
+                initializer_pair: .ar={{&ar3, &ar4}}
+                  field_designator: .ar
+                    .: .
+                    field_identifier: ar
+                  =: =
+                  initializer_list: {{&ar3, &ar4}}
+                    {: {
+                    initializer_list: {&ar3, &ar4}
+                      {: {
+                      pointer_expression: &ar3
+                        &: &
+                        identifier: ar3
+                      ,: ,
+                      pointer_expression: &ar4
+                        &: &
+                        identifier: ar4
+                      }: }
+                    }: }
+                }: }
+              }: }
+            }: }
+        ;: ;
+      expression_statement: (*compl_datastructure[1][0].ar[0][1])[1] = input();
+        assignment_expression: (*compl_datastructure[1][0].ar[0][1])[1] = input()
+          subscript_expression: (*compl_datastructure[1][0].ar[0][1])[1]
+            parenthesized_expression: (*compl_datastructure[1][0].ar[0][1])
+              (: (
+              pointer_expression: *compl_datastructure[1][0].ar[0][1]
+                *: *
+                subscript_expression: compl_datastructure[1][0].ar[0][1]
+                  subscript_expression: compl_datastructure[1][0].ar[0]
+                    field_expression: compl_datastructure[1][0].ar
+                      subscript_expression: compl_datastructure[1][0]
+                        subscript_expression: compl_datastructure[1]
+                          identifier: compl_datastructure
+                          [: [
+                          number_literal: 1
+                          ]: ]
+                        [: [
+                        number_literal: 0
+                        ]: ]
+                      .: .
+                      field_identifier: ar
+                    [: [
+                    number_literal: 0
+                    ]: ]
+                  [: [
+                  number_literal: 1
+                  ]: ]
+              ): )
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print((*compl_datastructure[1][0].ar[0][1])[0]);
+        call_expression: print((*compl_datastructure[1][0].ar[0][1])[0])
+          identifier: print
+          argument_list: ((*compl_datastructure[1][0].ar[0][1])[0])
+            (: (
+            subscript_expression: (*compl_datastructure[1][0].ar[0][1])[0]
+              parenthesized_expression: (*compl_datastructure[1][0].ar[0][1])
+                (: (
+                pointer_expression: *compl_datastructure[1][0].ar[0][1]
+                  *: *
+                  subscript_expression: compl_datastructure[1][0].ar[0][1]
+                    subscript_expression: compl_datastructure[1][0].ar[0]
+                      field_expression: compl_datastructure[1][0].ar
+                        subscript_expression: compl_datastructure[1][0]
+                          subscript_expression: compl_datastructure[1]
+                            identifier: compl_datastructure
+                            [: [
+                            number_literal: 1
+                            ]: ]
+                          [: [
+                          number_literal: 0
+                          ]: ]
+                        .: .
+                        field_identifier: ar
+                      [: [
+                      number_literal: 0
+                      ]: ]
+                    [: [
+                    number_literal: 1
+                    ]: ]
+                ): )
+              [: [
+              number_literal: 0
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: print((*compl_datastructure[1][0].ar[0][1])[1]);
+        call_expression: print((*compl_datastructure[1][0].ar[0][1])[1])
+          identifier: print
+          argument_list: ((*compl_datastructure[1][0].ar[0][1])[1])
+            (: (
+            subscript_expression: (*compl_datastructure[1][0].ar[0][1])[1]
+              parenthesized_expression: (*compl_datastructure[1][0].ar[0][1])
+                (: (
+                pointer_expression: *compl_datastructure[1][0].ar[0][1]
+                  *: *
+                  subscript_expression: compl_datastructure[1][0].ar[0][1]
+                    subscript_expression: compl_datastructure[1][0].ar[0]
+                      field_expression: compl_datastructure[1][0].ar
+                        subscript_expression: compl_datastructure[1][0]
+                          subscript_expression: compl_datastructure[1]
+                            identifier: compl_datastructure
+                            [: [
+                            number_literal: 1
+                            ]: ]
+                          [: [
+                          number_literal: 0
+                          ]: ]
+                        .: .
+                        field_identifier: ar
+                      [: [
+                      number_literal: 0
+                      ]: ]
+                    [: [
+                    number_literal: 1
+                    ]: ]
+                ): )
+              [: [
+              number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      }: }

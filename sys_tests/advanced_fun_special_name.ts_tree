@@ -1,0 +1,79 @@
+translation_unit: void _fun120(char c, int i);\n\nvoid main(){\n  _fun120('b', input());\n}\n\nvoid _fun120(char c, int i){\n  print(i * (100 + -c));\n}\n
+  declaration: void _fun120(char c, int i);
+    primitive_type: void
+    function_declarator: _fun120(char c, int i)
+      identifier: _fun120
+      parameter_list: (char c, int i)
+        (: (
+        parameter_declaration: char c
+          primitive_type: char
+          identifier: c
+        ,: ,
+        parameter_declaration: int i
+          primitive_type: int
+          identifier: i
+        ): )
+    ;: ;
+  function_definition: void main(){\n  _fun120('b', input());\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  _fun120('b', input());\n}
+      {: {
+      expression_statement: _fun120('b', input());
+        call_expression: _fun120('b', input())
+          identifier: _fun120
+          argument_list: ('b', input())
+            (: (
+            char_literal: 'b'
+              ': '
+              character: b
+              ': '
+            ,: ,
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            ): )
+        ;: ;
+      }: }
+  function_definition: void _fun120(char c, int i){\n  print(i * (100 + -c));\n}
+    primitive_type: void
+    function_declarator: _fun120(char c, int i)
+      identifier: _fun120
+      parameter_list: (char c, int i)
+        (: (
+        parameter_declaration: char c
+          primitive_type: char
+          identifier: c
+        ,: ,
+        parameter_declaration: int i
+          primitive_type: int
+          identifier: i
+        ): )
+    compound_statement: {\n  print(i * (100 + -c));\n}
+      {: {
+      expression_statement: print(i * (100 + -c));
+        call_expression: print(i * (100 + -c))
+          identifier: print
+          argument_list: (i * (100 + -c))
+            (: (
+            binary_expression: i * (100 + -c)
+              identifier: i
+              *: *
+              parenthesized_expression: (100 + -c)
+                (: (
+                binary_expression: 100 + -c
+                  number_literal: 100
+                  +: +
+                  unary_expression: -c
+                    -: -
+                    identifier: c
+                ): )
+            ): )
+        ;: ;
+      }: }

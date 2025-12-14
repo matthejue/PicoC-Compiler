@@ -1,0 +1,52 @@
+{
+  "__parents__": {
+    "global": null,
+    "int_fun": "global",
+    "main": "global",
+    "void_fun": "global"
+  },
+  "global": {
+    "int_fun": {
+      "datatype": "FunDecl(IntType(), Name('int_fun'), [Alloc(Writeable(), IntType(), Name('param'), 'param')])",
+      "name": "int_fun",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "void_fun": {
+      "datatype": "FunDecl(VoidType(), Name('void_fun'), [Alloc(Writeable(), IntType(), Name('param'), 'param')])",
+      "name": "void_fun",
+      "param_size": 1
+    }
+  },
+  "int_fun": {
+    "param": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "main": {
+    "local_var": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "local_var",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "void_fun": {
+    "param": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

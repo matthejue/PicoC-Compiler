@@ -1,0 +1,87 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(IntType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "str_a": {
+      "attrs": [
+        "Name('value')"
+      ],
+      "datatype": "StructDecl(Name('str_a'), [Alloc(Writeable(), IntType(), Name('value'), 'local_var')])",
+      "name": "str_a",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "str_b": {
+      "attrs": [
+        "Name('a')",
+        "Name('ptr')"
+      ],
+      "datatype": "StructDecl(Name('str_b'), [Alloc(Writeable(), StructSpec(Name('str_a')), Name('a'), 'local_var'), Alloc(Writeable(), PntrDecl(IntType()), Name('ptr'), 'local_var')])",
+      "name": "str_b",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "arr": {
+      "addr": 3,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "arr",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "b": {
+      "addr": 5,
+      "datatype": "StructSpec(Name('str_b'))",
+      "name": "b",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "x": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "y": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "y",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "str_a": {
+    "value": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "value",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "str_b": {
+    "a": {
+      "addr": "Empty()",
+      "datatype": "StructSpec(Name('str_a'))",
+      "name": "a",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "ptr": {
+      "addr": "Empty()",
+      "datatype": "PntrDecl(IntType())",
+      "name": "ptr",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  }
+}

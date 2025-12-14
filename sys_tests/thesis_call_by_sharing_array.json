@@ -1,0 +1,37 @@
+{
+  "__parents__": {
+    "fun": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun": {
+    "ar": {
+      "addr": 1,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun": {
+      "datatype": "FunDecl(VoidType(), Name('fun'), [Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('ar'), 'param')])",
+      "name": "fun",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "ar": {
+      "addr": 1,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  }
+}

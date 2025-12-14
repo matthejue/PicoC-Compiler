@@ -1,0 +1,83 @@
+translation_unit: void main() {\n  int ar[2][2] = {{1, 2}, {3, 4}};\n  *(*(ar + 2) + 1) = input();\n  print(ar[2][1]);\n}\n
+  function_definition: void main() {\n  int ar[2][2] = {{1, 2}, {3, 4}};\n  *(*(ar + 2) + 1) = input();\n  print(ar[2][1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[2][2] = {{1, 2}, {3, 4}};\n  *(*(ar + 2) + 1) = input();\n  print(ar[2][1]);\n}
+      {: {
+      declaration: int ar[2][2] = {{1, 2}, {3, 4}};
+        primitive_type: int
+        init_declarator: ar[2][2] = {{1, 2}, {3, 4}}
+          array_declarator: ar[2][2]
+            array_declarator: ar[2]
+              identifier: ar
+              [: [
+              number_literal: 2
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {{1, 2}, {3, 4}}
+            {: {
+            initializer_list: {1, 2}
+              {: {
+              number_literal: 1
+              ,: ,
+              number_literal: 2
+              }: }
+            ,: ,
+            initializer_list: {3, 4}
+              {: {
+              number_literal: 3
+              ,: ,
+              number_literal: 4
+              }: }
+            }: }
+        ;: ;
+      expression_statement: *(*(ar + 2) + 1) = input();
+        assignment_expression: *(*(ar + 2) + 1) = input()
+          pointer_expression: *(*(ar + 2) + 1)
+            *: *
+            parenthesized_expression: (*(ar + 2) + 1)
+              (: (
+              binary_expression: *(ar + 2) + 1
+                pointer_expression: *(ar + 2)
+                  *: *
+                  parenthesized_expression: (ar + 2)
+                    (: (
+                    binary_expression: ar + 2
+                      identifier: ar
+                      +: +
+                      number_literal: 2
+                    ): )
+                +: +
+                number_literal: 1
+              ): )
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print(ar[2][1]);
+        call_expression: print(ar[2][1])
+          identifier: print
+          argument_list: (ar[2][1])
+            (: (
+            subscript_expression: ar[2][1]
+              subscript_expression: ar[2]
+                identifier: ar
+                [: [
+                number_literal: 2
+                ]: ]
+              [: [
+              number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      }: }

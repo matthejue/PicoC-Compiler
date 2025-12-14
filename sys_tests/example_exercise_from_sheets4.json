@@ -1,0 +1,76 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "heap_space": {
+      "addr": 0,
+      "datatype": "StructSpec(Name('point'))",
+      "name": "heap_space",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "point": {
+      "attrs": [
+        "Name('x')",
+        "Name('y')"
+      ],
+      "datatype": "StructDecl(Name('point'), [Alloc(Writeable(), IntType(), Name('x'), 'local_var'), Alloc(Writeable(), IntType(), Name('y'), 'local_var')])",
+      "name": "point",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "a": {
+      "addr": 2,
+      "datatype": "PntrDecl(IntType())",
+      "name": "a",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "p1": {
+      "addr": 0,
+      "datatype": "PntrDecl(StructSpec(Name('point')))",
+      "name": "p1",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "p2": {
+      "addr": 4,
+      "datatype": "StructSpec(Name('point'))",
+      "name": "p2",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "p3": {
+      "addr": 1,
+      "datatype": "PntrDecl(StructSpec(Name('point')))",
+      "name": "p3",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "point": {
+    "x": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "y": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "y",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  }
+}

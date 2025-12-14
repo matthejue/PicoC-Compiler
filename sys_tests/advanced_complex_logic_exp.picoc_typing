@@ -1,0 +1,29 @@
+_global_inits:
+main:
+  StackMalloc('3')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(BinOp(ToBool(Num('0')), LogicOr(), BinOp(ToBool(BinOp(UnOp(Minus(), BinOp(ToBool(BinOp(Num('10'), Sub(), Stackframe(Num('0'), IntType()))), LogicOr(), ToBool(Num('0')))), Add(), Num('1'))), LogicAnd(), ToBool(Stackframe(Num('0'), IntType())))), LogicOr(), BinOp(Atom(Stackframe(Num('0'), IntType()), Lt(), Num('10')), LogicAnd(), ToBool(Num('1')))))
+  Assign(Stackframe(Num('2'), IntType()), BinOp(BinOp(BinOp(ToBool(Num('-42')), LogicAnd(), ToBool(BinOp(UnOp(Minus(), BinOp(ToBool(BinOp(Num('11'), Sub(), Stackframe(Num('0'), IntType()))), LogicOr(), ToBool(Num('0')))), Add(), Num('1')))), LogicOr(), UnOp(LogicNot(), ToBool(Stackframe(Num('0'), IntType())))), LogicOr(), BinOp(Atom(Stackframe(Num('0'), IntType()), Eq(), Num('10')), LogicAnd(), ToBool(Num('1')))))
+  // If(BinOp(ToBool(Name('bool1')), LogicAnd(), ToBool(Name('bool2'))), [Exp(Call(Name('print'), [Num('42')]), Empty())]), 
+  IfElse(
+    BinOp(
+      ToBool(
+        Stackframe(
+          Num('1'), 
+          IntType())), 
+      LogicAnd(), 
+      ToBool(
+        Stackframe(
+          Num('2'), 
+          IntType()))), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Exp(Call(Name('print'), [Num('42')]), Empty())
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())

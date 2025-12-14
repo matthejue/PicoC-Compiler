@@ -1,0 +1,141 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global",
+    "print_all": "global",
+    "print_all_pntr": "global"
+  },
+  "array_with_len": {
+    "ar": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('3'), IntType())",
+      "name": "ar",
+      "size": 3,
+      "type_qual": "Empty()"
+    },
+    "len": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "len",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "global": {
+    "array_with_len": {
+      "attrs": [
+        "Name('ar')",
+        "Name('len')"
+      ],
+      "datatype": "StructDecl(Name('array_with_len'), [Alloc(Writeable(), ArrayDecl(Num('3'), IntType()), Name('ar'), 'local_var'), Alloc(Writeable(), IntType(), Name('len'), 'local_var')])",
+      "name": "array_with_len",
+      "size": 4,
+      "type_qual": "Empty()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "print_all": {
+      "datatype": "FunDecl(VoidType(), Name('print_all'), [Alloc(Writeable(), IntType(), Name('len_copy'), 'local_var'), Alloc(Writeable(), ArrayDecl(Num('3'), IntType()), Name('ar_copy'), 'local_var'), Alloc(Writeable(), StructSpec(Name('array_with_len')), Name('st_ar_copy'), 'local_var')])",
+      "name": "print_all",
+      "param_size": 6
+    },
+    "print_all_pntr": {
+      "datatype": "FunDecl(IntType(), Name('print_all_pntr'), [Alloc(Writeable(), PntrDecl(IntType()), Name('len_ref'), 'local_var'), Alloc(Writeable(), PntrDecl(IntType()), Name('ar_ref'), 'local_var'), Alloc(Writeable(), PntrDecl(StructSpec(Name('array_with_len'))), Name('st_ar_ref'), 'local_var')])",
+      "name": "print_all_pntr",
+      "param_size": 3
+    }
+  },
+  "main": {
+    "ar": {
+      "addr": 2,
+      "datatype": "ArrayDecl(Num('3'), IntType())",
+      "name": "ar",
+      "size": 3,
+      "type_qual": "Writeable()"
+    },
+    "len": {
+      "addr": 7,
+      "datatype": "IntType()",
+      "name": "len",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "st_ar": {
+      "addr": 6,
+      "datatype": "StructSpec(Name('array_with_len'))",
+      "name": "st_ar",
+      "size": 4,
+      "type_qual": "Writeable()"
+    },
+    "success": {
+      "addr": 8,
+      "datatype": "IntType()",
+      "name": "success",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "print_all": {
+    "ar_copy": {
+      "addr": 3,
+      "datatype": "ArrayDecl(Num('3'), IntType())",
+      "name": "ar_copy",
+      "size": 3,
+      "type_qual": "Writeable()"
+    },
+    "i": {
+      "addr": 8,
+      "datatype": "IntType()",
+      "name": "i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "len_copy": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "len_copy",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "st_ar_copy": {
+      "addr": 7,
+      "datatype": "StructSpec(Name('array_with_len'))",
+      "name": "st_ar_copy",
+      "size": 4,
+      "type_qual": "Writeable()"
+    }
+  },
+  "print_all_pntr": {
+    "ar_ref": {
+      "addr": 1,
+      "datatype": "PntrDecl(IntType())",
+      "name": "ar_ref",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "i": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "len_ref": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "len_ref",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "st_ar_ref": {
+      "addr": 2,
+      "datatype": "PntrDecl(StructSpec(Name('array_with_len')))",
+      "name": "st_ar_ref",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

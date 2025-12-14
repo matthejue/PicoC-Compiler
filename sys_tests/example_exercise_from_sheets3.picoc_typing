@@ -1,0 +1,60 @@
+_global_inits:
+is_less_equal_without_overflow:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), IntType(), Name('x'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('y'), 'param'), Empty())
+  // Return(Atom(Name('x'), LtE(), Name('y'))), 
+  IfElse(
+    ToBool(
+      BinOp(
+        Atom(
+          Stackframe(
+            Num('0'), 
+            IntType()), 
+          Gt(), 
+          Num('0')), 
+        Oplus(), 
+        Atom(
+          Stackframe(
+            Num('1'), 
+            IntType()), 
+          Gt(), 
+          Num('0')))), 
+    [
+      GoTo(Name('if.5'))
+    ], 
+    [
+      GoTo(Name('else.4'))
+    ])
+if.5:
+  Return(Atom(Stackframe(Num('0'), IntType()), LtE(), Stackframe(Num('1'), IntType())))
+else.4:
+  // Return(Num('0')), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Gt(), 
+      Num('0')), 
+    [
+      GoTo(Name('if.3'))
+    ], 
+    [
+      GoTo(Name('else.2'))
+    ])
+if.3:
+  Return(Num('0'))
+else.2:
+  Return(Num('1'))
+if_else_after.1:
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('is_less_equal_without_overflow'), [Call(Name('input'), []), Call(Name('input'), [])])]), Empty())
+  Exp(Call(Name('print'), [Call(Name('is_less_equal_without_overflow'), [Call(Name('input'), []), Call(Name('input'), [])])]), Empty())
+  Exp(Call(Name('print'), [Call(Name('is_less_equal_without_overflow'), [Call(Name('input'), []), Call(Name('input'), [])])]), Empty())
+  Exp(Call(Name('print'), [Call(Name('is_less_equal_without_overflow'), [Call(Name('input'), []), Call(Name('input'), [])])]), Empty())
+  Return(Empty())

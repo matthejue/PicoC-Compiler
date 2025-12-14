@@ -1,0 +1,248 @@
+translation_unit: struct ar_with_lent {int len; int *ar;};\n\nint ar[10] = {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024};\n\nstruct ar_with_lent ar_with_len = {.len=10, .ar=ar};\n\nint bsearch_it(struct ar_with_lent ar_with_len, int key) {\n    int lo = 0;\n    int hi = ar_with_len.len;\n    int m;\n    while (lo != hi) {\n        m = (lo + hi) / 2;\n        if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;  \n    }\n    return -1;\n}\n\nvoid main() {\n  print(bsearch_it(ar_with_len, input()));\n  print(bsearch_it(ar_with_len, input()));\n}\n
+  struct_specifier: struct ar_with_lent {int len; int *ar;}
+    struct: struct
+    type_identifier: ar_with_lent
+    field_declaration_list: {int len; int *ar;}
+      {: {
+      field_declaration: int len;
+        primitive_type: int
+        field_identifier: len
+        ;: ;
+      field_declaration: int *ar;
+        primitive_type: int
+        pointer_declarator: *ar
+          *: *
+          field_identifier: ar
+        ;: ;
+      }: }
+  ;: ;
+  declaration: int ar[10] = {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024};
+    primitive_type: int
+    init_declarator: ar[10] = {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024}
+      array_declarator: ar[10]
+        identifier: ar
+        [: [
+        number_literal: 10
+        ]: ]
+      =: =
+      initializer_list: {1, 3, 4, 7, 19, 42, 128, 314, 512, 1024}
+        {: {
+        number_literal: 1
+        ,: ,
+        number_literal: 3
+        ,: ,
+        number_literal: 4
+        ,: ,
+        number_literal: 7
+        ,: ,
+        number_literal: 19
+        ,: ,
+        number_literal: 42
+        ,: ,
+        number_literal: 128
+        ,: ,
+        number_literal: 314
+        ,: ,
+        number_literal: 512
+        ,: ,
+        number_literal: 1024
+        }: }
+    ;: ;
+  declaration: struct ar_with_lent ar_with_len = {.len=10, .ar=ar};
+    struct_specifier: struct ar_with_lent
+      struct: struct
+      type_identifier: ar_with_lent
+    init_declarator: ar_with_len = {.len=10, .ar=ar}
+      identifier: ar_with_len
+      =: =
+      initializer_list: {.len=10, .ar=ar}
+        {: {
+        initializer_pair: .len=10
+          field_designator: .len
+            .: .
+            field_identifier: len
+          =: =
+          number_literal: 10
+        ,: ,
+        initializer_pair: .ar=ar
+          field_designator: .ar
+            .: .
+            field_identifier: ar
+          =: =
+          identifier: ar
+        }: }
+    ;: ;
+  function_definition: int bsearch_it(struct ar_with_lent ar_with_len, int key) {\n    int lo = 0;\n    int hi = ar_with_len.len;\n    int m;\n    while (lo != hi) {\n        m = (lo + hi) / 2;\n        if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;  \n    }\n    return -1;\n}
+    primitive_type: int
+    function_declarator: bsearch_it(struct ar_with_lent ar_with_len, int key)
+      identifier: bsearch_it
+      parameter_list: (struct ar_with_lent ar_with_len, int key)
+        (: (
+        parameter_declaration: struct ar_with_lent ar_with_len
+          struct_specifier: struct ar_with_lent
+            struct: struct
+            type_identifier: ar_with_lent
+          identifier: ar_with_len
+        ,: ,
+        parameter_declaration: int key
+          primitive_type: int
+          identifier: key
+        ): )
+    compound_statement: {\n    int lo = 0;\n    int hi = ar_with_len.len;\n    int m;\n    while (lo != hi) {\n        m = (lo + hi) / 2;\n        if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;  \n    }\n    return -1;\n}
+      {: {
+      declaration: int lo = 0;
+        primitive_type: int
+        init_declarator: lo = 0
+          identifier: lo
+          =: =
+          number_literal: 0
+        ;: ;
+      declaration: int hi = ar_with_len.len;
+        primitive_type: int
+        init_declarator: hi = ar_with_len.len
+          identifier: hi
+          =: =
+          field_expression: ar_with_len.len
+            identifier: ar_with_len
+            .: .
+            field_identifier: len
+        ;: ;
+      declaration: int m;
+        primitive_type: int
+        identifier: m
+        ;: ;
+      while_statement: while (lo != hi) {\n        m = (lo + hi) / 2;\n        if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;  \n    }
+        while: while
+        parenthesized_expression: (lo != hi)
+          (: (
+          binary_expression: lo != hi
+            identifier: lo
+            !=: !=
+            identifier: hi
+          ): )
+        compound_statement: {\n        m = (lo + hi) / 2;\n        if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;  \n    }
+          {: {
+          expression_statement: m = (lo + hi) / 2;
+            assignment_expression: m = (lo + hi) / 2
+              identifier: m
+              =: =
+              binary_expression: (lo + hi) / 2
+                parenthesized_expression: (lo + hi)
+                  (: (
+                  binary_expression: lo + hi
+                    identifier: lo
+                    +: +
+                    identifier: hi
+                  ): )
+                /: /
+                number_literal: 2
+            ;: ;
+          if_statement: if (ar_with_len.ar[m] == key)\n            return m;\n        else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;
+            if: if
+            parenthesized_expression: (ar_with_len.ar[m] == key)
+              (: (
+              binary_expression: ar_with_len.ar[m] == key
+                subscript_expression: ar_with_len.ar[m]
+                  field_expression: ar_with_len.ar
+                    identifier: ar_with_len
+                    .: .
+                    field_identifier: ar
+                  [: [
+                  identifier: m
+                  ]: ]
+                ==: ==
+                identifier: key
+              ): )
+            return_statement: return m;
+              return: return
+              identifier: m
+              ;: ;
+            else_clause: else if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;
+              else: else
+              if_statement: if (ar_with_len.ar[m] > key)\n            hi = m;  \n        else  \n            lo = m+1;
+                if: if
+                parenthesized_expression: (ar_with_len.ar[m] > key)
+                  (: (
+                  binary_expression: ar_with_len.ar[m] > key
+                    subscript_expression: ar_with_len.ar[m]
+                      field_expression: ar_with_len.ar
+                        identifier: ar_with_len
+                        .: .
+                        field_identifier: ar
+                      [: [
+                      identifier: m
+                      ]: ]
+                    >: >
+                    identifier: key
+                  ): )
+                expression_statement: hi = m;
+                  assignment_expression: hi = m
+                    identifier: hi
+                    =: =
+                    identifier: m
+                  ;: ;
+                else_clause: else  \n            lo = m+1;
+                  else: else
+                  expression_statement: lo = m+1;
+                    assignment_expression: lo = m+1
+                      identifier: lo
+                      =: =
+                      binary_expression: m+1
+                        identifier: m
+                        +: +
+                        number_literal: 1
+                    ;: ;
+          }: }
+      return_statement: return -1;
+        return: return
+        number_literal: -1
+        ;: ;
+      }: }
+  function_definition: void main() {\n  print(bsearch_it(ar_with_len, input()));\n  print(bsearch_it(ar_with_len, input()));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(bsearch_it(ar_with_len, input()));\n  print(bsearch_it(ar_with_len, input()));\n}
+      {: {
+      expression_statement: print(bsearch_it(ar_with_len, input()));
+        call_expression: print(bsearch_it(ar_with_len, input()))
+          identifier: print
+          argument_list: (bsearch_it(ar_with_len, input()))
+            (: (
+            call_expression: bsearch_it(ar_with_len, input())
+              identifier: bsearch_it
+              argument_list: (ar_with_len, input())
+                (: (
+                identifier: ar_with_len
+                ,: ,
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      expression_statement: print(bsearch_it(ar_with_len, input()));
+        call_expression: print(bsearch_it(ar_with_len, input()))
+          identifier: print
+          argument_list: (bsearch_it(ar_with_len, input()))
+            (: (
+            call_expression: bsearch_it(ar_with_len, input())
+              identifier: bsearch_it
+              argument_list: (ar_with_len, input())
+                (: (
+                identifier: ar_with_len
+                ,: ,
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      }: }

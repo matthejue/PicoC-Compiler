@@ -1,0 +1,62 @@
+translation_unit: void fun_scope(int param) {\n  int local_var = 2;\n  print(param);\n  print(local_var);\n}\n\nvoid main() {\n  int local_var = 4;\n  fun_scope(local_var);\n}\n
+  function_definition: void fun_scope(int param) {\n  int local_var = 2;\n  print(param);\n  print(local_var);\n}
+    primitive_type: void
+    function_declarator: fun_scope(int param)
+      identifier: fun_scope
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  int local_var = 2;\n  print(param);\n  print(local_var);\n}
+      {: {
+      declaration: int local_var = 2;
+        primitive_type: int
+        init_declarator: local_var = 2
+          identifier: local_var
+          =: =
+          number_literal: 2
+        ;: ;
+      expression_statement: print(param);
+        call_expression: print(param)
+          identifier: print
+          argument_list: (param)
+            (: (
+            identifier: param
+            ): )
+        ;: ;
+      expression_statement: print(local_var);
+        call_expression: print(local_var)
+          identifier: print
+          argument_list: (local_var)
+            (: (
+            identifier: local_var
+            ): )
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int local_var = 4;\n  fun_scope(local_var);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int local_var = 4;\n  fun_scope(local_var);\n}
+      {: {
+      declaration: int local_var = 4;
+        primitive_type: int
+        init_declarator: local_var = 4
+          identifier: local_var
+          =: =
+          number_literal: 4
+        ;: ;
+      expression_statement: fun_scope(local_var);
+        call_expression: fun_scope(local_var)
+          identifier: fun_scope
+          argument_list: (local_var)
+            (: (
+            identifier: local_var
+            ): )
+        ;: ;
+      }: }

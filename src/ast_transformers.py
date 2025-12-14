@@ -135,10 +135,10 @@ class TransformerPicoC:
             datatype = base_datatype
             for fragmented_datatype in fragmented_datatypes:
                 match fragmented_datatype:
-                    case pn.ArrayDecl(nums, _):
-                        datatype = pn.ArrayDecl(nums, datatype)
-                    case pn.PntrDecl(pn.Num(val), _):
-                        datatype = pn.PntrDecl(pn.Num(val), datatype)
+                    case pn.ArrayDecl(num, _):
+                        datatype = pn.ArrayDecl(num, datatype)
+                    case pn.PntrDecl(_):
+                        datatype = pn.PntrDecl(datatype)
                     case _:
                         throw_error(fragmented_datatype)
             return datatype, name
@@ -326,12 +326,12 @@ class TransformerPicoC:
     def array_declarator(self, _, children):
         declarator, size = children
         base = declarator if isinstance(declarator, list) else [declarator]
-        return [pn.ArrayDecl([size], pn.Placeholder()), *base]
+        return [pn.ArrayDecl(size, pn.Placeholder()), *base]
 
     def pointer_declarator(self, _, children):
         declarator = children[0]
         base = declarator if isinstance(declarator, list) else [declarator]
-        return [pn.PntrDecl(pn.Num("1"), pn.Placeholder()), *base]
+        return [pn.PntrDecl(pn.Placeholder()), *base]
 
     def initializer_list(self, _, children):
             """
@@ -435,7 +435,7 @@ class TransformerPicoC:
         base_datatype = children[0]
         pointer_depth = children[1] if len(children) > 1 else 0
         for _ in range(pointer_depth):
-            base_datatype = pn.PntrDecl(pn.Num("1"), base_datatype)
+            base_datatype = pn.PntrDecl(base_datatype)
         return base_datatype
 
     def abstract_pointer_declarator(self, node, _):

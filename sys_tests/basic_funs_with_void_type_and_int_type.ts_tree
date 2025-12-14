@@ -1,0 +1,93 @@
+translation_unit: void void_fun(int param) {\n  param = param + 2;\n  print(param);\n}\n\nint int_fun(int param) {\n  return param + 2;\n}\n\nvoid main() {\n  int local_var = input();\n  void_fun(local_var);\n  print(int_fun(local_var));\n}\n
+  function_definition: void void_fun(int param) {\n  param = param + 2;\n  print(param);\n}
+    primitive_type: void
+    function_declarator: void_fun(int param)
+      identifier: void_fun
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  param = param + 2;\n  print(param);\n}
+      {: {
+      expression_statement: param = param + 2;
+        assignment_expression: param = param + 2
+          identifier: param
+          =: =
+          binary_expression: param + 2
+            identifier: param
+            +: +
+            number_literal: 2
+        ;: ;
+      expression_statement: print(param);
+        call_expression: print(param)
+          identifier: print
+          argument_list: (param)
+            (: (
+            identifier: param
+            ): )
+        ;: ;
+      }: }
+  function_definition: int int_fun(int param) {\n  return param + 2;\n}
+    primitive_type: int
+    function_declarator: int_fun(int param)
+      identifier: int_fun
+      parameter_list: (int param)
+        (: (
+        parameter_declaration: int param
+          primitive_type: int
+          identifier: param
+        ): )
+    compound_statement: {\n  return param + 2;\n}
+      {: {
+      return_statement: return param + 2;
+        return: return
+        binary_expression: param + 2
+          identifier: param
+          +: +
+          number_literal: 2
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int local_var = input();\n  void_fun(local_var);\n  print(int_fun(local_var));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int local_var = input();\n  void_fun(local_var);\n  print(int_fun(local_var));\n}
+      {: {
+      declaration: int local_var = input();
+        primitive_type: int
+        init_declarator: local_var = input()
+          identifier: local_var
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: void_fun(local_var);
+        call_expression: void_fun(local_var)
+          identifier: void_fun
+          argument_list: (local_var)
+            (: (
+            identifier: local_var
+            ): )
+        ;: ;
+      expression_statement: print(int_fun(local_var));
+        call_expression: print(int_fun(local_var))
+          identifier: print
+          argument_list: (int_fun(local_var))
+            (: (
+            call_expression: int_fun(local_var)
+              identifier: int_fun
+              argument_list: (local_var)
+                (: (
+                identifier: local_var
+                ): )
+            ): )
+        ;: ;
+      }: }

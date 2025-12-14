@@ -1,0 +1,95 @@
+translation_unit: void fun();\n\nvoid main() {\n  int ar[1] = {42};\n  print(ar[0]);\n  fun();\n}\n\nvoid fun() {\n  int ar[3] = {1, 2, 3};\n  print(ar[1+1]);\n}\n
+  declaration: void fun();
+    primitive_type: void
+    function_declarator: fun()
+      identifier: fun
+      parameter_list: ()
+        (: (
+        ): )
+    ;: ;
+  function_definition: void main() {\n  int ar[1] = {42};\n  print(ar[0]);\n  fun();\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[1] = {42};\n  print(ar[0]);\n  fun();\n}
+      {: {
+      declaration: int ar[1] = {42};
+        primitive_type: int
+        init_declarator: ar[1] = {42}
+          array_declarator: ar[1]
+            identifier: ar
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          initializer_list: {42}
+            {: {
+            number_literal: 42
+            }: }
+        ;: ;
+      expression_statement: print(ar[0]);
+        call_expression: print(ar[0])
+          identifier: print
+          argument_list: (ar[0])
+            (: (
+            subscript_expression: ar[0]
+              identifier: ar
+              [: [
+              number_literal: 0
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: fun();
+        call_expression: fun()
+          identifier: fun
+          argument_list: ()
+            (: (
+            ): )
+        ;: ;
+      }: }
+  function_definition: void fun() {\n  int ar[3] = {1, 2, 3};\n  print(ar[1+1]);\n}
+    primitive_type: void
+    function_declarator: fun()
+      identifier: fun
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[3] = {1, 2, 3};\n  print(ar[1+1]);\n}
+      {: {
+      declaration: int ar[3] = {1, 2, 3};
+        primitive_type: int
+        init_declarator: ar[3] = {1, 2, 3}
+          array_declarator: ar[3]
+            identifier: ar
+            [: [
+            number_literal: 3
+            ]: ]
+          =: =
+          initializer_list: {1, 2, 3}
+            {: {
+            number_literal: 1
+            ,: ,
+            number_literal: 2
+            ,: ,
+            number_literal: 3
+            }: }
+        ;: ;
+      expression_statement: print(ar[1+1]);
+        call_expression: print(ar[1+1])
+          identifier: print
+          argument_list: (ar[1+1])
+            (: (
+            subscript_expression: ar[1+1]
+              identifier: ar
+              [: [
+              binary_expression: 1+1
+                number_literal: 1
+                +: +
+                number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      }: }

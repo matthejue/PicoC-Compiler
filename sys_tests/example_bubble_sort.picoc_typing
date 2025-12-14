@@ -1,0 +1,90 @@
+_global_inits:
+  Assign(Global(Name('ar'), ArrayDecl(Num('6'), IntType())), Array([Num('314'), Num('42'), Num('4'), Num('42'), Num('-2'), Num('5')], Empty()))
+  Assign(Global(Name('st_ar'), StructSpec(Name('stt'))), Struct([Assign(Name('len'), Num('6')), Assign(Name('ar'), Global(Name('ar'), ArrayDecl(Num('6'), IntType())))], Empty()))
+swap:
+  StackMalloc('2')
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('x'), 'param'), Empty())
+  Exp(Alloc(Writeable(), PntrDecl(IntType()), Name('y'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('h'), 'local_var'), Empty())
+  Assign(Stackframe(Num('3'), IntType()), Num('0'))
+  // If(Atom(Deref(Name('x'), Num('0'), Empty()), Gt(), Deref(Name('y'), Num('0'), Empty())), [Assign(Name('h'), Deref(Name('x'), Num('0'), Empty())), Assign(Deref(Name('x'), Num('0'), Empty()), Deref(Name('y'), Num('0'), Empty())), Assign(Deref(Name('y'), Num('0'), Empty()), Name('h')), Assign(Name('swapped'), Num('1'))]), 
+  IfElse(
+    Atom(
+      Deref(
+        Stackframe(
+          Num('0'), 
+          PntrDecl(
+            IntType())), 
+        Num('0'), 
+        PntrDecl(
+          IntType())), 
+      Gt(), 
+      Deref(
+        Stackframe(
+          Num('1'), 
+          PntrDecl(
+            IntType())), 
+        Num('0'), 
+        PntrDecl(
+          IntType()))), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Assign(Stackframe(Num('2'), IntType()), Deref(Stackframe(Num('0'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())))
+  Assign(Deref(Stackframe(Num('0'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())), Deref(Stackframe(Num('1'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())))
+  Assign(Deref(Stackframe(Num('1'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType())), Stackframe(Num('2'), IntType()))
+  Assign(Stackframe(Num('3'), IntType()), Num('1'))
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Stackframe(Num('3'), IntType()))
+main:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), IntType(), Name('swapped'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('i'), 'local_var'), Empty())
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Attr(Global(Name('st_ar'), StructSpec(Name('stt'))), Name('len'), StructSpec(Name('stt'))), Sub(), Num('1')))
+  // DoWhile(Name('swapped'), [Assign(Name('i'), Num('0')), While(Atom(Name('i'), Lt(), Name('n')), [Assign(Name('swapped'), Call(Name('swap'), [BinOp(Attr(Name('st_ar'), Name('ar'), Empty()), Add(), Name('i')), BinOp(Attr(Name('st_ar'), Name('ar'), Empty()), Add(), BinOp(Name('i'), Add(), Num('1')))])), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))]), Assign(Name('n'), BinOp(Name('n'), Sub(), Num('1')))])
+  GoTo(Name('do_while_branch.7'))
+do_while_branch.7:
+  Assign(Stackframe(Num('1'), IntType()), Num('0'))
+  // While(Atom(Name('i'), Lt(), Name('n')), [Assign(Name('swapped'), Call(Name('swap'), [BinOp(Attr(Name('st_ar'), Name('ar'), Empty()), Add(), Name('i')), BinOp(Attr(Name('st_ar'), Name('ar'), Empty()), Add(), BinOp(Name('i'), Add(), Num('1')))])), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.6'))
+condition_check.6:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('1'), 
+        IntType()), 
+      Lt(), 
+      Stackframe(
+        Num('2'), 
+        IntType())), 
+    [
+      GoTo(Name('while_branch.5'))
+    ], 
+    [
+      GoTo(Name('while_after.4'))
+    ])
+while_branch.5:
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('swap'), [BinOp(Attr(Global(Name('st_ar'), StructSpec(Name('stt'))), Name('ar'), StructSpec(Name('stt'))), Add(), Stackframe(Num('1'), IntType())), BinOp(Attr(Global(Name('st_ar'), StructSpec(Name('stt'))), Name('ar'), StructSpec(Name('stt'))), Add(), BinOp(Stackframe(Num('1'), IntType()), Add(), Num('1')))]))
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('1'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.6'))
+while_after.4:
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Stackframe(Num('2'), IntType()), Sub(), Num('1'))), 
+  IfElse(
+    Stackframe(
+      Num('0'), 
+      IntType()), 
+    [
+      GoTo(Name('do_while_branch.7'))
+    ], 
+    [
+      GoTo(Name('do_while_after.3'))
+    ])
+do_while_after.3:
+  Exp(Call(Name('print'), [Deref(Attr(Global(Name('st_ar'), StructSpec(Name('stt'))), Name('ar'), StructSpec(Name('stt'))), Call(Name('input'), []), PntrDecl(IntType()))]), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Global(Name('st_ar'), StructSpec(Name('stt'))), Name('ar'), StructSpec(Name('stt'))), Call(Name('input'), []), PntrDecl(IntType()))]), Empty())
+  Return(Empty())

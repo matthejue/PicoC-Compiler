@@ -1,0 +1,70 @@
+translation_unit: struct pos {int x; int y;};\n\nvoid main() {\n  struct pos st = {.x=4, .y=2};\n  st.y = 42;\n  print(st.y);\n}\n
+  struct_specifier: struct pos {int x; int y;}
+    struct: struct
+    type_identifier: pos
+    field_declaration_list: {int x; int y;}
+      {: {
+      field_declaration: int x;
+        primitive_type: int
+        field_identifier: x
+        ;: ;
+      field_declaration: int y;
+        primitive_type: int
+        field_identifier: y
+        ;: ;
+      }: }
+  ;: ;
+  function_definition: void main() {\n  struct pos st = {.x=4, .y=2};\n  st.y = 42;\n  print(st.y);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  struct pos st = {.x=4, .y=2};\n  st.y = 42;\n  print(st.y);\n}
+      {: {
+      declaration: struct pos st = {.x=4, .y=2};
+        struct_specifier: struct pos
+          struct: struct
+          type_identifier: pos
+        init_declarator: st = {.x=4, .y=2}
+          identifier: st
+          =: =
+          initializer_list: {.x=4, .y=2}
+            {: {
+            initializer_pair: .x=4
+              field_designator: .x
+                .: .
+                field_identifier: x
+              =: =
+              number_literal: 4
+            ,: ,
+            initializer_pair: .y=2
+              field_designator: .y
+                .: .
+                field_identifier: y
+              =: =
+              number_literal: 2
+            }: }
+        ;: ;
+      expression_statement: st.y = 42;
+        assignment_expression: st.y = 42
+          field_expression: st.y
+            identifier: st
+            .: .
+            field_identifier: y
+          =: =
+          number_literal: 42
+        ;: ;
+      expression_statement: print(st.y);
+        call_expression: print(st.y)
+          identifier: print
+          argument_list: (st.y)
+            (: (
+            field_expression: st.y
+              identifier: st
+              .: .
+              field_identifier: y
+            ): )
+        ;: ;
+      }: }

@@ -1,0 +1,95 @@
+translation_unit: void main() {\n  int ex1 = 12 * 3 + 6;\n  int ex2 = 12 * 3 * 6;\n  int ex3 = 6 + 12 * 3;\n  int ex4 = 6 * 12 * 3;\n  print(ex1);\n  print(ex2);\n  print(ex3);\n  print(ex4);\n}\n
+  function_definition: void main() {\n  int ex1 = 12 * 3 + 6;\n  int ex2 = 12 * 3 * 6;\n  int ex3 = 6 + 12 * 3;\n  int ex4 = 6 * 12 * 3;\n  print(ex1);\n  print(ex2);\n  print(ex3);\n  print(ex4);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ex1 = 12 * 3 + 6;\n  int ex2 = 12 * 3 * 6;\n  int ex3 = 6 + 12 * 3;\n  int ex4 = 6 * 12 * 3;\n  print(ex1);\n  print(ex2);\n  print(ex3);\n  print(ex4);\n}
+      {: {
+      declaration: int ex1 = 12 * 3 + 6;
+        primitive_type: int
+        init_declarator: ex1 = 12 * 3 + 6
+          identifier: ex1
+          =: =
+          binary_expression: 12 * 3 + 6
+            binary_expression: 12 * 3
+              number_literal: 12
+              *: *
+              number_literal: 3
+            +: +
+            number_literal: 6
+        ;: ;
+      declaration: int ex2 = 12 * 3 * 6;
+        primitive_type: int
+        init_declarator: ex2 = 12 * 3 * 6
+          identifier: ex2
+          =: =
+          binary_expression: 12 * 3 * 6
+            binary_expression: 12 * 3
+              number_literal: 12
+              *: *
+              number_literal: 3
+            *: *
+            number_literal: 6
+        ;: ;
+      declaration: int ex3 = 6 + 12 * 3;
+        primitive_type: int
+        init_declarator: ex3 = 6 + 12 * 3
+          identifier: ex3
+          =: =
+          binary_expression: 6 + 12 * 3
+            number_literal: 6
+            +: +
+            binary_expression: 12 * 3
+              number_literal: 12
+              *: *
+              number_literal: 3
+        ;: ;
+      declaration: int ex4 = 6 * 12 * 3;
+        primitive_type: int
+        init_declarator: ex4 = 6 * 12 * 3
+          identifier: ex4
+          =: =
+          binary_expression: 6 * 12 * 3
+            binary_expression: 6 * 12
+              number_literal: 6
+              *: *
+              number_literal: 12
+            *: *
+            number_literal: 3
+        ;: ;
+      expression_statement: print(ex1);
+        call_expression: print(ex1)
+          identifier: print
+          argument_list: (ex1)
+            (: (
+            identifier: ex1
+            ): )
+        ;: ;
+      expression_statement: print(ex2);
+        call_expression: print(ex2)
+          identifier: print
+          argument_list: (ex2)
+            (: (
+            identifier: ex2
+            ): )
+        ;: ;
+      expression_statement: print(ex3);
+        call_expression: print(ex3)
+          identifier: print
+          argument_list: (ex3)
+            (: (
+            identifier: ex3
+            ): )
+        ;: ;
+      expression_statement: print(ex4);
+        call_expression: print(ex4)
+          identifier: print
+          argument_list: (ex4)
+            (: (
+            identifier: ex4
+            ): )
+        ;: ;
+      }: }

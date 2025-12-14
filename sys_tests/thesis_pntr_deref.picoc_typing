@@ -1,0 +1,7 @@
+_global_inits:
+main:
+  StackMalloc('2')
+  Assign(Stackframe(Num('0'), IntType()), Num('42'))
+  Assign(Stackframe(Num('1'), PntrDecl(IntType())), Ref(Stackframe(Num('0'), IntType()), IntType()))
+  Exp(Call(Name('print'), [Deref(Stackframe(Num('1'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType()))]), Empty())
+  Return(Empty())

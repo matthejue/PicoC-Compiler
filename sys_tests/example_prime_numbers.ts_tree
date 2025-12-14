@@ -1,0 +1,277 @@
+translation_unit: int ar[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};\nint len = 10;\n\nvoid primes(int *primes, int n) {\n  int i = 3;\n  int j;\n  int idx = 1;\n  char undividable = 1;\n  if (n <= 1)\n      return;\n  primes[0] = 2;\n\n  while (i <= n) {\n    j = 0;\n    while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }\n    if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }\n    undividable = 1;\n    i = i + 1;\n  }\n}\n\nvoid main() {\n  int i = 0;\n  primes(ar, input());\n  while (i < len) {\n    print(ar[i]);\n    i = i + 1;\n  }\n}\n
+  declaration: int ar[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    primitive_type: int
+    init_declarator: ar[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+      array_declarator: ar[10]
+        identifier: ar
+        [: [
+        number_literal: 10
+        ]: ]
+      =: =
+      initializer_list: {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        {: {
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        ,: ,
+        number_literal: 0
+        }: }
+    ;: ;
+  declaration: int len = 10;
+    primitive_type: int
+    init_declarator: len = 10
+      identifier: len
+      =: =
+      number_literal: 10
+    ;: ;
+  function_definition: void primes(int *primes, int n) {\n  int i = 3;\n  int j;\n  int idx = 1;\n  char undividable = 1;\n  if (n <= 1)\n      return;\n  primes[0] = 2;\n\n  while (i <= n) {\n    j = 0;\n    while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }\n    if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }\n    undividable = 1;\n    i = i + 1;\n  }\n}
+    primitive_type: void
+    function_declarator: primes(int *primes, int n)
+      identifier: primes
+      parameter_list: (int *primes, int n)
+        (: (
+        parameter_declaration: int *primes
+          primitive_type: int
+          pointer_declarator: *primes
+            *: *
+            identifier: primes
+        ,: ,
+        parameter_declaration: int n
+          primitive_type: int
+          identifier: n
+        ): )
+    compound_statement: {\n  int i = 3;\n  int j;\n  int idx = 1;\n  char undividable = 1;\n  if (n <= 1)\n      return;\n  primes[0] = 2;\n\n  while (i <= n) {\n    j = 0;\n    while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }\n    if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }\n    undividable = 1;\n    i = i + 1;\n  }\n}
+      {: {
+      declaration: int i = 3;
+        primitive_type: int
+        init_declarator: i = 3
+          identifier: i
+          =: =
+          number_literal: 3
+        ;: ;
+      declaration: int j;
+        primitive_type: int
+        identifier: j
+        ;: ;
+      declaration: int idx = 1;
+        primitive_type: int
+        init_declarator: idx = 1
+          identifier: idx
+          =: =
+          number_literal: 1
+        ;: ;
+      declaration: char undividable = 1;
+        primitive_type: char
+        init_declarator: undividable = 1
+          identifier: undividable
+          =: =
+          number_literal: 1
+        ;: ;
+      if_statement: if (n <= 1)\n      return;
+        if: if
+        parenthesized_expression: (n <= 1)
+          (: (
+          binary_expression: n <= 1
+            identifier: n
+            <=: <=
+            number_literal: 1
+          ): )
+        return_statement: return;
+          return: return
+          ;: ;
+      expression_statement: primes[0] = 2;
+        assignment_expression: primes[0] = 2
+          subscript_expression: primes[0]
+            identifier: primes
+            [: [
+            number_literal: 0
+            ]: ]
+          =: =
+          number_literal: 2
+        ;: ;
+      while_statement: while (i <= n) {\n    j = 0;\n    while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }\n    if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }\n    undividable = 1;\n    i = i + 1;\n  }
+        while: while
+        parenthesized_expression: (i <= n)
+          (: (
+          binary_expression: i <= n
+            identifier: i
+            <=: <=
+            identifier: n
+          ): )
+        compound_statement: {\n    j = 0;\n    while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }\n    if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }\n    undividable = 1;\n    i = i + 1;\n  }
+          {: {
+          expression_statement: j = 0;
+            assignment_expression: j = 0
+              identifier: j
+              =: =
+              number_literal: 0
+            ;: ;
+          while_statement: while (j < idx) {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }
+            while: while
+            parenthesized_expression: (j < idx)
+              (: (
+              binary_expression: j < idx
+                identifier: j
+                <: <
+                identifier: idx
+              ): )
+            compound_statement: {\n      if (i % primes[j] == 0) {\n        undividable = 0;\n      }\n      j = j + 1;\n    }
+              {: {
+              if_statement: if (i % primes[j] == 0) {\n        undividable = 0;\n      }
+                if: if
+                parenthesized_expression: (i % primes[j] == 0)
+                  (: (
+                  binary_expression: i % primes[j] == 0
+                    binary_expression: i % primes[j]
+                      identifier: i
+                      %: %
+                      subscript_expression: primes[j]
+                        identifier: primes
+                        [: [
+                        identifier: j
+                        ]: ]
+                    ==: ==
+                    number_literal: 0
+                  ): )
+                compound_statement: {\n        undividable = 0;\n      }
+                  {: {
+                  expression_statement: undividable = 0;
+                    assignment_expression: undividable = 0
+                      identifier: undividable
+                      =: =
+                      number_literal: 0
+                    ;: ;
+                  }: }
+              expression_statement: j = j + 1;
+                assignment_expression: j = j + 1
+                  identifier: j
+                  =: =
+                  binary_expression: j + 1
+                    identifier: j
+                    +: +
+                    number_literal: 1
+                ;: ;
+              }: }
+          if_statement: if (undividable) {\n      primes[idx] = i;\n      idx = idx + 1;\n    }
+            if: if
+            parenthesized_expression: (undividable)
+              (: (
+              identifier: undividable
+              ): )
+            compound_statement: {\n      primes[idx] = i;\n      idx = idx + 1;\n    }
+              {: {
+              expression_statement: primes[idx] = i;
+                assignment_expression: primes[idx] = i
+                  subscript_expression: primes[idx]
+                    identifier: primes
+                    [: [
+                    identifier: idx
+                    ]: ]
+                  =: =
+                  identifier: i
+                ;: ;
+              expression_statement: idx = idx + 1;
+                assignment_expression: idx = idx + 1
+                  identifier: idx
+                  =: =
+                  binary_expression: idx + 1
+                    identifier: idx
+                    +: +
+                    number_literal: 1
+                ;: ;
+              }: }
+          expression_statement: undividable = 1;
+            assignment_expression: undividable = 1
+              identifier: undividable
+              =: =
+              number_literal: 1
+            ;: ;
+          expression_statement: i = i + 1;
+            assignment_expression: i = i + 1
+              identifier: i
+              =: =
+              binary_expression: i + 1
+                identifier: i
+                +: +
+                number_literal: 1
+            ;: ;
+          }: }
+      }: }
+  function_definition: void main() {\n  int i = 0;\n  primes(ar, input());\n  while (i < len) {\n    print(ar[i]);\n    i = i + 1;\n  }\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int i = 0;\n  primes(ar, input());\n  while (i < len) {\n    print(ar[i]);\n    i = i + 1;\n  }\n}
+      {: {
+      declaration: int i = 0;
+        primitive_type: int
+        init_declarator: i = 0
+          identifier: i
+          =: =
+          number_literal: 0
+        ;: ;
+      expression_statement: primes(ar, input());
+        call_expression: primes(ar, input())
+          identifier: primes
+          argument_list: (ar, input())
+            (: (
+            identifier: ar
+            ,: ,
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            ): )
+        ;: ;
+      while_statement: while (i < len) {\n    print(ar[i]);\n    i = i + 1;\n  }
+        while: while
+        parenthesized_expression: (i < len)
+          (: (
+          binary_expression: i < len
+            identifier: i
+            <: <
+            identifier: len
+          ): )
+        compound_statement: {\n    print(ar[i]);\n    i = i + 1;\n  }
+          {: {
+          expression_statement: print(ar[i]);
+            call_expression: print(ar[i])
+              identifier: print
+              argument_list: (ar[i])
+                (: (
+                subscript_expression: ar[i]
+                  identifier: ar
+                  [: [
+                  identifier: i
+                  ]: ]
+                ): )
+            ;: ;
+          expression_statement: i = i + 1;
+            assignment_expression: i = i + 1
+              identifier: i
+              =: =
+              binary_expression: i + 1
+                identifier: i
+                +: +
+                number_literal: 1
+            ;: ;
+          }: }
+      }: }

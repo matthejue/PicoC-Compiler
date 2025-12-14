@@ -1,0 +1,60 @@
+translation_unit: void main() {\n  int var = 10;\n  int boolean = 0 || 1 && var || (var < 10 && 1);\n  if (boolean) {\n    print(42);\n  }\n}\n
+  function_definition: void main() {\n  int var = 10;\n  int boolean = 0 || 1 && var || (var < 10 && 1);\n  if (boolean) {\n    print(42);\n  }\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int var = 10;\n  int boolean = 0 || 1 && var || (var < 10 && 1);\n  if (boolean) {\n    print(42);\n  }\n}
+      {: {
+      declaration: int var = 10;
+        primitive_type: int
+        init_declarator: var = 10
+          identifier: var
+          =: =
+          number_literal: 10
+        ;: ;
+      declaration: int boolean = 0 || 1 && var || (var < 10 && 1);
+        primitive_type: int
+        init_declarator: boolean = 0 || 1 && var || (var < 10 && 1)
+          identifier: boolean
+          =: =
+          binary_expression: 0 || 1 && var || (var < 10 && 1)
+            binary_expression: 0 || 1 && var
+              number_literal: 0
+              ||: ||
+              binary_expression: 1 && var
+                number_literal: 1
+                &&: &&
+                identifier: var
+            ||: ||
+            parenthesized_expression: (var < 10 && 1)
+              (: (
+              binary_expression: var < 10 && 1
+                binary_expression: var < 10
+                  identifier: var
+                  <: <
+                  number_literal: 10
+                &&: &&
+                number_literal: 1
+              ): )
+        ;: ;
+      if_statement: if (boolean) {\n    print(42);\n  }
+        if: if
+        parenthesized_expression: (boolean)
+          (: (
+          identifier: boolean
+          ): )
+        compound_statement: {\n    print(42);\n  }
+          {: {
+          expression_statement: print(42);
+            call_expression: print(42)
+              identifier: print
+              argument_list: (42)
+                (: (
+                number_literal: 42
+                ): )
+            ;: ;
+          }: }
+      }: }

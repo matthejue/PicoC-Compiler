@@ -1,0 +1,8 @@
+_global_inits:
+main:
+  StackMalloc('20')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('1'), PntrDecl(IntType())), Ref(Stackframe(Num('0'), IntType()), IntType()))
+  Assign(Stackframe(Num('19'), ArrayDecl(Num('3'), ArrayDecl(Num('3'), ArrayDecl(Num('2'), IntType())))), Array([Array([Array([BinOp(Num('0'), Add(), Num('1')), Num('2')], Empty()), Array([Num('3'), Num('4')], Empty()), Array([BinOp(Num('4'), Add(), Num('1')), Num('5')], Empty())], Empty()), Array([Array([Num('7'), Deref(Stackframe(Num('1'), PntrDecl(IntType())), Num('0'), PntrDecl(IntType()))], Empty()), Array([Num('10'), BinOp(Num('10'), Add(), Num('1'))], Empty()), Array([Num('11'), Num('12')], Empty())], Empty()), Array([Array([Num('13'), Num('14')], Empty()), Array([Num('15'), Num('16')], Empty()), Array([BinOp(Num('16'), Add(), Num('1')), BinOp(Num('17'), Add(), Num('1'))], Empty())], Empty())], Empty()))
+  Exp(Call(Name('print'), [Deref(Deref(Deref(Stackframe(Num('19'), ArrayDecl(Num('3'), ArrayDecl(Num('3'), ArrayDecl(Num('2'), IntType())))), Num('1'), ArrayDecl(Num('3'), ArrayDecl(Num('3'), ArrayDecl(Num('2'), IntType())))), Num('0'), ArrayDecl(Num('3'), ArrayDecl(Num('2'), IntType()))), BinOp(Num('3'), Sub(), Num('2')), ArrayDecl(Num('2'), IntType()))]), Empty())
+  Return(Empty())

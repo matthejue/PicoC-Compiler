@@ -1,0 +1,52 @@
+{
+  "__parents__": {
+    "fun_declared_before": "global",
+    "fun_defined": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun_declared_before": {
+    "param": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "fun_defined": {
+    "param": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun_declared_before": {
+      "datatype": "FunDecl(VoidType(), Name('fun_declared_before'), [Alloc(Writeable(), PntrDecl(IntType()), Name('param'), 'local_var')])",
+      "name": "fun_declared_before",
+      "param_size": 1
+    },
+    "fun_defined": {
+      "datatype": "FunDecl(IntType(), Name('fun_defined'), [Alloc(Writeable(), IntType(), Name('param'), 'param')])",
+      "name": "fun_defined",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "res": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "res",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

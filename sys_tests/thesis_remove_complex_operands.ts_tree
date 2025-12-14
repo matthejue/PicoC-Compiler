@@ -1,0 +1,32 @@
+translation_unit: void main() {\n  int x = 5 % 4;\n  print(x + 41);\n}\n
+  function_definition: void main() {\n  int x = 5 % 4;\n  print(x + 41);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int x = 5 % 4;\n  print(x + 41);\n}
+      {: {
+      declaration: int x = 5 % 4;
+        primitive_type: int
+        init_declarator: x = 5 % 4
+          identifier: x
+          =: =
+          binary_expression: 5 % 4
+            number_literal: 5
+            %: %
+            number_literal: 4
+        ;: ;
+      expression_statement: print(x + 41);
+        call_expression: print(x + 41)
+          identifier: print
+          argument_list: (x + 41)
+            (: (
+            binary_expression: x + 41
+              identifier: x
+              +: +
+              number_literal: 41
+            ): )
+        ;: ;
+      }: }

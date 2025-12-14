@@ -1,0 +1,67 @@
+_global_inits:
+main:
+  StackMalloc('4')
+  Assign(Alloc(Const(), IntType(), Name('min'), 'local_var'), Num('4'))
+  Assign(Alloc(Const(), IntType(), Name('max'), 'local_var'), Num('2'))
+  Assign(Stackframe(Num('2'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('3'), IntType()), Call(Name('input'), []))
+  // DoWhile(Atom(Name('i'), Gt(), Name('min')), [While(Atom(Name('j'), Lt(), Name('max')), [Assign(Name('j'), BinOp(Name('j'), Add(), Num('1'))), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))]), If(Atom(Name('i'), Eq(), Num('6')), [Exp(Call(Name('print'), [Name('i')]), Empty())]), Assign(Name('i'), BinOp(Name('i'), Sub(), Num('1')))])
+  GoTo(Name('do_while_branch.6'))
+do_while_branch.6:
+  // While(Atom(Name('j'), Lt(), Name('max')), [Assign(Name('j'), BinOp(Name('j'), Add(), Num('1'))), Assign(Name('i'), BinOp(Name('i'), Add(), Num('1')))])
+  GoTo(Name('condition_check.5'))
+condition_check.5:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('2'), 
+        IntType()), 
+      Lt(), 
+      Num('2')), 
+    [
+      GoTo(Name('while_branch.4'))
+    ], 
+    [
+      GoTo(Name('while_after.3'))
+    ])
+while_branch.4:
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Stackframe(Num('2'), IntType()), Add(), Num('1')))
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('3'), IntType()), Add(), Num('1')))
+  GoTo(Name('condition_check.5'))
+while_after.3:
+  // If(Atom(Name('i'), Eq(), Num('6')), [Exp(Call(Name('print'), [Name('i')]), Empty())]), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      Eq(), 
+      Num('6')), 
+    [
+      GoTo(Name('if.2'))
+    ], 
+    [
+      GoTo(Name('if_else_after.1'))
+    ])
+if.2:
+  Exp(Call(Name('print'), [Stackframe(Num('3'), IntType())]), Empty())
+  GoTo(Name('if_else_after.1'))
+if_else_after.1:
+  Assign(Stackframe(Num('3'), IntType()), BinOp(Stackframe(Num('3'), IntType()), Sub(), Num('1'))), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('3'), 
+        IntType()), 
+      Gt(), 
+      Num('4')), 
+    [
+      GoTo(Name('do_while_branch.6'))
+    ], 
+    [
+      GoTo(Name('do_while_after.0'))
+    ])
+do_while_after.0:
+  Exp(Call(Name('print'), [Stackframe(Num('3'), IntType())]), Empty())
+  Exp(Call(Name('print'), [Stackframe(Num('2'), IntType())]), Empty())
+  Return(Empty())

@@ -1,0 +1,109 @@
+translation_unit: void main() {\n  int i = input();\n  do {\n    i = i + 1;\n  } while (i < 4);\n  if (i-2) {\n    print(i);\n    i = 0;\n  }\n  while (i < 2) {\n    i = i + 1;\n  }\n  if (i) {\n    print(i);\n  }\n}\n
+  function_definition: void main() {\n  int i = input();\n  do {\n    i = i + 1;\n  } while (i < 4);\n  if (i-2) {\n    print(i);\n    i = 0;\n  }\n  while (i < 2) {\n    i = i + 1;\n  }\n  if (i) {\n    print(i);\n  }\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int i = input();\n  do {\n    i = i + 1;\n  } while (i < 4);\n  if (i-2) {\n    print(i);\n    i = 0;\n  }\n  while (i < 2) {\n    i = i + 1;\n  }\n  if (i) {\n    print(i);\n  }\n}
+      {: {
+      declaration: int i = input();
+        primitive_type: int
+        init_declarator: i = input()
+          identifier: i
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      do_statement: do {\n    i = i + 1;\n  } while (i < 4);
+        do: do
+        compound_statement: {\n    i = i + 1;\n  }
+          {: {
+          expression_statement: i = i + 1;
+            assignment_expression: i = i + 1
+              identifier: i
+              =: =
+              binary_expression: i + 1
+                identifier: i
+                +: +
+                number_literal: 1
+            ;: ;
+          }: }
+        while: while
+        parenthesized_expression: (i < 4)
+          (: (
+          binary_expression: i < 4
+            identifier: i
+            <: <
+            number_literal: 4
+          ): )
+        ;: ;
+      if_statement: if (i-2) {\n    print(i);\n    i = 0;\n  }
+        if: if
+        parenthesized_expression: (i-2)
+          (: (
+          binary_expression: i-2
+            identifier: i
+            -: -
+            number_literal: 2
+          ): )
+        compound_statement: {\n    print(i);\n    i = 0;\n  }
+          {: {
+          expression_statement: print(i);
+            call_expression: print(i)
+              identifier: print
+              argument_list: (i)
+                (: (
+                identifier: i
+                ): )
+            ;: ;
+          expression_statement: i = 0;
+            assignment_expression: i = 0
+              identifier: i
+              =: =
+              number_literal: 0
+            ;: ;
+          }: }
+      while_statement: while (i < 2) {\n    i = i + 1;\n  }
+        while: while
+        parenthesized_expression: (i < 2)
+          (: (
+          binary_expression: i < 2
+            identifier: i
+            <: <
+            number_literal: 2
+          ): )
+        compound_statement: {\n    i = i + 1;\n  }
+          {: {
+          expression_statement: i = i + 1;
+            assignment_expression: i = i + 1
+              identifier: i
+              =: =
+              binary_expression: i + 1
+                identifier: i
+                +: +
+                number_literal: 1
+            ;: ;
+          }: }
+      if_statement: if (i) {\n    print(i);\n  }
+        if: if
+        parenthesized_expression: (i)
+          (: (
+          identifier: i
+          ): )
+        compound_statement: {\n    print(i);\n  }
+          {: {
+          expression_statement: print(i);
+            call_expression: print(i)
+              identifier: print
+              argument_list: (i)
+                (: (
+                identifier: i
+                ): )
+            ;: ;
+          }: }
+      }: }

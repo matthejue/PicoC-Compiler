@@ -1,0 +1,13 @@
+_global_inits:
+fun_with_return_value:
+  StackMalloc('0')
+  Return(BinOp(Num('21'), Mul(), Num('2')))
+fun_no_return_value:
+  StackMalloc('0')
+  Return(Empty())
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('fun_with_return_value'), []))
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Exp(Call(Name('fun_no_return_value'), []), Empty())
+  Return(Empty())

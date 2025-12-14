@@ -1,0 +1,30 @@
+_global_inits:
+ret0:
+  StackMalloc('0')
+  Return(Num('0'))
+ret1:
+  StackMalloc('0')
+  Return(Num('1'))
+tail_call_fun:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), IntType(), Name('bool_val'), 'param'), Empty())
+  // If(ToBool(Name('bool_val')), [Return(Call(Name('ret0'), []))]), 
+  IfElse(
+    ToBool(
+      Stackframe(
+        Num('0'), 
+        IntType())), 
+    [
+      GoTo(Name('if.3'))
+    ], 
+    [
+      GoTo(Name('if_else_after.2'))
+    ])
+if.3:
+  Return(Call(Name('ret0'), []))
+if_else_after.2:
+  Return(Call(Name('ret1'), []))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('tail_call_fun'), [Call(Name('input'), [])])]), Empty())
+  Return(Empty())

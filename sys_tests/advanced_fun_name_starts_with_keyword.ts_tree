@@ -1,0 +1,40 @@
+translation_unit: void int_while_if(){\n  print(input());\n}\n\nvoid main() {\n  int_while_if();\n}\n
+  function_definition: void int_while_if(){\n  print(input());\n}
+    primitive_type: void
+    function_declarator: int_while_if()
+      identifier: int_while_if
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(input());\n}
+      {: {
+      expression_statement: print(input());
+        call_expression: print(input())
+          identifier: print
+          argument_list: (input())
+            (: (
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            ): )
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int_while_if();\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int_while_if();\n}
+      {: {
+      expression_statement: int_while_if();
+        call_expression: int_while_if()
+          identifier: int_while_if
+          argument_list: ()
+            (: (
+            ): )
+        ;: ;
+      }: }

@@ -1,0 +1,6 @@
+_global_inits:
+main:
+  StackMalloc('1')
+  Assign(Stackframe(Num('0'), IntType()), BinOp(BinOp(Num('1'), Sub(), BinOp(Num('2'), Mul(), Num('3'))), Add(), Num('6')))
+  Exp(Call(Name('print'), [BinOp(Stackframe(Num('0'), IntType()), Add(), Call(Name('input'), []))]), Empty())
+  Return(Empty())

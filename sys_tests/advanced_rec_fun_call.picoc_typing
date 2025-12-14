@@ -1,0 +1,28 @@
+_global_inits:
+rec_fun_call:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), IntType(), Name('arg'), 'param'), Empty())
+  // If(Atom(Name('arg'), Eq(), Call(Name('input'), [])), [Return(Name('arg'))]), 
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Eq(), 
+      Call(
+        Name('input'), 
+        [])), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Return(Stackframe(Num('0'), IntType()))
+if_else_after.0:
+  Return(Call(Name('rec_fun_call'), [BinOp(Stackframe(Num('0'), IntType()), Add(), Num('1'))]))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('rec_fun_call'), [Num('1')])]), Empty())
+  Return(Empty())

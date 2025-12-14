@@ -1,0 +1,59 @@
+{
+  "__parents__": {
+    "fun_array_from_global_data": "global",
+    "fun_array_from_stackframe": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun_array_from_global_data": {
+    "local_var": {
+      "addr": 11,
+      "datatype": "ArrayDecl(Num('2'), ArrayDecl(Num('3'), IntType()))",
+      "name": "local_var",
+      "size": 6,
+      "type_qual": "Writeable()"
+    },
+    "param": {
+      "addr": 5,
+      "datatype": "ArrayDecl(Num('2'), ArrayDecl(Num('3'), IntType()))",
+      "name": "param",
+      "size": 6,
+      "type_qual": "Writeable()"
+    }
+  },
+  "fun_array_from_stackframe": {
+    "param": {
+      "addr": 0,
+      "datatype": "PntrDecl(ArrayDecl(Num('3'), IntType()))",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun_array_from_global_data": {
+      "datatype": "FunDecl(VoidType(), Name('fun_array_from_global_data'), [Alloc(Writeable(), ArrayDecl(Num('2'), ArrayDecl(Num('3'), IntType())), Name('param'), 'param')])",
+      "name": "fun_array_from_global_data",
+      "param_size": 1
+    },
+    "fun_array_from_stackframe": {
+      "datatype": "FunDecl(VoidType(), Name('fun_array_from_stackframe'), [Alloc(Writeable(), PntrDecl(ArrayDecl(Num('3'), IntType())), Name('param'), 'param')])",
+      "name": "fun_array_from_stackframe",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "local_var": {
+      "addr": 5,
+      "datatype": "ArrayDecl(Num('2'), ArrayDecl(Num('3'), IntType()))",
+      "name": "local_var",
+      "size": 6,
+      "type_qual": "Writeable()"
+    }
+  }
+}

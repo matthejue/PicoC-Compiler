@@ -1,0 +1,51 @@
+{
+  "__parents__": {
+    "compute": "global",
+    "global": null,
+    "main": "global"
+  },
+  "compute": {
+    "x": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "compute": {
+      "datatype": "FunDecl(IntType(), Name('compute'), [Alloc(Writeable(), IntType(), Name('x'), 'param')])",
+      "name": "compute",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(IntType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "i": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "i",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "sum": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "sum",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "value": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "value",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

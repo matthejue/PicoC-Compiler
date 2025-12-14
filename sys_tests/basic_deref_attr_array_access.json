@@ -1,0 +1,62 @@
+{
+  "Data": {
+    "arr0": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "arr0",
+      "size": 2,
+      "type_qual": "Empty()"
+    },
+    "arr1": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "arr1",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  },
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "Data": {
+      "attrs": [
+        "Name('arr0')",
+        "Name('arr1')"
+      ],
+      "datatype": "StructDecl(Name('Data'), [Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('arr0'), 'local_var'), Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('arr1'), 'local_var')])",
+      "name": "Data",
+      "size": 4,
+      "type_qual": "Empty()"
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "obj": {
+      "addr": 3,
+      "datatype": "StructSpec(Name('Data'))",
+      "name": "obj",
+      "size": 4,
+      "type_qual": "Writeable()"
+    },
+    "ptr": {
+      "addr": 4,
+      "datatype": "PntrDecl(StructSpec(Name('Data')))",
+      "name": "ptr",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "x": {
+      "addr": 5,
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  }
+}

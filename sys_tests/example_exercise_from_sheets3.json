@@ -1,0 +1,36 @@
+{
+  "__parents__": {
+    "global": null,
+    "is_less_equal_without_overflow": "global",
+    "main": "global"
+  },
+  "global": {
+    "is_less_equal_without_overflow": {
+      "datatype": "FunDecl(IntType(), Name('is_less_equal_without_overflow'), [Alloc(Writeable(), IntType(), Name('x'), 'param'), Alloc(Writeable(), IntType(), Name('y'), 'param')])",
+      "name": "is_less_equal_without_overflow",
+      "param_size": 2
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "is_less_equal_without_overflow": {
+    "x": {
+      "addr": 0,
+      "datatype": "IntType()",
+      "name": "x",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "y": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "y",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "main": {}
+}

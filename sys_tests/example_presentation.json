@@ -1,0 +1,77 @@
+{
+  "__parents__": {
+    "fun": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun": {
+    "param": {
+      "addr": 0,
+      "datatype": "PntrDecl(ArrayDecl(Num('3'), ArrayDecl(Num('2'), StructSpec(Name('stt')))))",
+      "name": "param",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "ar_of_sts": {
+      "addr": 0,
+      "datatype": "ArrayDecl(Num('3'), ArrayDecl(Num('2'), StructSpec(Name('stt'))))",
+      "name": "ar_of_sts",
+      "size": 18,
+      "type_qual": "Writeable()"
+    },
+    "fun": {
+      "datatype": "FunDecl(IntType(), Name('fun'), [Alloc(Writeable(), PntrDecl(ArrayDecl(Num('3'), ArrayDecl(Num('2'), StructSpec(Name('stt'))))), Name('param'), 'local_var')])",
+      "name": "fun",
+      "param_size": 1
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "stt": {
+      "attrs": [
+        "Name('attr1')",
+        "Name('attr2')"
+      ],
+      "datatype": "StructDecl(Name('stt'), [Alloc(Writeable(), IntType(), Name('attr1'), 'local_var'), Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('attr2'), 'local_var')])",
+      "name": "stt",
+      "size": 3,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "pntr_on_ar_of_sts": {
+      "addr": 0,
+      "datatype": "PntrDecl(ArrayDecl(Num('3'), ArrayDecl(Num('2'), StructSpec(Name('stt')))))",
+      "name": "pntr_on_ar_of_sts",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "res": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "res",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "stt": {
+    "attr1": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "attr1",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "attr2": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "attr2",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+_global_inits:
+int_while_if:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('input'), [])]), Empty())
+  Return(Empty())
+main:
+  StackMalloc('0')
+  Exp(Call(Name('int_while_if'), []), Empty())
+  Return(Empty())

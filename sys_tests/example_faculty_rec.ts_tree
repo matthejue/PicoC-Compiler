@@ -1,0 +1,126 @@
+translation_unit: int fakul(int n) {\n  int res_f; int h;\n  if (n == 1) {\n    res_f = 1;\n  } else {\n    h = fakul(n-1);\n    res_f = n * h;\n  }\n  return res_f;\n}\n\nvoid main() {\n  int res;\n  print(fakul(input()));\n  res = fakul(input());\n  print(res);\n}\n
+  function_definition: int fakul(int n) {\n  int res_f; int h;\n  if (n == 1) {\n    res_f = 1;\n  } else {\n    h = fakul(n-1);\n    res_f = n * h;\n  }\n  return res_f;\n}
+    primitive_type: int
+    function_declarator: fakul(int n)
+      identifier: fakul
+      parameter_list: (int n)
+        (: (
+        parameter_declaration: int n
+          primitive_type: int
+          identifier: n
+        ): )
+    compound_statement: {\n  int res_f; int h;\n  if (n == 1) {\n    res_f = 1;\n  } else {\n    h = fakul(n-1);\n    res_f = n * h;\n  }\n  return res_f;\n}
+      {: {
+      declaration: int res_f;
+        primitive_type: int
+        identifier: res_f
+        ;: ;
+      declaration: int h;
+        primitive_type: int
+        identifier: h
+        ;: ;
+      if_statement: if (n == 1) {\n    res_f = 1;\n  } else {\n    h = fakul(n-1);\n    res_f = n * h;\n  }
+        if: if
+        parenthesized_expression: (n == 1)
+          (: (
+          binary_expression: n == 1
+            identifier: n
+            ==: ==
+            number_literal: 1
+          ): )
+        compound_statement: {\n    res_f = 1;\n  }
+          {: {
+          expression_statement: res_f = 1;
+            assignment_expression: res_f = 1
+              identifier: res_f
+              =: =
+              number_literal: 1
+            ;: ;
+          }: }
+        else_clause: else {\n    h = fakul(n-1);\n    res_f = n * h;\n  }
+          else: else
+          compound_statement: {\n    h = fakul(n-1);\n    res_f = n * h;\n  }
+            {: {
+            expression_statement: h = fakul(n-1);
+              assignment_expression: h = fakul(n-1)
+                identifier: h
+                =: =
+                call_expression: fakul(n-1)
+                  identifier: fakul
+                  argument_list: (n-1)
+                    (: (
+                    binary_expression: n-1
+                      identifier: n
+                      -: -
+                      number_literal: 1
+                    ): )
+              ;: ;
+            expression_statement: res_f = n * h;
+              assignment_expression: res_f = n * h
+                identifier: res_f
+                =: =
+                binary_expression: n * h
+                  identifier: n
+                  *: *
+                  identifier: h
+              ;: ;
+            }: }
+      return_statement: return res_f;
+        return: return
+        identifier: res_f
+        ;: ;
+      }: }
+  function_definition: void main() {\n  int res;\n  print(fakul(input()));\n  res = fakul(input());\n  print(res);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int res;\n  print(fakul(input()));\n  res = fakul(input());\n  print(res);\n}
+      {: {
+      declaration: int res;
+        primitive_type: int
+        identifier: res
+        ;: ;
+      expression_statement: print(fakul(input()));
+        call_expression: print(fakul(input()))
+          identifier: print
+          argument_list: (fakul(input()))
+            (: (
+            call_expression: fakul(input())
+              identifier: fakul
+              argument_list: (input())
+                (: (
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      expression_statement: res = fakul(input());
+        assignment_expression: res = fakul(input())
+          identifier: res
+          =: =
+          call_expression: fakul(input())
+            identifier: fakul
+            argument_list: (input())
+              (: (
+              call_expression: input()
+                identifier: input
+                argument_list: ()
+                  (: (
+                  ): )
+              ): )
+        ;: ;
+      expression_statement: print(res);
+        call_expression: print(res)
+          identifier: print
+          argument_list: (res)
+            (: (
+            identifier: res
+            ): )
+        ;: ;
+      }: }

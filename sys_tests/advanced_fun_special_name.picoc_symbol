@@ -1,0 +1,11 @@
+_global_inits:
+main:
+  StackMalloc('0')
+  Exp(Call(Name('_fun120'), [Char('b'), Call(Name('input'), [])]), Empty())
+  Return(Empty())
+_fun120:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), CharType(), Name('c'), 'param'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('i'), 'param'), Empty())
+  Exp(Call(Name('print'), [BinOp(Stackframe(Num('1'), IntType()), Mul(), BinOp(Num('100'), Add(), UnOp(Minus(), Stackframe(Num('0'), CharType()))))]), Empty())
+  Return(Empty())

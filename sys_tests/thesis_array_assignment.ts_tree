@@ -1,0 +1,41 @@
+translation_unit: void main() {\n  int ar[2];\n  ar[1] = 42;\n  print(ar[1]);\n}\n
+  function_definition: void main() {\n  int ar[2];\n  ar[1] = 42;\n  print(ar[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int ar[2];\n  ar[1] = 42;\n  print(ar[1]);\n}
+      {: {
+      declaration: int ar[2];
+        primitive_type: int
+        array_declarator: ar[2]
+          identifier: ar
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      expression_statement: ar[1] = 42;
+        assignment_expression: ar[1] = 42
+          subscript_expression: ar[1]
+            identifier: ar
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          number_literal: 42
+        ;: ;
+      expression_statement: print(ar[1]);
+        call_expression: print(ar[1])
+          identifier: print
+          argument_list: (ar[1])
+            (: (
+            subscript_expression: ar[1]
+              identifier: ar
+              [: [
+              number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      }: }

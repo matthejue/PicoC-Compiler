@@ -1,1 +1,1 @@
--t -m -f /tmp -i ./opts/isrs.reti -v
+-t -m -f /tmp -i ./opts/isrs.reti

@@ -1,0 +1,18 @@
+_global_inits:
+main:
+  StackMalloc('0')
+  // If(ToBool(Num('42')), [Exp(Call(Name('print'), [Num('42')]), Empty())]), 
+  IfElse(
+    ToBool(
+      Num('42')), 
+    [
+      GoTo(Name('if.1'))
+    ], 
+    [
+      GoTo(Name('if_else_after.0'))
+    ])
+if.1:
+  Exp(Call(Name('print'), [Num('42')]), Empty())
+  GoTo(Name('if_else_after.0'))
+if_else_after.0:
+  Return(Empty())

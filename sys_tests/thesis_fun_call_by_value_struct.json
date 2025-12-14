@@ -1,0 +1,78 @@
+{
+  "__parents__": {
+    "fun_struct_from_global_data": "global",
+    "fun_struct_from_stackframe": "global",
+    "global": null,
+    "main": "global"
+  },
+  "fun_struct_from_global_data": {
+    "param": {
+      "addr": 2,
+      "datatype": "StructSpec(Name('st'))",
+      "name": "param",
+      "size": 3,
+      "type_qual": "Writeable()"
+    }
+  },
+  "fun_struct_from_stackframe": {
+    "param": {
+      "addr": 2,
+      "datatype": "StructSpec(Name('st'))",
+      "name": "param",
+      "size": 3,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "fun_struct_from_global_data": {
+      "datatype": "FunDecl(VoidType(), Name('fun_struct_from_global_data'), [Alloc(Writeable(), StructSpec(Name('st')), Name('param'), 'param')])",
+      "name": "fun_struct_from_global_data",
+      "param_size": 3
+    },
+    "fun_struct_from_stackframe": {
+      "datatype": "FunDecl(VoidType(), Name('fun_struct_from_stackframe'), [Alloc(Writeable(), StructSpec(Name('st')), Name('param'), 'param')])",
+      "name": "fun_struct_from_stackframe",
+      "param_size": 3
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "st": {
+      "attrs": [
+        "Name('attr1')",
+        "Name('attr2')"
+      ],
+      "datatype": "StructDecl(Name('st'), [Alloc(Writeable(), IntType(), Name('attr1'), 'local_var'), Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('attr2'), 'local_var')])",
+      "name": "st",
+      "size": 3,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "local_var": {
+      "addr": 2,
+      "datatype": "StructSpec(Name('st'))",
+      "name": "local_var",
+      "size": 3,
+      "type_qual": "Writeable()"
+    }
+  },
+  "st": {
+    "attr1": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "attr1",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "attr2": {
+      "addr": "Empty()",
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "attr2",
+      "size": 2,
+      "type_qual": "Empty()"
+    }
+  }
+}

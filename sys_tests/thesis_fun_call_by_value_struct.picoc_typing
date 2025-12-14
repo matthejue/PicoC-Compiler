@@ -1,0 +1,18 @@
+_global_inits:
+fun_struct_from_stackframe:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), StructSpec(Name('st')), Name('param'), 'param'), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Stackframe(Num('2'), StructSpec(Name('st'))), Name('attr2'), StructSpec(Name('st'))), Num('1'), ArrayDecl(Num('2'), IntType()))]), Empty())
+  Return(Empty())
+fun_struct_from_global_data:
+  StackMalloc('0')
+  Exp(Alloc(Writeable(), StructSpec(Name('st')), Name('param'), 'param'), Empty())
+  Exp(Call(Name('print'), [Deref(Attr(Stackframe(Num('2'), StructSpec(Name('st'))), Name('attr2'), StructSpec(Name('st'))), Num('1'), ArrayDecl(Num('2'), IntType()))]), Empty())
+  Exp(Call(Name('fun_struct_from_stackframe'), [Stackframe(Num('2'), StructSpec(Name('st')))]), Empty())
+  Return(Empty())
+main:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), StructSpec(Name('st')), Name('local_var'), 'local_var'), Empty())
+  Assign(Deref(Attr(Stackframe(Num('2'), StructSpec(Name('st'))), Name('attr2'), StructSpec(Name('st'))), Num('1'), ArrayDecl(Num('2'), IntType())), Num('42'))
+  Exp(Call(Name('fun_struct_from_global_data'), [Stackframe(Num('2'), StructSpec(Name('st')))]), Empty())
+  Return(Empty())

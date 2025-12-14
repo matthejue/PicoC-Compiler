@@ -1,0 +1,11 @@
+_global_inits:
+main:
+  StackMalloc('3')
+  Exp(Alloc(Writeable(), IntType(), Name('x'), 'local_var'), Empty())
+  Exp(Alloc(Writeable(), IntType(), Name('y'), 'local_var'), Empty())
+  Assign(Alloc(Const(), IntType(), Name('z'), 'local_var'), Num('5'))
+  Assign(Stackframe(Num('1'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Add(), BinOp(BinOp(Stackframe(Num('1'), IntType()), Mul(), Num('5')), Add(), Num('10'))))
+  Exp(Call(Name('print'), [Stackframe(Num('0'), IntType())]), Empty())
+  Return(Empty())

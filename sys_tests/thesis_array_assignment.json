@@ -1,0 +1,22 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {
+    "ar": {
+      "addr": 1,
+      "datatype": "ArrayDecl(Num('2'), IntType())",
+      "name": "ar",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  }
+}

@@ -1,0 +1,82 @@
+translation_unit: int log2(int a) {\n    int b = -1;\n    while (a > 0) {\n        b = b + 1;\n        a = a / 2;\n    }\n    return b;\n}\n\nvoid main() {\n  print(log2(input()));\n}\n
+  function_definition: int log2(int a) {\n    int b = -1;\n    while (a > 0) {\n        b = b + 1;\n        a = a / 2;\n    }\n    return b;\n}
+    primitive_type: int
+    function_declarator: log2(int a)
+      identifier: log2
+      parameter_list: (int a)
+        (: (
+        parameter_declaration: int a
+          primitive_type: int
+          identifier: a
+        ): )
+    compound_statement: {\n    int b = -1;\n    while (a > 0) {\n        b = b + 1;\n        a = a / 2;\n    }\n    return b;\n}
+      {: {
+      declaration: int b = -1;
+        primitive_type: int
+        init_declarator: b = -1
+          identifier: b
+          =: =
+          number_literal: -1
+        ;: ;
+      while_statement: while (a > 0) {\n        b = b + 1;\n        a = a / 2;\n    }
+        while: while
+        parenthesized_expression: (a > 0)
+          (: (
+          binary_expression: a > 0
+            identifier: a
+            >: >
+            number_literal: 0
+          ): )
+        compound_statement: {\n        b = b + 1;\n        a = a / 2;\n    }
+          {: {
+          expression_statement: b = b + 1;
+            assignment_expression: b = b + 1
+              identifier: b
+              =: =
+              binary_expression: b + 1
+                identifier: b
+                +: +
+                number_literal: 1
+            ;: ;
+          expression_statement: a = a / 2;
+            assignment_expression: a = a / 2
+              identifier: a
+              =: =
+              binary_expression: a / 2
+                identifier: a
+                /: /
+                number_literal: 2
+            ;: ;
+          }: }
+      return_statement: return b;
+        return: return
+        identifier: b
+        ;: ;
+      }: }
+  function_definition: void main() {\n  print(log2(input()));\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  print(log2(input()));\n}
+      {: {
+      expression_statement: print(log2(input()));
+        call_expression: print(log2(input()))
+          identifier: print
+          argument_list: (log2(input()))
+            (: (
+            call_expression: log2(input())
+              identifier: log2
+              argument_list: (input())
+                (: (
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ): )
+            ): )
+        ;: ;
+      }: }

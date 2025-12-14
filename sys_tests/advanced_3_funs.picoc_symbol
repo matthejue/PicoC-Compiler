@@ -1,0 +1,20 @@
+_global_inits:
+main:
+  StackMalloc('2')
+  Assign(Stackframe(Num('0'), IntType()), Call(Name('input'), []))
+  Assign(Stackframe(Num('1'), IntType()), Call(Name('fun'), [Stackframe(Num('0'), IntType())]))
+  Exp(Call(Name('print'), [BinOp(Stackframe(Num('1'), IntType()), Add(), Num('2'))]), Empty())
+  Return(Num('0'))
+fun2:
+  StackMalloc('1')
+  Exp(Alloc(Writeable(), IntType(), Name('param'), 'param'), Empty())
+  Assign(Stackframe(Num('1'), IntType()), Num('2'))
+  Return(BinOp(Stackframe(Num('0'), IntType()), Add(), Stackframe(Num('1'), IntType())))
+fun:
+  StackMalloc('2')
+  Exp(Alloc(Writeable(), IntType(), Name('param'), 'param'), Empty())
+  Assign(Stackframe(Num('1'), IntType()), Num('2'))
+  Assign(Stackframe(Num('2'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Add(), Stackframe(Num('1'), IntType())))
+  Exp(Call(Name('print'), [Stackframe(Num('2'), IntType())]), Empty())
+  Exp(Call(Name('print'), [Call(Name('fun2'), [Stackframe(Num('2'), IntType())])]), Empty())
+  Return(Stackframe(Num('2'), IntType()))

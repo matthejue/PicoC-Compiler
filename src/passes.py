@@ -475,15 +475,9 @@ class Passes:
                 )
                 return int(symbol["size"])
             # ---------------------------- L_Array ----------------------------
-            case pn.ArrayDecl(nums, datatype2):
-                size = self._datatype_size(datatype2)
-                for num in nums:
-                    match num:
-                        case pn.Num(val):
-                            size *= int(val)
-                        case _:
-                            throw_error(num)
-                return size
+            case pn.ArrayDecl(pn.Num(val), datatype2):
+                elem_size = self._datatype_size(datatype2)
+                return elem_size * int(val)
             case _:
                 throw_error(datatype)
 
@@ -492,56 +486,33 @@ class Passes:
             case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
+                size = self._datatype_size(datatype_copy)
                 match self.current_scope:
                     case "global":
-                        size = self._datatype_size(datatype_copy)
-                        self.symbol_table.declare(
-                            var_name,
-                            {
-                                "type_qual": type_qual,
-                                "datatype": datatype_copy,
-                                "name": var_name,
-                                "addr": pn.Empty(),
-                                "size": size,
-                                **(
-                                    {"val": initial_val}
-                                    if initial_val is not None
-                                    else {}
-                                ),
-                            },
-                            scope=self.current_scope,
-                        )
+                        addr = pn.Empty()
                     case _:
-                        match datatype_copy:
-                            case pn.ArrayDecl(nums, datatype2) if (
-                                local_var_or_param == "param"
-                            ):
-                                if len(nums) > 1:
-                                    datatype_copy.nums.pop(0)
-                                    datatype = pn.PntrDecl(pn.Num("1"), datatype_copy)
-                                else:
-                                    datatype = pn.PntrDecl(pn.Num("1"), datatype2)
-                        size = self._datatype_size(datatype)
-                        self.symbol_table.declare(
-                            var_name,
-                            {
-                                "type_qual": type_qual,
-                                "datatype": datatype,
-                                "name": var_name,
-                                "addr": self.rel_fun_addr + size - 1,
-                                "size": size,
-                                **(
-                                    {"val": initial_val}
-                                    if initial_val is not None
-                                    else {}
-                                ),
-                            },
-                            scope=self.current_scope,
-                        )
+                        addr = self.rel_fun_addr + size - 1
                         self.rel_fun_addr += size
                         self.current_fun_local_vars_size += (
                             size if local_var_or_param == "local_var" else 0
                         )
+
+                self.symbol_table.declare(
+                    var_name,
+                    {
+                        "type_qual": type_qual,
+                        "datatype": datatype_copy,
+                        "name": var_name,
+                        "addr": addr,
+                        "size": size,
+                        **(
+                            {"val": initial_val}
+                            if initial_val is not None
+                            else {}
+                        ),
+                    },
+                    scope=self.current_scope,
+                )
             case _:
                 throw_error(alloc) 
 
@@ -901,13 +872,9 @@ class Passes:
 
     def _deref_result_datatype(self, pointer_dt):
         match pointer_dt:
-            case pn.PntrDecl(pn.Num(val), inner_dt):
-                if int(val) > 1:
-                    return pn.PntrDecl(pn.Num(str(int(val) - 1)), copy.deepcopy(inner_dt))
+            case pn.PntrDecl(inner_dt):
                 return copy.deepcopy(inner_dt)
-            case pn.ArrayDecl(nums, inner_dt):
-                if len(nums) > 1:
-                    return pn.ArrayDecl(nums[1:], copy.deepcopy(inner_dt))
+            case pn.ArrayDecl(_, inner_dt):
                 return copy.deepcopy(inner_dt)
             case _:
                 return pn.Empty()
@@ -920,13 +887,8 @@ class Passes:
                 symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
                 if symbol:
                     return copy.deepcopy(symbol.get("datatype", pn.Empty()))
-            case pn.StructDecl(pn.Name(struct_name), _):
-                symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
-                if symbol:
-                    return copy.deepcopy(symbol.get("datatype", pn.Empty()))
-            case pn.PntrDecl(_, inner_dt) | pn.ArrayDecl(_, inner_dt):
-                return self._attr_result_datatype(inner_dt, attr_name)
-        return pn.Empty()
+            case _:
+                throw_error(struct_dt)
 
     def _picoc_type_exp(self, exp):
         match exp:
@@ -990,7 +952,7 @@ class Passes:
             case pn.Ref(inner_exp):
                 inner_dt = self._picoc_type_exp(inner_exp)
                 exp.datatype = copy.deepcopy(inner_dt)
-                pointer_dt = pn.PntrDecl(pn.Num("1"), copy.deepcopy(inner_dt))
+                pointer_dt = pn.PntrDecl(copy.deepcopy(inner_dt))
                 return pointer_dt
             case pn.Deref(ptr_exp, idx_exp):
                 base_dt = self._picoc_type_exp(ptr_exp)
@@ -1003,7 +965,7 @@ class Passes:
                         elem_dt = self._picoc_type_exp(exp)
                     else:
                         self._picoc_type_exp(exp)
-                return pn.ArrayDecl([pn.Num(str(len(exps)))], elem_dt)
+                return pn.ArrayDecl(pn.Num(str(len(exps))), elem_dt)
             # ----------------------------- L_Struct ----------------------------
             case pn.Struct(assigns):
                 for assign in assigns:
@@ -1316,7 +1278,7 @@ class Passes:
             case pn.Attr(_, pn.Name(attr_name)):
                 refs_anf = self._picoc_anf_ref(exp)
                 final_exp = pn.Exp(pn.Stack(pn.Num("1")))
-                datatype = getattr(exp, "datatype", None)
+                datatype = exp.datatype
                 final_exp.datatype = self._attr_result_datatype(datatype, attr_name)
                 return refs_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
@@ -1988,19 +1950,8 @@ class Passes:
                 reti_instrs = self._single_line_comment(stmt, "#")
                 # Scale the index by the size of a single element of the referenced type.
                 match datatype:
-                    case pn.ArrayDecl(nums, datatype2):
-                        help_const = self._datatype_size(datatype2)
-                        for num in nums[1:]:
-                            match num:
-                                case pn.Num(val3):
-                                    help_const *= int(val3)
-                                case _:
-                                    throw_error(num)
-                    case pn.PntrDecl(pn.Num('1'), datatype2):
-                        help_const = self._datatype_size(datatype2)
-                    case pn.PntrDecl(_, datatype2):
-                        pass
-                        help_const = 1
+                    case pn.ArrayDecl(_, inner_dt) | pn.PntrDecl(inner_dt):
+                        help_const = self._datatype_size(inner_dt)
                     case _:
                         throw_error(datatype)
                 match datatype:

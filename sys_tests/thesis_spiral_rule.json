@@ -1,0 +1,47 @@
+{
+  "__parents__": {
+    "global": null,
+    "main": "global"
+  },
+  "global": {
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    },
+    "st": {
+      "attrs": [
+        "Name('attr')"
+      ],
+      "datatype": "StructDecl(Name('st'), [Alloc(Writeable(), IntType(), Name('attr'), 'local_var')])",
+      "name": "st",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "main": {
+    "complex_var": {
+      "addr": 3,
+      "datatype": "ArrayDecl(Num('1'), ArrayDecl(Num('2'), PntrDecl(ArrayDecl(Num('2'), StructSpec(Name('st'))))))",
+      "name": "complex_var",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "st_var": {
+      "addr": 1,
+      "datatype": "ArrayDecl(Num('2'), StructSpec(Name('st')))",
+      "name": "st_var",
+      "size": 2,
+      "type_qual": "Writeable()"
+    }
+  },
+  "st": {
+    "attr": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "attr",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  }
+}

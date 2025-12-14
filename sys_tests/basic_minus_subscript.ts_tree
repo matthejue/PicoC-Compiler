@@ -1,0 +1,45 @@
+translation_unit: void main() {\n  int a[2] = {1, input()};\n  print(-a[1]);\n}\n
+  function_definition: void main() {\n  int a[2] = {1, input()};\n  print(-a[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int a[2] = {1, input()};\n  print(-a[1]);\n}
+      {: {
+      declaration: int a[2] = {1, input()};
+        primitive_type: int
+        init_declarator: a[2] = {1, input()}
+          array_declarator: a[2]
+            identifier: a
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          initializer_list: {1, input()}
+            {: {
+            number_literal: 1
+            ,: ,
+            call_expression: input()
+              identifier: input
+              argument_list: ()
+                (: (
+                ): )
+            }: }
+        ;: ;
+      expression_statement: print(-a[1]);
+        call_expression: print(-a[1])
+          identifier: print
+          argument_list: (-a[1])
+            (: (
+            unary_expression: -a[1]
+              -: -
+              subscript_expression: a[1]
+                identifier: a
+                [: [
+                number_literal: 1
+                ]: ]
+            ): )
+        ;: ;
+      }: }

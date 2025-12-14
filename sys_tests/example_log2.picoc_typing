@@ -1,0 +1,31 @@
+_global_inits:
+log2:
+  StackMalloc('1')
+  Exp(Alloc(Writeable(), IntType(), Name('a'), 'param'), Empty())
+  Assign(Stackframe(Num('1'), IntType()), Num('-1'))
+  // While(Atom(Name('a'), Gt(), Num('0')), [Assign(Name('b'), BinOp(Name('b'), Add(), Num('1'))), Assign(Name('a'), BinOp(Name('a'), Div(), Num('2')))])
+  GoTo(Name('condition_check.2'))
+condition_check.2:
+  IfElse(
+    Atom(
+      Stackframe(
+        Num('0'), 
+        IntType()), 
+      Gt(), 
+      Num('0')), 
+    [
+      GoTo(Name('while_branch.1'))
+    ], 
+    [
+      GoTo(Name('while_after.0'))
+    ])
+while_branch.1:
+  Assign(Stackframe(Num('1'), IntType()), BinOp(Stackframe(Num('1'), IntType()), Add(), Num('1')))
+  Assign(Stackframe(Num('0'), IntType()), BinOp(Stackframe(Num('0'), IntType()), Div(), Num('2')))
+  GoTo(Name('condition_check.2'))
+while_after.0:
+  Return(Stackframe(Num('1'), IntType()))
+main:
+  StackMalloc('0')
+  Exp(Call(Name('print'), [Call(Name('log2'), [Call(Name('input'), [])])]), Empty())
+  Return(Empty())

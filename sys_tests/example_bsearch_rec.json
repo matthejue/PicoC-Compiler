@@ -1,0 +1,97 @@
+{
+  "__parents__": {
+    "bsearch_rec": "global",
+    "global": null,
+    "main": "global"
+  },
+  "ar_with_lent": {
+    "ar": {
+      "addr": "Empty()",
+      "datatype": "PntrDecl(IntType())",
+      "name": "ar",
+      "size": 1,
+      "type_qual": "Empty()"
+    },
+    "len": {
+      "addr": "Empty()",
+      "datatype": "IntType()",
+      "name": "len",
+      "size": 1,
+      "type_qual": "Empty()"
+    }
+  },
+  "bsearch_rec": {
+    "ar": {
+      "addr": 0,
+      "datatype": "PntrDecl(IntType())",
+      "name": "ar",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "hi": {
+      "addr": 3,
+      "datatype": "IntType()",
+      "name": "hi",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "key": {
+      "addr": 1,
+      "datatype": "IntType()",
+      "name": "key",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "lo": {
+      "addr": 2,
+      "datatype": "IntType()",
+      "name": "lo",
+      "size": 1,
+      "type_qual": "Writeable()"
+    },
+    "m": {
+      "addr": 4,
+      "datatype": "IntType()",
+      "name": "m",
+      "size": 1,
+      "type_qual": "Writeable()"
+    }
+  },
+  "global": {
+    "ar": {
+      "addr": 0,
+      "datatype": "ArrayDecl(Num('10'), IntType())",
+      "name": "ar",
+      "size": 10,
+      "type_qual": "Writeable()"
+    },
+    "ar_with_len": {
+      "addr": 10,
+      "datatype": "StructSpec(Name('ar_with_lent'))",
+      "name": "ar_with_len",
+      "size": 2,
+      "type_qual": "Writeable()"
+    },
+    "ar_with_lent": {
+      "attrs": [
+        "Name('len')",
+        "Name('ar')"
+      ],
+      "datatype": "StructDecl(Name('ar_with_lent'), [Alloc(Writeable(), IntType(), Name('len'), 'local_var'), Alloc(Writeable(), PntrDecl(IntType()), Name('ar'), 'local_var')])",
+      "name": "ar_with_lent",
+      "size": 2,
+      "type_qual": "Empty()"
+    },
+    "bsearch_rec": {
+      "datatype": "FunDecl(IntType(), Name('bsearch_rec'), [Alloc(Writeable(), PntrDecl(IntType()), Name('ar'), 'param'), Alloc(Writeable(), IntType(), Name('key'), 'param'), Alloc(Writeable(), IntType(), Name('lo'), 'param'), Alloc(Writeable(), IntType(), Name('hi'), 'param')])",
+      "name": "bsearch_rec",
+      "param_size": 4
+    },
+    "main": {
+      "datatype": "FunDecl(VoidType(), Name('main'), [])",
+      "name": "main",
+      "param_size": 0
+    }
+  },
+  "main": {}
+}

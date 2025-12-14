@@ -1,0 +1,140 @@
+translation_unit: void main() {\n  \n  int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};\n  \n  int var2[2];\n  \n  var2[0] = input();\n  \n  print(var[input()][2 - 1]);\n  \n  var2[1] = var[1][2 - 1] * 8;\n  \n  print(var2[0] + var2[1]);\n}\n
+  function_definition: void main() {\n  \n  int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};\n  \n  int var2[2];\n  \n  var2[0] = input();\n  \n  print(var[input()][2 - 1]);\n  \n  var2[1] = var[1][2 - 1] * 8;\n  \n  print(var2[0] + var2[1]);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  \n  int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};\n  \n  int var2[2];\n  \n  var2[0] = input();\n  \n  print(var[input()][2 - 1]);\n  \n  var2[1] = var[1][2 - 1] * 8;\n  \n  print(var2[0] + var2[1]);\n}
+      {: {
+      declaration: int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};
+        primitive_type: int
+        init_declarator: var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}}
+          array_declarator: var[2][3]
+            array_declarator: var[2]
+              identifier: var
+              [: [
+              number_literal: 2
+              ]: ]
+            [: [
+            number_literal: 3
+            ]: ]
+          =: =
+          initializer_list: {{1, 2, 3},{1, 2 + input(), 3}}
+            {: {
+            initializer_list: {1, 2, 3}
+              {: {
+              number_literal: 1
+              ,: ,
+              number_literal: 2
+              ,: ,
+              number_literal: 3
+              }: }
+            ,: ,
+            initializer_list: {1, 2 + input(), 3}
+              {: {
+              number_literal: 1
+              ,: ,
+              binary_expression: 2 + input()
+                number_literal: 2
+                +: +
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+              ,: ,
+              number_literal: 3
+              }: }
+            }: }
+        ;: ;
+      declaration: int var2[2];
+        primitive_type: int
+        array_declarator: var2[2]
+          identifier: var2
+          [: [
+          number_literal: 2
+          ]: ]
+        ;: ;
+      expression_statement: var2[0] = input();
+        assignment_expression: var2[0] = input()
+          subscript_expression: var2[0]
+            identifier: var2
+            [: [
+            number_literal: 0
+            ]: ]
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: print(var[input()][2 - 1]);
+        call_expression: print(var[input()][2 - 1])
+          identifier: print
+          argument_list: (var[input()][2 - 1])
+            (: (
+            subscript_expression: var[input()][2 - 1]
+              subscript_expression: var[input()]
+                identifier: var
+                [: [
+                call_expression: input()
+                  identifier: input
+                  argument_list: ()
+                    (: (
+                    ): )
+                ]: ]
+              [: [
+              binary_expression: 2 - 1
+                number_literal: 2
+                -: -
+                number_literal: 1
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: var2[1] = var[1][2 - 1] * 8;
+        assignment_expression: var2[1] = var[1][2 - 1] * 8
+          subscript_expression: var2[1]
+            identifier: var2
+            [: [
+            number_literal: 1
+            ]: ]
+          =: =
+          binary_expression: var[1][2 - 1] * 8
+            subscript_expression: var[1][2 - 1]
+              subscript_expression: var[1]
+                identifier: var
+                [: [
+                number_literal: 1
+                ]: ]
+              [: [
+              binary_expression: 2 - 1
+                number_literal: 2
+                -: -
+                number_literal: 1
+              ]: ]
+            *: *
+            number_literal: 8
+        ;: ;
+      expression_statement: print(var2[0] + var2[1]);
+        call_expression: print(var2[0] + var2[1])
+          identifier: print
+          argument_list: (var2[0] + var2[1])
+            (: (
+            binary_expression: var2[0] + var2[1]
+              subscript_expression: var2[0]
+                identifier: var2
+                [: [
+                number_literal: 0
+                ]: ]
+              +: +
+              subscript_expression: var2[1]
+                identifier: var2
+                [: [
+                number_literal: 1
+                ]: ]
+            ): )
+        ;: ;
+      }: }

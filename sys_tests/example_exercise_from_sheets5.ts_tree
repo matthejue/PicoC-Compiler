@@ -1,0 +1,101 @@
+translation_unit: void main() {\n  int f[3][4]; \n  int g;\n  \n  g = input();\n  \n  \n  f[1 + g][2] = 4;\n  print(f[1 + g][2]);\n  g = 3 + f[2][1 + g];\n  print(g);\n}\n
+  function_definition: void main() {\n  int f[3][4]; \n  int g;\n  \n  g = input();\n  \n  \n  f[1 + g][2] = 4;\n  print(f[1 + g][2]);\n  g = 3 + f[2][1 + g];\n  print(g);\n}
+    primitive_type: void
+    function_declarator: main()
+      identifier: main
+      parameter_list: ()
+        (: (
+        ): )
+    compound_statement: {\n  int f[3][4]; \n  int g;\n  \n  g = input();\n  \n  \n  f[1 + g][2] = 4;\n  print(f[1 + g][2]);\n  g = 3 + f[2][1 + g];\n  print(g);\n}
+      {: {
+      declaration: int f[3][4];
+        primitive_type: int
+        array_declarator: f[3][4]
+          array_declarator: f[3]
+            identifier: f
+            [: [
+            number_literal: 3
+            ]: ]
+          [: [
+          number_literal: 4
+          ]: ]
+        ;: ;
+      declaration: int g;
+        primitive_type: int
+        identifier: g
+        ;: ;
+      expression_statement: g = input();
+        assignment_expression: g = input()
+          identifier: g
+          =: =
+          call_expression: input()
+            identifier: input
+            argument_list: ()
+              (: (
+              ): )
+        ;: ;
+      expression_statement: f[1 + g][2] = 4;
+        assignment_expression: f[1 + g][2] = 4
+          subscript_expression: f[1 + g][2]
+            subscript_expression: f[1 + g]
+              identifier: f
+              [: [
+              binary_expression: 1 + g
+                number_literal: 1
+                +: +
+                identifier: g
+              ]: ]
+            [: [
+            number_literal: 2
+            ]: ]
+          =: =
+          number_literal: 4
+        ;: ;
+      expression_statement: print(f[1 + g][2]);
+        call_expression: print(f[1 + g][2])
+          identifier: print
+          argument_list: (f[1 + g][2])
+            (: (
+            subscript_expression: f[1 + g][2]
+              subscript_expression: f[1 + g]
+                identifier: f
+                [: [
+                binary_expression: 1 + g
+                  number_literal: 1
+                  +: +
+                  identifier: g
+                ]: ]
+              [: [
+              number_literal: 2
+              ]: ]
+            ): )
+        ;: ;
+      expression_statement: g = 3 + f[2][1 + g];
+        assignment_expression: g = 3 + f[2][1 + g]
+          identifier: g
+          =: =
+          binary_expression: 3 + f[2][1 + g]
+            number_literal: 3
+            +: +
+            subscript_expression: f[2][1 + g]
+              subscript_expression: f[2]
+                identifier: f
+                [: [
+                number_literal: 2
+                ]: ]
+              [: [
+              binary_expression: 1 + g
+                number_literal: 1
+                +: +
+                identifier: g
+              ]: ]
+        ;: ;
+      expression_statement: print(g);
+        call_expression: print(g)
+          identifier: print
+          argument_list: (g)
+            (: (
+            identifier: g
+            ): )
+        ;: ;
+      }: }
