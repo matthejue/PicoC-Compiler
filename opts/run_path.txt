@@ -1,1 +1,1 @@
-./sys_tests/thesis_3_funs.picoc
+./sys_tests/basic_typecast.picoc

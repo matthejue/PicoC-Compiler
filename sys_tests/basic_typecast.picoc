@@ -1,27 +1,31 @@
 // input:
 // expected:42
+#include<stdio.h>
 
-#define NULL 0
+#define NULL ((void *)0)
 
 struct BlockHeader {
-    int size;
     int free;
-    struct BlockHeader *next;
+    int size;
+    int next;
 };
 
 int main() {
     struct BlockHeader block = {
-        .size = 39,
         .free = 1,
-        .next = NULL
+        .size = 0,
+        .next = (int)NULL
     };
 
     struct BlockHeader *current = &block;
     int *data_start = (int *)(current + 1);
-    struct BlockHeader *new_block = (struct BlockHeader *)(data_start + (*current).size);
+    int *size = ((int *)current + 1);
+    *size = 3 * 38;
+    struct BlockHeader *new_block = ((struct BlockHeader *)(data_start + (*current).size) + 3);
 
-    print(current - new_block);
+    print(new_block - current);
 
     return 0;
 }
+
 
