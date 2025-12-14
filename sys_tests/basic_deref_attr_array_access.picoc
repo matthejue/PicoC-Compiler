@@ -7,10 +7,10 @@ struct Data {
 };
 
 void main() {
-    struct Data obj = {.arr1={1, 2}, .arr2={3, input()}};
+    struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};
     struct Data *ptr = &obj;
 
-    int x = (*ptr).arr1[2];
+    int x = (*ptr).arr1[1];
 
     print(x);
 }

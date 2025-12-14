@@ -290,7 +290,7 @@ class TransformerPicoC:
     
     # --------------------------------- Loops ---------------------------------
     def do_statement(self, _, children):
-        return pn.DoWhile(children[0], children[1])
+        return pn.DoWhile(children[1], children[0])
 
     def while_statement(self, _, children):
         return pn.While(children[0], children[1])

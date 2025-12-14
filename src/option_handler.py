@@ -55,7 +55,7 @@ class OptionHandler:
                     print(f"[ERROR] {f}: {e}")
                     if global_vars.args.traceback:
                         traceback.print_exc()
-                    exit(FAILURE)
+                    exit(1)
         else:
             with ThreadPoolExecutor(
                 max_workers=max_workers, thread_name_prefix="builder"
@@ -72,7 +72,7 @@ class OptionHandler:
                         print(f"[ERROR] {f}: {e}")
                         if global_vars.args.traceback:
                             traceback.print_exc()
-                        exit(FAILURE)
+                        exit(1)
 
         asts, symbol_tables, all_file_blocks = (
             map(list, zip(*results)) if results else ([], [], [])
