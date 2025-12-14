@@ -323,7 +323,7 @@ class OptionHandler:
 
         if global_vars.args.write_files:
             with open(
-                global_vars.tstate.path_without_ext + ".ts_tree",
+                global_vars.tstate.path_without_ext + ".dt",
                 "w",
                 encoding="utf-8",
             ) as fout:

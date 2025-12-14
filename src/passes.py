@@ -486,6 +486,10 @@ class Passes:
             case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
+                # Parameters of array type decay to pointers to their first element type.
+                if local_var_or_param == "param" and isinstance(datatype_copy, pn.ArrayDecl):
+                    datatype_copy = pn.PntrDecl(copy.deepcopy(datatype_copy.datatype))
+
                 size = self._datatype_size(datatype_copy)
                 match self.current_scope:
                     case "global":
