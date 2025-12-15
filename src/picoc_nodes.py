@@ -200,14 +200,15 @@ class UnOp(ASTNode):
 
 
 class Cast(ASTNode):
-    def __init__(self, datatype):
+    def __init__(self, datatype, exp):
         self.datatype = datatype
+        self.exp = exp
 
     @property
     def visible(self):
-        return [self.datatype]
+        return [self.datatype, self.exp]
 
-    __match_args__ = ("datatype",)
+    __match_args__ = ("datatype", "exp")
 
 
 class Exit(ASTNode):

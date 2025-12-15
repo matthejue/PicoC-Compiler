@@ -895,7 +895,7 @@ class Passes:
                 throw_error(struct_dt)
 
     def _strip_cast(self, exp):
-        while isinstance(exp, pn.UnOp) and isinstance(exp.un_op, pn.Cast):
+        while isinstance(exp, pn.Cast):
             exp = exp.exp
         return exp
 
@@ -943,17 +943,17 @@ class Passes:
                         return copy.deepcopy(r_dt)
                 exp.datatype = pn.IntType()
                 return pn.IntType()
+            case pn.Cast(datatype, inner_exp):
+                _ = self._picoc_type_exp(inner_exp)
+                inner_exp.datatype = copy.deepcopy(datatype)
+                exp.exp = self._strip_cast(exp.exp)
+                # exp.datatype = copy.deepcopy(datatype)
+                return datatype
             case pn.UnOp(un_op, inner_exp):
                 _ = self._picoc_type_exp(inner_exp)
-                match un_op:
-                    case pn.Cast(datatype):
-                        inner_exp.datatype = copy.deepcopy(datatype)
-                        exp.datatype = copy.deepcopy(datatype)
-                        return datatype
-                    case _:
-                        exp.exp = self._strip_cast(exp.exp)
-                        exp.datatype = pn.IntType()
-                        return pn.IntType()
+                exp.exp = self._strip_cast(exp.exp)
+                # exp.datatype = pn.IntType()
+                return pn.IntType()
             case pn.SizeOf():
                 return pn.IntType()
             # ----------------------------- L_Logic ------------------------------
@@ -1248,7 +1248,7 @@ class Passes:
                             val, scope=self.current_scope
                         )
                         size = self._datatype_size(symbol["datatype"])
-                    case pn.BinOp() | pn.Num() | pn.Char() | pn.UnOp() | pn.Ref():
+                    case pn.BinOp() | pn.Num() | pn.Char() | pn.UnOp() | pn.Ref() | pn.Cast():
                         pass
                     case _:
                         size = self._datatype_size(exp_datatype)
@@ -1279,6 +1279,9 @@ class Passes:
                         if val == "2147483648":
                             return [pn.Exp(pn.Num("-2147483648"))]
                 return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
+            case pn.Cast(datatype, inner_exp):
+                exps_anf = self._picoc_anf_exp(inner_exp)
+                return exps_anf
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
                 exps1_anf = self._picoc_anf_exp(left_exp)
@@ -1717,8 +1720,6 @@ class Passes:
                             rn.Instr(rn.Subi(), [rn.Reg(rn.Acc()), rn.Im("1")])
                         ]
                     case pn.Minus():
-                        pass
-                    case pn.Cast():
                         pass
                     case _:
                         throw_error(un_op)

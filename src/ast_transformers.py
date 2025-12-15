@@ -429,7 +429,7 @@ class TransformerPicoC:
 
     def cast_expression(self, _, children):
         datatype, exp = children
-        return pn.UnOp(pn.Cast(datatype), exp)
+        return pn.Cast(datatype, exp)
 
     def type_descriptor(self, _, children):
         base_datatype = children[0]
