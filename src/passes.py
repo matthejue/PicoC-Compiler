@@ -894,6 +894,11 @@ class Passes:
             case _:
                 throw_error(struct_dt)
 
+    def _strip_cast(self, exp):
+        while isinstance(exp, pn.UnOp) and isinstance(exp.un_op, pn.Cast):
+            exp = exp.exp
+        return exp
+
     def _picoc_type_exp(self, exp):
         match exp:
             # ----------------------------- L_Arith ------------------------------
@@ -922,10 +927,13 @@ class Passes:
             case pn.Name(val):
                 symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
                 dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+                exp.datatype = copy.deepcopy(dt)
                 return dt
             case pn.BinOp(left_exp, bin_op, right_exp):
                 l_dt = self._picoc_type_exp(left_exp)
                 r_dt = self._picoc_type_exp(right_exp)
+                exp.left_exp = self._strip_cast(exp.left_exp)
+                exp.right_exp = self._strip_cast(exp.right_exp)
                 if isinstance(bin_op, (pn.Add, pn.Sub)):
                     if isinstance(l_dt, (pn.PntrDecl, pn.ArrayDecl)):
                         exp.datatype = copy.deepcopy(l_dt)
@@ -939,8 +947,12 @@ class Passes:
                 _ = self._picoc_type_exp(inner_exp)
                 match un_op:
                     case pn.Cast(datatype):
+                        inner_exp.datatype = copy.deepcopy(datatype)
+                        exp.datatype = copy.deepcopy(datatype)
                         return datatype
                     case _:
+                        exp.exp = self._strip_cast(exp.exp)
+                        exp.datatype = pn.IntType()
                         return pn.IntType()
             case pn.SizeOf():
                 return pn.IntType()
@@ -948,19 +960,25 @@ class Passes:
             case pn.Atom(left_exp, _, right_exp):
                 self._picoc_type_exp(left_exp)
                 self._picoc_type_exp(right_exp)
+                exp.left_exp = self._strip_cast(exp.left_exp)
+                exp.right_exp = self._strip_cast(exp.right_exp)
                 return pn.IntType()
             case pn.ToBool(inner_exp):
                 self._picoc_type_exp(inner_exp)
+                exp.exp = self._strip_cast(exp.exp)
                 return pn.IntType()
             # ------------------------ L_Pntr + L_Array -------------------------
             case pn.Ref(inner_exp):
                 inner_dt = self._picoc_type_exp(inner_exp)
                 exp.datatype = copy.deepcopy(inner_dt)
                 pointer_dt = pn.PntrDecl(copy.deepcopy(inner_dt))
+                exp.exp = self._strip_cast(exp.exp)
                 return pointer_dt
             case pn.Deref(ptr_exp, idx_exp):
                 base_dt = self._picoc_type_exp(ptr_exp)
                 self._picoc_type_exp(idx_exp)
+                exp.exp1 = self._strip_cast(exp.exp1)
+                exp.exp2 = self._strip_cast(exp.exp2)
                 exp.datatype = copy.deepcopy(base_dt)
                 return self._deref_result_datatype(base_dt) if base_dt else None
             case pn.Array(exps):
@@ -969,6 +987,7 @@ class Passes:
                         elem_dt = self._picoc_type_exp(exp)
                     else:
                         self._picoc_type_exp(exp)
+                    exps[i] = self._strip_cast(exps[i])
                 return pn.ArrayDecl(pn.Num(str(len(exps))), elem_dt)
             # ----------------------------- L_Struct ----------------------------
             case pn.Struct(assigns):
@@ -978,6 +997,7 @@ class Passes:
             case pn.Attr(inner_exp, pn.Name(attr_name)):
                 base_dt = self._picoc_type_exp(inner_exp)
                 exp.datatype = copy.deepcopy(base_dt)
+                exp.exp = self._strip_cast(exp.exp)
                 return self._attr_result_datatype(base_dt, attr_name)
             case pn.Exit():
                 return None
@@ -986,6 +1006,7 @@ class Passes:
             case pn.Call(pn.Name(fun_name), exps):
                 for inner_exp in exps:
                     self._picoc_type_exp(inner_exp)
+                exp.exps = [self._strip_cast(inner) for inner in exps]
                 symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
                 match symbol:
                     case {"datatype": pn.FunDecl(ret_dt, _, _)}:
@@ -1000,19 +1021,24 @@ class Passes:
         match stmt:
             case pn.Assign(pn.Alloc(), exp):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 return [stmt]
             case pn.Assign(lhs, exp):
                 self._picoc_type_exp(lhs)
                 self._picoc_type_exp(exp)
+                stmt.lhs = self._strip_cast(stmt.lhs)
+                stmt.exp = self._strip_cast(stmt.exp)
                 return [stmt]
             case pn.Exp(pn.Alloc()):
                 return [stmt]
             case pn.Exp(exp):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 return [stmt]
             # --------------------------- L_If_Else ---------------------------
             case pn.If(exp, stmts):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 new_stmts = []
                 for inner_stmt in stmts:
                     new_stmts += self._picoc_type_stmt(inner_stmt)
@@ -1020,6 +1046,7 @@ class Passes:
                 return [stmt]
             case pn.IfElse(exp, stmts1, stmts2):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 new_stmts1 = []
                 for inner_stmt in stmts1:
                     new_stmts1 += self._picoc_type_stmt(inner_stmt)
@@ -1032,6 +1059,7 @@ class Passes:
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 new_stmts = []
                 for inner_stmt in stmts:
                     new_stmts += self._picoc_type_stmt(inner_stmt)
@@ -1039,6 +1067,7 @@ class Passes:
                 return [stmt]
             case pn.DoWhile(exp, stmts):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 new_stmts = []
                 for inner_stmt in stmts:
                     new_stmts += self._picoc_type_stmt(inner_stmt)
@@ -1049,6 +1078,7 @@ class Passes:
                 return [stmt]
             case pn.Return(exp):
                 self._picoc_type_exp(exp)
+                stmt.exp = self._strip_cast(stmt.exp)
                 return [stmt]
             case pn.StackMalloc():
                 return [stmt]

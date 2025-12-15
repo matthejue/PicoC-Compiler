@@ -15,10 +15,11 @@ class Name(ASTNode):
     # shorter then 'Identifier'
     def __init__(self, val):
         self.val = val
+        self.datatype = Empty()
 
     @property
     def visible(self):
-        return [self.val]
+        return _add_if_double_verbose([self.val], self.datatype)
 
     def __eq__(self, other):
         return self.val == other.val
@@ -175,10 +176,13 @@ class BinOp(ASTNode):
         self.left_exp = left_exp
         self.bin_op = bin_op
         self.right_exp = right_exp
+        self.datatype = Empty()
 
     @property
     def visible(self):
-        return [self.left_exp, self.bin_op, self.right_exp]
+        return _add_if_double_verbose(
+            [self.left_exp, self.bin_op, self.right_exp], self.datatype
+        )
 
     __match_args__ = ("left_exp", "bin_op", "right_exp")
 

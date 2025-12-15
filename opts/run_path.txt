@@ -1,1 +1,1 @@
-./sys_tests/basic_pragma_once.picoc
+./sys_tests/basic_typecast.picoc
