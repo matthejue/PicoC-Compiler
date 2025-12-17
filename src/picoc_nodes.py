@@ -373,16 +373,15 @@ class Ref(ASTNode):
 
 
 class Deref(ASTNode):
-    def __init__(self, exp1, exp2):
-        self.exp1 = exp1
-        self.exp2 = exp2
+    def __init__(self, exp):
+        self.exp = exp
         self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return _add_if_double_verbose([self.exp1, self.exp2], self.datatype)
+        return _add_if_double_verbose([self.exp], self.datatype)
 
-    __match_args__ = ("exp1", "exp2")
+    __match_args__ = ("exp",)
 
 
 # -------------------------------- L_Array --------------------------------

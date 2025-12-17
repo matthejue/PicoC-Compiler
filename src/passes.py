@@ -71,30 +71,25 @@ class Passes:
             case pn.Alloc():
                 return exp
             # ----------------------------- L_Pntr ----------------------------
-            case pn.Deref(ref, exp):
-                ref_shrunk = self._picoc_shrink_exp(ref)
-                exp_shrunk = self._picoc_shrink_exp(exp)
-                match ref_shrunk:
+            case pn.Deref(inner):
+                inner_shrunk = self._picoc_shrink_exp(inner)
+                match inner_shrunk:
                     # *&x (optionally with offset) -> x (or x with offset)
-                    case pn.Ref(inner):
-                        if isinstance(exp_shrunk, pn.Num) and exp_shrunk.val == "0":
-                            return inner
-                        return pn.Deref(inner, exp_shrunk)
-                return pn.Deref(ref_shrunk, exp_shrunk)
+                    case pn.Ref(inner_ref):
+                        return inner_ref
+                return pn.Deref(inner_shrunk)
             case pn.Ref(ref):
                 ref_shrunk = self._picoc_shrink_exp(ref)
                 match ref_shrunk:
-                    # &( *(ptr + idx) ) cancels to ptr + idx (or just ptr if idx==0)
-                    case pn.Deref(ptr_exp, idx_exp):
-                        if isinstance(idx_exp, pn.Num) and idx_exp.val == "0":
-                            return ptr_exp
-                        return pn.BinOp(ptr_exp, pn.Add(), idx_exp)
+                    # &( *(addr) ) cancels to addr
+                    case pn.Deref(addr_exp):
+                        return addr_exp
                 return pn.Ref(ref_shrunk)
             # ---------------------------- L_Array ----------------------------
             case pn.Subscr(ref, exp):
                 ref_shrunk = self._picoc_shrink_exp(ref)
                 exp_shrunk = self._picoc_shrink_exp(exp)
-                return pn.Deref(ref_shrunk, exp_shrunk)
+                return pn.Deref(pn.BinOp(ref_shrunk, pn.Add(), exp_shrunk))
             case pn.Array(exps):
                 return pn.Array([self._picoc_shrink_exp(exp) for exp in exps])
             # ---------------------------- L_Struct ---------------------------
@@ -572,11 +567,8 @@ class Passes:
                 )
             case pn.Ref(inner):
                 return pn.Ref(self._picoc_rewrite_exp(inner))
-            case pn.Deref(ref, idx):
-                return pn.Deref(
-                    self._picoc_rewrite_exp(ref),
-                    self._picoc_rewrite_exp(idx),
-                )
+            case pn.Deref(inner):
+                return pn.Deref(self._picoc_rewrite_exp(inner))
             # case pn.Subscr(ref, idx):
             #     return pn.Subscr(
             #         self._rewrite_names_exp(ref),
@@ -987,9 +979,8 @@ class Passes:
                 exp.datatype = copy.deepcopy(inner_dt)
                 pointer_dt = pn.PntrDecl(copy.deepcopy(inner_dt))
                 return pointer_dt
-            case pn.Deref(ptr_exp, idx_exp):
-                base_dt = self._picoc_type_exp(ptr_exp)
-                self._picoc_type_exp(idx_exp)
+            case pn.Deref(addr_exp):
+                base_dt = self._picoc_type_exp(addr_exp)
                 exp.datatype = copy.deepcopy(base_dt)
                 return self._deref_result_datatype(base_dt) if base_dt else None
             case pn.Array(exps):
@@ -1140,9 +1131,7 @@ class Passes:
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(inner_exp, pn.Name() as name):
                 exp_nodes = self._picoc_anf_ref(inner_exp)
-                attr_dt = copy.deepcopy(getattr(ref, "datatype", None))
-                if attr_dt is None:
-                    sys.exit(1)
+                attr_dt = copy.deepcopy(ref.datatype))
                 new_attr = pn.Attr(pn.Stack(pn.Num("1")), name)
                 new_attr.datatype = attr_dt
                 return exp_nodes + [pn.Ref(new_attr)]
@@ -1315,13 +1304,13 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Deref():
                 refs_anf = self._picoc_anf_ref(exp)
-                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
+                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
                 datatype = getattr(exp, "datatype", None)
                 final_exp.datatype = self._deref_result_datatype(datatype)
                 return refs_anf + [final_exp]
             case pn.Attr(_, pn.Name(attr_name)):
                 refs_anf = self._picoc_anf_ref(exp)
-                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
+                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
                 datatype = exp.datatype
                 final_exp.datatype = self._attr_result_datatype(datatype, attr_name)
                 return refs_anf + [final_exp]
@@ -1986,10 +1975,12 @@ class Passes:
                     )
                 ]
             case pn.Ref(
-                pn.Deref(pn.Stack(pn.Num(val1)), pn.Stack(pn.Num(val2))) as ref_node
+                pn.Deref(
+                    pn.BinOp(
+                        pn.Stack(pn.Num(val1)), pn.Add(), pn.Stack(pn.Num(val2))
+                    )
+                ) as ref_node
             ):
-                # db.activate_debug()
-                # db.debug()
                 datatype = ref_node.datatype
                 if datatype is None:
                     throw_error(datatype)
@@ -2019,7 +2010,6 @@ class Passes:
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                         ]
                     case pn.PntrDecl():
-                        # for ArrayDecl only 'if local_var_or_parameter.val == "parameter"' keep left
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),

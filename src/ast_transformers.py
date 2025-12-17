@@ -376,7 +376,7 @@ class TransformerPicoC:
         op = self.operator(node)
         base = children[0]
         if op == "->":
-            base = pn.Deref(base, pn.Num("0"))
+            base = pn.Deref(base)
         elif op != ".":
             throw_error(op)
         return pn.Attr(base, children[1])
@@ -385,12 +385,7 @@ class TransformerPicoC:
         op = self.operator(node)
         match op:
             case "*":
-                match children[0]:
-                    case pn.BinOp(pn.BinOp(exp, _, num1), pn.Add() | pn.Sub() as op, num2):
-                        return pn.Deref(exp, pn.BinOp(num1, op, num2))
-                    case pn.BinOp(exp, pn.Add() | pn.Sub(), num):
-                        return pn.Deref(exp, num)
-                return pn.Deref(children[0], pn.Num("0"))
+                return pn.Deref(children[0])
             case "&":
                 return pn.Ref(children[0])
         throw_error(op)
