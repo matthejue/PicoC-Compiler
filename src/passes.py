@@ -445,7 +445,8 @@ class Passes:
     # =========================================================================
     # =                            PicoC_Symbol                               =
     # =========================================================================
-    # - builds the symbol table and rewrites PicoC AST nodes ahead of typing
+    # - builds the symbol table and rewrites PicoC Name nodes ahead of typing
+    # - decalres function and struct declarations and defintions to symbol table
 
     def _param_size(self, allocs) -> int:
         size = 0
@@ -534,7 +535,7 @@ class Passes:
                             loc = pn.Stackframe(pn.Num(symbol["addr"]))
                         loc.datatype = copy.deepcopy(symbol.get("datatype"))
                         loc.symbol_name = var_name
-                        loc.scope = chosen_scope
+                        loc.scope = chosen_scope # TODO: schauen ob hier oder auf Funktionsebene lösen
                         return loc
             case _:
                 return name_node
@@ -879,7 +880,7 @@ class Passes:
     # =========================================================================
     # =                            PicoC_Typing                               =
     # =========================================================================
-    # - annotates the PicoC AST with datatype information collected before ANF
+    # - annotates the PicoC AST with datatype information collected
 
     def _deref_result_datatype(self, pointer_dt):
         match pointer_dt:
@@ -888,7 +889,7 @@ class Passes:
             case pn.ArrayDecl(_, inner_dt):
                 return copy.deepcopy(inner_dt)
             case _:
-                return pn.Empty()
+                throw_error(pointer_dt)
 
     def _attr_result_datatype(self, struct_dt, attr_name):
         if isinstance(attr_name, pn.Name):
@@ -937,11 +938,11 @@ class Passes:
                     exp.scope = self.current_scope
                 return dt
             # TODO: can probably be removed
-            case pn.Name(val):
-                symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
-                dt = copy.deepcopy(symbol["datatype"]) if symbol else None
-                exp.datatype = copy.deepcopy(dt)
-                return dt
+            # case pn.Name(val):
+            #     symbol, _ = self.symbol_table.resolve(val, scope=self.current_scope)
+            #     dt = copy.deepcopy(symbol["datatype"]) if symbol else None
+            #     exp.datatype = copy.deepcopy(dt)
+            #     return dt
             case pn.BinOp(left_exp, bin_op, right_exp):
                 l_dt = self._picoc_type_exp(left_exp)
                 r_dt = self._picoc_type_exp(right_exp)
@@ -1110,118 +1111,43 @@ class Passes:
     # =========================================================================
     # - bringt AST in A-Normalform:
 
-    def _picoc_anf_ref(self, ref):
-        match ref:
-            # ---------------------------- L_Arith ----------------------------
-            case pn.Global() | pn.Stackframe():
-                return [pn.Ref(ref)]
-            # ------------------------ L_Pntr + L_Array -----------------------
-            case pn.Deref(ptr_exp, idx_exp):
-                ptr_nodes = self._picoc_anf_ref(ptr_exp)
-                idx_nodes = self._picoc_anf_exp(idx_exp)
-                deref_dt = copy.deepcopy(getattr(ref, "datatype", None))
-                if deref_dt is None:
-                    sys.exit(1)
-                new_deref = pn.Deref(
-                    pn.Stack(pn.Num("2")),
-                    pn.Stack(pn.Num("1")),
-                )
-                new_deref.datatype = deref_dt
-                return ptr_nodes + idx_nodes + [pn.Ref(new_deref)]
-            # ---------------------------- L_Struct ---------------------------
-            case pn.Attr(inner_exp, pn.Name() as name):
-                exp_nodes = self._picoc_anf_ref(inner_exp)
-                attr_dt = copy.deepcopy(ref.datatype))
-                new_attr = pn.Attr(pn.Stack(pn.Num("1")), name)
-                new_attr.datatype = attr_dt
-                return exp_nodes + [pn.Ref(new_attr)]
-            case pn.Ref(inner):
-                return self._picoc_anf_ref(inner)
-            case _:
-                throw_error(ref)
-
-    def _picoc_anf_exp(self, exp):
+    def _picoc_anf_exp(self, exp, addr_calc=False):
         match exp:
             # ---------------------------- L_Arith ----------------------------
-            case pn.Global(pn.Name(var_name)) as loc:
-                symbol, chosen_scope = self.symbol_table.resolve(
-                    var_name, scope="global"
-                )
-                datatype = getattr(loc, "datatype", None)
-                if symbol:
-                    datatype = copy.deepcopy(symbol.get("datatype"))
-                match symbol:
-                    case {
-                        "type_qual": pn.Writeable(),
-                        "datatype": _ as datatype_sym,
-                        "name": _,
-                        "addr": _,
-                        "size": size,
-                    }:
-                        datatype = datatype or datatype_sym
-                        match ("global", datatype):
-                            case ("global", pn.ArrayDecl()):
-                                return [pn.Ref(loc)]
-                            case ("global", pn.StructSpec()):
-                                if self.argmode_on:
-                                    size_val = self._datatype_size(datatype)
-                                    return [
-                                        pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
-                                    ]
-                                return [pn.Exp(loc)]
-                            case ("global", _):
-                                return [pn.Exp(loc)]
-                    case {
-                        "type_qual": pn.Const(),
-                        "datatype": _,
-                        "name": _,
-                        "val": num,
-                        "size": _,
-                    }:
-                        return [pn.Exp(copy.deepcopy(num))]
-                    case _:
-                        throw_error(symbol)
-            case pn.Stackframe() as loc:
-                var_name = getattr(loc, "symbol_name", None)
-                symbol, chosen_scope = (
-                    self.symbol_table.resolve(var_name, scope=self.current_scope)
-                    if var_name
-                    else (None, None)
-                )
-                datatype = getattr(loc, "datatype", None)
-                if symbol:
-                    datatype = copy.deepcopy(symbol.get("datatype"))
-                match symbol:
-                    case {
-                        "type_qual": pn.Writeable(),
-                        "datatype": _ as datatype_sym,
-                        "name": _,
-                        "addr": _,
-                        "size": size,
-                    }:
-                        datatype = datatype or datatype_sym
-                        match (chosen_scope, datatype):
-                            case (_, pn.ArrayDecl()):
-                                return [pn.Ref(loc)]
-                            case (_, pn.StructSpec()):
-                                if self.argmode_on:
-                                    size_val = self._datatype_size(datatype)
-                                    return [
-                                        pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
-                                    ]
-                                return [pn.Exp(loc)]
-                            case (_, _):
-                                return [pn.Exp(loc)]
-                    case {
-                        "type_qual": pn.Const(),
-                        "datatype": _,
-                        "name": _,
-                        "val": num,
-                        "size": _,
-                    }:
-                        return [pn.Exp(copy.deepcopy(num))]
-                    case _:
-                        throw_error(symbol)
+            case (pn.Global() | pn.Stackframe()) as loc:
+                datatype = loc.datatype
+                if addr_calc:
+                    match datatype:
+                        case pn.ArrayDecl():
+                            return [pn.Ref(loc)]
+                        case pn.PntrDecl():
+                            return [pn.Exp(loc)]
+                        case pn.StructSpec():
+                            if self.argmode_on:
+                                # struct gets passed by value
+                                size_val = self._datatype_size(datatype)
+                                return [
+                                    pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
+                                ]
+                            return [pn.Ref(loc)]
+                        case _:
+                            throw_error(datatype)
+                else:
+                    match datatype:
+                        case pn.ArrayDecl():
+                            return [pn.Ref(loc)]
+                        case pn.PntrDecl():
+                            return [pn.Exp(loc)]
+                        case pn.StructSpec():
+                            if self.argmode_on:
+                                # struct gets passed by value
+                                size_val = self._datatype_size(datatype)
+                                return [
+                                    pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
+                                ]
+                            return [pn.Exp(loc)]
+                        case _:
+                            return [pn.Exp(loc)]
             case pn.Num() | pn.Char():
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
@@ -1243,7 +1169,7 @@ class Passes:
                         | pn.Char()
                         | pn.UnOp()
                         | pn.Ref()
-                        | pn.Cast()
+                        | pn.Cast() # TODO: should take this type
                     ):
                         pass
                     case _:
@@ -1302,18 +1228,18 @@ class Passes:
             case pn.Alloc():
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Deref():
-                refs_anf = self._picoc_anf_ref(exp)
-                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
-                datatype = getattr(exp, "datatype", None)
+            case pn.Deref(inner_exp):
+                binop_anf = self._picoc_anf_exp(inner_exp)
+                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
+                datatype = exp.datatype
                 final_exp.datatype = self._deref_result_datatype(datatype)
                 return refs_anf + [final_exp]
-            case pn.Attr(_, pn.Name(attr_name)):
-                refs_anf = self._picoc_anf_ref(exp)
-                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
+            case pn.Attr(inner_exp, pn.Name(attr_name)):
+                binop_anf = self._picoc_anf_exp(pn.BinOp(inner_exp, pn.Add(), pn.Num("insert")))
+                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
                 datatype = exp.datatype
                 final_exp.datatype = self._attr_result_datatype(datatype, attr_name)
-                return refs_anf + [final_exp]
+                return binop_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             # case pn.Ref(pn.Name(val)):
             #     var_name = val
