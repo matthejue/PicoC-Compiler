@@ -579,17 +579,17 @@ class Passes:
                 return pn.Attr(self._picoc_rewrite_exp(inner_exp), attr_name)
             case pn.Array(exps):
                 return pn.Array([self._picoc_rewrite_exp(inner) for inner in exps])
-            case pn.Struct(assigns):
-                assigns_out = []
-                for assign in assigns:
-                    match assign:
-                        case pn.Assign(lhs, inner_exp):
-                            assigns_out.append(
-                                pn.Assign(lhs, self._picoc_rewrite_exp(inner_exp))
+            case pn.Struct(init_pairs):
+                init_pairs_out = []
+                for init_pair in init_pairs:
+                    match init_pair:
+                        case pn.InitPair(lhs, inner_exp):
+                            init_pairs_out.append(
+                                pn.InitPair(lhs, self._picoc_rewrite_exp(inner_exp))
                             )
                         case _:
-                            throw_error(assign)
-                return pn.Struct(assigns_out)
+                            throw_error(init_pair)
+                return pn.Struct(init_pairs_out)
             case pn.Call(pn.Name() as fun_name, exps):
                 return pn.Call(
                     fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
@@ -1009,9 +1009,13 @@ class Passes:
                         self._picoc_type_exp(exp)
                 return pn.ArrayDecl(pn.Num(str(len(exps))), elem_dt)
             # ----------------------------- L_Struct ----------------------------
-            case pn.Struct(assigns):
-                for assign in assigns:
-                    self._picoc_type_stmt(assign)
+            case pn.Struct(init_pairs):
+                for init_pair in init_pairs:
+                    match init_pair:
+                        case pn.InitPair(_, inner_exp):
+                            self._picoc_type_exp(inner_exp)
+                        case _:
+                            throw_error(init_pair)
                 return None
             case pn.Attr(inner_exp, pn.Name(attr_name)):
                 base_dt = self._picoc_type_exp(inner_exp)
@@ -1194,19 +1198,12 @@ class Passes:
             case pn.BinOp(left_exp, bin_op, right_exp):
                 exps1_anf = self._picoc_anf_exp(left_exp)
                 exps2_anf = self._picoc_anf_exp(right_exp)
-                return (
-                    exps1_anf
-                    + exps2_anf
-                    + [
-                        pn.Exp(
-                            pn.BinOp(
-                                pn.Stack(pn.Num("2")),
-                                bin_op,
-                                pn.Stack(pn.Num("1")),
-                            )
-                        )
-                    ]
+                binop = pn.BinOp(
+                    pn.Stack(pn.Num("2")),
+                    bin_op,
+                    pn.Stack(pn.Num("1")),
                 )
+                return exps1_anf + exps2_anf + [pn.Exp(binop)]
             case pn.UnOp(un_op, exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 match exp:
@@ -1273,14 +1270,14 @@ class Passes:
                     exps_anf += self._picoc_anf_exp(exp)
                 return exps_anf
             # ---------------------------- L_Struct ---------------------------
-            case pn.Struct(assigns):
+            case pn.Struct(init_pairs):
                 exps_anf = []
-                for assign in assigns:
-                    match assign:
-                        case pn.Assign(_, exp):
+                for init_pair in init_pairs:
+                    match init_pair:
+                        case pn.InitPair(_, exp):
                             exps_anf += self._picoc_anf_exp(exp)
                         case _:
-                            throw_error(assign)
+                            throw_error(init_pair)
                 return exps_anf
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(pn.Name(val) as name, exps):
@@ -1418,7 +1415,7 @@ class Passes:
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
                 exps_anf = self._picoc_anf_exp(exp)
-                refs_anf = self._picoc_anf_ref(ref)
+                refs_anf = self._picoc_anf_exp(ref)
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_anf
@@ -1637,14 +1634,15 @@ class Passes:
                 pn.BinOp(pn.Stack(pn.Num(val1)), bin_aop, pn.Stack(pn.Num(val2)))
             ):
                 match (
-                    stmt.exp.lefp_exp.datatype,
+                    stmt.exp.left_exp.datatype,
                     bin_aop,
                     stmt.exp.right_exp.datatype,
                 ):
                     case (
                         pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
                         pn.Add(),
-                        pn.PntrDecl(_) | pn.ArrayDecl(_, _)):
+                        pn.PntrDecl(_) | pn.ArrayDecl(_, _),
+                    ):
                         reti_instrs = self._single_line_comment(stmt, "#")
                         help_const = self._datatype_size(inner_dt)
                         reti_instrs += [
@@ -1720,7 +1718,7 @@ class Passes:
                     case (
                         pn.StructSpec() | pn.IntType() | pn.CharType(),
                         pn.Add(),
-                        _
+                        _,
                     ) | (_, pn.Add(), pn.StructSpec() | pn.IntType() | pn.CharType()):
                         match bin_aop:
                             case pn.Add():
@@ -1759,7 +1757,7 @@ class Passes:
                         ]
                     case _:
                         throw_error(
-                            stmt.exp.lefp_exp.datatype,
+                            stmt.exp.left_exp.datatype,
                             bin_aop,
                             stmt.exp.right_exp.datatype,
                         )

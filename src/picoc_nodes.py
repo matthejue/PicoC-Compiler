@@ -298,9 +298,9 @@ class Exp(ASTNode):
 
 
 class Stack(ASTNode):
-    def __init__(self, num):
+    def __init__(self, num, datatype=Empty()):
         self.num = num
-        self.datatype = Empty()
+        self.datatype = datatype
 
     @property
     def visible(self):

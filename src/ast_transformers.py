@@ -334,12 +334,12 @@ class TransformerPicoC:
         return [pn.PntrDecl(pn.Placeholder()), *base]
 
     def initializer_list(self, _, children):
-            """
-            Distinguish struct-style initializer pairs from array/aggregate expressions.
-            """
-            if children and isinstance(children[0], pn.Assign):
-                return pn.Struct(children)
-            return pn.Array(children)
+        """
+        Distinguish struct-style initializer pairs from array/aggregate expressions.
+        """
+        if children and isinstance(children[0], pn.InitPair):
+            return pn.Struct(children)
+        return pn.Array(children)
 
     def debug_statement(self, *_):
         return pn.Debug()
