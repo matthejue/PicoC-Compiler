@@ -95,20 +95,20 @@ class Passes:
             # ---------------------------- L_Struct ---------------------------
             case pn.Attr(ref, name):
                 return pn.Attr(self._picoc_shrink_exp(ref), name)
-            case pn.Struct(assigns):
-                assigns_shrinked = []
-                for assign in assigns:
-                    match assign:
-                        case pn.Assign(lhs, exp):
-                            assigns_shrinked += [
-                                pn.Assign(
+            case pn.Struct(init_pairs):
+                init_pairs_shrinked = []
+                for init_pair in init_pairs:
+                    match init_pair:
+                        case pn.InitPair(lhs, exp):
+                            init_pairs_shrinked += [
+                                pn.InitPair(
                                     lhs,
                                     self._picoc_shrink_exp(exp),
                                 )
                             ]
                         case _:
-                            throw_error(assign)
-                return pn.Struct(assigns_shrinked)
+                            throw_error(init_pairs)
+                return pn.Struct(init_pairs_shrinked)
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(name, exps):
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
@@ -535,7 +535,7 @@ class Passes:
                             loc = pn.Stackframe(pn.Num(symbol["addr"]))
                         loc.datatype = copy.deepcopy(symbol.get("datatype"))
                         loc.symbol_name = var_name
-                        loc.scope = chosen_scope # TODO: schauen ob hier oder auf Funktionsebene lösen
+                        loc.scope = chosen_scope  # TODO: schauen ob hier oder auf Funktionsebene lösen
                         return loc
             case _:
                 return name_node
@@ -891,14 +891,31 @@ class Passes:
             case _:
                 throw_error(pointer_dt)
 
-    def _attr_result_datatype(self, struct_dt, attr_name):
-        if isinstance(attr_name, pn.Name):
-            attr_name = attr_name.val
+    def _attr_result_datatype(self, struct_dt, attr_name: str):
         match struct_dt:
             case pn.StructSpec(pn.Name(struct_name)):
                 symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
-                if symbol:
-                    return copy.deepcopy(symbol.get("datatype", pn.Empty()))
+                return copy.deepcopy(symbol["datatype"])
+            case _:
+                throw_error(struct_dt)
+
+    def _struct_attr_offset(self, struct_dt, attr_name: str) -> int:
+        match struct_dt:
+            case pn.StructSpec(pn.Name(struct_name)):
+                struct_sym, _ = self.symbol_table.resolve(
+                    struct_name, scope=self.current_scope
+                )
+                attr_ids = struct_sym["attrs"]
+                rel_pos_in_struct = 0
+                for attr_id in attr_ids:
+                    if attr_id.val == attr_name:
+                        return int(rel_pos_in_struct)
+                    attr_sym, _ = self.symbol_table.resolve(
+                        attr_id.val, scope=struct_name
+                    )
+                    rel_pos_in_struct += int(attr_sym["size"])
+
+                throw_error((struct_name, attr_name))
             case _:
                 throw_error(struct_dt)
 
@@ -1126,9 +1143,7 @@ class Passes:
                             if self.argmode_on:
                                 # struct gets passed by value
                                 size_val = self._datatype_size(datatype)
-                                return [
-                                    pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
-                                ]
+                                return [pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)]
                             return [pn.Ref(loc)]
                         case _:
                             throw_error(datatype)
@@ -1142,9 +1157,7 @@ class Passes:
                             if self.argmode_on:
                                 # struct gets passed by value
                                 size_val = self._datatype_size(datatype)
-                                return [
-                                    pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)
-                                ]
+                                return [pn.Assign(pn.Stack(pn.Num(str(size_val))), loc)]
                             return [pn.Exp(loc)]
                         case _:
                             return [pn.Exp(loc)]
@@ -1169,7 +1182,7 @@ class Passes:
                         | pn.Char()
                         | pn.UnOp()
                         | pn.Ref()
-                        | pn.Cast() # TODO: should take this type
+                        | pn.Cast()  # TODO: should take this type
                     ):
                         pass
                     case _:
@@ -1229,33 +1242,30 @@ class Passes:
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Deref(inner_exp):
-                binop_anf = self._picoc_anf_exp(inner_exp)
-                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
+                match exp.datatype:
+                    case pn.PntrDecl(pn.IntType() | pn.CharType()):
+                        binop_anf = []
+                    case pn.PntrDecl():
+                        binop_anf = [pn.Exp(pn.Deref(pn.Num("1")))]
+                    case _:
+                        binop_anf = []
+                binop_anf += self._picoc_anf_exp(inner_exp, addr_calc=True)
+                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
                 datatype = exp.datatype
-                final_exp.datatype = self._deref_result_datatype(datatype)
-                return refs_anf + [final_exp]
+                final_exp.exp.datatype = self._deref_result_datatype(datatype)
+                return binop_anf + [final_exp]
             case pn.Attr(inner_exp, pn.Name(attr_name)):
-                binop_anf = self._picoc_anf_exp(pn.BinOp(inner_exp, pn.Add(), pn.Num("insert")))
-                final_exp = pn.Exp(pn.Stack(pn.Num("1")))
-                datatype = exp.datatype
-                final_exp.datatype = self._attr_result_datatype(datatype, attr_name)
+                base_dt = exp.datatype
+                offset = self._struct_attr_offset(base_dt, attr_name)
+                binop = pn.BinOp(inner_exp, pn.Add(), pn.Num(str(offset)))
+                binop.datatype = base_dt
+                binop_anf = self._picoc_anf_exp(binop, addr_calc=True)
+                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
+                final_exp.exp.datatype = self._attr_result_datatype(base_dt, attr_name)
                 return binop_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
-            # case pn.Ref(pn.Name(val)):
-            #     var_name = val
-            #     _, choosen_scope = self.symbol_table.resolve(
-            #         var_name, scope=self.current_scope
-            #     )
-            #     name = pn.Name(var_name)
-            #     match choosen_scope:
-            #         case "global":
-            #             return [pn.Ref(pn.Global(name))]
-            #         case _:
-            #             return [pn.Ref(pn.Stackframe(name))]
-            case pn.Ref(
-                (pn.Deref() | pn.Attr() | pn.Global() | pn.Stackframe()) as ref
-            ):
-                return self._picoc_anf_ref(ref)
+            case pn.Ref(ref):
+                return self._picoc_anf_exp(ref, addr_calc=True)
             # ---------------------------- L_Array ----------------------------
             case pn.Array(exps):
                 exps_anf = []
@@ -1597,41 +1607,162 @@ class Passes:
                             ),
                         ]
                 return reti_instrs
+            case pn.Ref((pn.Global() | pn.Stackframe()) as exp):
+                reti_instrs = self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
+                ]
+                match exp:
+                    case pn.Global(pn.Name(val)):
+                        name = rn.Name(val)
+                        reti_instrs += [
+                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In1()), name]),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
+                        ]
+                    case pn.Stackframe(pn.Num(val)):
+                        reti_instrs += [
+                            rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
+                            rn.Instr(
+                                rn.Subi(), [rn.Reg(rn.In1()), rn.Im(str(int(val) + 2))]
+                            ),
+                        ]
+                    case _:
+                        throw_error(exp)
+                return reti_instrs + [
+                    rn.Instr(
+                        rn.Storein(),
+                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
+                    )
+                ]
             case pn.Exp(
                 pn.BinOp(pn.Stack(pn.Num(val1)), bin_aop, pn.Stack(pn.Num(val2)))
             ):
-                match bin_aop:
-                    case pn.Add():
-                        aop = rn.Add()
-                    case pn.Sub():
-                        aop = rn.Sub()
-                    case pn.Mul():
-                        aop = rn.Mult()
-                    case pn.Div():
-                        aop = rn.Div()
-                    case pn.Mod():
-                        aop = rn.Mod()
-                    case pn.Oplus():
-                        aop = rn.Oplus()
-                    case pn.And():
-                        aop = rn.And()
-                    case pn.Or():
-                        aop = rn.Or()
+                match (
+                    stmt.exp.lefp_exp.datatype,
+                    bin_aop,
+                    stmt.exp.right_exp.datatype,
+                ):
+                    case (
+                        pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
+                        pn.Add(),
+                        pn.PntrDecl(_) | pn.ArrayDecl(_, _)):
+                        reti_instrs = self._single_line_comment(stmt, "#")
+                        help_const = self._datatype_size(inner_dt)
+                        reti_instrs += [
+                            rn.Instr(
+                                rn.Loadin(),
+                                [
+                                    rn.Reg(rn.Sp()),
+                                    rn.Reg(rn.In1()),
+                                    rn.Im(val1),
+                                ],
+                            ),
+                            rn.Instr(
+                                rn.Loadin(),
+                                [
+                                    rn.Reg(rn.Sp()),
+                                    rn.Reg(rn.In2()),
+                                    rn.Im(val2),
+                                ],
+                            ),
+                            rn.Instr(
+                                rn.Sub(),
+                                [rn.Reg(rn.In2()), rn.Reg(rn.In1())],
+                            ),
+                            rn.Instr(
+                                rn.Divi(),
+                                [rn.Reg(rn.In2()), rn.Im(str(help_const))],
+                            ),
+                            rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                            rn.Instr(
+                                rn.Storein(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im("1")],
+                            ),
+                        ]
+                    case (
+                        pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
+                        pn.Add(),
+                        _,
+                    ) | (
+                        _,
+                        pn.Add(),
+                        pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
+                    ):
+                        reti_instrs = self._single_line_comment(stmt, "#")
+                        help_const = self._datatype_size(inner_dt)
+                        reti_instrs += [
+                            rn.Instr(
+                                rn.Loadin(),
+                                [
+                                    rn.Reg(rn.Sp()),
+                                    rn.Reg(rn.In1()),
+                                    rn.Im(val1),
+                                ],
+                            ),
+                            rn.Instr(
+                                rn.Loadin(),
+                                [
+                                    rn.Reg(rn.Sp()),
+                                    rn.Reg(rn.In2()),
+                                    rn.Im(val2),
+                                ],
+                            ),
+                            rn.Instr(
+                                rn.Multi(),
+                                [rn.Reg(rn.In2()), rn.Im(str(help_const))],
+                            ),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
+                            rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                            rn.Instr(
+                                rn.Storein(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
+                            ),
+                        ]
+                    case (
+                        pn.StructSpec() | pn.IntType() | pn.CharType(),
+                        pn.Add(),
+                        _
+                    ) | (_, pn.Add(), pn.StructSpec() | pn.IntType() | pn.CharType()):
+                        match bin_aop:
+                            case pn.Add():
+                                aop = rn.Add()
+                            case pn.Sub():
+                                aop = rn.Sub()
+                            case pn.Mul():
+                                aop = rn.Mult()
+                            case pn.Div():
+                                aop = rn.Div()
+                            case pn.Mod():
+                                aop = rn.Mod()
+                            case pn.Oplus():
+                                aop = rn.Oplus()
+                            case pn.And():
+                                aop = rn.And()
+                            case pn.Or():
+                                aop = rn.Or()
+                            case _:
+                                throw_error(bin_aop)
+                        return self._single_line_comment(stmt, "#") + [
+                            rn.Instr(
+                                rn.Loadin(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)],
+                            ),
+                            rn.Instr(
+                                rn.Loadin(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im(val2)],
+                            ),
+                            rn.Instr(aop, [rn.Reg(rn.Acc()), rn.Reg(rn.In2())]),
+                            rn.Instr(
+                                rn.Storein(),
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("2")],
+                            ),
+                            rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                        ]
                     case _:
-                        throw_error(bin_aop)
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val1)]
-                    ),
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im(val2)]
-                    ),
-                    rn.Instr(aop, [rn.Reg(rn.Acc()), rn.Reg(rn.In2())]),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("2")]
-                    ),
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                ]
+                        throw_error(
+                            stmt.exp.lefp_exp.datatype,
+                            bin_aop,
+                            stmt.exp.right_exp.datatype,
+                        )
             case pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num(val)))):
                 reti_instrs = self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("0")]),
@@ -1873,133 +2004,8 @@ class Passes:
                 return reti_instrs + [
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
-            # ----------------------------- L_Pntr ----------------------------
-            case pn.Ref((pn.Global() | pn.Stackframe()) as exp):
-                reti_instrs = self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
-                ]
-                match exp:
-                    case pn.Global(pn.Name(val)):
-                        name = rn.Name(val)
-                        reti_instrs += [
-                            rn.Instr(rn.Loadi(), [rn.Reg(rn.In1()), name]),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
-                        ]
-                    case pn.Stackframe(pn.Num(val)):
-                        reti_instrs += [
-                            rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
-                            rn.Instr(
-                                rn.Subi(), [rn.Reg(rn.In1()), rn.Im(str(int(val) + 2))]
-                            ),
-                        ]
-                    case _:
-                        throw_error(exp)
-                return reti_instrs + [
-                    rn.Instr(
-                        rn.Storein(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
-                    )
-                ]
-            case pn.Ref(
-                pn.Deref(
-                    pn.BinOp(
-                        pn.Stack(pn.Num(val1)), pn.Add(), pn.Stack(pn.Num(val2))
-                    )
-                ) as ref_node
-            ):
-                datatype = ref_node.datatype
-                if datatype is None:
-                    throw_error(datatype)
-                reti_instrs = self._single_line_comment(stmt, "#")
-                # Scale the index by the size of a single element of the referenced type.
-                match datatype:
-                    case pn.ArrayDecl(_, inner_dt) | pn.PntrDecl(inner_dt):
-                        help_const = self._datatype_size(inner_dt)
-                    case _:
-                        throw_error(datatype)
-                match datatype:
-                    case (
-                        pn.ArrayDecl() | pn.IntType() | pn.CharType() | pn.StructSpec()
-                    ):
-                        reti_instrs += [
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)],
-                            ),
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im(val2)],
-                            ),
-                            rn.Instr(
-                                rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
-                            ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
-                        ]
-                    case pn.PntrDecl():
-                        reti_instrs += [
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im(val1)],
-                            ),
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.In2()), rn.Reg(rn.In1()), rn.Im("0")],
-                            ),
-                            rn.Instr(
-                                rn.Loadin(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im(val2)],
-                            ),
-                            rn.Instr(
-                                rn.Multi(), [rn.Reg(rn.In2()), rn.Im(str(help_const))]
-                            ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
-                        ]
-                    case _:
-                        throw_error(datatype)
-                return reti_instrs + [
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")]
-                    ),
-                ]
-            case pn.Ref(
-                pn.Attr(pn.Stack(pn.Num(val1)), pn.Name(val2)) as ref_node,
-            ):
-                datatype = getattr(ref_node, "datatype", None)
-                if datatype is None:
-                    sys.exit(1)
-                attr_name = val2
-                rel_pos_in_struct = 0
-                match datatype:
-                    case pn.StructSpec(pn.Name(val3)):
-                        struct_name = val3
-                        symbol, _ = self.symbol_table.resolve(
-                            struct_name, scope=self.current_scope
-                        )
-                        attr_ids = symbol["attrs"]
-                        for attr_id in attr_ids:
-                            if attr_id.val == attr_name:
-                                break
-                            symbol, _ = self.symbol_table.resolve(
-                                attr_id.val, scope=struct_name
-                            )
-                            attr_size = symbol["size"]
-                            rel_pos_in_struct += int(attr_size)
-                    case _:
-                        throw_error(datatype)
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im(val1)]
-                    ),
-                    rn.Instr(
-                        rn.Addi(), [rn.Reg(rn.In1()), rn.Im(str(rel_pos_in_struct))]
-                    ),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")]
-                    ),
-                ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Stack(pn.Num(val1)), datatype):
+            case pn.Exp(pn.Deref(pn.Num(val1), datatype)):
                 match datatype:
                     case pn.StructSpec() | pn.PntrDecl() | pn.IntType() | pn.CharType():
                         return self._single_line_comment(stmt, "#") + [

@@ -345,7 +345,7 @@ class TransformerPicoC:
         return pn.Debug()
         
     def initializer_pair(self, _, children):
-        return pn.Assign(children[0], children[1])
+        return pn.InitPair(children[0], children[1])
 
     def field_designator(self, _, children):
         return children[0]

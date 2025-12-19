@@ -176,7 +176,7 @@ class BinOp(ASTNode):
         self.left_exp = left_exp
         self.bin_op = bin_op
         self.right_exp = right_exp
-        self.datatype = Empty()
+        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
@@ -289,11 +289,10 @@ class Assign(ASTNode):
 class Exp(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        self.datatype = Empty()
 
     @property
     def visible(self):
-        return _add_if_double_verbose([self.exp], self.datatype)
+        return [self.exp]
 
     __match_args__ = ("exp", "datatype")
 
@@ -301,10 +300,11 @@ class Exp(ASTNode):
 class Stack(ASTNode):
     def __init__(self, num):
         self.num = num
+        self.datatype = Empty()
 
     @property
     def visible(self):
-        return [self.num]
+        return _add_if_double_verbose([self.num], self.datatype)
 
     __match_args__ = ("num",)
 
@@ -381,7 +381,7 @@ class Deref(ASTNode):
     def visible(self):
         return _add_if_double_verbose([self.exp], self.datatype)
 
-    __match_args__ = ("exp",)
+    __match_args__ = ("exp", "datatype")
 
 
 # -------------------------------- L_Array --------------------------------
@@ -445,6 +445,16 @@ class Attr(ASTNode):
 
     __match_args__ = ("exp", "name")
 
+class InitPair(ASTNode):
+    def __init__(self, lhs, exp):
+        self.lhs = lhs
+        self.exp = exp
+
+    @property
+    def visible(self):
+        return [self.lhs, self.exp]
+
+    __match_args__ = ("lhs", "exp")
 
 class Struct(ASTNode):
     def __init__(self, assigns):
