@@ -13,9 +13,9 @@ def _add_if_double_verbose(base_list, datatype):
 # -------------------------------- L_Arith --------------------------------
 class Name(ASTNode):
     # shorter then 'Identifier'
-    def __init__(self, val):
+    def __init__(self, val, datatype=None):
         self.val = val
-        self.datatype = Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -24,13 +24,13 @@ class Name(ASTNode):
     def __eq__(self, other):
         return self.val == other.val
 
-    __match_args__ = ("val",)
+    __match_args__ = ("val", "datatype")
 
 
 class Num(ASTNode):
     def __init__(self, val, datatype=None):
         self.val = val
-        self.datatype = datatype if datatype is not None else Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -45,7 +45,7 @@ class Num(ASTNode):
 class Char(ASTNode):
     def __init__(self, val, datatype=None):
         self.val = val
-        self.datatype = datatype if datatype is not None else Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -174,11 +174,11 @@ class VoidType(ASTNode):
 # =========================================================================
 # -------------------------------- L_Arith --------------------------------
 class BinOp(ASTNode):
-    def __init__(self, left_exp, bin_op, right_exp):
+    def __init__(self, left_exp, bin_op, right_exp, datatype=None):
         self.left_exp = left_exp
         self.bin_op = bin_op
         self.right_exp = right_exp
-        self.datatype: ASTNode = Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -186,7 +186,7 @@ class BinOp(ASTNode):
             [self.left_exp, self.bin_op, self.right_exp], self.datatype
         )
 
-    __match_args__ = ("left_exp", "bin_op", "right_exp")
+    __match_args__ = ("left_exp", "bin_op", "right_exp", "datatype")
 
 
 class UnOp(ASTNode):
@@ -296,13 +296,13 @@ class Exp(ASTNode):
     def visible(self):
         return [self.exp]
 
-    __match_args__ = ("exp", "datatype")
+    __match_args__ = ("exp",)
 
 
 class Stack(ASTNode):
     def __init__(self, num, datatype=None):
         self.num = num
-        self.datatype = datatype if datatype is not None else Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -365,11 +365,10 @@ class PntrDecl(ASTNode):
 class Ref(ASTNode):
     def __init__(self, exp):
         self.exp = exp
-        self.datatype: ASTNode = Empty()
 
     @property
     def visible(self):
-        return _add_if_double_verbose([self.exp], self.datatype)
+        return [self.exp]
 
     __match_args__ = ("exp",)
 
@@ -377,7 +376,7 @@ class Ref(ASTNode):
 class Deref(ASTNode):
     def __init__(self, exp, datatype=None):
         self.exp = exp
-        self.datatype = datatype if datatype is not None else Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
@@ -436,16 +435,16 @@ class StructSpec(ASTNode):
 
 
 class Attr(ASTNode):
-    def __init__(self, exp, name):
+    def __init__(self, exp, name, datatype=None):
         self.exp = exp
         self.name = name
-        self.datatype: ASTNode = Empty()
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
         return _add_if_double_verbose([self.exp, self.name], self.datatype)
 
-    __match_args__ = ("exp", "name")
+    __match_args__ = ("exp", "name", "datatype")
 
 class InitPair(ASTNode):
     def __init__(self, lhs, exp):
