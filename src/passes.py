@@ -923,8 +923,10 @@ class Passes:
         match exp:
             # ----------------------------- L_Arith ------------------------------
             case pn.Num():
+                exp.datatype = pn.IntType()
                 return pn.IntType()
             case pn.Char():
+                exp.datatype = pn.IntType()
                 return pn.CharType()
             case pn.Global(pn.Name(val)):
                 symbol, _ = self.symbol_table.resolve(val, scope="global")
@@ -1199,9 +1201,9 @@ class Passes:
                 exps1_anf = self._picoc_anf_exp(left_exp)
                 exps2_anf = self._picoc_anf_exp(right_exp)
                 binop = pn.BinOp(
-                    pn.Stack(pn.Num("2")),
+                    pn.Stack(pn.Num("2"), left_exp.datatype),
                     bin_op,
-                    pn.Stack(pn.Num("1")),
+                    pn.Stack(pn.Num("1"), right_exp.datatype),
                 )
                 return exps1_anf + exps2_anf + [pn.Exp(binop)]
             case pn.UnOp(un_op, exp):
@@ -1243,13 +1245,11 @@ class Passes:
                     case pn.PntrDecl(pn.IntType() | pn.CharType()):
                         binop_anf = []
                     case pn.PntrDecl():
-                        binop_anf = [pn.Exp(pn.Deref(pn.Num("1")))]
+                        binop_anf = [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), exp.datatype)))]
                     case _:
                         binop_anf = []
                 binop_anf += self._picoc_anf_exp(inner_exp, addr_calc=True)
-                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
-                datatype = exp.datatype
-                final_exp.exp.datatype = self._deref_result_datatype(datatype)
+                final_exp = pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._deref_result_datatype(exp.datatype))))
                 return binop_anf + [final_exp]
             case pn.Attr(inner_exp, pn.Name(attr_name)):
                 base_dt = exp.datatype
@@ -1257,8 +1257,7 @@ class Passes:
                 binop = pn.BinOp(inner_exp, pn.Add(), pn.Num(str(offset)))
                 binop.datatype = base_dt
                 binop_anf = self._picoc_anf_exp(binop, addr_calc=True)
-                final_exp = pn.Exp(pn.Deref(pn.Num("1")))
-                final_exp.exp.datatype = self._attr_result_datatype(base_dt, attr_name)
+                final_exp = pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._attr_result_datatype(base_dt, attr_name))))
                 return binop_anf + [final_exp]
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(ref):
@@ -1640,12 +1639,12 @@ class Passes:
                 ):
                     case (
                         pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
-                        pn.Add(),
+                        pn.Sub(),
                         pn.PntrDecl(_) | pn.ArrayDecl(_, _),
                     ):
                         reti_instrs = self._single_line_comment(stmt, "#")
                         help_const = self._datatype_size(inner_dt)
-                        reti_instrs += [
+                        return reti_instrs + [
                             rn.Instr(
                                 rn.Loadin(),
                                 [
@@ -1687,7 +1686,7 @@ class Passes:
                     ):
                         reti_instrs = self._single_line_comment(stmt, "#")
                         help_const = self._datatype_size(inner_dt)
-                        reti_instrs += [
+                        return reti_instrs + [
                             rn.Instr(
                                 rn.Loadin(),
                                 [
@@ -1715,11 +1714,11 @@ class Passes:
                                 [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
                             ),
                         ]
-                    case (
-                        pn.StructSpec() | pn.IntType() | pn.CharType(),
-                        pn.Add(),
+                    case (pn.StructSpec() | pn.IntType() | pn.CharType(), _, _) | (
                         _,
-                    ) | (_, pn.Add(), pn.StructSpec() | pn.IntType() | pn.CharType()):
+                        _,
+                        pn.StructSpec() | pn.IntType() | pn.CharType(),
+                    ):
                         match bin_aop:
                             case pn.Add():
                                 aop = rn.Add()
@@ -2003,7 +2002,7 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
-            case pn.Exp(pn.Deref(pn.Num(val1), datatype)):
+            case pn.Exp(pn.Deref(pn.Stack(pn.Num(val1), datatype))):
                 match datatype:
                     case pn.StructSpec() | pn.PntrDecl() | pn.IntType() | pn.CharType():
                         return self._single_line_comment(stmt, "#") + [

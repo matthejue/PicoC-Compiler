@@ -28,28 +28,30 @@ class Name(ASTNode):
 
 
 class Num(ASTNode):
-    def __init__(self, val):
+    def __init__(self, val, datatype=None):
         self.val = val
+        self.datatype = datatype if datatype is not None else Empty()
 
     @property
     def visible(self):
-        return [self.val]
+        return _add_if_double_verbose([self.val], self.datatype)
 
     def __eq__(self, other):
         return self.val == other.val
 
-    __match_args__ = ("val",)
+    __match_args__ = ("val", "datatype")
 
 
 class Char(ASTNode):
-    def __init__(self, val):
+    def __init__(self, val, datatype=None):
         self.val = val
+        self.datatype = datatype if datatype is not None else Empty()
 
     @property
     def visible(self):
-        return [self.val]
+        return _add_if_double_verbose([self.val], self.datatype)
 
-    __match_args__ = ("val",)
+    __match_args__ = ("val", "datatype")
 
 
 class Minus(ASTNode):
@@ -298,15 +300,15 @@ class Exp(ASTNode):
 
 
 class Stack(ASTNode):
-    def __init__(self, num, datatype=Empty()):
+    def __init__(self, num, datatype=None):
         self.num = num
-        self.datatype = datatype
+        self.datatype = datatype if datatype is not None else Empty()
 
     @property
     def visible(self):
         return _add_if_double_verbose([self.num], self.datatype)
 
-    __match_args__ = ("num",)
+    __match_args__ = ("num", "datatype")
 
 
 class Stackframe(ASTNode):
@@ -373,9 +375,9 @@ class Ref(ASTNode):
 
 
 class Deref(ASTNode):
-    def __init__(self, exp):
+    def __init__(self, exp, datatype=None):
         self.exp = exp
-        self.datatype: ASTNode = Empty()
+        self.datatype = datatype if datatype is not None else Empty()
 
     @property
     def visible(self):
