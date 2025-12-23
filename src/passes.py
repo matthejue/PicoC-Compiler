@@ -895,6 +895,30 @@ class Passes:
             case _:
                 throw_error(struct_dt)
 
+    def _exp_result_datatype(self, exp):
+        match exp:
+            case pn.Deref(_, datatype):
+                return self._deref_result_datatype(datatype)
+            case pn.Attr(_, pn.Name(attr_name), datatype):
+                return self._attr_result_datatype(datatype, attr_name)
+            case pn.Ref(inner_exp):
+                inner_dt = self._exp_result_datatype(inner_exp)
+                return (
+                    pn.PntrDecl(copy.deepcopy(inner_dt)) if inner_dt is not None else None
+                )
+            case pn.Cast(datatype, _):
+                return copy.deepcopy(datatype)
+        datatype = getattr(exp, "datatype", None)
+        if datatype is not None:
+            return copy.deepcopy(datatype)
+        match exp:
+            case pn.Num():
+                return pn.IntType()
+            case pn.Char():
+                return pn.CharType()
+            case _:
+                return None
+
     def _struct_attr_offset(self, struct_dt, attr_name: str) -> int:
         match struct_dt:
             case pn.StructSpec(pn.Name(struct_name)):
@@ -1166,13 +1190,17 @@ class Passes:
             case pn.Exit(pn.Num(val)):
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
-            case pn.BinOp(left_exp, bin_op, right_exp):
+            case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
                 exps1_anf = self._picoc_anf_exp(left_exp)
                 exps2_anf = self._picoc_anf_exp(right_exp)
+                left_dt = self._exp_result_datatype(left_exp)
+                right_dt = self._exp_result_datatype(right_exp)
+                result_dt = self._exp_result_datatype(binop_exp)
                 binop = pn.BinOp(
-                    pn.Stack(pn.Num("2"), left_exp.datatype),
+                    pn.Stack(pn.Num("2"), left_dt),
                     bin_op,
-                    pn.Stack(pn.Num("1"), right_exp.datatype),
+                    pn.Stack(pn.Num("1"), right_dt),
+                    result_dt,
                 )
                 return exps1_anf + exps2_anf + [pn.Exp(binop)]
             case pn.UnOp(un_op, exp):
