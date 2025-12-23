@@ -312,31 +312,28 @@ class Stack(ASTNode):
 
 
 class Stackframe(ASTNode):
-    def __init__(self, num):
+    def __init__(self, num, datatype=None):
         self.num = num
-        self.datatype: ASTNode = Empty()
-        self.symbol_name = None
-        self.scope = None
+        self.datatype = datatype if datatype else Empty()
+        self.symbol_name: str
 
     @property
     def visible(self):
         return _add_if_double_verbose([self.num], self.datatype)
 
-    __match_args__ = ("num",)
+    __match_args__ = ("num", "datatype")
 
 
 class Global(ASTNode):
-    def __init__(self, num):
+    def __init__(self, num, datatype=None):
         self.num = num
-        self.datatype: ASTNode = Empty()
-        self.symbol_name = None
-        self.scope = None
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
         return _add_if_double_verbose([self.num], self.datatype)
 
-    __match_args__ = ("num",)
+    __match_args__ = ("num", "datatype")
 
 
 class StackMalloc(ASTNode):

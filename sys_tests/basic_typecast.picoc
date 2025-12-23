@@ -20,6 +20,7 @@ int main() {
     int *data_start = (int *)(current + 1);
     int *size = ((int *)current + 1);
     *size = 3 * 38;
+    debug;
     struct BlockHeader *new_block = ((struct BlockHeader *)(data_start + (*current).size) + 3);
 
     print(new_block - current);
