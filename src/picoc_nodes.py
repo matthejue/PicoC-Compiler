@@ -531,15 +531,16 @@ class DoWhile(ASTNode):
 
 # --------------------------------- L_Fun ---------------------------------
 class Call(ASTNode):
-    def __init__(self, name, exps):
+    def __init__(self, name, exps, datatype=None):
         self.name = name
         self.exps = exps
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
-        return [self.name, self.exps]
+        return _add_if_double_verbose([self.name, self.exps], self.datatype)
 
-    __match_args__ = ("name", "exps")
+    __match_args__ = ("name", "exps", "datatype")
 
 
 class Empty(ASTNode):

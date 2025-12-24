@@ -1034,6 +1034,7 @@ class Passes:
                 symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
                 match symbol:
                     case {"datatype": pn.FunDecl(ret_dt, _, _)}:
+                        exp.datatype = copy.deepcopy(ret_dt)
                         return copy.deepcopy(ret_dt)
                     case _:
                         throw_error(symbol)
