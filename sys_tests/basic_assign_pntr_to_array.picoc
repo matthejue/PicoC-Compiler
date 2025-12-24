@@ -3,8 +3,12 @@
 
 void main() {
   int var = input();
+  debug;
   int *ar[2];
+  debug;
   *(ar + 1) = &var;
+  debug;
   // the subtype of the array decides if the deref works
   print(**(ar + 1));
+  debug;
 }

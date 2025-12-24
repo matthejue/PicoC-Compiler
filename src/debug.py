@@ -13,24 +13,29 @@ import pudb
 from src import global_vars
 
 _debug_enabled = False
+_debug_triggered = False
 
 
 def activate_debug():
     """Enable debug breakpoints."""
-    global _debug_enabled
+    global _debug_enabled, _debug_triggered
     _debug_enabled = True
+    _debug_triggered = False
 
 
 def deactivate_debug():
     """Disable debug breakpoints."""
-    global _debug_enabled
+    global _debug_enabled, _debug_triggered
     _debug_enabled = False
+    _debug_triggered = False
 
 
 def debug():
     """Trigger pudb/pdb if debug mode was activated."""
-    if not (_debug_enabled and global_vars.args.debug):
+    global _debug_triggered
+    if not (_debug_enabled and global_vars.args.debug) or _debug_triggered:
         return
+    _debug_triggered = True
     pudb.set_trace()
 
 

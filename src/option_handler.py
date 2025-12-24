@@ -115,9 +115,6 @@ class OptionHandler:
         return preprocessor.preprocess(code, path)
 
     def _compl(self, code):
-        # db.activate_debug()
-        # db.debug()
-
         if global_vars.args.intermediate_stages:
             print(subheading("Preprocessed Code", "-"))
             print(code)

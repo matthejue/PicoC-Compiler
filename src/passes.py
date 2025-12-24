@@ -488,7 +488,7 @@ class Passes:
                 if local_var_or_param == "param" and isinstance(
                     datatype_copy, pn.ArrayDecl
                 ):
-                    datatype_copy = pn.PntrDecl(copy.deepcopy(datatype_copy.datatype))
+                    datatype_copy = self._ref_result_datatype(datatype_copy.datatype)
 
                 size = self._datatype_size(datatype_copy)
                 match self.current_scope:
@@ -887,6 +887,9 @@ class Passes:
             case _:
                 throw_error(pointer_dt)
 
+    def _ref_result_datatype(self, inner_dt):
+        return pn.PntrDecl(copy.deepcopy(inner_dt))
+
     def _attr_result_datatype(self, struct_dt, attr_name: str):
         match struct_dt:
             case pn.StructSpec(pn.Name(struct_name)):
@@ -902,10 +905,8 @@ class Passes:
             case pn.Attr(_, pn.Name(attr_name), datatype):
                 return self._attr_result_datatype(datatype, attr_name)
             case pn.Ref(inner_exp):
-                inner_dt = self._exp_result_datatype(inner_exp)
-                return (
-                    pn.PntrDecl(copy.deepcopy(inner_dt)) if inner_dt is not None else None
-                )
+                inner_dt = self._exp_result_datatype(inner_exp) # TODO: warum ist Datatype hicht schon in Ref?
+                return self._ref_result_datatype(inner_dt)
             case pn.Cast(datatype, _):
                 return copy.deepcopy(datatype)
         datatype = getattr(exp, "datatype", None)
@@ -998,8 +999,7 @@ class Passes:
             case pn.Ref(inner_exp):
                 inner_dt = self._picoc_type_exp(inner_exp)
                 exp.datatype = copy.deepcopy(inner_dt)
-                pointer_dt = pn.PntrDecl(copy.deepcopy(inner_dt))
-                return pointer_dt
+                return self._ref_result_datatype(inner_dt)
             case pn.Deref(addr_exp):
                 base_dt = self._picoc_type_exp(addr_exp)
                 exp.datatype = copy.deepcopy(base_dt)
@@ -1035,7 +1035,8 @@ class Passes:
                 match symbol:
                     case {"datatype": pn.FunDecl(ret_dt, _, _)}:
                         return copy.deepcopy(ret_dt)
-                return None
+                    case _:
+                        throw_error(symbol)
             case pn.Empty():
                 return None
             case _:
@@ -1191,8 +1192,8 @@ class Passes:
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
-                exps1_anf = self._picoc_anf_exp(left_exp)
-                exps2_anf = self._picoc_anf_exp(right_exp)
+                exps1_anf = self._picoc_anf_exp(left_exp, addr_calc)
+                exps2_anf = self._picoc_anf_exp(right_exp, addr_calc)
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
                 result_dt = self._exp_result_datatype(binop_exp)
@@ -1238,18 +1239,18 @@ class Passes:
                 return []
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Deref(inner_exp, datatype):
-                binop_anf = self._picoc_anf_exp(inner_exp, addr_calc=True)
+                exp_anf = self._picoc_anf_exp(inner_exp, addr_calc=True)
                 match datatype:
                     # case pn.PntrDecl(pn.IntType() | pn.CharType()):
                     #     binop_anf = []
                     case pn.PntrDecl():
-                        binop_anf += [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), datatype)))]
-                return binop_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), datatype)))])
+                        exp_anf += [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), datatype)))]
+                return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._deref_result_datatype(datatype))))])
             case pn.Attr(inner_exp, pn.Name(attr_name), datatype):
                 offset = self._struct_attr_offset(datatype, attr_name)
                 binop = pn.BinOp(inner_exp, pn.Add(), pn.Num(str(offset)), datatype)
-                binop_anf = self._picoc_anf_exp(binop, addr_calc=True)
-                return binop_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), datatype)))])
+                exp_anf = self._picoc_anf_exp(binop, addr_calc=True)
+                return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._ref_result_datatype(datatype))))])
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(ref):
                 return self._picoc_anf_exp(ref, addr_calc=True)
@@ -1359,7 +1360,7 @@ class Passes:
                         throw_error(symbol)
             case pn.Assign(pn.Stackframe() as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
-                var_name = getattr(lhs, "symbol_name", None)
+                var_name = lhs.symbol_name
                 symbol, choosen_scope = (
                     self.symbol_table.resolve(var_name, scope=self.current_scope)
                     if var_name
@@ -1399,13 +1400,13 @@ class Passes:
             case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
                 self._picoc_anf_exp(alloc)
                 stmt_anf = self._picoc_anf_stmt(
-                    pn.Assign(self._picoc_rewrite_exp(name), exp)
+                        pn.Assign(self._picoc_rewrite_exp(name), exp) # TODO: ist Name bereits Stackframe oder Global?
                 )
                 return self._single_line_comment(stmt, "//") + stmt_anf
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
                 exps_anf = self._picoc_anf_exp(exp)
-                refs_anf = self._picoc_anf_exp(ref)
+                refs_anf = self._picoc_anf_exp(ref, addr_calc=True)
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_anf
