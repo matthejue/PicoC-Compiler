@@ -1,1 +1,1 @@
-./sys_tests/basic_tmp2.picoc
+./sys_tests/example_bubble_sort.picoc

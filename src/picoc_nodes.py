@@ -190,15 +190,16 @@ class BinOp(ASTNode):
 
 
 class UnOp(ASTNode):
-    def __init__(self, un_op, exp):
+    def __init__(self, un_op, exp, datatype=None):
         self.un_op = un_op
         self.exp = exp
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
-        return [self.un_op, self.exp]
+        return _add_if_double_verbose([self.un_op, self.exp], self.datatype)
 
-    __match_args__ = ("un_op", "exp")
+    __match_args__ = ("un_op", "exp", "datatype")
 
 
 class Cast(ASTNode):

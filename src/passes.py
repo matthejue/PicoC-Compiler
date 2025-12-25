@@ -1020,6 +1020,7 @@ class Passes:
                 return datatype
             case pn.UnOp(un_op, inner_exp):
                 _ = self._picoc_type_exp(inner_exp)
+                exp.datatype = pn.IntType()
                 return pn.IntType()
             case pn.SizeOf():
                 return pn.IntType()
@@ -1249,19 +1250,25 @@ class Passes:
                         right_is_zero = True
                     case _:
                         right_is_zero = False
-                exps1_anf = [] if left_is_zero else self._picoc_anf_exp(left_exp, left_addr_calc)
+                if isinstance(bin_op, (pn.Add, pn.Sub)) and left_is_zero:
+                    exps1_anf = []
+                else:
+                    exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
                         exps1_anf += [] if isinstance(left_exp, pn.BinOp) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
                         ]
-                exps2_anf = [] if right_is_zero else self._picoc_anf_exp(right_exp, right_addr_calc)
+                if isinstance(bin_op, (pn.Add, pn.Sub)) and right_is_zero:
+                    exps2_anf = []
+                else:
+                    exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
                         exps2_anf += [] if isinstance(right_exp, pn.BinOp) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
                         ]
-                if left_is_zero or right_is_zero:
+                if isinstance(bin_op, (pn.Add, pn.Sub)) and (left_is_zero or right_is_zero):
                     return exps1_anf + exps2_anf
                 binop = pn.BinOp(
                     pn.Stack(pn.Num("2"), left_dt),
