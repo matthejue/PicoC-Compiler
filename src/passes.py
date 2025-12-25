@@ -1277,11 +1277,12 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Deref(inner_exp, datatype):
                 exp_anf = self._picoc_anf_exp(inner_exp, addr_calc=True)
-                match datatype:
+                inner_dt = self._deref_result_datatype(datatype)
+                match inner_dt:
                     # case pn.PntrDecl(pn.IntType() | pn.CharType()):
                     #     binop_anf = []
                     case pn.PntrDecl():
-                        exp_anf += [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), datatype)))]
+                        exp_anf += [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), inner_dt)))]
                 return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._deref_result_datatype(datatype))))])
             case pn.Attr(inner_exp, pn.Name(attr_name), datatype):
                 offset = self._struct_attr_offset(datatype, attr_name)
