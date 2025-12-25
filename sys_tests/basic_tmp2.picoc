@@ -1,0 +1,7 @@
+// in:32
+// expected:42
+
+void main() {
+  int var = input();
+  print(-(-'*' + var * 0));
+}

@@ -236,16 +236,17 @@ class SizeOf(ASTNode):
 
 # -------------------------------- L_Logic --------------------------------
 class Atom(ASTNode):
-    def __init__(self, left_exp, rel, right_exp):
+    def __init__(self, left_exp, rel, right_exp, datatype=None):
         self.left_exp = left_exp
         self.rel = rel
         self.right_exp = right_exp
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
-        return [self.left_exp, self.rel, self.right_exp]
+        return _add_if_double_verbose([self.left_exp, self.rel, self.right_exp], self.datatype)
 
-    __match_args__ = ("left_exp", "rel", "right_exp")
+    __match_args__ = ("left_exp", "rel", "right_exp", "datatype")
 
 
 class ToBool(ASTNode):

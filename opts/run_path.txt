@@ -1,1 +1,1 @@
-./sys_tests/advanced_pntr_deref_a_ref_and_ref_a_deref.picoc
+./sys_tests/basic_tmp2.picoc

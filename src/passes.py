@@ -1027,6 +1027,7 @@ class Passes:
             case pn.Atom(left_exp, _, right_exp):
                 self._picoc_type_exp(left_exp)
                 self._picoc_type_exp(right_exp)
+                exp.datatype = pn.IntType()
                 return pn.IntType()
             case pn.ToBool(inner_exp): # TODO: What is with pointer?
                 self._picoc_type_exp(inner_exp)
