@@ -1,1 +1,1 @@
-./sys_tests/advanced_array_of_pntrs_init.picoc
+./sys_tests/advanced_pntr_def_ref_and_deref_var_deref_subscr_attribute_deref_arith_mix_array_assign.picoc

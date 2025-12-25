@@ -1232,18 +1232,30 @@ class Passes:
                 right_addr_calc = addr_calc and isinstance(
                     right_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
                 )
-                exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
+                match left_exp:
+                    case pn.Num("0"):
+                        left_is_zero = True
+                    case _:
+                        left_is_zero = False
+                match right_exp:
+                    case pn.Num("0"):
+                        right_is_zero = True
+                    case _:
+                        right_is_zero = False
+                exps1_anf = [] if left_is_zero else self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
                         exps1_anf += [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
                         ]
-                exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
+                exps2_anf = [] if right_is_zero else self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
                         exps2_anf += [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
                         ]
+                if left_is_zero or right_is_zero:
+                    return exps1_anf + exps2_anf
                 binop = pn.BinOp(
                     pn.Stack(pn.Num("2"), left_dt),
                     bin_op,

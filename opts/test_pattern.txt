@@ -1,1 +1,0 @@
-advanced_array_of_pntrs_init
