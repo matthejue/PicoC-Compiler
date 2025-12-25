@@ -1233,7 +1233,17 @@ class Passes:
                     right_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
                 )
                 exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
+                match left_dt:
+                    case pn.PntrDecl():
+                        exps1_anf += [
+                            pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
+                        ]
                 exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
+                match right_dt:
+                    case pn.PntrDecl():
+                        exps2_anf += [
+                            pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
+                        ]
                 binop = pn.BinOp(
                     pn.Stack(pn.Num("2"), left_dt),
                     bin_op,
@@ -1277,12 +1287,6 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Deref(inner_exp, datatype):
                 exp_anf = self._picoc_anf_exp(inner_exp, addr_calc=True)
-                inner_dt = self._deref_result_datatype(datatype)
-                match inner_dt:
-                    # case pn.PntrDecl(pn.IntType() | pn.CharType()):
-                    #     binop_anf = []
-                    case pn.PntrDecl():
-                        exp_anf += [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), inner_dt)))]
                 return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._deref_result_datatype(datatype))))])
             case pn.Attr(inner_exp, pn.Name(attr_name), datatype):
                 offset = self._struct_attr_offset(datatype, attr_name)
