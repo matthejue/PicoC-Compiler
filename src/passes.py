@@ -75,13 +75,19 @@ class Passes:
                 inner_shrunk = self._picoc_shrink_exp(inner)
                 match inner_shrunk:
                     # *&x (optionally with offset) -> x (or x with offset)
-                    case pn.Ref(inner_ref):
+                    case pn.BinOp(pn.Ref(inner_ref), pn.Add(), pn.Num("0")):
                         return inner_ref
+                    case pn.BinOp(pn.Ref(inner_ref), pn.Add(), offset_exp):
+                        return pn.BinOp(inner_ref, pn.Add(), offset_exp)
                 return pn.Deref(inner_shrunk)
             case pn.Ref(ref):
                 ref_shrunk = self._picoc_shrink_exp(ref)
                 match ref_shrunk:
                     # &( *(addr) ) cancels to addr
+                    case pn.Deref(pn.BinOp(addr_exp, pn.Add(), pn.Num("0"))):
+                        return addr_exp
+                    case pn.Deref(pn.BinOp(addr_exp, pn.Add(), offset_exp)):
+                        return pn.BinOp(addr_exp, pn.Add(), offset_exp)
                     case pn.Deref(addr_exp):
                         return addr_exp
                 return pn.Ref(ref_shrunk)
