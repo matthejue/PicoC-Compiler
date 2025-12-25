@@ -1245,13 +1245,13 @@ class Passes:
                 exps1_anf = [] if left_is_zero else self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
-                        exps1_anf += [
+                        exps1_anf += [] if isinstance(left_exp, pn.BinOp) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
                         ]
                 exps2_anf = [] if right_is_zero else self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
-                        exps2_anf += [
+                        exps2_anf += [] if isinstance(right_exp, pn.BinOp) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
                         ]
                 if left_is_zero or right_is_zero:

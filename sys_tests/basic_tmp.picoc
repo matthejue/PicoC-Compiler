@@ -1,0 +1,21 @@
+// in:3
+// expected:3
+
+struct array_with_len {int *ar; int len;};
+
+void main() {
+  // pointer definition
+  int **pntr_on_pntr;  // pointer on pointers
+  debug;
+  // reference and dereference operator on variable
+  int ar[3] = {4, 2, input()};
+  debug;
+  struct array_with_len st_ar = {.ar=ar, .len=3};
+  debug;
+
+  // reference operator on a attribute operation
+  pntr_on_pntr = &st_ar.ar;
+  debug;
+  print(*(*pntr_on_pntr + st_ar.len - 1));
+  debug;
+}
