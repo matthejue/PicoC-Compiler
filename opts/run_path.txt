@@ -1,1 +1,1 @@
-./sys_tests/basic_typical_test.picoc
+./sys_tests/advanced_array_of_pntrs.picoc

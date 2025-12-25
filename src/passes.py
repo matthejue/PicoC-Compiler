@@ -516,6 +516,32 @@ class Passes:
             case _:
                 throw_error(alloc)
 
+    def _declare_input_builtin(self):
+        if self.symbol_table.contains("input", scope="global"):
+            return
+        self.symbol_table.declare(
+            "input",
+            {
+                "datatype": pn.FunDecl(pn.IntType(), pn.Name("input"), []),
+                "name": "input",
+                "param_size": 0,
+            },
+            scope="global",
+        )
+
+    def _declare_print_builtin(self):
+        if self.symbol_table.contains("print", scope="global"):
+            return
+        self.symbol_table.declare(
+            "print",
+            {
+                "datatype": pn.FunDecl(pn.VoidType(), pn.Name("print"), []),
+                "name": "print",
+                "param_size": 0,
+            },
+            scope="global",
+        )
+
     def _resolve_name_to_storage(self, name_node):
         match name_node:
             case pn.Name(var_name):
@@ -589,14 +615,18 @@ class Passes:
                             throw_error(init_pair)
                 return pn.Struct(init_pairs_out)
             case pn.Call(pn.Name() as fun_name, exps):
+                if fun_name.val == "input":
+                    self._declare_input_builtin()
+                elif fun_name.val == "print":
+                    self._declare_print_builtin()
                 return pn.Call(
                     fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
                 )
-            case pn.Call(fun_exp, exps):
-                return pn.Call(
-                    self._picoc_rewrite_exp(fun_exp),
-                    [self._picoc_rewrite_exp(inner) for inner in exps],
-                )
+            # case pn.Call(fun_exp, exps):
+            #     return pn.Call(
+            #         self._picoc_rewrite_exp(fun_exp),
+            #         [self._picoc_rewrite_exp(inner) for inner in exps],
+            #     )
             case pn.SizeOf():
                 return exp
             case pn.Exit():
@@ -1193,11 +1223,17 @@ class Passes:
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
-                exps1_anf = self._picoc_anf_exp(left_exp, addr_calc)
-                exps2_anf = self._picoc_anf_exp(right_exp, addr_calc)
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
                 result_dt = self._exp_result_datatype(binop_exp)
+                left_addr_calc = addr_calc and isinstance(
+                    left_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
+                )
+                right_addr_calc = addr_calc and isinstance(
+                    right_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
+                )
+                exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
+                exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
                 binop = pn.BinOp(
                     pn.Stack(pn.Num("2"), left_dt),
                     bin_op,

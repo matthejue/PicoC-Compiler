@@ -6,8 +6,11 @@ void main() {
   int b;
 
   a[0][2] = input();
+  debug;
   a[1][1] = 1;
+  debug;
   b = a[0][a[0][2] - a[1][1]];
 
+  debug;
   print(b);
 }
