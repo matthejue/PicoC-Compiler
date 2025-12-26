@@ -75,19 +75,19 @@ class Passes:
                 inner_shrunk = self._picoc_shrink_exp(inner)
                 match inner_shrunk:
                     # *&x (optionally with offset) -> x (or x with offset)
-                    case pn.BinOp(pn.Ref(inner_ref), pn.Add(), pn.Num("0")):
+                    case pn.BinOp(pn.Ref(inner_ref), pn.Add() | pn.Sub() as bin_op, pn.Num("0")):
                         return inner_ref
-                    case pn.BinOp(pn.Ref(inner_ref), pn.Add(), offset_exp):
-                        return pn.BinOp(inner_ref, pn.Add(), offset_exp)
+                    case pn.BinOp(pn.Ref(inner_ref), pn.Add() | pn.Sub() as bin_op, offset_exp):
+                        return pn.BinOp(inner_ref, bin_op, offset_exp)
                 return pn.Deref(inner_shrunk)
             case pn.Ref(ref):
                 ref_shrunk = self._picoc_shrink_exp(ref)
                 match ref_shrunk:
                     # &( *(addr) ) cancels to addr
-                    case pn.Deref(pn.BinOp(addr_exp, pn.Add(), pn.Num("0"))):
+                    case pn.Deref(pn.BinOp(addr_exp, pn.Add() | pn.Sub() as bin_op, pn.Num("0"))):
                         return addr_exp
-                    case pn.Deref(pn.BinOp(addr_exp, pn.Add(), offset_exp)):
-                        return pn.BinOp(addr_exp, pn.Add(), offset_exp)
+                    case pn.Deref(pn.BinOp(addr_exp, pn.Add() | pn.Sub() as bin_op, offset_exp)):
+                        return pn.BinOp(addr_exp, bin_op, offset_exp)
                     case pn.Deref(addr_exp):
                         return addr_exp
                 return pn.Ref(ref_shrunk)
@@ -1231,13 +1231,14 @@ class Passes:
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
+                db.debug()
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
                 result_dt = self._exp_result_datatype(binop_exp)
-                left_addr_calc = addr_calc and isinstance(
+                left_addr_calc = isinstance(
                     left_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
                 )
-                right_addr_calc = addr_calc and isinstance(
+                right_addr_calc = isinstance(
                     right_dt, (pn.PntrDecl, pn.ArrayDecl, pn.StructSpec)
                 )
                 match left_exp:
@@ -1256,7 +1257,7 @@ class Passes:
                     exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
-                        exps1_anf += [] if isinstance(left_exp, pn.BinOp) else [
+                        exps1_anf += [] if isinstance(left_exp, (pn.BinOp)) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
                         ]
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and right_is_zero:
@@ -1265,7 +1266,7 @@ class Passes:
                     exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
-                        exps2_anf += [] if isinstance(right_exp, pn.BinOp) else [
+                        exps2_anf += [] if isinstance(right_exp, (pn.BinOp)) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
                         ]
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and (left_is_zero or right_is_zero):
@@ -1285,7 +1286,7 @@ class Passes:
                             return [pn.Exp(pn.Num("-2147483648"))]
                 return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             case pn.Cast(datatype, inner_exp):
-                exps_anf = self._picoc_anf_exp(inner_exp)
+                exps_anf = self._picoc_anf_exp(inner_exp, addr_calc=addr_calc)
                 return exps_anf
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
@@ -1515,6 +1516,7 @@ class Passes:
                 return [pn.Exp(stmt)]
             # ---------------------------- L_Misc -----------------------------
             case pn.Debug():
+                db.activate_debug()
                 return [pn.Exp(stmt)]
             case _:
                 throw_error(stmt)

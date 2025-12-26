@@ -1,0 +1,19 @@
+// in:
+// expected:4 42
+
+struct stt {int len; int *ar;};
+
+int ar[6] = {314, 42, 4, 42, -2, 5};
+
+struct stt st_ar = {.len=6, .ar=ar};
+
+int call_by_reference(int *x, int *y) {
+  debug;
+  print(*x);
+  print(*y);
+}
+
+void main() {
+  debug;
+  call_by_reference(&st_ar.ar[2], &st_ar.ar[3]);
+}

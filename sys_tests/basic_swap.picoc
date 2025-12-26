@@ -1,5 +1,5 @@
 // in:
-// expected:-2 314
+// expected:4 42 -2 42
 
 struct stt {int len; int *ar;};
 
@@ -9,15 +9,16 @@ struct stt st_ar = {.len=6, .ar=ar};
 
 int swap(int *x, int *y) {
   int h;
-  int swapped = 0;
   if (*x > *y) {
-    h = *x; *x = *y; *y = h; swapped = 1;
+    h = *x; *x = *y; *y = h;
   }
-  return swapped;
 }
 
 void main() {
-  swapped = swap(&st_ar.ar[2], &st_ar.ar[3]);
+  swap(&st_ar.ar[2], &st_ar.ar[3]);
   print(st_ar.ar[2]);
   print(st_ar.ar[3]);
+  swap(&st_ar.ar[3], &st_ar.ar[4]);
+  print(st_ar.ar[3]);
+  print(st_ar.ar[4]);
 }
