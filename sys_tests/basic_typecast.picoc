@@ -1,5 +1,5 @@
 // input:
-// expected:42
+// expected:42 -42
 
 #define NULL ((void *)0)
 
@@ -18,15 +18,12 @@ int main() {
 
     struct BlockHeader *current = &block;
     int *data_start = (int *)(current + 1);
-    debug;
     int *size = ((int *)current + 1);
-    debug;
     *size = 3 * 38;
-    debug;
     struct BlockHeader *new_block = ((struct BlockHeader *)(data_start + (*current).size) + 3);
-    debug;
 
     print(new_block - current);
+    print(current - new_block);
 
     return 0;
 }

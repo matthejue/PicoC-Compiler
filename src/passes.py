@@ -1257,7 +1257,10 @@ class Passes:
                     exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
-                        exps1_anf += [] if isinstance(left_exp, (pn.BinOp)) else [
+                        exps1_anf += [] if isinstance(left_exp, (pn.BinOp)) or (
+                            isinstance(left_exp, pn.Cast)
+                            and isinstance(left_exp.exp, pn.BinOp)
+                        ) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
                         ]
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and right_is_zero:
@@ -1266,7 +1269,10 @@ class Passes:
                     exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
-                        exps2_anf += [] if isinstance(right_exp, (pn.BinOp)) else [
+                        exps2_anf += [] if isinstance(right_exp, (pn.BinOp)) or (
+                            isinstance(right_exp, pn.Cast)
+                            and isinstance(right_exp.exp, pn.BinOp)
+                        ) else [
                             pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
                         ]
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and (left_is_zero or right_is_zero):
@@ -1711,7 +1717,7 @@ class Passes:
                                 rn.Loadin(),
                                 [
                                     rn.Reg(rn.Sp()),
-                                    rn.Reg(rn.In1()),
+                                    rn.Reg(rn.Acc()),
                                     rn.Im(val1),
                                 ],
                             ),
@@ -1725,16 +1731,16 @@ class Passes:
                             ),
                             rn.Instr(
                                 rn.Sub(),
-                                [rn.Reg(rn.In2()), rn.Reg(rn.In1())],
+                                [rn.Reg(rn.Acc()), rn.Reg(rn.In2())],
                             ),
                             rn.Instr(
                                 rn.Divi(),
-                                [rn.Reg(rn.In2()), rn.Im(str(help_const))],
+                                [rn.Reg(rn.Acc()), rn.Im(str(help_const))],
                             ),
                             rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                             rn.Instr(
                                 rn.Storein(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.In2()), rn.Im("1")],
+                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
                             ),
                         ]
                     case (

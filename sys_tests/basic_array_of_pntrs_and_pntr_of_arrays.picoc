@@ -9,6 +9,5 @@ void main() {
   int *(*pntr_on_ars)[3] = &ar_of_pntrs;
 
   print(*ar_of_pntrs[1]);
-  debug;
   print(*(*pntr_on_ars)[1]);
 }

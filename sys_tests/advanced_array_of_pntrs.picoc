@@ -3,18 +3,13 @@
 
 void main() {
   int var = input();
-  debug;
   int ar[3] = {1, var, 3};
   // array of pointers
-  debug;
   int *ar_of_pntrs[3];
-  debug;
   ar_of_pntrs[0] = ar;
   // ar_of_pntrs[1] = &ar;
   // ar_of_pntrs[2] = &var;
-  debug;
   print(ar_of_pntrs[0][1]);
-  debug;
   // the subtype of the array decides how the 2nd subscript behaves:
   // print(ar_of_pntrs[1][1]);
   // print(ar_of_pntrs[2][0]);
