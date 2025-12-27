@@ -113,7 +113,16 @@ class TransformerPicoC:
                 return node
             case pn.UnOp(pn.LogicNot(), _):
                 return node
-            case pn.BinOp() | pn.UnOp() | pn.Num() | pn.Name() | pn.Char():
+            case (
+                pn.Attr()
+                | pn.Deref()
+                | pn.Subscr()
+                | pn.BinOp()
+                | pn.UnOp()
+                | pn.Num()
+                | pn.Name()
+                | pn.Char()
+            ):
                 return pn.ToBool(node)
         throw_error(node)
 

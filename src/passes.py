@@ -1888,7 +1888,7 @@ class Passes:
             case pn.Exp(pn.ToBool(pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
+                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                     rn.Jump(rn.Eq(), rn.Im("3")),
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("1")]),
