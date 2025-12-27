@@ -141,16 +141,16 @@ class TransformerPicoC:
             return base_datatype, declarator
         if isinstance(declarator, list) and declarator:
             *fragmented_datatypes, name = declarator
-            datatype = base_datatype
+            full_datatype = base_datatype
             for fragmented_datatype in fragmented_datatypes:
                 match fragmented_datatype:
                     case pn.ArrayDecl(num, _):
-                        datatype = pn.ArrayDecl(num, datatype)
+                        full_datatype = pn.ArrayDecl(num, full_datatype)
                     case pn.PntrDecl(_):
-                        datatype = pn.PntrDecl(datatype)
+                        full_datatype = pn.PntrDecl(full_datatype)
                     case _:
                         throw_error(fragmented_datatype)
-            return datatype, name
+            return full_datatype, name
         throw_error(declarator)
 
     def walk(self, root):
@@ -245,21 +245,30 @@ class TransformerPicoC:
     def declaration(self, _, children):
         if len(children) == 2:
             type_qual = pn.Writeable()
-            datatype, init_or_decl = children
+            base_datatype, init_or_decl = children
         elif len(children) == 3:
-            type_qual, datatype, init_or_decl = children
+            type_qual, base_datatype, init_or_decl = children
         else:
             throw_error(len(children))
 
         match init_or_decl:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
-                full_dt, name = self._seperate_name_and_datatype(datatype, declarator)
-                return pn.Assign(pn.Alloc(type_qual, full_dt, name), val)
+                full_datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
+                return pn.Assign(pn.Alloc(type_qual, full_datatype, name), val)
             case pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs):
-                return pn.FunDecl(datatype, name, allocs)
+                return pn.FunDecl(base_datatype, name, allocs)
+            case [*fragments, pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs)]:
+                full_datatype = base_datatype
+                for fragment in fragments:
+                    match fragment:
+                        case pn.PntrDecl(_):
+                            full_datatype = pn.PntrDecl(full_datatype)
+                        case _:
+                            throw_error(fragment)
+                return pn.FunDecl(full_datatype, name, allocs)
             case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
-                full_dt, name = self._seperate_name_and_datatype(datatype, init_or_decl)
-                return pn.Exp(pn.Alloc(type_qual, full_dt, name))
+                full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
+                return pn.Exp(pn.Alloc(type_qual, full_datatype, name))
         throw_error(init_or_decl)
 
     def type_qualifier(self, node, _):
