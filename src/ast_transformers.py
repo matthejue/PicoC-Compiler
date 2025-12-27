@@ -174,12 +174,23 @@ class TransformerPicoC:
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
     def function_definition(self, _, children):
+        base_datatype = children[0]
         declarator = children[1]
         match declarator:
             case pn.FunDecl(_, name, allocs):
-                return pn.FunDef(children[0], name, allocs, children[2])
+                return pn.FunDef(base_datatype, name, allocs, children[2])
+            case [*fragments, pn.FunDecl(_, name, allocs)]:
+                datatype = base_datatype
+                for fragment in fragments:
+                    match fragment:
+                        # case pn.ArrayDecl(num, _) is not possible
+                        case pn.PntrDecl(_):
+                            datatype = pn.PntrDecl(datatype)
+                        case _:
+                            throw_error(fragment)
+                return pn.FunDef(datatype, name, allocs, children[2])
             case [pn.Name() as name, params]:
-                return pn.FunDef(children[0], name, params, children[2])
+                return pn.FunDef(base_datatype, name, params, children[2])
         throw_error(declarator)
 
     def function_declarator(self, _, children):
