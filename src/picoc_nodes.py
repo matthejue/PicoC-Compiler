@@ -226,14 +226,15 @@ class Exit(ASTNode):
 
 
 class SizeOf(ASTNode):
-    def __init__(self, exp_datatype):
+    def __init__(self, exp_datatype, datatype=None):
         self.exp_datatype = exp_datatype
+        self.datatype = datatype if datatype else Empty()
 
     @property
     def visible(self):
-        return [self.exp_datatype]
+        return _add_if_double_verbose([self.exp_datatype], self.datatype)
 
-    __match_args__ = ("exp_datatype",)
+    __match_args__ = ("exp_datatype", "datatype")
 
 # -------------------------------- L_Logic --------------------------------
 class Atom(ASTNode):

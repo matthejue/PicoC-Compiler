@@ -260,6 +260,20 @@ class Passes:
                     node.visible[i] = []
         return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
+    def _char_literal_code(self, val: str) -> int:
+        if len(val) == 2 and val[0] == "\\":
+            escape_map = {
+                "0": 0,
+                "n": 10,
+                "t": 9,
+                "r": 13,
+                "\\": 92,
+                "'": 39,
+                '"': 34,
+            }
+            return escape_map.get(val[1], ord(val[1]))
+        return ord(val)
+
     # def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
     #     if not (global_vars.args.verbose or global_vars.args.double_verbose):
     #         return []
@@ -1028,7 +1042,9 @@ class Passes:
                 _ = self._picoc_type_exp(inner_exp)
                 exp.datatype = pn.IntType()
                 return pn.IntType()
-            case pn.SizeOf():
+            case pn.SizeOf(exp_datatype):
+                # _ = self._picoc_type_exp(exp_datatype)
+                exp.datatype = pn.IntType()
                 return pn.IntType()
             # ----------------------------- L_Logic ------------------------------
             case pn.Atom(left_exp, _, right_exp):
@@ -1215,23 +1231,32 @@ class Passes:
                 return [pn.Exp(exp)]
             case pn.SizeOf(exp_datatype):
                 size = 1
-                match exp_datatype:
-                    case pn.Name(val):
-                        symbol, _ = self.symbol_table.resolve(
-                            val, scope=self.current_scope
-                        )
-                        size = self._datatype_size(symbol["datatype"])
-                    case (
-                        pn.BinOp()
-                        | pn.Num()
-                        | pn.Char()
-                        | pn.UnOp()
-                        | pn.Ref()
-                        | pn.Cast()  # TODO: should take this type
-                    ):
-                        pass
-                    case _:
-                        size = self._datatype_size(exp_datatype)
+                if isinstance(
+                    exp_datatype,
+                    (pn.IntType, pn.CharType, pn.VoidType, pn.StructSpec, pn.ArrayDecl, pn.PntrDecl),
+                ):
+                    size = self._datatype_size(exp_datatype)
+                else:
+                    match exp_datatype:
+                        case pn.Name(val):
+                            symbol, _ = self.symbol_table.resolve(
+                                val, scope=self.current_scope
+                            )
+                            size = self._datatype_size(symbol["datatype"])
+                        case (
+                            pn.BinOp()
+                            | pn.Subscr()
+                            | pn.Deref()
+                            | pn.Attr()
+                            | pn.Num()
+                            | pn.Char()
+                            | pn.UnOp()
+                            | pn.Ref()
+                            | pn.Cast()  # TODO: should take this type
+                        ):
+                            pass
+                        case _:
+                            size = self._datatype_size(exp_datatype)
                 return [pn.Exp(pn.SizeOf(size))]
             case pn.Exit(pn.Num(val)):
                 return [exp_datatype]
@@ -1629,7 +1654,8 @@ class Passes:
                     case pn.Char(val):
                         reti_instrs += [
                             rn.Instr(
-                                rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(str(ord(val)))]
+                                rn.Loadi(),
+                                [rn.Reg(rn.Acc()), rn.Im(str(self._char_literal_code(val)))],
                             )
                         ]
                     case rn.Reg():
