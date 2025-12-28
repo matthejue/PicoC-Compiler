@@ -458,6 +458,8 @@ class Passes:
         size = 0
         for alloc in allocs:
             match alloc:
+                case pn.VoidType():
+                    continue
                 case pn.Alloc(_, pn.ArrayDecl()):
                     size += 1
                 case pn.Alloc(_, datatype):
@@ -487,6 +489,8 @@ class Passes:
 
     def _declare_alloc(self, alloc, *, initial_val=None):
         match alloc:
+            case pn.VoidType():
+                return
             case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
