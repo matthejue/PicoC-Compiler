@@ -855,7 +855,9 @@ class Passes:
 
                 match blocks:
                     case [pn.Block(_, entry_stmts), *_]:
-                        entry_stmts[:0] = [pn.Exp(alloc) for alloc in allocs]
+                        entry_stmts[:0] = [
+                            pn.Exp(alloc) for alloc in allocs if not isinstance(alloc, pn.VoidType)
+                        ]
                         entry_stmts[:0] = [
                             pn.StackMalloc(self.current_fun_local_vars_size)
                         ]
