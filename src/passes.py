@@ -1262,6 +1262,11 @@ class Passes:
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
+                def _skip_deref_after(exp):
+                    return isinstance(exp, (pn.Call, pn.BinOp)) or (
+                        isinstance(exp, pn.Cast)
+                        and isinstance(exp.exp, (pn.Call, pn.BinOp))
+                    )
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
                 result_dt = self._exp_result_datatype(binop_exp)
@@ -1287,24 +1292,22 @@ class Passes:
                     exps1_anf = self._picoc_anf_exp(left_exp, left_addr_calc)
                 match left_dt:
                     case pn.PntrDecl():
-                        exps1_anf += [] if isinstance(left_exp, (pn.BinOp)) or (
-                            isinstance(left_exp, pn.Cast)
-                            and isinstance(left_exp.exp, pn.BinOp)
-                        ) else [
-                            pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))
-                        ]
+                        exps1_anf += (
+                            []
+                            if _skip_deref_after(left_exp)
+                            else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), left_dt)))]
+                        )
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and right_is_zero:
                     exps2_anf = []
                 else:
                     exps2_anf = self._picoc_anf_exp(right_exp, right_addr_calc)
                 match right_dt:
                     case pn.PntrDecl():
-                        exps2_anf += [] if isinstance(right_exp, (pn.BinOp)) or (
-                            isinstance(right_exp, pn.Cast)
-                            and isinstance(right_exp.exp, pn.BinOp)
-                        ) else [
-                            pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))
-                        ]
+                        exps2_anf += (
+                            []
+                            if _skip_deref_after(right_exp)
+                            else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), right_dt)))]
+                        )
                 if isinstance(bin_op, (pn.Add, pn.Sub)) and (left_is_zero or right_is_zero):
                     return exps1_anf + exps2_anf
                 binop = pn.BinOp(
