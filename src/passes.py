@@ -1262,7 +1262,6 @@ class Passes:
                 return [exp_datatype]
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
-                db.debug()
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
                 result_dt = self._exp_result_datatype(binop_exp)
@@ -1553,7 +1552,6 @@ class Passes:
                 return [pn.Exp(stmt)]
             # ---------------------------- L_Misc -----------------------------
             case pn.Debug():
-                db.activate_debug()
                 return [pn.Exp(stmt)]
             case _:
                 throw_error(stmt)

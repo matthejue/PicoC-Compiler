@@ -5,11 +5,15 @@ import os
 
 
 def find_all_paths(pattern, from_start):
+    def is_picoc(file):
+        return file.endswith(".picoc")
+
     if from_start:
         return map(
             lambda file: f"./sys_tests/{file}",
             filter(
-                lambda file: any([file.startswith(ptrn) for ptrn in pattern]),
+                lambda file: is_picoc(file)
+                and any([file.startswith(ptrn) for ptrn in pattern]),
                 os.listdir(os.curdir + "/sys_tests/"),
             ),
         )
@@ -17,7 +21,7 @@ def find_all_paths(pattern, from_start):
         return map(
             lambda file: f"./sys_tests/{file}",
             filter(
-                lambda file: any([ptrn in file for ptrn in pattern]),
+                lambda file: is_picoc(file) and any([ptrn in file for ptrn in pattern]),
                 os.listdir(os.curdir + "/sys_tests/"),
             ),
         )

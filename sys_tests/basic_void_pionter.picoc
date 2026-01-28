@@ -1,0 +1,21 @@
+// in:42
+// expected:42
+
+struct Pair {
+  int first;
+  int second;
+};
+struct Pair p;
+
+void *fun_return_void_pointer() {
+  p.first  = 66;
+  p.second = input();
+  debug;
+  return (void *)&p;
+}
+
+void main() {
+  int var = ((struct Pair *)fun_return_void_pointer())->second;
+  debug;
+  print(var);
+}
