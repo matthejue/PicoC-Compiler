@@ -1,0 +1,26 @@
+// in:41
+// expected:42
+
+#define SIZE (8 * 4)
+
+/* struct with array attribute */
+struct Box {
+    int data[SIZE];
+};
+
+/* function using last element of array */
+int last_element(int arr[SIZE]) {
+    return arr[SIZE - 1];
+}
+
+int main() {
+    struct Box b;
+    int x;
+
+    x = input();
+    b.data[SIZE - 1] = x + 1;
+
+    print(last_element(b.data));
+
+    return 0;
+}

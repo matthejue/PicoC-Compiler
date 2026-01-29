@@ -1,0 +1,15 @@
+// in:41
+// expected:42
+
+#define A /* block */ 6 * 2
+
+#define B 10 + 10 // addition with comment
+
+#define C 4 /* mid */ + /* mid */ 2
+
+#define RESULT /* mixed */ (A + B) / C
+
+int main() {
+    print(RESULT);
+    return 0;
+}
