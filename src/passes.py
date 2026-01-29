@@ -41,10 +41,7 @@ class Passes:
     def _const_int_value(self, exp):
         match exp:
             case pn.Num(val):
-                try:
-                    return int(val, 0)
-                except ValueError:
-                    return None
+                return int(val, 0)
             case pn.Char(val):
                 return self._char_literal_code(val)
             case pn.ToBool(inner_exp):
@@ -232,7 +229,7 @@ class Passes:
                 return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
             case pn.FunDecl(ret_dt, name, allocs):
                 allocs_shrunk = [self._picoc_shrink_exp(a) for a in allocs]
-                return pn.FunDecl(self._picoc_shrink_datatype(ret_dt), name, allocs_shrunk)
+                return pn.FunDecl(ret_dt, name, allocs_shrunk)
             case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
                 return datatype
             case _:
@@ -297,11 +294,39 @@ class Passes:
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
-                            decls_defs_shrinked += [
-                                pn.FunDef(datatype, name, allocs, stmts_shrinked)
+                            allocs_shrinked = [
+                                self._picoc_shrink_exp(alloc) for alloc in allocs
                             ]
-                        case pn.StructDecl() | pn.FunDecl() | pn.Exp() | pn.Assign():
-                            decls_defs_shrinked += [decl_def]
+                            decls_defs_shrinked += [
+                                pn.FunDef(
+                                    datatype,
+                                    name,
+                                    allocs_shrinked,
+                                    stmts_shrinked,
+                                )
+                            ]
+                        case pn.StructDecl(pn.Name() as name, allocs):
+                            allocs_shrinked = [
+                                self._picoc_shrink_exp(alloc) for alloc in allocs
+                            ]
+                            decls_defs_shrinked += [
+                                pn.StructDecl(name, allocs_shrinked)
+                            ]
+                        case pn.FunDecl(datatype, pn.Name() as name, allocs):
+                            allocs_shrinked = [
+                                self._picoc_shrink_exp(alloc) for alloc in allocs
+                            ]
+                            decls_defs_shrinked += [
+                                pn.FunDecl(
+                                    datatype,
+                                    name,
+                                    allocs_shrinked,
+                                )
+                            ]
+                        case pn.Exp() | pn.Assign():
+                            decls_defs_shrinked += [
+                                self._picoc_shrink_stmt(decl_def)
+                            ]
                         case _:
                             throw_error(decl_def)
                 return pn.File(
