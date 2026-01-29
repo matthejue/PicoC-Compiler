@@ -7,15 +7,13 @@ struct Pair {
 };
 struct Pair p;
 
-void *fun_return_void_pointer() {
+int *fun_return_void_pointer() {
   p.first  = 66;
   p.second = input();
-  debug;
   return (void *)&p;
 }
 
 void main() {
-  int var = ((struct Pair *)fun_return_void_pointer())->second;
-  debug;
+  int var = fun_return_void_pointer()[1];
   print(var);
 }

@@ -1,2 +1,2 @@
-./sys_tests/basic_void_pionter.picoc
+./sys_tests/basic_void_pointer.picoc
 
