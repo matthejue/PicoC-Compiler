@@ -92,7 +92,7 @@ class Preprocessor:
         linebuf: List[str] = []
 
         mode = Mode.OUT
-        at_bol = True  # beginning of logical line (after line-splicing)
+        at_beg_of_line = True  # beginning of logical line (after line-splicing)
 
         while i < n:
             c = s[i]
@@ -121,13 +121,13 @@ class Preprocessor:
                     mode = Mode.STR
                     linebuf.append(c)
                     i += 1
-                    at_bol = False
+                    at_beg_of_line = False
                     continue
                 if c == "'":
                     mode = Mode.CHAR
                     linebuf.append(c)
                     i += 1
-                    at_bol = False
+                    at_beg_of_line = False
                     continue
 
             if mode is Mode.LINE_COMMENT:
@@ -138,7 +138,7 @@ class Preprocessor:
                     i += 1
                     phys_line += 1
                     mode = Mode.OUT
-                    at_bol = True
+                    at_beg_of_line = True
                 else:
                     i += 1
                 continue
@@ -165,12 +165,12 @@ class Preprocessor:
                     linebuf.append(c)
                     i += 1
                     mode = Mode.OUT
-                    at_bol = False
+                    at_beg_of_line = False
                     continue
                 linebuf.append(c)
                 if c == "\n":
                     phys_line += 1
-                    at_bol = True
+                    at_beg_of_line = True
                 i += 1
                 continue
 
@@ -186,17 +186,17 @@ class Preprocessor:
                     linebuf.append(c)
                     i += 1
                     mode = Mode.OUT
-                    at_bol = False
+                    at_beg_of_line = False
                     continue
                 linebuf.append(c)
                 if c == "\n":
                     phys_line += 1
-                    at_bol = True
+                    at_beg_of_line = True
                 i += 1
                 continue
 
             # Detect directives only at beginning-of-line (after optional whitespace)
-            if at_bol:
+            if at_beg_of_line:
                 if c in " \t\f\v\r":
                     linebuf.append(c)
                     i += 1
@@ -251,7 +251,8 @@ class Preprocessor:
 
                     elif kw == "define":
                         # handle simple object-like macros
-                        parts = arg.strip().split(None, 1)
+                        cleaned_arg = self._strip_comments_in_define_arg(arg)
+                        parts = cleaned_arg.strip().split(None, 1)
                         if not parts:
                             self._error(
                                 "missing macro name in #define", file_path, phys_line
@@ -267,11 +268,11 @@ class Preprocessor:
                     if i < n and s[i] == "\n":
                         i += 1
                         phys_line += 1
-                        at_bol = True
+                        at_beg_of_line = True
                     continue
 
                 # first non-space, non-# at BOL → normal code
-                at_bol = False
+                at_beg_of_line = False
 
             # Normal code — perform macro substitution
             if mode is Mode.OUT and c.isalpha() or c == '_':
@@ -292,7 +293,7 @@ class Preprocessor:
                 linebuf.clear()
                 i += 1
                 phys_line += 1
-                at_bol = True
+                at_beg_of_line = True
             else:
                 linebuf.append(c)
                 i += 1
@@ -368,6 +369,65 @@ class Preprocessor:
             if os.path.isfile(c):
                 return self._canonical(c)
         return None
+
+    @staticmethod
+    def _strip_comments_in_define_arg(arg: str) -> str:
+        """Strip // and /* */ comments from a #define argument, preserving strings."""
+        out: List[str] = []
+        i, n = 0, len(arg)
+        mode = Mode.OUT
+        while i < n:
+            c = arg[i]
+            if mode is Mode.OUT:
+                if c == "/" and i + 1 < n and arg[i + 1] == "/":
+                    break  # line comment to end
+                if c == "/" and i + 1 < n and arg[i + 1] == "*":
+                    mode = Mode.BLOCK_COMMENT
+                    i += 2
+                    continue
+                if c == '"':
+                    mode = Mode.STR
+                    out.append(c)
+                    i += 1
+                    continue
+                if c == "'":
+                    mode = Mode.CHAR
+                    out.append(c)
+                    i += 1
+                    continue
+                out.append(c)
+                i += 1
+                continue
+            if mode is Mode.BLOCK_COMMENT:
+                if c == "*" and i + 1 < n and arg[i + 1] == "/":
+                    mode = Mode.OUT
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if mode is Mode.STR:
+                if c == "\\" and i + 1 < n:
+                    out.append(c)
+                    out.append(arg[i + 1])
+                    i += 2
+                    continue
+                out.append(c)
+                if c == '"':
+                    mode = Mode.OUT
+                i += 1
+                continue
+            if mode is Mode.CHAR:
+                if c == "\\" and i + 1 < n:
+                    out.append(c)
+                    out.append(arg[i + 1])
+                    i += 2
+                    continue
+                out.append(c)
+                if c == "'":
+                    mode = Mode.OUT
+                i += 1
+                continue
+        return "".join(out)
 
     @staticmethod
     def _read_file(path: str) -> str:
