@@ -32,6 +32,90 @@ class Passes:
         # RETI_Blocks
         self.instrs_cnt = 0
 
+    INT32_MIN = -2147483648
+    INT32_MAX = 2147483647
+
+    def _fits_int32(self, val: int) -> bool:
+        return self.INT32_MIN <= val <= self.INT32_MAX
+
+    def _const_int_value(self, exp):
+        match exp:
+            case pn.Num(val):
+                try:
+                    return int(val, 0)
+                except ValueError:
+                    return None
+            case pn.Char(val):
+                return self._char_literal_code(val)
+            case pn.ToBool(inner_exp):
+                inner_val = self._const_int_value(inner_exp)
+                if inner_val is None or not self._fits_int32(inner_val):
+                    return None
+                return 1 if inner_val != 0 else 0
+        return None
+
+    def _c_div(self, left_val: int, right_val: int):
+        if right_val == 0:
+            return None
+        sign = -1 if (left_val < 0) ^ (right_val < 0) else 1
+        return sign * (abs(left_val) // abs(right_val))
+
+    def _c_mod(self, left_val: int, right_val: int):
+        div = self._c_div(left_val, right_val)
+        if div is None:
+            return None
+        return left_val - div * right_val
+
+    def _fold_binop_const(self, bin_op, left_val: int, right_val: int):
+        if not (self._fits_int32(left_val) and self._fits_int32(right_val)):
+            return None
+        match bin_op:
+            case pn.Add():
+                res = left_val + right_val
+            case pn.Sub():
+                res = left_val - right_val
+            case pn.Mul():
+                res = left_val * right_val
+            case pn.Div():
+                res = self._c_div(left_val, right_val)
+            case pn.Mod():
+                res = self._c_mod(left_val, right_val)
+            case pn.Oplus():
+                res = left_val ^ right_val
+            case pn.And():
+                res = left_val & right_val
+            case pn.Or():
+                res = left_val | right_val
+            case pn.LogicAnd():
+                res = 1 if (left_val != 0 and right_val != 0) else 0
+            case pn.LogicOr():
+                res = 1 if (left_val != 0 or right_val != 0) else 0
+            case _:
+                return None
+        if res is None or not self._fits_int32(res):
+            return None
+        return res
+
+    def _fold_atom_const(self, rel, left_val: int, right_val: int):
+        if not (self._fits_int32(left_val) and self._fits_int32(right_val)):
+            return None
+        match rel:
+            case pn.Eq():
+                res = left_val == right_val
+            case pn.NEq():
+                res = left_val != right_val
+            case pn.Lt():
+                res = left_val < right_val
+            case pn.Gt():
+                res = left_val > right_val
+            case pn.LtE():
+                res = left_val <= right_val
+            case pn.GtE():
+                res = left_val >= right_val
+            case _:
+                return None
+        return 1 if res else 0
+
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
@@ -47,11 +131,15 @@ class Passes:
             case pn.Char():
                 return exp
             case pn.BinOp(left_exp, bin_op, right_exp):
-                return pn.BinOp(
-                    self._picoc_shrink_exp(left_exp),
-                    bin_op,
-                    self._picoc_shrink_exp(right_exp),
-                )
+                left_shrunk = self._picoc_shrink_exp(left_exp)
+                right_shrunk = self._picoc_shrink_exp(right_exp)
+                left_val = self._const_int_value(left_shrunk)
+                right_val = self._const_int_value(right_shrunk)
+                if left_val is not None and right_val is not None:
+                    folded = self._fold_binop_const(bin_op, left_val, right_val)
+                    if folded is not None:
+                        return pn.Num(str(folded))
+                return pn.BinOp(left_shrunk, bin_op, right_shrunk)
             case pn.UnOp(un_op, exp):
                 return pn.UnOp(un_op, self._picoc_shrink_exp(exp))
             case pn.Cast(datatype, exp):
@@ -60,16 +148,30 @@ class Passes:
                 return exp
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
-                return pn.Atom(
-                    self._picoc_shrink_exp(left_exp),
-                    rel,
-                    self._picoc_shrink_exp(right_exp),
-                )
+                left_shrunk = self._picoc_shrink_exp(left_exp)
+                right_shrunk = self._picoc_shrink_exp(right_exp)
+                left_val = self._const_int_value(left_shrunk)
+                right_val = self._const_int_value(right_shrunk)
+                if left_val is not None and right_val is not None:
+                    folded = self._fold_atom_const(rel, left_val, right_val)
+                    if folded is not None:
+                        return pn.Num(str(folded))
+                return pn.Atom(left_shrunk, rel, right_shrunk)
             case pn.ToBool(exp):
                 return pn.ToBool(self._picoc_shrink_exp(exp))
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Alloc():
-                return exp
+                match exp:
+                    case pn.Alloc(type_qual, datatype, name, local_var_or_param):
+                        alloc = pn.Alloc(
+                            type_qual,
+                            self._picoc_shrink_datatype(datatype),
+                            name,
+                        )
+                        alloc.local_var_or_param = local_var_or_param
+                        return alloc
+                    case _:
+                        return exp
             # ----------------------------- L_Pntr ----------------------------
             case pn.Deref(inner):
                 inner_shrunk = self._picoc_shrink_exp(inner)
@@ -120,6 +222,21 @@ class Passes:
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case _:
                 throw_error(exp)
+
+    def _picoc_shrink_datatype(self, datatype):
+        match datatype:
+            case pn.ArrayDecl(const_exp, inner_dt):
+                const_shrunk = self._picoc_shrink_exp(const_exp)
+                return pn.ArrayDecl(const_shrunk, self._picoc_shrink_datatype(inner_dt))
+            case pn.PntrDecl(inner_dt):
+                return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
+            case pn.FunDecl(ret_dt, name, allocs):
+                allocs_shrunk = [self._picoc_shrink_exp(a) for a in allocs]
+                return pn.FunDecl(self._picoc_shrink_datatype(ret_dt), name, allocs_shrunk)
+            case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
+                return datatype
+            case _:
+                return datatype
 
     def _picoc_shrink_stmt(self, stmt):
         match stmt:

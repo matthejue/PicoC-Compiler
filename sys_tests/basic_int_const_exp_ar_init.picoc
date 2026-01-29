@@ -1,0 +1,12 @@
+// in:41
+// expected:42
+
+int main() {
+  int one = 1;
+  int ar[3 * 5];   // must be accepted as a constant expression
+
+  ar[3 * 5 - one] = input();
+  print(ar[3 * 5 - one]+one);
+
+  return 0;
+}

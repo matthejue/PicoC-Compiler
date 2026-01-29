@@ -1,2 +1,2 @@
-./sys_tests/basic_void_pointer.picoc
+./sys_tests/basic_assign_pntr_to_array.picoc
 

@@ -387,15 +387,15 @@ class Deref(ASTNode):
 
 # -------------------------------- L_Array --------------------------------
 class ArrayDecl(ASTNode):
-    def __init__(self, num, datatype):
-        self.num = num
+    def __init__(self, const_exp, datatype):
+        self.const_exp = const_exp
         self.datatype = datatype
 
     @property
     def visible(self):
-        return [self.num, self.datatype]
+        return [self.const_exp, self.datatype]
 
-    __match_args__ = ("num", "datatype")
+    __match_args__ = ("const_exp", "datatype")
 
 
 class Array(ASTNode):
