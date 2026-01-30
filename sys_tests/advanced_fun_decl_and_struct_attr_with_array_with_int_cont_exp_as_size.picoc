@@ -1,7 +1,7 @@
 // in:41
 // expected:42
 
-#define SIZE (8 * 4)
+#define SIZE (3 * 2)
 
 /* struct with array attribute */
 struct Box {
@@ -10,20 +10,18 @@ struct Box {
 
 /* function using last element of array */
 int last_element(int arr[SIZE]) {
+    int var = 2;
     return arr[SIZE - 1];
 }
 
 int main() {
-    debug;
     struct Box b;
 
     int x = input();
-    debug;
     b.data[SIZE - 1] = x + 1;
-    debug;
 
-    print(last_element(b.data));
     debug;
+    print(last_element(b.data));
 
     return 0;
 }

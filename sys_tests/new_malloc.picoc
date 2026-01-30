@@ -1,0 +1,20 @@
+// in:10 20
+// expected:
+
+#include "./include/simple_malloc_only_malloc.h"
+
+int main() {
+    debug;
+    init_heap();
+    debug;
+
+    int *a = (int *)simple_malloc(input());
+    debug;
+    int *b = (int *)simple_malloc(input());
+    debug;
+
+    print(a);
+    print(b);
+
+    return 0;
+}

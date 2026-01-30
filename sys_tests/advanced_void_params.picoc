@@ -1,0 +1,12 @@
+// in:
+// expected:4 2
+
+void fun(void) {
+  print(4);
+}
+
+int main(void) {
+  fun();
+  print(2);
+  return 0;
+}

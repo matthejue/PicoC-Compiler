@@ -1,1 +1,1 @@
-./sys_tests/new_macro_cycles.picoc
+./sys_tests/new_malloc.picoc

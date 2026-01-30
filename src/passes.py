@@ -228,7 +228,10 @@ class Passes:
             case pn.PntrDecl(inner_dt):
                 return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
             case pn.FunDecl(ret_dt, name, allocs):
-                allocs_shrunk = [self._picoc_shrink_exp(a) for a in allocs]
+                if allocs and isinstance(allocs[0], pn.VoidType):
+                    allocs_shrunk = []
+                else:
+                    allocs_shrunk = [self._picoc_shrink_exp(a) for a in allocs]
                 return pn.FunDecl(ret_dt, name, allocs_shrunk)
             case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
                 return datatype
@@ -294,9 +297,12 @@ class Passes:
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
-                            allocs_shrinked = [
-                                self._picoc_shrink_exp(alloc) for alloc in allocs
-                            ]
+                            if allocs and isinstance(allocs[0], pn.VoidType):
+                                allocs_shrinked = []
+                            else:
+                                allocs_shrinked = [
+                                    self._picoc_shrink_exp(alloc) for alloc in allocs
+                                ]
                             decls_defs_shrinked += [
                                 pn.FunDef(
                                     datatype,
@@ -313,9 +319,12 @@ class Passes:
                                 pn.StructDecl(name, allocs_shrinked)
                             ]
                         case pn.FunDecl(datatype, pn.Name() as name, allocs):
-                            allocs_shrinked = [
-                                self._picoc_shrink_exp(alloc) for alloc in allocs
-                            ]
+                            if allocs and isinstance(allocs[0], pn.VoidType):
+                                allocs_shrinked = []
+                            else:
+                                allocs_shrinked = [
+                                    self._picoc_shrink_exp(alloc) for alloc in allocs
+                                ]
                             decls_defs_shrinked += [
                                 pn.FunDecl(
                                     datatype,
@@ -1500,7 +1509,7 @@ class Passes:
                 offset = self._struct_attr_offset(datatype, attr_name)
                 binop = pn.BinOp(inner_exp, pn.Add(), pn.Num(str(offset)), datatype)
                 exp_anf = self._picoc_anf_exp(binop, addr_calc=True)
-                return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._ref_result_datatype(datatype))))])
+                return exp_anf + ([] if addr_calc else [pn.Exp(pn.Deref(pn.Stack(pn.Num("1"), self._attr_result_datatype(datatype, attr_name))))])
             # ----------------------------- L_Pntr ----------------------------
             case pn.Ref(ref):
                 return self._picoc_anf_exp(ref, addr_calc=True)
@@ -1584,7 +1593,7 @@ class Passes:
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Global(pn.Name(var_name)) as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
-                symbol, choosen_scope = self.symbol_table.resolve(
+                symbol, _ = self.symbol_table.resolve(
                     var_name, scope="global"
                 )
                 match symbol:
@@ -1611,7 +1620,7 @@ class Passes:
             case pn.Assign(pn.Stackframe() as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 var_name = lhs.symbol_name
-                symbol, choosen_scope = (
+                symbol, _ = (
                     self.symbol_table.resolve(var_name, scope=self.current_scope)
                     if var_name
                     else (None, None)
