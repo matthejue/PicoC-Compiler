@@ -259,7 +259,6 @@ class Preprocessor:
                             )
                         name = parts[0]
                         value = parts[1].strip() if len(parts) > 1 else "1"
-                        value = self._expand_macros(value)
                         self.macros[name] = value
 
                     else:
@@ -282,9 +281,8 @@ class Preprocessor:
                     i += 1
                 ident = s[start:i]
                 if ident in self.macros:
-                    # Re-expand at use site because definition-time expansion only
-                    # resolves identifiers known at that moment; later macros may
-                    # appear in the replacement text and must be expanded here
+                    # Expand at use site because macro replacement text is stored
+                    # unexpanded (per C rules) and later-defined macros should apply.
                     linebuf.append(self._expand_macros(self.macros[ident]))
                 else:
                     linebuf.append(ident)
@@ -308,7 +306,7 @@ class Preprocessor:
 
         return "".join(out)
 
-    # -------- Helpers --------
+    # -------------------------------- Helpers --------------------------------
 
     def _parse_include_arg(self, rest: str) -> Tuple[IncludeKind, str]:
         """
