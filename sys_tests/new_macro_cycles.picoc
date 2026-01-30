@@ -1,0 +1,29 @@
+// in:22
+// expected:10 20 5 32 42 27
+
+#define A B
+#define B A
+#define X X
+
+int main()
+{
+    int A = 10;
+    int B = 20;
+    int X = 5;
+
+    print(A);   // must print 10
+    print(B);   // must print 20
+    print(X);   // must print 5
+
+    int v = input();
+
+    A = A + v;
+    B = B + v;
+    X = X + v;
+
+    print(A);   // must print 10 + v
+    print(B);   // must print 20 + v
+    print(X);   // must print 5  + v
+
+    return 0;
+}

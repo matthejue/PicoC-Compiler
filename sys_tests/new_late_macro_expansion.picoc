@@ -1,0 +1,10 @@
+// in:
+// expected:123
+
+#define A B
+#define B 123
+
+int main() {
+    print(A);
+    return 0;
+}

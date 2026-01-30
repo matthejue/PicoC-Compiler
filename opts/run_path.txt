@@ -1,2 +1,1 @@
-./sys_tests/basic_assign_pntr_to_array.picoc
-
+./sys_tests/new_macro_cycles.picoc

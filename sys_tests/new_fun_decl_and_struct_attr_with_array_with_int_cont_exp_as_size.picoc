@@ -14,13 +14,16 @@ int last_element(int arr[SIZE]) {
 }
 
 int main() {
+    debug;
     struct Box b;
-    int x;
 
-    x = input();
+    int x = input();
+    debug;
     b.data[SIZE - 1] = x + 1;
+    debug;
 
     print(last_element(b.data));
+    debug;
 
     return 0;
 }

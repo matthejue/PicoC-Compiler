@@ -259,6 +259,7 @@ class Preprocessor:
                             )
                         name = parts[0]
                         value = parts[1].strip() if len(parts) > 1 else "1"
+                        value = self._expand_macros(value)
                         self.macros[name] = value
 
                     else:
@@ -281,7 +282,10 @@ class Preprocessor:
                     i += 1
                 ident = s[start:i]
                 if ident in self.macros:
-                    linebuf.append(self.macros[ident])
+                    # Re-expand at use site because definition-time expansion only
+                    # resolves identifiers known at that moment; later macros may
+                    # appear in the replacement text and must be expanded here
+                    linebuf.append(self._expand_macros(self.macros[ident]))
                 else:
                     linebuf.append(ident)
                 continue
@@ -427,6 +431,72 @@ class Preprocessor:
                     mode = Mode.OUT
                 i += 1
                 continue
+        return "".join(out)
+
+    def _expand_macros(self, text: str, expansion_guard=None) -> str:
+        if expansion_guard is None:
+            expansion_guard = []
+
+        s = text
+        n, i = len(s), 0
+        out: List[str] = []
+        mode = Mode.OUT
+
+        while i < n:
+            c = s[i]
+            if mode is Mode.OUT:
+                if c == '"':
+                    mode = Mode.STR
+                    out.append(c)
+                    i += 1
+                    continue
+                if c == "'":
+                    mode = Mode.CHAR
+                    out.append(c)
+                    i += 1
+                    continue
+                if c.isalpha() or c == "_":
+                    start = i
+                    while i < n and (s[i].isalnum() or s[i] == "_"):
+                        i += 1
+                    ident = s[start:i]
+                    if ident in self.macros:
+                        if ident in expansion_guard:
+                            out.append(ident)
+                        else:
+                            expanded = self._expand_macros(
+                                self.macros[ident], expansion_guard + [ident]
+                            )
+                            out.append(expanded)
+                    else:
+                        out.append(ident)
+                    continue
+                out.append(c)
+                i += 1
+                continue
+            if mode is Mode.STR:
+                if c == "\\" and i + 1 < n:
+                    out.append(c)
+                    out.append(s[i + 1])
+                    i += 2
+                    continue
+                out.append(c)
+                if c == '"':
+                    mode = Mode.OUT
+                i += 1
+                continue
+            if mode is Mode.CHAR:
+                if c == "\\" and i + 1 < n:
+                    out.append(c)
+                    out.append(s[i + 1])
+                    i += 2
+                    continue
+                out.append(c)
+                if c == "'":
+                    mode = Mode.OUT
+                i += 1
+                continue
+
         return "".join(out)
 
     @staticmethod
