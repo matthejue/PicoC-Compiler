@@ -1,0 +1,27 @@
+// in:
+// expected:12 42
+
+#include "./include/simple_malloc.h"
+
+int main() {
+    init_heap();
+
+    int *a = (int *)simple_malloc(8);
+    int *b = (int *)simple_malloc(6);
+
+    a[0] = 41;
+
+    b[0] = 3;
+    b[5] = 4;
+
+    simple_free(a);
+
+    int *c = (int *)simple_malloc(8);
+    c[0] = 21;
+    c[7] = 2;
+
+    print(b[0] * b[5]);
+    print(c[0] * c[7]);
+
+    return 0;
+}

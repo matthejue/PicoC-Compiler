@@ -1932,15 +1932,22 @@ class Passes:
                         ]
                     case (
                         pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
-                        pn.Add(),
+                        pn.Add() | pn.Sub(),
                         _,
                     ) | (
                         _,
-                        pn.Add(),
+                        pn.Add() | pn.Sub(),
                         pn.PntrDecl(inner_dt) | pn.ArrayDecl(_, inner_dt),
                     ):
                         reti_instrs = self._single_line_comment(stmt, "#")
                         help_const = self._datatype_size(inner_dt)
+                        match bin_aop:
+                            case pn.Add():
+                                aop = rn.Add()
+                            case pn.Sub():
+                                aop = rn.Sub()
+                            case _:
+                                throw_error(bin_aop)
                         return reti_instrs + [
                             rn.Instr(
                                 rn.Loadin(),
@@ -1962,7 +1969,7 @@ class Passes:
                                 rn.Multi(),
                                 [rn.Reg(rn.In2()), rn.Im(str(help_const))],
                             ),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
+                            rn.Instr(aop, [rn.Reg(rn.In1()), rn.Reg(rn.In2())]),
                             rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                             rn.Instr(
                                 rn.Storein(),

@@ -1,20 +1,21 @@
 // in:8 6
-// expected:42 42
+// expected:12 42
 
-#include "./include/simple_malloc_only_malloc.h"
+#include "./include/simple_malloc.h"
 
 int main() {
     init_heap();
 
     int *a = (int *)simple_malloc(input());
-    a[0] = 42;
+    a[0] = 3;
+    a[7] = 4;
 
     int *b = (int *)simple_malloc(input());
     b[0] = 21;
-    b[1] = 2;
+    b[5] = 2;
 
-    print(a[0]);
-    print(b[0] * b[1]);
+    print(a[0] * a[7]);
+    print(b[0] * b[5]);
 
     return 0;
 }
