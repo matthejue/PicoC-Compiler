@@ -1187,8 +1187,7 @@ class Passes:
                 return pn.IntType()
             case pn.Cast(datatype, inner_exp):
                 _ = self._picoc_type_exp(inner_exp)
-                inner_exp.datatype = copy.deepcopy(datatype)
-                return datatype
+                return copy.deepcopy(datatype)
             case pn.UnOp(un_op, inner_exp):
                 _ = self._picoc_type_exp(inner_exp)
                 exp.datatype = pn.IntType()
@@ -1394,6 +1393,8 @@ class Passes:
                                 val, scope=self.current_scope
                             )
                             size = self._datatype_size(symbol["datatype"])
+                        case pn.Cast(datatype, _):
+                            size = self._datatype_size(datatype)
                         case (
                             pn.BinOp()
                             | pn.Subscr()
@@ -1403,7 +1404,6 @@ class Passes:
                             | pn.Char()
                             | pn.UnOp()
                             | pn.Ref()
-                            | pn.Cast()  # TODO: should take this type
                         ):
                             pass
                         case _:
@@ -1476,8 +1476,11 @@ class Passes:
                             return [pn.Exp(pn.Num("-2147483648"))]
                 return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
             case pn.Cast(datatype, inner_exp):
+                inner_dt = self._exp_result_datatype(inner_exp)
                 exps_anf = self._picoc_anf_exp(inner_exp, addr_calc=addr_calc)
-                return exps_anf
+                return exps_anf + [
+                    pn.Exp(pn.Cast(copy.deepcopy(datatype), pn.Stack(pn.Num("1"), inner_dt)))
+                ]
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
                 exps1_anf = self._picoc_anf_exp(left_exp)
@@ -2051,6 +2054,8 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Int(rn.Im("0")),
                 ]
+            case pn.Exp(pn.Cast(_, pn.Stack())):
+                return self._single_line_comment(stmt, "# // cast no-op")
             case pn.Exp(pn.Debug()):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Int(rn.Im("3")),
