@@ -6,22 +6,22 @@
 int main() {
     init_heap();
 
-    int *a = (int *)simple_malloc(8);
-    int *b = (int *)simple_malloc(8);
-    int *c = (int *)simple_malloc(6);
+    int *a = (int *)simple_malloc(4);
+    int *b = (int *)simple_malloc(4);
+    int *c = (int *)simple_malloc(3);
 
     c[0] = 3;
-    c[5] = 4;
+    c[2] = 4;
 
     simple_free(a);
     simple_free(b);
 
-    int *d = (int *)simple_malloc(16);
+    int *d = (int *)simple_malloc(11);
     d[0] = 21;
-    d[15] = 2;
+    d[10] = 2;
 
     print(c[0] * c[5]);
-    print(d[0] * d[15]);
+    print(d[0] * d[10]);
 
     return 0;
 }

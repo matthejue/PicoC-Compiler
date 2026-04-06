@@ -1,1 +1,1 @@
-./sys_tests/basic_free.picoc
+./sys_tests/basic_free_block_merging.picoc

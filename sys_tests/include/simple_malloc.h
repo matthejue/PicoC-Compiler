@@ -74,9 +74,7 @@ void simple_free(void *ptr) {
     if (ptr == NULL)
         return;
 
-    debug;
     struct BlockHeader *header = (struct BlockHeader *)ptr - 1;
-    debug;
     header->free = 1;
 
     merge_free_blocks();
