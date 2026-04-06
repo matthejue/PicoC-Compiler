@@ -1,4 +1,4 @@
-#define HEAP_SIZE  (3 * 2)
+#define HEAP_SIZE  (5 * 4)
 #define NULL       ((void *)0)
 
 struct BlockHeader {
@@ -15,13 +15,9 @@ struct BlockHeader *block_list = NULL;
 
 void init_heap() {
     block_list = (struct BlockHeader *)heap;
-    debug;
     block_list->size = HEAP_SIZE - sizeof(struct BlockHeader);
-    debug;
     block_list->free = 1;
-    debug;
     block_list->next = NULL;
-    debug;
 }
 
 void *simple_malloc(int size) {

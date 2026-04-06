@@ -4,21 +4,17 @@
 #include "./include/simple_malloc_only_malloc.h"
 
 int main() {
-    debug;
     init_heap();
-    debug;
 
     int *a = (int *)simple_malloc(input());
     a[0] = 42;
-    debug;
+
     int *b = (int *)simple_malloc(input());
     b[0] = 21;
     b[1] = 2;
-    debug;
 
     print(a[0]);
     print(b[0] * b[1]);
-    debug;
 
     return 0;
 }
