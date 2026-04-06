@@ -1,1 +1,1 @@
-./sys_tests/new_malloc.picoc
+./sys_tests/basic_malloc.picoc
