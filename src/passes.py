@@ -143,6 +143,8 @@ class Passes:
                 return pn.Cast(datatype, self._picoc_shrink_exp(exp))
             case pn.SizeOf():
                 return exp
+            case pn.Asm():
+                return exp
             # ---------------------------- L_Logic ----------------------------
             case pn.Atom(left_exp, rel, right_exp):
                 left_shrunk = self._picoc_shrink_exp(left_exp)
@@ -797,6 +799,8 @@ class Passes:
                 return pn.Call(
                     fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
                 )
+            case pn.Asm():
+                return exp
             # case pn.Call(fun_exp, exps):
             #     return pn.Call(
             #         self._picoc_rewrite_exp(fun_exp),
@@ -1236,6 +1240,8 @@ class Passes:
                 return self._attr_result_datatype(base_dt, attr_name)
             case pn.Exit():
                 return None
+            case pn.Asm():
+                return None
             # ------------------------------ L_Fun ------------------------------
             # TODO: Problem with linking, if function defined in other file
             case pn.Call(pn.Name(fun_name), exps):
@@ -1378,6 +1384,8 @@ class Passes:
                 exp_anf = self._picoc_anf_exp(exp)
                 return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
             case pn.Call(pn.Name("input"), []):
+                return [pn.Exp(exp)]
+            case pn.Asm():
                 return [pn.Exp(exp)]
             case pn.SizeOf(exp_datatype):
                 size = 1
@@ -2061,6 +2069,8 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Int(rn.Im("0")),
                 ]
+            case pn.Exp(pn.Asm(code)):
+                return self._single_line_comment(stmt, "#") + [rn.RawInstr(code.strip())]
             case pn.Exp(pn.Cast(_, pn.Stack())):
                 return self._single_line_comment(stmt, "# // cast no-op")
             case pn.Exp(pn.Debug()):

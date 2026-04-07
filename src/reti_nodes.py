@@ -55,6 +55,16 @@ class Int(ASTNode):
     __match_args__ = ("num",)
 
 
+class RawInstr(ASTNode):
+    def __init__(self, code):
+        self.code = code
+
+    def __repr__(self, depth=0):
+        return f"\n{' ' * depth}{self.code}"
+
+    __match_args__ = ("code",)
+
+
 # ---------------------------- Input and Print ----------------------------
 # class Call(ASTNode):
 #     def __init__(self, name, reg):

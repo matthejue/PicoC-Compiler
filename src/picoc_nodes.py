@@ -225,6 +225,17 @@ class Exit(ASTNode):
     __match_args__ = ("num",)
 
 
+class Asm(ASTNode):
+    def __init__(self, code):
+        self.code = code
+
+    @property
+    def visible(self):
+        return [self.code]
+
+    __match_args__ = ("code",)
+
+
 class SizeOf(ASTNode):
     def __init__(self, exp_datatype, datatype=None):
         self.exp_datatype = exp_datatype

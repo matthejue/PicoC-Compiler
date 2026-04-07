@@ -664,7 +664,7 @@ def _syntax_check(
         "-Wall",
         "-Wextra",
         "-Wpedantic",
-        "-std=c11",
+        "-std=gnu11",
     ]
     if extra_flags:
         flags.extend(list(extra_flags))

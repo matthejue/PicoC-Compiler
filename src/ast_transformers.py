@@ -290,6 +290,10 @@ class TransformerPicoC:
     def char_literal(self, node, _):
         return pn.Char(self.value(node)[1:-1])
 
+    def string_literal(self, node, _):
+        literal = self.value(node)
+        return literal[1:-1]
+
     def parenthesized_expression(self, _, children):
         return children[0]
 
@@ -350,6 +354,13 @@ class TransformerPicoC:
         if not children:
             return pn.Return(pn.Empty())
         return pn.Return(children[0])
+
+    def gnu_asm_expression(self, node, children):
+        if len(children) != 1:
+            throw_error(
+                f"Only asm with a single string literal is supported, got {self.value(node)}"
+            )
+        return pn.Asm(children[0])
 
     # --------------------------------- Array ---------------------------------
     def array_declarator(self, _, children):
