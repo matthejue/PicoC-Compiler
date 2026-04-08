@@ -1,6 +1,6 @@
 #pragma once
 
-#define HEAP_SIZE  (1024 * 256)     // heap size in words
+#define HEAP_SIZE  (5 * 4)     // heap size in words
 #define NULL       ((void *)0)
 
 struct BlockHeader {
@@ -10,8 +10,8 @@ struct BlockHeader {
 };
 
 void init_heap();
-void *simple_malloc(int size);
-void simple_free(void *ptr);
+void *malloc(int size);
+void free(void *ptr);
 
 int heap[HEAP_SIZE];                  // fixed-size heap memory
 struct BlockHeader *block_list = NULL; // head of the block list (free + used)
@@ -40,7 +40,7 @@ void init_heap() {
 }
 
 // Allocate memory
-void *simple_malloc(int size) {
+void *malloc(int size) {
     struct BlockHeader *current = block_list;
 
     while (current != NULL) {
@@ -70,7 +70,7 @@ void *simple_malloc(int size) {
 }
 
 // Free a block and merge neighbors
-void simple_free(void *ptr) {
+void free(void *ptr) {
     if (ptr == NULL)
         return;
 
@@ -79,4 +79,3 @@ void simple_free(void *ptr) {
 
     merge_free_blocks();
 }
-

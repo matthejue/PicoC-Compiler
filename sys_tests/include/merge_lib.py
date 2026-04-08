@@ -6,9 +6,9 @@ import sys
 
 MODES = {
     "1": {
-        "picoc": Path("/home/areo/Documents/Studium/Pico-OS/lib/malloc/simple_malloc.picoc"),
-        "header": Path("/home/areo/Documents/Studium/Pico-OS/lib/malloc/simple_malloc.h"),
-        "output": Path("/home/areo/Documents/Studium/PicoC-Compiler/sys_tests/include/simple_malloc.h"),
+        "picoc": Path("/home/areo/Documents/Studium/Pico-OS/lib/malloc/malloc.picoc"),
+        "header": Path("/home/areo/Documents/Studium/Pico-OS/lib/malloc/malloc.h"),
+        "output": Path("/home/areo/Documents/Studium/PicoC-Compiler/sys_tests/include/malloc.h"),
     },
     "2": {
         "picoc": Path("/home/areo/Documents/Studium/Pico-OS/lib/mutex/mutex.picoc"),
@@ -22,6 +22,8 @@ MODES = {
     },
 }
 
+TEST_HEAP_DEFINE = "#define HEAP_SIZE  (5 * 4)     // heap size in words"
+
 
 def merge_files(picoc_path: Path, header_path: Path, output_path: Path) -> None:
     picoc_text = picoc_path.read_text()
@@ -32,6 +34,12 @@ def merge_files(picoc_path: Path, header_path: Path, output_path: Path) -> None:
         raise ValueError(f'Could not find {include_line!r} in {picoc_path}')
 
     merged_text = picoc_text.replace(include_line, header_text, 1)
+    if output_path.name == "malloc.h":
+        merged_text = merged_text.replace(
+            "#define HEAP_SIZE  (1024 * 256)     // heap size in words",
+            TEST_HEAP_DEFINE,
+            1,
+        )
     output_path.write_text(merged_text)
 
 

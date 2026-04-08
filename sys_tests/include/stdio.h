@@ -1,13 +1,10 @@
-/*
- * printf format codes:
- *   0: value is a char* buffer
- *   1: value is a signed decimal integer
- *
- * scanf format codes:
- *   1: read one signed decimal integer from the next 4 UART bytes
- */
-int printf(int format, int value);
-int scanf(int format, int *value);
+int printf(char *format);
+int scanf(char *format, int *value);
+
+int frame_base() {
+    asm("MOVE BAF ACC");
+    return 0;
+}
 
 int uart_print_integer(int value) {
     asm("LOADIN BAF ACC -2");
@@ -26,54 +23,29 @@ int uart_read_word() {
     return 0;
 }
 
-int unpack_input_char(int packed, int index) {
-    int byte0;
-    int byte1;
-    int byte2;
+int uart_print_character(int value) {
+    char character[2];
 
-    byte0 = packed / 16777216;
-    packed = packed - (byte0 * 16777216);
-    if (index == 0) {
-        return byte0;
-    }
-
-    byte1 = packed / 65536;
-    packed = packed - (byte1 * 65536);
-    if (index == 1) {
-        return byte1;
-    }
-
-    byte2 = packed / 256;
-    packed = packed - (byte2 * 256);
-    if (index == 2) {
-        return byte2;
-    }
-
-    return packed;
+    character[0] = value;
+    character[1] = 0;
+    uart_print_string(character);
+    return 0;
 }
 
-int is_input_terminator(int value) {
-    if (value == 0) {
-        return 1;
+int input_character_at(int packed, int index) {
+    if (index == 0) {
+        return packed / 16777216;
     }
 
-    if (value == 10) {
-        return 1;
+    if (index == 1) {
+        return (packed / 65536) & 255;
     }
 
-    if (value == 13) {
-        return 1;
+    if (index == 2) {
+        return (packed / 256) & 255;
     }
 
-    if (value == 32) {
-        return 1;
-    }
-
-    if (value == 9) {
-        return 1;
-    }
-
-    return 0;
+    return packed & 255;
 }
 
 int is_decimal_digit(int value) {
@@ -88,62 +60,33 @@ int is_decimal_digit(int value) {
     return 1;
 }
 
-int parse_decimal_word(int packed, int *value) {
+int parse_decimal_input(int packed, int *value) {
     int index;
     int current;
     int sign;
-    int parsed;
     int has_digit;
-    int terminator;
-    int done;
     int decimal_digit;
 
     sign = 1;
-    parsed = 0;
     has_digit = 0;
-    done = 0;
-
     index = 0;
+
+    current = input_character_at(packed, 0);
+    if (current == 45) {
+        sign = -1;
+        index = 1;
+    }
+
     while (index < 4) {
-        if (done) {
+        current = input_character_at(packed, index);
+        decimal_digit = is_decimal_digit(current);
+
+        if (decimal_digit == 0) {
             index = 4;
         } else {
-            current = unpack_input_char(packed, index);
-            terminator = is_input_terminator(current);
-
-            if (terminator) {
-                done = 1;
-            } else {
-                if (parsed == 0) {
-                    if (current == 45) {
-                        sign = -1;
-                        parsed = 1;
-                    } else {
-                        if (current == 43) {
-                            parsed = 1;
-                        } else {
-                            decimal_digit = is_decimal_digit(current);
-                            if (decimal_digit == 0) {
-                                return 0;
-                            }
-
-                            *value = (*value * 10) + (current - 48);
-                            has_digit = 1;
-                            parsed = 1;
-                        }
-                    }
-                } else {
-                    decimal_digit = is_decimal_digit(current);
-                    if (decimal_digit == 0) {
-                        return 0;
-                    }
-
-                    *value = (*value * 10) + (current - 48);
-                    has_digit = 1;
-                }
-
-                index = index + 1;
-            }
+            *value = (*value * 10) + (current - 48);
+            has_digit = 1;
+            index = index + 1;
         }
     }
 
@@ -155,28 +98,80 @@ int parse_decimal_word(int packed, int *value) {
     return 1;
 }
 
-int printf(int format, int value) {
-    if (format == 0) {
-        uart_print_string((char *)value);
-        return 0;
-    }
+int next_printf_argument(int argument_index) {
+    int *base;
+    int slot;
 
-    if (format == 1) {
-        uart_print_integer(value);
-        return 0;
-    }
-
-    return -1;
+    base = (int *)frame_base();
+    slot = argument_index + 3;
+    return *(base - slot);
 }
 
-int scanf(int format, int *value) {
-    int packed;
+int printf(char *format) {
+    int index;
+    int current;
+    int argument_index;
+    int argument_value;
 
-    if (format != 1) {
+    index = 0;
+    argument_index = 0;
+
+    while (format[index] != 0) {
+        current = format[index];
+
+        if (current == 37) {
+            index = index + 1;
+            current = format[index];
+
+            if (current == 100) {
+                argument_value = next_printf_argument(argument_index);
+                uart_print_integer(argument_value);
+                argument_index = argument_index + 1;
+            } else {
+                if (current == 99) {
+                    argument_value = next_printf_argument(argument_index);
+                    uart_print_character(argument_value);
+                    argument_index = argument_index + 1;
+                } else {
+                    if (current == 37) {
+                        uart_print_character(37);
+                    }
+                }
+            }
+        } else {
+            uart_print_character(current);
+        }
+
+        index = index + 1;
+    }
+
+    return 0;
+}
+
+int scanf(char *format, int *value) {
+    int packed;
+    int current;
+
+    if (format[0] != 37) {
         return 0;
     }
 
-    *value = 0;
+    if (format[2] != 0) {
+        return 0;
+    }
+
+    current = format[1];
     packed = uart_read_word();
-    return parse_decimal_word(packed, value);
+
+    if (current == 99) {
+        *value = input_character_at(packed, 0);
+        return 1;
+    }
+
+    if (current == 100) {
+        *value = 0;
+        return parse_decimal_input(packed, value);
+    }
+
+    return 0;
 }

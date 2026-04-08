@@ -54,6 +54,18 @@ class Char(ASTNode):
     __match_args__ = ("val", "datatype")
 
 
+class String(ASTNode):
+    def __init__(self, val, datatype=None):
+        self.val = val
+        self.datatype = datatype if datatype else Empty()
+
+    @property
+    def visible(self):
+        return _add_if_double_verbose([self.val], self.datatype)
+
+    __match_args__ = ("val", "datatype")
+
+
 class Minus(ASTNode):
     pass
 

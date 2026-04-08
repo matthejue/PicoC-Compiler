@@ -1,26 +1,34 @@
 // in:
 // expected:12 42
 
-#include "./include/simple_malloc.h"
+#include "./include/malloc.h"
 
 int main() {
     init_heap();
 
-    int *a = (int *)simple_malloc(4);
-    int *b = (int *)simple_malloc(4);
-    int *c = (int *)simple_malloc(3);
+    int *a = (int *)malloc(4);
+    debug;
+    int *b = (int *)malloc(4);
+    debug;
+    int *c = (int *)malloc(3);
+    debug;
 
     c[0] = 3;
     c[2] = 4;
+    debug;
 
-    simple_free(a);
-    simple_free(b);
+    free(a);
+    debug;
+    free(b);
+    debug;
 
-    int *d = (int *)simple_malloc(11);
+    int *d = (int *)malloc(11);
+    debug;
     d[0] = 21;
     d[10] = 2;
+    debug;
 
-    print(c[0] * c[5]);
+    print(c[0] * c[2]);
     print(d[0] * d[10]);
 
     return 0;

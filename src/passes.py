@@ -29,6 +29,9 @@ class Passes:
         self.fun_local_sizes = {}
         self.global_decl_stmts = []
         self.block_scopes = {}
+        self.generated_string_literals = {}
+        self.generated_string_defs = []
+        self.generated_string_counter = 0
         # RETI_Blocks
         self.instrs_cnt = 0
 
@@ -113,6 +116,58 @@ class Passes:
                 return None
         return 1 if res else 0
 
+    def _string_literal_to_array(self, literal: pn.String):
+        return pn.Array([pn.Char(ch) for ch in literal.val] + [pn.Char("\\0")])
+
+    def _globalize_string_literal(self, literal: pn.String):
+        cached_name = self.generated_string_literals.get(literal.val)
+        if cached_name is not None:
+            return pn.Name(cached_name)
+
+        symbol_name = f"__strlit_{self.generated_string_counter}"
+        self.generated_string_counter += 1
+        self.generated_string_literals[literal.val] = symbol_name
+
+        array_exp = self._string_literal_to_array(literal)
+        array_dt = pn.ArrayDecl(
+            pn.Num(str(len(literal.val) + 1)),
+            pn.CharType(),
+        )
+        self.generated_string_defs.append(
+            pn.Assign(
+                pn.Alloc(pn.Writeable(), array_dt, pn.Name(symbol_name)),
+                array_exp,
+            )
+        )
+        return pn.Name(symbol_name)
+
+    def _normalize_unsized_array_initializer(self, datatype, initializer):
+        match datatype:
+            case pn.ArrayDecl(pn.Empty(), inner_dt):
+                match initializer:
+                    case pn.String() as literal:
+                        return (
+                            pn.ArrayDecl(
+                                pn.Num(str(len(literal.val) + 1)),
+                                copy.deepcopy(inner_dt),
+                            ),
+                            self._string_literal_to_array(literal),
+                        )
+                    case pn.Array(exps):
+                        return (
+                            pn.ArrayDecl(
+                                pn.Num(str(len(exps))),
+                                copy.deepcopy(inner_dt),
+                            ),
+                            initializer,
+                        )
+                    case _:
+                        throw_error(
+                            "Array declarations with omitted size require a valid initializer"
+                        )
+            case _:
+                return datatype, initializer
+
     # =========================================================================
     # =                              PicoC_Shrink                             =
     # =========================================================================
@@ -127,6 +182,9 @@ class Passes:
                 return exp
             case pn.Char():
                 return exp
+            case pn.String():
+                # char *str = "..." always points to generated global data.
+                return self._globalize_string_literal(exp)
             case pn.BinOp(left_exp, bin_op, right_exp):
                 left_shrunk = self._picoc_shrink_exp(left_exp)
                 right_shrunk = self._picoc_shrink_exp(right_exp)
@@ -159,18 +217,18 @@ class Passes:
             case pn.ToBool(exp):
                 return pn.ToBool(self._picoc_shrink_exp(exp))
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Alloc():
-                match exp:
-                    case pn.Alloc(type_qual, datatype, name, local_var_or_param):
-                        alloc = pn.Alloc(
-                            type_qual,
-                            self._picoc_shrink_datatype(datatype),
-                            name,
-                        )
-                        alloc.local_var_or_param = local_var_or_param
-                        return alloc
-                    case _:
-                        return exp
+            case pn.Alloc(type_qual, datatype, name, local_var_or_param):
+                if isinstance(datatype, pn.ArrayDecl) and isinstance(datatype.const_exp, pn.Empty):
+                    throw_error(
+                        "Array declarations with omitted size require a valid initializer"
+                    )
+                alloc = pn.Alloc(
+                    type_qual,
+                    self._picoc_shrink_datatype(datatype),
+                    name,
+                )
+                alloc.local_var_or_param = local_var_or_param
+                return alloc
             # ----------------------------- L_Pntr ----------------------------
             case pn.Deref(inner):
                 inner_shrunk = self._picoc_shrink_exp(inner)
@@ -243,6 +301,13 @@ class Passes:
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
+            case pn.Assign(pn.Alloc(type_qual, datatype, name), exp):
+                # char str[] = "..." becomes a regular array and can be put on the stack.
+                datatype, exp = self._normalize_unsized_array_initializer(datatype, exp)
+                return pn.Assign(
+                    pn.Alloc(type_qual, self._picoc_shrink_datatype(datatype), name),
+                    self._picoc_shrink_exp(exp),
+                )
             case pn.Assign(lhs, exp):
                 return pn.Assign(
                     self._picoc_shrink_exp(lhs), self._picoc_shrink_exp(exp)
@@ -292,6 +357,9 @@ class Passes:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
                 filename = val
+                self.generated_string_literals = {}
+                self.generated_string_defs = []
+                self.generated_string_counter = 0
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
                     match decl_def:
@@ -340,6 +408,7 @@ class Passes:
                             ]
                         case _:
                             throw_error(decl_def)
+                decls_defs_shrinked = self.generated_string_defs + decls_defs_shrinked
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_shrink"),
                     decls_defs_shrinked,
@@ -2069,7 +2138,7 @@ class Passes:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Int(rn.Im("0")),
                 ]
-            case pn.Exp(pn.Asm(code)):
+            case pn.Exp(pn.Asm(pn.String(code))):
                 return self._single_line_comment(stmt, "#") + [rn.RawInstr(code.strip())]
             case pn.Exp(pn.Cast(_, pn.Stack())):
                 return self._single_line_comment(stmt, "# // cast no-op")
