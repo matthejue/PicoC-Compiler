@@ -1,0 +1,10 @@
+// in:
+// expected:whatever
+
+int main() {
+  char str[] = "whatever";
+  asm("MOVE BAF ACC");
+  asm("SUBI ACC 10");
+  asm("INT 1");
+  return 0;
+}

@@ -1,3 +1,4 @@
+import copy
 import ctypes
 from pathlib import Path
 from typing import Sequence
@@ -153,6 +154,29 @@ class TransformerPicoC:
             return full_datatype, name
         throw_error(declarator)
 
+    def _string_literal_to_array(self, literal: str):
+        return pn.Array([pn.Char(ch) for ch in literal] + [pn.Char("\\0")])
+
+    def _infer_array_size_from_initializer(self, datatype, initializer):
+        match datatype:
+            case pn.ArrayDecl(pn.Empty(), inner_dt):
+                match initializer:
+                    case str() as literal:
+                        return pn.ArrayDecl(
+                            pn.Num(str(len(literal) + 1)),
+                            copy.deepcopy(inner_dt),
+                        ), self._string_literal_to_array(literal)
+                    case pn.Array(exps):
+                        return pn.ArrayDecl(
+                            pn.Num(str(len(exps))),
+                            copy.deepcopy(inner_dt),
+                        ), initializer
+                throw_error(
+                    "Array declarations with omitted size require a valid initializer"
+                )
+            case _:
+                return datatype, initializer
+
     def walk(self, root):
         """
         Iterative post-order walk that dispatches to methods named after
@@ -254,6 +278,9 @@ class TransformerPicoC:
         match init_or_decl:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
+                full_datatype, val = self._infer_array_size_from_initializer(
+                    full_datatype, val
+                )
                 return pn.Assign(pn.Alloc(type_qual, full_datatype, name), val)
             case pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs):
                 return pn.FunDecl(base_datatype, name, allocs)
@@ -364,7 +391,13 @@ class TransformerPicoC:
 
     # --------------------------------- Array ---------------------------------
     def array_declarator(self, _, children):
-        declarator, size = children
+        match children:
+            case [declarator, size]:
+                pass
+            case [declarator]:
+                size = pn.Empty()
+            case _:
+                throw_error(children)
         base = declarator if isinstance(declarator, list) else [declarator]
         return [pn.ArrayDecl(size, pn.Placeholder()), *base]
 

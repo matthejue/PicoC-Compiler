@@ -1,1 +1,1 @@
-./sys_tests/basic_mutex_lock_unlock.picoc
+./sys_tests/new_string.picoc

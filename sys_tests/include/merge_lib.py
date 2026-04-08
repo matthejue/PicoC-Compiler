@@ -15,6 +15,11 @@ MODES = {
         "header": Path("/home/areo/Documents/Studium/Pico-OS/lib/mutex/mutex.h"),
         "output": Path("/home/areo/Documents/Studium/PicoC-Compiler/sys_tests/include/mutex.h"),
     },
+    "3": {
+        "picoc": Path("/home/areo/Documents/Studium/Pico-OS/lib/stdio/stdio.picoc"),
+        "header": Path("/home/areo/Documents/Studium/Pico-OS/lib/stdio/stdio.h"),
+        "output": Path("/home/areo/Documents/Studium/PicoC-Compiler/sys_tests/include/stdio.h"),
+    },
 }
 
 
@@ -34,7 +39,7 @@ def main() -> int:
     mode = sys.argv[1] if len(sys.argv) > 1 else "1"
     config = MODES.get(mode)
     if config is None:
-        print("usage: merge_simple_malloc.py [1|2]", file=sys.stderr)
+        print("usage: merge_lib.py [1|2|3]", file=sys.stderr)
         return 1
 
     try:
