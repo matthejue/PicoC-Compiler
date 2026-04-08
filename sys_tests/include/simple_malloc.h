@@ -1,6 +1,6 @@
 #pragma once
 
-#define HEAP_SIZE  (5 * 4)     // heap size in words
+#define HEAP_SIZE  (1024 * 256)     // heap size in words
 #define NULL       ((void *)0)
 
 struct BlockHeader {
