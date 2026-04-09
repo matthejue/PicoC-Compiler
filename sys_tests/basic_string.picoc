@@ -1,0 +1,30 @@
+// in:
+// expected:whatever1 whatever2 whatever3
+
+#include "./include/malloc.h"
+#include "./include/stdio.h"
+
+int main() {
+  init_heap();
+
+  char *str = "whatever1";
+  char stack_str[] = "whatever2";
+
+  char *heap_str = (char *)malloc(10);
+  heap_str[0] = 'w';
+  heap_str[1] = 'h';
+  heap_str[2] = 'a';
+  heap_str[3] = 't';
+  heap_str[4] = 'e';
+  heap_str[5] = 'v';
+  heap_str[6] = 'e';
+  heap_str[7] = 'r';
+  heap_str[8] = '3';
+  heap_str[9] = '\0';
+
+  uart_print_string(str);
+  uart_print_string(stack_str);
+  uart_print_string(heap_str);
+
+  return 0;
+}

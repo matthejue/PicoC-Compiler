@@ -29,9 +29,11 @@ class Passes:
         self.fun_local_sizes = {}
         self.global_decl_stmts = []
         self.block_scopes = {}
+
         self.generated_string_literals = {}
         self.generated_string_defs = []
         self.generated_string_counter = 0
+
         # RETI_Blocks
         self.instrs_cnt = 0
 
@@ -124,6 +126,7 @@ class Passes:
         if cached_name is not None:
             return pn.Name(cached_name)
 
+        # Create a unique compiler-internal global name for the lifted string literal.
         symbol_name = f"__strlit_{self.generated_string_counter}"
         self.generated_string_counter += 1
         self.generated_string_literals[literal.val] = symbol_name
