@@ -144,7 +144,7 @@ class Passes:
         )
         return pn.Name(symbol_name)
 
-    def _normalize_unsized_array_initializer(self, datatype, initializer):
+    def _infer_unsized_array_size_from_initializer(self, datatype, initializer):
         match datatype:
             case pn.ArrayDecl(pn.Empty(), inner_dt):
                 match initializer:
@@ -306,7 +306,7 @@ class Passes:
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Alloc(type_qual, datatype, name), exp):
                 # char str[] = "..." becomes a regular array and can be put on the stack.
-                datatype, exp = self._normalize_unsized_array_initializer(datatype, exp)
+                datatype, exp = self._infer_unsized_array_size_from_initializer(datatype, exp)
                 return pn.Assign(
                     pn.Alloc(type_qual, self._picoc_shrink_datatype(datatype), name),
                     self._picoc_shrink_exp(exp),

@@ -1,1 +1,1 @@
-./sys_tests/new_string.picoc
+./sys_tests/basic_string.picoc

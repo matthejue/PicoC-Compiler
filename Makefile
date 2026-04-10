@@ -1,5 +1,11 @@
 .PHONY: test run clean
 
+TEST_PATTERN ?= $(shell cat ./opts/test_pattern.txt)
+RUN_PATH ?= $(shell cat ./opts/run_path.txt)
+DEBUG_PATH ?= $(shell cat ./opts/debug_path.txt)
+EXTRA_CPL_ARGS ?=
+EXTRA_EMU_ARGS ?=
+
 full-install: install-dependencies install-global
 
 SHELL := /bin/bash
@@ -50,13 +56,13 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh $${COLUMNS} "$(shell cat ./opts/test_pattern.txt)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	./run_sys_tests.sh $${COLUMNS} "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 run:
-	./run.sh "$(shell cat ./opts/run_path.txt)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	./run.sh "$(RUN_PATH)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 debug:
-	./debug.sh "$(shell cat ./opts/debug_path.txt)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	./debug.sh "$(DEBUG_PATH)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip
