@@ -616,14 +616,14 @@ class FunDef(ASTNode):
 
 
 class NewStackframe(ASTNode):
-    def __init__(self, fun_name):
-        self.fun_name = fun_name
+    def __init__(self, arg_count):
+        self.arg_count = arg_count
 
     @property
     def visible(self):
-        return [self.fun_name]
+        return [self.arg_count]
 
-    __match_args__ = ("fun_name",)
+    __match_args__ = ("arg_count",)
 
 class RemoveStackframe(ASTNode):
     pass

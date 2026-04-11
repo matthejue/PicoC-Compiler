@@ -15,6 +15,7 @@ int sum(int count, ...) {
     count = count - 1;
   }
 
+  debug;
   return total;
 }
 

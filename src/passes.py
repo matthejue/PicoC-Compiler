@@ -1652,14 +1652,13 @@ class Passes:
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
-                block_name = pn.Name(fun_name)
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
                     + [pn.StackMalloc(2)]
                     + exps_anf
                     + [
-                        pn.NewStackframe(block_name),
-                        pn.Exp(pn.GoTo(block_name)),
+                        pn.NewStackframe(pn.Num(str(len(exps)))),
+                        pn.Exp(pn.GoTo(pn.Name(fun_name))),
                         pn.RemoveStackframe(),
                     ]
                     + (
@@ -2429,22 +2428,20 @@ class Passes:
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
                 ]
-            case pn.NewStackframe(pn.Name(val)):
-                fun_block_name = val
-                symbol, _ = self.symbol_table.resolve(fun_block_name, scope="global")
-                param_size = symbol["param_size"]
+            case pn.NewStackframe(pn.Num(arg_count)):
+                frame_size = 2 + int(arg_count)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
                     rn.Instr(
                         rn.Addi(),
-                        [rn.Reg(rn.Sp()), rn.Im(str(2 + int(param_size)))],
+                        [rn.Reg(rn.Sp()), rn.Im(str(frame_size))],
                     ),
                     rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
                     rn.Instr(
                         rn.Subi(),
                         [
                             rn.Reg(rn.Sp()),
-                            rn.Im(str(2 + int(param_size))),
+                            rn.Im(str(frame_size)),
                         ],
                     ),
                     rn.Instr(
