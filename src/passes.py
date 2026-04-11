@@ -40,6 +40,12 @@ class Passes:
     INT32_MIN = -2147483648
     INT32_MAX = 2147483647
 
+    def _is_variadic_params(self, allocs) -> bool:
+        return bool(allocs) and isinstance(allocs[-1], pn.VariadicParam)
+
+    def _fixed_params(self, allocs):
+        return [alloc for alloc in allocs if not isinstance(alloc, pn.VariadicParam)]
+
     def _fits_int32(self, val: int) -> bool:
         return self.INT32_MIN <= val <= self.INT32_MAX
 
@@ -294,7 +300,12 @@ class Passes:
                 if allocs and isinstance(allocs[0], pn.VoidType):
                     allocs_shrunk = []
                 else:
-                    allocs_shrunk = [self._picoc_shrink_exp(a) for a in allocs]
+                    allocs_shrunk = [
+                        self._picoc_shrink_exp(a)
+                        if not isinstance(a, pn.VariadicParam)
+                        else a
+                        for a in allocs
+                    ]
                 return pn.FunDecl(ret_dt, name, allocs_shrunk)
             case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
                 return datatype
@@ -374,7 +385,10 @@ class Passes:
                                 allocs_shrinked = []
                             else:
                                 allocs_shrinked = [
-                                    self._picoc_shrink_exp(alloc) for alloc in allocs
+                                    self._picoc_shrink_exp(alloc)
+                                    if not isinstance(alloc, pn.VariadicParam)
+                                    else alloc
+                                    for alloc in allocs
                                 ]
                             decls_defs_shrinked += [
                                 pn.FunDef(
@@ -396,7 +410,10 @@ class Passes:
                                 allocs_shrinked = []
                             else:
                                 allocs_shrinked = [
-                                    self._picoc_shrink_exp(alloc) for alloc in allocs
+                                    self._picoc_shrink_exp(alloc)
+                                    if not isinstance(alloc, pn.VariadicParam)
+                                    else alloc
+                                    for alloc in allocs
                                 ]
                             decls_defs_shrinked += [
                                 pn.FunDecl(
@@ -698,6 +715,8 @@ class Passes:
         for alloc in allocs:
             match alloc:
                 case pn.VoidType():
+                    continue
+                case pn.VariadicParam():
                     continue
                 case pn.Alloc(_, pn.ArrayDecl()):
                     size += 1
@@ -1047,6 +1066,7 @@ class Passes:
                         "datatype": decl_def,
                         "name": fun_name,
                         "param_size": param_size,
+                        "variadic": self._is_variadic_params(allocs),
                     },
                     scope="global",
                 )
@@ -1059,7 +1079,7 @@ class Passes:
                 self.current_fun_local_vars_size = 0
 
                 if fun_name not in ["main", "global"]:
-                    for alloc in allocs:
+                    for alloc in self._fixed_params(allocs):
                         alloc.local_var_or_param = "param"
 
                 param_size = self._param_size(allocs)
@@ -1070,11 +1090,12 @@ class Passes:
                             "datatype": pn.FunDecl(datatype, name, allocs),
                             "name": fun_name,
                             "param_size": param_size,
+                            "variadic": self._is_variadic_params(allocs),
                         },
                         scope="global",
                     )
 
-                for alloc in allocs:
+                for alloc in self._fixed_params(allocs):
                     self._declare_alloc(alloc)
 
                 for block in blocks:
@@ -1097,7 +1118,9 @@ class Passes:
                 match blocks:
                     case [pn.Block(_, entry_stmts), *_]:
                         entry_stmts[:0] = [
-                            pn.Exp(alloc) for alloc in allocs if not isinstance(alloc, pn.VoidType)
+                            pn.Exp(alloc)
+                            for alloc in self._fixed_params(allocs)
+                            if not isinstance(alloc, pn.VoidType)
                         ]
                         entry_stmts[:0] = [
                             pn.StackMalloc(self.current_fun_local_vars_size)

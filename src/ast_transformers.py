@@ -225,6 +225,11 @@ class TransformerPicoC:
     def parameter_list(self, _, children):
         return children
 
+    def variadic_parameter(self, _, children):
+        if children:
+            throw_error(children)
+        return pn.VariadicParam()
+
     def parameter_declaration(self, _, children):
         match children:
             case [pn.VoidType() as void_type]:

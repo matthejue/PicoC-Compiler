@@ -1,1 +1,1 @@
-./sys_tests/basic_string.picoc
+./sys_tests/basic_variadic_function_syntax.picoc

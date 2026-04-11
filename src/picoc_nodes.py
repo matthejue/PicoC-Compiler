@@ -573,6 +573,10 @@ class Empty(ASTNode):
     pass
 
 
+class VariadicParam(ASTNode):
+    pass
+
+
 class Return(ASTNode):
     def __init__(self, exp=Empty()):
         self.exp = exp
