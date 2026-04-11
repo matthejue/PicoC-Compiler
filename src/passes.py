@@ -24,7 +24,8 @@ class Passes:
         self.current_scope = "global"
         self.global_stmts_instrs = []
         self.current_fun_local_vars_size = 0
-        self.rel_fun_addr = 0
+        self.next_param_addr = 0
+        self.next_local_addr = 0
         self.stack_type_hints = {}
         self.fun_local_sizes = {}
         self.global_decl_stmts = []
@@ -762,12 +763,18 @@ class Passes:
                 match self.current_scope:
                     case "global":
                         addr = pn.Empty()
+                        frame_kind = "global"
                     case _:
-                        addr = self.rel_fun_addr + size - 1
-                        self.rel_fun_addr += size
-                        self.current_fun_local_vars_size += (
-                            size if local_var_or_param == "local_var" else 0
-                        )
+                        match local_var_or_param:
+                            case "param":
+                                addr = self.next_param_addr + size - 1
+                                self.next_param_addr += size
+                                frame_kind = "param"
+                            case _:
+                                addr = self.next_local_addr + size - 1
+                                self.next_local_addr += size
+                                self.current_fun_local_vars_size += size
+                                frame_kind = "local_var"
 
                 self.symbol_table.declare(
                     var_name,
@@ -777,12 +784,24 @@ class Passes:
                         "name": var_name,
                         "addr": addr,
                         "size": size,
+                        "frame_kind": frame_kind,
                         **({"val": initial_val} if initial_val is not None else {}),
                     },
                     scope=self.current_scope,
                 )
             case _:
                 throw_error(alloc)
+
+    def _stackframe_access_offset(self, addr, frame_kind, tmp_idx=0):
+        addr = int(addr)
+        tmp_idx = int(tmp_idx)
+        match frame_kind:
+            case "param":
+                return 1 + addr - tmp_idx
+            case "local_var":
+                return -(2 + addr - tmp_idx)
+            case _:
+                raise ValueError(f"Unknown frame kind: {frame_kind}")
 
     def _declare_input_builtin(self):
         if self.symbol_table.contains("input", scope="global"):
@@ -828,6 +847,7 @@ class Passes:
                         else:
                             loc = pn.Stackframe(pn.Num(symbol["addr"]))
                             loc.symbol_name = var_name
+                            loc.frame_kind = symbol["frame_kind"]
                         return loc
             case _:
                 return name_node
@@ -1075,8 +1095,9 @@ class Passes:
                 fun_blocks_out = []
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
-                self.rel_fun_addr = 0
                 self.current_fun_local_vars_size = 0
+                self.next_param_addr = 0
+                self.next_local_addr = 0
 
                 if fun_name not in ["main", "global"]:
                     for alloc in self._fixed_params(allocs):
@@ -1123,7 +1144,7 @@ class Passes:
                             if not isinstance(alloc, pn.VoidType)
                         ]
                         entry_stmts[:0] = [
-                            pn.StackMalloc(self.current_fun_local_vars_size)
+                            pn.StackMalloc(self.current_fun_local_vars_size + 2)
                         ]
                         # entry_stmts[:0] = (
                         #     self._single_line_comment(blocks[0], "//", filtr=[2])
@@ -1654,7 +1675,6 @@ class Passes:
 
                 return (
                     self._single_line_comment(exp, "//", filtr=[])
-                    + [pn.StackMalloc(2)]
                     + exps_anf
                     + [
                         pn.NewStackframe(pn.Num(str(len(exps)))),
@@ -1744,6 +1764,7 @@ class Passes:
                             target, "symbol_name", getattr(lhs, "symbol_name", None)
                         )
                         setattr(target, "datatype", getattr(lhs, "datatype", None))
+                        setattr(target, "frame_kind", symbol["frame_kind"])
                         return (
                             self._single_line_comment(stmt, "//")
                             + exps_anf
@@ -1823,7 +1844,6 @@ class Passes:
                 for block in blocks:
                     label = block.name
                     self.current_scope = self.block_scopes.get(label, "global")
-                    self.rel_fun_addr = 0
                     self.current_fun_local_vars_size = self.fun_local_sizes.get(
                         self.current_scope, 0
                     )
@@ -1945,13 +1965,20 @@ class Passes:
                             ),
                         ]
                     case pn.Stackframe(pn.Num(val2)):
+                        frame_kind = getattr(exp, "frame_kind", None)
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
                                 [
                                     rn.Reg(rn.Baf()),
                                     rn.Reg(rn.Acc()),
-                                    rn.Im(str(-(2 + int(val2)))),
+                                    rn.Im(
+                                        str(
+                                            self._stackframe_access_offset(
+                                                val2, frame_kind
+                                            )
+                                        )
+                                    ),
                                 ],
                             ),
                             rn.Instr(
@@ -1972,10 +1999,23 @@ class Passes:
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
                         ]
                     case pn.Stackframe(pn.Num(val)):
+                        frame_kind = getattr(exp, "frame_kind", None)
                         reti_instrs += [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
                             rn.Instr(
-                                rn.Subi(), [rn.Reg(rn.In1()), rn.Im(str(int(val) + 2))]
+                                rn.Addi() if frame_kind == "param" else rn.Subi(),
+                                [
+                                    rn.Reg(rn.In1()),
+                                    rn.Im(
+                                        str(
+                                            abs(
+                                                self._stackframe_access_offset(
+                                                    val, frame_kind
+                                                )
+                                            )
+                                        )
+                                    ),
+                                ],
                             ),
                         ]
                     case _:
@@ -2271,13 +2311,20 @@ class Passes:
                                 ),
                             ]
                         case (pn.Stack(pn.Num(val1)), pn.Stackframe(pn.Num(val2))):
+                            frame_kind = getattr(mem, "frame_kind", None)
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
                                     [
                                         rn.Reg(rn.Baf()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(-(2 + int(val2) - int(val1)))),
+                                        rn.Im(
+                                            str(
+                                                self._stackframe_access_offset(
+                                                    val2, frame_kind, val1
+                                                )
+                                            )
+                                        ),
                                     ],
                                 ),
                                 rn.Instr(
@@ -2335,6 +2382,7 @@ class Passes:
                                 ),
                             ]
                         case (pn.Stackframe(pn.Num(val1)), pn.Stack(pn.Num(val2))):
+                            frame_kind = getattr(mem, "frame_kind", None)
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -2351,12 +2399,10 @@ class Passes:
                                         rn.Reg(rn.Acc()),
                                         rn.Im(
                                             str(
-                                                -(
-                                                    2
-                                                    + int(val1)
-                                                    - int(tmp_max)
-                                                    + 1
-                                                    + int(val2)
+                                                self._stackframe_access_offset(
+                                                    val1,
+                                                    frame_kind,
+                                                    int(tmp_max) - 1 - int(val2),
                                                 )
                                             )
                                         ),
@@ -2429,24 +2475,17 @@ class Passes:
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
                 ]
             case pn.NewStackframe(pn.Num(arg_count)):
+                # TODO(frame-layout): adapt this sequence for
+                # [args][return address][previous BAF][locals].
                 frame_size = 2 + int(arg_count)
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())]),
-                    rn.Instr(
-                        rn.Addi(),
-                        [rn.Reg(rn.Sp()), rn.Im(str(frame_size))],
-                    ),
-                    rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
-                    rn.Instr(
-                        rn.Subi(),
-                        [
-                            rn.Reg(rn.Sp()),
-                            rn.Im(str(frame_size)),
-                        ],
-                    ),
                     rn.Instr(
                         rn.Storein(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
+                        [rn.Reg(rn.Sp()), rn.Reg(rn.Baf()), rn.Im("0")],
+                    ),
+                    rn.Instr(
+                        rn.Move(),
+                        [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())],
                     ),
                     rn.Instr(
                         rn.Loadi(),
@@ -2467,6 +2506,8 @@ class Passes:
                 ]
 
             case pn.RemoveStackframe():
+                # TODO(frame-layout): adapt teardown for
+                # [args][return address][previous BAF][locals].
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
                     rn.Instr(
@@ -2475,6 +2516,8 @@ class Passes:
                     rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Reg(rn.Sp())]),
                 ]
             case pn.Return(pn.Stack(pn.Num(val))):
+                # TODO(frame-layout): update return-address access for the new
+                # frame layout.
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
@@ -2485,6 +2528,8 @@ class Passes:
                     ),
                 ]
             case pn.Return(pn.Empty()):
+                # TODO(frame-layout): update return-address access for the new
+                # frame layout.
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
