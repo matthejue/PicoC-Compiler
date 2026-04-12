@@ -23,7 +23,6 @@ class Passes:
         self.symbol_table = SymbolTable()
         self.current_scope = "global"
         self.global_stmts_instrs = []
-        self.current_fun_local_vars_size = 0
         self.next_param_addr = 0
         self.next_local_addr = 0
         self.stack_type_hints = {}
@@ -773,7 +772,6 @@ class Passes:
                             case _:
                                 addr = self.next_local_addr + size - 1
                                 self.next_local_addr += size
-                                self.current_fun_local_vars_size += size
                                 frame_kind = "local_var"
 
                 self.symbol_table.declare(
@@ -1095,7 +1093,6 @@ class Passes:
                 fun_blocks_out = []
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
-                self.current_fun_local_vars_size = 0
                 self.next_param_addr = 0
                 self.next_local_addr = 0
 
@@ -1144,13 +1141,13 @@ class Passes:
                             if not isinstance(alloc, pn.VoidType)
                         ]
                         entry_stmts[:0] = [
-                            pn.StackMalloc(self.current_fun_local_vars_size + 2)
+                            pn.StackMalloc(self.next_local_addr)
                         ]
                         # entry_stmts[:0] = (
                         #     self._single_line_comment(blocks[0], "//", filtr=[2])
                         #     if global_vars.args.double_verbose
                         #     else []
-                        # ) + [pn.StackMalloc(self.current_fun_local_vars_size)]
+                        # ) + [pn.StackMalloc(self.next_local_addr)]
                     case _:
                         throw_error(blocks)
 
@@ -1164,7 +1161,7 @@ class Passes:
                     case _:
                         throw_error(blocks[-1])
 
-                self.fun_local_sizes[fun_name] = self.current_fun_local_vars_size
+                self.fun_local_sizes[fun_name] = self.next_local_addr
                 self.current_scope = "global"
                 return fun_blocks_out
             case pn.Exp() | pn.Assign():
@@ -1669,7 +1666,7 @@ class Passes:
 
                 exps_anf = []
                 self.argmode_on = True
-                for exp2 in exps:
+                for exp2 in reversed(exps):
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
@@ -1679,7 +1676,9 @@ class Passes:
                     + [
                         pn.NewStackframe(pn.Num(str(len(exps)))),
                         pn.Exp(pn.GoTo(pn.Name(fun_name))),
-                        pn.RemoveStackframe(),
+                        pn.RemoveStackframe(
+                            pn.Num(str(self.next_local_addr))
+                        ),
                     ]
                     + (
                         [pn.Exp(rn.Reg(rn.Acc()))]
@@ -1844,9 +1843,7 @@ class Passes:
                 for block in blocks:
                     label = block.name
                     self.current_scope = self.block_scopes.get(label, "global")
-                    self.current_fun_local_vars_size = self.fun_local_sizes.get(
-                        self.current_scope, 0
-                    )
+                    self.next_local_addr = self.fun_local_sizes.get(self.current_scope, 0)
                     match block:
                         case pn.Block(_, stmts):
                             stmts_anf = []
@@ -2488,6 +2485,10 @@ class Passes:
                         [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())],
                     ),
                     rn.Instr(
+                        rn.Subi(),
+                        [rn.Reg(rn.Sp()), rn.Im("2")],
+                    ),
+                    rn.Instr(
                         rn.Loadi(),
                         [
                             rn.Reg(rn.Acc()),
@@ -2504,16 +2505,18 @@ class Passes:
                         [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")],
                     ),
                 ]
-
-            case pn.RemoveStackframe():
+            case pn.RemoveStackframe(pn.Num(local_var_count)):
                 # TODO(frame-layout): adapt teardown for
                 # [args][return address][previous BAF][locals].
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
                     rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.In1()), rn.Reg(rn.Baf()), rn.Im("0")]
+                        rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Baf()), rn.Im("0")]
                     ),
-                    rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Reg(rn.Sp())]),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Sp())]),
+                    rn.Instr(
+                        rn.Subi(),
+                        [rn.Reg(rn.Sp()), rn.Im(str(int(local_var_count) + 2))],
+                    ),
                 ]
             case pn.Return(pn.Stack(pn.Num(val))):
                 # TODO(frame-layout): update return-address access for the new

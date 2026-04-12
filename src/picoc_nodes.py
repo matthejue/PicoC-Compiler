@@ -626,7 +626,14 @@ class NewStackframe(ASTNode):
     __match_args__ = ("arg_count",)
 
 class RemoveStackframe(ASTNode):
-    pass
+    def __init__(self, local_var_count):
+        self.local_var_count = local_var_count
+
+    @property
+    def visible(self):
+        return [self.local_var_count]
+
+    __match_args__ = ("local_var_count",)
 
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):

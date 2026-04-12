@@ -4,9 +4,13 @@
 void _fun120(char c, int i);
 
 void main(){
+  debug;
   _fun120('b', input());
+  debug;
 }
 
 void _fun120(char c, int i){
+  debug;
   print(i * (100 + -c));
+  debug;
 }
