@@ -2,12 +2,16 @@
 // expected:10
 
 int rec_fun_call(int arg) {
+  debug;
   if (arg == input()) {
     return arg;
   }
+  debug;
   return rec_fun_call(arg + 1);
 }
 
 void main() {
+  debug;
   print(rec_fun_call(1));
+  debug;
 }

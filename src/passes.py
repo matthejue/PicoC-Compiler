@@ -2477,8 +2477,8 @@ class Passes:
                 frame_size = 2 + int(arg_count)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
-                        rn.Storein(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.Baf()), rn.Im("0")],
+                        rn.Move(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())],
                     ),
                     rn.Instr(
                         rn.Move(),
@@ -2487,6 +2487,10 @@ class Passes:
                     rn.Instr(
                         rn.Subi(),
                         [rn.Reg(rn.Sp()), rn.Im("2")],
+                    ),
+                    rn.Instr(
+                        rn.Storein(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
                     ),
                     rn.Instr(
                         rn.Loadi(),

@@ -1,1 +1,1 @@
-./sys_tests/advanced_fun_special_name.picoc
+./sys_tests/advanced_rec_fun_call.picoc

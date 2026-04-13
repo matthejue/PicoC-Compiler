@@ -78,3 +78,6 @@ create_bin_linux:
 
 exec_bin_linux:
 	./dist/pico_c_compiler_linux -S
+
+run_send_keypresses:
+	./send_keypresses.py --input ./opts/input.txt reti_emulator $(shell cat ./opts/run_emu_opts.txt) $(EXTRA_ARGS) $(shell cat ./opts/run_path.txt)

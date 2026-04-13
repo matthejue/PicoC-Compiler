@@ -23,6 +23,8 @@ README.txt
 *.reti_blocks
 *.reti_patch
 *.reti
+*.picoc_typing
+*.picoc_symbol
 *.error
 *.c
 *.c_output
