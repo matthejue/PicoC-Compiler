@@ -1,1 +1,1 @@
-./sys_tests/advanced_rec_fun_call.picoc
+./sys_tests/basic_variadic_function_syntax.picoc

@@ -1,4 +1,4 @@
-.PHONY: test run clean
+.PHONY: test run clean run_send_keypresses
 
 TEST_PATTERN ?= $(shell cat ./opts/test_pattern.txt)
 RUN_PATH ?= $(shell cat ./opts/run_path.txt)
@@ -80,4 +80,11 @@ exec_bin_linux:
 	./dist/pico_c_compiler_linux -S
 
 run_send_keypresses:
-	./send_keypresses.py --input ./opts/input.txt reti_emulator $(shell cat ./opts/run_emu_opts.txt) $(EXTRA_ARGS) $(shell cat ./opts/run_path.txt)
+	@set -e; \
+	run_path="$(RUN_PATH)"; \
+	if [[ "$$run_path" == *.picoc ]]; then \
+		compiled_path="$${run_path%.picoc}.reti"; \
+		./run.py $$(cat ./opts/run_cpl_opts.txt) $(EXTRA_CPL_ARGS) "$$run_path" -o "$$compiled_path"; \
+		run_path="$$compiled_path"; \
+	fi; \
+	./send_keypresses.py --input ./opts/input.txt reti_emulator $$(cat ./opts/run_emu_opts.txt) $(EXTRA_EMU_ARGS) "$$run_path"

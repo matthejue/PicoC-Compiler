@@ -2516,11 +2516,10 @@ class Passes:
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Baf()), rn.Im("0")]
                     ),
+                    # had to implmented this way because of interrupts overwitting the BAF address
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Baf()), rn.Im(str(int(local_var_count) + 2))]),
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Sp())]),
-                    rn.Instr(
-                        rn.Subi(),
-                        [rn.Reg(rn.Sp()), rn.Im(str(int(local_var_count) + 2))],
-                    ),
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Baf()), rn.Im(str(int(local_var_count) + 2))]),
                 ]
             case pn.Return(pn.Stack(pn.Num(val))):
                 # TODO(frame-layout): update return-address access for the new

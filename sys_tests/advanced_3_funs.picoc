@@ -4,8 +4,11 @@
 int fun(int param);
 
 int main() {
+  debug;
   int local_var1 = input();
+  debug;
   int local_var2 = fun(local_var1);
+  debug;
   print(local_var2 + 2);
   return 0;
 }
@@ -13,13 +16,17 @@ int main() {
 int fun2(int param)
 {
   int local_var = 2;
+  debug;
   return param + local_var;
 }
 
 int fun(int param) {
   int local_var1 = 2;
   int local_var2 = param + local_var1;
+  debug;
   print(local_var2);
+  debug;
   print(fun2(local_var2));
+  debug;
   return local_var2;
 }
