@@ -6,12 +6,12 @@ int sum(int count, ...);
 int sum(int count, ...) {
   debug;
   int total = 0;
-  int *arg = &count - 1;
+  int *arg = &count + 1;
   debug;
 
   while (count) {
     total = total + *arg;
-    arg = arg - 1;
+    arg = arg + 1;
     count = count - 1;
   }
 

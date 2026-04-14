@@ -1325,8 +1325,9 @@ class Passes:
             # ------------------------ L_Pntr + L_Array -------------------------
             case pn.Ref(inner_exp):
                 inner_dt = self._picoc_type_exp(inner_exp)
-                exp.datatype = copy.deepcopy(inner_dt)
-                return self._ref_result_datatype(inner_dt)
+                ref_dt = self._ref_result_datatype(inner_dt)
+                exp.datatype = copy.deepcopy(ref_dt)
+                return ref_dt
             case pn.Deref(addr_exp):
                 base_dt = self._picoc_type_exp(addr_exp)
                 exp.datatype = copy.deepcopy(base_dt)
@@ -1535,9 +1536,9 @@ class Passes:
             # ----------------------- L_Arith + L_Logic -----------------------
             case pn.BinOp(left_exp, bin_op, right_exp) as binop_exp:
                 def _skip_deref_after(exp):
-                    return isinstance(exp, (pn.Call, pn.BinOp)) or (
+                    return isinstance(exp, (pn.Call, pn.BinOp, pn.Ref)) or (
                         isinstance(exp, pn.Cast)
-                        and isinstance(exp.exp, (pn.Call, pn.BinOp))
+                        and isinstance(exp.exp, (pn.Call, pn.BinOp, pn.Ref))
                     )
                 left_dt = self._exp_result_datatype(left_exp)
                 right_dt = self._exp_result_datatype(right_exp)
