@@ -266,6 +266,49 @@ class OptionHandler:
         merged_table = {}
         merged_parents = {}
 
+        def struct_completeness(symbol):
+            datatype = symbol.get("datatype") if isinstance(symbol, dict) else None
+            if isinstance(datatype, pn.StructDecl):
+                return "complete"
+            if isinstance(datatype, pn.StructSpec):
+                return "incomplete"
+            return None
+
+        def merge_symbol(scope, name, incoming):
+            existing = merged_table[scope].get(name)
+            if existing is None:
+                merged_table[scope][name] = dict(incoming)
+                return
+
+            existing_struct = struct_completeness(existing)
+            incoming_struct = struct_completeness(incoming)
+            if existing_struct and incoming_struct:
+                # Struct forward declarations are incomplete symbols. A full
+                # struct definition must always win over a forward declaration,
+                # independent of file merge order.
+                if existing_struct == "incomplete" and incoming_struct == "complete":
+                    merged_table[scope][name] = dict(incoming)
+                elif existing_struct == "complete" and incoming_struct == "incomplete":
+                    return
+                elif existing_struct == "incomplete" and incoming_struct == "incomplete":
+                    return
+                else:
+                    throw_error(
+                        f"Duplicate definition of struct '{name}' in scope '{scope}'"
+                    )
+                return
+
+            # Duplicate non-struct symbols should not be silently overwritten:
+            # function declarations and definitions currently store the same
+            # symbol-table information, so keeping the existing function symbol
+            # loses nothing. Other duplicate symbols are errors.
+            existing_dt = existing.get("datatype")
+            incoming_dt = incoming.get("datatype")
+            if isinstance(existing_dt, pn.FunDecl) and isinstance(incoming_dt, pn.FunDecl):
+                return
+
+            throw_error(f"Duplicate symbol '{name}' in scope '{scope}'")
+
         # Merge all symbol tables
         for symbol_table in symbol_tables:
             for scope, symbols in symbol_table.items():
@@ -274,7 +317,8 @@ class OptionHandler:
                         merged_parents[k] = v
                 else:
                     merged_table.setdefault(scope, {})
-                    merged_table[scope].update(symbols)
+                    for symbol_name, symbol in symbols.items():
+                        merge_symbol(scope, symbol_name, symbol)
 
         # Ensure global scope exists
         merged_table.setdefault("global", {})

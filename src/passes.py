@@ -377,6 +377,8 @@ class Passes:
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
                     match decl_def:
+                        case pn.StructSpec() as structspec:
+                            decls_defs_shrinked += [structspec]
                         case pn.FunDef(datatype, pn.Name() as name, allocs, stmts):
                             stmts_shrinked = []
                             for stmt in stmts:
@@ -685,7 +687,7 @@ class Passes:
                         ),
                     )
                 ]
-            case pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign():
+            case pn.StructSpec() | pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign():
                 return [decl_def]
             case _:
                 throw_error(decl_def)
@@ -737,6 +739,15 @@ class Passes:
                 symbol, _ = self.symbol_table.resolve(
                     struct_type_name, scope=self.current_scope
                 )
+                if symbol is None:
+                    throw_error(
+                        f"Invalid use of undefined struct type '{struct_type_name}'"
+                    )
+                if not symbol.get("complete", True):
+                    throw_error(
+                        f"Invalid use of incomplete struct type '{struct_type_name}'; "
+                        f"forward-declared structs may only be used through pointers"
+                    )
                 return int(symbol["size"])
             # ---------------------------- L_Array ----------------------------
             case pn.ArrayDecl(pn.Num(val), datatype2):
@@ -1041,6 +1052,25 @@ class Passes:
 
     def _picoc_symbol_decl_def(self, decl_def):
         match decl_def:
+            case pn.StructSpec(pn.Name(struct_name)):
+                existing, _ = self.symbol_table.resolve(
+                    struct_name, scope=self.current_scope
+                )
+                if existing is not None and existing.get("complete", True):
+                    return []
+                self.symbol_table.declare(
+                    struct_name,
+                    {
+                        "type_qual": pn.Empty(),
+                        "datatype": decl_def,
+                        "name": struct_name,
+                        "attrs": [],
+                        "size": pn.Empty(),
+                        "complete": False,
+                    },
+                    scope=self.current_scope,
+                )
+                return []
             case pn.StructDecl(pn.Name(struct_name), allocs):
                 attrs = []
                 struct_size = 0
@@ -1072,6 +1102,7 @@ class Passes:
                         "name": struct_name,
                         "attrs": attrs,
                         "size": struct_size,
+                        "complete": True,
                     },
                     scope=self.current_scope,
                 )
@@ -1218,6 +1249,20 @@ class Passes:
         match struct_dt:
             case pn.StructSpec(pn.Name(struct_name)):
                 symbol, _ = self.symbol_table.resolve(attr_name, scope=struct_name)
+                if symbol is None:
+                    struct_symbol, _ = self.symbol_table.resolve(
+                        struct_name, scope=self.current_scope
+                    )
+                    if struct_symbol is not None and not struct_symbol.get(
+                        "complete", True
+                    ):
+                        throw_error(
+                            f"Invalid member access on incomplete struct type '{struct_name}'; "
+                            f"the full struct declaration is required"
+                        )
+                    throw_error(
+                        f"Struct '{struct_name}' has no member named '{attr_name}'"
+                    )
                 return copy.deepcopy(symbol["datatype"])
             case _:
                 throw_error(struct_dt)
@@ -1250,6 +1295,15 @@ class Passes:
                 struct_sym, _ = self.symbol_table.resolve(
                     struct_name, scope=self.current_scope
                 )
+                if struct_sym is None:
+                    throw_error(
+                        f"Invalid member access on undefined struct type '{struct_name}'"
+                    )
+                if not struct_sym.get("complete", True):
+                    throw_error(
+                        f"Invalid member access on incomplete struct type '{struct_name}'; "
+                        f"the full struct declaration is required"
+                    )
                 attr_ids = struct_sym["attrs"]
                 rel_pos_in_struct = 0
                 for attr_id in attr_ids:

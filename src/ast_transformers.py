@@ -408,11 +408,7 @@ class TransformerPicoC:
     def struct_specifier(self, _, children):
         if len(children) == 1:
             return pn.StructSpec(children[0])
-        match children[1][0]:
-            case pn.Alloc():
-                return pn.StructDecl(children[0], children[1])
-            case _:
-                return pn.StructDecl(children[0], children[1])
+        return pn.StructDecl(children[0], children[1])
 
     def type_identifier(self, node, _):
         return pn.Name(self.value(node))
