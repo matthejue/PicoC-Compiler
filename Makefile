@@ -31,7 +31,8 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.json" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_shrink" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_blocks" -delete
-	find . -type f -wholename "./sys_tests/*.picoc_patch" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_symbol" -delete
+	find . -type f -wholename "./sys_tests/*.picoc_typing" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_anf" -delete
 	find . -type f -wholename "./sys_tests/*.reti_blocks" -delete
 	find . -type f -wholename "./sys_tests/*.reti_patch" -delete

@@ -1,7 +1,6 @@
 from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
-from src import reti_nodes as rn
 from src import debug as db
 import sys
 import shutil
@@ -18,6 +17,7 @@ import subprocess, os, platform
 from pygments.lexers.c_cpp import CLexer
 import re
 import argparse
+import shlex
 from src.preprocessor import Preprocessor
 from typing import Iterable, List, Optional, Dict, Any, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -36,8 +36,12 @@ class OptionHandler:
             open_documentation()
 
     def build_all(self, max_workers=None):
-        files = list(global_vars.args.infiles)  # strings, as passed on CLI
-        _syntax_check(files)
+        files = _expand_dependency_metadata(list(global_vars.args.infiles))
+        global_vars.args.infiles = files
+
+        picoc_files = [f for f in files if get_ext(f) == "picoc"]
+        if picoc_files:
+            _syntax_check(picoc_files)
         if not files:
             return
 
@@ -92,10 +96,11 @@ class OptionHandler:
                 preprocessed_code = self._preprocess(path)
                 return self._compl(preprocessed_code)
             case "reti_blocks":
-                # convert reti_blocks to ast
-                # lock for .json_file
-                # convert datatype to string with build_ast_from_string
-                pass
+                # TODO: Add external .reti_blocks dependency loading here.
+                # For now, dependency metadata only supports .picoc files.
+                print(f"filename: {path}")
+                print("External '.reti_blocks' inputs are not supported yet")
+                exit(1)
             case _:
                 print(f"filename: {path}")
                 print(f"File with extension '.{extension}' is not supported")
@@ -636,6 +641,91 @@ def open_documentation():
         subprocess.call(("xdg-open", filepath))
     else:
         print("OS not supported.")
+
+
+def _expand_dependency_metadata(files: List[str]) -> List[str]:
+    if not files or get_ext(files[0]) != "picoc":
+        return files
+
+    dependencies = _read_dependency_metadata(files[0])
+    if not dependencies:
+        return files
+
+    seen = set()
+    expanded = []
+    for path in files + dependencies:
+        key = os.path.abspath(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        expanded.append(path)
+    return expanded
+
+
+def _read_dependency_metadata(source_path: str) -> List[str]:
+    source_dir = os.path.dirname(source_path) or "."
+    dependencies: List[str] = []
+    in_block_comment = False
+
+    try:
+        with open(source_path, encoding="utf-8") as fin:
+            lines = fin.readlines()
+    except OSError as exc:
+        print(f"[ERROR] Could not read dependency metadata from '{source_path}': {exc}")
+        sys.exit(1)
+
+    for line in lines:
+        stripped = line.strip()
+
+        if in_block_comment:
+            if "*/" in stripped:
+                in_block_comment = False
+            continue
+        if not stripped:
+            continue
+        if stripped.startswith("/*"):
+            in_block_comment = "*/" not in stripped
+            continue
+
+        match = re.match(r"^\s*//\s*dependencies\s*:\s*(.*?)\s*$", line)
+        if match:
+            try:
+                dependency_specs = shlex.split(match.group(1))
+            except ValueError as exc:
+                print(f"[ERROR] Invalid dependencies metadata in '{source_path}': {exc}")
+                sys.exit(1)
+            dependencies.extend(
+                _resolve_dependency_path(source_dir, dependency)
+                for dependency in dependency_specs
+            )
+            continue
+
+        if stripped.startswith("//"):
+            continue
+        break
+
+    return dependencies
+
+
+def _resolve_dependency_path(source_dir: str, dependency: str) -> str:
+    if os.path.isabs(dependency):
+        candidates = [dependency]
+    else:
+        candidates = [dependency, os.path.join(source_dir, dependency)]
+
+    for candidate in candidates:
+        if os.path.isfile(candidate):
+            resolved = os.path.normpath(candidate)
+            if get_ext(resolved) != "picoc":
+                print(
+                    f"[ERROR] Dependency '{dependency}' has unsupported extension. "
+                    "Only .picoc dependencies are supported right now."
+                )
+                sys.exit(1)
+            return resolved
+
+    print(f"[ERROR] Dependency '{dependency}' was not found")
+    sys.exit(1)
 
 
 def _get_test_metadata():
