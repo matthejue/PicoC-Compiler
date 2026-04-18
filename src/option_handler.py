@@ -279,6 +279,10 @@ class OptionHandler:
                 return "incomplete"
             return None
 
+        def is_struct_scope(scope):
+            struct_symbol = merged_table.get("global", {}).get(scope)
+            return struct_completeness(struct_symbol) == "complete"
+
         def merge_symbol(scope, name, incoming):
             existing = merged_table[scope].get(name)
             if existing is None:
@@ -287,32 +291,33 @@ class OptionHandler:
 
             existing_struct = struct_completeness(existing)
             incoming_struct = struct_completeness(incoming)
+            existing_dt = existing.get("datatype")
+            incoming_dt = incoming.get("datatype")
+
             if existing_struct and incoming_struct:
+                # Structs are compile-time types, so repeated
+                # header-provided definitions can share the existing entry.
+                if existing_struct == "complete" and incoming_struct == "complete":
+                    return
                 # Struct forward declarations are incomplete symbols. A full
                 # struct definition must always win over a forward declaration,
                 # independent of file merge order.
-                if existing_struct == "incomplete" and incoming_struct == "complete":
+                elif existing_struct == "incomplete" and incoming_struct == "complete":
                     merged_table[scope][name] = dict(incoming)
                 elif existing_struct == "complete" and incoming_struct == "incomplete":
                     return
                 elif existing_struct == "incomplete" and incoming_struct == "incomplete":
                     return
-                else:
-                    throw_error(
-                        f"Duplicate definition of struct '{name}' in scope '{scope}'"
-                    )
+            elif is_struct_scope(scope):
+                # Repeated headers duplicate struct attributes too; they are layout
+                # metadata inside the type, not separate runtime symbols.
                 return
-
-            # Duplicate non-struct symbols should not be silently overwritten:
-            # function declarations and definitions currently store the same
-            # symbol-table information, so keeping the existing function symbol
-            # loses nothing. Other duplicate symbols are errors.
-            existing_dt = existing.get("datatype")
-            incoming_dt = incoming.get("datatype")
-            if isinstance(existing_dt, pn.FunDecl) and isinstance(incoming_dt, pn.FunDecl):
+            elif isinstance(existing_dt, pn.FunDecl) and isinstance(incoming_dt, pn.FunDecl):
+                # Repeated declarations are fine; the syntax checker rejects
+                # multiple definitions before symbol tables are merged.
                 return
-
-            throw_error(f"Duplicate symbol '{name}' in scope '{scope}'")
+            else:
+                throw_error(f"Duplicate symbol '{name}' in scope '{scope}'")
 
         # Merge all symbol tables
         for symbol_table in symbol_tables:
