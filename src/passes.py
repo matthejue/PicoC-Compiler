@@ -33,12 +33,75 @@ class Passes:
         self.generated_string_literals = {}
         self.generated_string_defs = []
         self.generated_string_counter = 0
+        self.inline_functions = {}
 
         # RETI_Blocks
         self.instrs_cnt = 0
 
     INT32_MIN = -2147483648
     INT32_MAX = 2147483647
+
+    def _storage_class_specifiers(self, node):
+        return getattr(node, "storage_class_specifiers", [])
+
+    def _is_static_inline(self, node):
+        specifiers = self._storage_class_specifiers(node)
+        return any(isinstance(spec, pn.Static) for spec in specifiers) and any(
+            isinstance(spec, pn.Inline) for spec in specifiers
+        )
+
+    def _collect_inline_functions(self, decls_defs):
+        self.inline_functions = {}
+        for decl_def in decls_defs:
+            match decl_def:
+                case pn.FunDef(_, pn.Name(fun_name), allocs, [pn.Return(exp)]):
+                    if self._is_static_inline(decl_def) and not isinstance(exp, pn.Empty):
+                        self.inline_functions[fun_name] = {
+                            "allocs": allocs,
+                            "return_exp": exp,
+                        }
+
+    def _inline_static_call(self, fun_name, exps):
+        inline_fun = self.inline_functions.get(fun_name)
+        if inline_fun is None:
+            return None
+
+        allocs = inline_fun["allocs"]
+        if len(allocs) != len(exps):
+            return None
+
+        replacements = {}
+        for alloc, exp in zip(allocs, exps):
+            match alloc:
+                case pn.Alloc(_, _, pn.Name(param_name)):
+                    replacements[param_name] = exp
+                case _:
+                    return None
+
+        return self._replace_inline_params(inline_fun["return_exp"], replacements)
+
+    def _replace_inline_params(self, node, replacements):
+        if isinstance(node, pn.Name) and node.val in replacements:
+            return copy.deepcopy(replacements[node.val])
+        if isinstance(node, list):
+            return [self._replace_inline_params(elem, replacements) for elem in node]
+        if isinstance(node, dict):
+            return {
+                key: self._replace_inline_params(value, replacements)
+                for key, value in node.items()
+            }
+        if isinstance(node, pn.ASTNode):
+            node_copy = copy.deepcopy(node)
+            for key, value in vars(node_copy).items():
+                setattr(node_copy, key, self._replace_inline_params(value, replacements))
+            return node_copy
+        return copy.deepcopy(node)
+
+    def _should_omit_inlined_fun_def(self, decl_def):
+        match decl_def:
+            case pn.FunDef(_, pn.Name(fun_name), _, _):
+                return fun_name in self.inline_functions
+        return False
 
     def _is_variadic_params(self, allocs) -> bool:
         return bool(allocs) and isinstance(allocs[-1], pn.VariadicParam)
@@ -284,6 +347,11 @@ class Passes:
                             throw_error(init_pairs)
                 return pn.Struct(init_pairs_shrinked)
             # ----------------------------- L_Fun -----------------------------
+            case pn.Call(pn.Name(fun_name) as name, exps):
+                inline_exp = self._inline_static_call(fun_name, exps)
+                if inline_exp is not None:
+                    return self._picoc_shrink_exp(inline_exp)
+                return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case pn.Call(name, exps):
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case _:
@@ -374,8 +442,11 @@ class Passes:
                 self.generated_string_literals = {}
                 self.generated_string_defs = []
                 self.generated_string_counter = 0
+                self._collect_inline_functions(decls_defs)
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
+                    if self._should_omit_inlined_fun_def(decl_def):
+                        continue
                     match decl_def:
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
@@ -398,6 +469,7 @@ class Passes:
                                     name,
                                     allocs_shrinked,
                                     stmts_shrinked,
+                                    self._storage_class_specifiers(decl_def),
                                 )
                             ]
                         case pn.StructDecl(pn.Name() as name, allocs):
@@ -422,6 +494,7 @@ class Passes:
                                     datatype,
                                     name,
                                     allocs_shrinked,
+                                    self._storage_class_specifiers(decl_def),
                                 )
                             ]
                         case pn.Exp() | pn.Assign():

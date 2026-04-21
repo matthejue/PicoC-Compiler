@@ -160,6 +160,14 @@ class Writeable(ASTNode):
     pass
 
 
+class Inline(ASTNode):
+    pass
+
+
+class Static(ASTNode):
+    pass
+
+
 class IntType(ASTNode):
     pass
 
@@ -589,28 +597,30 @@ class Return(ASTNode):
 
 
 class FunDecl(ASTNode):
-    def __init__(self, datatype, name, allocs):
+    def __init__(self, datatype, name, allocs, storage_class_specifiers=None):
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
+        self.storage_class_specifiers = storage_class_specifiers or []
 
     @property
     def visible(self):
-        return [self.datatype, self.name, self.allocs]
+        return self.storage_class_specifiers + [self.datatype, self.name, self.allocs]
 
     __match_args__ = ("datatype", "name", "allocs")
 
 
 class FunDef(ASTNode):
-    def __init__(self, datatype, name, allocs, stmts_blocks):
+    def __init__(self, datatype, name, allocs, stmts_blocks, storage_class_specifiers=None):
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
         self.stmts_blocks = stmts_blocks
+        self.storage_class_specifiers = storage_class_specifiers or []
 
     @property
     def visible(self):
-        return [self.datatype, self.name, self.allocs, self.stmts_blocks]
+        return self.storage_class_specifiers + [self.datatype, self.name, self.allocs, self.stmts_blocks]
 
     __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
 

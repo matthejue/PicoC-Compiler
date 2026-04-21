@@ -1,0 +1,11 @@
+// in:41
+// expected:42
+
+static inline int add_one(int value) {
+  return value + 1;
+}
+
+void main() {
+  int number = input();
+  print(add_one(number));
+}

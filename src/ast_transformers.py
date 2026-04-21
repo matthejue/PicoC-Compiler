@@ -38,6 +38,13 @@ def _load_ts_language() -> Language:
 _TS_LANGUAGE = _load_ts_language()
 
 
+def _storage_class_specifiers(children):
+    return [child for child in children if isinstance(child, (pn.Inline, pn.Static))]
+
+
+def _without_storage_class_specifiers(children):
+    return [child for child in children if not isinstance(child, (pn.Inline, pn.Static))]
+
 class TransformerPicoC:
     """
     Tree-sitter backed transformer that builds the PicoC AST using the
@@ -183,11 +190,13 @@ class TransformerPicoC:
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
     def function_definition(self, _, children):
+        storage_class_specifiers = _storage_class_specifiers(children)
+        children = _without_storage_class_specifiers(children)
         base_datatype = children[0]
         declarator = children[1]
         match declarator:
             case pn.FunDecl(_, name, allocs):
-                return pn.FunDef(base_datatype, name, allocs, children[2])
+                return pn.FunDef(base_datatype, name, allocs, children[2], storage_class_specifiers)
             case [*fragments, pn.FunDecl(_, name, allocs)]:
                 datatype = base_datatype
                 for fragment in fragments:
@@ -197,9 +206,9 @@ class TransformerPicoC:
                             datatype = pn.PntrDecl(datatype)
                         case _:
                             throw_error(fragment)
-                return pn.FunDef(datatype, name, allocs, children[2])
+                return pn.FunDef(datatype, name, allocs, children[2], storage_class_specifiers)
             case [pn.Name() as name, params]:
-                return pn.FunDef(base_datatype, name, params, children[2])
+                return pn.FunDef(base_datatype, name, params, children[2], storage_class_specifiers)
         throw_error(declarator)
 
     def function_declarator(self, _, children):
@@ -248,6 +257,8 @@ class TransformerPicoC:
         return children
 
     def declaration(self, _, children):
+        storage_class_specifiers = _storage_class_specifiers(children)
+        children = _without_storage_class_specifiers(children)
         if len(children) == 2:
             type_qual = pn.Writeable()
             base_datatype, init_or_decl = children
@@ -261,7 +272,7 @@ class TransformerPicoC:
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
                 return pn.Assign(pn.Alloc(type_qual, full_datatype, name), val)
             case pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs):
-                return pn.FunDecl(base_datatype, name, allocs)
+                return pn.FunDecl(base_datatype, name, allocs, storage_class_specifiers)
             case [*fragments, pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs)]:
                 full_datatype = base_datatype
                 for fragment in fragments:
@@ -270,7 +281,7 @@ class TransformerPicoC:
                             full_datatype = pn.PntrDecl(full_datatype)
                         case _:
                             throw_error(fragment)
-                return pn.FunDecl(full_datatype, name, allocs)
+                return pn.FunDecl(full_datatype, name, allocs, storage_class_specifiers)
             case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
                 return pn.Exp(pn.Alloc(type_qual, full_datatype, name))
@@ -280,6 +291,15 @@ class TransformerPicoC:
         match self.value(node):
             case "const":
                 return pn.Const()
+            case _:
+                throw_error(self.value(node))
+
+    def storage_class_specifier(self, node, _):
+        match self.value(node):
+            case "inline":
+                return pn.Inline()
+            case "static":
+                return pn.Static()
             case _:
                 throw_error(self.value(node))
 
