@@ -10,6 +10,7 @@ from src import global_vars
 import copy
 from bitstring import Bits
 from inspect import isclass
+import sys
 
 
 class Passes:
@@ -40,23 +41,23 @@ class Passes:
     INT32_MIN = -2147483648
     INT32_MAX = 2147483647
 
-    def _storage_class_specifiers(self, node):
-        return getattr(node, "storage_class_specifiers", [])
-
     def _is_static_inline(self, node):
-        specifiers = self._storage_class_specifiers(node)
-        return any(isinstance(spec, pn.Static) for spec in specifiers) and any(
-            isinstance(spec, pn.Inline) for spec in specifiers
-        )
+        specifiers = getattr(node, "storage_class_specifiers", [])
+        # C allows both orders: static inline and inline static.
+        if specifiers == [pn.Inline()]:
+            throw_error("'inline' functions without 'static' are not supported")
+        return specifiers in ([pn.Static(), pn.Inline()], [pn.Inline(), pn.Static()])
 
     def _collect_inline_functions(self, decls_defs):
         self.inline_functions = {}
         for decl_def in decls_defs:
             match decl_def:
-                case pn.FunDef(_, pn.Name(fun_name), allocs, stmts):
+                case pn.FunDef(_, _, pn.Name(fun_name), allocs, stmts):
                     if not self._is_static_inline(decl_def):
                         continue
                     match stmts:
+                        # Excludes variadic functions like f(int x, ...);
+                        # the simple inliner only substitutes named params.
                         case [pn.Return(exp)] if (
                             not isinstance(exp, pn.Empty)
                             and all(isinstance(alloc, pn.Alloc) for alloc in allocs)
@@ -74,9 +75,6 @@ class Passes:
             return None
 
         allocs = inline_fun["allocs"]
-        if len(allocs) != len(exps):
-            return None
-
         replacements = {}
         for alloc, exp in zip(allocs, exps):
             match alloc:
@@ -88,25 +86,28 @@ class Passes:
         return self._replace_inline_params(inline_fun["return_exp"], replacements)
 
     def _replace_inline_params(self, node, replacements):
-        if isinstance(node, pn.Name) and node.val in replacements:
-            return copy.deepcopy(replacements[node.val])
-        if isinstance(node, list):
-            return [self._replace_inline_params(elem, replacements) for elem in node]
-        if isinstance(node, dict):
-            return {
-                key: self._replace_inline_params(value, replacements)
-                for key, value in node.items()
-            }
-        if isinstance(node, pn.ASTNode):
-            node_copy = copy.deepcopy(node)
-            for key, value in vars(node_copy).items():
-                setattr(node_copy, key, self._replace_inline_params(value, replacements))
-            return node_copy
-        return copy.deepcopy(node)
+        match node:
+            # Handles return arg; directly, and Name attributes reached while
+            # walking a bigger return expression like return arg + 1;.
+            case pn.Name(val) if val in replacements:
+                return copy.deepcopy(replacements[val])
+            # Handles list attributes reached while walking an AST node, e.g.
+            # the argument list in Call(..., exps).
+            case list():
+                return [self._replace_inline_params(elem, replacements) for elem in node]
+            # Walk a compound expression node, e.g. BinOp(left, op, right). Its
+            # attributes are passed back into this function and may hit cases above.
+            case pn.ASTNode():
+                node_copy = copy.deepcopy(node)
+                for key, value in vars(node_copy).items():
+                    setattr(node_copy, key, self._replace_inline_params(value, replacements))
+                return node_copy
+            case _:
+                return copy.deepcopy(node)
 
     def _should_omit_inlined_fun_def(self, decl_def):
         match decl_def:
-            case pn.FunDef(_, pn.Name(fun_name), _, _):
+            case pn.FunDef(_, _, pn.Name(fun_name), _, _):
                 return fun_name in self.inline_functions
         return False
 
@@ -371,7 +372,7 @@ class Passes:
                 return pn.ArrayDecl(const_shrunk, self._picoc_shrink_datatype(inner_dt))
             case pn.PntrDecl(inner_dt):
                 return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
-            case pn.FunDecl(ret_dt, name, allocs):
+            case pn.FunDecl(_, ret_dt, name, allocs):
                 if allocs and isinstance(allocs[0], pn.VoidType):
                     allocs_shrunk = []
                 else:
@@ -381,7 +382,7 @@ class Passes:
                         else a
                         for a in allocs
                     ]
-                return pn.FunDecl(ret_dt, name, allocs_shrunk)
+                return pn.FunDecl([], ret_dt, name, allocs_shrunk)
             case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
                 return datatype
             case _:
@@ -457,7 +458,7 @@ class Passes:
                     match decl_def:
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
-                        case pn.FunDef(datatype, pn.Name() as name, allocs, stmts):
+                        case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts):
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
@@ -472,11 +473,11 @@ class Passes:
                                 ]
                             decls_defs_shrinked += [
                                 pn.FunDef(
+                                    storage_class_specifiers,
                                     datatype,
                                     name,
                                     allocs_shrinked,
                                     stmts_shrinked,
-                                    self._storage_class_specifiers(decl_def),
                                 )
                             ]
                         case pn.StructDecl(pn.Name() as name, allocs):
@@ -486,7 +487,7 @@ class Passes:
                             decls_defs_shrinked += [
                                 pn.StructDecl(name, allocs_shrinked)
                             ]
-                        case pn.FunDecl(datatype, pn.Name() as name, allocs):
+                        case pn.FunDecl(storage_class_specifiers, datatype, pn.Name() as name, allocs):
                             if allocs and isinstance(allocs[0], pn.VoidType):
                                 allocs_shrinked = []
                             else:
@@ -498,10 +499,10 @@ class Passes:
                                 ]
                             decls_defs_shrinked += [
                                 pn.FunDecl(
+                                    storage_class_specifiers,
                                     datatype,
                                     name,
                                     allocs_shrinked,
-                                    self._storage_class_specifiers(decl_def),
                                 )
                             ]
                         case pn.Exp() | pn.Assign():
@@ -743,7 +744,7 @@ class Passes:
     def _picoc_blocks_def(self, decl_def):
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
-            case pn.FunDef(datatype, pn.Name(val) as name, allocs, stmts):
+            case pn.FunDef(storage_class_specifiers, datatype, pn.Name(val) as name, allocs, stmts):
                 fun_name = val
                 blocks = dict()
                 processed_stmts = []
@@ -756,6 +757,7 @@ class Passes:
                 self.all_blocks |= blocks
                 return [
                     pn.FunDef(
+                        storage_class_specifiers,
                         datatype,
                         name,
                         allocs,
@@ -898,7 +900,7 @@ class Passes:
         self.symbol_table.declare(
             "input",
             {
-                "datatype": pn.FunDecl(pn.IntType(), pn.Name("input"), []),
+                "datatype": pn.FunDecl([], pn.IntType(), pn.Name("input"), []),
                 "name": "input",
                 "param_size": 0,
             },
@@ -911,7 +913,7 @@ class Passes:
         self.symbol_table.declare(
             "print",
             {
-                "datatype": pn.FunDecl(pn.VoidType(), pn.Name("print"), []),
+                "datatype": pn.FunDecl([], pn.VoidType(), pn.Name("print"), []),
                 "name": "print",
                 "param_size": 0,
             },
@@ -1187,7 +1189,7 @@ class Passes:
                     scope=self.current_scope,
                 )
                 return []
-            case pn.FunDecl(datatype, pn.Name(fun_name), allocs):
+            case pn.FunDecl(_, datatype, pn.Name(fun_name), allocs):
                 param_size = self._param_size(allocs)
                 self.symbol_table.declare(
                     fun_name,
@@ -1200,7 +1202,7 @@ class Passes:
                     scope="global",
                 )
                 return []
-            case pn.FunDef(datatype, pn.Name(fun_name) as name, allocs, blocks):
+            case pn.FunDef(_, datatype, pn.Name(fun_name) as name, allocs, blocks):
                 fun_blocks_out = []
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
@@ -1216,7 +1218,7 @@ class Passes:
                     self.symbol_table.declare(
                         fun_name,
                         {
-                            "datatype": pn.FunDecl(datatype, name, allocs),
+                            "datatype": pn.FunDecl([], datatype, name, allocs),
                             "name": fun_name,
                             "param_size": param_size,
                             "variadic": self._is_variadic_params(allocs),
@@ -1497,7 +1499,7 @@ class Passes:
                     self._picoc_type_exp(inner_exp)
                 symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
                 match symbol:
-                    case {"datatype": pn.FunDecl(ret_dt, _, _)}:
+                    case {"datatype": pn.FunDecl(_, ret_dt, _, _)}:
                         exp.datatype = copy.deepcopy(ret_dt)
                         return copy.deepcopy(ret_dt)
                     case _:
@@ -1794,7 +1796,7 @@ class Passes:
                 symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
                 datatype = symbol["datatype"]
                 match datatype:
-                    case pn.FunDecl(datatype2, pn.Name()):
+                    case pn.FunDecl(_, datatype2, pn.Name()):
                         return_type = datatype2
                     case _:
                         throw_error(datatype)

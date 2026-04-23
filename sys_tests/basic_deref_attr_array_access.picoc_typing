@@ -1,8 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('6')
-  Assign(Stackframe(Num('3'), StructSpec(Name('Data'))), Struct([Assign(Name('arr0'), Array([Num('1'), Num('2')], Empty())), Assign(Name('arr1'), Array([Num('3'), Call(Name('input'), [])], Empty()))], Empty()))
-  Assign(Stackframe(Num('4'), PntrDecl(StructSpec(Name('Data')))), Ref(Stackframe(Num('3'), StructSpec(Name('Data'))), StructSpec(Name('Data'))))
-  Assign(Stackframe(Num('5'), IntType()), Deref(Attr(Deref(Stackframe(Num('4'), PntrDecl(StructSpec(Name('Data')))), Num('0'), PntrDecl(StructSpec(Name('Data')))), Name('arr1'), StructSpec(Name('Data'))), Num('1'), ArrayDecl(Num('2'), IntType())))
-  Exp(Call(Name('print'), [Stackframe(Num('5'), IntType())]), Empty())
-  Return(Empty())

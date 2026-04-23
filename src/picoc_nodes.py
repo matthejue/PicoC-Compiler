@@ -161,11 +161,13 @@ class Writeable(ASTNode):
 
 
 class Inline(ASTNode):
-    pass
+    def __eq__(self, other):
+        return isinstance(other, Inline)
 
 
 class Static(ASTNode):
-    pass
+    def __eq__(self, other):
+        return isinstance(other, Static)
 
 
 class IntType(ASTNode):
@@ -597,32 +599,32 @@ class Return(ASTNode):
 
 
 class FunDecl(ASTNode):
-    def __init__(self, datatype, name, allocs, storage_class_specifiers=None):
+    def __init__(self, storage_class_specifiers, datatype, name, allocs):
+        self.storage_class_specifiers = storage_class_specifiers
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
-        self.storage_class_specifiers = storage_class_specifiers or []
 
     @property
     def visible(self):
         return self.storage_class_specifiers + [self.datatype, self.name, self.allocs]
 
-    __match_args__ = ("datatype", "name", "allocs")
+    __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs")
 
 
 class FunDef(ASTNode):
-    def __init__(self, datatype, name, allocs, stmts_blocks, storage_class_specifiers=None):
+    def __init__(self, storage_class_specifiers, datatype, name, allocs, stmts_blocks):
+        self.storage_class_specifiers = storage_class_specifiers
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
         self.stmts_blocks = stmts_blocks
-        self.storage_class_specifiers = storage_class_specifiers or []
 
     @property
     def visible(self):
         return self.storage_class_specifiers + [self.datatype, self.name, self.allocs, self.stmts_blocks]
 
-    __match_args__ = ("datatype", "name", "allocs", "stmts_blocks")
+    __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs", "stmts_blocks")
 
 
 class NewStackframe(ASTNode):

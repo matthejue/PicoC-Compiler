@@ -1,7 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('0')
-  Exp(Call(Name('print'), [BinOp(Num('1'), Add(), BinOp(Num('2'), Add(), BinOp(Num('3'), Add(), BinOp(Num('4'), Add(), BinOp(Num('5'), Add(), BinOp(Num('6'), Add(), Num('7')))))))]), Empty())
-  Exp(Call(Name('print'), [BinOp(BinOp(BinOp(BinOp(Num('1'), Add(), Num('2')), Add(), BinOp(Num('3'), Add(), Num('4'))), Add(), BinOp(Num('5'), Add(), Num('6'))), Add(), Num('7'))]), Empty())
-  Exp(Call(Name('print'), [BinOp(BinOp(BinOp(BinOp(BinOp(BinOp(Num('1'), Add(), Num('2')), Add(), Num('3')), Add(), Num('4')), Add(), Num('5')), Add(), Num('6')), Add(), Num('7'))]), Empty())
-  Return(Empty())

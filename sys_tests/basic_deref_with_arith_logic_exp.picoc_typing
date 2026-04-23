@@ -1,6 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('2')
-  Assign(Stackframe(Num('1'), ArrayDecl(Num('2'), IntType())), Array([Num('1'), Call(Name('input'), [])], Empty()))
-  Exp(Call(Name('print'), [Deref(Stackframe(Num('1'), ArrayDecl(Num('2'), IntType())), BinOp(ToBool(Num('1')), LogicAnd(), ToBool(BinOp(Num('0'), Add(), Num('1')))), ArrayDecl(Num('2'), IntType()))]), Empty())
-  Return(Empty())

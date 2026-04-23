@@ -195,9 +195,9 @@ class TransformerPicoC:
         base_datatype = children[0]
         declarator = children[1]
         match declarator:
-            case pn.FunDecl(_, name, allocs):
-                return pn.FunDef(base_datatype, name, allocs, children[2], storage_class_specifiers)
-            case [*fragments, pn.FunDecl(_, name, allocs)]:
+            case pn.FunDecl(_, _, name, allocs):
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, allocs, children[2])
+            case [*fragments, pn.FunDecl(_, _, name, allocs)]:
                 datatype = base_datatype
                 for fragment in fragments:
                     match fragment:
@@ -206,15 +206,15 @@ class TransformerPicoC:
                             datatype = pn.PntrDecl(datatype)
                         case _:
                             throw_error(fragment)
-                return pn.FunDef(datatype, name, allocs, children[2], storage_class_specifiers)
+                return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2])
             case [pn.Name() as name, params]:
-                return pn.FunDef(base_datatype, name, params, children[2], storage_class_specifiers)
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2])
         throw_error(declarator)
 
     def function_declarator(self, _, children):
         match children:
             case [pn.Name() as name, params]:
-                return pn.FunDecl(pn.Placeholder(), name, params)
+                return pn.FunDecl([], pn.Placeholder(), name, params)
         return children
 
     def identifier(self, node, _):
@@ -271,9 +271,9 @@ class TransformerPicoC:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
                 return pn.Assign(pn.Alloc(type_qual, full_datatype, name), val)
-            case pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs):
-                return pn.FunDecl(base_datatype, name, allocs, storage_class_specifiers)
-            case [*fragments, pn.FunDecl(pn.Placeholder(), pn.Name() as name, allocs)]:
+            case pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs):
+                return pn.FunDecl(storage_class_specifiers, base_datatype, name, allocs)
+            case [*fragments, pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs)]:
                 full_datatype = base_datatype
                 for fragment in fragments:
                     match fragment:
@@ -281,7 +281,7 @@ class TransformerPicoC:
                             full_datatype = pn.PntrDecl(full_datatype)
                         case _:
                             throw_error(fragment)
-                return pn.FunDecl(full_datatype, name, allocs, storage_class_specifiers)
+                return pn.FunDecl(storage_class_specifiers, full_datatype, name, allocs)
             case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
                 return pn.Exp(pn.Alloc(type_qual, full_datatype, name))

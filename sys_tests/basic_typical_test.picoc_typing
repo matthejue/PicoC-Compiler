@@ -1,6 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('0')
-  Exp(Call(Name('print'), [BinOp(Call(Name('input'), []), Mul(), Call(Name('input'), []))]), Empty())
-  Exp(Call(Name('print'), [BinOp(Call(Name('input'), []), Mul(), Call(Name('input'), []))]), Empty())
-  Return(Empty())

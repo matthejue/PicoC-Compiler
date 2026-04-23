@@ -1,7 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('4')
-  Assign(Stackframe(Num('1'), ArrayDecl(Num('2'), StructSpec(Name('st')))), Array([Struct([Assign(Name('attr'), Num('314'))], Empty()), Struct([Assign(Name('attr'), Num('42'))], Empty())], Empty()))
-  Assign(Stackframe(Num('3'), ArrayDecl(Num('1'), ArrayDecl(Num('2'), PntrDecl(ArrayDecl(Num('2'), StructSpec(Name('st'))))))), Array([Array([Ref(Stackframe(Num('1'), ArrayDecl(Num('2'), StructSpec(Name('st')))), Empty()), Ref(Stackframe(Num('1'), ArrayDecl(Num('2'), StructSpec(Name('st')))), Empty())], Empty())], Empty()))
-  Exp(Call(Name('print'), [Attr(Deref(Deref(Deref(Deref(Stackframe(Num('3'), ArrayDecl(Num('1'), ArrayDecl(Num('2'), PntrDecl(ArrayDecl(Num('2'), StructSpec(Name('st'))))))), Num('0'), Empty()), Num('1'), Empty()), Num('0'), Empty()), Num('1'), Empty()), Name('attr'), Empty())]), Empty())
-  Return(Empty())

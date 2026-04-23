@@ -1,7 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('2')
-  Assign(Stackframe(Num('0'), ArrayDecl(Num('1'), IntType())), Array([Num('42')], Empty()))
-  Assign(Stackframe(Num('1'), StructSpec(Name('st'))), Struct([Assign(Name('ar'), Ref(Stackframe(Num('0'), ArrayDecl(Num('1'), IntType())), Empty()))], Empty()))
-  Exp(Call(Name('print'), [Deref(Deref(Attr(Stackframe(Num('1'), StructSpec(Name('st'))), Name('ar'), Empty()), Num('0'), Empty()), BinOp(Num('2'), Sub(), Num('2')), Empty())]), Empty())
-  Return(Empty())

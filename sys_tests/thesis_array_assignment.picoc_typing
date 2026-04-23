@@ -1,7 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('2')
-  Exp(Alloc(Writeable(), ArrayDecl(Num('2'), IntType()), Name('ar'), 'local_var'), Empty())
-  Assign(Deref(Stackframe(Num('1'), ArrayDecl(Num('2'), IntType())), Num('1'), ArrayDecl(Num('2'), IntType())), Num('42'))
-  Exp(Call(Name('print'), [Deref(Stackframe(Num('1'), ArrayDecl(Num('2'), IntType())), Num('1'), ArrayDecl(Num('2'), IntType()))]), Empty())
-  Return(Empty())

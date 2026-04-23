@@ -1,7 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('3')
-  Exp(Alloc(Writeable(), StructSpec(Name('st')), Name('st_var'), 'local_var'), Empty())
-  Assign(Deref(Attr(Stackframe(Num('2'), StructSpec(Name('st'))), Name('ar'), Empty()), Num('1'), Empty()), Num('42'))
-  Exp(Call(Name('print'), [Deref(Attr(Stackframe(Num('2'), StructSpec(Name('st'))), Name('ar'), Empty()), Num('1'), Empty())]), Empty())
-  Return(Empty())

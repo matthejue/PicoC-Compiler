@@ -1,6 +1,0 @@
-_global_inits:
-main:
-  StackMalloc('2')
-  Assign(Stackframe(Num('1'), StructSpec(Name('ExStrc'))), Struct([Assign(Name('attr1'), Char('c')), Assign(Name('attr2'), Num('12'))], Empty()))
-  Exp(Call(Name('print'), [Attr(Stackframe(Num('1'), StructSpec(Name('ExStrc'))), Name('attr2'), Empty())]), Empty())
-  Return(Empty())
