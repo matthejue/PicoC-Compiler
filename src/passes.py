@@ -10,7 +10,6 @@ from src import global_vars
 import copy
 from bitstring import Bits
 from inspect import isclass
-import sys
 
 
 class Passes:
@@ -54,12 +53,20 @@ class Passes:
         self.inline_functions = {}
         for decl_def in decls_defs:
             match decl_def:
-                case pn.FunDef(_, pn.Name(fun_name), allocs, [pn.Return(exp)]):
-                    if self._is_static_inline(decl_def) and not isinstance(exp, pn.Empty):
-                        self.inline_functions[fun_name] = {
-                            "allocs": allocs,
-                            "return_exp": exp,
-                        }
+                case pn.FunDef(_, pn.Name(fun_name), allocs, stmts):
+                    if not self._is_static_inline(decl_def):
+                        continue
+                    match stmts:
+                        case [pn.Return(exp)] if (
+                            not isinstance(exp, pn.Empty)
+                            and all(isinstance(alloc, pn.Alloc) for alloc in allocs)
+                        ):
+                            self.inline_functions[fun_name] = {
+                                "allocs": allocs,
+                                "return_exp": exp,
+                            }
+                        case _:
+                            pass
 
     def _inline_static_call(self, fun_name, exps):
         inline_fun = self.inline_functions.get(fun_name)
