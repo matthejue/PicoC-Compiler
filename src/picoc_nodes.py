@@ -224,6 +224,30 @@ class UnOp(ASTNode):
     __match_args__ = ("un_op", "exp", "datatype")
 
 
+class PostInc(ASTNode):
+    def __init__(self, exp, datatype=None):
+        self.exp = exp
+        self.datatype = datatype if datatype else Empty()
+
+    @property
+    def visible(self):
+        return _add_if_double_verbose([self.exp], self.datatype)
+
+    __match_args__ = ("exp", "datatype")
+
+
+class PostDec(ASTNode):
+    def __init__(self, exp, datatype=None):
+        self.exp = exp
+        self.datatype = datatype if datatype else Empty()
+
+    @property
+    def visible(self):
+        return _add_if_double_verbose([self.exp], self.datatype)
+
+    __match_args__ = ("exp", "datatype")
+
+
 class Cast(ASTNode):
     def __init__(self, datatype, exp):
         self.datatype = datatype

@@ -1,4 +1,3 @@
-import copy
 import ctypes
 from pathlib import Path
 from typing import Sequence
@@ -358,15 +357,9 @@ class TransformerPicoC:
 
         match op:
             case "++":
-                return pn.Assign(
-                    operand,
-                    pn.BinOp(copy.deepcopy(operand), pn.Add(), pn.Num("1")),
-                )
+                return pn.PostInc(operand)
             case "--":
-                return pn.Assign(
-                    operand,
-                    pn.BinOp(copy.deepcopy(operand), pn.Sub(), pn.Num("1")),
-                )
+                return pn.PostDec(operand)
         throw_error(f"Unsupported update operator '{op}'")
 
     def expression_statement(self, _, children):

@@ -277,6 +277,10 @@ class Passes:
                 return pn.BinOp(left_shrunk, bin_op, right_shrunk)
             case pn.UnOp(un_op, exp):
                 return pn.UnOp(un_op, self._picoc_shrink_exp(exp))
+            case pn.PostInc(exp):
+                return pn.PostInc(self._picoc_shrink_exp(exp))
+            case pn.PostDec(exp):
+                return pn.PostDec(self._picoc_shrink_exp(exp))
             case pn.Cast(datatype, exp):
                 return pn.Cast(datatype, self._picoc_shrink_exp(exp))
             case pn.SizeOf():
@@ -959,6 +963,10 @@ class Passes:
                 )
             case pn.UnOp(un_op, inner_exp):
                 return pn.UnOp(un_op, self._picoc_rewrite_exp(inner_exp))
+            case pn.PostInc(inner_exp):
+                return pn.PostInc(self._picoc_rewrite_exp(inner_exp))
+            case pn.PostDec(inner_exp):
+                return pn.PostDec(self._picoc_rewrite_exp(inner_exp))
             case pn.Cast(datatype, exp):
                 return pn.Cast(datatype, self._picoc_rewrite_exp(exp))
             case pn.ToBool(inner_exp):
@@ -1445,6 +1453,10 @@ class Passes:
                 _ = self._picoc_type_exp(inner_exp)
                 exp.datatype = pn.IntType()
                 return pn.IntType()
+            case pn.PostInc(inner_exp) | pn.PostDec(inner_exp):
+                inner_dt = self._picoc_type_exp(inner_exp)
+                exp.datatype = copy.deepcopy(inner_dt)
+                return copy.deepcopy(inner_dt)
             case pn.SizeOf(exp_datatype):
                 # _ = self._picoc_type_exp(exp_datatype)
                 exp.datatype = pn.IntType()
@@ -1733,6 +1745,24 @@ class Passes:
                         if val == "2147483648":
                             return [pn.Exp(pn.Num("-2147483648"))]
                 return exps_anf + [pn.Exp(pn.UnOp(un_op, pn.Stack(pn.Num("1"))))]
+            case pn.PostInc(inner_exp):
+                exp_anf = self._picoc_anf_exp(copy.deepcopy(inner_exp))
+                assign_anf = self._picoc_anf_stmt(
+                    pn.Assign(
+                        copy.deepcopy(inner_exp),
+                        pn.BinOp(copy.deepcopy(inner_exp), pn.Add(), pn.Num("1")),
+                    )
+                )
+                return exp_anf + assign_anf
+            case pn.PostDec(inner_exp):
+                exp_anf = self._picoc_anf_exp(copy.deepcopy(inner_exp))
+                assign_anf = self._picoc_anf_stmt(
+                    pn.Assign(
+                        copy.deepcopy(inner_exp),
+                        pn.BinOp(copy.deepcopy(inner_exp), pn.Sub(), pn.Num("1")),
+                    )
+                )
+                return exp_anf + assign_anf
             case pn.Cast(datatype, inner_exp):
                 inner_dt = self._exp_result_datatype(inner_exp)
                 exps_anf = self._picoc_anf_exp(inner_exp, addr_calc=addr_calc)
