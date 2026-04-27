@@ -1,0 +1,23 @@
+// in:0 5
+// expected:1 4
+
+int func_return_bool(int val) {
+  return val;
+}
+
+void main() {
+  int val1 = input();
+  int val2 = input();
+
+  if (!func_return_bool(val1)) {
+    print(1);
+  } else {
+    print(2);
+  }
+
+  if (!func_return_bool(val2)) {
+    print(3);
+  } else {
+    print(4);
+  }
+}
