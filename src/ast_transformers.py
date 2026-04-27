@@ -129,6 +129,7 @@ class TransformerPicoC:
                 | pn.Num()
                 | pn.Name()
                 | pn.Char()
+                | pn.Call()
             ):
                 return pn.ToBool(node)
         throw_error(node)
