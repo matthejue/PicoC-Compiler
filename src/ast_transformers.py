@@ -1,3 +1,4 @@
+import copy
 import ctypes
 from pathlib import Path
 from typing import Sequence
@@ -350,6 +351,23 @@ class TransformerPicoC:
         if isinstance(bin_node, (pn.LogicAnd, pn.LogicOr)):
             return pn.BinOp(self._to_bool(left), bin_node, self._to_bool(right))
         return pn.BinOp(left, bin_node, right)
+
+    def update_expression(self, node, children):
+        operand = children[0]
+        op = self.operator(node)
+
+        match op:
+            case "++":
+                return pn.Assign(
+                    operand,
+                    pn.BinOp(copy.deepcopy(operand), pn.Add(), pn.Num("1")),
+                )
+            case "--":
+                return pn.Assign(
+                    operand,
+                    pn.BinOp(copy.deepcopy(operand), pn.Sub(), pn.Num("1")),
+                )
+        throw_error(f"Unsupported update operator '{op}'")
 
     def expression_statement(self, _, children):
         match children[0]:

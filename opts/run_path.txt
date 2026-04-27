@@ -1,1 +1,1 @@
-./sys_tests/basic_variadic_function_syntax.picoc
+./sys_tests/advanced_increment.picoc
