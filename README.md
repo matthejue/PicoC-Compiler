@@ -27,6 +27,90 @@
 <!-- · -->
 <!-- <a href="./doc/help-page.txt">Usage</a> -->
 
+## Local Tree-sitter Parsers
+
+The repository vendors the custom Tree-sitter grammars for RETI and PicoC in:
+
+- `vendor/tree-sitter-reti`
+- `vendor/tree-sitter-picoc`
+
+To generate and build the parser libraries, change into each directory and run the Tree-sitter commands there.
+
+For RETI:
+
+```bash
+cd /path/to/repo/vendor/tree-sitter-reti
+tree-sitter generate
+tree-sitter build -o reti.so
+```
+
+For PicoC:
+
+```bash
+cd /path/to/repo/vendor/tree-sitter-picoc
+tree-sitter generate
+tree-sitter build -o picoc.so
+```
+
+This produces the shared libraries expected by the local Neovim setup described below.
+
+## Neovim Tree-sitter Setup
+
+To get syntax highlighting for `.reti`, `.picoc`, and `.header` files in Neovim, paste the following code into your `init.lua`:
+
+```lua
+local function register_local_parser(lang, parser_dir, query_names, extensions)
+  local parser_path = vim.fs.joinpath(parser_dir, lang .. ".so")
+  local filetype_extensions = {}
+
+  for _, extension in ipairs(extensions or { lang }) do
+    filetype_extensions[extension] = lang
+  end
+
+  vim.filetype.add({
+    extension = filetype_extensions,
+  })
+
+  vim.treesitter.language.register(lang, { lang })
+
+  if vim.uv.fs_stat(parser_path) then
+    local ok, err = vim.treesitter.language.add(lang, {
+      path = parser_path,
+    })
+    if not ok then
+      vim.notify("Failed to load " .. lang .. " treesitter parser: " .. err, vim.log.levels.WARN)
+    end
+  else
+    vim.notify("Missing treesitter parser library: " .. parser_path, vim.log.levels.WARN)
+  end
+
+  for _, query_name in ipairs(query_names) do
+    local query_file = vim.fs.joinpath(parser_dir, "queries", query_name .. ".scm")
+    if vim.uv.fs_stat(query_file) then
+      local lines = vim.fn.readfile(query_file)
+      if #lines > 0 then
+        vim.treesitter.query.set(lang, query_name, table.concat(lines, "\n"))
+      end
+    end
+  end
+end
+
+register_local_parser(
+  "picoc",
+  "/path/to/repo/vendor/tree-sitter-picoc",
+  { "highlights", "tags" },
+  { "picoc", "header" }
+)
+register_local_parser("reti", "/path/to/repo/vendor/tree-sitter-reti", { "highlights" })
+```
+
+This configuration:
+
+- registers the local parser shared libraries
+- maps `.picoc` and `.header` files to the `picoc` parser
+- maps `.reti` files to the `reti` parser
+- loads the vendored Tree-sitter query files for highlighting and tags
+
 ## Compiler Pipeline Overview
 
 This section summarizes how the compiler processes PicoC source files, covering preprocessing, lexing, parsing, AST passes, and final RETI output.
