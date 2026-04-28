@@ -1,0 +1,25 @@
+{
+  "grammars": [
+    {
+      "name": "reti",
+      "camelcase": "ReTI",
+      "scope": "source.reti",
+      "path": ".",
+      "file-types": [
+        "reti",
+        "reti_blocks",
+        "reti_patch"
+      ],
+      "highlights": "queries/highlights.scm",
+      "injection-regex": "^(reti|reti_blocks|reti_patch)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "RETI grammar for tree-sitter"
+  },
+  "bindings": {
+    "c": true
+  }
+}

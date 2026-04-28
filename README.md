@@ -56,9 +56,11 @@ This produces the shared libraries expected by the local Neovim setup described 
 
 ## Neovim Tree-sitter Setup
 
-To get syntax highlighting for `.reti`, `.picoc`, and `.header` files in Neovim, paste the following code into your `init.lua`:
+To get syntax highlighting for `.reti`, `.reti_blocks`, `.reti_patch`, `.picoc`, and `.header` files in Neovim, paste the following code into your `init.lua`:
 
 ```lua
+local local_treesitter_filetypes = {}
+
 local function register_local_parser(lang, parser_dir, query_names, extensions)
   local parser_path = vim.fs.joinpath(parser_dir, lang .. ".so")
   local filetype_extensions = {}
@@ -71,6 +73,7 @@ local function register_local_parser(lang, parser_dir, query_names, extensions)
     extension = filetype_extensions,
   })
 
+  local_treesitter_filetypes[lang] = true
   vim.treesitter.language.register(lang, { lang })
 
   if vim.uv.fs_stat(parser_path) then
@@ -97,18 +100,34 @@ end
 
 register_local_parser(
   "picoc",
-  "/path/to/repo/vendor/tree-sitter-picoc",
+  "/path/to/repo/PicoC-Compiler/vendor/tree-sitter-picoc",
   { "highlights", "tags" },
   { "picoc", "header" }
 )
-register_local_parser("reti", "/path/to/repo/vendor/tree-sitter-reti", { "highlights" })
+register_local_parser(
+  "reti",
+  "/path/to/repo/PicoC-Compiler/vendor/tree-sitter-reti",
+  { "highlights" },
+  { "reti", "reti_blocks", "reti_patch" }
+)
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("local-treesitter-parsers", { clear = true }),
+  pattern = vim.tbl_keys(local_treesitter_filetypes),
+  callback = function(event)
+    local ok, err = pcall(vim.treesitter.start, event.buf, event.match)
+    if not ok and not tostring(err):match("no parser for") then
+      vim.notify("Failed to start treesitter for " .. event.match .. ": " .. err, vim.log.levels.WARN)
+    end
+  end,
+})
 ```
 
 This configuration:
 
 - registers the local parser shared libraries
 - maps `.picoc` and `.header` files to the `picoc` parser
-- maps `.reti` files to the `reti` parser
+- maps `.reti`, `.reti_blocks`, and `.reti_patch` files to the `reti` parser
 - loads the vendored Tree-sitter query files for highlighting and tags
 
 ## Compiler Pipeline Overview

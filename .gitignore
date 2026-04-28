@@ -15,6 +15,7 @@ README.txt
 *.rast
 *.st_mon
 *.json
+!tree-sitter.json
 *.picoc_shrink
 *.picoc_blocks
 *.picoc_patch
