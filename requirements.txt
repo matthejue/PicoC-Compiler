@@ -1,8 +1,6 @@
 pyinstaller
 bitstring
-cmd2
-lark
-pygments
 pudb
 tree-sitter
-tree-sitter-c @ file:vendor/tree-sitter-c
+tree-sitter-picoc @ file:vendor/tree-sitter-picoc
+tree-sitter-reti @ file:vendor/tree-sitter-reti

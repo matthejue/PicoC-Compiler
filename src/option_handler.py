@@ -5,7 +5,7 @@ from src import debug as db
 import sys
 import shutil
 from src.ast_node import ASTNode
-from src.ast_transformers import TransformerPicoC, ASTTransformerRETI
+from src.ast_transformers import TransformerPicoC
 from src.passes import Passes
 from src.utils.util_funs_dependent import (
     remove_ext,
@@ -14,7 +14,6 @@ from src.utils.util_funs_dependent import (
     get_ext,
 )
 import subprocess, os, platform
-from pygments.lexers.c_cpp import CLexer
 import re
 import argparse
 import shlex

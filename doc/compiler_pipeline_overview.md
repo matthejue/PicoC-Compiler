@@ -30,10 +30,10 @@ The preprocessing stage is implemented in [`src/preprocessor.py`](../src/preproc
 
 The preprocessor is intentionally small. It supports:
 
-- `#include "file.h"`
-  Example: `#include "defs.h"`
-- `#include <file.h>`
-  Example: `#include <stdio.h>`
+- `#include "file.header"`
+  Example: `#include "defs.header"`
+- `#include <file.header>`
+  Example: `#include <stdio.header>`
 - `#pragma once`
   Example: a header with `#pragma once` is only included the first time
 - simple object-like `#define`
@@ -46,16 +46,16 @@ It does not implement full C preprocessing with function-like macros or conditio
 Include resolution depends on whether the include is quoted or angled.
 
 - Quoted includes search:
-  Example: `#include "defs.h"` searches:
+  Example: `#include "defs.header"` searches:
   1. the directory of the including file
   2. the `-I` include paths
   3. the system include paths
 - Angled includes search:
-  Example: `#include <defs.h>` searches:
+  Example: `#include <defs.header>` searches:
   1. the `-I` include paths
   2. the system include paths
 - Absolute include paths are used directly.
-  Example: `#include "/tmp/defs.h"`
+  Example: `#include "/tmp/defs.header"`
 
 ### `#pragma once`
 
@@ -63,9 +63,9 @@ If a file contains `#pragma once`, its canonical path is recorded and future inc
 
 Example:
 
-- `a.picoc` includes `defs.h`
-- `b.picoc` also includes `defs.h`
-- if `defs.h` contains `#pragma once`, the second inclusion produces no output for that file within the same preprocessing run
+- `a.picoc` includes `defs.header`
+- `b.picoc` also includes `defs.header`
+- if `defs.header` contains `#pragma once`, the second inclusion produces no output for that file within the same preprocessing run
 
 ### Macros
 
@@ -90,7 +90,7 @@ The preprocessor distinguishes normal code from comments, strings, and char lite
 
 Examples:
 
-- `// #include "x.h"` is ignored as a comment, not treated as a directive
+- `// #include "x.header"` is ignored as a comment, not treated as a directive
 - `/* #define A 1 */` is ignored as a block comment
 - `" #include <x> "` inside a string is preserved as string content
 - a backslash followed by newline joins physical lines into one logical line

@@ -2,37 +2,35 @@ import ctypes
 from pathlib import Path
 from typing import Sequence
 
-from lark.lexer import Token
-from lark.visitors import Transformer
 from tree_sitter import Language, Parser
 
 from src import global_vars
 from src import picoc_nodes as pn
-from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
 
 
 def _load_ts_language() -> Language:
     """
-    Load the vendored Tree-sitter C grammar (../vendor/tree-sitter-c/c.so)
+    Load the vendored Tree-sitter PicoC grammar
+    (../vendor/tree-sitter-picoc/picoc.so)
     so local grammar changes are used instead of the PyPI wheel.
     """
     grammar_lib = (
         Path(__file__).resolve().parent.parent
         / "vendor"
-        / "tree-sitter-c"
-        / "c.so"
+        / "tree-sitter-picoc"
+        / "picoc.so"
     )
     if not grammar_lib.exists():
         raise FileNotFoundError(
-            f"Tree-sitter C grammar not found at {grammar_lib}. "
-            "Build the grammar in vendor/tree-sitter-c."
+            f"Tree-sitter PicoC grammar not found at {grammar_lib}. "
+            "Build the grammar in vendor/tree-sitter-picoc."
         )
     lib = ctypes.CDLL(str(grammar_lib))
-    if not hasattr(lib, "tree_sitter_c"):
-        raise AttributeError(f"'tree_sitter_c' symbol missing in {grammar_lib}")
-    lib.tree_sitter_c.restype = ctypes.c_void_p
-    return Language(lib.tree_sitter_c())
+    if not hasattr(lib, "tree_sitter_picoc"):
+        raise AttributeError(f"'tree_sitter_picoc' symbol missing in {grammar_lib}")
+    lib.tree_sitter_picoc.restype = ctypes.c_void_p
+    return Language(lib.tree_sitter_picoc())
 
 
 _TS_LANGUAGE = _load_ts_language()
@@ -48,7 +46,7 @@ def _without_storage_class_specifiers(children):
 class TransformerPicoC:
     """
     Tree-sitter backed transformer that builds the PicoC AST using the
-    vendored C grammar from ../vendor/tree-sitter-c.
+    vendored PicoC grammar from ../vendor/tree-sitter-picoc.
     """
 
     def __init__(self):
@@ -525,197 +523,3 @@ class TransformerPicoC:
 
     def abstract_pointer_declarator(self, node, _):
         return len(self._unnamed_children(node))
-    # HERE end
-
-class ASTTransformerRETI(Transformer):
-    # =========================================================================
-    # =                                 Lexer                                 =
-    # =========================================================================
-    # ------------------------------- L_Program -------------------------------
-    def IM(self, token: Token):
-        return rn.Im(token.value)
-
-    def FILENAME(self, token: Token):
-        return pn.Name(token.value)
-
-    def NAME(self, token: Token):
-        return pn.Name(token.value)
-
-    def reg(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "ACC":
-                return rn.Reg(
-                    rn.Acc(
-                        token.value,
-                    )
-                )
-            case "IN1":
-                return rn.Reg(
-                    rn.In1(
-                        token.value,
-                    )
-                )
-            case "IN2":
-                return rn.Reg(
-                    rn.In2(
-                        token.value,
-                    )
-                )
-            case "PC":
-                return rn.Reg(
-                    rn.Pc(
-                        token.value,
-                    )
-                )
-            case "SP":
-                return rn.Reg(
-                    rn.Sp(
-                        token.value,
-                    )
-                )
-            case "BAF":
-                return rn.Reg(
-                    rn.Baf(
-                        token.value,
-                    )
-                )
-            case "CS":
-                return rn.Reg(
-                    rn.Cs(
-                        token.value,
-                    )
-                )
-            case "DS":
-                return rn.Reg(
-                    rn.Ds(
-                        token.value,
-                    )
-                )
-
-    def arg(self, nodes_tokens):
-        return nodes_tokens[0]
-
-    def rel(self, tokens: list[Token]):
-        token = tokens[0]
-        match token.value:
-            case "<":
-                return rn.Lt(
-                    token.value,
-                )
-            case "<=":
-                return rn.LtE(
-                    token.value,
-                )
-            case ">":
-                return rn.Gt(
-                    token.value,
-                )
-            case ">=":
-                return rn.GtE(
-                    token.value,
-                )
-            case "==":
-                return rn.Eq(
-                    token.value,
-                )
-            case "!=":
-                return rn.NEq(
-                    token.value,
-                )
-            case "_NOP":
-                return rn.NOp(
-                    token.value,
-                )
-
-    def ADD(self, token: Token):
-        return rn.Add(token.value)
-
-    def ADDI(self, token: Token):
-        return rn.Addi(token.value)
-
-    def SUB(self, token: Token):
-        return rn.Sub(token.value)
-
-    def SUBI(self, token: Token):
-        return rn.Subi(token.value)
-
-    def MULT(self, token: Token):
-        return rn.Mult(token.value)
-
-    def MULTI(self, token: Token):
-        return rn.Multi(token.value)
-
-    def DIV(self, token: Token):
-        return rn.Div(token.value)
-
-    def DIVI(self, token: Token):
-        return rn.Divi(token.value)
-
-    def MOD(self, token: Token):
-        return rn.Mod(token.value)
-
-    def MODI(self, token: Token):
-        return rn.Modi(token.value)
-
-    def OPLUS(self, token: Token):
-        return rn.Oplus(token.value)
-
-    def OPLUSI(self, token: Token):
-        return rn.Oplusi(token.value)
-
-    def OR(self, token: Token):
-        return rn.Or(token.value)
-
-    def ORI(self, token: Token):
-        return rn.Ori(token.value)
-
-    def AND(self, token: Token):
-        return rn.And(token.value)
-
-    def ANDI(self, token: Token):
-        return rn.Andi(token.value)
-
-    def LOAD(self, token: Token):
-        return rn.Load(token.value)
-
-    def LOADIN(self, token: Token):
-        return rn.Loadin(token.value)
-
-    def LOADI(self, token: Token):
-        return rn.Loadi(token.value)
-
-    def STORE(self, token: Token):
-        return rn.Store(token.value)
-
-    def STOREIN(self, token: Token):
-        return rn.Storein(token.value)
-
-    def MOVE(self, token: Token):
-        return rn.Move(token.value)
-
-    def INT(self, token: Token):
-        return rn.Int(token.value)
-
-    def RTI(self, token: Token):
-        return rn.Rti(token.value)
-
-    # =========================================================================
-    # =                                 Parser                                =
-    # =========================================================================
-    # ------------------------------- L_Program -------------------------------
-    def instr(self, nodes):
-        return rn.Instr(nodes[0], nodes[1:])
-
-    def jump(self, nodes):
-        if len(nodes) == 1:
-            return rn.Jump(rn.Always(), nodes[0])
-        else:  # len(nodes) == 2:
-            return rn.Jump(nodes[0], nodes[1])
-
-    def call(self, nodes):
-        return rn.Call(nodes[0], nodes[1])
-
-    def program(self, nodes):
-        nodes[0].val = global_vars.tstate.path_without_ext + ".rast"
-        return rn.Program(nodes[0], nodes[1:])

@@ -18,8 +18,8 @@ class Mode(Enum):
 
 
 class IncludeKind(Enum):
-    QUOTED = auto()  # #include "file.h"
-    ANGLED = auto()  # #include <file.h>
+    QUOTED = auto()  # #include "file.header"
+    ANGLED = auto()  # #include <file.header>
 
 
 @dataclass

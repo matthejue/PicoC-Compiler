@@ -1,7 +1,6 @@
 from src.ast_node import ASTNode
 from src import picoc_nodes as pn
 from src import global_vars
-from bitstring import Bits
 
 # =========================================================================
 # =                            Container Nodes                            =

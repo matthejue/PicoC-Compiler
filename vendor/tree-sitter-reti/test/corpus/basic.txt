@@ -1,0 +1,62 @@
+==================
+Basic RETI program
+==================
+
+MOVE BAF ACC
+SUBI SP 2
+STOREIN BAF ACC 0
+JUMP== 3
+RTI
+
+---
+
+(source_file
+  (statement
+    (instruction
+      (move_instruction
+        (register)
+        (register))))
+  (statement
+    (instruction
+      (register_immediate_instruction
+        (register_immediate_opcode)
+        (register)
+        (immediate))))
+  (statement
+    (instruction
+      (indexed_memory_instruction
+        (indexed_memory_opcode)
+        (argument
+          (register))
+        (argument
+          (register))
+        (immediate))))
+  (statement
+    (jump
+      (relation)
+      (immediate)))
+  (statement
+    (instruction
+      (return_from_interrupt_instruction))))
+
+=========================
+Comments and bare jumps
+=========================
+
+# expected: 42
+LOADI ACC 0
+JUMP 0
+
+---
+
+(source_file
+  (comment)
+  (statement
+    (instruction
+      (register_immediate_instruction
+        (register_immediate_opcode)
+        (register)
+        (immediate))))
+  (statement
+    (jump
+      (immediate))))

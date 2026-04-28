@@ -8,9 +8,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[("concrete_syntax_picoc.lark", "."),
-           ("concrete_syntax_reti.lark", "."),
-           ("interpr_showcase.vim", "."),
+    datas=[("interpr_showcase.vim", "."),
            ("Bachelorarbeit_Dokumentation_out/Dokumentation.pdf", ".")
     ],
     hiddenimports=[],

@@ -1,6 +1,6 @@
 // in:
 // expected:12
-#include "./include/basic_incl_headerfile.h"
+#include "./include/basic_incl_headerfile.header"
 
 void main() {
   struct ExStrc exstrc = {.attr1='c', .attr2=12};

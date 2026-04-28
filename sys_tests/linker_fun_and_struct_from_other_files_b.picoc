@@ -1,4 +1,4 @@
-#include "./include/linker_fun_and_struct_from_other_files_b.h"
+#include "./include/linker_fun_and_struct_from_other_files_b.header"
 
 int add(int a, int b) {
     return a + b;

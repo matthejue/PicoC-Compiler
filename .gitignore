@@ -1,4 +1,5 @@
 __pycache__/
+.bak/
 dist/
 dist_old/
 dist_old_2/
@@ -37,7 +38,12 @@ README.txt
 *.reti_states
 *.eprom
 *.res
+*.so
 *.cast
 *.gdb_history
 *.venv/
 .virtualenv/
+
+# Generated tree-sitter artifacts for the vendored grammars
+vendor/tree-sitter-picoc/src/
+vendor/tree-sitter-reti/src/

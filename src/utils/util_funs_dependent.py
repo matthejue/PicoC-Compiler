@@ -10,19 +10,6 @@ from src.utils.util_funs_independent import convert_to_single_line
 def overwrite(old, replace_with, idx):
     return old[:idx] + replace_with + old[idx + len(replace_with) :]
 
-
-def tokennames_to_str(tokens: set):
-    tokens = set(global_vars.TOKENNAME_TO_SYMBOL.get(elem, elem) for elem in tokens)
-    return " or ".join(
-        elem
-        for elem in (
-            tokens
-            if global_vars.args.double_verbose
-            else itertools.islice(tokens, global_vars.max_print_out_elements + 1)
-        )
-        if "ANON" not in elem
-    )
-
 NODE_TO_Symbol = {pn.Add: "+", pn.Sub: "-"}
 
 def nodes_to_str(nodes: list):
