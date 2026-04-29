@@ -1,4 +1,5 @@
 import ctypes
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
 
@@ -6,34 +7,51 @@ from tree_sitter import Language, Parser
 
 from src import global_vars
 from src import picoc_nodes as pn
+from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
 
 
-def _load_ts_language() -> Language:
+def _load_ts_language(grammar_dir: str, library_name: str, symbol_name: str) -> Language:
     """
-    Load the vendored Tree-sitter PicoC grammar
-    (../vendor/tree-sitter-picoc/picoc.so)
-    so local grammar changes are used instead of the PyPI wheel.
+    Load a vendored Tree-sitter grammar so local grammar changes are used
+    instead of the PyPI wheel.
     """
     grammar_lib = (
         Path(__file__).resolve().parent.parent
         / "vendor"
-        / "tree-sitter-picoc"
-        / "picoc.so"
+        / grammar_dir
+        / library_name
     )
     if not grammar_lib.exists():
         raise FileNotFoundError(
-            f"Tree-sitter PicoC grammar not found at {grammar_lib}. "
-            "Build the grammar in vendor/tree-sitter-picoc."
+            f"Tree-sitter grammar not found at {grammar_lib}. "
+            f"Build the grammar in vendor/{grammar_dir}."
         )
     lib = ctypes.CDLL(str(grammar_lib))
-    if not hasattr(lib, "tree_sitter_picoc"):
-        raise AttributeError(f"'tree_sitter_picoc' symbol missing in {grammar_lib}")
-    lib.tree_sitter_picoc.restype = ctypes.c_void_p
-    return Language(lib.tree_sitter_picoc())
+    if not hasattr(lib, symbol_name):
+        raise AttributeError(f"'{symbol_name}' symbol missing in {grammar_lib}")
+    symbol = getattr(lib, symbol_name)
+    symbol.restype = ctypes.c_void_p
+    return Language(symbol())
 
 
-_TS_LANGUAGE = _load_ts_language()
+_TS_PICOC_LANGUAGE = _load_ts_language(
+    "tree-sitter-picoc",
+    "picoc.so",
+    "tree_sitter_picoc",
+)
+_TS_RETI_LANGUAGE: Language | None = None
+
+
+def _load_reti_ts_language() -> Language:
+    global _TS_RETI_LANGUAGE
+    if _TS_RETI_LANGUAGE is None:
+        _TS_RETI_LANGUAGE = _load_ts_language(
+            "tree-sitter-reti",
+            "reti.so",
+            "tree_sitter_reti",
+        )
+    return _TS_RETI_LANGUAGE
 
 
 def _storage_class_specifiers(children):
@@ -43,15 +61,11 @@ def _storage_class_specifiers(children):
 def _without_storage_class_specifiers(children):
     return [child for child in children if not isinstance(child, (pn.Inline, pn.Static))]
 
-class TransformerPicoC:
-    """
-    Tree-sitter backed transformer that builds the PicoC AST using the
-    vendored PicoC grammar from ../vendor/tree-sitter-picoc.
-    """
 
-    def __init__(self):
+class _TreeSitterTransformer:
+    def __init__(self, language: Language):
         self.parser = Parser()
-        self.parser.language = _TS_LANGUAGE
+        self.parser.language = language
         self._code: str | None = None
         self._cache: dict[int, object] = {}
 
@@ -59,13 +73,9 @@ class TransformerPicoC:
         return self.parser.parse(code.encode("utf-8"))
 
     def build_ast(self, tree, code: str):
-        """
-        Build the PicoC AST from a Tree-sitter parse tree.
-        """
         self._code = code
         return self.walk(tree.root_node)
 
-    # -------------------------------- Helpers --------------------------------
     def value(self, node) -> str:
         return "" if self._code is None else self._code[node.start_byte : node.end_byte]
 
@@ -73,8 +83,44 @@ class TransformerPicoC:
         return [c for c in node.children if c.is_named]
 
     def _unnamed_children(self, node):
-        """Return all unnamed (token) children for a Tree-sitter node."""
         return [c for c in node.children if not c.is_named]
+
+    def operator(self, node):
+        unnamed = self._unnamed_children(node)
+        if not unnamed:
+            throw_error(f"No unnamed children found in node '{node.type}'")
+        return self.value(unnamed[0])
+
+    def walk(self, root):
+        self._cache = {}
+        stack = [(root, False)]
+        while stack:
+            node, done = stack.pop()
+            if done:
+                child_nodes = self._named_children(node)
+                child_vals = [self._cache[id(c)] for c in child_nodes]
+                handler = getattr(self, node.type, self.generic)
+                self._cache[id(node)] = handler(node, child_vals)
+            else:
+                stack.append((node, True))
+                for child in reversed(self._named_children(node)):
+                    stack.append((child, False))
+        return self._cache[id(root)]
+
+    def generic(self, _node, children):
+        if len(children) == 1:
+            return children[0]
+        return children
+
+
+class TransformerPicoC(_TreeSitterTransformer):
+    """
+    Tree-sitter backed transformer that builds the PicoC AST using the
+    vendored PicoC grammar from ../vendor/tree-sitter-picoc.
+    """
+
+    def __init__(self):
+        super().__init__(_TS_PICOC_LANGUAGE)
 
     def _bin_op(self, op: str):
         match op:
@@ -132,16 +178,6 @@ class TransformerPicoC:
                 return pn.ToBool(node)
         throw_error(node)
 
-    def operator(self, node):
-        """
-        Return the operator text from the first unnamed child of a node.
-        Raises if no such child exists.
-        """
-        unnamed = self._unnamed_children(node)
-        if not unnamed:
-            throw_error(f"No unnamed children found in node '{node.type}'")
-        return self.value(unnamed[0])
-
     def _seperate_name_and_datatype(self, base_datatype, declarator):
         if isinstance(declarator, pn.Name):
             return base_datatype, declarator
@@ -158,31 +194,6 @@ class TransformerPicoC:
                         throw_error(fragmented_datatype)
             return full_datatype, name
         throw_error(declarator)
-
-    def walk(self, root):
-        """
-        Iterative post-order walk that dispatches to methods named after
-        Tree-sitter node types (e.g., `binary_expression`).
-        """
-        self._cache = {}
-        stack = [(root, False)]
-        while stack:
-            node, done = stack.pop()
-            if done:
-                child_nodes = self._named_children(node)
-                child_vals = [self._cache[id(c)] for c in child_nodes]
-                handler = getattr(self, node.type, self.generic)
-                self._cache[id(node)] = handler(node, child_vals)
-            else:
-                stack.append((node, True))
-                for child in reversed(self._named_children(node)):
-                    stack.append((child, False))
-        return self._cache[id(root)]
-
-    def generic(self, _node, children):
-        if len(children) == 1:
-            return children[0]
-        return children
 
     # -------------------------------- General --------------------------------
     def translation_unit(self, _, children):
@@ -523,3 +534,322 @@ class TransformerPicoC:
 
     def abstract_pointer_declarator(self, node, _):
         return len(self._unnamed_children(node))
+
+
+# ============================================================================
+# =                           RETI Blocks Roundtrip                          =
+# ============================================================================
+# The `reti_blocks` pass stores linker-relevant block attributes inside
+# assembler directives below each block label. When several `.reti_blocks`
+# files are linked later, these directives allow the compiler to reconstruct
+# `Block(...)` nodes with stable metadata such as scope, block indices, layout
+# information, and any additional linker annotations that should survive the
+# textual assembly form.
+
+
+@dataclass(slots=True)
+class _RetiDirective:
+    name: str
+    arguments: list[object]
+
+
+class TransformerRetiBlocks(_TreeSitterTransformer):
+    """
+    Tree-sitter backed transformer that rebuilds a `.reti_blocks` file into
+    the block-based AST shape used by later RETI passes.
+    """
+
+    _REGISTER_TYPES = {
+        "ACC": rn.Acc,
+        "IN1": rn.In1,
+        "IN2": rn.In2,
+        "PC": rn.Pc,
+        "SP": rn.Sp,
+        "BAF": rn.Baf,
+        "CS": rn.Cs,
+        "DS": rn.Ds,
+    }
+
+    _RELATION_TYPES = {
+        "<": rn.Lt,
+        "<=": rn.LtE,
+        ">": rn.Gt,
+        ">=": rn.GtE,
+        "==": rn.Eq,
+        "!=": rn.NEq,
+        "_NOP": rn.NOp,
+    }
+
+    _REGISTER_ARGUMENT_OPS = {
+        "ADD": rn.Add,
+        "SUB": rn.Sub,
+        "MULT": rn.Mult,
+        "DIV": rn.Div,
+        "MOD": rn.Mod,
+        "OPLUS": rn.Oplus,
+        "OR": rn.Or,
+        "AND": rn.And,
+    }
+
+    _REGISTER_IMMEDIATE_OPS = {
+        "ADDI": rn.Addi,
+        "SUBI": rn.Subi,
+        "MULTI": rn.Multi,
+        "DIVI": rn.Divi,
+        "MODI": rn.Modi,
+        "OPLUSI": rn.Oplusi,
+        "ORI": rn.Ori,
+        "ANDI": rn.Andi,
+        "LOAD": rn.Load,
+        "LOADI": rn.Loadi,
+        "STORE": rn.Store,
+    }
+
+    _INDEXED_MEMORY_OPS = {
+        "LOADIN": rn.Loadin,
+        "STOREIN": rn.Storein,
+    }
+
+    _BLOCK_ATTR_DIRECTIVES = {
+        ".scope": "scope",
+        ".instrs_before": "instrs_before",
+        ".num_instrs": "num_instrs",
+        ".block_idx": "block_idx",
+        ".param_size": "param_size",
+        ".local_vars_size": "local_vars_size",
+    }
+
+    def __init__(self):
+        super().__init__(_load_reti_ts_language())
+
+    def build_ast(self, tree, code: str):
+        """
+        Build the RETI blocks AST from a Tree-sitter parse tree.
+        """
+        return super().build_ast(tree, code)
+
+    def _register(self, reg_name: str) -> rn.Reg:
+        reg_type = self._REGISTER_TYPES.get(reg_name)
+        if reg_type is None:
+            throw_error(reg_name)
+        return rn.Reg(reg_type())
+
+    def _op_from_text(self, op_text: str):
+        match op_text:
+            case "+":
+                return rn.Add()
+            case "-":
+                return rn.Sub()
+        throw_error(op_text)
+
+    def _coerce_numeric_attr(self, value):
+        match value:
+            case rn.Im(val):
+                return pn.Num(str(val))
+            case _:
+                throw_error(value)
+
+    def _directive_value(self, value):
+        match value:
+            case rn.Im(val):
+                return str(val)
+            case rn.Name(val):
+                return val
+            case rn.BinOp() | rn.Reg():
+                return value
+            case str():
+                return value
+            case _:
+                throw_error(value)
+
+    def _apply_block_directive(self, block: pn.Block, directive: _RetiDirective):
+        attr_name = self._BLOCK_ATTR_DIRECTIVES.get(directive.name)
+        if attr_name is None:
+            return
+
+        if len(directive.arguments) != 1:
+            throw_error(directive)
+
+        value = directive.arguments[0]
+        match attr_name:
+            case "scope":
+                block.scope = self._directive_value(value)
+            case "instrs_before" | "num_instrs":
+                setattr(block, attr_name, self._coerce_numeric_attr(value))
+            case "block_idx" | "param_size" | "local_vars_size":
+                match value:
+                    case rn.Im(val):
+                        setattr(block, attr_name, int(val))
+                    case _:
+                        throw_error(value)
+            case _:
+                throw_error(attr_name)
+
+    # ------------------------------- Structure ------------------------------
+    def source_file(self, _, children):
+        file_name = pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks")
+        items = children
+        if children and isinstance(children[0], pn.Name) and children[0].val.endswith(".reti"):
+            file_name = children[0]
+            items = children[1:]
+
+        blocks = []
+        top_level_directives: dict[str, list[list[object]]] = {}
+        top_level_statements = []
+        for item in items:
+            match item:
+                case pn.Block():
+                    blocks.append(item)
+                case _RetiDirective(name, arguments):
+                    top_level_directives.setdefault(name, []).append(arguments)
+                case _:
+                    top_level_statements.append(item)
+
+        file_node = pn.File(file_name, blocks)
+        file_node.assembler_directives = top_level_directives
+        file_node.top_level_statements = top_level_statements
+        return file_node
+
+    def filename(self, node, _):
+        return pn.Name(self.value(node))
+
+    def label(self, node, _):
+        return pn.Name(self.value(node))
+
+    def block(self, _, children):
+        label, *entries = children
+        instructions = []
+        directives = []
+        for entry in entries:
+            if isinstance(entry, _RetiDirective):
+                directives.append(entry)
+            else:
+                instructions.append(entry)
+
+        block = pn.Block(label.val, instructions)
+        block.scope = "global"
+        block.block_idx = -1
+        block.assembler_directives = {}
+        for directive in directives:
+            block.assembler_directives.setdefault(directive.name, []).append(
+                directive.arguments
+            )
+        for directive in directives:
+            self._apply_block_directive(block, directive)
+        return block
+
+    # ------------------------------- Terminals ------------------------------
+    def comment(self, node, _):
+        raw = self.value(node)[1:].strip()
+        if raw.startswith("//"):
+            content = raw[2:].strip()
+            return pn.SingleLineComment("# //", content)
+        return pn.SingleLineComment("#", raw)
+
+    def immediate(self, node, _):
+        return rn.Im(self.value(node))
+
+    def string(self, node, _):
+        return self.value(node)[1:-1]
+
+    def symbol(self, node, _):
+        return rn.Name(self.value(node))
+
+    def register(self, node, _):
+        return self._register(self.value(node))
+
+    # ------------------------------- Operands -------------------------------
+    def symbol_offset(self, node, children):
+        base, offset = children
+        op_text = self.operator(node)
+        match offset:
+            case rn.Im(val):
+                return rn.BinOp(base, self._op_from_text(op_text), int(val))
+            case _:
+                throw_error(offset)
+
+    def symbolic_operand(self, _, children):
+        return children[0]
+
+    def argument(self, _, children):
+        return children[0]
+
+    def relation(self, node, _):
+        relation_type = self._RELATION_TYPES.get(self.value(node))
+        if relation_type is None:
+            throw_error(self.value(node))
+        return relation_type()
+
+    # ------------------------------ Directives ------------------------------
+    def directive_name(self, node, _):
+        return self.value(node)
+
+    def directive_argument(self, _, children):
+        return children[0]
+
+    def directive(self, _, children):
+        return _RetiDirective(children[0], children[1:])
+
+    # ----------------------------- Instructions -----------------------------
+    def register_argument_opcode(self, node, _):
+        op_type = self._REGISTER_ARGUMENT_OPS.get(self.value(node))
+        if op_type is None:
+            throw_error(self.value(node))
+        return op_type()
+
+    def register_immediate_opcode(self, node, _):
+        op_type = self._REGISTER_IMMEDIATE_OPS.get(self.value(node))
+        if op_type is None:
+            throw_error(self.value(node))
+        return op_type()
+
+    def indexed_memory_opcode(self, node, _):
+        op_type = self._INDEXED_MEMORY_OPS.get(self.value(node))
+        if op_type is None:
+            throw_error(self.value(node))
+        return op_type()
+
+    def register_argument_instruction(self, _, children):
+        return rn.Instr(children[0], children[1:])
+
+    def register_immediate_instruction(self, _, children):
+        return rn.Instr(children[0], children[1:])
+
+    def indexed_memory_instruction(self, _, children):
+        return rn.Instr(children[0], children[1:])
+
+    def move_instruction(self, _, children):
+        return rn.Instr(rn.Move(), children)
+
+    def interrupt_instruction(self, _, children):
+        return rn.Int(children[0])
+
+    def return_from_interrupt_instruction(self, _, children):
+        if children:
+            throw_error(children)
+        return rn.Rti()
+
+    # --------------------------------- Jumps --------------------------------
+    def name_target(self, _, children):
+        return pn.Name(children[0])
+
+    def goto_target(self, _, children):
+        return pn.GoTo(children[0])
+
+    def jump_target(self, _, children):
+        return children[0]
+
+    def jump(self, _, children):
+        if len(children) == 1:
+            relation = rn.Always()
+            target = children[0]
+        elif len(children) == 2:
+            relation, target = children
+        else:
+            throw_error(children)
+
+        if not isinstance(target, (rn.Im, rn.Name, rn.BinOp, pn.GoTo)):
+            throw_error(target)
+        if not isinstance(relation, rn.Always) and isinstance(target, rn.Name):
+            target = pn.GoTo(pn.Name(target.val))
+        return rn.Jump(relation, target)

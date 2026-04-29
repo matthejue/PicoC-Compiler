@@ -34,7 +34,8 @@ RTI
   (statement
     (jump
       (relation)
-      (immediate)))
+      (jump_target
+        (immediate))))
   (statement
     (instruction
       (return_from_interrupt_instruction))))
@@ -59,4 +60,53 @@ JUMP 0
         (immediate))))
   (statement
     (jump
-      (immediate))))
+      (jump_target
+        (immediate)))))
+
+==========================================
+Blocks, symbolic targets, and directives
+==========================================
+
+main:
+  .something_important 12
+  .other_important target.4
+  LOADI ACC _this_instruction + 7
+  JUMP== GoTo(Name('if_else_after.0'))
+  JUMP do_while_branch.8
+
+---
+
+(source_file
+  (block
+    (label
+      (symbol))
+    (directive
+      (directive_name)
+      (directive_argument
+        (immediate)))
+    (directive
+      (directive_name)
+      (directive_argument
+        (symbolic_operand
+          (symbol))))
+    (statement
+      (instruction
+        (register_immediate_instruction
+          (register_immediate_opcode)
+          (register)
+          (symbolic_operand
+            (symbol_offset
+              (symbol)
+              (immediate))))))
+    (statement
+      (jump
+        (relation)
+        (jump_target
+          (goto_target
+            (name_target
+              (string))))))
+    (statement
+      (jump
+        (jump_target
+          (symbolic_operand
+            (symbol)))))))
