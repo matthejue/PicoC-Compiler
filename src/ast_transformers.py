@@ -35,12 +35,19 @@ def _load_ts_language(grammar_dir: str, library_name: str, symbol_name: str) -> 
     return Language(symbol())
 
 
-_TS_PICOC_LANGUAGE = _load_ts_language(
-    "tree-sitter-picoc",
-    "picoc.so",
-    "tree_sitter_picoc",
-)
+_TS_PICOC_LANGUAGE: Language | None = None
 _TS_RETI_LANGUAGE: Language | None = None
+
+
+def _load_picoc_ts_language() -> Language:
+    global _TS_PICOC_LANGUAGE
+    if _TS_PICOC_LANGUAGE is None:
+        _TS_PICOC_LANGUAGE = _load_ts_language(
+            "tree-sitter-picoc",
+            "picoc.so",
+            "tree_sitter_picoc",
+        )
+    return _TS_PICOC_LANGUAGE
 
 
 def _load_reti_ts_language() -> Language:
@@ -120,7 +127,7 @@ class TransformerPicoC(_TreeSitterTransformer):
     """
 
     def __init__(self):
-        super().__init__(_TS_PICOC_LANGUAGE)
+        super().__init__(_load_picoc_ts_language())
 
     def _bin_op(self, op: str):
         match op:

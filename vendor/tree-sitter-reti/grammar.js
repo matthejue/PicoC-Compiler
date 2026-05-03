@@ -31,6 +31,7 @@ module.exports = grammar({
       field('label', $.label),
       ':',
       repeat($.directive),
+
       repeat($.statement),
     ),
 

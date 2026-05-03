@@ -697,11 +697,12 @@ def _build_target_path(target) -> str:
 
 def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
     json_by_base: Dict[str, str] = {}
-    used_json_bases = set()
+    reti_block_bases_with_matching_json = set()
 
     for path in files:
         if get_ext(path) != "json":
             continue
+        # Canonicalize relative spellings like "x/y.json" vs "./x/y.json".
         base_path = os.path.abspath(remove_ext(path))
         if base_path in json_by_base:
             print(
@@ -717,25 +718,30 @@ def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
             case "picoc":
                 build_targets.append({"kind": "picoc", "path": path})
             case "reti_blocks":
+                # Use the same canonicalized base-path key as above.
                 base_path = os.path.abspath(remove_ext(path))
-                json_path = json_by_base.get(base_path)
-                if json_path is None:
+                explicit_json_path = json_by_base.get(base_path)
+                if explicit_json_path is None:
                     auto_json_path = remove_ext(path) + ".json"
                     if os.path.isfile(auto_json_path):
                         json_path = auto_json_path
-                if json_path is None:
-                    print(
-                        f"[ERROR] Missing companion .json symbol table for '{path}'. "
-                        "Pass the matching .json file as input or place it next to the "
-                        ".reti_blocks file."
-                    )
-                    sys.exit(1)
-                if not os.path.isfile(json_path):
-                    print(
-                        f"[ERROR] Companion .json symbol table '{json_path}' was not found"
-                    )
-                    sys.exit(1)
-                used_json_bases.add(base_path)
+                    else:
+                        print(
+                            f"[ERROR] Missing companion .json symbol table for '{path}'. "
+                            "Pass the matching .json file as input or place it next to the "
+                            ".reti_blocks file."
+                        )
+                        sys.exit(1)
+                else:
+                    json_path = explicit_json_path
+                    # Reached when a matching `.json` path was provided explicitly
+                    # in the input list, but that path does not currently exist.
+                    if not os.path.isfile(json_path):
+                        print(
+                            f"[ERROR] Companion .json symbol table '{json_path}' was not found"
+                        )
+                        sys.exit(1)
+                reti_block_bases_with_matching_json.add(base_path)
                 build_targets.append(
                     {
                         "kind": "reti_blocks",
@@ -750,7 +756,7 @@ def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
                 sys.exit(1)
 
     for base_path, json_path in json_by_base.items():
-        if base_path not in used_json_bases:
+        if base_path not in reti_block_bases_with_matching_json:
             print(
                 f"[ERROR] Standalone .json input '{json_path}' has no matching "
                 ".reti_blocks input"
