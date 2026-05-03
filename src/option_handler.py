@@ -5,7 +5,7 @@ from src import debug as db
 import sys
 import shutil
 from src.ast_node import ASTNode
-from src.ast_transformers import TransformerPicoC
+from src.ast_transformers import TransformerPicoC, TransformerRetiBlocks
 from src.passes import Passes
 from src.utils.util_funs_dependent import (
     remove_ext,
@@ -37,6 +37,7 @@ class OptionHandler:
     def build_all(self, max_workers=None):
         files = _expand_dependency_metadata(list(global_vars.args.infiles))
         global_vars.args.infiles = files
+        build_targets = _normalize_input_units(files)
 
         picoc_files = [f for f in files if get_ext(f) == "picoc"]
         if picoc_files:
@@ -47,14 +48,14 @@ class OptionHandler:
         results = []
 
         if global_vars.args.intermediate_stages:
-            for f in files:
+            for target in build_targets:
                 try:
-                    result = self.build_file(f)
+                    result = self.build_file(target)
                     results.append(result)  # store filename + return value
                 except Exception as e:
                     if global_vars.args.debug:
                         raise  # let the post-mortem hook handle it
-                    print(f"[ERROR] {f}: {e}")
+                    print(f"[ERROR] {_build_target_path(target)}: {e}")
                     if global_vars.args.traceback:
                         traceback.print_exc()
                     exit(1)
@@ -62,16 +63,19 @@ class OptionHandler:
             with ThreadPoolExecutor(
                 max_workers=max_workers, thread_name_prefix="builder"
             ) as ex:
-                fut_for = {ex.submit(self.build_file, f): f for f in files}
+                fut_for = {
+                    ex.submit(self.build_file, target): target
+                    for target in build_targets
+                }
                 for fut in as_completed(fut_for):
-                    f = fut_for[fut]
+                    target = fut_for[fut]
                     try:
                         result = fut.result()
                         results.append(result)
                     except Exception as e:
                         if global_vars.args.debug:
                             raise  # let the post-mortem hook handle it
-                        print(f"[ERROR] {f}: {e}")
+                        print(f"[ERROR] {_build_target_path(target)}: {e}")
                         if global_vars.args.traceback:
                             traceback.print_exc()
                         exit(1)
@@ -86,24 +90,43 @@ class OptionHandler:
             self._insert_start_fun(asts, symbol_tables, all_file_blocks)
             self._link(asts, symbol_tables, all_file_blocks)
 
-    def build_file(self, path: str):
+    def build_file(self, target):
+        path = _build_target_path(target)
         global_vars.tstate.path_without_ext = remove_ext(path)
 
-        extension = get_ext(path)  # still a string
-        match extension:
+        target_kind = target["kind"] if isinstance(target, dict) else get_ext(path)
+        match target_kind:
             case "picoc":
                 preprocessed_code = self._preprocess(path)
                 return self._compl(preprocessed_code)
             case "reti_blocks":
-                # TODO: Add external .reti_blocks dependency loading here.
-                # For now, dependency metadata only supports .picoc files.
-                print(f"filename: {path}")
-                print("External '.reti_blocks' inputs are not supported yet")
-                exit(1)
+                return self._load_external_reti_blocks(path, target["json_path"])
             case _:
                 print(f"filename: {path}")
-                print(f"File with extension '.{extension}' is not supported")
+                print(f"File with extension '.{target_kind}' is not supported")
                 exit(1)
+
+    def _load_external_reti_blocks(self, path: str, json_path: str):
+        with open(path, encoding="utf-8") as fin:
+            code = fin.read()
+
+        transformer = TransformerRetiBlocks()
+        ts_tree = transformer.parse_tree(code)
+        reti_blocks = transformer.build_ast(ts_tree, code)
+
+        symbol_table = st.SymbolTable.load_json(json_path)
+        all_blocks = {}
+        for block in reti_blocks.decls_defs_blocks_instrs:
+            if isinstance(block, pn.Block):
+                all_blocks[block.name] = block
+
+        if global_vars.args.intermediate_stages:
+            print(subheading("RETI Blocks", "-"))
+            print(reti_blocks.__repr__(incl_filenode=True)[1:])
+            print(subheading("Symbol Table", "-"))
+            print(symbol_table.to_json_str(pretty=True))
+
+        return reti_blocks, symbol_table, all_blocks
 
     def _preprocess(self, path):
         with open(path, encoding="utf-8") as fin:
@@ -666,6 +689,77 @@ def _expand_dependency_metadata(files: List[str]) -> List[str]:
     return expanded
 
 
+def _build_target_path(target) -> str:
+    if isinstance(target, dict):
+        return target["path"]
+    return target
+
+
+def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
+    json_by_base: Dict[str, str] = {}
+    used_json_bases = set()
+
+    for path in files:
+        if get_ext(path) != "json":
+            continue
+        base_path = os.path.abspath(remove_ext(path))
+        if base_path in json_by_base:
+            print(
+                f"[ERROR] Multiple .json files were provided for '{base_path}.reti_blocks'"
+            )
+            sys.exit(1)
+        json_by_base[base_path] = path
+
+    build_targets: List[Dict[str, str]] = []
+    for path in files:
+        extension = get_ext(path)
+        match extension:
+            case "picoc":
+                build_targets.append({"kind": "picoc", "path": path})
+            case "reti_blocks":
+                base_path = os.path.abspath(remove_ext(path))
+                json_path = json_by_base.get(base_path)
+                if json_path is None:
+                    auto_json_path = remove_ext(path) + ".json"
+                    if os.path.isfile(auto_json_path):
+                        json_path = auto_json_path
+                if json_path is None:
+                    print(
+                        f"[ERROR] Missing companion .json symbol table for '{path}'. "
+                        "Pass the matching .json file as input or place it next to the "
+                        ".reti_blocks file."
+                    )
+                    sys.exit(1)
+                if not os.path.isfile(json_path):
+                    print(
+                        f"[ERROR] Companion .json symbol table '{json_path}' was not found"
+                    )
+                    sys.exit(1)
+                used_json_bases.add(base_path)
+                build_targets.append(
+                    {
+                        "kind": "reti_blocks",
+                        "path": path,
+                        "json_path": json_path,
+                    }
+                )
+            case "json":
+                continue
+            case _:
+                print(f"[ERROR] File '{path}' has unsupported extension '.{extension}'")
+                sys.exit(1)
+
+    for base_path, json_path in json_by_base.items():
+        if base_path not in used_json_bases:
+            print(
+                f"[ERROR] Standalone .json input '{json_path}' has no matching "
+                ".reti_blocks input"
+            )
+            sys.exit(1)
+
+    return build_targets
+
+
 def _read_dependency_metadata(source_path: str) -> List[str]:
     source_dir = os.path.dirname(source_path) or "."
     dependencies: List[str] = []
@@ -720,10 +814,10 @@ def _resolve_dependency_path(source_dir: str, dependency: str) -> str:
     for candidate in candidates:
         if os.path.isfile(candidate):
             resolved = os.path.normpath(candidate)
-            if get_ext(resolved) != "picoc":
+            if get_ext(resolved) not in {"picoc", "reti_blocks", "json"}:
                 print(
                     f"[ERROR] Dependency '{dependency}' has unsupported extension. "
-                    "Only .picoc dependencies are supported right now."
+                    "Only .picoc, .reti_blocks, and .json dependencies are supported."
                 )
                 sys.exit(1)
             return resolved

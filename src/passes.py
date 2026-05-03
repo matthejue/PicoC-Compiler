@@ -2798,7 +2798,7 @@ class Passes:
                     instr,
                 ]
             # case rn.Instr(rn.Divi(), [_, rn.Im("0")]) doesn't occur
-            case rn.Instr((rn.Loadin() | rn.Storein) as op, [reg1, reg2, rn.Im(val)]):
+            case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [reg1, reg2, rn.Im(val)]):
                 s_num = int(val)
                 if s_num < -(2**31) and s_num > 2**31 - 1:
                     raise errors.TooLargeLiteral()
@@ -2820,6 +2820,13 @@ class Passes:
                             ) + [
                                 rn.Instr(rn.Add(), [reg1, rn.Reg(rn.Acc())]),
                                 rn.Instr(rn.Storein(), [reg1, reg2, rn.Im("0")]),
+                            ]
+                        case rn.Tsl():
+                            return self._write_large_immediate_in_register(
+                                rn.Reg(rn.Acc()), s_num
+                            ) + [
+                                rn.Instr(rn.Add(), [reg1, rn.Reg(rn.Acc())]),
+                                rn.Instr(rn.Tsl(), [reg1, reg2, rn.Im("0")]),
                             ]
                         case _:
                             throw_error(op)
@@ -2935,7 +2942,7 @@ class Passes:
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
                 return self._patch_too_large_jumps(rel, distance, instr)
-            case rn.Instr((rn.Loadin() | rn.Storein()), [_, _, rn.Name(val)]):
+            case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()), [_, _, rn.Name(val)]):
                 var_name = val
                 symbol, _ = self.symbol_table.resolve(
                     var_name, scope=self.current_scope
@@ -2951,7 +2958,8 @@ class Passes:
                         instr.args[2] = rn.Im(addr)
                         return [instr]
             case rn.Instr(
-                (rn.Loadin() | rn.Storein()), [_, _, rn.BinOp(rn.Name(val), op, num)]
+                (rn.Loadin() | rn.Storein() | rn.Tsl()),
+                [_, _, rn.BinOp(rn.Name(val), op, num)],
             ):
                 var_name = val
                 symbol, _ = self.symbol_table.resolve(

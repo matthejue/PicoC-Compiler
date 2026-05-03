@@ -5,6 +5,7 @@ Basic RETI program
 MOVE BAF ACC
 SUBI SP 2
 STOREIN BAF ACC 0
+TSL DS ACC 0
 JUMP== 3
 RTI
 
@@ -13,24 +14,34 @@ RTI
 (source_file
   (statement
     (instruction
-      (move_instruction
-        (register)
-        (register))))
+      (store_or_move_instruction
+        (move_instruction
+          (register)
+          (register)))))
   (statement
     (instruction
-      (register_immediate_instruction
-        (register_immediate_opcode)
-        (register)
-        (immediate))))
+      (compute_instruction
+        (compute_immediate_instruction
+          (register_immediate_opcode)
+          (register)
+          (immediate)))))
   (statement
     (instruction
-      (indexed_memory_instruction
-        (indexed_memory_opcode)
-        (argument
-          (register))
-        (argument
-          (register))
-        (immediate))))
+      (store_or_move_instruction
+        (store_indexed_instruction
+          (argument
+            (register))
+          (argument
+            (register))
+          (immediate)))))
+  (statement
+    (instruction
+      (store_or_move_instruction
+        (tsl_instruction
+          (argument
+            (register))
+          (register)
+          (immediate)))))
   (statement
     (jump
       (relation)
@@ -54,10 +65,11 @@ JUMP 0
   (comment)
   (statement
     (instruction
-      (register_immediate_instruction
-        (register_immediate_opcode)
-        (register)
-        (immediate))))
+      (load_instruction
+        (load_immediate_instruction
+          (load_immediate_opcode)
+          (register)
+          (immediate)))))
   (statement
     (jump
       (jump_target
@@ -68,8 +80,8 @@ Blocks, symbolic targets, and directives
 ==========================================
 
 main:
-  .something_important 12
-  .other_important target.4
+  .block_idx 12
+  .scope target.4
   LOADI ACC _this_instruction + 7
   JUMP== GoTo(Name('if_else_after.0'))
   JUMP do_while_branch.8
@@ -87,17 +99,17 @@ main:
     (directive
       (directive_name)
       (directive_argument
-        (symbolic_operand
-          (symbol))))
+        (symbol)))
     (statement
       (instruction
-        (register_immediate_instruction
-          (register_immediate_opcode)
-          (register)
-          (symbolic_operand
-            (symbol_offset
-              (symbol)
-              (immediate))))))
+        (load_instruction
+          (load_immediate_instruction
+            (load_immediate_opcode)
+            (register)
+            (symbolic_operand
+              (symbol_offset
+                (symbol)
+                (immediate)))))))
     (statement
       (jump
         (relation)

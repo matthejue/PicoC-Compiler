@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Dict, Any, Optional, Tuple
 from pathlib import Path
 import json
+import re
+from src import picoc_nodes as pn
 from src.utils.util_funs_independent import convert_to_single_line
 
 Symbol = Dict[str, Any]  # e.g. {"kind": "var", "type": "int", ...}
@@ -80,7 +82,9 @@ class SymbolTable:
                 st._parents.update(v)
             else:
                 st._table[k] = {
-                    name: (dict(sym) if isinstance(sym, dict) else sym)
+                    name: (
+                        _restore_symbol_payload(dict(sym)) if isinstance(sym, dict) else sym
+                    )
                     for name, sym in v.items()
                 }
         # Make sure every scope in parents exists and vice versa
@@ -97,3 +101,59 @@ class SymbolTable:
 
 def _json_default(ast):
     return convert_to_single_line(ast)
+
+
+_AST_STRING_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\(.*\)$", re.DOTALL)
+_PICOC_AST_REGISTRY = {
+    name: value
+    for name, value in vars(pn).items()
+    if isinstance(value, type) and issubclass(value, pn.ASTNode)
+}
+_PICOC_AST_EVAL_SCOPE = dict(_PICOC_AST_REGISTRY)
+
+
+def _restore_alloc(type_qual, datatype, name, local_var_or_param="local_var"):
+    alloc = pn.Alloc(type_qual, datatype, name)
+    alloc.local_var_or_param = local_var_or_param
+    return alloc
+
+
+def _restore_fun_decl(*args):
+    if len(args) == 3:
+        datatype, name, allocs = args
+        return pn.FunDecl([], datatype, name, allocs)
+    if len(args) == 4:
+        storage_class_specifiers, datatype, name, allocs = args
+        return pn.FunDecl(storage_class_specifiers, datatype, name, allocs)
+    raise TypeError(f"Unsupported FunDecl payload: {args!r}")
+
+
+def _restore_fun_def(*args):
+    if len(args) == 4:
+        datatype, name, allocs, stmts_blocks = args
+        return pn.FunDef([], datatype, name, allocs, stmts_blocks)
+    if len(args) == 5:
+        storage_class_specifiers, datatype, name, allocs, stmts_blocks = args
+        return pn.FunDef(storage_class_specifiers, datatype, name, allocs, stmts_blocks)
+    raise TypeError(f"Unsupported FunDef payload: {args!r}")
+
+
+_PICOC_AST_EVAL_SCOPE.update(
+    {
+        "Alloc": _restore_alloc,
+        "FunDecl": _restore_fun_decl,
+        "FunDef": _restore_fun_def,
+    }
+)
+
+
+def _restore_symbol_payload(value):
+    if isinstance(value, dict):
+        return {key: _restore_symbol_payload(val) for key, val in value.items()}
+    if isinstance(value, list):
+        return [_restore_symbol_payload(item) for item in value]
+    if isinstance(value, str) and _AST_STRING_RE.match(value):
+        node_name = value.split("(", 1)[0]
+        if node_name in _PICOC_AST_REGISTRY:
+            return eval(value, {"__builtins__": {}}, _PICOC_AST_EVAL_SCOPE)
+    return value

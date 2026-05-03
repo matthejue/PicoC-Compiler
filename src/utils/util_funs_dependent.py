@@ -1,6 +1,7 @@
 import itertools
 import sys
 import traceback
+import ast
 from typing import Any, Dict, List, Optional, Type
 
 from src import global_vars
@@ -235,7 +236,7 @@ def build_ast_from_string(
 
             # Case 1: exactly one string literal arg -> becomes .val, no children
             if len(built_args) == 1 and isinstance(built_args[0], str):
-                return cls(val=built_args[0], visible=[])
+                return cls(built_args[0])
 
             # Otherwise: all args must be nodes/lists-of-nodes/dicts-of-nodes
             children: List[Any] = []
@@ -258,7 +259,7 @@ def build_ast_from_string(
                     )
                     sys.exit(1)
 
-            return cls(val="", visible=children)
+            return cls(*children)
 
         print(f"Error: Unsupported syntax at {ctx}: {ast.dump(node)}", file=sys.stderr)
         sys.exit(1)

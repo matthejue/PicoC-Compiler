@@ -266,6 +266,11 @@ class Storein(ASTNode):
         return "STOREIN"
 
 
+class Tsl(ASTNode):
+    def __repr__(self):
+        return "TSL"
+
+
 class Move(ASTNode):
     def __repr__(self):
         return "MOVE"

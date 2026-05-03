@@ -17,24 +17,43 @@ module.exports = grammar({
   rules: {
     source_file: $ => seq(
       optional(field('filename', $.filename)),
-      repeat($._line),
+      repeat(choice(
+        $.block,
+        $.statement,
+      )),
     ),
 
-    _line: $ => choice(
-      $.block,
-      $.statement,
-      $.directive,
-    ),
+    comment: _ => token(seq('#', /[^\n]*/)),
 
-    block: $ => prec.right(seq(
+    filename: _ => token(/[ -~]+\.reti(_blocks|_patch)?/),
+
+    block: $ => seq(
       field('label', $.label),
       ':',
-      repeat($._block_line),
-    )),
+      repeat($.directive),
+      repeat($.statement),
+    ),
 
-    _block_line: $ => choice(
-      $.statement,
-      $.directive,
+    label: $ => $.symbol,
+
+    directive: $ => seq(
+      field('name', $.directive_name),
+      field('argument', $.directive_argument),
+    ),
+
+    directive_name: _ => choice(
+      '.scope',
+      '.instrs_before',
+      '.num_instrs',
+      '.block_idx',
+      '.param_size',
+      '.local_vars_size',
+    ),
+
+    directive_argument: $ => choice(
+      $.immediate,
+      $.string,
+      $.symbol,
     ),
 
     statement: $ => seq(
@@ -45,48 +64,141 @@ module.exports = grammar({
       optional(';'),
     ),
 
-    comment: _ => token(seq('#', /[^\n]*/)),
-
-    filename: _ => token(/[ -~]+\.reti(_blocks|_patch)?/),
-
-    label: $ => $.symbol,
-
-    immediate: _ => token(choice(
-      '0',
-      /-?[1-9][0-9]*/,
-    )),
-
-    string: _ => token(seq("'", /[^'\n]*/, "'")),
-
-    symbol: _ => token(/[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)*/),
-
-    register: _ => choice(
-      'ACC',
-      'IN1',
-      'IN2',
-      'PC',
-      'SP',
-      'BAF',
-      'CS',
-      'DS',
+    instruction: $ => choice(
+      $.load_instruction,
+      $.store_or_move_instruction,
+      $.compute_instruction,
+      $.syscall_instruction,
+      $.return_from_interrupt_instruction,
     ),
 
-    argument: $ => choice(
-      $.register,
-      $.symbolic_operand,
-      $.immediate,
+    load_instruction: $ => choice(
+      $.load_immediate_instruction,
+      $.load_indexed_instruction,
     ),
 
-    symbolic_operand: $ => choice(
-      $.symbol,
-      $.symbol_offset,
+    load_immediate_instruction: $ => seq(
+      field('opcode', $.load_immediate_opcode),
+      field('register', $.register),
+      field('value', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
     ),
 
-    symbol_offset: $ => prec.left(seq(
-      field('base', $.symbol),
-      field('operator', choice('+', '-')),
-      field('offset', $.immediate),
-    )),
+    load_immediate_opcode: _ => choice(
+      'LOAD',
+      'LOADI',
+    ),
+
+    load_indexed_instruction: $ => seq(
+      field('opcode', 'LOADIN'),
+      field('base', $.argument),
+      field('index', $.argument),
+      field('offset', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    store_or_move_instruction: $ => choice(
+      $.store_instruction,
+      $.store_indexed_instruction,
+      $.tsl_instruction,
+      $.move_instruction,
+    ),
+
+    store_instruction: $ => seq(
+      field('opcode', 'STORE'),
+      field('register', $.register),
+      field('value', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    store_indexed_instruction: $ => seq(
+      field('opcode', 'STOREIN'),
+      field('base', $.argument),
+      field('index', $.argument),
+      field('offset', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    tsl_instruction: $ => seq(
+      field('opcode', 'TSL'),
+      field('source', $.argument),
+      field('target', $.register),
+      field('offset', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    move_instruction: $ => seq(
+      field('opcode', 'MOVE'),
+      field('target', $.register),
+      field('source', $.register),
+    ),
+
+    compute_instruction: $ => choice(
+      $.compute_register_instruction,
+      $.compute_immediate_instruction,
+    ),
+
+    compute_register_instruction: $ => seq(
+      field('opcode', $.register_argument_opcode),
+      field('left', $.register),
+      field('right', $.argument),
+    ),
+
+    register_argument_opcode: _ => choice(
+      'ADD',
+      'SUB',
+      'MULT',
+      'DIV',
+      'MOD',
+      'OPLUS',
+      'OR',
+      'AND',
+    ),
+
+    compute_immediate_instruction: $ => seq(
+      field('opcode', $.register_immediate_opcode),
+      field('register', $.register),
+      field('value', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    register_immediate_opcode: _ => choice(
+      'ADDI',
+      'SUBI',
+      'MULTI',
+      'DIVI',
+      'MODI',
+      'OPLUSI',
+      'ORI',
+      'ANDI',
+    ),
+
+    syscall_instruction: $ => $.interrupt_instruction,
+
+    interrupt_instruction: $ => seq(
+      field('opcode', 'INT'),
+      field('value', $.immediate),
+    ),
+
+    return_from_interrupt_instruction: $ => 'RTI',
+
+    jump: $ => seq(
+      'JUMP',
+      optional(field('relation', $.relation)),
+      field('target', $.jump_target),
+    ),
 
     relation: _ => choice(
       '<',
@@ -96,12 +208,6 @@ module.exports = grammar({
       '==',
       '!=',
       '_NOP',
-    ),
-
-    jump: $ => seq(
-      'JUMP',
-      optional(field('relation', $.relation)),
-      field('target', $.jump_target),
     ),
 
     jump_target: $ => choice(
@@ -124,95 +230,41 @@ module.exports = grammar({
       ')',
     ),
 
-    instruction: $ => choice(
-      $.register_argument_instruction,
-      $.register_immediate_instruction,
-      $.indexed_memory_instruction,
-      $.move_instruction,
-      $.interrupt_instruction,
-      $.return_from_interrupt_instruction,
+    argument: $ => choice(
+      $.register,
+      $.symbolic_operand,
+      $.immediate,
     ),
 
-    register_argument_opcode: _ => choice(
-      'ADD',
-      'SUB',
-      'MULT',
-      'DIV',
-      'MOD',
-      'OPLUS',
-      'OR',
-      'AND',
+    register: _ => choice(
+      'ACC',
+      'IN1',
+      'IN2',
+      'PC',
+      'SP',
+      'BAF',
+      'CS',
+      'DS',
     ),
 
-    register_immediate_opcode: _ => choice(
-      'ADDI',
-      'SUBI',
-      'MULTI',
-      'DIVI',
-      'MODI',
-      'OPLUSI',
-      'ORI',
-      'ANDI',
-      'LOAD',
-      'LOADI',
-      'STORE',
+    symbolic_operand: $ => choice(
+      $.symbol,
+      $.symbol_offset,
     ),
 
-    indexed_memory_opcode: _ => choice(
-      'LOADIN',
-      'STOREIN',
-    ),
-
-    register_argument_instruction: $ => seq(
-      field('opcode', $.register_argument_opcode),
-      field('left', $.register),
-      field('right', $.argument),
-    ),
-
-    register_immediate_instruction: $ => seq(
-      field('opcode', $.register_immediate_opcode),
-      field('register', $.register),
-      field('value', choice(
-        $.immediate,
-        $.symbolic_operand,
-      )),
-    ),
-
-    indexed_memory_instruction: $ => seq(
-      field('opcode', $.indexed_memory_opcode),
-      field('base', $.argument),
-      field('index', $.argument),
-      field('offset', choice(
-        $.immediate,
-        $.symbolic_operand,
-      )),
-    ),
-
-    move_instruction: $ => seq(
-      field('opcode', 'MOVE'),
-      field('target', $.register),
-      field('source', $.register),
-    ),
-
-    interrupt_instruction: $ => seq(
-      field('opcode', 'INT'),
-      field('value', $.immediate),
-    ),
-
-    return_from_interrupt_instruction: $ => 'RTI',
-
-    directive: $ => prec.right(seq(
-      field('name', $.directive_name),
-      repeat1(field('argument', $.directive_argument)),
+    immediate: _ => token(choice(
+      '0',
+      /-?[1-9][0-9]*/,
     )),
 
-    directive_name: _ => token(/\.[A-Za-z_][A-Za-z0-9_]*/),
+    string: _ => token(seq("'", /[^'\n]*/, "'")),
 
-    directive_argument: $ => choice(
-      $.register,
-      $.immediate,
-      $.string,
-      $.symbolic_operand,
+    symbol: _ => token(/[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)?/),
+
+    symbol_offset: $ => seq(
+      field('base', $.symbol),
+      field('operator', choice('+', '-')),
+      field('offset', $.immediate),
     ),
   },
 });

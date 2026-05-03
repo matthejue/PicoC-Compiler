@@ -608,6 +608,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
     _INDEXED_MEMORY_OPS = {
         "LOADIN": rn.Loadin,
         "STOREIN": rn.Storein,
+        "TSL": rn.Tsl,
     }
 
     _BLOCK_ATTR_DIRECTIVES = {
@@ -803,17 +804,46 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
             throw_error(self.value(node))
         return op_type()
 
+    def load_immediate_opcode(self, node, _):
+        return self.value(node)
+
     def indexed_memory_opcode(self, node, _):
         op_type = self._INDEXED_MEMORY_OPS.get(self.value(node))
         if op_type is None:
             throw_error(self.value(node))
         return op_type()
 
-    def register_argument_instruction(self, _, children):
+    def compute_register_instruction(self, _, children):
         return rn.Instr(children[0], children[1:])
 
-    def register_immediate_instruction(self, _, children):
+    def compute_immediate_instruction(self, _, children):
         return rn.Instr(children[0], children[1:])
+
+    def load_immediate_instruction(self, _, children):
+        opcode_text = children[0]
+        if opcode_text == "LOAD":
+            return rn.Instr(rn.Load(), children[1:])
+        if opcode_text == "LOADI":
+            return rn.Instr(rn.Loadi(), children[1:])
+        throw_error(opcode_text)
+
+    def store_instruction(self, _, children):
+        return rn.Instr(rn.Store(), children[1:])
+
+    def load_indexed_instruction(self, _, children):
+        return rn.Instr(rn.Loadin(), children[1:])
+
+    def store_indexed_instruction(self, _, children):
+        return rn.Instr(rn.Storein(), children[1:])
+
+    def tsl_instruction(self, _, children):
+        return rn.Instr(rn.Tsl(), children[1:])
+
+    def register_argument_instruction(self, _, children):
+        return self.compute_register_instruction(_, children)
+
+    def register_immediate_instruction(self, _, children):
+        return self.compute_immediate_instruction(_, children)
 
     def indexed_memory_instruction(self, _, children):
         return rn.Instr(children[0], children[1:])
