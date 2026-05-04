@@ -27,13 +27,12 @@ module.exports = grammar({
 
     filename: _ => token(/[ -~]+\.reti(_blocks|_patch)?/),
 
-    block: $ => seq(
+    block: $ => prec.right(seq(
       field('label', $.label),
       ':',
       repeat($.directive),
-
       repeat($.statement),
-    ),
+    )),
 
     label: $ => $.symbol,
 
