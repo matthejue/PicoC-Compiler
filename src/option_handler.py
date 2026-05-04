@@ -55,7 +55,7 @@ class OptionHandler:
                 except Exception as e:
                     if global_vars.args.debug:
                         raise  # let the post-mortem hook handle it
-                    print(f"[ERROR] {_build_target_path(target)}: {e}")
+                    print(f"[ERROR] {target['path']}: {e}")
                     if global_vars.args.traceback:
                         traceback.print_exc()
                     exit(1)
@@ -75,7 +75,7 @@ class OptionHandler:
                     except Exception as e:
                         if global_vars.args.debug:
                             raise  # let the post-mortem hook handle it
-                        print(f"[ERROR] {_build_target_path(target)}: {e}")
+                        print(f"[ERROR] {target['path']}: {e}")
                         if global_vars.args.traceback:
                             traceback.print_exc()
                         exit(1)
@@ -91,10 +91,10 @@ class OptionHandler:
             self._link(asts, symbol_tables, all_file_blocks)
 
     def build_file(self, target):
-        path = _build_target_path(target)
+        path = target["path"]
         global_vars.tstate.path_without_ext = remove_ext(path)
 
-        target_kind = target["kind"] if isinstance(target, dict) else get_ext(path)
+        target_kind = target["kind"]
         match target_kind:
             case "picoc":
                 preprocessed_code = self._preprocess(path)
@@ -117,8 +117,11 @@ class OptionHandler:
         symbol_table = st.SymbolTable.load_json(json_path)
         all_blocks = {}
         for block in reti_blocks.decls_defs_blocks_instrs:
-            if isinstance(block, pn.Block):
-                all_blocks[block.name] = block
+            match block:
+                case pn.Block(name, _):
+                    all_blocks[name] = block
+                case _:
+                    throw_error(block)
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI Blocks", "-"))
@@ -687,13 +690,6 @@ def _expand_dependency_metadata(files: List[str]) -> List[str]:
         seen.add(key)
         expanded.append(path)
     return expanded
-
-
-def _build_target_path(target) -> str:
-    if isinstance(target, dict):
-        return target["path"]
-    return target
-
 
 def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
     json_by_base: Dict[str, str] = {}
