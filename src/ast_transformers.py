@@ -8,6 +8,7 @@ from tree_sitter import Language, Parser
 from src import global_vars
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src.ast_node import set_source_origin
 from src.utils.util_funs_dependent import throw_error
 
 
@@ -105,9 +106,12 @@ class _TreeSitterTransformer:
             node, done = stack.pop()
             if done:
                 child_nodes = self._named_children(node)
+                # Use id(node) as the cache key to ensure uniqueness and avoid issues if
+                # parse tree node objects are not hashable or override __eq__/__hash__.
                 child_vals = [self._cache[id(c)] for c in child_nodes]
                 handler = getattr(self, node.type, self.generic)
-                self._cache[id(node)] = handler(node, child_vals)
+                result = handler(node, child_vals)
+                self._cache[id(node)] = self._attach_origin(result, node)
             else:
                 stack.append((node, True))
                 for child in reversed(self._named_children(node)):
@@ -118,6 +122,15 @@ class _TreeSitterTransformer:
         if len(children) == 1:
             return children[0]
         return children
+
+    def _attach_origin(self, result, node):
+        source_path = getattr(global_vars.tstate, "input_path", "")
+        if source_path and (
+            isinstance(result, pn.ASTNode) or isinstance(result, rn.ASTNode)
+        ):
+            # Tree-sitter rows are 0-based; store 1-based lines for debuginfo.
+            set_source_origin(result, Path(source_path).name, node.start_point[0] + 1)
+        return result
 
 
 class TransformerPicoC(_TreeSitterTransformer):

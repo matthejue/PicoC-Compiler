@@ -17,6 +17,7 @@ import subprocess, os, platform
 import re
 import argparse
 import shlex
+import json
 from src.preprocessor import Preprocessor
 from typing import Iterable, List, Optional, Dict, Any, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -38,6 +39,15 @@ class OptionHandler:
         files = _expand_dependency_metadata(list(global_vars.args.infiles))
         global_vars.args.infiles = files
         build_targets = _normalize_input_units(files)
+
+        if global_vars.args.generate_debuginfo and global_vars.args.compile:
+            print("[ERROR] '-g/--generate_debuginfo' is not supported together with '--compile'")
+            exit(1)
+        if global_vars.args.generate_debuginfo and any(
+            target["kind"] != "picoc" for target in build_targets
+        ):
+            print("[ERROR] '-g/--generate_debuginfo' only works when all inputs are '.picoc' files")
+            exit(1)
 
         picoc_files = [f for f in files if get_ext(f) == "picoc"]
         if picoc_files:
@@ -93,6 +103,7 @@ class OptionHandler:
     def build_file(self, target):
         path = target["path"]
         global_vars.tstate.path_without_ext = remove_ext(path)
+        global_vars.tstate.input_path = path
 
         target_kind = target["kind"]
         match target_kind:
@@ -210,6 +221,8 @@ class OptionHandler:
         )
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI")
+        if global_vars.args.generate_debuginfo:
+            self._write_debuginfo(reti)
 
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
         passes = Passes()
@@ -468,6 +481,54 @@ class OptionHandler:
             case _:
                 throw_error(pass_ast)
 
+    def _write_debuginfo(self, pass_ast: pn.File):
+        match pass_ast:
+            case pn.File(_, instrs):
+                files = []
+                file_ids = {}
+                ranges = []
+                current_range = None
+                line_no = 0
+
+                for instr in instrs:
+                    if isinstance(instr, pn.SingleLineComment):
+                        continue
+                    line_no += 1
+
+                    source_file = getattr(instr, "source_file", None)
+                    source_line = getattr(instr, "source_line", None)
+                    if source_file is None or source_line is None:
+                        current_range = None
+                        continue
+
+                    file_id = file_ids.get(source_file)
+                    if file_id is None:
+                        file_id = len(files)
+                        file_ids[source_file] = file_id
+                        files.append(source_file)
+
+                    if (
+                        current_range is not None
+                        and current_range["file_id"] == file_id
+                        and current_range["line"] == source_line
+                        and current_range["end"] + 1 == line_no
+                    ):
+                        current_range["end"] = line_no
+                    else:
+                        current_range = {
+                            "start": line_no,
+                            "end": line_no,
+                            "file_id": file_id,
+                            "line": source_line,
+                        }
+                        ranges.append(current_range)
+
+                with open(Path.cwd() / "debuginfo.json", "w", encoding="utf-8") as fout:
+                    json.dump({"files": files, "ranges": ranges}, fout, indent=2)
+                    fout.write("\n")
+            case _:
+                throw_error(pass_ast)
+
 
 def _iter_tokens(tree, code):
     def dfs(node):
@@ -594,6 +655,12 @@ def _parse_cli_args():
         "--compile",
         action="store_true",
         help="Compile source files without linking (like gcc -c)",
+    )
+    parser.add_argument(
+        "-g",
+        "--generate_debuginfo",
+        action="store_true",
+        help="Write debuginfo.json for linked '.picoc' inputs",
     )
 
     global_vars.args = parser.parse_args()

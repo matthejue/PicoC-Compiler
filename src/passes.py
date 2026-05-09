@@ -1,6 +1,7 @@
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src import debug as db
+from src.ast_node import copy_source_origin, copy_source_origin_to_many, suppress_source_origin
 from src.symbol_table import SymbolTable
 from src.utils.util_funs_dependent import throw_error
 from src.utils.util_funs_independent import (
@@ -40,6 +41,12 @@ class Passes:
 
     INT32_MIN = -2147483648
     INT32_MAX = 2147483647
+
+    def _inherit_origin(self, target, source):
+        return copy_source_origin(target, source)
+
+    def _inherit_origin_many(self, targets, source):
+        return copy_source_origin_to_many(targets, source)
 
     def _is_static_inline(self, node):
         specifiers = getattr(node, "storage_class_specifiers", [])
@@ -214,9 +221,12 @@ class Passes:
             pn.CharType(),
         )
         self.generated_string_defs.append(
-            pn.Assign(
-                pn.Alloc(pn.Writeable(), array_dt, pn.Name(symbol_name)),
-                array_exp,
+            self._inherit_origin(
+                pn.Assign(
+                    pn.Alloc(pn.Writeable(), array_dt, pn.Name(symbol_name)),
+                    array_exp,
+                ),
+                literal,
             )
         )
         return pn.Name(symbol_name)
@@ -406,21 +416,27 @@ class Passes:
                 return pn.Assign(
                     self._picoc_shrink_exp(lhs), self._picoc_shrink_exp(exp)
                 )
+            case pn.StructSpec() | pn.StructDecl():
+                throw_error(
+                    "Struct declarations and forward declarations inside function "
+                    "definitions are not supported. Move the struct declaration "
+                    "or forward declaration to global scope."
+                )
             case pn.Exp(exp):
                 return pn.Exp(self._picoc_shrink_exp(exp))
             # --------------------------- L_If_Else ---------------------------
             case pn.If(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
+                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
                 return pn.If(self._picoc_shrink_exp(exp), stmts_shrinked)
             case pn.IfElse(exp, stmts1, stmts2):
                 stmts_shrinked1 = []
                 for stmt1 in stmts1:
-                    stmts_shrinked1 += [self._picoc_shrink_stmt(stmt1)]
+                    stmts_shrinked1 += [self._inherit_origin(self._picoc_shrink_stmt(stmt1), stmt1)]
                 stmts_shrinked2 = []
                 for stmt2 in stmts2:
-                    stmts_shrinked2 += [self._picoc_shrink_stmt(stmt2)]
+                    stmts_shrinked2 += [self._inherit_origin(self._picoc_shrink_stmt(stmt2), stmt2)]
                 return pn.IfElse(
                     self._picoc_shrink_exp(exp), stmts_shrinked1, stmts_shrinked2
                 )
@@ -428,12 +444,12 @@ class Passes:
             case pn.While(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
+                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
                 return pn.While(self._picoc_shrink_exp(exp), stmts_shrinked)
             case pn.DoWhile(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
+                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
                 return pn.DoWhile(self._picoc_shrink_exp(exp), stmts_shrinked)
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(pn.Empty()):
@@ -465,7 +481,7 @@ class Passes:
                         case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts):
                             stmts_shrinked = []
                             for stmt in stmts:
-                                stmts_shrinked += [self._picoc_shrink_stmt(stmt)]
+                                stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
                             if allocs and isinstance(allocs[0], pn.VoidType):
                                 allocs_shrinked = []
                             else:
@@ -511,7 +527,7 @@ class Passes:
                             ]
                         case pn.Exp() | pn.Assign():
                             decls_defs_shrinked += [
-                                self._picoc_shrink_stmt(decl_def)
+                                self._inherit_origin(self._picoc_shrink_stmt(decl_def), decl_def)
                             ]
                         case _:
                             throw_error(decl_def)
@@ -680,7 +696,9 @@ class Passes:
 
                 stmts_if = [goto_after]
                 for sub_stmt in reversed(stmts):
-                    stmts_if = self._picoc_blocks_stmt(sub_stmt, stmts_if, blocks)
+                    stmts_if = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(sub_stmt, stmts_if, blocks), sub_stmt
+                    )
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment(stmt, "//") + [
@@ -693,12 +711,16 @@ class Passes:
 
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
-                    stmts_else = self._picoc_blocks_stmt(stmt, stmts_else, blocks)
+                    stmts_else = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(stmt, stmts_else, blocks), stmt
+                    )
                 goto_else = self._create_block("else", stmts_else, blocks)
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
-                    stmts_if = self._picoc_blocks_stmt(stmt, stmts_if, blocks)
+                    stmts_if = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(stmt, stmts_if, blocks), stmt
+                    )
                 goto_if = self._create_block("if", stmts_if, blocks)
 
                 return self._single_line_comment(stmt, "//") + [
@@ -713,7 +735,9 @@ class Passes:
                 stmts_while = [goto_condition_check]
 
                 for sub_stmt in reversed(stmts):
-                    stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
+                    stmts_while = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks), sub_stmt
+                    )
                 goto_branch.name.val = self._create_block(
                     "while_branch", stmts_while, blocks
                 ).name.val
@@ -733,7 +757,9 @@ class Passes:
                 stmts_while = [pn.IfElse(exp, [goto_branch], [goto_after])]
 
                 for sub_stmt in reversed(stmts):
-                    stmts_while = self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks)
+                    stmts_while = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks), sub_stmt
+                    )
                 goto_branch.name.val = self._create_block(
                     "do_while_branch", stmts_while, blocks
                 ).name.val
@@ -753,8 +779,8 @@ class Passes:
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
-                    processed_stmts = self._picoc_blocks_stmt(
-                        stmt, processed_stmts, blocks
+                    processed_stmts = self._inherit_origin_many(
+                        self._picoc_blocks_stmt(stmt, processed_stmts, blocks), stmt
                     )
 
                 self._create_block(fun_name, processed_stmts, blocks, add_id=False)
@@ -1080,23 +1106,21 @@ class Passes:
                     pn.Alloc(type_qual, datatype, pn.Name(val1)),
                     initial_val=copy.deepcopy(num),
                 )
-                return [stmt]  # self._single_line_comment(stmt, "//")
+                return self._single_line_comment(stmt, "//")
             case pn.Assign(pn.Alloc(type_qual, _, pn.Name() as name) as alloc, exp):
                 initial_val = (
                     copy.deepcopy(exp) if isinstance(type_qual, pn.Const) else None
                 )
                 self._declare_alloc(alloc, initial_val=initial_val)
                 new_stmt = pn.Assign(name, exp)
-                # return self._single_line_comment(stmt, "//") + self._picoc_symbol_stmt(new_stmt)
-                return self._picoc_symbol_stmt(new_stmt)
+                return self._single_line_comment(stmt, "//") + [new_stmt]
             case pn.Exp(pn.Alloc() as alloc):
                 self._declare_alloc(alloc)
-                # return self._single_line_comment(stmt, "//")
+                return self._single_line_comment(stmt, "//")
+            case pn.Assign():
                 return [stmt]
-            case pn.Assign(lhs, exp):
-                return [pn.Assign(lhs, exp)]
-            case pn.Exp(exp):
-                return [pn.Exp(exp)]
+            case pn.Exp():
+                return [stmt]
             # --------------------------- L_If_Else ---------------------------
             case pn.If(exp, stmts):
                 new_stmts = []
@@ -1243,9 +1267,11 @@ class Passes:
                             self.stack_type_hints = {}
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
-                                typed_out = self._picoc_symbol_stmt(stmt)
+                                typed_out = self._inherit_origin_many(
+                                    self._picoc_symbol_stmt(stmt), stmt
+                                )
                                 rewritten_stmts_instrs += [
-                                    self._picoc_rewrite_stmt(inner)
+                                    self._inherit_origin(self._picoc_rewrite_stmt(inner), inner)
                                     for inner in typed_out
                                 ]
                             block.stmts_instrs = rewritten_stmts_instrs
@@ -1254,23 +1280,13 @@ class Passes:
                         case _:
                             throw_error(block)
 
-                match blocks:
+                match fun_blocks_out:
                     case [pn.Block(_, entry_stmts), *_]:
                         entry_stmts[:0] = [
-                            pn.Exp(alloc)
-                            for alloc in self._fixed_params(allocs)
-                            if not isinstance(alloc, pn.VoidType)
+                            self._inherit_origin(pn.StackMalloc(self.next_local_addr), decl_def)
                         ]
-                        entry_stmts[:0] = [
-                            pn.StackMalloc(self.next_local_addr)
-                        ]
-                        # entry_stmts[:0] = (
-                        #     self._single_line_comment(blocks[0], "//", filtr=[2])
-                        #     if global_vars.args.double_verbose
-                        #     else []
-                        # ) + [pn.StackMalloc(self.next_local_addr)]
                     case _:
-                        throw_error(blocks)
+                        throw_error(fun_blocks_out)
 
                 match blocks[-1]:
                     case pn.Block(_, stmts) if stmts and isinstance(
@@ -1287,8 +1303,10 @@ class Passes:
                 return fun_blocks_out
             case pn.Exp() | pn.Assign():
                 self.current_scope = "global"
-                rewritten = self._picoc_symbol_stmt(decl_def)
-                rewritten = [self._picoc_rewrite_stmt(stmt) for stmt in rewritten]
+                rewritten = self._inherit_origin_many(
+                    self._picoc_symbol_stmt(decl_def), decl_def
+                )
+                rewritten = [self._inherit_origin(self._picoc_rewrite_stmt(stmt), stmt) for stmt in rewritten]
                 self.global_decl_stmts += copy.deepcopy(rewritten)
                 return []
             case _:
@@ -1529,8 +1547,6 @@ class Passes:
             case pn.Assign(lhs, exp):
                 self._picoc_type_exp(lhs)
                 self._picoc_type_exp(exp)
-                return [stmt]
-            case pn.Exp(pn.Alloc()):
                 return [stmt]
             case pn.Exp(exp):
                 self._picoc_type_exp(exp)
@@ -1869,7 +1885,6 @@ class Passes:
                 pn.Alloc(_, datatype, name) as alloc,
                 (pn.Array(_) | pn.Struct(_)) as array_struct,
             ):
-                self._picoc_anf_exp(alloc)
                 # this has to be in this order because the datatype declarator
                 # has to be reversed in the _picoc_mon_exp call
                 # TODO: ugly solution and add it again
@@ -1880,7 +1895,7 @@ class Passes:
                 stmt_anf = self._picoc_anf_stmt(
                     pn.Assign(self._picoc_rewrite_exp(name), array_struct)
                 )
-                return self._single_line_comment(stmt, "//") + stmt_anf
+                return self._single_line_comment(stmt, "//") + self._inherit_origin_many(stmt_anf, stmt)
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Global(pn.Name(var_name)) as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
@@ -1943,17 +1958,6 @@ class Passes:
                         )
                     case _:
                         throw_error(symbol)
-            case pn.Assign(
-                pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1)), num
-            ):
-                # Symbol table already populated during typing; no runtime code needed
-                return self._single_line_comment(stmt, "//") + []
-            case pn.Assign(pn.Alloc(_, _, name) as alloc, exp):
-                self._picoc_anf_exp(alloc)
-                stmt_anf = self._picoc_anf_stmt(
-                        pn.Assign(self._picoc_rewrite_exp(name), exp) # TODO: ist Name bereits Stackframe oder Global?
-                )
-                return self._single_line_comment(stmt, "//") + stmt_anf
             case pn.Assign(ref, exp):
                 # Deref, Subscript, Attribute
                 exps_anf = self._picoc_anf_exp(exp)
@@ -2015,7 +2019,9 @@ class Passes:
                         case pn.Block(_, stmts):
                             stmts_anf = []
                             for stmt in stmts:
-                                stmts_anf += self._picoc_anf_stmt(stmt)
+                                stmts_anf += self._inherit_origin_many(
+                                    self._picoc_anf_stmt(stmt), stmt
+                                )
                             block.stmts_instrs[:] = stmts_anf
                             blocks_anf.append(block)
                         case _:
@@ -2577,7 +2583,9 @@ class Passes:
                             throw_error((mem, tmp))
                     tmp.num.val = int(tmp.num.val) + 1
                 return reti_instrs + [
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
+                    suppress_source_origin(
+                        rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
+                    )
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Exp(pn.Deref(pn.Stack(pn.Num(val1), datatype))):
@@ -2696,16 +2704,22 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
+                    suppress_source_origin(
+                        rn.Instr(
+                            rn.Loadin(),
+                            [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
+                        )
                     ),
                 ]
             case pn.Return(pn.Empty()):
                 # TODO(frame-layout): update return-address access for the new
                 # frame layout.
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")]
+                    suppress_source_origin(
+                        rn.Instr(
+                            rn.Loadin(),
+                            [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
+                        )
                     ),
                 ]
             case _:
@@ -2721,7 +2735,9 @@ class Passes:
                         case pn.Block(_, stmts):
                             instrs = []
                             for stmt in stmts:
-                                instrs += self._reti_blocks_stmt(stmt)
+                                instrs += self._inherit_origin_many(
+                                    self._reti_blocks_stmt(stmt), stmt
+                                )
                             block.stmts_instrs[:] = instrs
                         case _:
                             throw_error(block)
@@ -2849,10 +2865,13 @@ class Passes:
                 current_block_name = name
                 patched_instrs = []
                 for instr in instrs:
-                    patched_instrs += self._reti_patch_instr(
+                    patched_instrs += self._inherit_origin_many(
+                        self._reti_patch_instr(
+                            instr,
+                            current_block_name,
+                            instr == instrs[-1],
+                        ),
                         instr,
-                        current_block_name,
-                        instr == instrs[-1],
                     )
                 block.stmts_instrs[:] = patched_instrs
                 # this has to be done in this pass, because the reti_blocks
@@ -3034,7 +3053,9 @@ class Passes:
                                         idx += 4
                                     case _:
                                         pass
-                                instrs_block_free += self._reti_instr(instr, idx, block)
+                                instrs_block_free += self._inherit_origin_many(
+                                    self._reti_instr(instr, idx, block), instr
+                                )
                                 match instr:
                                     case pn.SingleLineComment():
                                         pass

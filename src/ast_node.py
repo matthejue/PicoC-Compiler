@@ -29,6 +29,45 @@ class ASTNode:
         return acc + ")"
 
 
+def set_source_origin(node, source_file, source_line):
+    if isinstance(node, ASTNode):
+        node.source_file = source_file
+        node.source_line = source_line
+    return node
+
+
+def get_source_origin(node):
+    source_file = getattr(node, "source_file", None)
+    source_line = getattr(node, "source_line", None)
+    if source_file is None or source_line is None:
+        return None
+    return source_file, source_line
+
+
+def copy_source_origin(target, source):
+    if not isinstance(target, ASTNode):
+        from src.utils.util_funs_dependent import throw_error
+        throw_error(target)
+    if getattr(target, "suppress_source_origin", False):
+        return target
+    if get_source_origin(target) is not None:
+        return target
+    origin = get_source_origin(source)
+    if origin is not None:
+        target.source_file, target.source_line = origin
+    return target
+
+
+def copy_source_origin_to_many(targets, source):
+    return [copy_source_origin(target, source) for target in targets]
+
+
+def suppress_source_origin(node):
+    if isinstance(node, ASTNode):
+        node.suppress_source_origin = True
+    return node
+
+
 def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
     sep = ", " if i > 0 else ""
     depth2 = depth + 2

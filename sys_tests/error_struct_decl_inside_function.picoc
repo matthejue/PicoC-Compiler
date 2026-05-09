@@ -1,0 +1,8 @@
+int main() {
+  struct Pair {
+    int x;
+    int y;
+  };
+
+  return 0;
+}
