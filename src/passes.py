@@ -2583,9 +2583,7 @@ class Passes:
                             throw_error((mem, tmp))
                     tmp.num.val = int(tmp.num.val) + 1
                 return reti_instrs + [
-                    suppress_source_origin(
-                        rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
-                    )
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(stack_offset)])
                 ]
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Exp(pn.Deref(pn.Stack(pn.Num(val1), datatype))):
@@ -2704,22 +2702,18 @@ class Passes:
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    suppress_source_origin(
-                        rn.Instr(
-                            rn.Loadin(),
-                            [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                        )
+                    rn.Instr(
+                        rn.Loadin(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
                     ),
                 ]
             case pn.Return(pn.Empty()):
                 # TODO(frame-layout): update return-address access for the new
                 # frame layout.
                 return self._single_line_comment(stmt, "#") + [
-                    suppress_source_origin(
-                        rn.Instr(
-                            rn.Loadin(),
-                            [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                        )
+                    rn.Instr(
+                        rn.Loadin(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
                     ),
                 ]
             case _:

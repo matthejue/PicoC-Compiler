@@ -488,6 +488,8 @@ class OptionHandler:
                 file_ids = {}
                 ranges = []
                 current_range = None
+                # Instruction line numbers in debuginfo.json are 1-based,
+                # matching source-code line numbers.
                 line_no = 0
 
                 for instr in instrs:

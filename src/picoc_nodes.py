@@ -1,4 +1,4 @@
-from src.ast_node import ASTNode, repr_arg_types
+from src.ast_node import ASTNode, repr_arg_types, _source_origin_repr_suffix
 from src import global_vars
 
 # Helper: include datatype fields in visible output only when double-verbose is on.
@@ -716,7 +716,7 @@ class Block(ASTNode):
     def __repr__(self, depth=0):
         return f"\n{depth * ' '}{self.name}:" + repr_arg_types(
             0, self.stmts_instrs, depth, "", is_block=True
-        )
+        ) + _source_origin_repr_suffix(self)
 
     __match_args__ = (
         "name",
@@ -750,7 +750,7 @@ class SingleLineComment(ASTNode):
         return [self.prefix, self.content]
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{self.prefix} {self.content}"
+        return f"\n{' ' * depth}{self.prefix} {self.content}{_source_origin_repr_suffix(self)}"
 
     __match_args__ = ("prefix", "content")
 

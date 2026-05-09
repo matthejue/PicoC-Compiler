@@ -1,4 +1,4 @@
-from src.ast_node import ASTNode
+from src.ast_node import ASTNode, _source_origin_repr_suffix
 from src import picoc_nodes as pn
 from src import global_vars
 
@@ -26,7 +26,7 @@ class Instr(ASTNode):
         for arg in self.args:
             instr_str += f" {arg}"
         # return f"{instr_str}{'' if depth > 0 else ';'}"
-        return instr_str
+        return instr_str + _source_origin_repr_suffix(self)
 
     __match_args__ = ("op", "args")
 
@@ -39,7 +39,7 @@ class Jump(ASTNode):
         super().__init__(visible=[self.rel, self.im_goto])
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
+        return f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}{_source_origin_repr_suffix(self)}"
 
     __match_args__ = ("rel", "im_goto")
 
@@ -49,7 +49,7 @@ class Int(ASTNode):
         self.num = num
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}INT {self.num}"
+        return f"\n{' ' * depth}INT {self.num}{_source_origin_repr_suffix(self)}"
 
     __match_args__ = ("num",)
 
@@ -59,7 +59,7 @@ class RawInstr(ASTNode):
         self.code = code
 
     def __repr__(self, depth=0):
-        return f"\n{' ' * depth}{self.code}"
+        return f"\n{' ' * depth}{self.code}{_source_origin_repr_suffix(self)}"
 
     __match_args__ = ("code",)
 

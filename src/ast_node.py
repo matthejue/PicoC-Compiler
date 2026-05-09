@@ -1,4 +1,5 @@
 from src import picoc_nodes as pn
+from src import global_vars
 from src.utils.util_funs_independent import convert_to_single_line
 from src.log import log
 
@@ -16,8 +17,9 @@ class ASTNode:
     # __match_args__ = ("val",)
 
     def __repr__(self, depth=0, is_file=False):
+        origin_suffix = _source_origin_repr_suffix(self)
         if not self.visible:
-            return f"\n{' ' * depth}{self.__class__.__name__}()"
+            return f"\n{' ' * depth}{self.__class__.__name__}(){origin_suffix}"
 
         acc = ""
 
@@ -26,7 +28,17 @@ class ASTNode:
         for i, child in enumerate(self.visible):
             acc = repr_arg_types(i, child, depth, acc, is_file=is_file)
 
-        return acc + ")"
+        return acc + f"){origin_suffix}"
+
+
+def _source_origin_repr_suffix(node):
+    if not getattr(global_vars, "args", None) or not global_vars.args.double_verbose:
+        return ""
+    origin = get_source_origin(node)
+    if origin is None:
+        return ""
+    source_file, source_line = origin
+    return f" [source: {source_file}:{source_line}]"
 
 
 def set_source_origin(node, source_file, source_line):
