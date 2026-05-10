@@ -17,28 +17,31 @@ class ASTNode:
     # __match_args__ = ("val",)
 
     def __repr__(self, depth=0, is_file=False):
-        origin_suffix = _source_origin_repr_suffix(self)
-        if not self.visible:
-            return f"\n{' ' * depth}{self.__class__.__name__}(){origin_suffix}"
+        visible = list(self.visible)
+        origin_visible = _source_origin_visible(self)
+        if origin_visible is not None:
+            visible.append(origin_visible)
+        if not visible:
+            return f"\n{' ' * depth}{self.__class__.__name__}()"
 
         acc = ""
 
         acc += f"\n{' ' * depth}{self.__class__.__name__}("
 
-        for i, child in enumerate(self.visible):
+        for i, child in enumerate(visible):
             acc = repr_arg_types(i, child, depth, acc, is_file=is_file)
 
-        return acc + f"){origin_suffix}"
+        return acc + ")"
 
 
-def _source_origin_repr_suffix(node):
-    if not getattr(global_vars, "args", None) or not global_vars.args.double_verbose:
-        return ""
+def _source_origin_visible(node):
+    if not global_vars.args.double_verbose:
+        return None
     origin = get_source_origin(node)
     if origin is None:
-        return ""
+        return None
     source_file, source_line = origin
-    return f" [source: {source_file}:{source_line}]"
+    return f"{source_file}:{source_line}"
 
 
 def set_source_origin(node, source_file, source_line):
