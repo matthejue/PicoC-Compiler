@@ -1267,6 +1267,10 @@ class Passes:
                             self.stack_type_hints = {}
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
+                                # Needed for cases like `int x = expr;`, where
+                                # `_picoc_symbol_stmt` expands one source statement into
+                                # multiple nodes. Its output feeds `_picoc_rewrite_stmt`, so
+                                # without this the origin chain would break at `inner`
                                 typed_out = self._inherit_origin_many(
                                     self._picoc_symbol_stmt(stmt), stmt
                                 )

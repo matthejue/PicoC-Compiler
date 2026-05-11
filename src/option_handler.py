@@ -156,9 +156,7 @@ class OptionHandler:
         return preprocessor.preprocess(code, path)
 
     def _compl(self, code):
-        if global_vars.args.intermediate_stages:
-            print(subheading("Preprocessed Code", "-"))
-            print(code)
+        self._output_preprocess(code, "Preprocessed Code", ".pre")
 
         transformer = TransformerPicoC()
         ts_tree = transformer.parse_tree(code)
@@ -431,6 +429,19 @@ class OptionHandler:
                 case _:
                     throw_error(pass_ast)
 
+    def _output_preprocess(self, text: str, heading: str, suffix: str):
+        if global_vars.args.intermediate_stages:
+            print(subheading(heading, "-"))
+            print(text)
+
+        if global_vars.args.write_files:
+            with open(
+                global_vars.tstate.path_without_ext + suffix,
+                "w",
+                encoding="utf-8",
+            ) as fout:
+                fout.write(text)
+
     def _st_pass(self, symbol_table: st.SymbolTable, heading, compl_opt_active=False, is_global_st=False):
         if (
             global_vars.args.intermediate_stages
@@ -483,7 +494,7 @@ class OptionHandler:
 
     def _write_debuginfo(self, pass_ast: pn.File):
         match pass_ast:
-            case pn.File(_, instrs):
+            case pn.File(pn.Name(val), instrs):
                 files = []
                 file_ids = {}
                 ranges = []
@@ -525,7 +536,8 @@ class OptionHandler:
                         }
                         ranges.append(current_range)
 
-                with open(Path.cwd() / "debuginfo.json", "w", encoding="utf-8") as fout:
+                debuginfo_path = Path(val).resolve().parent / "debuginfo.json"
+                with open(debuginfo_path, "w", encoding="utf-8") as fout:
                     json.dump({"files": files, "ranges": ranges}, fout, indent=2)
                     fout.write("\n")
             case _:

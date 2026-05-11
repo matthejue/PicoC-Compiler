@@ -3,6 +3,12 @@ from src import global_vars
 from src.utils.util_funs_independent import convert_to_single_line
 from src.log import log
 
+_SOURCE_ORIGIN_HIDDEN_NODE_NAMES = {
+    "SingleLineComment",
+    "Num"
+}
+
+
 class ASTNode:
     def __init__(self, visible=[]):
         # val="", 
@@ -36,6 +42,8 @@ class ASTNode:
 
 def _source_origin_visible(node):
     if not global_vars.args.double_verbose:
+        return None
+    if node.__class__.__name__ in _SOURCE_ORIGIN_HIDDEN_NODE_NAMES:
         return None
     origin = get_source_origin(node)
     if origin is None:

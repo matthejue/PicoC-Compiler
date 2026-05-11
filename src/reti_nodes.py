@@ -28,7 +28,7 @@ class Instr(ASTNode):
         # return f"{instr_str}{'' if depth > 0 else ';'}"
         origin_visible = _source_origin_visible(self)
         if origin_visible is not None:
-            instr_str += f", '{origin_visible}'"
+            instr_str += f" # {origin_visible}"
         return instr_str
 
     __match_args__ = ("op", "args")
@@ -45,7 +45,7 @@ class Jump(ASTNode):
         instr_str = f"\n{' ' * depth}JUMP{self.rel} {self.im_goto}"
         origin_visible = _source_origin_visible(self)
         if origin_visible is not None:
-            instr_str += f", '{origin_visible}'"
+            instr_str += f" # {origin_visible}"
         return instr_str
 
     __match_args__ = ("rel", "im_goto")
@@ -59,7 +59,7 @@ class Int(ASTNode):
         instr_str = f"\n{' ' * depth}INT {self.num}"
         origin_visible = _source_origin_visible(self)
         if origin_visible is not None:
-            instr_str += f", '{origin_visible}'"
+            instr_str += f" # {origin_visible}"
         return instr_str
 
     __match_args__ = ("num",)
@@ -73,7 +73,7 @@ class RawInstr(ASTNode):
         instr_str = f"\n{' ' * depth}{self.code}"
         origin_visible = _source_origin_visible(self)
         if origin_visible is not None:
-            instr_str += f", '{origin_visible}'"
+            instr_str += f" # {origin_visible}"
         return instr_str
 
     __match_args__ = ("code",)
