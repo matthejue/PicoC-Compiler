@@ -260,6 +260,7 @@ class Preprocessor:
                         name = parts[0]
                         value = parts[1].strip() if len(parts) > 1 else "1"
                         self.macros[name] = value
+                        out.append("\n")
 
                     else:
                         out.append(f"#{kw}{arg}\n")  # preserve unknown directives

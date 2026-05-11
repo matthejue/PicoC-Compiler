@@ -463,15 +463,24 @@ class OptionHandler:
                 fout.write(str(json_symbol_table))
 
     def _reti_with_metadata(self, pass_ast: pn.File, heading):
-        pass_ast.decls_defs_blocks_instrs[:0] = [
-            pn.SingleLineComment(
-                "#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"
-            ),
-            pn.SingleLineComment(
-                "#",
-                f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}",
-            ),
-        ]
+        metadata_entries = []
+        if global_vars.args.metadata_comments and global_vars.metadata_comments:
+            for key in ("input", "expected", "datasegment"):
+                value = global_vars.metadata_comments.get(key)
+                if value is not None:
+                    metadata_entries.append(pn.SingleLineComment("#", f"{key}: {value}"))
+        else:
+            metadata_entries = [
+                pn.SingleLineComment(
+                    "#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"
+                ),
+                pn.SingleLineComment(
+                    "#",
+                    f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}",
+                ),
+            ]
+
+        pass_ast.decls_defs_blocks_instrs[:0] = metadata_entries
 
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
@@ -910,26 +919,50 @@ def _resolve_dependency_path(source_dir: str, dependency: str) -> str:
 
 
 def _get_test_metadata():
+    global_vars.metadata_comments = {}
     if global_vars.args.metadata_comments:
         # the first specified .picoc file needs to inlcude the metadata comment
         with open(global_vars.args.infiles[0], encoding="utf-8") as fin:
             code = fin.read()
 
-        regex = re.search(
-            r"((\/\/|#) +in(put)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +exp(ected)?: *([\d\-]+( +[\d\-]+)*)? *\n)?((\/\/|#) +data(segment)?: *([\d\-]+)? *\n)?",
-            code,
+        for line in code.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                continue
+            match = re.match(
+                r"^(//|#)\s*(input|in|expected|exp|datasegment|data)\s*:\s*(.*)$",
+                stripped,
+                re.IGNORECASE,
+            )
+            if match:
+                raw_key = match.group(2).lower()
+                value = match.group(3).strip()
+                key = {
+                    "in": "input",
+                    "input": "input",
+                    "exp": "expected",
+                    "expected": "expected",
+                    "data": "datasegment",
+                    "datasegment": "datasegment",
+                }[raw_key]
+                global_vars.metadata_comments[key] = value
+                continue
+            if stripped.startswith("//") or stripped.startswith("#") or stripped.startswith("/*"):
+                continue
+            break
+
+        input_comment = global_vars.metadata_comments.get("input")
+        expected_comment = global_vars.metadata_comments.get("expected")
+        global_vars.input = (
+            [int(token) for token in input_comment.split() if token.lstrip("-").isdigit()]
+            if input_comment
+            else []
         )
-        if regex:
-            global_vars.input = (
-                list(map(lambda x: int(x), regex.group(4).split()))
-                if regex.group(4)
-                else []
-            )
-            global_vars.expected = (
-                list(map(lambda x: int(x), regex.group(9).split()))
-                if regex.group(9)
-                else []
-            )
+        global_vars.expected = (
+            [int(token) for token in expected_comment.split() if token.lstrip("-").isdigit()]
+            if expected_comment
+            else []
+        )
     elif global_vars.args.testmode:
         if os.path.isfile(global_vars.tstate.path_without_ext + ".input"):
             with open(

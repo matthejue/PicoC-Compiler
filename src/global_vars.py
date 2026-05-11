@@ -22,6 +22,7 @@ max_print_out_elements = 5
 
 input = []
 expected = []
+metadata_comments = {}
 
 terminal_columns = 72
 terminal_lines = 24
