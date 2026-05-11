@@ -2701,25 +2701,27 @@ class Passes:
             case pn.Return(pn.Stack(pn.Num(val))):
                 # TODO(frame-layout): update return-address access for the new
                 # frame layout.
+                return_instr = rn.Instr(
+                    rn.Loadin(),
+                    [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
+                )
+                return_instr.return_statement = True
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                     ),
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    rn.Instr(
-                        rn.Loadin(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                    ),
+                    return_instr,
                 ]
             case pn.Return(pn.Empty()):
                 # TODO(frame-layout): update return-address access for the new
                 # frame layout.
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                    ),
-                ]
+                return_instr = rn.Instr(
+                    rn.Loadin(),
+                    [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
+                )
+                return_instr.return_statement = True
+                return self._single_line_comment(stmt, "#") + [return_instr]
             case _:
                 throw_error(stmt)
 
@@ -2939,6 +2941,18 @@ class Passes:
                 rn.Jump(rel, rn.Im(str(distance)))
             ]
 
+    def _mark_call_jump(self, instrs, target_function):
+        for instr in reversed(instrs):
+            if isinstance(instr, pn.SingleLineComment):
+                continue
+            instr.call_target_function = target_function
+            break
+        return instrs
+
+    def _is_function_label(self, name):
+        symbol, _ = self.symbol_table.resolve(name, scope="global")
+        return isinstance(symbol, dict) and isinstance(symbol.get("datatype"), pn.FunDecl)
+
     def _determine_distance(self, current_block, other_block, idx):
         if int(other_block.instrs_before.val) != int(current_block.instrs_before.val):
             return (
@@ -2954,7 +2968,10 @@ class Passes:
             case rn.Jump(rn.Always(), rn.Name(val)):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                return self._patch_too_large_jumps(rn.Always(), distance, instr)
+                patched = self._patch_too_large_jumps(rn.Always(), distance, instr)
+                if self._is_function_label(val):
+                    patched = self._mark_call_jump(patched, val)
+                return patched
             case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)

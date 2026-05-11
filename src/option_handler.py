@@ -13,6 +13,7 @@ from src.utils.util_funs_dependent import (
     subheading,
     get_ext,
 )
+from src.utils.util_funs_independent import convert_to_single_line
 import subprocess, os, platform
 import re
 import argparse
@@ -220,7 +221,7 @@ class OptionHandler:
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI")
         if global_vars.args.generate_debuginfo:
-            self._write_debuginfo(reti)
+            self._write_debuginfo(reti, passes.symbol_table)
 
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
         passes = Passes()
@@ -501,12 +502,48 @@ class OptionHandler:
             case _:
                 throw_error(pass_ast)
 
-    def _write_debuginfo(self, pass_ast: pn.File):
+    def _debug_json_value(self, value):
+        if isinstance(value, pn.Empty):
+            return None
+        if isinstance(value, pn.Num):
+            return int(value.val)
+        if isinstance(value, (int, float, str, bool)) or value is None:
+            return value
+        return convert_to_single_line(value)
+
+    def _debug_runtime_symbols(self, symbol_table: st.SymbolTable):
+        variables = []
+        arguments = []
+        for scope, symbols in symbol_table.items():
+            if scope == "__parents__":
+                continue
+            for symbol_name, symbol in symbols.items():
+                if not isinstance(symbol, dict) or "frame_kind" not in symbol:
+                    continue
+
+                entry = {
+                    "name": symbol.get("name", symbol_name),
+                    "scope": scope,
+                    "address": self._debug_json_value(symbol.get("addr")),
+                    "size": self._debug_json_value(symbol.get("size")),
+                }
+
+                if symbol.get("frame_kind") == "param":
+                    arguments.append(entry)
+                else:
+                    variables.append(entry)
+
+        return variables, arguments
+
+    def _write_debuginfo(self, pass_ast: pn.File, symbol_table: st.SymbolTable):
         match pass_ast:
             case pn.File(pn.Name(val), instrs):
+                variables, arguments = self._debug_runtime_symbols(symbol_table)
                 files = []
                 file_ids = {}
                 ranges = []
+                call_jumps = []
+                return_addresses = []
                 current_range = None
                 # Instruction line numbers in debuginfo.json are 1-based,
                 # matching source-code line numbers.
@@ -516,6 +553,17 @@ class OptionHandler:
                     if isinstance(instr, pn.SingleLineComment):
                         continue
                     line_no += 1
+
+                    call_target_function = getattr(instr, "call_target_function", None)
+                    if call_target_function is not None:
+                        call_jumps.append(
+                            {
+                                "address": line_no - 1,
+                                "target_function": call_target_function,
+                            }
+                        )
+                    if getattr(instr, "return_statement", False):
+                        return_addresses.append(line_no - 1)
 
                     source_file = getattr(instr, "source_file", None)
                     source_line = getattr(instr, "source_line", None)
@@ -547,7 +595,18 @@ class OptionHandler:
 
                 debuginfo_path = Path(val).resolve().parent / "debuginfo.json"
                 with open(debuginfo_path, "w", encoding="utf-8") as fout:
-                    json.dump({"files": files, "ranges": ranges}, fout, indent=2)
+                    json.dump(
+                        {
+                            "files": files,
+                            "ranges": ranges,
+                            "variables": variables,
+                            "arguments": arguments,
+                            "call_jumps": call_jumps,
+                            "return_addresses": return_addresses,
+                        },
+                        fout,
+                        indent=2,
+                    )
                     fout.write("\n")
             case _:
                 throw_error(pass_ast)
