@@ -732,8 +732,13 @@ class Passes:
                 goto_after = self._create_block("while_after", processed_stmts, blocks)
 
                 goto_branch = pn.GoTo(pn.Name("placeholder"))
-                goto_condition_check = pn.GoTo(pn.Name("placeholder"))
-                stmts_while = [goto_condition_check]
+                goto_condition_check = self._inherit_origin(
+                    pn.GoTo(pn.Name("placeholder")), stmt
+                )
+                goto_loopback_condition_check = self._inherit_origin(
+                    pn.GoTo(pn.Name("placeholder")), stmt
+                )
+                stmts_while = [goto_loopback_condition_check]
 
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._inherit_origin_many(
@@ -743,10 +748,16 @@ class Passes:
                     "while_branch", stmts_while, blocks
                 ).name.val
 
-                condition_check = [pn.IfElse(exp, [goto_branch], [goto_after])]
-                goto_condition_check.name.val = self._create_block(
+                condition_check = [
+                    self._inherit_origin(
+                        pn.IfElse(exp, [goto_branch], [goto_after]), stmt
+                    )
+                ]
+                condition_check_name = self._create_block(
                     "condition_check", condition_check, blocks
                 ).name.val
+                goto_condition_check.name.val = condition_check_name
+                goto_loopback_condition_check.name.val = condition_check_name
 
                 return self._single_line_comment(stmt, "//") + [goto_condition_check]
             case pn.DoWhile(exp, stmts):
