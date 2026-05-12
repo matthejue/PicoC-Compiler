@@ -429,7 +429,10 @@ class Passes:
                 stmts_shrinked = []
                 for stmt in stmts:
                     stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
-                return pn.If(self._picoc_shrink_exp(exp), stmts_shrinked)
+                return pn.If(
+                    self._inherit_origin(self._picoc_shrink_exp(exp), exp),
+                    stmts_shrinked,
+                )
             case pn.IfElse(exp, stmts1, stmts2):
                 stmts_shrinked1 = []
                 for stmt1 in stmts1:
@@ -438,19 +441,27 @@ class Passes:
                 for stmt2 in stmts2:
                     stmts_shrinked2 += [self._inherit_origin(self._picoc_shrink_stmt(stmt2), stmt2)]
                 return pn.IfElse(
-                    self._picoc_shrink_exp(exp), stmts_shrinked1, stmts_shrinked2
+                    self._inherit_origin(self._picoc_shrink_exp(exp), exp),
+                    stmts_shrinked1,
+                    stmts_shrinked2,
                 )
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
                     stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
-                return pn.While(self._picoc_shrink_exp(exp), stmts_shrinked)
+                return pn.While(
+                    self._inherit_origin(self._picoc_shrink_exp(exp), exp),
+                    stmts_shrinked,
+                )
             case pn.DoWhile(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
                     stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
-                return pn.DoWhile(self._picoc_shrink_exp(exp), stmts_shrinked)
+                return pn.DoWhile(
+                    self._inherit_origin(self._picoc_shrink_exp(exp), exp),
+                    stmts_shrinked,
+                )
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(pn.Empty()):
                 return stmt
@@ -765,8 +776,17 @@ class Passes:
                     "do_while_after", processed_stmts, blocks
                 )
 
-                goto_branch = pn.GoTo(pn.Name("placeholder"))
-                stmts_while = [pn.IfElse(exp, [goto_branch], [goto_after])]
+                goto_branch = self._inherit_origin(
+                    pn.GoTo(pn.Name("placeholder")), stmt
+                )
+                goto_loopback_branch = self._inherit_origin(
+                    pn.GoTo(pn.Name("placeholder")), exp
+                )
+                stmts_while = [
+                    self._inherit_origin(
+                        pn.IfElse(exp, [goto_loopback_branch], [goto_after]), exp
+                    )
+                ]
 
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._inherit_origin_many(
@@ -775,6 +795,7 @@ class Passes:
                 goto_branch.name.val = self._create_block(
                     "do_while_branch", stmts_while, blocks
                 ).name.val
+                goto_loopback_branch.name.val = goto_branch.name.val
 
                 return self._single_line_comment(stmt, "//") + [goto_branch]
             # ----------------------------- L_Fun -----------------------------
