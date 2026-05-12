@@ -491,14 +491,15 @@ class Passes:
                                     else alloc
                                     for alloc in allocs
                                 ]
+                            fun_def = pn.FunDef(
+                                storage_class_specifiers,
+                                datatype,
+                                name,
+                                allocs_shrinked,
+                                stmts_shrinked,
+                            )
                             decls_defs_shrinked += [
-                                pn.FunDef(
-                                    storage_class_specifiers,
-                                    datatype,
-                                    name,
-                                    allocs_shrinked,
-                                    stmts_shrinked,
-                                )
+                                self._inherit_origin(fun_def, decl_def)
                             ]
                         case pn.StructDecl(pn.Name() as name, allocs):
                             allocs_shrinked = [
@@ -785,19 +786,20 @@ class Passes:
 
                 self._create_block(fun_name, processed_stmts, blocks, add_id=False)
                 self.all_blocks |= blocks
+                fun_def = pn.FunDef(
+                    storage_class_specifiers,
+                    datatype,
+                    name,
+                    allocs,
+                    list(
+                        sorted(
+                            blocks.values(),
+                            key=lambda block: -int(block.block_idx),
+                        )
+                    ),
+                )
                 return [
-                    pn.FunDef(
-                        storage_class_specifiers,
-                        datatype,
-                        name,
-                        allocs,
-                        list(
-                            sorted(
-                                blocks.values(),
-                                key=lambda block: -int(block.block_idx),
-                            )
-                        ),
-                    )
+                    self._inherit_origin(fun_def, decl_def)
                 ]
             case pn.StructSpec() | pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign():
                 return [decl_def]
