@@ -740,8 +740,31 @@ class Passes:
                 ]
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
-                # Block creation order controls final emission/fallthrough.
-                # Create after before branch so after is emitted after branch.
+                # Example:
+                # while (i < max) {
+                #   i = i + 1;
+                # }
+                # print(i);
+                #
+                # Becomes roughly:
+                #
+                # current block:
+                #   goto condition_check
+                #
+                # condition_check:
+                #   if (i < max) goto while_branch else goto while_after
+                #
+                # while_branch:
+                #   i = i + 1
+                #   goto condition_check
+                #
+                # while_after:
+                #   print(i)
+                #
+                # Blocks are sorted by descending block_idx later. Because this
+                # pass walks statements in reverse and _create_block counts upward,
+                # create the code-after-loop block first, then loop-body, then
+                # condition-check.
                 goto_after = self._inherit_origin(
                     self._create_block("while_after", processed_stmts, blocks), exp
                 )
@@ -774,6 +797,23 @@ class Passes:
 
                 return self._single_line_comment(stmt, "//") + [goto_condition_check]
             case pn.DoWhile(exp, stmts):
+                # Example:
+                # do {
+                #   i = i + 1;
+                # } while (i < max);
+                # print(i);
+                #
+                # Becomes roughly:
+                #
+                # current block:
+                #   goto do_while_branch
+                #
+                # do_while_branch:
+                #   i = i + 1
+                #   if (i < max) goto do_while_branch else goto do_while_after
+                #
+                # do_while_after:
+                #   print(i)
                 goto_after = self._create_block(
                     "do_while_after", processed_stmts, blocks
                 )
