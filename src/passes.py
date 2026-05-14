@@ -740,35 +740,37 @@ class Passes:
                 ]
             # ----------------------------- L_Loop ----------------------------
             case pn.While(exp, stmts):
-                goto_after = self._create_block("while_after", processed_stmts, blocks)
-
-                goto_branch = pn.GoTo(pn.Name("placeholder"))
-                goto_condition_check = self._inherit_origin(
-                    pn.GoTo(pn.Name("placeholder")), stmt
+                # Block creation order controls final emission/fallthrough.
+                # Create after before branch so after is emitted after branch.
+                goto_after = self._inherit_origin(
+                    self._create_block("while_after", processed_stmts, blocks), exp
                 )
+                # Keep goto_loopback_condition_check and the later
+                # goto_condition_check separate; later object changes must not
+                # affect both instruction sites.
                 goto_loopback_condition_check = self._inherit_origin(
                     pn.GoTo(pn.Name("placeholder")), stmt
                 )
                 stmts_while = [goto_loopback_condition_check]
-
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._inherit_origin_many(
                         self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks), sub_stmt
                     )
-                goto_branch.name.val = self._create_block(
-                    "while_branch", stmts_while, blocks
-                ).name.val
-
+                goto_branch = self._inherit_origin(
+                    self._create_block("while_branch", stmts_while, blocks), exp
+                )
                 condition_check = [
                     self._inherit_origin(
-                        pn.IfElse(exp, [goto_branch], [goto_after]), stmt
+                        pn.IfElse(exp, [goto_branch], [goto_after]), exp
                     )
                 ]
                 condition_check_name = self._create_block(
                     "condition_check", condition_check, blocks
                 ).name.val
-                goto_condition_check.name.val = condition_check_name
                 goto_loopback_condition_check.name.val = condition_check_name
+                goto_condition_check = self._inherit_origin(
+                    pn.GoTo(pn.Name(condition_check_name)), stmt
+                )
 
                 return self._single_line_comment(stmt, "//") + [goto_condition_check]
             case pn.DoWhile(exp, stmts):
