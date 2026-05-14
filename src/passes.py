@@ -783,8 +783,8 @@ class Passes:
                     self._create_block("while_branch", stmts_while, blocks), exp
                 )
                 goto_condition_check = self._inherit_origin(self._create_block(
-                    "condition_check", [self._inherit_origin(pn.IfElse(exp, [goto_branch], [goto_after]), exp)], blocks).name.val, stmt)
-                goto_loopback_condition_check.name.val = condition_check_name.name.val
+                    "condition_check", [self._inherit_origin(pn.IfElse(exp, [goto_branch], [goto_after]), exp)], blocks), stmt)
+                goto_loopback_condition_check.name.val = goto_condition_check.name.val
 
                 return self._single_line_comment(stmt, "//") + [goto_condition_check]
             case pn.DoWhile(exp, stmts):
