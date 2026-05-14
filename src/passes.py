@@ -611,10 +611,43 @@ class Passes:
                             break  # success
             else:
                 return []
+
+        def _repr_with_visible(node_for_repr, visible):
+            if not visible:
+                return f"\n{node_for_repr.__class__.__name__}()"
+            parts = []
+            for child in visible:
+                match child:
+                    case list() as lst:
+                        if not lst:
+                            parts.append("[]")
+                        else:
+                            lst_parts = []
+                            for item in lst:
+                                try:
+                                    lst_parts.append(convert_to_single_line(item))
+                                except Exception:
+                                    lst_parts.append(repr(item))
+                            parts.append("[" + ", ".join(lst_parts) + "]")
+                    case str() as s:
+                        parts.append(f"'{s}'")
+                    case int() as i:
+                        parts.append(str(i))
+                    case _:
+                        try:
+                            parts.append(child.__repr__())
+                        except Exception:
+                            parts.append(repr(child))
+            return f"\n{node_for_repr.__class__.__name__}(" + ", ".join(parts) + ")"
+
         if hasattr(node, "visible"):
-            for i, visible_list_item in enumerate(node.visible):
+            visible_copy = copy.deepcopy(list(node.visible))
+            for i, visible_list_item in enumerate(visible_copy):
                 if isinstance(visible_list_item, list) and i in filtr:
-                    node.visible[i] = []
+                    visible_copy[i] = []
+            node_repr = _repr_with_visible(node, visible_copy)
+            return [pn.SingleLineComment(prefix, convert_to_single_line(node_repr))]
+
         return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
     def _char_literal_code(self, val: str) -> int:
