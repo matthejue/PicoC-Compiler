@@ -73,6 +73,10 @@ def copy_source_origin(target, source):
         throw_error(target)
     if getattr(target, "suppress_source_origin", False):
         return target
+    # Do not overwrite an existing origin. For example, While/DoWhile body
+    # rewriting calls _inherit_origin_many(..., sub_stmt); without this guard,
+    # condition-related jumps already marked with the condition/loop origin
+    # would be overwritten with the current body statement's origin.
     if get_source_origin(target) is not None:
         return target
     origin = get_source_origin(source)
