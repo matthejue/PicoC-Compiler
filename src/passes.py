@@ -368,13 +368,18 @@ class Passes:
                             throw_error(init_pairs)
                 return pn.Struct(init_pairs_shrinked)
             # ----------------------------- L_Fun -----------------------------
+            case pn.FunRef(name):
+                return pn.FunRef(name)
             case pn.Call(pn.Name(fun_name) as name, exps):
                 inline_exp = self._inline_static_call(fun_name, exps)
                 if inline_exp is not None:
                     return self._picoc_shrink_exp(inline_exp)
                 return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
-            case pn.Call(name, exps):
-                return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
+            case pn.Call(fun_exp, exps):
+                return pn.Call(
+                    self._picoc_shrink_exp(fun_exp),
+                    [self._picoc_shrink_exp(exp) for exp in exps],
+                )
             case _:
                 throw_error(exp)
 
@@ -385,6 +390,30 @@ class Passes:
                 return pn.ArrayDecl(const_shrunk, self._picoc_shrink_datatype(inner_dt))
             case pn.PntrDecl(inner_dt):
                 return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
+            case pn.FunPtrDecl(ret_dt, params):
+                params_shrunk = []
+                for param in params:
+                    match param:
+                        case pn.ParamDecl(type_qual, param_dt):
+                            params_shrunk.append(
+                                pn.ParamDecl(
+                                    type_qual,
+                                    self._picoc_shrink_datatype(param_dt),
+                                )
+                            )
+                        case pn.VoidType() | pn.VariadicParam():
+                            params_shrunk.append(param)
+                        case pn.Alloc(type_qual, param_dt, name):
+                            params_shrunk.append(
+                                pn.Alloc(
+                                    type_qual,
+                                    self._picoc_shrink_datatype(param_dt),
+                                    name,
+                                )
+                            )
+                        case _:
+                            throw_error(param)
+                return pn.FunPtrDecl(self._picoc_shrink_datatype(ret_dt), params_shrunk)
             case pn.FunDecl(_, ret_dt, name, allocs):
                 if allocs and isinstance(allocs[0], pn.VoidType):
                     allocs_shrunk = []
@@ -955,6 +984,15 @@ class Passes:
             scope="global",
         )
 
+    def _function_pointer_datatype(self, fun_decl):
+        match fun_decl:
+            case pn.FunDecl(_, ret_dt, _, params):
+                return pn.PntrDecl(
+                    pn.FunPtrDecl(copy.deepcopy(ret_dt), copy.deepcopy(params))
+                )
+            case _:
+                throw_error(fun_decl)
+
     def _resolve_name_to_storage(self, name_node):
         match name_node:
             case pn.Name(var_name):
@@ -964,6 +1002,11 @@ class Passes:
                 # TODO: error message instead
                 if symbol is None:
                     return name_node
+                if isinstance(symbol.get("datatype"), pn.FunDecl):
+                    return pn.FunRef(
+                        copy.deepcopy(name_node),
+                        self._function_pointer_datatype(symbol["datatype"]),
+                    )
                 match symbol.get("type_qual"):
                     case pn.Const():
                         return copy.deepcopy(symbol.get("val", name_node))
@@ -1035,18 +1078,34 @@ class Passes:
             case pn.Call(pn.Name() as fun_name, exps):
                 if fun_name.val == "input":
                     self._declare_input_builtin()
+                    return pn.Call(
+                        fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
+                    )
                 elif fun_name.val == "print":
                     self._declare_print_builtin()
+                    return pn.Call(
+                        fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
+                    )
+                symbol, _ = self.symbol_table.resolve(fun_name.val, scope="global")
+                if isinstance(symbol, dict) and isinstance(
+                    symbol.get("datatype"), pn.FunDecl
+                ):
+                    return pn.Call(
+                        fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
+                    )
                 return pn.Call(
-                    fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
+                    self._picoc_rewrite_exp(fun_name),
+                    [self._picoc_rewrite_exp(inner) for inner in exps],
+                )
+            case pn.Call(fun_exp, exps):
+                return pn.Call(
+                    self._picoc_rewrite_exp(fun_exp),
+                    [self._picoc_rewrite_exp(inner) for inner in exps],
                 )
             case pn.Asm():
                 return exp
-            # case pn.Call(fun_exp, exps):
-            #     return pn.Call(
-            #         self._picoc_rewrite_exp(fun_exp),
-            #         [self._picoc_rewrite_exp(inner) for inner in exps],
-            #     )
+            case pn.FunRef():
+                return exp
             case pn.SizeOf():
                 return exp
             case pn.Exit():
@@ -1362,6 +1421,17 @@ class Passes:
     def _ref_result_datatype(self, inner_dt):
         return pn.PntrDecl(copy.deepcopy(inner_dt))
 
+    def _call_return_datatype(self, fun_dt):
+        match fun_dt:
+            case pn.FunDecl(_, ret_dt, _, _):
+                return copy.deepcopy(ret_dt)
+            case pn.PntrDecl(pn.FunPtrDecl(ret_dt, _)):
+                return copy.deepcopy(ret_dt)
+            case pn.FunPtrDecl(ret_dt, _):
+                return copy.deepcopy(ret_dt)
+            case _:
+                throw_error(fun_dt)
+
     def _attr_result_datatype(self, struct_dt, attr_name: str):
         match struct_dt:
             case pn.StructSpec(pn.Name(struct_name)):
@@ -1447,6 +1517,10 @@ class Passes:
             case pn.Global(pn.Name(val)):
                 symbol, _ = self.symbol_table.resolve(val, scope="global")
                 dt = copy.deepcopy(symbol["datatype"])
+                exp.datatype = copy.deepcopy(dt)
+                return dt
+            case pn.FunRef(_, datatype):
+                dt = copy.deepcopy(datatype)
                 exp.datatype = copy.deepcopy(dt)
                 return dt
             case pn.Stackframe():
@@ -1543,6 +1617,13 @@ class Passes:
                         return copy.deepcopy(ret_dt)
                     case _:
                         throw_error(symbol)
+            case pn.Call(fun_exp, exps):
+                fun_dt = self._picoc_type_exp(fun_exp)
+                for inner_exp in exps:
+                    self._picoc_type_exp(inner_exp)
+                ret_dt = self._call_return_datatype(fun_dt)
+                exp.datatype = copy.deepcopy(ret_dt)
+                return ret_dt
             case pn.Empty():
                 return None
             case _:
@@ -1666,6 +1747,8 @@ class Passes:
                         case _:
                             throw_error(datatype)
             case pn.Num() | pn.Char():
+                return [pn.Exp(exp)]
+            case pn.FunRef():
                 return [pn.Exp(exp)]
             case pn.Call(pn.Name("print") as name, [exp]):
                 exp_anf = self._picoc_anf_exp(exp)
@@ -1875,6 +1958,32 @@ class Passes:
                     + (
                         [pn.Exp(rn.Reg(rn.Acc()))]
                         if not isinstance(return_type, pn.VoidType)
+                        else []
+                    )
+                )
+            case pn.Call(fun_exp, exps, datatype):
+                callee_anf = self._picoc_anf_exp(fun_exp)
+
+                exps_anf = []
+                self.argmode_on = True
+                for exp2 in reversed(exps):
+                    exps_anf += self._picoc_anf_exp(exp2)
+                self.argmode_on = False
+
+                return (
+                    self._single_line_comment(exp, "//")
+                    + callee_anf
+                    + exps_anf
+                    + [
+                        pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("4")),
+                        pn.Exp(pn.GoTo(pn.Stack(pn.Num(str(len(exps) + 1))))),
+                        pn.RemoveStackframe(
+                            pn.Num(str(self.next_local_addr))
+                        ),
+                    ]
+                    + (
+                        [pn.Exp(rn.Reg(rn.Acc()))]
+                        if not isinstance(datatype, pn.VoidType)
                         else []
                     )
                 )
@@ -2122,6 +2231,15 @@ class Passes:
                         throw_error(exp)
 
                 return reti_instrs + [
+                    rn.Instr(
+                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
+                    ),
+                ]
+            case pn.Exp(pn.FunRef(pn.Name(fun_name))):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Name(fun_name)]),
+                    rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                     rn.Instr(
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
                     ),
@@ -2648,6 +2766,13 @@ class Passes:
                 return self._single_line_comment(stmt, "#") + [
                     rn.Jump(rn.Always(), rn.Name(block_name))
                 ]
+            case pn.Exp(pn.GoTo(pn.Stack(pn.Num(val)))):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(
+                        rn.Loadin(),
+                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im(val)],
+                    )
+                ]
             # ----------------------------- L_Fun -----------------------------
             case pn.StackMalloc(val):
                 return self._single_line_comment(stmt, "#") + [
@@ -2657,6 +2782,11 @@ class Passes:
                 # TODO(frame-layout): adapt this sequence for
                 # [args][return address][previous BAF][locals].
                 frame_size = 2 + int(arg_count)
+                return_offset = (
+                    int(stmt.return_offset.val)
+                    if not isinstance(stmt.return_offset, pn.Empty)
+                    else 4 + (3 if global_vars.args.no_long_jumps else 0)
+                )
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Move(),
@@ -2681,7 +2811,7 @@ class Passes:
                             rn.BinOp(
                                 rn.Name("_this_instruction"),
                                 rn.Add(),
-                                4 + (3 if global_vars.args.no_long_jumps else 0),
+                                return_offset,
                             ),
                         ],
                     ),
@@ -3030,6 +3160,9 @@ class Passes:
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
             case rn.Instr(rn.Loadi(), [_, rn.Name(val)]):
+                if self._is_function_label(val):
+                    instr.args[1] = rn.Im(self.all_blocks[val].instrs_before.val)
+                    return [instr]
                 var_name = val
                 symbol, _ = self.symbol_table.resolve(
                     var_name, scope=self.current_scope

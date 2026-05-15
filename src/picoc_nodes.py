@@ -603,6 +603,18 @@ class Call(ASTNode):
     __match_args__ = ("name", "exps", "datatype")
 
 
+class FunRef(ASTNode):
+    def __init__(self, name, datatype=None):
+        self.name = name
+        self.datatype = datatype if datatype else Empty()
+
+    @property
+    def visible(self):
+        return _add_if_double_verbose([self.name], self.datatype)
+
+    __match_args__ = ("name", "datatype")
+
+
 class Empty(ASTNode):
     pass
 
@@ -682,14 +694,17 @@ class FunDef(ASTNode):
 
 
 class NewStackframe(ASTNode):
-    def __init__(self, arg_count):
+    def __init__(self, arg_count, return_offset=Empty()):
         self.arg_count = arg_count
+        self.return_offset = return_offset
 
     @property
     def visible(self):
-        return [self.arg_count]
+        if isinstance(self.return_offset, Empty):
+            return [self.arg_count]
+        return [self.arg_count, self.return_offset]
 
-    __match_args__ = ("arg_count",)
+    __match_args__ = ("arg_count", "return_offset")
 
 class RemoveStackframe(ASTNode):
     def __init__(self, local_var_count):
