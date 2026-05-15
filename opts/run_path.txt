@@ -1,1 +1,1 @@
-./sys_tests/advanced_increment.picoc
+./sys_tests/basic_function_pointer_array.picoc

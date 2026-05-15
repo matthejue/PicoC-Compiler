@@ -123,6 +123,7 @@ def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
                         | pn.Block()
                         | pn.FunDef()
                         | pn.FunDecl()
+                        | pn.FunPtrDecl()
                         | pn.StructDecl()
                     ):
                         acc += f"{sub_sep}{list_child.__repr__(subdepth)}"

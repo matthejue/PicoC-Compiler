@@ -205,15 +205,22 @@ class TransformerPicoC(_TreeSitterTransformer):
             *fragmented_datatypes, name = declarator
             full_datatype = base_datatype
             for fragmented_datatype in fragmented_datatypes:
-                match fragmented_datatype:
-                    case pn.ArrayDecl(num, _):
-                        full_datatype = pn.ArrayDecl(num, full_datatype)
-                    case pn.PntrDecl(_):
-                        full_datatype = pn.PntrDecl(full_datatype)
-                    case _:
-                        throw_error(fragmented_datatype)
+                full_datatype = self._apply_declarator_fragment(
+                    full_datatype, fragmented_datatype
+                )
             return full_datatype, name
         throw_error(declarator)
+
+    def _apply_declarator_fragment(self, base_datatype, fragmented_datatype):
+        match fragmented_datatype:
+            case pn.ArrayDecl(num, _):
+                return pn.ArrayDecl(num, base_datatype)
+            case pn.PntrDecl(_):
+                return pn.PntrDecl(base_datatype)
+            case pn.FunPtrDecl(_, params):
+                return pn.FunPtrDecl(base_datatype, params)
+            case _:
+                throw_error(fragmented_datatype)
 
     # -------------------------------- General --------------------------------
     def translation_unit(self, _, children):
@@ -245,6 +252,9 @@ class TransformerPicoC(_TreeSitterTransformer):
         match children:
             case [pn.Name() as name, params]:
                 return pn.FunDecl([], pn.Placeholder(), name, params)
+            case [declarator, params]:
+                base = declarator if isinstance(declarator, list) else [declarator]
+                return [pn.FunPtrDecl(pn.Placeholder(), params), *base]
         return children
 
     def identifier(self, node, _):
@@ -273,6 +283,10 @@ class TransformerPicoC(_TreeSitterTransformer):
         match children:
             case [pn.VoidType() as void_type]:
                 return void_type
+            case [base_datatype]:
+                return pn.ParamDecl(pn.Writeable(), base_datatype)
+            case [pn.Const() as type_qual, base_datatype]:
+                return pn.ParamDecl(type_qual, base_datatype)
             case [base_datatype, declarator]:
                 type_qual = pn.Writeable()
             case [type_qual, base_datatype, declarator]:
@@ -306,13 +320,11 @@ class TransformerPicoC(_TreeSitterTransformer):
             case [*fragments, pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs)]:
                 full_datatype = base_datatype
                 for fragment in fragments:
-                    match fragment:
-                        case pn.PntrDecl(_):
-                            full_datatype = pn.PntrDecl(full_datatype)
-                        case _:
-                            throw_error(fragment)
+                    full_datatype = self._apply_declarator_fragment(
+                        full_datatype, fragment
+                    )
                 return pn.FunDecl(storage_class_specifiers, full_datatype, name, allocs)
-            case [pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
+            case [pn.FunPtrDecl() | pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
                 return pn.Exp(pn.Alloc(type_qual, full_datatype, name))
         throw_error(init_or_decl)

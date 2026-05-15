@@ -1,0 +1,23 @@
+// in:
+// expected:7 7 3
+
+int add(int left, int right) {
+  return left + right;
+}
+
+int sub(int left, int right) {
+  return left - right;
+}
+
+void main() {
+  int (*fp)(int, int);
+  int (*ops[2])(int, int);
+
+  fp = add;
+  ops[0] = add;
+  ops[1] = sub;
+
+  print(fp(3, 4));
+  print(ops[0](3, 4));
+  print(ops[1](7, 4));
+}

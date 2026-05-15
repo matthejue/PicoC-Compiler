@@ -611,6 +611,18 @@ class VariadicParam(ASTNode):
     pass
 
 
+class ParamDecl(ASTNode):
+    def __init__(self, type_qual, datatype):
+        self.type_qual = type_qual
+        self.datatype = datatype
+
+    @property
+    def visible(self):
+        return [self.type_qual, self.datatype]
+
+    __match_args__ = ("type_qual", "datatype")
+
+
 class Return(ASTNode):
     def __init__(self, exp=Empty()):
         self.exp = exp
@@ -634,6 +646,18 @@ class FunDecl(ASTNode):
         return [self.storage_class_specifiers, self.datatype, self.name, self.allocs]
 
     __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs")
+
+
+class FunPtrDecl(ASTNode):
+    def __init__(self, datatype, params):
+        self.datatype = datatype
+        self.params = params
+
+    @property
+    def visible(self):
+        return [self.datatype, self.params]
+
+    __match_args__ = ("datatype", "params")
 
 
 class FunDef(ASTNode):
