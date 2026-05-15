@@ -10,7 +10,6 @@ from src.utils.util_funs_independent import (
 from src import global_vars
 import copy
 from bitstring import Bits
-from inspect import isclass
 import sys
 
 
@@ -558,59 +557,25 @@ class Passes:
     # DoWhile(exp, stmts) durch Block(name, stmts instrs-, GoTo(lable)- und
     # IfElse(exp, stmts1, stmts2) ersetzt.
 
-    IMPORTANT_STMTS_INSTRS = [
-        pn.Ref,
-        #  pn.Assign,
-        pn.Assign(pn.Stack, pn.Global),
-        pn.Assign(pn.Stack, pn.Stackframe),
-        pn.Assign(pn.Global, pn.Stack),
-        pn.Assign(pn.Stackframe, pn.Stack),
-        pn.Assign(pn.Name, object),
-        pn.Assign(pn.Attr, object),
-        pn.Assign(pn.Deref, object),
-        pn.Assign(pn.Stack, pn.Stack),
-        #  pn.Exp,
-        pn.Exp(pn.Num),
-        pn.Exp(pn.Name),
-        pn.Exp(pn.BinOp),
-        pn.Exp(pn.Stack),
-        pn.Exp(pn.Global),
-        pn.Exp(pn.Stackframe),
-        pn.Exp(pn.Deref),
-        pn.Exp(pn.Attr),
-        pn.Exp(pn.Deref),
-        pn.Exp(pn.Ref),
-        pn.Exp(pn.GoTo),
-        pn.Exp(rn.Reg),
-        pn.StackMalloc,
-        pn.NewStackframe,
-        pn.RemoveStackframe,
-        pn.Return,
-        pn.Exit,
-        pn.If,
-        pn.IfElse,
-        pn.While,
-        pn.DoWhile,
-        pn.StackMalloc,
-    ]
+    COMMENT_VISIBLE_FILTERS = {
+        rn.Instr: (),
+        pn.Array: (),
+        pn.Struct: (),
+        pn.StructDecl: (),
+        pn.If: (1,),
+        pn.IfElse: (1, 2),
+        pn.While: (1,),
+        pn.DoWhile: (1,),
+        pn.Call: (),
+        pn.FunDecl: (3,),
+        pn.FunDef: (3, 4),
+        pn.File: (1,),
+        pn.Block: (1,),
+    }
 
-    def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
+    def _single_line_comment(self, node, prefix):
         if not (global_vars.args.verbose or global_vars.args.double_verbose):
             return []
-        if global_vars.args.example:
-            for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
-                if isclass(stmt_instr):
-                    if isinstance(node, stmt_instr):
-                        break  # success
-                else:
-                    if type(node) is type(stmt_instr):
-                        for i in range(len(stmt_instr.visible)):
-                            if not isinstance(node.visible[i], stmt_instr.visible[i]):
-                                break
-                        else:
-                            break  # success
-            else:
-                return []
 
         def _repr_with_visible(node_for_repr, visible):
             if not visible:
@@ -642,8 +607,9 @@ class Passes:
 
         if hasattr(node, "visible"):
             visible_copy = copy.deepcopy(list(node.visible))
+            filtered_indexes = self.COMMENT_VISIBLE_FILTERS.get(type(node), ())
             for i, visible_list_item in enumerate(visible_copy):
-                if isinstance(visible_list_item, list) and i in filtr:
+                if isinstance(visible_list_item, list) and i in filtered_indexes:
                     visible_copy[i] = []
             node_repr = _repr_with_visible(node, visible_copy)
             return [pn.SingleLineComment(prefix, convert_to_single_line(node_repr))]
@@ -663,62 +629,6 @@ class Passes:
             }
             return escape_map.get(val[1], ord(val[1]))
         return ord(val)
-
-    # def _single_line_comment(self, node, prefix, filtr=[1, 2, 3]):
-    #     if not (global_vars.args.verbose or global_vars.args.double_verbose):
-    #         return []
-    #     if global_vars.args.example:
-    #         for stmt_instr in self.IMPORTANT_STMTS_INSTRS:
-    #             if isclass(stmt_instr):
-    #                 if isinstance(node, stmt_instr):
-    #                     break  # success
-    #             else:
-    #                 if type(node) is type(stmt_instr):
-    #                     for i in range(len(stmt_instr.visible)):
-    #                         if not isinstance(node.visible[i], stmt_instr.visible[i]):
-    #                             break
-    #                     else:
-    #                         break  # success
-    #         else:
-    #             return []
-    #
-    #     def _repr_with_visible(node_for_repr, visible):
-    #         if not visible:
-    #             return f"\n{node_for_repr.__class__.__name__}()"
-    #         parts = []
-    #         for child in visible:
-    #             match child:
-    #                 case list() as lst:
-    #                     if not lst:
-    #                         parts.append("[]")
-    #                     else:
-    #                         lst_parts = []
-    #                         for item in lst:
-    #                             try:
-    #                                 lst_parts.append(convert_to_single_line(item))
-    #                             except Exception:
-    #                                 lst_parts.append(repr(item))
-    #                         parts.append("[" + ", ".join(lst_parts) + "]")
-    #                 case str() as s:
-    #                     parts.append(f"'{s}'")
-    #                 case int() as i:
-    #                     parts.append(str(i))
-    #                 case _:
-    #                     try:
-    #                         parts.append(child.__repr__())
-    #                     except Exception:
-    #                         parts.append(repr(child))
-    #         return f"\n{node_for_repr.__class__.__name__}(" + ", ".join(parts) + ")"
-    #
-    #     if hasattr(node, "visible"):
-    #         visible_copy = copy.deepcopy(list(node.visible))
-    #         for i, visible_list_item in enumerate(visible_copy):
-    #             if isinstance(visible_list_item, list) and i in filtr:
-    #                 visible_copy[i] = []
-    #         node_repr = _repr_with_visible(node, visible_copy)
-    #         return [pn.SingleLineComment(prefix, convert_to_single_line(node_repr))]
-    #
-    #     return [pn.SingleLineComment(prefix, convert_to_single_line(node))]
 
     def _create_block(self, labelbase, stmts, blocks, *, add_id=True):
         label = labelbase + (f".{self.block_idx}" if add_id else "")
@@ -1953,7 +1863,7 @@ class Passes:
                 self.argmode_on = False
 
                 return (
-                    self._single_line_comment(exp, "//", filtr=[])
+                    self._single_line_comment(exp, "//")
                     + exps_anf
                     + [
                         pn.NewStackframe(pn.Num(str(len(exps)))),

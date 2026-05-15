@@ -676,7 +676,6 @@ def _parse_cli_args():
         action="store_true",
         help="Additionaly makes formatting wider",  # and adds datatype to ref and adds BuiltinTypes char and int to SymbolTable"
     )
-    parser.add_argument("-e", "--example", action="store_true", help="Run example mode")
     parser.add_argument(
         "-t",
         "--testmode",

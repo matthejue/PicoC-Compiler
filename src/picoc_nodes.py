@@ -631,7 +631,7 @@ class FunDecl(ASTNode):
 
     @property
     def visible(self):
-        return self.storage_class_specifiers + [self.datatype, self.name, self.allocs]
+        return [self.storage_class_specifiers, self.datatype, self.name, self.allocs]
 
     __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs")
 
@@ -646,7 +646,13 @@ class FunDef(ASTNode):
 
     @property
     def visible(self):
-        return self.storage_class_specifiers + [self.datatype, self.name, self.allocs, self.stmts_blocks]
+        return [
+            self.storage_class_specifiers,
+            self.datatype,
+            self.name,
+            self.allocs,
+            self.stmts_blocks,
+        ]
 
     __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs", "stmts_blocks")
 
