@@ -1,1 +1,1 @@
-./sys_tests/basic_function_pointer_array.picoc
+./sys_tests/error_named_funptr_args.picoc

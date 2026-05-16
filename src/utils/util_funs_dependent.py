@@ -37,7 +37,10 @@ def args_to_str(args: list):
 
 
 def throw_error(node):
-    msg = f"Unexpected value ({type(node).__name__}): {node!r}"
+    if isinstance(node, str):
+        msg = node
+    else:
+        msg = f"Unexpected value ({type(node).__name__}): {node!r}"
     if getattr(global_vars, "args", None) and getattr(global_vars.args, "debug", False):
         # Let the post-mortem hook handle the crash when debug mode is enabled.
         raise RuntimeError(msg)

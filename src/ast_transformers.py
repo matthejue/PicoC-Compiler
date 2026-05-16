@@ -253,9 +253,34 @@ class TransformerPicoC(_TreeSitterTransformer):
             case [pn.Name() as name, params]:
                 return pn.FunDecl([], pn.Placeholder(), name, params)
             case [declarator, params]:
+                self._reject_named_funptr_params(params)
                 base = declarator if isinstance(declarator, list) else [declarator]
                 return [pn.FunPtrDecl(pn.Placeholder(), params), *base]
         return children
+
+    def _reject_named_funptr_params(self, params):
+        for param in params:
+            match param:
+                case pn.Alloc():
+                    throw_error(
+                        "Named arguments in function pointer declarations are not "
+                        "supported; use unnamed parameter types instead, e.g. "
+                        "'int (*fp)(int, char);' instead of "
+                        "'int (*fp)(int x, char y);'"
+                    )
+                case pn.ParamDecl(_, datatype):
+                    self._reject_named_funptr_params_in_datatype(datatype)
+                case _:
+                    pass
+
+    def _reject_named_funptr_params_in_datatype(self, datatype):
+        match datatype:
+            case pn.ArrayDecl(_, inner_dt) | pn.PntrDecl(inner_dt):
+                self._reject_named_funptr_params_in_datatype(inner_dt)
+            case pn.FunPtrDecl(_, params):
+                self._reject_named_funptr_params(params)
+            case _:
+                pass
 
     def identifier(self, node, _):
         return pn.Name(self.value(node))

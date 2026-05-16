@@ -370,12 +370,11 @@ class Passes:
             # ----------------------------- L_Fun -----------------------------
             case pn.FunRef(name):
                 return pn.FunRef(name)
-            case pn.Call(pn.Name(fun_name) as name, exps):
-                inline_exp = self._inline_static_call(fun_name, exps)
-                if inline_exp is not None:
-                    return self._picoc_shrink_exp(inline_exp)
-                return pn.Call(name, [self._picoc_shrink_exp(exp) for exp in exps])
             case pn.Call(fun_exp, exps):
+                if isinstance(fun_exp, pn.Name):
+                    inline_exp = self._inline_static_call(fun_exp.val, exps)
+                    if inline_exp is not None:
+                        return self._picoc_shrink_exp(inline_exp)
                 return pn.Call(
                     self._picoc_shrink_exp(fun_exp),
                     [self._picoc_shrink_exp(exp) for exp in exps],
@@ -403,13 +402,13 @@ class Passes:
                             )
                         case pn.VoidType() | pn.VariadicParam():
                             params_shrunk.append(param)
-                        case pn.Alloc(type_qual, param_dt, name):
-                            params_shrunk.append(
-                                pn.Alloc(
-                                    type_qual,
-                                    self._picoc_shrink_datatype(param_dt),
-                                    name,
-                                )
+                            break
+                        case pn.Alloc():
+                            throw_error(
+                                "Named arguments in function pointer declarations are "
+                                "not supported; use unnamed parameter types instead, "
+                                "e.g. 'int (*fp)(int, char);' instead of "
+                                "'int (*fp)(int x, char y);'"
                             )
                         case _:
                             throw_error(param)

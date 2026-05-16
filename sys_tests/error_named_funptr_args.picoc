@@ -1,0 +1,7 @@
+// in:
+// expected:
+
+void main() {
+  int (*fp)(int x, char y);
+  int later_var;
+}
