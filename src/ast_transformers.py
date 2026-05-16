@@ -85,7 +85,7 @@ class _TreeSitterTransformer:
         return self.walk(tree.root_node)
 
     def value(self, node) -> str:
-        return "" if self._code is None else self._code[node.start_byte : node.end_byte]
+        return self._code[node.start_byte : node.end_byte]
 
     def _named_children(self, node):
         return [c for c in node.children if c.is_named]
@@ -254,8 +254,9 @@ class TransformerPicoC(_TreeSitterTransformer):
                 return pn.FunDecl([], pn.Placeholder(), name, params)
             case [declarator, params]:
                 self._reject_named_funptr_params(params)
-                base = declarator if isinstance(declarator, list) else [declarator]
-                return [pn.FunPtrDecl(pn.Placeholder(), params), *base]
+                if not isinstance(declarator, list):
+                    throw_error(declarator)
+                return [pn.FunPtrDecl(pn.Placeholder(), params), *declarator]
         return children
 
     def _reject_named_funptr_params(self, params):
@@ -264,9 +265,9 @@ class TransformerPicoC(_TreeSitterTransformer):
                 case pn.Alloc():
                     throw_error(
                         "Named arguments in function pointer declarations are not "
-                        "supported; use unnamed parameter types instead, e.g. "
-                        "'int (*fp)(int, char);' instead of "
-                        "'int (*fp)(int x, char y);'"
+                        "supported. Use unnamed parameter types instead, e.g. "
+                        "int (*fp)(int, char); instead of "
+                        "int (*fp)(int x, char y);"
                     )
                 case pn.ParamDecl(_, datatype):
                     self._reject_named_funptr_params_in_datatype(datatype)
