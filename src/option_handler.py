@@ -350,8 +350,11 @@ class OptionHandler:
                 # metadata inside the type, not separate runtime symbols.
                 return
             elif isinstance(existing_dt, pn.FunDecl) and isinstance(incoming_dt, pn.FunDecl):
-                # Repeated declarations are fine; the syntax checker rejects
-                # multiple definitions before symbol tables are merged.
+                # Repeated function declarations are fine. Definitions are stored
+                # as FunDecl too; normally they should overwrite declarations,
+                # because declarations may omit parameter names. In PicoC,
+                # however, function declarations require named parameters.
+                # Syntax checking rejects duplicate definitions before merging.
                 return
             else:
                 throw_error(f"Duplicate symbol '{name}' in scope '{scope}'")

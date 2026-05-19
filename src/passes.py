@@ -390,6 +390,14 @@ class Passes:
             case pn.PntrDecl(inner_dt):
                 return pn.PntrDecl(self._picoc_shrink_datatype(inner_dt))
             case pn.FunPtrDecl(ret_dt, params):
+                if isinstance(ret_dt, pn.StructSpec):
+                    throw_error(
+                        "Returning structs by value is not supported; use "
+                        "a pointer to the struct instead. If a function returns "
+                        "a struct, the usual trick is to rewrite it so the caller "
+                        "creates the struct in its own stackframe and passes a "
+                        "struct pointer to the function"
+                    )
                 params_shrunk = []
                 for param in params:
                     match param:
@@ -405,7 +413,7 @@ class Passes:
                             break
                         case pn.Alloc():
                             throw_error(
-                                "Named arguments in function pointer declarations are "
+                                "Named parameters in function pointer declarations are "
                                 "not supported; use unnamed parameter types instead, "
                                 "e.g. 'int (*fp)(int, char);' instead of "
                                 "'int (*fp)(int x, char y);'"
@@ -517,6 +525,14 @@ class Passes:
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
                         case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts):
+                            if isinstance(datatype, pn.StructSpec):
+                                throw_error(
+                                    "Returning structs by value is not supported; use "
+                                    "a pointer to the struct instead. If a function returns "
+                                    "a struct, the usual trick is to rewrite it so the caller "
+                                    "creates the struct in its own stackframe and passes a "
+                                    "struct pointer to the function"
+                                )
                             stmts_shrinked = []
                             for stmt in stmts:
                                 stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
@@ -547,6 +563,20 @@ class Passes:
                                 pn.StructDecl(name, allocs_shrinked)
                             ]
                         case pn.FunDecl(storage_class_specifiers, datatype, pn.Name() as name, allocs):
+                            if isinstance(datatype, pn.StructSpec):
+                                throw_error(
+                                    "Returning structs by value is not supported; use "
+                                    "a pointer to the struct instead. If a function returns "
+                                    "a struct, the usual trick is to rewrite it so the caller "
+                                    "creates the struct in its own stackframe and passes a "
+                                    "struct pointer to the function"
+                                )
+                            if any(isinstance(alloc, pn.ParamDecl) for alloc in allocs):
+                                throw_error(
+                                    "Unnamed parameters in function declarations are not "
+                                    "supported; use named parameters instead, e.g. "
+                                    "'int f(int x);' instead of 'int f(int);'"
+                                )
                             if allocs and isinstance(allocs[0], pn.VoidType):
                                 allocs_shrinked = []
                             else:
@@ -876,7 +906,7 @@ class Passes:
     def _datatype_size(self, datatype) -> int:
         match datatype:
             # ------------------------ L_Arith + L_Pntr -----------------------
-            case pn.IntType() | pn.CharType() | pn.PntrDecl():
+            case pn.IntType() | pn.CharType() | pn.PntrDecl() | pn.FunPtrDecl():
                 return 1
             # ---------------------------- L_Struct ---------------------------
             case pn.StructSpec(pn.Name(val)):
@@ -986,9 +1016,7 @@ class Passes:
     def _function_pointer_datatype(self, fun_decl):
         match fun_decl:
             case pn.FunDecl(_, ret_dt, _, params):
-                return pn.PntrDecl(
-                    pn.FunPtrDecl(copy.deepcopy(ret_dt), copy.deepcopy(params))
-                )
+                return pn.FunPtrDecl(copy.deepcopy(ret_dt), copy.deepcopy(params))
             case _:
                 throw_error(fun_decl)
 
@@ -1727,7 +1755,14 @@ class Passes:
                 datatype = loc.datatype
                 if addr_calc:
                     match datatype:
-                        case pn.StructSpec() | pn.ArrayDecl() | pn.PntrDecl() | pn.IntType() | pn.CharType():
+                        case (
+                            pn.StructSpec()
+                            | pn.ArrayDecl()
+                            | pn.PntrDecl()
+                            | pn.FunPtrDecl()
+                            | pn.IntType()
+                            | pn.CharType()
+                        ):
                             return [pn.Ref(loc)]
                         case _:
                             throw_error(datatype)
@@ -1741,7 +1776,12 @@ class Passes:
                             return [pn.Exp(loc)]
                         case pn.ArrayDecl():
                             return [pn.Ref(loc)]
-                        case pn.PntrDecl() | pn.IntType() | pn.CharType():
+                        case (
+                            pn.PntrDecl()
+                            | pn.FunPtrDecl()
+                            | pn.IntType()
+                            | pn.CharType()
+                        ):
                             return [pn.Exp(loc)]
                         case _:
                             throw_error(datatype)
@@ -1760,7 +1800,15 @@ class Passes:
                 size = 1
                 if isinstance(
                     exp_datatype,
-                    (pn.IntType, pn.CharType, pn.VoidType, pn.StructSpec, pn.ArrayDecl, pn.PntrDecl),
+                    (
+                        pn.IntType,
+                        pn.CharType,
+                        pn.VoidType,
+                        pn.StructSpec,
+                        pn.ArrayDecl,
+                        pn.PntrDecl,
+                        pn.FunPtrDecl,
+                    ),
                 ):
                     size = self._datatype_size(exp_datatype)
                 else:
@@ -2714,7 +2762,13 @@ class Passes:
             # ------------------ L_Pntr + L_Array + L_Struct ------------------
             case pn.Exp(pn.Deref(pn.Stack(pn.Num(val1), datatype))):
                 match datatype:
-                    case pn.StructSpec() | pn.PntrDecl() | pn.IntType() | pn.CharType():
+                    case (
+                        pn.StructSpec()
+                        | pn.PntrDecl()
+                        | pn.FunPtrDecl()
+                        | pn.IntType()
+                        | pn.CharType()
+                    ):
                         return self._single_line_comment(stmt, "#") + [
                             rn.Instr(
                                 rn.Loadin(),
@@ -2950,9 +3004,12 @@ class Passes:
             # case rn.Instr(rn.Divi(), [_, rn.Im("0")]) doesn't occur
             case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [reg1, reg2, rn.Im(val)]):
                 s_num = int(val)
-                if s_num < -(2**31) and s_num > 2**31 - 1:
-                    raise errors.TooLargeLiteral()
-                elif s_num < -(2**21) and s_num > 2**21 - 1:
+                if s_num < -(2**31) or s_num > 2**31 - 1:
+                    throw_error(
+                        f"Immediate literal {s_num} for {type(op).__name__.upper()} "
+                        "does not fit in a signed 32-bit integer"
+                    )
+                elif s_num < -(2**21) or s_num > 2**21 - 1:
                     # TODO: internal error if reg1 + u_num over 2^32-1
                     # the ACC register is never used as first arg of LOADIN in
                     # the compilation process

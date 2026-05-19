@@ -201,7 +201,8 @@ class TransformerPicoC(_TreeSitterTransformer):
     def _seperate_name_and_datatype(self, base_datatype, declarator):
         if isinstance(declarator, pn.Name):
             return base_datatype, declarator
-        if isinstance(declarator, list) and declarator:
+        if isinstance(declarator, list):
+            # Declarator fragment lists are expected to be non-empty and end in a name.
             *fragmented_datatypes, name = declarator
             full_datatype = base_datatype
             for fragmented_datatype in fragmented_datatypes:
@@ -237,12 +238,11 @@ class TransformerPicoC(_TreeSitterTransformer):
             case [*fragments, pn.FunDecl(_, _, name, allocs)]:
                 datatype = base_datatype
                 for fragment in fragments:
-                    match fragment:
-                        # case pn.ArrayDecl(num, _) is not possible
-                        case pn.PntrDecl(_):
-                            datatype = pn.PntrDecl(datatype)
-                        case _:
-                            throw_error(fragment)
+                    datatype = self._apply_declarator_fragment(datatype, fragment)
+                # case pn.ArrayDecl(num, _) is not possible here: functions
+                # cannot return arrays, only pointers to arrays/functions.
+                if isinstance(datatype, pn.ArrayDecl):
+                    throw_error(datatype)
                 return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2])
             case [pn.Name() as name, params]:
                 return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2])
@@ -256,7 +256,14 @@ class TransformerPicoC(_TreeSitterTransformer):
                 self._reject_named_funptr_params(params)
                 if not isinstance(declarator, list):
                     throw_error(declarator)
-                return [pn.FunPtrDecl(pn.Placeholder(), params), *declarator]
+                match declarator:
+                    case [pn.PntrDecl(_), *rest]:
+                        return [pn.FunPtrDecl(pn.Placeholder(), params), *rest]
+                    case _:
+                        throw_error(
+                            "Function pointer declarations must use '*', e.g. "
+                            "int (*fp)(int);"
+                        )
         return children
 
     def _reject_named_funptr_params(self, params):
@@ -264,10 +271,10 @@ class TransformerPicoC(_TreeSitterTransformer):
             match param:
                 case pn.Alloc():
                     throw_error(
-                        "Named arguments in function pointer declarations are not "
-                        "supported. Use unnamed parameter types instead, e.g. "
-                        "int (*fp)(int, char); instead of "
-                        "int (*fp)(int x, char y);"
+                        "Named parameters in function pointer declarations are not "
+                        "supported; use unnamed parameter types instead, e.g. "
+                        "'int (*fp)(int, char);' instead of "
+                        "'int (*fp)(int x, char y);'"
                     )
                 case pn.ParamDecl(_, datatype):
                     self._reject_named_funptr_params_in_datatype(datatype)
@@ -349,6 +356,10 @@ class TransformerPicoC(_TreeSitterTransformer):
                     full_datatype = self._apply_declarator_fragment(
                         full_datatype, fragment
                     )
+                # case pn.ArrayDecl(num, _) is not possible here: functions
+                # cannot return arrays, only pointers to arrays/functions.
+                if isinstance(full_datatype, pn.ArrayDecl):
+                    throw_error(full_datatype)
                 return pn.FunDecl(storage_class_specifiers, full_datatype, name, allocs)
             case [pn.FunPtrDecl() | pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)

@@ -50,7 +50,6 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.eprom" -delete
 	find . -type f -wholename "./sys_tests/*.c" -delete
 	find . -type f -wholename "./sys_tests/*.res" -delete
-	find ./vendor/tree-sitter-reti -type f -name "reti.so" -delete
 	find ./vendor/tree-sitter-reti/src -type f \( -name "grammar.json" -o -name "node-types.json" -o -name "parser.c" \) -delete
 	find ./vendor/tree-sitter-reti/src -type d -name "tree_sitter" -exec rm -rf {} +
 

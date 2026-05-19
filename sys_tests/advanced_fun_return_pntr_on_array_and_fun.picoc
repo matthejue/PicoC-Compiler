@@ -1,0 +1,38 @@
+// in:42
+// expected:42 7 9 4
+
+int (*get_values(int (*values)[3]))[3] {
+  return values;
+}
+
+int add(int left, int right) {
+  return left + right;
+}
+
+int sub(int left, int right) {
+  return left - right;
+}
+
+int (*get_operation(int use_sub))(int, int) {
+  if (use_sub) {
+    return sub;
+  }
+
+  return add;
+}
+
+void main() {
+  int values[3] = {1, input(), 7};
+  int (*returned_values)[3];
+  int (*operation)(int, int);
+
+  returned_values = get_values(&values);
+  print((*returned_values)[1]);
+  print((*returned_values)[2]);
+
+  operation = get_operation(0);
+  print(operation(4, 5));
+
+  operation = get_operation(1);
+  print(operation(9, 5));
+}

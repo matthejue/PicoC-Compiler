@@ -30,9 +30,7 @@ class ASTNode:
         if not visible:
             return f"\n{' ' * depth}{self.__class__.__name__}()"
 
-        acc = ""
-
-        acc += f"\n{' ' * depth}{self.__class__.__name__}("
+        acc = f"\n{' ' * depth}{self.__class__.__name__}("
 
         for i, child in enumerate(visible):
             acc = repr_arg_types(i, child, depth, acc, is_file=is_file)

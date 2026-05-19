@@ -1,0 +1,16 @@
+// in:42
+// expected:42 7
+
+int (*get_values(int (*values)[3]))[3] {
+  return values;
+}
+
+void main() {
+  int values[3] = {1, input(), 7};
+  int (*returned_values)[3];
+
+  returned_values = get_values(&values);
+
+  print((*returned_values)[1]);
+  print((*returned_values)[2]);
+}

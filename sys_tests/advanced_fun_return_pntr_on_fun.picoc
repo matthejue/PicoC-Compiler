@@ -1,0 +1,28 @@
+// in:
+// expected:9 4
+
+int add(int left, int right) {
+  return left + right;
+}
+
+int sub(int left, int right) {
+  return left - right;
+}
+
+int (*get_operation(int use_sub))(int, int) {
+  if (use_sub) {
+    return sub;
+  }
+
+  return add;
+}
+
+void main() {
+  int (*operation)(int, int);
+
+  operation = get_operation(0);
+  print(operation(4, 5));
+
+  operation = get_operation(1);
+  print(operation(9, 5));
+}
