@@ -1,5 +1,7 @@
 __pycache__/
 .bak/
+.tach/
+.pytest_ache/
 dist/
 dist_old/
 dist_old_2/

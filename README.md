@@ -138,7 +138,7 @@ The relevant implementation lives mainly in:
 
 - [`src/preprocessor.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/preprocessor.py)
 - [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py)
-- [`src/passes.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes.py)
+- [`src/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/)
 - [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py)
 
 ### Overall Flow
@@ -299,7 +299,7 @@ The parse tree is converted into the compiler's PicoC AST.
 Main points:
 
 - `transformer.build_ast(ts_tree, code)` in [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py) walks the Tree-sitter parse tree and builds the compiler's PicoC AST.
-- The AST construction logic therefore lives in `ast_transformers.py`, while the later lowering logic lives in `passes.py`.
+- The AST construction logic therefore lives in `ast_transformers.py`, while the later lowering logic lives in `src/passes/`.
 
 ### Symbol Table Output and `.json` Files
 
@@ -316,7 +316,7 @@ Main points:
 
 ### The Main AST/Lowering Passes
 
-The pass pipeline is defined in [`src/passes.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes.py) and run from [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py).
+The pass pipeline is defined in [`src/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/) and run from [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py).
 
 #### `picoc_shrink`
 
@@ -471,11 +471,11 @@ Main tasks:
 
 #### When Symbolic Names Become Concrete Addresses
 
-Part of linking / multi-file handling is preparing one merged symbol table with final global addresses, but the actual replacement of symbolic names inside RETI instructions happens later in the final [`reti`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes.py) pass.
+Part of linking / multi-file handling is preparing one merged symbol table with final global addresses, but the actual replacement of symbolic names inside RETI instructions happens later in the final [`reti`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/linking/reti_pass.py) pass.
 
 Relevant place in the code:
 
-- [`Passes._reti_instr()`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes.py#L2594) resolves symbolic RETI operands with `self.symbol_table.resolve(...)`
+- [`Passes._reti_instr()`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/linking/reti_pass.py) resolves symbolic RETI operands with `self.symbol_table.resolve(...)`
   Example: `Instr(Loadin(), [Ds, Acc, Name("x")])` becomes `Instr(Loadin(), [Ds, Acc, Im(addr_of_x)])`.
 - The same method also handles offsets built on top of symbolic names.
   Example: `BinOp(Name("arr"), Add(), 3)` becomes `Im(addr_of_arr + 3)`.

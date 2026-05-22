@@ -134,6 +134,7 @@ def _restore_symbol_payload(value):
             node_type = _PICOC_AST_REGISTRY.get(node_name)
             if node_type is None:
                 raise ValueError(f"Unknown AST node type in symbol table JSON: {node_name}")
+            # Create an empty node without requiring original __init__ args.
             node = node_type.__new__(node_type)
             for key, val in value.items():
                 if key == _AST_NODE_TAG:
