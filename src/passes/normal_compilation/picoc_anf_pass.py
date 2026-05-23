@@ -235,38 +235,6 @@ class PicocAnfPass:
                             throw_error(init_pair)
                 return exps_anf
             # ----------------------------- L_Fun -----------------------------
-            case pn.Call(pn.Name(val) as name, exps):
-                fun_name = val
-                symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
-                datatype = symbol["datatype"]
-                match datatype:
-                    case pn.FunDecl(_, datatype2, pn.Name()):
-                        return_type = datatype2
-                    case _:
-                        throw_error(datatype)
-
-                exps_anf = []
-                self.argmode_on = True
-                for exp2 in reversed(exps):
-                    exps_anf += self._picoc_anf_exp(exp2)
-                self.argmode_on = False
-
-                return (
-                    self._single_line_comment(exp, "//")
-                    + exps_anf
-                    + [
-                        pn.NewStackframe(pn.Num(str(len(exps)))),
-                        pn.Exp(pn.GoTo(pn.Name(fun_name))),
-                        pn.RemoveStackframe(
-                            pn.Num(str(self.next_local_addr))
-                        ),
-                    ]
-                    + (
-                        [pn.Exp(rn.Reg(rn.Acc()))]
-                        if not isinstance(return_type, pn.VoidType)
-                        else []
-                    )
-                )
             case pn.Call(fun_exp, exps, datatype):
                 exps_anf = []
                 self.argmode_on = True
@@ -274,7 +242,12 @@ class PicocAnfPass:
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
-                callee_anf = self._picoc_anf_exp(fun_exp)
+                return_type = datatype
+                match fun_exp:
+                    case pn.Name():
+                        callee_anf = [pn.Exp(pn.FunRef(copy.deepcopy(fun_exp)))]
+                    case _:
+                        callee_anf = self._picoc_anf_exp(fun_exp)
 
                 return (
                     self._single_line_comment(exp, "//")
@@ -290,7 +263,7 @@ class PicocAnfPass:
                     ]
                     + (
                         [pn.Exp(rn.Reg(rn.Acc()))]
-                        if not isinstance(datatype, pn.VoidType)
+                        if not isinstance(return_type, pn.VoidType)
                         else []
                     )
                 )

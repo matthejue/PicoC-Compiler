@@ -661,15 +661,15 @@ class FunDecl(ASTNode):
 
 
 class FunPtrDecl(ASTNode):
-    def __init__(self, ret_datatype, params):
-        self.ret_datatype = ret_datatype
+    def __init__(self, datatype, params):
+        self.datatype = datatype  # return datatype
         self.params = params
 
     @property
     def visible(self):
-        return [self.ret_datatype, self.params]
+        return [self.datatype, self.params]
 
-    __match_args__ = ("ret_datatype", "params")
+    __match_args__ = ("datatype", "params")
 
 
 class FunDef(ASTNode):
