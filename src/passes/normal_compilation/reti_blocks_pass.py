@@ -418,6 +418,14 @@ class RetiBlocksPass:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
+            case pn.Assign(rn.Reg() as reg, pn.Stack(pn.Num(val))):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(
+                        rn.Loadin(),
+                        [rn.Reg(rn.Sp()), reg, rn.Im(val)],
+                    ),
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                ]
             case pn.Assign(
                 pn.Stack(pn.Num(val1)) as lhs,
                 (pn.Global() | pn.Stackframe()) as exp,
@@ -623,6 +631,10 @@ class RetiBlocksPass:
                 return self._single_line_comment(stmt, "#") + [
                     rn.Jump(rn.Always(), rn.Name(block_name))
                 ]
+            case pn.Exp(pn.GoTo(rn.Reg() as reg)):
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Move(), [reg, rn.Reg(rn.Pc())])
+                ]
             case pn.Exp(pn.GoTo(pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
@@ -740,4 +752,3 @@ class RetiBlocksPass:
                 )
             case _:
                 throw_error(file)
-

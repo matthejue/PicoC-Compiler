@@ -268,21 +268,22 @@ class PicocAnfPass:
                     )
                 )
             case pn.Call(fun_exp, exps, datatype):
-                callee_anf = self._picoc_anf_exp(fun_exp)
-
                 exps_anf = []
                 self.argmode_on = True
                 for exp2 in reversed(exps):
                     exps_anf += self._picoc_anf_exp(exp2)
                 self.argmode_on = False
 
+                callee_anf = self._picoc_anf_exp(fun_exp)
+
                 return (
                     self._single_line_comment(exp, "//")
-                    + callee_anf
                     + exps_anf
+                    + callee_anf
                     + [
+                        pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
                         pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("4")),
-                        pn.Exp(pn.GoTo(pn.Stack(pn.Num(str(len(exps) + 1))))),
+                        pn.Exp(pn.GoTo(rn.Reg(rn.In2()))),
                         pn.RemoveStackframe(
                             pn.Num(str(self.next_local_addr))
                         ),
@@ -456,4 +457,3 @@ class PicocAnfPass:
                 )
             case _:
                 throw_error(file)
-
