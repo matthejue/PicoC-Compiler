@@ -572,7 +572,11 @@ class OptionHandler:
 
                     source_file = getattr(instr, "source_file", None)
                     source_line = getattr(instr, "source_line", None)
-                    if source_file is None or source_line is None:
+                    if (source_file is None) != (source_line is None):
+                        throw_error(instr)
+                    # The fields are either both set or both unset, so checking
+                    # one field is sufficient here.
+                    if source_file is None:
                         current_range = None
                         continue
 
