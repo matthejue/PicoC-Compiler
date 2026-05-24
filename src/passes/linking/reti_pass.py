@@ -46,14 +46,6 @@ class RetiPass:
                 rn.Jump(rel, rn.Im(str(distance)))
             ]
 
-    def _mark_call_jump(self, instrs, target_function):
-        for instr in reversed(instrs):
-            if isinstance(instr, pn.SingleLineComment):
-                continue
-            instr.call_target_function = target_function
-            break
-        return instrs
-
     def _is_function_label(self, name):
         symbol, _ = self.symbol_table.resolve(name, scope="global")
         return isinstance(symbol, dict) and isinstance(symbol.get("datatype"), pn.FunDecl)
@@ -73,10 +65,7 @@ class RetiPass:
             case rn.Jump(rn.Always(), rn.Name(val)):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)
-                patched = self._patch_too_large_jumps(rn.Always(), distance, instr)
-                if self._is_function_label(val):
-                    patched = self._mark_call_jump(patched, val)
-                return patched
+                return self._patch_too_large_jumps(rn.Always(), distance, instr)
             case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
                 distance = self._determine_distance(current_block, other_block, idx)

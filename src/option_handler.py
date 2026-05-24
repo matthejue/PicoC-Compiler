@@ -558,11 +558,13 @@ class OptionHandler:
                     line_no += 1
 
                     call_target_function = getattr(instr, "call_target_function", None)
-                    if call_target_function is not None:
+                    indirect_call = getattr(instr, "indirect_call", False)
+                    if call_target_function is not None or indirect_call:
                         call_jumps.append(
                             {
                                 "address": line_no - 1,
                                 "target_function": call_target_function,
+                                "indirect": indirect_call,
                             }
                         )
                     if getattr(instr, "return_statement", False):

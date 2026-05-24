@@ -243,11 +243,19 @@ class PicocAnfPass:
                 self.argmode_on = False
 
                 return_type = datatype
+                call_target_function = None
+                indirect_call = True
                 match fun_exp:
-                    case pn.Name():
+                    case pn.Name(fun_name):
                         callee_anf = [pn.Exp(pn.FunRef(copy.deepcopy(fun_exp)))]
+                        call_target_function = fun_name
+                        indirect_call = False
                     case _:
                         callee_anf = self._picoc_anf_exp(fun_exp)
+
+                call_goto = pn.Exp(pn.GoTo(rn.Reg(rn.In2())))
+                call_goto.call_target_function = call_target_function
+                call_goto.indirect_call = indirect_call
 
                 return (
                     self._single_line_comment(exp, "//")
@@ -256,7 +264,7 @@ class PicocAnfPass:
                     + [
                         pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
                         pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("4")),
-                        pn.Exp(pn.GoTo(rn.Reg(rn.In2()))),
+                        call_goto,
                         pn.RemoveStackframe(
                             pn.Num(str(self.next_local_addr))
                         ),

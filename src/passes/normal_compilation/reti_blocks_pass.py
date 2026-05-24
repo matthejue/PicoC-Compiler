@@ -632,8 +632,11 @@ class RetiBlocksPass:
                     rn.Jump(rn.Always(), rn.Name(block_name))
                 ]
             case pn.Exp(pn.GoTo(rn.Reg() as reg)):
+                instr = rn.Instr(rn.Move(), [reg, rn.Reg(rn.Pc())])
+                instr.call_target_function = getattr(stmt, "call_target_function", None)
+                instr.indirect_call = getattr(stmt, "indirect_call", False)
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Move(), [reg, rn.Reg(rn.Pc())])
+                    instr
                 ]
             case pn.Exp(pn.GoTo(pn.Stack(pn.Num(val)))):
                 return self._single_line_comment(stmt, "#") + [
