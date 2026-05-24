@@ -748,10 +748,9 @@ class RetiBlocksPass:
                             block.stmts_instrs[:] = instrs
                         case _:
                             throw_error(block)
-                reti_blocks = blocks
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
-                    reti_blocks,
+                    [pn.Section(".text", blocks)],
                 )
             case _:
                 throw_error(file)

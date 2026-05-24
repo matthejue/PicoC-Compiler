@@ -763,22 +763,32 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
             file_name = children[0]
             items = children[1:]
 
-        blocks = []
+        output_items = []
         top_level_directives: dict[str, list[list[object]]] = {}
         top_level_statements = []
         for item in items:
             match item:
-                case pn.Block():
-                    blocks.append(item)
+                case []:
+                    continue
+                case pn.Block() | pn.Section():
+                    output_items.append(item)
                 case _RetiDirective(name, arguments):
                     top_level_directives.setdefault(name, []).append(arguments)
                 case _:
+                    output_items.append(item)
                     top_level_statements.append(item)
 
-        file_node = pn.File(file_name, blocks)
+        file_node = pn.File(file_name, output_items)
         file_node.assembler_directives = top_level_directives
         file_node.top_level_statements = top_level_statements
         return file_node
+
+    def section(self, _, children):
+        section_name, *entries = children
+        return pn.Section(section_name, [entry for entry in entries if entry != []])
+
+    def section_name(self, node, _):
+        return self.value(node)
 
     def filename(self, node, _):
         return pn.Name(self.value(node))
@@ -791,6 +801,8 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         instructions = []
         directives = []
         for entry in entries:
+            if entry == []:
+                continue
             if isinstance(entry, _RetiDirective):
                 directives.append(entry)
             else:
@@ -818,6 +830,9 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
 
     def immediate(self, node, _):
         return rn.Im(self.value(node))
+
+    def data_value(self, _, children):
+        return children[0]
 
     def string(self, node, _):
         return self.value(node)[1:-1]
@@ -897,16 +912,16 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         throw_error(opcode_text)
 
     def store_instruction(self, _, children):
-        return rn.Instr(rn.Store(), children[1:])
+        return rn.Instr(rn.Store(), children)
 
     def load_indexed_instruction(self, _, children):
-        return rn.Instr(rn.Loadin(), children[1:])
+        return rn.Instr(rn.Loadin(), children)
 
     def store_indexed_instruction(self, _, children):
-        return rn.Instr(rn.Storein(), children[1:])
+        return rn.Instr(rn.Storein(), children)
 
     def tsl_instruction(self, _, children):
-        return rn.Instr(rn.Tsl(), children[1:])
+        return rn.Instr(rn.Tsl(), children)
 
     def register_argument_instruction(self, _, children):
         return self.compute_register_instruction(_, children)

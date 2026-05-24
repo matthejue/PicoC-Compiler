@@ -18,8 +18,10 @@ module.exports = grammar({
     source_file: $ => seq(
       optional(field('filename', $.filename)),
       repeat(choice(
+        $.section,
         $.block,
         $.statement,
+        $.data_value,
       )),
     ),
 
@@ -33,6 +35,21 @@ module.exports = grammar({
       repeat($.directive),
       repeat($.statement),
     )),
+
+    section: $ => prec.right(seq(
+      field('name', $.section_name),
+      repeat(choice(
+        $.block,
+        $.statement,
+        $.data_value,
+      )),
+    )),
+
+    section_name: _ => choice(
+      '.interrupt_vector_table',
+      '.text',
+      '.data',
+    ),
 
     label: $ => $.symbol,
 
@@ -61,6 +78,11 @@ module.exports = grammar({
         $.instruction,
         $.jump,
       ),
+      optional(';'),
+    ),
+
+    data_value: $ => seq(
+      $.immediate,
       optional(';'),
     ),
 

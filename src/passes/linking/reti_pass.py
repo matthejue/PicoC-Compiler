@@ -139,45 +139,78 @@ class RetiPass:
             case _:
                 return [instr]
 
+    def _flatten_text_entries(self, entries):
+        instrs_block_free = []
+        for entry in entries:
+            match entry:
+                case pn.Block(name, instrs):
+                    idx = 0
+                    instrs_block_free += self._single_line_comment(
+                        pn.Block(name, []), "# //"
+                    )
+                    label = entry.name
+                    self.current_scope = self.block_scopes.get(label, "global")
+                    for instr in instrs:
+                        match instr:
+                            case rn.Jump(
+                                rn.Always(), rn.Name()
+                            ) if global_vars.args.no_long_jumps:
+                                idx += 3
+                            case rn.Jump(
+                                rn.Eq(), pn.GoTo()
+                            ) if global_vars.args.no_long_jumps:
+                                idx += 4
+                            case _:
+                                pass
+                        instrs_block_free += self._inherit_origin_many(
+                            self._reti_instr(instr, idx, entry), instr
+                        )
+                        match instr:
+                            case pn.SingleLineComment():
+                                pass
+                            case _:
+                                idx += 1
+                case pn.SingleLineComment():
+                    instrs_block_free.append(entry)
+                case _:
+                    instrs_block_free.append(entry)
+        return instrs_block_free
+
     def reti(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
-            case pn.File(pn.Name(val), blocks):
-                instrs_block_free = []
-                for block in blocks:
-                    match block:
-                        case pn.Block(name, instrs):
-                            idx = 0
-                            instrs_block_free += self._single_line_comment(
-                                pn.Block(name, []), "# //"
-                            )
-                            label = block.name
-                            self.current_scope = self.block_scopes.get(label, "global")
-                            for instr in instrs:
-                                match instr:
-                                    case rn.Jump(
-                                        rn.Always(), rn.Name()
-                                    ) if global_vars.args.no_long_jumps:
-                                        idx += 3
-                                    case rn.Jump(
-                                        rn.Eq(), pn.GoTo()
-                                    ) if global_vars.args.no_long_jumps:
-                                        idx += 4
-                                    case _:
-                                        pass
-                                instrs_block_free += self._inherit_origin_many(
-                                    self._reti_instr(instr, idx, block), instr
+            case pn.File(pn.Name(val), entries):
+                section_entries = {
+                    ".interrupt_vector_table": [],
+                    ".text": [],
+                    ".data": [],
+                }
+                leading_entries = []
+                for entry in entries:
+                    match entry:
+                        case pn.Section(name, section_body) if name in section_entries:
+                            if name == ".text":
+                                section_entries[name].extend(
+                                    self._flatten_text_entries(section_body)
                                 )
-                                match instr:
-                                    case pn.SingleLineComment():
-                                        pass
-                                    case _:
-                                        idx += 1
+                            else:
+                                section_entries[name].extend(section_body)
+                        case pn.Block():
+                            section_entries[".text"].extend(
+                                self._flatten_text_entries([entry])
+                            )
+                        case pn.SingleLineComment():
+                            leading_entries.append(entry)
                         case _:
-                            throw_error(block)
+                            section_entries[".text"].append(entry)
+                output_entries = leading_entries + [
+                    pn.Section(".interrupt_vector_table", section_entries[".interrupt_vector_table"]),
+                    pn.Section(".text", section_entries[".text"]),
+                    pn.Section(".data", section_entries[".data"]),
+                ]
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti"),
-                    instrs_block_free,
+                    output_entries,
                 )
             case _:
                 throw_error(file)

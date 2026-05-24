@@ -1,6 +1,7 @@
 from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
+from src import reti_nodes as rn
 from src import debug as db
 import sys
 import shutil
@@ -25,6 +26,76 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import traceback
 from typing import cast
+
+
+SECTION_ORDER = [".interrupt_vector_table", ".text", ".data"]
+TEXT_SECTION = ".text"
+DATA_SECTION = ".data"
+
+
+def _section_entries(file_ast: pn.File, section_name: str):
+    for item in file_ast.decls_defs_blocks_instrs:
+        if isinstance(item, pn.Section) and item.name == section_name:
+            return item.entries
+    return []
+
+
+def _walk_blocks(items):
+    for item in items:
+        match item:
+            case pn.Section(_, entries):
+                yield from _walk_blocks(entries)
+            case pn.Block():
+                yield item
+
+
+def _remove_blocks_named(items, block_name: str):
+    removed = []
+    kept = []
+    for item in items:
+        match item:
+            case pn.Section(name, entries):
+                section_removed, section_kept = _remove_blocks_named(entries, block_name)
+                removed.extend(section_removed)
+                kept.append(pn.Section(name, section_kept))
+            case pn.Block(name, stmts) if name == block_name:
+                removed.extend(stmts)
+            case _:
+                kept.append(item)
+    return removed, kept
+
+
+def _merge_sectioned_items(asts, data_entries=None):
+    sections = {name: [] for name in SECTION_ORDER}
+    loose_text_entries = []
+
+    for ast in asts:
+        for item in ast.decls_defs_blocks_instrs:
+            match item:
+                case pn.Section(name, entries) if name in sections:
+                    sections[name].extend(entries)
+                case pn.Block():
+                    loose_text_entries.append(item)
+                case _:
+                    loose_text_entries.append(item)
+
+    sections[TEXT_SECTION][:0] = loose_text_entries
+    if data_entries is not None:
+        sections[DATA_SECTION].extend(data_entries)
+
+    return [pn.Section(name, sections[name]) for name in SECTION_ORDER]
+
+
+def _entry_size(entry):
+    match entry:
+        case pn.SingleLineComment():
+            return 0
+        case pn.Section(_, entries):
+            return sum(_entry_size(section_entry) for section_entry in entries)
+        case pn.Block(_, instrs):
+            return sum(_entry_size(instr) for instr in instrs)
+        case _:
+            return 1
 
 
 class OptionHandler:
@@ -128,7 +199,7 @@ class OptionHandler:
 
         symbol_table = st.SymbolTable.load_json(json_path)
         all_blocks = {}
-        for block in reti_blocks.decls_defs_blocks_instrs:
+        for block in _walk_blocks(reti_blocks.decls_defs_blocks_instrs):
             match block:
                 case pn.Block(name, _):
                     all_blocks[name] = block
@@ -206,10 +277,10 @@ class OptionHandler:
         return reti_blocks, passes.symbol_table, passes.all_blocks
 
     def _link(self, asts, symbol_tables, all_file_blocks):
-        merged_ast = self._merge_asts(asts)
         passes = Passes()
         passes.all_blocks = {k: v for d in all_file_blocks for k, v in d.items()}
         passes.symbol_table = self._merge_symbol_tables(symbol_tables)
+        merged_ast = self._merge_asts(asts, passes.symbol_table)
 
         self._st_pass(passes.symbol_table, "Combined Symbol Table", is_global_st=True)
 
@@ -229,21 +300,10 @@ class OptionHandler:
 
         for file_ast in asts:
             match file_ast:
-                case pn.File(filename, blocks):
-                    # iterate safely (copy, since we remove in place)
-                    for block in blocks[:]:
-                        match block:
-                            case pn.Block("_global_inits", inits):
-                                global_inits.extend(inits)
-                                blocks.remove(block)
-                            case pn.Block(_, _):
-                                continue
-                            case _:
-                                print(
-                                    f"[error] Unexpected block type in file '{filename}': {type(block).__name__}",
-                                    file=sys.stderr,
-                                )
-                                sys.exit(1)
+                case pn.File(_, items):
+                    removed, kept = _remove_blocks_named(items, "_global_inits")
+                    global_inits.extend(removed)
+                    file_ast.decls_defs_blocks_instrs[:] = kept
 
                 case _:
                     print(
@@ -279,26 +339,37 @@ class OptionHandler:
 
         reti_blocks: pn.File = passes.reti_blocks(start_ast)
 
-        reti_blocks.decls_defs_blocks_instrs[0].stmts_instrs[:0] = global_inits
+        start_blocks = list(_walk_blocks(reti_blocks.decls_defs_blocks_instrs))
+        if not start_blocks:
+            print("[error] Internal error: generated _start has no RETI block.", file=sys.stderr)
+            sys.exit(1)
+        start_blocks[0].stmts_instrs[:0] = global_inits
 
         # Insert at the beginning so _start comes first
         asts.insert(0, reti_blocks)
         symbol_tables.insert(0, passes.symbol_table)
         all_file_blocks.insert(0, passes.all_blocks)
 
-    def _merge_asts(self, asts):
+    def _merge_asts(self, asts, symbol_table=None):
         global_vars.tstate.path_without_ext = remove_ext(global_vars.args.output_name)
 
         if not asts:
-            return pn.File(pn.Name(global_vars.args.output_name), [])
+            return pn.File(pn.Name(global_vars.args.output_name), _merge_sectioned_items([]))
 
-        # collect all decls_defs_blocks_instrs into one list
-        merged_decls_defs_blocks_instrs = []
-        for ast in asts:
-            merged_decls_defs_blocks_instrs.extend(ast.decls_defs_blocks_instrs)
+        data_entries = self._zero_initialized_data_entries(symbol_table)
+        merged_decls_defs_blocks_instrs = _merge_sectioned_items(asts, data_entries)
 
         # return a new merged File node
         return pn.File(pn.Name(global_vars.args.output_name), merged_decls_defs_blocks_instrs)
+
+    def _zero_initialized_data_entries(self, symbol_table):
+        if symbol_table is None:
+            return []
+        size = 0
+        for sym in symbol_table._table.get("global", {}).values():
+            if isinstance(sym, dict) and "addr" in sym and "size" in sym:
+                size = max(size, int(sym["addr"]) + int(sym["size"]))
+        return [rn.Im("0") for _ in range(size)]
 
     def _merge_symbol_tables(self, symbol_tables):
         if not symbol_tables:
@@ -502,8 +573,26 @@ class OptionHandler:
                 ) as fout:
                     # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
                     fout.write(str(pass_ast)[1:])
+                self._write_reti_header(pass_ast, val)
             case _:
                 throw_error(pass_ast)
+
+    def _write_reti_header(self, pass_ast: pn.File, reti_path: str):
+        ivt_size = sum(
+            _entry_size(entry)
+            for entry in _section_entries(pass_ast, ".interrupt_vector_table")
+        )
+        text_size = sum(
+            _entry_size(entry) for entry in _section_entries(pass_ast, ".text")
+        )
+        header = {
+            "codesegment_start": ivt_size,
+            "datasegment_start": ivt_size + text_size,
+        }
+        header_path = Path(reti_path).parent / "header.json"
+        with open(header_path, "w", encoding="utf-8") as fout:
+            json.dump(header, fout, indent=2)
+            fout.write("\n")
 
     def _debug_json_value(self, value):
         if isinstance(value, pn.Empty):
@@ -542,6 +631,9 @@ class OptionHandler:
         match pass_ast:
             case pn.File(pn.Name(val), instrs):
                 variables, arguments = self._debug_runtime_symbols(symbol_table)
+                text_instrs = _section_entries(pass_ast, ".text")
+                if any(isinstance(entry, pn.Section) for entry in instrs):
+                    instrs = text_instrs
                 files = []
                 file_ids = {}
                 ranges = []

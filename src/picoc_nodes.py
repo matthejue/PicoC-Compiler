@@ -740,6 +740,28 @@ class File(ASTNode):
     __match_args__ = ("name", "decls_defs_blocks_instrs")
 
 
+class Section(ASTNode):
+    def __init__(self, name, entries):
+        self.name = name
+        self.entries = entries
+
+    @property
+    def visible(self):
+        return [self.name, self.entries]
+
+    def __repr__(self, depth=0):
+        acc = f"\n{' ' * depth}{self.name}"
+        for entry in self.entries:
+            entry_str = str(entry)
+            if entry_str.startswith("\n"):
+                acc += entry_str
+            else:
+                acc += f"\n{' ' * depth}{entry_str}"
+        return acc
+
+    __match_args__ = ("name", "entries")
+
+
 # -------------------------------- L_Block --------------------------------
 class Block(ASTNode):
     def __init__(self, name, stmts_instrs):
