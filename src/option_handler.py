@@ -235,7 +235,7 @@ class OptionHandler:
 
         # Always emit tokens/parse tree even if AST construction fails
         self._tokens_option(ts_tree, code, "Tokens")
-        self._dt_pass(ts_tree, code, "Parse Tree")
+        self._parse_tree_pass(ts_tree, code, "Parse Tree")
 
         try:
             ast = transformer.build_ast(ts_tree, code)
@@ -473,7 +473,7 @@ class OptionHandler:
             ) as fout:
                 fout.write(str(leaf_tokens))
 
-    def _dt_pass(self, ts_tree, code, heading):
+    def _parse_tree_pass(self, ts_tree, code, heading):
         include_unnamed = bool(global_vars.args.double_verbose)
         formatted_tree = _format_tree(
             ts_tree.root_node, code, include_unnamed=include_unnamed
@@ -485,7 +485,7 @@ class OptionHandler:
 
         if global_vars.args.write_files:
             with open(
-                global_vars.tstate.path_without_ext + ".dt",
+                global_vars.tstate.path_without_ext + ".ps",
                 "w",
                 encoding="utf-8",
             ) as fout:

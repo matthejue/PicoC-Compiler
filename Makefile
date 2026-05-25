@@ -23,6 +23,7 @@ _clean-pycache:
 _clean-files:
 	find . -type f -wholename "./sys_tests/*.tokens" -delete
 	find . -type f -wholename "./sys_tests/*.rtokens" -delete
+	find . -type f -wholename "./sys_tests/*.ps" -delete
 	find . -type f -wholename "./sys_tests/*.dt" -delete
 	find . -type f -wholename "./sys_tests/*.rdt" -delete
 	find . -type f -wholename "./sys_tests/*.dt_simple" -delete

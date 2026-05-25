@@ -13,6 +13,7 @@ compiler_pipeline_overview.md
 *.pre
 *.tokens
 *.rtokens
+*.ps
 *.dt
 *.rdt
 *.ast
