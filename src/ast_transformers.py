@@ -785,7 +785,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
 
     def section(self, _, children):
         section_name, *entries = children
-        return pn.Section(section_name, [entry for entry in entries if entry != []])
+        return pn.Section(section_name, entries)
 
     def section_name(self, node, _):
         return self.value(node)
@@ -801,8 +801,6 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         instructions = []
         directives = []
         for entry in entries:
-            if entry == []:
-                continue
             if isinstance(entry, _RetiDirective):
                 directives.append(entry)
             else:
