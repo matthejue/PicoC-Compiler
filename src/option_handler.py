@@ -183,13 +183,13 @@ class OptionHandler:
                 preprocessed_code = self._preprocess(path)
                 return self._compl(preprocessed_code)
             case "reti_blocks":
-                return self._load_external_reti_blocks(path, target["json_path"])
+                return self._load_external_reti_blocks(path, target["st_path"])
             case _:
                 print(f"filename: {path}")
                 print(f"File with extension '.{target_kind}' is not supported")
                 exit(1)
 
-    def _load_external_reti_blocks(self, path: str, json_path: str):
+    def _load_external_reti_blocks(self, path: str, st_path: str):
         with open(path, encoding="utf-8") as fin:
             code = fin.read()
 
@@ -197,7 +197,7 @@ class OptionHandler:
         ts_tree = transformer.parse_tree(code)
         reti_blocks = transformer.build_ast(ts_tree, code)
 
-        symbol_table = st.SymbolTable.load_json(json_path)
+        symbol_table = st.SymbolTable.load_json(st_path)
         all_blocks = {}
         for block in _walk_blocks(reti_blocks.decls_defs_blocks_instrs):
             match block:
@@ -531,7 +531,7 @@ class OptionHandler:
 
         if global_vars.args.write_files or compl_opt_active:
             with open(
-                global_vars.tstate.path_without_ext + ".json",
+                global_vars.tstate.path_without_ext + ".st",
                 "w",
                 encoding="utf-8",
             ) as fout:
@@ -573,11 +573,11 @@ class OptionHandler:
                 ) as fout:
                     # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
                     fout.write(str(pass_ast)[1:])
-                self._write_reti_header(pass_ast, val)
+                self._write_reti_sections(pass_ast, val)
             case _:
                 throw_error(pass_ast)
 
-    def _write_reti_header(self, pass_ast: pn.File, reti_path: str):
+    def _write_reti_sections(self, pass_ast: pn.File, reti_path: str):
         ivt_size = sum(
             _entry_size(entry)
             for entry in _section_entries(pass_ast, ".interrupt_vector_table")
@@ -585,13 +585,13 @@ class OptionHandler:
         text_size = sum(
             _entry_size(entry) for entry in _section_entries(pass_ast, ".text")
         )
-        header = {
+        sections = {
             "codesegment_start": ivt_size,
             "datasegment_start": ivt_size + text_size,
         }
-        header_path = Path(reti_path).parent / "header.json"
-        with open(header_path, "w", encoding="utf-8") as fout:
-            json.dump(header, fout, indent=2)
+        sections_path = Path(reti_path).with_suffix(".sections")
+        with open(sections_path, "w", encoding="utf-8") as fout:
+            json.dump(sections, fout, indent=2)
             fout.write("\n")
 
     def _debug_json_value(self, value):
@@ -640,7 +640,7 @@ class OptionHandler:
                 call_jumps = []
                 return_addresses = []
                 current_range = None
-                # Instruction line numbers in debuginfo.json are 1-based,
+                # Instruction line numbers in the .debuginfo file are 1-based,
                 # matching source-code line numbers.
                 line_no = 0
 
@@ -694,7 +694,7 @@ class OptionHandler:
                         }
                         ranges.append(current_range)
 
-                debuginfo_path = Path(val).resolve().parent / "debuginfo.json"
+                debuginfo_path = Path(val).with_suffix(".debuginfo")
                 with open(debuginfo_path, "w", encoding="utf-8") as fout:
                     json.dump(
                         {
@@ -842,7 +842,7 @@ def _parse_cli_args():
         "-g",
         "--generate_debuginfo",
         action="store_true",
-        help="Write debuginfo.json for linked '.picoc' inputs",
+        help="Write <output>.debuginfo for linked '.picoc' inputs",
     )
 
     global_vars.args = parser.parse_args()
@@ -941,20 +941,20 @@ def _expand_dependency_metadata(files: List[str]) -> List[str]:
     return expanded
 
 def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
-    json_by_base: Dict[str, str] = {}
-    reti_block_bases_with_matching_json = set()
+    st_by_base: Dict[str, str] = {}
+    reti_block_bases_with_matching_st = set()
 
     for path in files:
-        if get_ext(path) != "json":
+        if get_ext(path) != "st":
             continue
-        # Canonicalize relative spellings like "x/y.json" vs "./x/y.json".
+        # Canonicalize relative spellings like "x/y.st" vs "./x/y.st".
         base_path = os.path.abspath(remove_ext(path))
-        if base_path in json_by_base:
+        if base_path in st_by_base:
             print(
-                f"[ERROR] Multiple .json files were provided for '{base_path}.reti_blocks'"
+                f"[ERROR] Multiple .st files were provided for '{base_path}.reti_blocks'"
             )
             sys.exit(1)
-        json_by_base[base_path] = path
+        st_by_base[base_path] = path
 
     build_targets: List[Dict[str, str]] = []
     for path in files:
@@ -965,45 +965,45 @@ def _normalize_input_units(files: List[str]) -> List[Dict[str, str]]:
             case "reti_blocks":
                 # Use the same canonicalized base-path key as above.
                 base_path = os.path.abspath(remove_ext(path))
-                explicit_json_path = json_by_base.get(base_path)
-                if explicit_json_path is None:
-                    auto_json_path = remove_ext(path) + ".json"
-                    if os.path.isfile(auto_json_path):
-                        json_path = auto_json_path
+                explicit_st_path = st_by_base.get(base_path)
+                if explicit_st_path is None:
+                    auto_st_path = remove_ext(path) + ".st"
+                    if os.path.isfile(auto_st_path):
+                        st_path = auto_st_path
                     else:
                         print(
-                            f"[ERROR] Missing companion .json symbol table for '{path}'. "
-                            "Pass the matching .json file as input or place it next to the "
+                            f"[ERROR] Missing companion .st symbol table for '{path}'. "
+                            "Pass the matching .st file as input or place it next to the "
                             ".reti_blocks file."
                         )
                         sys.exit(1)
                 else:
-                    json_path = explicit_json_path
-                    # Reached when a matching `.json` path was provided explicitly
+                    st_path = explicit_st_path
+                    # Reached when a matching `.st` path was provided explicitly
                     # in the input list, but that path does not currently exist.
-                    if not os.path.isfile(json_path):
+                    if not os.path.isfile(st_path):
                         print(
-                            f"[ERROR] Companion .json symbol table '{json_path}' was not found"
+                            f"[ERROR] Companion .st symbol table '{st_path}' was not found"
                         )
                         sys.exit(1)
-                reti_block_bases_with_matching_json.add(base_path)
+                reti_block_bases_with_matching_st.add(base_path)
                 build_targets.append(
                     {
                         "kind": "reti_blocks",
                         "path": path,
-                        "json_path": json_path,
+                        "st_path": st_path,
                     }
                 )
-            case "json":
+            case "st":
                 continue
             case _:
                 print(f"[ERROR] File '{path}' has unsupported extension '.{extension}'")
                 sys.exit(1)
 
-    for base_path, json_path in json_by_base.items():
-        if base_path not in reti_block_bases_with_matching_json:
+    for base_path, st_path in st_by_base.items():
+        if base_path not in reti_block_bases_with_matching_st:
             print(
-                f"[ERROR] Standalone .json input '{json_path}' has no matching "
+                f"[ERROR] Standalone .st input '{st_path}' has no matching "
                 ".reti_blocks input"
             )
             sys.exit(1)
@@ -1065,10 +1065,10 @@ def _resolve_dependency_path(source_dir: str, dependency: str) -> str:
     for candidate in candidates:
         if os.path.isfile(candidate):
             resolved = os.path.normpath(candidate)
-            if get_ext(resolved) not in {"picoc", "reti_blocks", "json"}:
+            if get_ext(resolved) not in {"picoc", "reti_blocks", "st"}:
                 print(
                     f"[ERROR] Dependency '{dependency}' has unsupported extension. "
-                    "Only .picoc, .reti_blocks, and .json dependencies are supported."
+                    "Only .picoc, .reti_blocks, and .st dependencies are supported."
                 )
                 sys.exit(1)
             return resolved

@@ -28,7 +28,7 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.dt_simple" -delete
 	find . -type f -wholename "./sys_tests/*.ast" -delete
 	find . -type f -wholename "./sys_tests/*.rast" -delete
-	find . -type f -wholename "./sys_tests/*.json" -delete
+	find . -type f -wholename "./sys_tests/*.st" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_shrink" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_blocks" -delete
 	find . -type f -wholename "./sys_tests/*.picoc_symbol" -delete
@@ -46,6 +46,8 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.output" -delete
 	find . -type f -wholename "./sys_tests/*.expected_output" -delete
 	find . -type f -wholename "./sys_tests/*.datasegment_size" -delete
+	find . -type f -wholename "./sys_tests/*.debuginfo" -delete
+	find . -type f -wholename "./sys_tests/*.sections" -delete
 	find . -type f -wholename "./sys_tests/*.reti_states" -delete
 	find . -type f -wholename "./sys_tests/*.eprom" -delete
 	find . -type f -wholename "./sys_tests/*.c" -delete

@@ -29,13 +29,6 @@ module.exports = grammar({
 
     filename: _ => token(/[ -~]+\.reti(_blocks|_patch)?/),
 
-    block: $ => prec.right(seq(
-      field('label', $.label),
-      ':',
-      repeat($.directive),
-      repeat($.statement),
-    )),
-
     section: $ => prec.right(seq(
       field('name', $.section_name),
       repeat(choice(
@@ -50,6 +43,18 @@ module.exports = grammar({
       '.text',
       '.data',
     ),
+
+    data_value: $ => seq(
+      $.immediate,
+      optional(';'),
+    ),
+
+    block: $ => prec.right(seq(
+      field('label', $.label),
+      ':',
+      repeat($.directive),
+      repeat($.statement),
+    )),
 
     label: $ => $.symbol,
 
@@ -78,11 +83,6 @@ module.exports = grammar({
         $.instruction,
         $.jump,
       ),
-      optional(';'),
-    ),
-
-    data_value: $ => seq(
-      $.immediate,
       optional(';'),
     ),
 

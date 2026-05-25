@@ -11,6 +11,7 @@
   (register_immediate_opcode)
   (load_immediate_opcode)
   (directive_name)
+  (section_name)
 ] @keyword
 
 (store_instruction "STORE" @keyword)

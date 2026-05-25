@@ -301,7 +301,7 @@ Main points:
 - `transformer.build_ast(ts_tree, code)` in [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py) walks the Tree-sitter parse tree and builds the compiler's PicoC AST.
 - The AST construction logic therefore lives in `ast_transformers.py`, while the later lowering logic lives in `src/passes/`.
 
-### Symbol Table Output and `.json` Files
+### Symbol Table Output and `.st` Files
 
 `OptionHandler._st_pass(...)` serializes symbol tables with `symbol_table.to_json_str(pretty=True)`.
 
@@ -309,10 +309,10 @@ Main points:
 
 - The per-file symbol table after `picoc_symbol` can be printed as JSON.
 - `-i` / `--intermediate_stages` prints the JSON symbol table to the terminal.
-- `-w` / `--write_files` writes the JSON symbol table to `<path_without_ext>.json`.
-- `-c` / `--compile` also causes the per-file symbol table JSON to be written to `<path_without_ext>.json`.
+- `-w` / `--write_files` writes the JSON symbol table to `<path_without_ext>.st`.
+- `-c` / `--compile` also causes the per-file symbol table JSON to be written to `<path_without_ext>.st`.
 - During linking / multi-file handling, the merged symbol table is also emitted in the same JSON form.
-- These `.json` files contain the symbol table state relevant to that stage, including scopes and symbol metadata such as datatype, address, and size where available.
+- These `.st` files contain JSON symbol table state relevant to that stage, including scopes and symbol metadata such as datatype, address, and size where available.
 
 ### The Main AST/Lowering Passes
 
