@@ -9,6 +9,7 @@ dist_old_3/
 build/
 pico_c_compiler.spec
 README.txt
+compiler_pipeline_overview.md
 *.pre
 *.tokens
 *.rtokens
@@ -52,3 +53,4 @@ README.txt
 # Generated tree-sitter artifacts for the vendored grammars
 vendor/tree-sitter-picoc/src/
 vendor/tree-sitter-reti/src/
+.vscode/tasks.json
