@@ -30,9 +30,10 @@
 
 (return_from_interrupt_instruction) @keyword
 
-(label
-  (symbol) @label)
-
 (symbol) @variable
+
+(block
+  label: (label
+    (symbol) @label))
 
 (relation) @operator

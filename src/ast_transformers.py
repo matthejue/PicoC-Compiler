@@ -763,25 +763,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
             file_name = children[0]
             items = children[1:]
 
-        output_items = []
-        top_level_directives: dict[str, list[list[object]]] = {}
-        top_level_statements = []
-        for item in items:
-            match item:
-                case []:
-                    continue
-                case pn.Block() | pn.Section():
-                    output_items.append(item)
-                case _RetiDirective(name, arguments):
-                    top_level_directives.setdefault(name, []).append(arguments)
-                case _:
-                    output_items.append(item)
-                    top_level_statements.append(item)
-
-        file_node = pn.File(file_name, output_items)
-        file_node.assembler_directives = top_level_directives
-        file_node.top_level_statements = top_level_statements
-        return file_node
+        return pn.File(file_name, items)
 
     def section(self, _, children):
         section_name, *entries = children
@@ -809,11 +791,6 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         block = pn.Block(label.val, instructions)
         block.scope = "global"
         block.block_idx = -1
-        block.assembler_directives = {}
-        for directive in directives:
-            block.assembler_directives.setdefault(directive.name, []).append(
-                directive.arguments
-            )
         for directive in directives:
             self._apply_block_directive(block, directive)
         return block
