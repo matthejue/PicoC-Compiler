@@ -1,10 +1,17 @@
 from src.ast_node import ASTNode, _source_origin_visible
 from src import picoc_nodes as pn
 from src import global_vars
+from dataclasses import dataclass
 
 # =========================================================================
 # =                            Container Nodes                            =
 # =========================================================================
+@dataclass(slots=True)
+class Directive(ASTNode):
+    name: str
+    arguments: list[object]
+
+
 # -------------------------------- Program --------------------------------
 # class Program(ASTNode):
 #     def __init__(self, name, instrs):
@@ -124,7 +131,9 @@ class Im(ASTNode):
     def __eq__(self, other):
         return self.val == other.val
 
-    def __repr__(self):
+    def __repr__(self, depth=None):
+        if depth is not None:
+            return f"\n{' ' * depth}{self.val}"
         return f"{self.val}"
 
     __match_args__ = ("val",)

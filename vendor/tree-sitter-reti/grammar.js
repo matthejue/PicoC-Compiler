@@ -30,6 +30,7 @@ module.exports = grammar({
     filename: _ => token(/[ -~]+\.reti(_blocks|_patch)?/),
 
     section: $ => prec.right(seq(
+      '.',
       field('name', $.section_name),
       repeat(choice(
         $.block,
@@ -38,11 +39,11 @@ module.exports = grammar({
       )),
     )),
 
-    section_name: _ => choice(
-      '.interrupt_vector_table',
-      '.text',
-      '.data',
-    ),
+    section_name: _ => token.immediate(choice(
+      'interrupt_vector_table',
+      'text',
+      'data',
+    )),
 
     data_value: $ => seq(
       $.immediate,
@@ -59,18 +60,19 @@ module.exports = grammar({
     label: $ => $.symbol,
 
     directive: $ => seq(
+      '.',
       field('name', $.directive_name),
       field('argument', $.directive_argument),
     ),
 
-    directive_name: _ => choice(
-      '.scope',
-      '.instrs_before',
-      '.num_instrs',
-      '.block_idx',
-      '.param_size',
-      '.local_vars_size',
-    ),
+    directive_name: _ => token.immediate(choice(
+      'scope',
+      'instrs_before',
+      'num_instrs',
+      'block_idx',
+      'param_size',
+      'local_vars_size',
+    )),
 
     directive_argument: $ => choice(
       $.immediate,

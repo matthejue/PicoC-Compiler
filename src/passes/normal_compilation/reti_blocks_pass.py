@@ -750,7 +750,11 @@ class RetiBlocksPass:
                             throw_error(block)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
-                    [pn.Section(".text", blocks)],
+                    [
+                        pn.Section("interrupt_vector_table", []),
+                        pn.Section("text", blocks),
+                        pn.Section("data", []),
+                    ],
                 )
             case _:
                 throw_error(file)

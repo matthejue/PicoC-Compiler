@@ -176,38 +176,52 @@ class RetiPass:
                     instrs_block_free.append(entry)
         return instrs_block_free
 
+    def _entry_size(self, entry):
+        match entry:
+            case pn.SingleLineComment():
+                return 0
+            case _:
+                return 1
+
+    def _entries_size(self, entries):
+        return sum(self._entry_size(entry) for entry in entries)
+
     def reti(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), entries):
                 section_entries = {
-                    ".interrupt_vector_table": [],
-                    ".text": [],
-                    ".data": [],
+                    "interrupt_vector_table": [],
+                    "text": [],
+                    "data": [],
                 }
                 leading_entries = []
                 for entry in entries:
                     match entry:
                         case pn.Section(name, section_body) if name in section_entries:
-                            if name == ".text":
+                            if name == "text":
                                 section_entries[name].extend(
                                     self._flatten_text_entries(section_body)
                                 )
                             else:
                                 section_entries[name].extend(section_body)
                         case pn.Block():
-                            section_entries[".text"].extend(
+                            section_entries["text"].extend(
                                 self._flatten_text_entries([entry])
                             )
                         case pn.SingleLineComment():
                             leading_entries.append(entry)
                         case _:
-                            section_entries[".text"].append(entry)
-                output_entries = leading_entries + [
-                    pn.Section(".interrupt_vector_table", section_entries[".interrupt_vector_table"]),
-                    pn.Section(".text", section_entries[".text"]),
-                    pn.Section(".data", section_entries[".data"]),
-                ]
+                            section_entries["text"].append(entry)
+                ivt_entries = section_entries["interrupt_vector_table"]
+                text_entries = section_entries["text"]
+                data_entries = section_entries["data"]
+                self.reti_sections = {
+                    "codesegment_start": self._entries_size(ivt_entries),
+                    "datasegment_start": self._entries_size(ivt_entries)
+                    + self._entries_size(text_entries),
+                }
+                output_entries = leading_entries + ivt_entries + text_entries + data_entries
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti"),
                     output_entries,

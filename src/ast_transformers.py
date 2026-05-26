@@ -1,5 +1,4 @@
 import ctypes
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
 
@@ -615,13 +614,6 @@ class TransformerPicoC(_TreeSitterTransformer):
 # information, and any additional linker annotations that should survive the
 # textual assembly form.
 
-
-@dataclass(slots=True)
-class _RetiDirective:
-    name: str
-    arguments: list[object]
-
-
 class TransformerRetiBlocks(_TreeSitterTransformer):
     """
     Tree-sitter backed transformer that rebuilds a `.reti_blocks` file into
@@ -681,12 +673,12 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
     }
 
     _BLOCK_ATTR_DIRECTIVES = {
-        ".scope": "scope",
-        ".instrs_before": "instrs_before",
-        ".num_instrs": "num_instrs",
-        ".block_idx": "block_idx",
-        ".param_size": "param_size",
-        ".local_vars_size": "local_vars_size",
+        "scope": "scope",
+        "instrs_before": "instrs_before",
+        "num_instrs": "num_instrs",
+        "block_idx": "block_idx",
+        "param_size": "param_size",
+        "local_vars_size": "local_vars_size",
     }
 
     def __init__(self):
@@ -732,7 +724,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
             case _:
                 throw_error(value)
 
-    def _apply_block_directive(self, block: pn.Block, directive: _RetiDirective):
+    def _apply_block_directive(self, block: pn.Block, directive: rn.Directive):
         attr_name = self._BLOCK_ATTR_DIRECTIVES.get(directive.name)
         if attr_name is None:
             return
@@ -783,7 +775,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         instructions = []
         directives = []
         for entry in entries:
-            if isinstance(entry, _RetiDirective):
+            if isinstance(entry, rn.Directive):
                 directives.append(entry)
             else:
                 instructions.append(entry)
@@ -848,7 +840,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         return children[0]
 
     def directive(self, _, children):
-        return _RetiDirective(children[0], children[1:])
+        return rn.Directive(children[0], children[1:])
 
     # ----------------------------- Instructions -----------------------------
     def register_argument_opcode(self, node, _):

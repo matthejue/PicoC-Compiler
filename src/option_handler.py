@@ -28,9 +28,9 @@ import traceback
 from typing import cast
 
 
-SECTION_ORDER = [".interrupt_vector_table", ".text", ".data"]
-TEXT_SECTION = ".text"
-DATA_SECTION = ".data"
+SECTION_ORDER = ["interrupt_vector_table", "text", "data"]
+TEXT_SECTION = "text"
+DATA_SECTION = "data"
 
 
 def _section_entries(file_ast: pn.File, section_name: str):
@@ -88,18 +88,6 @@ def _merge_sectioned_items(asts, data_entries=None):
         sections[DATA_SECTION].extend(data_entries)
 
     return [pn.Section(name, sections[name]) for name in SECTION_ORDER]
-
-
-def _entry_size(entry):
-    match entry:
-        case pn.SingleLineComment():
-            return 0
-        case pn.Section(_, entries):
-            return sum(_entry_size(section_entry) for section_entry in entries)
-        case pn.Block(_, instrs):
-            return sum(_entry_size(instr) for instr in instrs)
-        case _:
-            return 1
 
 
 class OptionHandler:
@@ -294,7 +282,7 @@ class OptionHandler:
             "RETI Patch",
         )
         reti = passes.reti(reti_patch)
-        self._reti_with_metadata(reti, "RETI")
+        self._reti_with_metadata(reti, "RETI", passes.reti_sections)
         if global_vars.args.generate_debuginfo:
             self._write_debuginfo(reti, passes.symbol_table)
 
@@ -541,7 +529,7 @@ class OptionHandler:
             ) as fout:
                 fout.write(str(json_symbol_table))
 
-    def _reti_with_metadata(self, pass_ast: pn.File, heading):
+    def _reti_with_metadata(self, pass_ast: pn.File, heading, sections):
         metadata_entries = []
         if global_vars.args.metadata_comments and global_vars.metadata_comments:
             for key in ("input", "expected", "datasegment"):
@@ -575,26 +563,19 @@ class OptionHandler:
                 ) as fout:
                     # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
                     fout.write(_pass_output_text(pass_ast))
-                self._write_reti_sections(pass_ast, val)
+                self._write_reti_sections(sections, val)
             case _:
                 throw_error(pass_ast)
 
-    def _write_reti_sections(self, pass_ast: pn.File, reti_path: str):
-        ivt_size = sum(
-            _entry_size(entry)
-            for entry in _section_entries(pass_ast, ".interrupt_vector_table")
-        )
-        text_size = sum(
-            _entry_size(entry) for entry in _section_entries(pass_ast, ".text")
-        )
-        sections = {
-            "codesegment_start": ivt_size,
-            "datasegment_start": ivt_size + text_size,
-        }
+    def _write_reti_sections(self, sections, reti_path: str):
+        sections_text = json.dumps(sections, indent=2)
+        if global_vars.args.intermediate_stages:
+            print(subheading("RETI Sections", "-"))
+            print(sections_text)
+
         sections_path = Path(reti_path).with_suffix(".sections")
         with open(sections_path, "w", encoding="utf-8") as fout:
-            json.dump(sections, fout, indent=2)
-            fout.write("\n")
+            fout.write(sections_text + "\n")
 
     def _debug_json_value(self, value):
         if isinstance(value, pn.Empty):
@@ -633,7 +614,7 @@ class OptionHandler:
         match pass_ast:
             case pn.File(pn.Name(val), instrs):
                 variables, arguments = self._debug_runtime_symbols(symbol_table)
-                text_instrs = _section_entries(pass_ast, ".text")
+                text_instrs = _section_entries(pass_ast, "text")
                 if any(isinstance(entry, pn.Section) for entry in instrs):
                     instrs = text_instrs
                 files = []

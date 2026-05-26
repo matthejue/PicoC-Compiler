@@ -745,13 +745,12 @@ class Section(ASTNode):
         return [self.name, self.entries]
 
     def __repr__(self, depth=0):
-        acc = f"\n{' ' * depth}{self.name}"
+        acc = f"\n{' ' * (depth + 2)}.{self.name}"
         for entry in self.entries:
-            entry_str = str(entry)
-            if entry_str.startswith("\n"):
-                acc += entry_str
+            if isinstance(entry, Block):
+                acc += entry.__repr__(depth)
             else:
-                acc += f"\n{' ' * depth}{entry_str}"
+                acc += entry.__repr__(depth + 2)
         return acc
 
     __match_args__ = ("name", "entries")
