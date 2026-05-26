@@ -726,16 +726,11 @@ class File(ASTNode):
     def visible(self):
         return [self.name, self.decls_defs_blocks_instrs]
 
-    def __repr__(self, incl_filenode=False):
-        if not self.decls_defs_blocks_instrs:
-            return ""
-        if incl_filenode:
-            return super().__repr__(is_file=True)
-        else:
-            instrs_str = str(self.decls_defs_blocks_instrs[0])
-            for instr in self.decls_defs_blocks_instrs[1:]:
-                instrs_str += str(instr)
-            return instrs_str
+    def __repr__(self):
+        entries_str = ""
+        for entry in self.decls_defs_blocks_instrs:
+            entries_str += str(entry)
+        return entries_str
 
     __match_args__ = ("name", "decls_defs_blocks_instrs")
 

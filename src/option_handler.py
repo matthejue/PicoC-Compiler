@@ -40,6 +40,10 @@ def _section_entries(file_ast: pn.File, section_name: str):
     return []
 
 
+def _pass_output_text(pass_ast: pn.File):
+    return str(pass_ast)[1:]
+
+
 def _walk_blocks(items):
     for item in items:
         match item:
@@ -208,7 +212,7 @@ class OptionHandler:
 
         if global_vars.args.intermediate_stages:
             print(subheading("RETI Blocks", "-"))
-            print(reti_blocks.__repr__(incl_filenode=True)[1:])
+            print(_pass_output_text(reti_blocks))
             print(subheading("Symbol Table", "-"))
             print(symbol_table.to_json_str(pretty=True))
 
@@ -494,13 +498,13 @@ class OptionHandler:
     def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(pass_ast.__repr__(incl_filenode=True)[1:])
+            print(_pass_output_text(pass_ast))
 
         if global_vars.args.write_files or compl_opt_active:
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(str(pass_ast)[1:])
+                        fout.write(_pass_output_text(pass_ast))
                 case _:
                     throw_error(pass_ast)
 
@@ -559,9 +563,7 @@ class OptionHandler:
 
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            # print(pass_ast.decls_defs_blocks_instrs[0])
-            # print(type(pass_ast.decls_defs_blocks_instrs[0]))
-            print(pass_ast.__repr__(incl_filenode=True)[1:])
+            print(_pass_output_text(pass_ast))
 
         match pass_ast:
             case pn.File(pn.Name(val)):
@@ -572,7 +574,7 @@ class OptionHandler:
                     encoding="utf-8",
                 ) as fout:
                     # metadata = f"# input: {' '.join(map(lambda x: str(x), global_vars.input))}\n# expected: {' '.join(map(lambda x: str(x), global_vars.expected))}\n"
-                    fout.write(str(pass_ast)[1:])
+                    fout.write(_pass_output_text(pass_ast))
                 self._write_reti_sections(pass_ast, val)
             case _:
                 throw_error(pass_ast)

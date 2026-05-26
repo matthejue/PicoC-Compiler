@@ -22,7 +22,7 @@ class ASTNode:
 
     # __match_args__ = ("val",)
 
-    def __repr__(self, depth=0, is_file=False):
+    def __repr__(self, depth=0):
         visible = list(self.visible)
         origin_visible = _source_origin_visible(self)
         if origin_visible is not None:
@@ -33,7 +33,7 @@ class ASTNode:
         acc = f"\n{' ' * depth}{self.__class__.__name__}("
 
         for i, child in enumerate(visible):
-            acc = repr_arg_types(i, child, depth, acc, is_file=is_file)
+            acc = repr_arg_types(i, child, depth, acc)
 
         return acc + ")"
 
@@ -93,7 +93,7 @@ def suppress_source_origin(node):
     return node
 
 
-def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
+def repr_arg_types(i, arg, depth, acc, *, is_block=False):
     sep = ", " if i > 0 else ""
     depth2 = depth + 2
     indent2 = " " * (depth2)
@@ -119,6 +119,7 @@ def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
                         | pn.While()
                         | pn.DoWhile()
                         | pn.Block()
+                        | pn.Section()
                         | pn.FunDef()
                         | pn.FunDecl()
                         | pn.FunPtrDecl()
@@ -129,7 +130,7 @@ def repr_arg_types(i, arg, depth, acc, *, is_block=False, is_file=False):
                     # Everything else gets converted to a single line
                     case _:
                         # log("list_child", convert_to_single_line(list_child))
-                        acc += f"{"" if is_block or is_file else sub_sep}\n{subindent}{convert_to_single_line(list_child)}"
+                        acc += f"{'' if is_block else sub_sep}\n{subindent}{convert_to_single_line(list_child)}"
             acc += "" if is_block else f"\n{indent2}]"
         case str() | int():
             acc += f"{sep}'{arg}'"
