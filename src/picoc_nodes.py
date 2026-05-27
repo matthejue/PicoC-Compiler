@@ -729,7 +729,7 @@ class File(ASTNode):
     def __repr__(self):
         entries_str = ""
         for entry in self.decls_defs_blocks_instrs:
-            entries_str += str(entry)
+            entries_str += entry.__repr__(0)
         return entries_str
 
     __match_args__ = ("name", "decls_defs_blocks_instrs")

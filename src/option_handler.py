@@ -1,7 +1,6 @@
 from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
-from src import reti_nodes as rn
 from src import debug as db
 import sys
 import shutil
@@ -69,7 +68,7 @@ def _remove_blocks_named(items, block_name: str):
     return removed, kept
 
 
-def _merge_sectioned_items(asts, data_entries=None):
+def _merge_sectioned_items(asts):
     sections = {name: [] for name in SECTION_ORDER}
     loose_text_entries = []
 
@@ -84,9 +83,6 @@ def _merge_sectioned_items(asts, data_entries=None):
                     loose_text_entries.append(item)
 
     sections[TEXT_SECTION][:0] = loose_text_entries
-    if data_entries is not None:
-        sections[DATA_SECTION].extend(data_entries)
-
     return [pn.Section(name, sections[name]) for name in SECTION_ORDER]
 
 
@@ -348,20 +344,10 @@ class OptionHandler:
         if not asts:
             return pn.File(pn.Name(global_vars.args.output_name), _merge_sectioned_items([]))
 
-        data_entries = self._zero_initialized_data_entries(symbol_table)
-        merged_decls_defs_blocks_instrs = _merge_sectioned_items(asts, data_entries)
+        merged_decls_defs_blocks_instrs = _merge_sectioned_items(asts)
 
         # return a new merged File node
         return pn.File(pn.Name(global_vars.args.output_name), merged_decls_defs_blocks_instrs)
-
-    def _zero_initialized_data_entries(self, symbol_table):
-        if symbol_table is None:
-            return []
-        size = 0
-        for sym in symbol_table._table.get("global", {}).values():
-            if isinstance(sym, dict) and "addr" in sym and "size" in sym:
-                size = max(size, int(sym["addr"]) + int(sym["size"]))
-        return [rn.Im("0") for _ in range(size)]
 
     def _merge_symbol_tables(self, symbol_tables):
         if not symbol_tables:
