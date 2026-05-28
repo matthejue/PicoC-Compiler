@@ -142,36 +142,33 @@ class RetiPatchPass:
 
     def _reti_patch_section(self, section):
         match section:
-            case pn.Section(name, entries):
-                if name != "text":
-                    return
-                patched_entries = []
+            case pn.Section(_, entries):
                 for entry in entries:
                     match entry:
                         case pn.Block():
                             self._reti_patch_block(entry)
-                            patched_entries.append(entry)
                         case _:
-                            patched_entries.append(entry)
-                section.entries[:] = patched_entries
+                            pass
             case _:
                 throw_error(section)
 
     def reti_patch(self, file: pn.File):
         match file:
-            case pn.File(pn.Name(val), entries):
+            case pn.File(pn.Name(val), sections):
                 self.instrs_cnt = 0
-                for entry in entries:
-                    match entry:
+                for section in sections:
+                    match section:
+                        case pn.Section("text", _):
+                            self._reti_patch_section(section)
                         case pn.Section():
-                            self._reti_patch_section(entry)
+                            pass
                         case pn.SingleLineComment():
                             pass
                         case _:
-                            throw_error(entry)
+                            throw_error(section)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_patch"),
-                    entries,
+                    sections,
                 )
             case _:
                 throw_error(file)

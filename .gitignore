@@ -11,6 +11,7 @@ pico_c_compiler.spec
 README.txt
 compiler_pipeline_overview.md
 *.pre
+*.pdf
 *.tokens
 *.rtokens
 *.ps

@@ -139,16 +139,15 @@ class RetiPass:
             case _:
                 return [instr]
 
-    def _flatten_text_entries(self, entries):
+    def _flatten_text_blocks(self, entries):
         instrs_block_free = []
         for entry in entries:
             match entry:
-                case pn.Block(name, instrs):
+                case pn.Block(label, instrs) as block:
                     idx = 0
                     instrs_block_free += self._single_line_comment(
-                        pn.Block(name, []), "# //"
+                        pn.Block(label, []), "# //"
                     )
-                    label = entry.name
                     self.current_scope = self.block_scopes.get(label, "global")
                     for instr in instrs:
                         match instr:
@@ -163,7 +162,7 @@ class RetiPass:
                             case _:
                                 pass
                         instrs_block_free += self._inherit_origin_many(
-                            self._reti_instr(instr, idx, entry), instr
+                            self._reti_instr(instr, idx, block), instr
                         )
                         match instr:
                             case pn.SingleLineComment():
@@ -189,39 +188,28 @@ class RetiPass:
     def reti(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
-            case pn.File(pn.Name(val), entries):
-                section_entries = {
-                    "interrupt_vector_table": [],
-                    "text": [],
-                    "data": [],
-                }
-                leading_entries = []
-                for entry in entries:
-                    match entry:
-                        case pn.Section(name, section_body) if name in section_entries:
-                            if name == "text":
-                                section_entries[name].extend(
-                                    self._flatten_text_entries(section_body)
-                                )
-                            else:
-                                section_entries[name].extend(section_body)
-                        case pn.Block():
-                            section_entries["text"].extend(
-                                self._flatten_text_entries([entry])
+            case pn.File(pn.Name(val), sections):
+                ivt_entries = []
+                text_entries = []
+                data_entries = []
+                for section in sections:
+                    match section:
+                        case pn.Section("interrupt_vector_table", section_entries):
+                            ivt_entries.extend(section_entries)
+                        case pn.Section("text", section_entries):
+                            text_entries.extend(
+                                self._flatten_text_blocks(section_entries)
                             )
-                        case pn.SingleLineComment():
-                            leading_entries.append(entry)
+                        case pn.Section("data", section_entries):
+                            data_entries.extend(section_entries)
                         case _:
-                            section_entries["text"].append(entry)
-                ivt_entries = section_entries["interrupt_vector_table"]
-                text_entries = section_entries["text"]
-                data_entries = section_entries["data"]
+                            throw_error(section)
                 self.reti_sections = {
                     "codesegment_start": self._entries_size(ivt_entries),
                     "datasegment_start": self._entries_size(ivt_entries)
                     + self._entries_size(text_entries),
                 }
-                output_entries = leading_entries + ivt_entries + text_entries + data_entries
+                output_entries = ivt_entries + text_entries + data_entries
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti"),
                     output_entries,
