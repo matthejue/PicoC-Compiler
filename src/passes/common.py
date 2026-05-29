@@ -1,4 +1,8 @@
-from src.passes.dependencies import *
+from src import picoc_nodes as pn
+from src.ast_node import copy_source_origin, copy_source_origin_to_many
+from src.symbol_table import SymbolTable
+from src.utils.util_funs_dependent import throw_error
+import copy
 
 
 class PassStateMixin:
@@ -244,4 +248,3 @@ class PassStateMixin:
                         )
             case _:
                 return datatype, initializer
-

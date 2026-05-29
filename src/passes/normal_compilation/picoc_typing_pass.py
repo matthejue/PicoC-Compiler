@@ -1,4 +1,7 @@
-from src.passes.dependencies import *
+from src import global_vars
+from src import picoc_nodes as pn
+from src.utils.util_funs_dependent import throw_error
+import copy
 
 
 class PicocTypingPass:
@@ -312,4 +315,3 @@ class PicocTypingPass:
                 )
             case _:
                 throw_error(file)
-

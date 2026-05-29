@@ -1,4 +1,9 @@
-from src.passes.dependencies import *
+from src import global_vars
+from src import picoc_nodes as pn
+from src import reti_nodes as rn
+from src.utils.util_funs_dependent import throw_error
+from src.utils.util_funs_independent import convert_to_single_line
+import copy
 
 
 class PicocBlocksPass:
@@ -274,4 +279,3 @@ class PicocBlocksPass:
                 )
             case _:
                 throw_error(file)
-
