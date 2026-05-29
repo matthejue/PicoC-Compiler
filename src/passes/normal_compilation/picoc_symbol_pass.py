@@ -11,6 +11,12 @@ class PicocSymbolPass:
     # - builds the symbol table and rewrites PicoC Name nodes ahead of typing
     # - decalres function and struct declarations and defintions to symbol table
 
+    def _is_variadic_params(self, allocs) -> bool:
+        return bool(allocs) and isinstance(allocs[-1], pn.VariadicParam)
+
+    def _fixed_params(self, allocs):
+        return [alloc for alloc in allocs if not isinstance(alloc, pn.VariadicParam)]
+
     def _param_size(self, allocs) -> int:
         size = 0
         for alloc in allocs:
