@@ -8,31 +8,31 @@ class RetiPass:
     # - keine Blöcke mehr, Knoten genauso zusammengefügt, wie sie in entfernten Blöcken angeordnet waren
     # - GoTo(Name(str)) werden duch einen Immediate mit passender Distanz / Adresse oder einen Sprungbefehl mit passender Distanz Jump(Always(), Im(str(distance))) ersetzt.
 
-    # NEG_RELS = {
-    #     "": rn.Always(),
-    #     "==": rn.Eq(),
-    #     "!=": rn.NEq(),
-    #     "<": rn.GtE(),
-    #     "<=": rn.Gt(),
-    #     ">": rn.LtE(),
-    #     ">=": rn.Lt(),
-    # }
-    NEG_RELS = {
-        "": rn.Always(),
-        "==": rn.NEq(),
-        "!=": rn.Eq(),
-        "<": rn.GtE(),
-        "<=": rn.Gt(),
-        ">": rn.LtE(),
-        ">=": rn.Lt(),
-    }
+    def _negated_rel(self, rel):
+        match rel:
+            case rn.Always():
+                return rn.Always()
+            case rn.Eq():
+                return rn.NEq()
+            case rn.NEq():
+                return rn.Eq()
+            case rn.Lt():
+                return rn.GtE()
+            case rn.LtE():
+                return rn.Gt()
+            case rn.Gt():
+                return rn.LtE()
+            case rn.GtE():
+                return rn.Lt()
+            case _:
+                throw_error(rel)
 
     def _patch_too_large_jumps(self, rel, distance, instr):
         if global_vars.args.no_long_jumps:
             #  if (
             #  distance < -(2**21) and distance > 2**21 - 1
             #  ) or global_vars.args.no_jump:
-            neg_rel = self.NEG_RELS[str(rel)]
+            neg_rel = self._negated_rel(rel)
             instrs_for_immediate = self._write_large_immediate_in_register(
                 rn.Reg(rn.Acc()), distance
             )
