@@ -153,6 +153,7 @@ class RetiPatchPass:
                         case pn.Block():
                             self._reti_patch_block(entry)
                         case _:
+                            # interrupt_vector_table/data entries need no patching.
                             pass
             case _:
                 throw_error(section)
