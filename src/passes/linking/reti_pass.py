@@ -64,12 +64,20 @@ class RetiPass:
         match instr:
             case rn.Jump(rn.Always(), rn.Name(val)):
                 other_block = self.all_blocks[val]
-                distance = self._determine_distance(current_block, other_block, idx)
-                return self._patch_too_large_jumps(rn.Always(), distance, instr)
+                distance_idx = idx + 3 if global_vars.args.no_long_jumps else idx
+                distance = self._determine_distance(
+                    current_block, other_block, distance_idx
+                )
+                instrs = self._patch_too_large_jumps(rn.Always(), distance, instr)
+                return instrs, distance_idx + 1
             case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(val))):
                 other_block = self.all_blocks[val]
-                distance = self._determine_distance(current_block, other_block, idx)
-                return self._patch_too_large_jumps(rel, distance, instr)
+                distance_idx = idx + 4 if global_vars.args.no_long_jumps else idx
+                distance = self._determine_distance(
+                    current_block, other_block, distance_idx
+                )
+                instrs = self._patch_too_large_jumps(rel, distance, instr)
+                return instrs, distance_idx + 1
             case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()), [_, _, rn.Name(val)]):
                 var_name = val
                 symbol, _ = self.symbol_table.resolve(
@@ -84,7 +92,7 @@ class RetiPass:
                         "size": _,
                     }:
                         instr.args[2] = rn.Im(addr)
-                        return [instr]
+                        return [instr], idx + 1
             case rn.Instr(
                 (rn.Loadin() | rn.Storein() | rn.Tsl()),
                 [_, _, rn.BinOp(rn.Name(val), op, num)],
@@ -106,7 +114,7 @@ class RetiPass:
                                 instr.args[2] = rn.Im(addr + num)
                             case rn.Sub():
                                 instr.args[2] = rn.Im(addr - num)
-                        return [instr]
+                        return [instr], idx + 1
             case rn.Instr(
                 rn.Loadi(),
                 [
@@ -115,13 +123,14 @@ class RetiPass:
                 ],
             ):
                 rel_addr = str(int(current_block.instrs_before.val) + idx + constant)
-                return self._single_line_comment(instr, "#") + [
+                instrs = self._single_line_comment(instr, "#") + [
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
+                return instrs, idx + 1
             case rn.Instr(rn.Loadi(), [_, rn.Name(val)]):
                 if self._is_function_label(val):
                     instr.args[1] = rn.Im(self.all_blocks[val].instrs_before.val)
-                    return [instr]
+                    return [instr], idx + 1
                 var_name = val
                 symbol, _ = self.symbol_table.resolve(
                     var_name, scope=self.current_scope
@@ -135,9 +144,11 @@ class RetiPass:
                         "size": _,
                     }:
                         instr.args[1] = rn.Im(addr)
-                        return [instr]
+                        return [instr], idx + 1
+            case pn.SingleLineComment():
+                return [instr], idx
             case _:
-                return [instr]
+                return [instr], idx + 1
 
     def _flatten_text_blocks(self, entries):
         instrs_block_free = []
@@ -150,25 +161,10 @@ class RetiPass:
                     )
                     self.current_scope = self.block_scopes.get(label, "global")
                     for instr in instrs:
-                        match instr:
-                            case rn.Jump(
-                                rn.Always(), rn.Name()
-                            ) if global_vars.args.no_long_jumps:
-                                idx += 3
-                            case rn.Jump(
-                                rn.Eq(), pn.GoTo()
-                            ) if global_vars.args.no_long_jumps:
-                                idx += 4
-                            case _:
-                                pass
+                        reti_instrs, idx = self._reti_instr(instr, idx, block)
                         instrs_block_free += self._inherit_origin_many(
-                            self._reti_instr(instr, idx, block), instr
+                            reti_instrs, instr
                         )
-                        match instr:
-                            case pn.SingleLineComment():
-                                pass
-                            case _:
-                                idx += 1
                 case pn.SingleLineComment():
                     instrs_block_free.append(entry)
                 case _:
