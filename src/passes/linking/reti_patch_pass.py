@@ -3,7 +3,6 @@ from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
 from bitstring import Bits
-import sys
 
 
 class RetiPatchPass:
@@ -15,6 +14,11 @@ class RetiPatchPass:
     # - deal with division by 0
     # - what if the main fun isn't the first fun in the file
     # - what is there's no main function
+
+    SIGNED_22_MIN = -(2**21)
+    SIGNED_22_MAX = 2**21 - 1
+    SIGNED_32_MIN = -(2**31)
+    SIGNED_32_MAX = 2**31 - 1
 
     def count_instrs(self, instrs):
         cnt = 0
@@ -44,79 +48,52 @@ class RetiPatchPass:
 
     def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
-            # case pn.Exp(pn.GoTo(pn.Name(val))):
-            case rn.Jump(rn.Always(), rn.Name(val)):
+            # Example: JUMPALWAYS next_block at block end can be omitted.
+            case rn.Jump(rn.Always(), rn.Name(target_block_name)):
                 if not is_last_instr:
                     return [instr]
-                goto_block_name = val
-                goto_block_idx = self.all_blocks[goto_block_name].block_idx
-                current_block_idx = self.all_blocks[current_block_name].block_idx
-                if current_block_idx - 1 == goto_block_idx:
+
+                current_block = self.all_blocks[current_block_name]
+                target_block = self.all_blocks[target_block_name]
+                # Remove an unnecessary jump to the next emitted block.
+                target_is_next_block = current_block.block_idx - 1 == target_block.block_idx
+
+                if target_is_next_block:
                     return self._single_line_comment(instr, "# // not included")
-                else:
-                    return [instr]
-            case rn.Instr(rn.Div(), _):
-                return self._single_line_comment(
-                    instr, "# check division by zero for"
-                ) + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
-                    rn.Jump(rn.NEq(), rn.Im("3")),
-                    # ACC=1 is DivisionByZero error
-                    rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("1")]),
-                    rn.Jump(rn.Always(), rn.Im("0")),
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("2")]
-                    ),
-                    instr,
-                ]
-            # case rn.Instr(rn.Divi(), [_, rn.Im("0")]) doesn't occur
-            case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [reg1, reg2, rn.Im(val)]):
-                s_num = int(val)
-                if s_num < -(2**31) or s_num > 2**31 - 1:
+                return [instr]
+            # Example: LOADIN SP ACC 3000000 writes 3000000 to ACC, then ADD SP ACC; LOADIN SP ACC 0.
+            case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [base_reg, value_reg, rn.Im(val)]):
+                offset = int(val)
+                if offset < self.SIGNED_32_MIN or offset > self.SIGNED_32_MAX:
                     throw_error(
-                        f"Immediate literal {s_num} for {type(op).__name__.upper()} "
+                        f"Immediate literal {offset} for {type(op).__name__.upper()} "
                         "does not fit in a signed 32-bit integer"
                     )
-                elif s_num < -(2**21) or s_num > 2**21 - 1:
-                    # TODO: internal error if reg1 + u_num over 2^32-1
-                    # the ACC register is never used as first arg of LOADIN in
-                    # the compilation process
-                    match op:
-                        case rn.Loadin():
-                            return self._write_large_immediate_in_register(
-                                rn.Reg(rn.Acc()), s_num
-                            ) + [
-                                rn.Instr(rn.Add(), [reg1, rn.Reg(rn.Acc())]),
-                                rn.Instr(rn.Loadin(), [reg1, reg2, rn.Im("0")]),
-                            ]
-                        case rn.Storein():
-                            return self._write_large_immediate_in_register(
-                                rn.Reg(rn.Acc()), s_num
-                            ) + [
-                                rn.Instr(rn.Add(), [reg1, rn.Reg(rn.Acc())]),
-                                rn.Instr(rn.Storein(), [reg1, reg2, rn.Im("0")]),
-                            ]
-                        case rn.Tsl():
-                            return self._write_large_immediate_in_register(
-                                rn.Reg(rn.Acc()), s_num
-                            ) + [
-                                rn.Instr(rn.Add(), [reg1, rn.Reg(rn.Acc())]),
-                                rn.Instr(rn.Tsl(), [reg1, reg2, rn.Im("0")]),
-                            ]
-                        case _:
-                            throw_error(op)
-                else:
+
+                if self.SIGNED_22_MIN <= offset <= self.SIGNED_22_MAX:
                     return [instr]
+
+                # Large memory offsets are added to the base register first.
+                scratch_reg = rn.Reg(rn.Acc())
+                return self._write_large_immediate_in_register(scratch_reg, offset) + [
+                    rn.Instr(rn.Add(), [base_reg, scratch_reg]),
+                    rn.Instr(op, [base_reg, value_reg, rn.Im("0")]),
+                ]
+            # Example: LOADI ACC 3000000 writes 3000000 to ACC with LOADI/MULTI/ORI.
             case rn.Instr(rn.Loadi(), [reg, rn.Im(val)]):
-                s_num = int(val)
-                if s_num < -(2**31) or s_num > 2**31:
-                    sys.exit(1)
-                elif s_num < -(2**21) or s_num > 2**21 - 1:
-                    return self._write_large_immediate_in_register(reg, s_num)
-                else:
+                immediate = int(val)
+                if immediate < self.SIGNED_32_MIN or immediate > self.SIGNED_32_MAX:
+                    throw_error(
+                        f"Immediate literal {immediate} for LOADI "
+                        "does not fit in a signed 32-bit integer"
+                    )
+
+                if self.SIGNED_22_MIN <= immediate <= self.SIGNED_22_MAX:
                     return [instr]
+
+                # LOADI encodes only 22-bit immediates; synthesize larger values.
+                return self._write_large_immediate_in_register(reg, immediate)
+            # Example: ADD ACC IN1 already needs no patching.
             case _:
                 return [instr]
 
@@ -135,11 +112,6 @@ class RetiPatchPass:
                         instr,
                     )
                 block.stmts_instrs[:] = patched_instrs
-                # this has to be done in this pass, because the reti_blocks
-                # pass sometimes needs to access this attribute from a block
-                # where it hasn't yet beeen determined
-                # TODO: Move this into the patch_instructions pass, because
-                # in this pass goto(next_block_name) gets removed
                 block.instrs_before = pn.Num(str(self.instrs_cnt))
                 num_instrs = self.count_instrs(block.stmts_instrs)
                 block.num_instrs = pn.Num(str(num_instrs))

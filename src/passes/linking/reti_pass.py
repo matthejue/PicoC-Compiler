@@ -31,6 +31,8 @@ class RetiPass:
                 throw_error(rel)
 
     def _patch_too_large_jumps(self, rel, distance, instr):
+        # Long jumps are patched here, not in reti_patch, because the concrete
+        # distance is known only while flattening symbolic block targets.
         if global_vars.args.no_long_jumps:
             #  if (
             #  distance < -(2**21) and distance > 2**21 - 1
