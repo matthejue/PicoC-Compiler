@@ -92,14 +92,17 @@ class RetiPass:
                 return self._patch_named_jump(
                     rel, target_name, instr, idx, current_block, 4
                 )
-            # Replace a memory-offset name with the symbol table address.
+            # Resolve symbolic indexed-memory offsets, e.g. LOADIN DS ACC var_name.
+            # TSL is not emitted by normal PicoC compilation, but can appear in
+            # external .reti_blocks input.
             case rn.Instr(
                 (rn.Loadin() | rn.Storein() | rn.Tsl()),
                 [_, _, rn.Name(var_name)],
             ):
                 instr.args[2] = rn.Im(self._symbol_addr(var_name))
                 return [instr], idx + 1
-            # Replace a computed memory-offset name with address + n or address - n.
+            # Resolve symbolic indexed-memory offsets, e.g. STOREIN DS ACC var_name + 1.
+            # Same TSL comment as above.
             case rn.Instr(
                 (rn.Loadin() | rn.Storein() | rn.Tsl()),
                 [_, _, rn.BinOp(rn.Name(var_name), op, num)],
@@ -126,7 +129,7 @@ class RetiPass:
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
                 return instrs, idx + 1
-            # Replace a LOADI target name with a function or variable address.
+            # Resolve a LOADI target name to a function or variable address from the symbol table.
             case rn.Instr(rn.Loadi(), [_, rn.Name(name)]):
                 if self._is_function_label(name):
                     instr.args[1] = rn.Im(self.all_blocks[name].instrs_before.val)
