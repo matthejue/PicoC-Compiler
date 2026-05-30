@@ -59,61 +59,61 @@ class RetiPass:
         else:  # int(other_block.instrs_before.val) == int(current_block.instrs_before.val):
             return -idx
 
+    def _symbol_addr(self, var_name):
+        symbol, _ = self.symbol_table.resolve(var_name, scope=self.current_scope)
+        match symbol:
+            case {
+                "type_qual": _,
+                "datatype": _,
+                "name": _,
+                "addr": addr,
+                "size": _,
+            }:
+                return addr
+            case _:
+                throw_error(symbol)
+
+    def _patch_named_jump(self, rel, target_name, instr, idx, current_block, idx_offset):
+        target_block = self.all_blocks[target_name]
+        distance_idx = idx + idx_offset if global_vars.args.no_long_jumps else idx
+        distance = self._determine_distance(current_block, target_block, distance_idx)
+        instrs = self._patch_too_large_jumps(rel, distance, instr)
+        return instrs, distance_idx + 1
+
     def _reti_instr(self, instr, idx, current_block):
         match instr:
-            case rn.Jump(rn.Always(), rn.Name(val)):
-                other_block = self.all_blocks[val]
-                distance_idx = idx + 3 if global_vars.args.no_long_jumps else idx
-                distance = self._determine_distance(
-                    current_block, other_block, distance_idx
+            # Resolve the target name to determine the relative jump distance.
+            case rn.Jump(rn.Always(), rn.Name(target_name)):
+                return self._patch_named_jump(
+                    rn.Always(), target_name, instr, idx, current_block, 3
                 )
-                instrs = self._patch_too_large_jumps(rn.Always(), distance, instr)
-                return instrs, distance_idx + 1
-            case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(val))):
-                other_block = self.all_blocks[val]
-                distance_idx = idx + 4 if global_vars.args.no_long_jumps else idx
-                distance = self._determine_distance(
-                    current_block, other_block, distance_idx
+            # Same as above, but conditional long jumps add a guard jump.
+            case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(target_name))):
+                return self._patch_named_jump(
+                    rel, target_name, instr, idx, current_block, 4
                 )
-                instrs = self._patch_too_large_jumps(rel, distance, instr)
-                return instrs, distance_idx + 1
-            case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()), [_, _, rn.Name(val)]):
-                var_name = val
-                symbol, _ = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
-                )
-                match symbol:
-                    case {
-                        "type_qual": _,
-                        "datatype": _,
-                        "name": _,
-                        "addr": addr,
-                        "size": _,
-                    }:
-                        instr.args[2] = rn.Im(addr)
-                        return [instr], idx + 1
+            # Replace a memory-offset name with the symbol table address.
             case rn.Instr(
                 (rn.Loadin() | rn.Storein() | rn.Tsl()),
-                [_, _, rn.BinOp(rn.Name(val), op, num)],
+                [_, _, rn.Name(var_name)],
             ):
-                var_name = val
-                symbol, _ = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
-                )
-                match symbol:
-                    case {
-                        "type_qual": _,
-                        "datatype": _,
-                        "name": _,
-                        "addr": addr,
-                        "size": _,
-                    }:
-                        match op:
-                            case rn.Add():
-                                instr.args[2] = rn.Im(addr + num)
-                            case rn.Sub():
-                                instr.args[2] = rn.Im(addr - num)
-                        return [instr], idx + 1
+                instr.args[2] = rn.Im(self._symbol_addr(var_name))
+                return [instr], idx + 1
+            # Replace a computed memory-offset name with address + n or address - n.
+            case rn.Instr(
+                (rn.Loadin() | rn.Storein() | rn.Tsl()),
+                [_, _, rn.BinOp(rn.Name(var_name), op, num)],
+            ):
+                addr = self._symbol_addr(var_name)
+                match op:
+                    case rn.Add():
+                        instr.args[2] = rn.Im(addr + num)
+                    case rn.Sub():
+                        instr.args[2] = rn.Im(addr - num)
+                    case _:
+                        throw_error(op)
+                return [instr], idx + 1
+            # Replace _this_instruction + n with the current absolute instruction address + n.
             case rn.Instr(
                 rn.Loadi(),
                 [
@@ -126,26 +126,18 @@ class RetiPass:
                     rn.Instr(rn.Loadi(), [reg, rn.Im(rel_addr)])
                 ]
                 return instrs, idx + 1
-            case rn.Instr(rn.Loadi(), [_, rn.Name(val)]):
-                if self._is_function_label(val):
-                    instr.args[1] = rn.Im(self.all_blocks[val].instrs_before.val)
+            # Replace a LOADI target name with a function or variable address.
+            case rn.Instr(rn.Loadi(), [_, rn.Name(name)]):
+                if self._is_function_label(name):
+                    instr.args[1] = rn.Im(self.all_blocks[name].instrs_before.val)
                     return [instr], idx + 1
-                var_name = val
-                symbol, _ = self.symbol_table.resolve(
-                    var_name, scope=self.current_scope
-                )
-                match symbol:
-                    case {
-                        "type_qual": _,
-                        "datatype": _,
-                        "name": _,
-                        "addr": addr,
-                        "size": _,
-                    }:
-                        instr.args[1] = rn.Im(addr)
-                        return [instr], idx + 1
+
+                instr.args[1] = rn.Im(self._symbol_addr(name))
+                return [instr], idx + 1
+            # Keep comments in output without increasing the instruction index.
             case pn.SingleLineComment():
                 return [instr], idx
+            # Already concrete RETI instructions pass through unchanged.
             case _:
                 return [instr], idx + 1
 

@@ -100,17 +100,6 @@ class PicocSymbolPass:
             case _:
                 throw_error(alloc)
 
-    def _stackframe_access_offset(self, addr, frame_kind, tmp_idx=0):
-        addr = int(addr)
-        tmp_idx = int(tmp_idx)
-        match frame_kind:
-            case "param":
-                return 1 + addr - tmp_idx
-            case "local_var":
-                return -(2 + addr - tmp_idx)
-            case _:
-                raise ValueError(f"Unknown frame kind: {frame_kind}")
-
     def _declare_input_builtin(self):
         if self.symbol_table.contains("input", scope="global"):
             return

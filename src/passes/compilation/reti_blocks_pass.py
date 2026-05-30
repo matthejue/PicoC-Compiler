@@ -6,6 +6,17 @@ import copy
 
 
 class RetiBlocksPass:
+    def _stackframe_access_offset(self, addr, frame_kind, tmp_idx=0):
+        addr = int(addr)
+        tmp_idx = int(tmp_idx)
+        match frame_kind:
+            case "param":
+                return 1 + addr - tmp_idx
+            case "local_var":
+                return -(2 + addr - tmp_idx)
+            case _:
+                raise ValueError(f"Unknown frame kind: {frame_kind}")
+
     def _reti_blocks_stmt(self, stmt):
         match stmt:
             # --------------------------- L_Comment ---------------------------
@@ -441,7 +452,7 @@ class RetiBlocksPass:
                             break
                         case (pn.Stack(pn.Num(val1)), pn.Global(pn.Name(val2))):
                             name = rn.Name(val2)
-                            constant = int(val1)  # TODO: Int not needed?
+                            constant = int(val1)
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -461,7 +472,7 @@ class RetiBlocksPass:
                                     [
                                         rn.Reg(rn.Sp()),
                                         rn.Reg(rn.Acc()),
-                                        rn.Im(str(int(val1) + 1)),
+                                        rn.Im(str(constant + 1)),
                                     ],
                                 ),
                             ]
