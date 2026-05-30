@@ -6,15 +6,6 @@ from bitstring import Bits
 
 
 class RetiPatchPass:
-    # =========================================================================
-    # =                               RETI_Patch                              =
-    # =========================================================================
-    # - deal with large immediates
-    # - deal with goto directly to next block
-    # - deal with division by 0
-    # - what if the main fun isn't the first fun in the file
-    # - what is there's no main function
-
     SIGNED_22_MIN = -(2**21)
     SIGNED_22_MAX = 2**21 - 1
     SIGNED_32_MIN = -(2**31)

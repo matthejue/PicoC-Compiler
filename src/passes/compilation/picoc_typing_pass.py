@@ -5,11 +5,6 @@ import copy
 
 
 class PicocTypingPass:
-    # =========================================================================
-    # =                            PicoC_Typing                               =
-    # =========================================================================
-    # - annotates the PicoC AST with datatype information collected
-
     def _deref_result_datatype(self, pointer_dt):
         match pointer_dt:
             case pn.PntrDecl(inner_dt):

@@ -5,11 +5,6 @@ import copy
 
 
 class PicocShrinkPass:
-    # =========================================================================
-    # =                              PicoC_Shrink                             =
-    # =========================================================================
-    # - Ersetzt Array-Zugriffe durch Pointer-Arithmetik (arr[i] -> *(arr + i))
-
     INT32_MIN = -2147483648
     INT32_MAX = 2147483647
 

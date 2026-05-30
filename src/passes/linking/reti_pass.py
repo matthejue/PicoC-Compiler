@@ -5,12 +5,6 @@ from src.utils.util_funs_dependent import throw_error
 
 
 class RetiPass:
-    # =========================================================================
-    # =                                  RETI                                 =
-    # =========================================================================
-    # - keine Blöcke mehr, Knoten genauso zusammengefügt, wie sie in entfernten Blöcken angeordnet waren
-    # - GoTo(Name(str)) werden duch einen Immediate mit passender Distanz / Adresse oder einen Sprungbefehl mit passender Distanz Jump(Always(), Im(str(distance))) ersetzt.
-
     def _negated_rel(self, rel):
         match rel:
             case rn.Always():

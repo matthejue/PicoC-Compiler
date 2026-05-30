@@ -6,11 +6,6 @@ import copy
 
 
 class RetiBlocksPass:
-    # =========================================================================
-    # =                              RETI_Blocks                              =
-    # =========================================================================
-    # - PicoC-Knoten werden durch semantisch entsprechende RETI-Knoten ersetzt
-
     def _reti_blocks_stmt(self, stmt):
         match stmt:
             # --------------------------- L_Comment ---------------------------

@@ -7,13 +7,6 @@ import copy
 
 
 class PicocBlocksPass:
-    # =========================================================================
-    # =                              PicoC_Blocks                             =
-    # =========================================================================
-    # -  If(exp, stmts), IfElse(exp, stmts1, stmts2), While(exp, stmts) und
-    # DoWhile(exp, stmts) durch Block(name, stmts instrs-, GoTo(lable)- und
-    # IfElse(exp, stmts1, stmts2) ersetzt.
-
     COMMENT_VISIBLE_FILTERS = {
         rn.Instr: (),
         pn.Array: (),
