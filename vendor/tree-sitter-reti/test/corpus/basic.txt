@@ -83,7 +83,7 @@ main:
   .block_idx 12
   .scope target.4
   LOADI ACC _this_instruction + 7
-  JUMP== GoTo(Name('if_else_after.0'))
+  JUMP== if_else_after.0
   JUMP do_while_branch.8
 
 ---
@@ -114,9 +114,8 @@ main:
       (jump
         (relation)
         (jump_target
-          (goto_target
-            (name_target
-              (string))))))
+          (symbolic_operand
+            (symbol)))))
     (statement
       (jump
         (jump_target

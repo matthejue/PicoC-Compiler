@@ -17,7 +17,7 @@ class RetiPatchPass:
             match instr:
                 case pn.SingleLineComment():
                     pass
-                case rn.Jump(rn.Eq(), pn.GoTo()) if global_vars.args.no_long_jumps:
+                case rn.Jump(rn.Eq(), rn.Name()) if global_vars.args.no_long_jumps:
                     cnt += 5
                 case rn.Jump(rn.Always(), rn.Name()) if global_vars.args.no_long_jumps:
                     cnt += 4

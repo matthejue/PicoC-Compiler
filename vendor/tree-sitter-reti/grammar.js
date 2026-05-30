@@ -237,21 +237,6 @@ module.exports = grammar({
     jump_target: $ => choice(
       $.immediate,
       $.symbolic_operand,
-      $.goto_target,
-    ),
-
-    goto_target: $ => seq(
-      'GoTo',
-      '(',
-      field('target', $.name_target),
-      ')',
-    ),
-
-    name_target: $ => seq(
-      'Name',
-      '(',
-      field('value', $.string),
-      ')',
     ),
 
     argument: $ => choice(

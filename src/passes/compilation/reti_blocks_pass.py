@@ -623,7 +623,11 @@ class RetiBlocksPass:
                     ),
                 ]
             # ----------------------- L_If_Else + L_Loop ----------------------
-            case pn.IfElse(pn.Stack(pn.Num(val)), [goto1], [goto2]):
+            case pn.IfElse(
+                pn.Stack(pn.Num(val)),
+                [pn.GoTo(pn.Name()) as goto1],
+                [pn.GoTo(pn.Name(goto2_name))],
+            ):
                 return (
                     self._single_line_comment(stmt, "#")
                     + [
@@ -631,7 +635,7 @@ class RetiBlocksPass:
                             rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                         ),
                         rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                        rn.Jump(rn.Eq(), goto2),
+                        rn.Jump(rn.Eq(), rn.Name(goto2_name)),
                     ]
                     + self._single_line_comment(goto1, "#")
                     + self._reti_blocks_stmt(pn.Exp(goto1))

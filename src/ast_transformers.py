@@ -911,12 +911,6 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         return rn.Rti()
 
     # --------------------------------- Jumps --------------------------------
-    def name_target(self, _, children):
-        return pn.Name(children[0])
-
-    def goto_target(self, _, children):
-        return pn.GoTo(children[0])
-
     def jump_target(self, _, children):
         return children[0]
 
@@ -929,8 +923,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         else:
             throw_error(children)
 
-        if not isinstance(target, (rn.Im, rn.Name, rn.BinOp, pn.GoTo)):
+        # Example: JUMP label + n is possible.
+        if not isinstance(target, (rn.Im, rn.Name, rn.BinOp)):
             throw_error(target)
-        if not isinstance(relation, rn.Always) and isinstance(target, rn.Name):
-            target = pn.GoTo(pn.Name(target.val))
         return rn.Jump(relation, target)

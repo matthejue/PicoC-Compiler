@@ -88,7 +88,7 @@ class RetiPass:
                     rn.Always(), target_name, instr, idx, current_block, 3
                 )
             # Same as above, but conditional long jumps add a guard jump.
-            case rn.Jump(rn.Eq() as rel, pn.GoTo(pn.Name(target_name))):
+            case rn.Jump(rn.Eq() as rel, rn.Name(target_name)):
                 return self._patch_named_jump(
                     rel, target_name, instr, idx, current_block, 4
                 )
