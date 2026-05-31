@@ -1,5 +1,7 @@
 from src.ast_node import copy_source_origin, copy_source_origin_to_many
+from src import reti_nodes as rn
 from src.symbol_table import SymbolTable
+from bitstring import Bits
 
 
 class PassStateMixin:
@@ -32,3 +34,15 @@ class PassStateMixin:
 
     def _inherit_origin_many(self, targets, source):
         return copy_source_origin_to_many(targets, source)
+
+    def _write_large_immediate_in_register(self, reg, s_num):
+        bits = Bits(int=s_num, length=32).bin
+        h_bits = bits[0:22]
+        l_bits = bits[22:32]
+        h_num = Bits(bin=h_bits).int
+        l_num = Bits(bin="0" + l_bits).int
+        return self._single_line_comment(reg, "# write large immediate into") + [
+            rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
+            rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
+            rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
+        ]

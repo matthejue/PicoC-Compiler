@@ -2,7 +2,6 @@ from src import global_vars
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
-from bitstring import Bits
 
 
 class RetiPatchPass:
@@ -24,18 +23,6 @@ class RetiPatchPass:
                 case _:
                     cnt += 1
         return cnt
-
-    def _write_large_immediate_in_register(self, reg, s_num):
-        bits = Bits(int=s_num, length=32).bin
-        h_bits = bits[0:22]
-        l_bits = bits[22:32]
-        h_num = Bits(bin=h_bits).int
-        l_num = Bits(bin="0" + l_bits).int
-        return self._single_line_comment(reg, "# write large immediate into") + [
-            rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
-            rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),
-            rn.Instr(rn.Ori(), [reg, rn.Im(str(l_num))]),
-        ]
 
     def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
