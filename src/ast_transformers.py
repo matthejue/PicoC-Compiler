@@ -604,15 +604,6 @@ class TransformerPicoC(_TreeSitterTransformer):
         return len(self._unnamed_children(node))
 
 
-# ============================================================================
-# =                           RETI Blocks Roundtrip                          =
-# ============================================================================
-# The `reti_blocks` pass stores linker-relevant block attributes inside
-# assembler directives below each block label. When several `.reti_blocks`
-# files are linked later, these directives allow the compiler to reconstruct
-# `Block(...)` nodes with stable metadata such as scope, block indices, layout
-# information, and any additional linker annotations that should survive the
-# textual assembly form.
 
 class TransformerRetiBlocks(_TreeSitterTransformer):
     """
@@ -663,6 +654,7 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         "ANDI": rn.Andi,
         "LOAD": rn.Load,
         "LOADI": rn.Loadi,
+        "LOADI32": rn.Loadi32,
         "STORE": rn.Store,
     }
 
@@ -751,7 +743,11 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
     def source_file(self, _, children):
         file_name = pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks")
         items = children
-        if children and isinstance(children[0], pn.Name) and children[0].val.endswith(".reti"):
+        if (
+            children
+            and isinstance(children[0], pn.Name)
+            and children[0].val.endswith((".reti", ".reti_blocks", ".reti_patch"))
+        ):
             file_name = children[0]
             items = children[1:]
 
@@ -876,6 +872,8 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
             return rn.Instr(rn.Load(), children[1:])
         if opcode_text == "LOADI":
             return rn.Instr(rn.Loadi(), children[1:])
+        if opcode_text == "LOADI32":
+            return rn.Instr(rn.Loadi32(), children[1:])
         throw_error(opcode_text)
 
     def store_instruction(self, _, children):
@@ -927,3 +925,16 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
         if not isinstance(target, (rn.Im, rn.Name, rn.BinOp)):
             throw_error(target)
         return rn.Jump(relation, target)
+
+    def jump32(self, _, children):
+        if len(children) == 1:
+            relation = rn.Always()
+            target = children[0]
+        elif len(children) == 2:
+            relation, target = children
+        else:
+            throw_error(children)
+
+        if not isinstance(target, (rn.Im, rn.Name, rn.BinOp)):
+            throw_error(target)
+        return rn.Jump32(relation, target)

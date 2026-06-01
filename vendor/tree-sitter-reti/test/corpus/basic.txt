@@ -121,3 +121,37 @@ main:
         (jump_target
           (symbolic_operand
             (symbol)))))))
+
+==================================
+32-bit pseudo instructions
+==================================
+
+LOADI32 ACC 3000000
+JUMP32 123456
+JUMP32== 234567
+JUMP32 target_block
+
+---
+
+(source_file
+  (statement
+    (instruction
+      (load_instruction
+        (load_immediate_instruction
+          (load_immediate_opcode)
+          (register)
+          (immediate)))))
+  (statement
+    (jump32
+      (jump_target
+        (immediate))))
+  (statement
+    (jump32
+      (relation)
+      (jump_target
+        (immediate))))
+  (statement
+    (jump32
+      (jump_target
+        (symbolic_operand
+          (symbol))))))

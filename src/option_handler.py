@@ -769,9 +769,6 @@ def _parse_cli_args():
         "-b", "--binary", action="store_true", help="Produce binary output"
     )
     parser.add_argument(
-        "-n", "--no_long_jumps", action="store_true", help="Disable long jumps"
-    )
-    parser.add_argument(
         "-m",
         "--metadata_comments",
         action="store_true",
@@ -866,7 +863,6 @@ def _print_args_if_verbose():
         "debug",
         "supress_errors",
         "binary",
-        "no_long_jumps",
         "metadata_comments",
     ]
 

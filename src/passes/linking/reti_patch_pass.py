@@ -10,24 +10,43 @@ class RetiPatchPass:
     SIGNED_32_MIN = -(2**31)
     SIGNED_32_MAX = 2**31 - 1
 
+    def _jump32_size(self, rel, target):
+        match target:
+            case rn.Im():
+                target_size = 4
+            case rn.Name() | rn.BinOp():
+                target_size = 5
+            case _:
+                throw_error(f"Unsupported JUMP32 target: {target}")
+
+        return target_size + (0 if isinstance(rel, rn.Always) else 1)
+
     def count_instrs(self, instrs):
         cnt = 0
         for instr in instrs:
             match instr:
                 case pn.SingleLineComment():
                     pass
-                case rn.Jump(rn.Eq(), rn.Name()) if global_vars.args.no_long_jumps:
-                    cnt += 5
-                case rn.Jump(rn.Always(), rn.Name()) if global_vars.args.no_long_jumps:
-                    cnt += 4
+                # Immediate LOADI32/JUMP32 only come from user-written .reti_blocks.
+                # The PicoC compilation pipeline emits symbolic targets instead.
+                case rn.Jump32(rel, target):
+                    cnt += self._jump32_size(rel, target)
+                case rn.Instr(rn.Loadi32(), _):
+                    cnt += 3
+                # The compiler pipeline only emits JUMP32/LOADI32 for symbolic
+                # addresses. Plain symbolic JUMP/LOADI may still come from
+                # user-written .reti_blocks, but they stay short and are not
+                # always working: if the final address needs more than 22 bits,
+                # later stages intentionally produce incorrect code instead of
+                # expanding them.
                 case _:
                     cnt += 1
         return cnt
 
     def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
-            # Example: JUMPALWAYS next_block at block end can be omitted.
-            case rn.Jump(rn.Always(), rn.Name(target_block_name)):
+            # JUMP32 next_block at block end can be omitted.
+            case rn.Jump32(rn.Always(), rn.Name(target_block_name)):
                 if not is_last_instr:
                     return [instr]
 
@@ -39,6 +58,21 @@ class RetiPatchPass:
                 if target_is_next_block:
                     return self._single_line_comment(instr, "# // not included")
                 return [instr]
+            # Leave plain symbolic JUMP short so reti_pass can resolve the distance.
+            case rn.Jump(_, rn.Name() | rn.BinOp()):
+                # The compiler pipeline only emits JUMP32 for symbolic targets.
+                # Plain symbolic JUMP can still come from user-written
+                # .reti_blocks input, but this short form is not always working:
+                # if the resolved relative address needs more than 22 bits, the
+                # generated code is intentionally left incorrect instead of
+                # being expanded here.
+                return [instr]
+            # Keep valid JUMP32 pseudo instructions for final expansion in reti_pass.
+            case rn.Jump32(_, rn.Name() | rn.Im() | rn.BinOp()):
+                return [instr]
+            # Reject malformed JUMP32 targets before block sizes are finalized.
+            case rn.Jump32():
+                throw_error(f"Unsupported JUMP32 target: {instr}")
             # Example: LOADIN SP ACC 3000000 writes 3000000 to ACC, then ADD SP ACC; LOADIN SP ACC 0.
             case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [base_reg, value_reg, rn.Im(val)]):
                 offset = int(val)
@@ -71,6 +105,15 @@ class RetiPatchPass:
 
                 # LOADI encodes only 22-bit immediates; synthesize larger values.
                 return self._write_large_immediate_in_register(reg, immediate)
+            # Leave symbolic LOADI short so reti_pass can resolve the address.
+            case rn.Instr(rn.Loadi(), [_, rn.Name() | rn.BinOp()]):
+                # The compiler pipeline only emits LOADI32 for symbolic address
+                # loads. Plain symbolic LOADI can still come from user-written
+                # .reti_blocks input, but this short form is not always working:
+                # if the resolved address needs more than 22 bits, the generated
+                # code is intentionally left incorrect instead of being expanded
+                # here.
+                return [instr]
             # Example: ADD ACC IN1 already needs no patching.
             case _:
                 return [instr]

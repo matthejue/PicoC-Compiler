@@ -36,7 +36,13 @@ class PassStateMixin:
         return copy_source_origin_to_many(targets, source)
 
     def _write_large_immediate_in_register(self, reg, s_num):
-        bits = Bits(int=s_num, length=32).bin
+        if s_num < -(2**31) or s_num > 2**32 - 1:
+            raise ValueError(f"{s_num} does not fit in 32 bits")
+
+        if s_num < 0:
+            bits = Bits(int=s_num, length=32).bin
+        else:
+            bits = Bits(uint=s_num, length=32).bin
         h_bits = bits[0:22]
         l_bits = bits[22:32]
         h_num = Bits(bin=h_bits).int

@@ -58,6 +58,22 @@ class Jump(ASTNode):
     __match_args__ = ("rel", "im_goto")
 
 
+class Jump32(ASTNode):
+    def __init__(self, rel, target):
+        self.rel = rel
+        self.target = target
+        super().__init__(visible=[self.rel, self.target])
+
+    def __repr__(self, depth=0):
+        instr_str = f"\n{' ' * depth}JUMP32{self.rel} {self.target}"
+        origin_visible = _source_origin_visible(self)
+        if origin_visible is not None:
+            instr_str += f" # {origin_visible}"
+        return instr_str
+
+    __match_args__ = ("rel", "target")
+
+
 class Int(ASTNode):
     def __init__(self, num):
         self.num = num
@@ -277,6 +293,11 @@ class Loadin(ASTNode):
 class Loadi(ASTNode):
     def __repr__(self):
         return "LOADI"
+
+
+class Loadi32(ASTNode):
+    def __repr__(self):
+        return "LOADI32"
 
 
 # --------------------------- Store Instructions --------------------------

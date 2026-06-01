@@ -262,7 +262,7 @@ class PicocAnfPass:
                     + callee_anf
                     + [
                         pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
-                        pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("4")),
+                        pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("6")),
                         call_goto,
                         pn.RemoveStackframe(
                             pn.Num(str(self.next_local_addr))

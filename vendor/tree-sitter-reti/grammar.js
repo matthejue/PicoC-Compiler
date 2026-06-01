@@ -84,6 +84,7 @@ module.exports = grammar({
       choice(
         $.instruction,
         $.jump,
+        $.jump32,
       ),
       optional(';'),
     ),
@@ -113,6 +114,7 @@ module.exports = grammar({
     load_immediate_opcode: _ => choice(
       'LOAD',
       'LOADI',
+      'LOADI32',
     ),
 
     load_indexed_instruction: $ => seq(
@@ -220,6 +222,12 @@ module.exports = grammar({
 
     jump: $ => seq(
       'JUMP',
+      optional(field('relation', $.relation)),
+      field('target', $.jump_target),
+    ),
+
+    jump32: $ => seq(
+      'JUMP32',
       optional(field('relation', $.relation)),
       field('target', $.jump_target),
     ),
