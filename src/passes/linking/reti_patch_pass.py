@@ -34,7 +34,7 @@ class RetiPatchPass:
                 case rn.Instr(rn.Loadi32(), _):
                     cnt += 3
                 # The compiler pipeline only emits JUMP32/LOADI32 for symbolic
-                # addresses. Plain symbolic JUMP/LOADI may still come from
+                # addresses. Plain symbolic operands may still come from
                 # user-written .reti_blocks, but they stay short and are not
                 # always working: if the final address needs more than 22 bits,
                 # later stages intentionally produce incorrect code instead of
@@ -45,8 +45,17 @@ class RetiPatchPass:
 
     def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
-            # JUMP32 next_block at block end can be omitted.
-            case rn.Jump32(rn.Always(), rn.Name(target_block_name)):
+            # Only unconditional jumps can be omitted when their target is the
+            # next emitted block; conditional jumps still encode a branch decision.
+            # PicoC emits JUMP32, but user-written .reti_blocks or asm()
+            # can also introduce short symbolic JUMP directly.
+            # Example: JUMP32 next_block or JUMP next_block at block end.
+            case rn.Jump32(rn.Always(), rn.Name(target_block_name)) | rn.Jump(
+                rn.Always(), rn.Name(target_block_name)
+            ):
+                if target_block_name not in self.all_blocks:
+                    jump_kind = "JUMP32" if isinstance(instr, rn.Jump32) else "JUMP"
+                    throw_error(f"Unknown block target for {jump_kind}: {target_block_name}")
                 if not is_last_instr:
                     return [instr]
 
@@ -58,21 +67,6 @@ class RetiPatchPass:
                 if target_is_next_block:
                     return self._single_line_comment(instr, "# // not included")
                 return [instr]
-            # Leave plain symbolic JUMP short so reti_pass can resolve the distance.
-            case rn.Jump(_, rn.Name() | rn.BinOp()):
-                # The compiler pipeline only emits JUMP32 for symbolic targets.
-                # Plain symbolic JUMP can still come from user-written
-                # .reti_blocks input, but this short form is not always working:
-                # if the resolved relative address needs more than 22 bits, the
-                # generated code is intentionally left incorrect instead of
-                # being expanded here.
-                return [instr]
-            # Keep valid JUMP32 pseudo instructions for final expansion in reti_pass.
-            case rn.Jump32(_, rn.Name() | rn.Im() | rn.BinOp()):
-                return [instr]
-            # Reject malformed JUMP32 targets before block sizes are finalized.
-            case rn.Jump32():
-                throw_error(f"Unsupported JUMP32 target: {instr}")
             # Example: LOADIN SP ACC 3000000 writes 3000000 to ACC, then ADD SP ACC; LOADIN SP ACC 0.
             case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [base_reg, value_reg, rn.Im(val)]):
                 offset = int(val)
@@ -105,15 +99,6 @@ class RetiPatchPass:
 
                 # LOADI encodes only 22-bit immediates; synthesize larger values.
                 return self._write_large_immediate_in_register(reg, immediate)
-            # Leave symbolic LOADI short so reti_pass can resolve the address.
-            case rn.Instr(rn.Loadi(), [_, rn.Name() | rn.BinOp()]):
-                # The compiler pipeline only emits LOADI32 for symbolic address
-                # loads. Plain symbolic LOADI can still come from user-written
-                # .reti_blocks input, but this short form is not always working:
-                # if the resolved address needs more than 22 bits, the generated
-                # code is intentionally left incorrect instead of being expanded
-                # here.
-                return [instr]
             # Example: ADD ACC IN1 already needs no patching.
             case _:
                 return [instr]

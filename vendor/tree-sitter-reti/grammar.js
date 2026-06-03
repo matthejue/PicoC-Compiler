@@ -215,7 +215,10 @@ module.exports = grammar({
 
     interrupt_instruction: $ => seq(
       field('opcode', 'INT'),
-      field('value', $.immediate),
+      field('value', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
     ),
 
     return_from_interrupt_instruction: $ => 'RTI',

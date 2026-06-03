@@ -83,6 +83,7 @@ main:
   .block_idx 12
   .scope target.4
   LOADI ACC _this_instruction + 7
+  INT syscall_num
   JUMP== if_else_after.0
   JUMP do_while_branch.8
 
@@ -110,6 +111,12 @@ main:
               (symbol_offset
                 (symbol)
                 (immediate)))))))
+    (statement
+      (instruction
+        (syscall_instruction
+          (interrupt_instruction
+            (symbolic_operand
+              (symbol))))))
     (statement
       (jump
         (relation)

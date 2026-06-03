@@ -24,10 +24,6 @@ class RetiPass:
             case _:
                 throw_error(rel)
 
-    def _is_function_label(self, name):
-        symbol, _ = self.symbol_table.resolve(name, scope="global")
-        return isinstance(symbol, dict) and isinstance(symbol.get("datatype"), pn.FunDecl)
-
     def _symbol_addr(self, var_name):
         symbol, _ = self.symbol_table.resolve(var_name, scope=self.current_scope)
         match symbol:
@@ -42,90 +38,80 @@ class RetiPass:
             case _:
                 throw_error(symbol)
 
-    def _load_address_operand(self, operand, idx, current_block):
+    def _symbolic_operand_value(self, operand, idx, current_block):
         match operand:
-            # Immediate LOADI32 is supported for user-written .reti_blocks only.
-            # PicoC-generated code reaches LOADI32 through symbolic addresses.
+            # Immediate values are already concrete.
             case rn.Im(val):
                 return int(val)
+            case rn.Name("_this_instruction"):
+                return int(current_block.instrs_before.val) + idx
             case rn.Name(name):
-                if self._is_function_label(name):
+                if name in self.all_blocks:
                     return int(self.all_blocks[name].instrs_before.val)
                 return int(self._symbol_addr(name))
-            case rn.BinOp(rn.Name("_this_instruction"), rn.Add(), constant):
-                return int(current_block.instrs_before.val) + idx + int(constant)
-            case _:
-                throw_error(f"Unsupported LOADI32 operand: {operand}")
+            case rn.BinOp(rn.Name(name), op, constant):
+                if name == "_this_instruction":
+                    value = int(current_block.instrs_before.val) + idx
+                elif name in self.all_blocks:
+                    value = int(self.all_blocks[name].instrs_before.val)
+                else:
+                    value = int(self._symbol_addr(name))
 
-    def _expand_loadi32(self, reg, operand, idx, current_block):
-        return self._write_large_immediate_in_register(
-            reg, self._load_address_operand(operand, idx, current_block)
-        )
-
-    def _jump_target_distance(self, target, idx, current_block):
-        match target:
-            case rn.Name(target_name):
-                target_offset = 0
-            case rn.BinOp(rn.Name(target_name), op, num):
                 match op:
                     case rn.Add():
-                        target_offset = int(num)
+                        return value + int(constant)
                     case rn.Sub():
-                        target_offset = -int(num)
+                        return value - int(constant)
                     case _:
                         throw_error(op)
             case _:
-                throw_error(f"Unsupported JUMP target: {target}")
+                throw_error(f"Unsupported symbolic operand: {operand}")
 
-        if target_name not in self.all_blocks:
-            throw_error(f"JUMP target is not a known block: {target_name}")
+    def _resolve_symbolic_operand(self, operand, idx, current_block):
+        match operand:
+            case rn.Name() | rn.BinOp():
+                return rn.Im(
+                    str(self._symbolic_operand_value(operand, idx, current_block))
+                )
+            case _:
+                return operand
 
-        target_block = self.all_blocks[target_name]
+    def _resolve_symbolic_operands(self, operands, idx, current_block):
+        return [
+            self._resolve_symbolic_operand(operand, idx, current_block)
+            for operand in operands
+        ]
+
+    def _has_symbolic_operand(self, operands):
+        return any(isinstance(operand, (rn.Name, rn.BinOp)) for operand in operands)
+
+    def _expand_loadi32(self, reg, operand, idx, current_block):
+        return self._write_large_immediate_in_register(
+            reg, self._symbolic_operand_value(operand, idx, current_block)
+        )
+
+    def _jump_target_distance(self, target, idx, current_block):
         return (
-            int(target_block.instrs_before.val)
-            + target_offset
+            self._symbolic_operand_value(target, idx, current_block)
             - int(current_block.instrs_before.val)
             - idx
         )
 
-    def _jump32_target_instrs(self, target):
+    def _jump32_target_instrs(self, target, idx, current_block):
         match target:
-            case rn.Name(target_name):
-                if target_name not in self.all_blocks:
-                    throw_error(f"JUMP32 target is not a known block: {target_name}")
-
+            case rn.Name() | rn.BinOp():
                 return (
                     self._write_large_immediate_in_register(
                         rn.Reg(rn.Acc()),
-                        int(self.all_blocks[target_name].instrs_before.val),
+                        self._symbolic_operand_value(target, idx, current_block),
                     )
                     + [
                         rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                         rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())]),
                     ]
                 )
-            case rn.BinOp(rn.Name(target_name), op, num):
-                if target_name not in self.all_blocks:
-                    throw_error(f"JUMP32 target is not a known block: {target_name}")
-
-                addr = int(self.all_blocks[target_name].instrs_before.val)
-                match op:
-                    case rn.Add():
-                        addr += int(num)
-                    case rn.Sub():
-                        addr -= int(num)
-                    case _:
-                        throw_error(op)
-
-                return (
-                    self._write_large_immediate_in_register(rn.Reg(rn.Acc()), addr)
-                    + [
-                        rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
-                        rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())]),
-                    ]
-                )
             case rn.Im(val):
-                # Immediate JUMP32 is supported for user-written .reti_blocks only.
+                # Immediate JUMP32 is for e.g. user-written .reti_blocks.
                 # PicoC-generated jumps use block labels and add CS after loading.
                 return self._write_large_immediate_in_register(
                     rn.Reg(rn.Acc()), int(val)
@@ -133,8 +119,8 @@ class RetiPass:
             case _:
                 throw_error(f"Unsupported JUMP32 target: {target}")
 
-    def _expand_jump32(self, rel, target):
-        target_instrs = self._jump32_target_instrs(target)
+    def _expand_jump32(self, rel, target, idx, current_block):
+        target_instrs = self._jump32_target_instrs(target, idx, current_block)
         if isinstance(rel, rn.Always):
             return target_instrs
 
@@ -144,6 +130,36 @@ class RetiPass:
 
     def _reti_instr(self, instr, idx, current_block):
         match instr:
+            # Expand LOADI32 pseudo instructions into the fixed LOADI/MULTI/ORI sequence.
+            case rn.Instr(rn.Loadi32(), [reg, operand]):
+                instrs = self._single_line_comment(instr, "#") + self._expand_loadi32(
+                    reg, operand, idx, current_block
+                )
+                # LOADI32 always expands to LOADI/MULTI/ORI, so its size is fixed.
+                return instrs, idx + 3
+            # Expand a symbolic or immediate 32-bit jump into concrete RETI instructions.
+            case rn.Jump32(rel, target):
+                expanded = self._expand_jump32(rel, target, idx, current_block)
+                instrs = self._single_line_comment(instr, "#") + expanded
+                # JUMP32 expansion length depends on relation and target kind:
+                # conditional jumps add a guard, label targets add CS, immediates do not.
+                return instrs, idx + len(expanded)
+            # Resolve symbolic interrupt values, e.g. INT syscall_name.
+            case rn.Int(rn.Name() | rn.BinOp() as num):
+                instr.num = self._resolve_symbolic_operand(num, idx, current_block)
+                return [instr], idx + 1
+            # Resolve symbolic instruction operands in any parsed operand position.
+            case rn.Instr(_, args) if self._has_symbolic_operand(args):
+                instr.args[:] = self._resolve_symbolic_operands(
+                    args, idx, current_block
+                )
+                # The compiler pipeline only emits LOADI32 for symbolic address
+                # loads. Plain symbolic operands can still come from
+                # user-written .reti_blocks input, but short immediate fields
+                # are not always working: if the resolved address needs more
+                # than 22 bits, the generated code is intentionally left
+                # incorrect instead of being expanded here.
+                return [instr], idx + 1
             # Resolve the target name to determine the relative jump distance.
             case rn.Jump(rel, rn.Name() | rn.BinOp() as target):
                 distance = self._jump_target_distance(target, idx, current_block)
@@ -154,56 +170,6 @@ class RetiPass:
                 # generated code is intentionally left incorrect instead of
                 # being expanded here.
                 return [rn.Jump(rel, rn.Im(str(distance)))], idx + 1
-            # Expand a symbolic or immediate 32-bit jump into concrete RETI instructions.
-            case rn.Jump32(rel, target):
-                expanded = self._expand_jump32(rel, target)
-                instrs = self._single_line_comment(instr, "#") + expanded
-                # JUMP32 expansion length depends on relation and target kind:
-                # conditional jumps add a guard, label targets add CS, immediates do not.
-                return instrs, idx + len(expanded)
-            # Resolve symbolic indexed-memory offsets, e.g. LOADIN DS ACC var_name.
-            # TSL is not emitted by normal PicoC compilation, but can appear in
-            # external .reti_blocks input.
-            case rn.Instr(
-                (rn.Loadin() | rn.Storein() | rn.Tsl()),
-                [_, _, rn.Name(var_name)],
-            ):
-                instr.args[2] = rn.Im(self._symbol_addr(var_name))
-                return [instr], idx + 1
-            # Resolve symbolic indexed-memory offsets, e.g. STOREIN DS ACC var_name + 1.
-            # Same TSL comment as above.
-            case rn.Instr(
-                (rn.Loadin() | rn.Storein() | rn.Tsl()),
-                [_, _, rn.BinOp(rn.Name(var_name), op, num)],
-            ):
-                addr = self._symbol_addr(var_name)
-                match op:
-                    case rn.Add():
-                        instr.args[2] = rn.Im(addr + num)
-                    case rn.Sub():
-                        instr.args[2] = rn.Im(addr - num)
-                    case _:
-                        throw_error(op)
-                return [instr], idx + 1
-            # Expand LOADI32 pseudo instructions into the fixed LOADI/MULTI/ORI sequence.
-            case rn.Instr(rn.Loadi32(), [reg, operand]):
-                instrs = self._single_line_comment(instr, "#") + self._expand_loadi32(
-                    reg, operand, idx, current_block
-                )
-                # LOADI32 always expands to LOADI/MULTI/ORI, so its size is fixed.
-                return instrs, idx + 3
-            # Resolve a symbolic LOADI operand to a function, variable, or current-instruction address.
-            case rn.Instr(rn.Loadi(), [_, rn.Name() | rn.BinOp() as operand]):
-                instr.args[1] = rn.Im(
-                    str(self._load_address_operand(operand, idx, current_block))
-                )
-                # The compiler pipeline only emits LOADI32 for symbolic address
-                # loads. Plain symbolic LOADI can still come from user-written
-                # .reti_blocks input, but this short form is not always working:
-                # if the resolved address needs more than 22 bits, the generated
-                # code is intentionally left incorrect instead of being expanded
-                # here.
-                return [instr], idx + 1
             # Keep comments in output without increasing the instruction index.
             case pn.SingleLineComment():
                 return [instr], idx
