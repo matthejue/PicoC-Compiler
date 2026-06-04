@@ -33,6 +33,8 @@ class RetiPatchPass:
                     cnt += self._jump32_size(rel, target)
                 case rn.Instr(rn.Loadi32(), _):
                     cnt += 3
+                case rn.Instr((rn.Push() | rn.Pop()), _):
+                    cnt += 2
                 # The compiler pipeline only emits JUMP32/LOADI32 for symbolic
                 # addresses. Plain symbolic operands may still come from
                 # user-written .reti_blocks, but they stay short and are not
@@ -67,7 +69,20 @@ class RetiPatchPass:
                 if target_is_next_block:
                     return self._single_line_comment(instr, "# // not included")
                 return [instr]
-            # Example: LOADIN SP ACC 3000000 writes 3000000 to ACC, then ADD SP ACC; LOADIN SP ACC 0.
+            # Expand stack pseudo instructions while blocks still exist, so
+            # block sizes include their real machine-instruction length.
+            case rn.Instr(rn.Push(), [rn.Reg() as reg]):
+                return [
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                    rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), reg, rn.Im("1")]),
+                ]
+            case rn.Instr(rn.Pop(), [rn.Reg() as reg]):
+                return [
+                    rn.Instr(rn.Loadin(), [rn.Reg(rn.Sp()), reg, rn.Im("1")]),
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                ]
+            # Example: a large LOADIN offset is added to the base register first,
+            # then the same memory op is emitted with offset 0.
             case rn.Instr((rn.Loadin() | rn.Storein() | rn.Tsl()) as op, [base_reg, value_reg, rn.Im(val)]):
                 offset = int(val)
                 if offset < self.SIGNED_32_MIN or offset > self.SIGNED_32_MAX:

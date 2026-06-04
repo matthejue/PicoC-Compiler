@@ -34,6 +34,8 @@
 - Deals with division by zero.
 - Handles the case where the `main` function is not the first function in the file.
 - Handles the case where there is no `main` function.
+- Converts pseudo instructions that may affect block instruction counts into
+  concrete machine-instruction sequences.
 
 ## RETI
 
@@ -42,3 +44,5 @@
 - `GoTo(Name(str))` wird durch ein Immediate mit passender Distanz/Adresse oder
   einen Sprungbefehl mit passender Distanz ersetzt:
   `Jump(Always(), Im(str(distance)))`.
+- Converts remaining pseudo instructions that do not need block-level metadata
+  into concrete machine-instruction sequences.

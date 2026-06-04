@@ -69,9 +69,7 @@ class RetiBlocksPass:
                 ]
             # ---------------------------- L_Arith ----------------------------
             case pn.Exp((pn.Num() | pn.Char() | rn.Reg()) as exp):
-                reti_instrs = self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
-                ]
+                reti_instrs = self._single_line_comment(stmt, "#")
                 match exp:
                     case pn.Num(val):
                         reti_instrs += [
@@ -86,29 +84,22 @@ class RetiBlocksPass:
                         ]
                     case rn.Reg():
                         return reti_instrs + [
-                            rn.Instr(rn.Storein(), [rn.Reg(rn.Sp()), exp, rn.Im("1")]),
+                            rn.Instr(rn.Push(), [exp]),
                         ]
                     case _:
                         throw_error(exp)
 
                 return reti_instrs + [
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
             case pn.Exp(pn.FunRef(pn.Name(fun_name))):
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(rn.Loadi32(), [rn.Reg(rn.Acc()), rn.Name(fun_name)]),
                     rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
             case pn.Exp((pn.Global() | pn.Stackframe()) as exp):
-                reti_instrs = self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
-                ]
+                reti_instrs = self._single_line_comment(stmt, "#")
                 match exp:
                     case pn.Global(pn.Name(val2)):
                         name = rn.Name(val2)
@@ -116,10 +107,6 @@ class RetiBlocksPass:
                             rn.Instr(
                                 rn.Loadin(),
                                 [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), name],
-                            ),
-                            rn.Instr(
-                                rn.Storein(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
                             ),
                         ]
                     case pn.Stackframe(pn.Num(val2)):
@@ -139,16 +126,10 @@ class RetiBlocksPass:
                                     ),
                                 ],
                             ),
-                            rn.Instr(
-                                rn.Storein(),
-                                [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")],
-                            ),
                         ]
-                return reti_instrs
+                return reti_instrs + [rn.Instr(rn.Push(), [rn.Reg(rn.Acc())])]
             case pn.Ref((pn.Global() | pn.Stackframe()) as exp):
-                reti_instrs = self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")])
-                ]
+                reti_instrs = self._single_line_comment(stmt, "#")
                 match exp:
                     case pn.Global(pn.Name(val)):
                         name = rn.Name(val)
@@ -179,10 +160,7 @@ class RetiBlocksPass:
                     case _:
                         throw_error(exp)
                 return reti_instrs + [
-                    rn.Instr(
-                        rn.Storein(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.In1()), rn.Im("1")],
-                    )
+                    rn.Instr(rn.Push(), [rn.Reg(rn.In1())])
                 ]
             case pn.Exp(
                 pn.BinOp(pn.Stack(pn.Num(val1)), bin_aop, pn.Stack(pn.Num(val2)))
@@ -348,12 +326,14 @@ class RetiBlocksPass:
                 return self._single_line_comment(stmt, "#") + [
                     # rn.Call(rn.Name("INPUT"), rn.Reg(rn.Acc())),
                     rn.Int(rn.Im("2")),
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
             case pn.Exp(pn.Call(pn.Name("print"), [pn.Stack(pn.Num(val))])):
+                if str(val) == "1":
+                    return self._single_line_comment(stmt, "#") + [
+                        rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                        rn.Int(rn.Im("0")),
+                    ]
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
@@ -376,11 +356,8 @@ class RetiBlocksPass:
                 ]
             case pn.Exp(pn.SizeOf(val)):
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
-                    rn.Instr(
-                        rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
-                    ),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
             # ---------------------------- L_Logic ----------------------------
             case pn.Exp(pn.ToBool(pn.Stack(pn.Num(val)))):
@@ -428,6 +405,10 @@ class RetiBlocksPass:
                 ]
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(rn.Reg() as reg, pn.Stack(pn.Num(val))):
+                if str(val) == "1":
+                    return self._single_line_comment(stmt, "#") + [
+                        rn.Instr(rn.Pop(), [reg]),
+                    ]
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(),
@@ -513,6 +494,41 @@ class RetiBlocksPass:
                 reti_instrs = []
                 stack_offset = val2
                 reti_instrs = self._single_line_comment(stmt, "#")
+                if int(tmp_max) == 1 and int(stack_offset) == 1:
+                    match mem:
+                        case pn.Global(pn.Name(val1)):
+                            return reti_instrs + [
+                                rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [
+                                        rn.Reg(rn.Ds()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Name(val1),
+                                    ],
+                                ),
+                            ]
+                        case pn.Stackframe(pn.Num(val1)):
+                            frame_kind = getattr(mem, "frame_kind", None)
+                            return reti_instrs + [
+                                rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                                rn.Instr(
+                                    rn.Storein(),
+                                    [
+                                        rn.Reg(rn.Baf()),
+                                        rn.Reg(rn.Acc()),
+                                        rn.Im(
+                                            str(
+                                                self._stackframe_access_offset(
+                                                    val1, frame_kind, 0
+                                                )
+                                            )
+                                        ),
+                                    ],
+                                ),
+                            ]
+                        case _:
+                            throw_error(mem)
                 while True:
                     match (mem, tmp):
                         case (_, pn.Stack(pn.Num(val))) if val == tmp_max:
@@ -627,15 +643,22 @@ class RetiBlocksPass:
                 [pn.GoTo(pn.Name()) as goto1],
                 [pn.GoTo(pn.Name(goto2_name))],
             ):
-                return (
-                    self._single_line_comment(stmt, "#")
-                    + [
+                if str(val) == "1":
+                    condition_instrs = [
+                        rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                        rn.Jump32(rn.Eq(), rn.Name(goto2_name)),
+                    ]
+                else:
+                    condition_instrs = [
                         rn.Instr(
                             rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
                         ),
                         rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
                         rn.Jump32(rn.Eq(), rn.Name(goto2_name)),
                     ]
+                return (
+                    self._single_line_comment(stmt, "#")
+                    + condition_instrs
                     + self._single_line_comment(goto1, "#")
                     + self._reti_blocks_stmt(pn.Exp(goto1))
                 )
@@ -726,6 +749,11 @@ class RetiBlocksPass:
                     [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
                 )
                 return_instr.return_statement = True
+                if str(val) == "1":
+                    return self._single_line_comment(stmt, "#") + [
+                        rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                        return_instr,
+                    ]
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
                         rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]

@@ -311,6 +311,16 @@ class Storein(ASTNode):
         return "STOREIN"
 
 
+class Push(ASTNode):
+    def __repr__(self):
+        return "PUSH"
+
+
+class Pop(ASTNode):
+    def __repr__(self):
+        return "POP"
+
+
 class Tsl(ASTNode):
     def __repr__(self):
         return "TSL"

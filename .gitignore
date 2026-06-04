@@ -56,3 +56,4 @@ compiler_pipeline_overview.md
 vendor/tree-sitter-picoc/src/
 vendor/tree-sitter-reti/src/
 .vscode/tasks.json
+doc/passes.md

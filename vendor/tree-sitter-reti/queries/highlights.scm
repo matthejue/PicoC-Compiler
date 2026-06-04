@@ -24,6 +24,10 @@
 
 (move_instruction "MOVE" @keyword)
 
+(push_instruction "PUSH" @keyword)
+
+(pop_instruction "POP" @keyword)
+
 (interrupt_instruction "INT" @keyword)
 
 (jump "JUMP" @keyword)

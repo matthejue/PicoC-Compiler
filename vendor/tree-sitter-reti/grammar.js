@@ -93,6 +93,7 @@ module.exports = grammar({
       $.load_instruction,
       $.store_or_move_instruction,
       $.compute_instruction,
+      $.stack_instruction,
       $.syscall_instruction,
       $.return_from_interrupt_instruction,
     ),
@@ -209,6 +210,21 @@ module.exports = grammar({
       'OPLUSI',
       'ORI',
       'ANDI',
+    ),
+
+    stack_instruction: $ => choice(
+      $.push_instruction,
+      $.pop_instruction,
+    ),
+
+    push_instruction: $ => seq(
+      field('opcode', 'PUSH'),
+      field('register', $.register),
+    ),
+
+    pop_instruction: $ => seq(
+      field('opcode', 'POP'),
+      field('register', $.register),
     ),
 
     syscall_instruction: $ => $.interrupt_instruction,

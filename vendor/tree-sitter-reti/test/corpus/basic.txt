@@ -137,6 +137,8 @@ LOADI32 ACC 3000000
 JUMP32 123456
 JUMP32== 234567
 JUMP32 target_block
+PUSH ACC
+POP IN1
 
 ---
 
@@ -161,4 +163,14 @@ JUMP32 target_block
     (jump32
       (jump_target
         (symbolic_operand
-          (symbol))))))
+          (symbol)))))
+  (statement
+    (instruction
+      (stack_instruction
+        (push_instruction
+          (register)))))
+  (statement
+    (instruction
+      (stack_instruction
+        (pop_instruction
+          (register))))))

@@ -515,12 +515,17 @@ Main tasks:
   Example: before `DIV`, the divisor is checked and execution aborts on zero.
 - Removes useless jumps to the immediately following block.
   Example: a final `jump next_block` is dropped if control would fall through anyway.
+- Converts block-sensitive pseudo instructions into concrete machine-instruction
+  sequences while block sizes are still known.
+  Example: `PUSH ACC` becomes `SUBI SP 1` followed by `STOREIN SP ACC 1`.
 - Counts instructions per block and records block start positions for later jump-distance computation.
   Example: block `foo` may get metadata like "starts at instruction 27".
 
 #### `reti`
 
-This is the final lowering pass. It removes block structure and resolves symbolic references.
+This is the final lowering pass. It removes block structure, resolves symbolic
+references, and expands pseudo instructions that do not need block-level
+metadata.
 
 Main tasks:
 
@@ -532,3 +537,6 @@ Main tasks:
   Example: a global `x` is replaced by its final data-segment address.
 - Resolves special placeholders such as `_this_instruction`.
   Example: a placeholder for the current program counter becomes a concrete instruction address.
+- Converts remaining non-block pseudo instructions into concrete
+  machine-instruction sequences.
+  Example: `LOADI32` is expanded after symbolic addresses are known.

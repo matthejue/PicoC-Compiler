@@ -894,6 +894,15 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
     def register_immediate_instruction(self, _, children):
         return self.compute_immediate_instruction(_, children)
 
+    def push_instruction(self, _, children):
+        return rn.Instr(rn.Push(), children)
+
+    def pop_instruction(self, _, children):
+        return rn.Instr(rn.Pop(), children)
+
+    def stack_instruction(self, _, children):
+        return children[0]
+
     def indexed_memory_instruction(self, _, children):
         return rn.Instr(children[0], children[1:])
 
