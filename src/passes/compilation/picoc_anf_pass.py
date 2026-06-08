@@ -28,6 +28,16 @@ class PicocAnfPass:
                 return
         throw_error("Function call continuation has no SaveReturnAddress")
 
+    def _register_block(self, block, scope):
+        match block:
+            case pn.Block(block_name, _):
+                block.block_idx = self.block_idx
+                self.block_idx += 1
+                self.all_blocks[block_name] = block
+                self.block_scopes[block_name] = scope
+            case _:
+                throw_error(block)
+
     def _split_call_continuations(self, block, blocks_out):
         match block:
             case pn.Block(block_name, stmts):
@@ -59,11 +69,9 @@ class PicocAnfPass:
                             blocks_out.append(block)
 
                             cont_block = pn.Block(cont_label, cont_stmts)
-                            cont_block.block_idx = self.block_idx
-                            self.block_idx += 1
-                            self.all_blocks[cont_label] = cont_block
-                            self.block_scopes[cont_label] = self.block_scopes.get(
-                                block_name, "global"
+                            self._register_block(
+                                cont_block,
+                                self.block_scopes.get(block_name, "global"),
                             )
                             self._split_call_continuations(cont_block, blocks_out)
                             return

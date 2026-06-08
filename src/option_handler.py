@@ -314,16 +314,16 @@ class OptionHandler:
 
         passes.symbol_table.declare("main", main_func, scope="global")
 
-        start_ast = pn.File(
-            pn.Name("start"),
-            [
-                pn.Block(
-                    "_start",
-                    passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
-                    + [pn.Exit(pn.Num("0"))],
-                )
-            ],
+        start_block = pn.Block(
+            "_start",
+            passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
+            + [pn.Exit(pn.Num("0"))],
         )
+        passes._register_block(start_block, "global")
+        start_blocks = []
+        passes._split_call_continuations(start_block, start_blocks)
+
+        start_ast = pn.File(pn.Name("start"), start_blocks)
 
         reti_blocks: pn.File = passes.reti_blocks(start_ast)
 
