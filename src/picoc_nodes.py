@@ -371,11 +371,24 @@ class Stack(ASTNode):
     __match_args__ = ("num", "datatype")
 
 
-class Stackframe(ASTNode):
+class StackframeLocalVar(ASTNode):
     def __init__(self, num, datatype=None):
         self.num = num
         self.datatype = datatype if datatype else Empty()
-        self.symbol_name: str
+        self.symbol_name = None
+
+    @property
+    def visible(self):
+        return _add_if_double_verbose([self.num], self.datatype)
+
+    __match_args__ = ("num", "datatype")
+
+
+class StackframeParam(ASTNode):
+    def __init__(self, num, datatype=None):
+        self.num = num
+        self.datatype = datatype if datatype else Empty()
+        self.symbol_name = None
 
     @property
     def visible(self):

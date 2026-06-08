@@ -103,7 +103,7 @@ class PicocAnfPass:
     def _picoc_anf_exp(self, exp, addr_calc=False):
         match exp:
             # ---------------------------- L_Arith ----------------------------
-            case (pn.Global() | pn.Stackframe()) as loc:
+            case (pn.Global() | pn.StackframeLocalVar() | pn.StackframeParam()) as loc:
                 datatype = loc.datatype
                 if addr_calc:
                     match datatype:
@@ -419,7 +419,7 @@ class PicocAnfPass:
                         )
                     case _:
                         throw_error(symbol)
-            case pn.Assign(pn.Stackframe() as lhs, exp):
+            case pn.Assign((pn.StackframeLocalVar() | pn.StackframeParam()) as lhs, exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 var_name = lhs.symbol_name
                 symbol, _ = (
@@ -436,12 +436,12 @@ class PicocAnfPass:
                         "size": size,
                     }:
                         num_size = pn.Num(size)
-                        target = pn.Stackframe(pn.Num(addr))
+                        target = copy.deepcopy(lhs)
+                        target.num = pn.Num(addr)
                         setattr(
                             target, "symbol_name", getattr(lhs, "symbol_name", None)
                         )
                         setattr(target, "datatype", getattr(lhs, "datatype", None))
-                        setattr(target, "frame_kind", symbol["frame_kind"])
                         return (
                             self._single_line_comment(stmt, "//")
                             + exps_anf

@@ -6,16 +6,17 @@ import copy
 
 
 class RetiBlocksPass:
-    def _stackframe_access_offset(self, addr, frame_kind, tmp_idx=0):
-        addr = int(addr)
+    def _stackframe_access_offset(self, loc, tmp_idx=0):
         tmp_idx = int(tmp_idx)
-        match frame_kind:
-            case "param":
+        match loc:
+            case pn.StackframeParam(pn.Num(addr)):
+                addr = int(addr)
                 return 3 + addr - tmp_idx
-            case "local_var":
+            case pn.StackframeLocalVar(pn.Num(addr)):
+                addr = int(addr)
                 return -(addr - tmp_idx)
             case _:
-                raise ValueError(f"Unknown frame kind: {frame_kind}")
+                throw_error(loc)
 
     def _add_signed_offset(self, reg, offset):
         offset = int(offset)
@@ -103,7 +104,7 @@ class RetiBlocksPass:
                     rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                     rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
-            case pn.Exp((pn.Global() | pn.Stackframe()) as exp):
+            case pn.Exp((pn.Global() | pn.StackframeLocalVar() | pn.StackframeParam()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#")
                 match exp:
                     case pn.Global(pn.Name(val2)):
@@ -114,8 +115,7 @@ class RetiBlocksPass:
                                 [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), name],
                             ),
                         ]
-                    case pn.Stackframe(pn.Num(val2)):
-                        frame_kind = getattr(exp, "frame_kind", None)
+                    case pn.StackframeLocalVar() | pn.StackframeParam():
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
@@ -125,7 +125,7 @@ class RetiBlocksPass:
                                     rn.Im(
                                         str(
                                             self._stackframe_access_offset(
-                                                val2, frame_kind
+                                                exp
                                             )
                                         )
                                     ),
@@ -133,7 +133,7 @@ class RetiBlocksPass:
                             ),
                         ]
                 return reti_instrs + [rn.Instr(rn.Push(), [rn.Reg(rn.Acc())])]
-            case pn.Ref((pn.Global() | pn.Stackframe()) as exp):
+            case pn.Ref((pn.Global() | pn.StackframeLocalVar() | pn.StackframeParam()) as exp):
                 reti_instrs = self._single_line_comment(stmt, "#")
                 match exp:
                     case pn.Global(pn.Name(val)):
@@ -142,9 +142,8 @@ class RetiBlocksPass:
                             rn.Instr(rn.Loadi32(), [rn.Reg(rn.In1()), name]),
                             rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
                         ]
-                    case pn.Stackframe(pn.Num(val)):
-                        frame_kind = getattr(exp, "frame_kind", None)
-                        offset = self._stackframe_access_offset(val, frame_kind)
+                    case pn.StackframeLocalVar() | pn.StackframeParam():
+                        offset = self._stackframe_access_offset(exp)
                         reti_instrs += [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
                             self._add_signed_offset(rn.Reg(rn.In1()), offset),
@@ -410,7 +409,7 @@ class RetiBlocksPass:
                 ]
             case pn.Assign(
                 pn.Stack(pn.Num(val1)) as lhs,
-                (pn.Global() | pn.Stackframe()) as exp,
+                (pn.Global() | pn.StackframeLocalVar() | pn.StackframeParam()) as exp,
             ):
                 tmp_max = lhs.num.val
                 tmp = pn.Stack(pn.Num(0))
@@ -448,8 +447,7 @@ class RetiBlocksPass:
                                     ],
                                 ),
                             ]
-                        case (pn.Stack(pn.Num(val1)), pn.Stackframe(pn.Num(val2))):
-                            frame_kind = getattr(mem, "frame_kind", None)
+                        case (pn.Stack(pn.Num(val1)), pn.StackframeLocalVar() | pn.StackframeParam()):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -459,7 +457,7 @@ class RetiBlocksPass:
                                         rn.Im(
                                             str(
                                                 self._stackframe_access_offset(
-                                                    val2, frame_kind, val1
+                                                    mem, val1
                                                 )
                                             )
                                         ),
@@ -477,7 +475,7 @@ class RetiBlocksPass:
                     tmp.num.val = str(int(tmp.num.val) + 1)
                 return reti_instrs
             case pn.Assign(
-                (pn.Global() | pn.Stackframe()) as lhs,
+                (pn.Global() | pn.StackframeLocalVar() | pn.StackframeParam()) as lhs,
                 pn.Stack(pn.Num(val2)) as tmp,
             ):
                 tmp_max = tmp.num.val
@@ -500,8 +498,7 @@ class RetiBlocksPass:
                                     ],
                                 ),
                             ]
-                        case pn.Stackframe(pn.Num(val1)):
-                            frame_kind = getattr(mem, "frame_kind", None)
+                        case pn.StackframeLocalVar() | pn.StackframeParam():
                             return reti_instrs + [
                                 rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
                                 rn.Instr(
@@ -512,7 +509,7 @@ class RetiBlocksPass:
                                         rn.Im(
                                             str(
                                                 self._stackframe_access_offset(
-                                                    val1, frame_kind, 0
+                                                    mem, 0
                                                 )
                                             )
                                         ),
@@ -554,8 +551,7 @@ class RetiBlocksPass:
                                     ],
                                 ),
                             ]
-                        case (pn.Stackframe(pn.Num(val1)), pn.Stack(pn.Num(val2))):
-                            frame_kind = getattr(mem, "frame_kind", None)
+                        case (pn.StackframeLocalVar() | pn.StackframeParam(), pn.Stack(pn.Num(val2))):
                             reti_instrs += [
                                 rn.Instr(
                                     rn.Loadin(),
@@ -573,8 +569,7 @@ class RetiBlocksPass:
                                         rn.Im(
                                             str(
                                                 self._stackframe_access_offset(
-                                                    val1,
-                                                    frame_kind,
+                                                    mem,
                                                     int(tmp_max) - 1 - int(val2),
                                                 )
                                             )

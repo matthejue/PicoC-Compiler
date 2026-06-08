@@ -366,8 +366,8 @@ Main tasks:
 - Declares globals, locals, parameters, functions, and structs in the symbol table.
   Example: `int x;` becomes a symbol entry for `x` with datatype and scope.
 - Computes datatype sizes and stack offsets.
-  Example: a local `int x` may get a stackframe offset such as `Stackframe(0)`.
-- Rewrites `Name(x)` into `Global(x)` or `Stackframe(offset)`.
+  Example: a local `int x` may get a stackframe offset such as `StackframeLocalVar(0)`.
+- Rewrites `Name(x)` into `Global(x)`, `StackframeLocalVar(offset)`, or `StackframeParam(offset)`.
   Example: a global use of `x` becomes `Global(Name("x"))`.
 - Replaces `const` values with compile-time values where possible.
   Example: `const int n = 4;` can later be used as `4`.
@@ -498,7 +498,7 @@ Relevant place in the code:
 Important distinction:
 
 - Stackframe-local accesses do not need this final name replacement.
-  Example: a local variable use was already rewritten much earlier from `Name("x")` to something like `Stackframe(Num("0"))` in `picoc_symbol`.
+  Example: a local variable use was already rewritten much earlier from `Name("x")` to something like `StackframeLocalVar(Num("0"))` in `picoc_symbol`.
 - In other words, locals and parameters are resolved to stack-frame offsets before the RETI stage.
   Example: a local `x` becomes an access relative to `Baf`, not a symbolic RETI name.
 - The final `reti` pass mainly has to replace symbolic names that still refer to globally addressed entities.
@@ -507,7 +507,7 @@ Important distinction:
 Reason for the distinction:
 
 - Local function variables and parameters live inside one function's stack frame, so their position can already be determined during `picoc_symbol`.
-  Example: once the local layout of a function is known, `x` can be fixed as something like `Stackframe(Num("0"))`.
+  Example: once the local layout of a function is known, `x` can be fixed as something like `StackframeLocalVar(Num("0"))`.
 - Global variables live in one shared program-wide address space, so their final concrete addresses depend on the merged symbol tables of all input files.
   Example: the final address of global `x` depends on how many other globals from other files are placed before it.
 - Because of that, locals are resolved early by function-local stack layout, while globals are resolved later by linking / multi-file handling.

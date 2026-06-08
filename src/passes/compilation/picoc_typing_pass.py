@@ -118,7 +118,7 @@ class PicocTypingPass:
             case pn.FunRef(_, datatype):
                 dt = copy.deepcopy(datatype)
                 return dt
-            case pn.Stackframe():
+            case pn.StackframeLocalVar() | pn.StackframeParam():
                 symbol_name = exp.symbol_name
                 symbol, _ = self.symbol_table.resolve(symbol_name, scope=self.current_scope)
                 dt = copy.deepcopy(symbol["datatype"])

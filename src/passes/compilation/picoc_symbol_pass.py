@@ -162,9 +162,16 @@ class PicocSymbolPass:
                         if chosen_scope == "global":
                             loc = pn.Global(copy.deepcopy(name_node))
                         else:
-                            loc = pn.Stackframe(pn.Num(symbol["addr"]))
+                            match symbol["frame_kind"]:
+                                case "param":
+                                    loc = pn.StackframeParam(pn.Num(symbol["addr"]))
+                                case "local_var":
+                                    loc = pn.StackframeLocalVar(pn.Num(symbol["addr"]))
+                                case frame_kind:
+                                    throw_error(
+                                        f"Internal error: unsupported frame kind for '{var_name}': {frame_kind!r}"
+                                    )
                             loc.symbol_name = var_name
-                            loc.frame_kind = symbol["frame_kind"]
                         return loc
                     case type_qual:
                         throw_error(
@@ -181,7 +188,7 @@ class PicocSymbolPass:
                 return self._resolve_name_to_storage(exp)
             case pn.Num() | pn.Char() | pn.Empty() | pn.Stack():
                 return exp
-            case pn.Stackframe() | pn.Global():
+            case pn.StackframeLocalVar() | pn.StackframeParam() | pn.Global():
                 return exp
             case pn.BinOp(left_exp, bin_op, right_exp):
                 return pn.BinOp(
