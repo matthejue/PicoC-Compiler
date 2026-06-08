@@ -66,6 +66,8 @@ class PicocAnfPass:
                                 stmts, idx, cont_label
                             )
                             block.stmts_instrs = stmts[: idx + 1]
+                            # Append before recursively splitting the continuation, so
+                            # each *_cont.N block stays next to the part it came from.
                             blocks_out.append(block)
 
                             cont_block = pn.Block(cont_label, cont_stmts)

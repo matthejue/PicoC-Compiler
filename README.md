@@ -372,7 +372,7 @@ Main tasks:
 - Creates a `_global_inits` block for global initialization code.
   Example: top-level initializers are collected into one synthetic block.
 - Inserts function-entry information such as local stack allocation requirements.
-  Example: a function with three local words gets `StackMalloc(3)` at entry.
+  Example: a function with three local words gets `NewStackframe(3)` at entry.
 
 #### `picoc_typing`
 
@@ -402,9 +402,20 @@ Main tasks:
 - Breaks complex expressions into small steps with intermediate results on the stack.
   Example: `a + b * c` becomes separate stack operations for `b * c` and then the addition.
 - Lowers function calls into explicit stack-frame setup, jump, and return-value handling.
-  Example: a call turns into `StackMalloc`, `NewStackframe`, `GoTo`, and `RemoveStackframe`.
+  Example: a call saves a labeled return address, evaluates the callee address, jumps with `GoTo(Stack(1))`, and continues in a generated continuation block.
 - Lowers assignments, dereferences, struct access, conditions, and returns into simple stack-based operations.
-  Example: `return x + 1;` becomes evaluate `x`, evaluate `1`, add, then `Return(Stack(1))`.
+  Example: `return x + 1;` becomes evaluate `x`, evaluate `1`, add, move the result to `ACC`, restore the stack frame, and restore the return address.
+
+#### Function Calls and Stack Frames
+
+The runtime stack frame is arranged from higher to lower addresses as:
+
+1. arguments
+2. return address
+3. saved frame pointer, the previous `BAF`
+4. local variables
+
+The called function saves and restores the frame pointer (`BAF`). This keeps both ordinary function calls and interrupt service routines stack based: an `INT i` places the return address on the stack, while a function entry places the previous `BAF` on the stack. The address to continue after a function call is represented by a generated continuation block label such as `<fun_name>_cont.<idx>`. The call site saves that address with `LOADI32 ACC <fun_name>_cont.<idx>`, adds `CS` to make it absolute, and pushes `ACC` onto the stack.
 
 #### `reti_blocks`
 
@@ -503,6 +514,25 @@ Reason for the distinction:
 
 After all files are merged, two final passes run on the combined RETI-block AST.
 
+#### RETI Pseudoinstructions
+
+Some RETI-side nodes are pseudoinstructions that are expanded after higher-level lowering.
+
+- `PUSH reg` reserves a stack slot with `SUBI SP 1` and then stores `reg` with `STOREIN SP reg 1`.
+- `POP reg` loads the top stack value with `LOADIN SP reg 1` and then releases the slot with `ADDI SP 1`.
+- `LOADI32 reg operand` loads a 32-bit immediate or symbolic address into `reg`.
+  Example: function calls use it to load a continuation block label before pushing the return address.
+- `JUMP32 rel target` jumps to a 32-bit immediate or symbolic block target.
+  Example: block-level control flow uses it when the final jump distance is not known yet.
+
+Pseudoinstructions are split between the final RETI-side passes by whether they depend on block labels:
+
+- `reti_patch` expands pseudoinstructions that do not depend on block-label addresses.
+  Example: `PUSH` and `POP` can be replaced directly by their concrete machine-instruction sequences, which may increase block sizes in a straightforward way.
+  Their instruction order keeps the stack pointer in a protective position even if a hardware interrupt occurs between the two generated instructions. `PUSH` moves `SP` before writing the value, so an interrupt cannot overwrite the not-yet-written stack slot. `POP` reads the value before moving `SP` back, so an interrupt cannot overwrite the still-needed stack slot before it is read.
+- `reti` expands pseudoinstructions that depend on symbolic block labels or final instruction positions.
+  Example: `LOADI32` and `JUMP32` are lowered only after label addresses and jump targets are known.
+
 #### `reti_patch`
 
 This pass adjusts RETI instruction blocks to satisfy machine-level constraints.
@@ -535,8 +565,6 @@ Main tasks:
   Example: `Jump(..., Name("if.1"))` becomes `Jump(..., Im("12"))`.
 - Replaces symbolic variable names with concrete addresses from the symbol table.
   Example: a global `x` is replaced by its final data-segment address.
-- Resolves special placeholders such as `_this_instruction`.
-  Example: a placeholder for the current program counter becomes a concrete instruction address.
 - Converts remaining non-block pseudo instructions into concrete
   machine-instruction sequences.
   Example: `LOADI32` is expanded after symbolic addresses are known.

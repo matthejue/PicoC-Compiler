@@ -57,3 +57,5 @@ vendor/tree-sitter-picoc/src/
 vendor/tree-sitter-reti/src/
 .vscode/tasks.json
 doc/passes.md
+test_examples/minimal_function_call.picoc
+test_examples/minimal_function_call.reti_blocks_backup
