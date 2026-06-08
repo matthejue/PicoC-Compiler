@@ -11,11 +11,16 @@ class RetiBlocksPass:
         tmp_idx = int(tmp_idx)
         match frame_kind:
             case "param":
-                return 1 + addr - tmp_idx
+                return 3 + addr - tmp_idx
             case "local_var":
-                return -(2 + addr - tmp_idx)
+                return -(addr - tmp_idx)
             case _:
                 raise ValueError(f"Unknown frame kind: {frame_kind}")
+
+    def _add_signed_offset(self, reg, offset):
+        offset = int(offset)
+        op = rn.Addi() if offset >= 0 else rn.Subi()
+        return rn.Instr(op, [reg, rn.Im(str(abs(offset)))])
 
     def _reti_blocks_stmt(self, stmt):
         match stmt:
@@ -139,23 +144,10 @@ class RetiBlocksPass:
                         ]
                     case pn.Stackframe(pn.Num(val)):
                         frame_kind = getattr(exp, "frame_kind", None)
+                        offset = self._stackframe_access_offset(val, frame_kind)
                         reti_instrs += [
                             rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.In1())]),
-                            rn.Instr(
-                                rn.Addi() if frame_kind == "param" else rn.Subi(),
-                                [
-                                    rn.Reg(rn.In1()),
-                                    rn.Im(
-                                        str(
-                                            abs(
-                                                self._stackframe_access_offset(
-                                                    val, frame_kind
-                                                )
-                                            )
-                                        )
-                                    ),
-                                ],
-                            ),
+                            self._add_signed_offset(rn.Reg(rn.In1()), offset),
                         ]
                     case _:
                         throw_error(exp)
@@ -675,101 +667,44 @@ class RetiBlocksPass:
                     instr
                 ]
             case pn.Exp(pn.GoTo(pn.Stack(pn.Num(val)))):
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im(val)],
+                if str(val) != "1":
+                    throw_error(
+                        f"Function call GoTo(Stack(...)) must use Stack(1), got Stack({val})"
                     )
+                instr = rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())])
+                instr.call_target_function = getattr(stmt, "call_target_function", None)
+                instr.indirect_call = getattr(stmt, "indirect_call", False)
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
+                    instr,
                 ]
             # ----------------------------- L_Fun -----------------------------
-            case pn.StackMalloc(val):
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(val)])
-                ]
-            case pn.NewStackframe(pn.Num(arg_count)):
-                # TODO(frame-layout): adapt this sequence for
-                # [args][return address][previous BAF][locals].
-                frame_size = 2 + int(arg_count)
-                return_offset = (
-                    int(stmt.return_offset.val)
-                    if not isinstance(stmt.return_offset, pn.Empty)
-                    else 6
-                )
+            case pn.SaveReturnAddress(pn.Name(label)):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(
-                        rn.Move(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc())],
-                    ),
-                    rn.Instr(
-                        rn.Move(),
-                        [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())],
-                    ),
-                    rn.Instr(
-                        rn.Subi(),
-                        [rn.Reg(rn.Sp()), rn.Im("2")],
-                    ),
-                    rn.Instr(
-                        rn.Storein(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("0")],
-                    ),
-                    rn.Instr(
-                        rn.Loadi32(),
-                        [
-                            rn.Reg(rn.Acc()),
-                            rn.BinOp(
-                                rn.Name("_this_instruction"),
-                                rn.Add(),
-                                return_offset,
-                            ),
-                        ],
+                        rn.Loadi32(), [rn.Reg(rn.Acc()), rn.Name(label)]
                     ),
                     rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
-                    rn.Instr(
-                        rn.Storein(),
-                        [rn.Reg(rn.Baf()), rn.Reg(rn.Acc()), rn.Im("-1")],
-                    ),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
-            case pn.RemoveStackframe(pn.Num(local_var_count)):
-                # TODO(frame-layout): adapt teardown for
-                # [args][return address][previous BAF][locals].
+            case pn.NewStackframe(pn.Num(local_var_count)):
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Baf()), rn.Reg(rn.Baf()), rn.Im("0")]
-                    ),
-                    # had to implmented this way because of interrupts overwitting the BAF address
-                    rn.Instr(rn.Subi(), [rn.Reg(rn.Baf()), rn.Im(str(int(local_var_count) + 2))]),
+                    rn.Instr(rn.Push(), [rn.Reg(rn.Baf())]),
+                    rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
+                    rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(local_var_count)]),
+                ]
+            case pn.RestoreStackframe():
+                return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Sp())]),
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Baf()), rn.Im(str(int(local_var_count) + 2))]),
+                    rn.Instr(rn.Pop(), [rn.Reg(rn.Baf())]),
                 ]
-            case pn.Return(pn.Stack(pn.Num(val))):
-                # TODO(frame-layout): update return-address access for the new
-                # frame layout.
-                return_instr = rn.Instr(
-                    rn.Loadin(),
-                    [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                )
+            case pn.RestoreReturnAddress():
+                return_instr = rn.Instr(rn.Move(), [rn.Reg(rn.In1()), rn.Reg(rn.Pc())])
                 return_instr.return_statement = True
-                if str(val) == "1":
-                    return self._single_line_comment(stmt, "#") + [
-                        rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
-                        return_instr,
-                    ]
                 return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
-                    ),
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
+                    rn.Instr(rn.Pop(), [rn.Reg(rn.In1())]),
                     return_instr,
                 ]
-            case pn.Return(pn.Empty()):
-                # TODO(frame-layout): update return-address access for the new
-                # frame layout.
-                return_instr = rn.Instr(
-                    rn.Loadin(),
-                    [rn.Reg(rn.Baf()), rn.Reg(rn.Pc()), rn.Im("-1")],
-                )
-                return_instr.return_statement = True
-                return self._single_line_comment(stmt, "#") + [return_instr]
             case _:
                 throw_error(stmt)
 

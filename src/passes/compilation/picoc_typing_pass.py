@@ -276,7 +276,7 @@ class PicocTypingPass:
             case pn.Return(exp):
                 self._picoc_type_exp(exp)
                 return [stmt]
-            case pn.StackMalloc():
+            case pn.NewStackframe():
                 return [stmt]
             case pn.GoTo():
                 return [stmt]

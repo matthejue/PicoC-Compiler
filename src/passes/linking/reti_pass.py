@@ -43,16 +43,12 @@ class RetiPass:
             # Immediate values are already concrete.
             case rn.Im(val):
                 return int(val)
-            case rn.Name("_this_instruction"):
-                return int(current_block.instrs_before.val) + idx
             case rn.Name(name):
                 if name in self.all_blocks:
                     return int(self.all_blocks[name].instrs_before.val)
                 return int(self._symbol_addr(name))
             case rn.BinOp(rn.Name(name), op, constant):
-                if name == "_this_instruction":
-                    value = int(current_block.instrs_before.val) + idx
-                elif name in self.all_blocks:
+                if name in self.all_blocks:
                     value = int(self.all_blocks[name].instrs_before.val)
                 else:
                     value = int(self._symbol_addr(name))

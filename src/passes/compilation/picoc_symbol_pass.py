@@ -304,8 +304,6 @@ class PicocSymbolPass:
                 return pn.Return(self._picoc_rewrite_exp(exp))
             case pn.GoTo():
                 return stmt
-            case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
-                return stmt
             # ---------------------------- L_Misc -----------------------------
             case pn.SingleLineComment() | pn.Debug():
                 return stmt
@@ -369,8 +367,6 @@ class PicocSymbolPass:
                 return [stmt]
             # ----------------------------- L_Fun -----------------------------
             case pn.Return(exp):
-                return [stmt]
-            case pn.StackMalloc() | pn.NewStackframe() | pn.RemoveStackframe():
                 return [stmt]
             case pn.GoTo():
                 return [stmt]
@@ -502,8 +498,13 @@ class PicocSymbolPass:
 
                 match fun_blocks_out:
                     case [pn.Block(_, entry_stmts), *_]:
+                        # Symbol pass knows the final local-frame size after declaring locals,
+                        # so NewStackframe is inserted here instead of in ANF.
                         entry_stmts[:0] = [
-                            self._inherit_origin(pn.StackMalloc(self.next_local_addr), decl_def)
+                            self._inherit_origin(
+                                pn.NewStackframe(pn.Num(str(self.next_local_addr))),
+                                decl_def,
+                            )
                         ]
                     case _:
                         throw_error(fun_blocks_out)

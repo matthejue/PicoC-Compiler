@@ -396,17 +396,6 @@ class Global(ASTNode):
     __match_args__ = ("num", "datatype")
 
 
-class StackMalloc(ASTNode):
-    def __init__(self, num):
-        self.num = num
-
-    @property
-    def visible(self):
-        return [self.num]
-
-    __match_args__ = ("num",)
-
-
 # --------------------------------- L_Pntr --------------------------------
 class PntrDecl(ASTNode):
     def __init__(self, datatype):
@@ -694,19 +683,6 @@ class FunDef(ASTNode):
 
 
 class NewStackframe(ASTNode):
-    def __init__(self, arg_count, return_offset=Empty()):
-        self.arg_count = arg_count
-        self.return_offset = return_offset
-
-    @property
-    def visible(self):
-        if isinstance(self.return_offset, Empty):
-            return [self.arg_count]
-        return [self.arg_count, self.return_offset]
-
-    __match_args__ = ("arg_count", "return_offset")
-
-class RemoveStackframe(ASTNode):
     def __init__(self, local_var_count):
         self.local_var_count = local_var_count
 
@@ -715,6 +691,25 @@ class RemoveStackframe(ASTNode):
         return [self.local_var_count]
 
     __match_args__ = ("local_var_count",)
+
+
+class SaveReturnAddress(ASTNode):
+    def __init__(self, label=Empty()):
+        self.label = label
+
+    @property
+    def visible(self):
+        return [] if isinstance(self.label, Empty) else [self.label]
+
+    __match_args__ = ("label",)
+
+
+class RestoreReturnAddress(ASTNode):
+    pass
+
+
+class RestoreStackframe(ASTNode):
+    pass
 
 # --------------------------------- L_File --------------------------------
 class File(ASTNode):

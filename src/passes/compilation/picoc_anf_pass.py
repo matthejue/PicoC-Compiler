@@ -6,6 +6,72 @@ import copy
 
 
 class PicocAnfPass:
+    def _new_call_cont_label(self, block_name):
+        base = f"{block_name}_cont"
+        while True:
+            label = f"{base}.{self.block_idx}"
+            if label not in self.all_blocks:
+                return label
+            self.block_idx += 1
+
+    def _set_save_return_address_label(self, stmts, call_idx, label):
+        save_return_address_offset = getattr(
+            stmts[call_idx], "save_return_address_offset", None
+        )
+        if save_return_address_offset is None:
+            throw_error("Function call GoTo has no SaveReturnAddress offset")
+
+        save_return_address_idx = call_idx - save_return_address_offset
+        match stmts[save_return_address_idx]:
+            case pn.SaveReturnAddress(pn.Empty()) as save_return_address:
+                save_return_address.label = pn.Name(label)
+                return
+        throw_error("Function call continuation has no SaveReturnAddress")
+
+    def _split_call_continuations(self, block, blocks_out):
+        match block:
+            case pn.Block(block_name, stmts):
+                for idx, stmt in enumerate(stmts):
+                    match stmt:
+                        case pn.Exp(pn.GoTo(pn.Stack(pn.Num("1")))):
+                            # These attrs preserve call info for the generated .debuginfo file;
+                            # here they also mark that this stack jump came from call lowering.
+                            # Only function-call jumps need continuation splitting.
+                            if not (
+                                getattr(stmt, "call_target_function", None)
+                                or getattr(stmt, "indirect_call", False)
+                            ):
+                                continue
+
+                            cont_stmts = stmts[idx + 1 :]
+                            if not cont_stmts:
+                                # Only possible if the implicit void return was removed;
+                                # otherwise calls continue at return/return-expr nodes.
+                                throw_error(
+                                    f"Function call in block '{block_name}' has no continuation"
+                                )
+
+                            cont_label = self._new_call_cont_label(block_name)
+                            self._set_save_return_address_label(
+                                stmts, idx, cont_label
+                            )
+                            block.stmts_instrs = stmts[: idx + 1]
+                            blocks_out.append(block)
+
+                            cont_block = pn.Block(cont_label, cont_stmts)
+                            cont_block.block_idx = self.block_idx
+                            self.block_idx += 1
+                            self.all_blocks[cont_label] = cont_block
+                            self.block_scopes[cont_label] = self.block_scopes.get(
+                                block_name, "global"
+                            )
+                            self._split_call_continuations(cont_block, blocks_out)
+                            return
+                # No function-call jump was found, so the block stays unchanged.
+                blocks_out.append(block)
+            case _:
+                throw_error(block)
+
     def _picoc_anf_exp(self, exp, addr_calc=False):
         match exp:
             # ---------------------------- L_Arith ----------------------------
@@ -252,21 +318,18 @@ class PicocAnfPass:
                     case _:
                         callee_anf = self._picoc_anf_exp(fun_exp)
 
-                call_goto = pn.Exp(pn.GoTo(rn.Reg(rn.In2())))
+                call_goto = pn.Exp(pn.GoTo(pn.Stack(pn.Num("1"))))
                 call_goto.call_target_function = call_target_function
                 call_goto.indirect_call = indirect_call
+                call_goto.save_return_address_offset = len(callee_anf) + 1
 
                 return (
                     self._single_line_comment(exp, "//")
                     + exps_anf
+                    + [pn.SaveReturnAddress()]
                     + callee_anf
                     + [
-                        pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
-                        pn.NewStackframe(pn.Num(str(len(exps))), pn.Num("6")),
                         call_goto,
-                        pn.RemoveStackframe(
-                            pn.Num(str(self.next_local_addr))
-                        ),
                     ]
                     + (
                         [pn.Exp(rn.Reg(rn.Acc()))]
@@ -391,16 +454,23 @@ class PicocAnfPass:
                     + [pn.IfElse(pn.Stack(pn.Num("1")), goto1_list, goto2_list)]
                 )
             # ----------------------------- L_Fun -----------------------------
-            case pn.StackMalloc():
+            case pn.NewStackframe():
                 return [stmt]
             case pn.Return(pn.Empty()):
-                return [stmt]
+                return [
+                    pn.RestoreStackframe(),
+                    pn.RestoreReturnAddress(),
+                ]
             case pn.Return(exp):
                 exps_anf = self._picoc_anf_exp(exp)
                 return (
                     self._single_line_comment(stmt, "//")
                     + exps_anf
-                    + [pn.Return(pn.Stack(pn.Num("1")))]
+                    + [
+                        pn.Assign(rn.Reg(rn.Acc()), pn.Stack(pn.Num("1"))),
+                        pn.RestoreStackframe(),
+                        pn.RestoreReturnAddress(),
+                    ]
                 )
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
@@ -428,7 +498,7 @@ class PicocAnfPass:
                                     self._picoc_anf_stmt(stmt), stmt
                                 )
                             block.stmts_instrs[:] = stmts_anf
-                            blocks_anf.append(block)
+                            self._split_call_continuations(block, blocks_anf)
                         case _:
                             throw_error(block)
                 return pn.File(
