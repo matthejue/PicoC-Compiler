@@ -476,7 +476,6 @@ class PicocSymbolPass:
                 for block in blocks:
                     match block:
                         case pn.Block(_, stmts_instrs):
-                            self.stack_type_hints = {}
                             rewritten_stmts_instrs = []
                             for stmt in stmts_instrs:
                                 # Needed for cases like `int x = expr;`, where

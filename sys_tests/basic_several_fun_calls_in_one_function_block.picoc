@@ -1,0 +1,21 @@
+// in:5
+// expected:13
+
+int add_one(int val) {
+  return val + 1;
+}
+
+int double_it(int val) {
+  return val * 2;
+}
+
+void main() {
+  int input_val = input();
+
+  if (input_val < 10) {
+    int tmp = add_one(input_val);
+    print(double_it(tmp));
+  } else {
+    print(0);
+  }
+}

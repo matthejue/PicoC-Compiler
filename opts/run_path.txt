@@ -1,1 +1,1 @@
-./sys_tests/basic_function_pointer_array.picoc
+./sys_tests/basic_several_fun_calls_in_one_function_block.picoc

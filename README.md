@@ -354,6 +354,8 @@ Function handling:
   Example: inside `main`, additional blocks may be named `if.3`, `while_branch.4`, or `if_else_after.5`.
 - The function entry block is created with `add_id=False`, while helper blocks use the default numbered form.
   Example: `foo` is the function entry label, but a generated branch target becomes something like `if.8`.
+- Function-call continuation blocks use the normalized source block family plus `_cont.<id>`.
+  Example: a call inside `if.4` continues at `if_cont.6`, and a later call in that continuation becomes `if_cont.7`, not `if.4_cont.6_cont.7`.
 
 #### `picoc_symbol`
 
@@ -415,7 +417,7 @@ The runtime stack frame is arranged from higher to lower addresses as:
 3. saved frame pointer, the previous `BAF`
 4. local variables
 
-The called function saves and restores the frame pointer (`BAF`). This keeps both ordinary function calls and interrupt service routines stack based: an `INT i` places the return address on the stack, while a function entry places the previous `BAF` on the stack. The address to continue after a function call is represented by a generated continuation block label such as `<fun_name>_cont.<idx>`. The call site saves that address with `LOADI32 ACC <fun_name>_cont.<idx>`, adds `CS` to make it absolute, and pushes `ACC` onto the stack.
+The called function saves and restores the frame pointer (`BAF`). This keeps both ordinary function calls and interrupt service routines stack based: an `INT i` places the return address on the stack, while a function entry places the previous `BAF` on the stack. The address to continue after a function call is represented by a generated continuation block label such as `<block_base>_cont.<idx>`. The call site saves that address with `LOADI32 ACC <block_base>_cont.<idx>`, adds `CS` to make it absolute, and pushes `ACC` onto the stack.
 
 #### `reti_blocks`
 

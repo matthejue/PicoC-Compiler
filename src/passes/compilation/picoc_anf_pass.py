@@ -6,8 +6,26 @@ import copy
 
 
 class PicocAnfPass:
+    # This strips repeated final ".<id>" and "_cont" parts, so the next label
+    # becomes if_cont.7, not if.4_cont.6_cont.7 
+    def _block_label_base(self, block_name):
+        # Both suffixes can appear together, so keep stripping until the base
+        # remains: if_cont.6 -> if_cont -> if.
+        while True:
+            # rsplit(..., 1) returns either [name] or [name, suffix], so
+            # len(label_parts) == 2 is needed before reading label_parts[1].
+            label_parts = block_name.rsplit(".", 1)
+            if len(label_parts) == 2 and label_parts[1].isdigit():
+                block_name = label_parts[0]
+                continue
+            if block_name.endswith("_cont"):
+                block_name = block_name.removesuffix("_cont")
+                continue
+            return block_name
+
     def _new_call_cont_label(self, block_name):
-        base = f"{block_name}_cont"
+        label_base = self._block_label_base(block_name)
+        base = f"{label_base}_cont"
         while True:
             label = f"{base}.{self.block_idx}"
             if label not in self.all_blocks:
