@@ -3,6 +3,6 @@
 
 void main() {
   int ar[2][2] = {{1, 2}, {3, 4}};
-  *(*(ar + 2) + 1) = input();
-  print(ar[2][1]);
+  *(*(ar + 1) + 1) = input();
+  print(ar[1][1]);
 }

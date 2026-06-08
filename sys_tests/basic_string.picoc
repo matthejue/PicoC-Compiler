@@ -6,10 +6,10 @@ int main() {
   char *str = "whatever1";
   char stack_str[] = "whatever2";
 
-  asm("LOADIN BAF ACC -2");
+  asm("LOADIN BAF ACC 0");
   asm("INT 1");
   asm("MOVE BAF ACC");
-  asm("SUBI ACC 12");
+  asm("SUBI ACC 10");
   asm("INT 1");
 
   return 0;
