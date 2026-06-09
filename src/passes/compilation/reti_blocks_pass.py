@@ -682,6 +682,12 @@ class RetiBlocksPass:
                     rn.Instr(rn.Add(), [rn.Reg(rn.Acc()), rn.Reg(rn.Cs())]),
                     rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
                 ]
+            case pn.RemoveArguments(pn.Num(arg_size)):
+                if int(arg_size) == 0:
+                    return self._single_line_comment(stmt, "#")
+                return self._single_line_comment(stmt, "#") + [
+                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(arg_size)]),
+                ]
             case pn.NewStackframe(pn.Num(local_var_count)):
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Push(), [rn.Reg(rn.Baf())]),

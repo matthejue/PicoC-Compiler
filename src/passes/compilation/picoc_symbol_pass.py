@@ -55,15 +55,15 @@ class PicocSymbolPass:
             case _:
                 throw_error(datatype)
 
-    def _declare_alloc(self, alloc, *, initial_val=None):
+    def _declare_alloc(self, alloc, *, initial_val=None, is_param=False):
         match alloc:
             case pn.VoidType():
                 return
-            case pn.Alloc(type_qual, datatype, pn.Name(val1), local_var_or_param):
+            case pn.Alloc(type_qual, datatype, pn.Name(val1), _):
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
                 # Parameters of array type decay to pointers to their first element type.
-                if local_var_or_param == "param" and isinstance(
+                if is_param and isinstance(
                     datatype_copy, pn.ArrayDecl
                 ):
                     datatype_copy = self._ref_result_datatype(datatype_copy.datatype)
@@ -74,15 +74,17 @@ class PicocSymbolPass:
                         addr = pn.Empty()
                         frame_kind = "global"
                     case _:
-                        match local_var_or_param:
-                            case "param":
-                                addr = self.next_param_addr + size - 1
-                                self.next_param_addr += size
-                                frame_kind = "param"
-                            case _:
-                                addr = self.next_local_addr + size - 1
-                                self.next_local_addr += size
-                                frame_kind = "local_var"
+                        if is_param:
+                            # Parameter symbols keep a non-negative logical slot
+                            # index starting at 0; RetiBlocksPass applies the
+                            # concrete ReTI stack offsets when emitting instructions.
+                            addr = self.next_param_addr + size - 1
+                            self.next_param_addr += size
+                            frame_kind = "param"
+                        else:
+                            addr = self.next_local_addr + size - 1
+                            self.next_local_addr += size
+                            frame_kind = "local_var"
 
                 self.symbol_table.declare(
                     var_name,
@@ -460,10 +462,6 @@ class PicocSymbolPass:
                 self.next_param_addr = 0
                 self.next_local_addr = 0
 
-                if fun_name not in ["main", "global"]:
-                    for alloc in self._fixed_params(allocs):
-                        alloc.local_var_or_param = "param"
-
                 param_size = self._param_size(allocs)
                 if not self.symbol_table.contains(fun_name, scope="global"):
                     self.symbol_table.declare(
@@ -478,7 +476,7 @@ class PicocSymbolPass:
                     )
 
                 for alloc in self._fixed_params(allocs):
-                    self._declare_alloc(alloc)
+                    self._declare_alloc(alloc, is_param=True)
 
                 for block in blocks:
                     match block:

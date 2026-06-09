@@ -56,6 +56,20 @@ class PicocAnfPass:
             case _:
                 throw_error(block)
 
+    def _argument_word_size(self, exp):
+        match self._exp_result_datatype(exp):
+            case pn.ArrayDecl():
+                return 1
+            case pn.VoidType():
+                return 0
+            case None:
+                return 1
+            case datatype:
+                return self._datatype_size(datatype)
+
+    def _call_argument_word_size(self, exps):
+        return sum(self._argument_word_size(exp) for exp in exps)
+
     def _split_call_continuations(self, block, blocks_out):
         match block:
             case pn.Block(block_name, stmts):
@@ -350,6 +364,9 @@ class PicocAnfPass:
                 call_goto.call_target_function = call_target_function
                 call_goto.indirect_call = indirect_call
                 call_goto.save_return_address_offset = len(callee_anf) + 1
+                remove_arguments = pn.RemoveArguments(
+                    pn.Num(str(self._call_argument_word_size(exps)))
+                )
 
                 return (
                     self._single_line_comment(exp, "//")
@@ -358,6 +375,7 @@ class PicocAnfPass:
                     + callee_anf
                     + [
                         call_goto,
+                        remove_arguments,
                     ]
                     + (
                         [pn.Exp(rn.Reg(rn.Acc()))]

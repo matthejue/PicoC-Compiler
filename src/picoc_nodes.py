@@ -717,6 +717,17 @@ class SaveReturnAddress(ASTNode):
     __match_args__ = ("label",)
 
 
+class RemoveArguments(ASTNode):
+    def __init__(self, size):
+        self.size = size
+
+    @property
+    def visible(self):
+        return [self.size]
+
+    __match_args__ = ("size",)
+
+
 class RestoreReturnAddress(ASTNode):
     pass
 

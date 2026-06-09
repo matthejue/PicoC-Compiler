@@ -120,8 +120,9 @@ class RetiPass:
         if isinstance(rel, rn.Always):
             return target_instrs
 
+        skip_distance = self.count_instrs(target_instrs) + 1
         return [
-            rn.Jump(self._negated_rel(rel), rn.Im(str(len(target_instrs) + 1)))
+            rn.Jump(self._negated_rel(rel), rn.Im(str(skip_distance)))
         ] + target_instrs
 
     def _reti_instr(self, instr, idx, current_block):
@@ -132,14 +133,14 @@ class RetiPass:
                     reg, operand, idx, current_block
                 )
                 # LOADI32 always expands to LOADI/MULTI/ORI, so its size is fixed.
-                return instrs, idx + 3
+                return instrs, idx + self.count_instrs(instrs)
             # Expand a symbolic or immediate 32-bit jump into concrete RETI instructions.
             case rn.Jump32(rel, target):
                 expanded = self._expand_jump32(rel, target, idx, current_block)
                 instrs = self._single_line_comment(instr, "#") + expanded
                 # JUMP32 expansion length depends on relation and target kind:
                 # conditional jumps add a guard, label targets add CS, immediates do not.
-                return instrs, idx + len(expanded)
+                return instrs, idx + self.count_instrs(instrs)
             # Resolve symbolic interrupt values, e.g. INT syscall_name.
             case rn.Int(rn.Name() | rn.BinOp() as num):
                 instr.num = self._resolve_symbolic_operand(num, idx, current_block)
