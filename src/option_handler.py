@@ -269,6 +269,7 @@ class OptionHandler:
         passes.all_blocks = {k: v for d in all_file_blocks for k, v in d.items()}
         passes.symbol_table = self._merge_symbol_tables(symbol_tables)
         merged_ast = self._merge_asts(asts, passes.symbol_table)
+        self._combined_reti_blocks_pass(merged_ast)
 
         self._st_pass(passes.symbol_table, "Combined Symbol Table", is_global_st=True)
 
@@ -326,6 +327,11 @@ class OptionHandler:
         start_ast = pn.File(pn.Name("start"), start_blocks)
 
         reti_blocks: pn.File = passes.reti_blocks(start_ast)
+        start_reti_blocks_path = (
+            remove_ext(global_vars.args.output_name) + "_startprogram.reti_blocks"
+        )
+        reti_blocks.name = pn.Name(start_reti_blocks_path)
+        self._output_pass(reti_blocks, "RETI Blocks")
 
         start_blocks = list(_walk_blocks(reti_blocks.decls_defs_blocks_instrs))
         if not start_blocks:
@@ -481,6 +487,18 @@ class OptionHandler:
                         fout.write(_pass_output_text(pass_ast))
                 case _:
                     throw_error(pass_ast)
+
+    def _combined_reti_blocks_pass(self, pass_ast: pn.File):
+        if not global_vars.args.intermediate_stages:
+            return
+
+        print(subheading("Combined RETI Blocks", "-"))
+        print(_pass_output_text(pass_ast))
+
+        if global_vars.args.write_files:
+            output_path = remove_ext(global_vars.args.output_name) + "_combined.reti_blocks"
+            with open(output_path, "w", encoding="utf-8") as fout:
+                fout.write(_pass_output_text(pass_ast))
 
     def _output_preprocess(self, text: str, heading: str, suffix: str):
         if global_vars.args.intermediate_stages:
