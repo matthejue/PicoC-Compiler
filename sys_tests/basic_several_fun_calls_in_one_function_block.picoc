@@ -1,5 +1,5 @@
 // in:5
-// expected:13
+// expected:12
 
 int add_one(int val) {
   return val + 1;

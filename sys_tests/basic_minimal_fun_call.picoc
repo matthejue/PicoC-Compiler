@@ -10,7 +10,6 @@ int add_one_if_larger_40(int value) {
 }
 
 void main() {
-  debug;
   int result = add_one_if_larger_40(41);
   print(result);
 }
