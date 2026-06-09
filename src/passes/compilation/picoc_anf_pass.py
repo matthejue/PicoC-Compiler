@@ -76,13 +76,8 @@ class PicocAnfPass:
                 for idx, stmt in enumerate(stmts):
                     match stmt:
                         case pn.Exp(pn.GoTo(pn.Stack(pn.Num("1")))):
-                            # These attrs preserve call info for the generated .debuginfo file;
-                            # here they also mark that this stack jump came from call lowering.
                             # Only function-call jumps need continuation splitting.
-                            if not (
-                                getattr(stmt, "call_target_function", None)
-                                or getattr(stmt, "indirect_call", False)
-                            ):
+                            if getattr(stmt, "save_return_address_offset", None) is None:
                                 continue
 
                             cont_stmts = stmts[idx + 1 :]
@@ -350,19 +345,13 @@ class PicocAnfPass:
                 self.argmode_on = False
 
                 return_type = datatype
-                call_target_function = None
-                indirect_call = True
                 match fun_exp:
-                    case pn.Name(fun_name):
+                    case pn.Name():
                         callee_anf = [pn.Exp(pn.FunRef(copy.deepcopy(fun_exp)))]
-                        call_target_function = fun_name
-                        indirect_call = False
                     case _:
                         callee_anf = self._picoc_anf_exp(fun_exp)
 
                 call_goto = pn.Exp(pn.GoTo(pn.Stack(pn.Num("1"))))
-                call_goto.call_target_function = call_target_function
-                call_goto.indirect_call = indirect_call
                 call_goto.save_return_address_offset = len(callee_anf) + 1
                 remove_arguments = pn.RemoveArguments(
                     pn.Num(str(self._call_argument_word_size(exps)))
@@ -501,6 +490,8 @@ class PicocAnfPass:
                 )
             # ----------------------------- L_Fun -----------------------------
             case pn.NewStackframe():
+                stmt.call_target_function = self.current_scope
+                stmt.indirect_call = False
                 return [stmt]
             case pn.Return(pn.Empty()):
                 return [

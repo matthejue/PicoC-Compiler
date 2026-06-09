@@ -656,8 +656,6 @@ class RetiBlocksPass:
                 ]
             case pn.Exp(pn.GoTo(rn.Reg() as reg)):
                 instr = rn.Instr(rn.Move(), [reg, rn.Reg(rn.Pc())])
-                instr.call_target_function = getattr(stmt, "call_target_function", None)
-                instr.indirect_call = getattr(stmt, "indirect_call", False)
                 return self._single_line_comment(stmt, "#") + [
                     instr
                 ]
@@ -667,8 +665,6 @@ class RetiBlocksPass:
                         f"Function call GoTo(Stack(...)) must use Stack(1), got Stack({val})"
                     )
                 instr = rn.Instr(rn.Move(), [rn.Reg(rn.Acc()), rn.Reg(rn.Pc())])
-                instr.call_target_function = getattr(stmt, "call_target_function", None)
-                instr.indirect_call = getattr(stmt, "indirect_call", False)
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
                     instr,
@@ -689,11 +685,16 @@ class RetiBlocksPass:
                     rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im(arg_size)]),
                 ]
             case pn.NewStackframe(pn.Num(local_var_count)):
-                return self._single_line_comment(stmt, "#") + [
+                instrs = [
                     rn.Instr(rn.Push(), [rn.Reg(rn.Baf())]),
                     rn.Instr(rn.Move(), [rn.Reg(rn.Sp()), rn.Reg(rn.Baf())]),
                     rn.Instr(rn.Subi(), [rn.Reg(rn.Sp()), rn.Im(local_var_count)]),
                 ]
+                instrs[-1].call_target_function = getattr(
+                    stmt, "call_target_function", None
+                )
+                instrs[-1].indirect_call = getattr(stmt, "indirect_call", False)
+                return self._single_line_comment(stmt, "#") + instrs
             case pn.RestoreStackframe():
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Move(), [rn.Reg(rn.Baf()), rn.Reg(rn.Sp())]),

@@ -410,12 +410,12 @@ Main tasks:
 
 #### Function Calls and Stack Frames
 
-The runtime stack frame is arranged from higher to lower addresses as:
+The runtime stack frame is arranged from lower to higher addresses as:
 
-1. arguments
-2. return address
-3. saved frame pointer, the previous `BAF`
-4. local variables
+1. local variables
+2. saved frame pointer, the previous `BAF`
+3. return address
+4. arguments
 
 The called function saves and restores the frame pointer (`BAF`). This keeps both ordinary function calls and interrupt service routines stack based: an `INT i` places the return address on the stack, while a function entry places the previous `BAF` on the stack. The address to continue after a function call is represented by a generated continuation block label such as `<block_base>_cont.<idx>`. The call site saves that address with `LOADI32 ACC <block_base>_cont.<idx>`, adds `CS` to make it absolute, and pushes `ACC` onto the stack.
 
