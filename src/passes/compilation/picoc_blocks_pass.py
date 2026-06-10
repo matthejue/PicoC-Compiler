@@ -80,13 +80,16 @@ class PicocBlocksPass:
             return escape_map.get(val[1], ord(val[1]))
         return ord(val)
 
-    def _create_block(self, labelbase, stmts, blocks, *, add_id=True):
+    def _create_block(
+        self, labelbase, stmts, blocks, *, add_id=True, show_id_comment=False
+    ):
         label = labelbase + (f".{self.block_idx}" if add_id else "")
         new_block = pn.Block(
             label,
             stmts,
         )
         new_block.block_idx = self.block_idx
+        new_block.show_id_comment = show_id_comment
         blocks[label] = new_block
         self.block_idx += 1
         return pn.GoTo(pn.Name(label))
@@ -237,7 +240,13 @@ class PicocBlocksPass:
                         self._picoc_blocks_stmt(stmt, processed_stmts, blocks), stmt
                     )
 
-                self._create_block(fun_name, processed_stmts, blocks, add_id=False)
+                self._create_block(
+                    fun_name,
+                    processed_stmts,
+                    blocks,
+                    add_id=False,
+                    show_id_comment=True,
+                )
                 self.all_blocks |= blocks
                 fun_def = pn.FunDef(
                     storage_class_specifiers,

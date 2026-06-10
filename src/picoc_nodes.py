@@ -767,7 +767,7 @@ class Section(ASTNode):
         acc = f"\n{' ' * (depth + 2)}.{self.name}"
         for entry in self.entries:
             if isinstance(entry, Block):
-                acc += entry.__repr__(depth)
+                acc += _repr_block(entry, depth, include_id_comment=True)
             else:
                 acc += entry.__repr__(depth + 2)
         return acc
@@ -794,13 +794,7 @@ class Block(ASTNode):
         )
 
     def __repr__(self, depth=0):
-        acc = f"\n{depth * ' '}{self.name}:" + repr_arg_types(
-            0, self.stmts_instrs, depth, "", is_block=True
-        )
-        origin_visible = _source_origin_visible(self)
-        if origin_visible is not None:
-            acc = repr_arg_types(1, origin_visible, depth, acc, is_block=True)
-        return acc
+        return _repr_block(self, depth)
 
     __match_args__ = (
         "name",
@@ -810,6 +804,19 @@ class Block(ASTNode):
         "param_size",
         "local_vars_size",
     )
+
+
+def _repr_block(block, depth=0, *, include_id_comment=False):
+    acc = f"\n{depth * ' '}{block.name}:"
+    if include_id_comment:
+        id_comment = block_id_comment(block)
+        if id_comment is not None:
+            acc += id_comment.__repr__(depth + 2)
+    acc = repr_arg_types(0, block.stmts_instrs, depth, acc, is_block=True)
+    origin_visible = _source_origin_visible(block)
+    if origin_visible is not None:
+        acc = repr_arg_types(1, origin_visible, depth, acc, is_block=True)
+    return acc
 
 
 class GoTo(ASTNode):
@@ -841,6 +848,22 @@ class SingleLineComment(ASTNode):
         return acc
 
     __match_args__ = ("prefix", "content")
+
+
+def _block_label_has_id(label):
+    parts = label.rsplit(".", 1)
+    return len(parts) == 2 and parts[1].isdigit()
+
+
+def block_id_comment(block):
+    if (
+        getattr(getattr(global_vars, "args", None), "double_verbose", False)
+        and getattr(block, "show_id_comment", False)
+        and not _block_label_has_id(block.name)
+    ):
+        return SingleLineComment("#", f".{block.block_idx}")
+    return None
+
 
 class Debug(ASTNode):
     pass

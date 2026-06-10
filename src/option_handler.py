@@ -320,6 +320,7 @@ class OptionHandler:
             passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
             + [pn.Exit(pn.Num("0"))],
         )
+        start_block.show_id_comment = True
         passes._register_block(start_block, "global")
         start_blocks = []
         passes._split_call_continuations(start_block, start_blocks)

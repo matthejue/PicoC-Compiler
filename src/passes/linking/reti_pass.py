@@ -180,6 +180,9 @@ class RetiPass:
             match entry:
                 case pn.Block(label, instrs) as block:
                     idx = 0
+                    id_comment = pn.block_id_comment(block)
+                    if id_comment is not None:
+                        instrs_block_free.append(id_comment)
                     instrs_block_free += self._single_line_comment(
                         pn.Block(label, []), "# //"
                     )
