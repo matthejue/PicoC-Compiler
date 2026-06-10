@@ -11,7 +11,7 @@ class RetiBlocksPass:
         match loc:
             case pn.StackframeParam(pn.Num(addr)):
                 addr = int(addr)
-                return 3 + addr - tmp_idx
+                return 3 + addr + tmp_idx
             case pn.StackframeLocalVar(pn.Num(addr)):
                 addr = int(addr)
                 return -(addr - tmp_idx)

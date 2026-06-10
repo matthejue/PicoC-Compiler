@@ -78,7 +78,7 @@ class PicocSymbolPass:
                             # Parameter symbols keep a non-negative logical slot
                             # index starting at 0; RetiBlocksPass applies the
                             # concrete ReTI stack offsets when emitting instructions.
-                            addr = self.next_param_addr + size - 1
+                            addr = self.next_param_addr
                             self.next_param_addr += size
                             frame_kind = "param"
                         else:
