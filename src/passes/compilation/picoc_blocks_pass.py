@@ -81,8 +81,17 @@ class PicocBlocksPass:
         return ord(val)
 
     def _create_block(
-        self, labelbase, stmts, blocks, *, add_id=True, show_id_comment=False
+        self,
+        labelbase,
+        stmts,
+        blocks,
+        *,
+        add_id=True,
+        label_prefix=None,
+        show_id_comment=False,
     ):
+        if add_id and label_prefix is not None:
+            labelbase = f"{label_prefix}_{labelbase}"
         label = labelbase + (f".{self.block_idx}" if add_id else "")
         new_block = pn.Block(
             label,
@@ -94,42 +103,53 @@ class PicocBlocksPass:
         self.block_idx += 1
         return pn.GoTo(pn.Name(label))
 
-    def _picoc_blocks_stmt(self, stmt, processed_stmts, blocks):
+    def _picoc_blocks_stmt(self, stmt, processed_stmts, blocks, label_prefix):
         match stmt:
             # --------------------------- L_If_Else ---------------------------
             case pn.If(exp, stmts):
                 goto_after = self._create_block(
-                    "if_else_after", processed_stmts, blocks
+                    "if_else_after", processed_stmts, blocks, label_prefix=label_prefix
                 )
 
                 stmts_if = [goto_after]
                 for sub_stmt in reversed(stmts):
                     stmts_if = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(sub_stmt, stmts_if, blocks), sub_stmt
+                        self._picoc_blocks_stmt(
+                            sub_stmt, stmts_if, blocks, label_prefix
+                        ),
+                        sub_stmt,
                     )
-                goto_if = self._create_block("if", stmts_if, blocks)
+                goto_if = self._create_block(
+                    "if", stmts_if, blocks, label_prefix=label_prefix
+                )
 
                 return self._single_line_comment(stmt, "//") + [
                     pn.IfElse(exp, [goto_if], [goto_after])
                 ]
             case pn.IfElse(exp, stmts1, stmts2):
                 goto_after = self._create_block(
-                    "if_else_after", processed_stmts, blocks
+                    "if_else_after", processed_stmts, blocks, label_prefix=label_prefix
                 )
 
                 stmts_else = [goto_after]
                 for stmt in reversed(stmts2):
                     stmts_else = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(stmt, stmts_else, blocks), stmt
+                        self._picoc_blocks_stmt(stmt, stmts_else, blocks, label_prefix),
+                        stmt,
                     )
-                goto_else = self._create_block("else", stmts_else, blocks)
+                goto_else = self._create_block(
+                    "else", stmts_else, blocks, label_prefix=label_prefix
+                )
 
                 stmts_if = [goto_after]
                 for stmt in reversed(stmts1):
                     stmts_if = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(stmt, stmts_if, blocks), stmt
+                        self._picoc_blocks_stmt(stmt, stmts_if, blocks, label_prefix),
+                        stmt,
                     )
-                goto_if = self._create_block("if", stmts_if, blocks)
+                goto_if = self._create_block(
+                    "if", stmts_if, blocks, label_prefix=label_prefix
+                )
 
                 return self._single_line_comment(stmt, "//") + [
                     pn.IfElse(exp, [goto_if], [goto_else])
@@ -162,7 +182,13 @@ class PicocBlocksPass:
                 # create the code-after-loop block first, then loop-body, then
                 # condition-check.
                 goto_after = self._inherit_origin(
-                    self._create_block("while_after", processed_stmts, blocks), exp
+                    self._create_block(
+                        "while_after",
+                        processed_stmts,
+                        blocks,
+                        label_prefix=label_prefix,
+                    ),
+                    exp,
                 )
                 # Keep goto_loopback_condition_check and the later
                 # goto_condition_check separate; later object changes must not
@@ -173,13 +199,30 @@ class PicocBlocksPass:
                 stmts_while = [goto_loopback_condition_check]
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks), sub_stmt
+                        self._picoc_blocks_stmt(
+                            sub_stmt, stmts_while, blocks, label_prefix
+                        ),
+                        sub_stmt,
                     )
                 goto_branch = self._inherit_origin(
-                    self._create_block("while_branch", stmts_while, blocks), exp
+                    self._create_block(
+                        "while_branch", stmts_while, blocks, label_prefix=label_prefix
+                    ),
+                    exp,
                 )
-                goto_condition_check = self._inherit_origin(self._create_block(
-                    "condition_check", [self._inherit_origin(pn.IfElse(exp, [goto_branch], [goto_after]), exp)], blocks), stmt)
+                goto_condition_check = self._inherit_origin(
+                    self._create_block(
+                        "condition_check",
+                        [
+                            self._inherit_origin(
+                                pn.IfElse(exp, [goto_branch], [goto_after]), exp
+                            )
+                        ],
+                        blocks,
+                        label_prefix=label_prefix,
+                    ),
+                    stmt,
+                )
                 goto_loopback_condition_check.name.val = goto_condition_check.name.val
 
                 return self._single_line_comment(stmt, "//") + [goto_condition_check]
@@ -202,7 +245,13 @@ class PicocBlocksPass:
                 # do_while_after:
                 #   print(i)
                 goto_after = self._inherit_origin(
-                    self._create_block("do_while_after", processed_stmts, blocks), exp
+                    self._create_block(
+                        "do_while_after",
+                        processed_stmts,
+                        blocks,
+                        label_prefix=label_prefix,
+                    ),
+                    exp,
                 )
                 goto_loopback_branch = self._inherit_origin(
                     pn.GoTo(pn.Name("placeholder")), exp
@@ -214,10 +263,19 @@ class PicocBlocksPass:
                 ]
                 for sub_stmt in reversed(stmts):
                     stmts_while = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(sub_stmt, stmts_while, blocks), sub_stmt
+                        self._picoc_blocks_stmt(
+                            sub_stmt, stmts_while, blocks, label_prefix
+                        ),
+                        sub_stmt,
                     )
                 goto_branch = self._inherit_origin(
-                    self._create_block("do_while_branch", stmts_while, blocks), stmt
+                    self._create_block(
+                        "do_while_branch",
+                        stmts_while,
+                        blocks,
+                        label_prefix=label_prefix,
+                    ),
+                    stmt,
                 )
                 goto_loopback_branch.name.val = goto_branch.name.val
 
@@ -237,7 +295,8 @@ class PicocBlocksPass:
                 processed_stmts = []
                 for stmt in reversed(stmts):
                     processed_stmts = self._inherit_origin_many(
-                        self._picoc_blocks_stmt(stmt, processed_stmts, blocks), stmt
+                        self._picoc_blocks_stmt(stmt, processed_stmts, blocks, fun_name),
+                        stmt,
                     )
 
                 self._create_block(
