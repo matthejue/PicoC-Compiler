@@ -13,6 +13,10 @@ int gcd(int a, int b) {
 }
 
 void main() {
-  print(gcd(input(), input()));
-  print(gcd(input(), input()));
+  int a = input();
+  int b = input();
+  print(gcd(a, b));
+  a = input();
+  b = input();
+  print(gcd(a, b));
 }

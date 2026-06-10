@@ -9,7 +9,10 @@ struct array_with_fixed_len {int ar_pntr[3]; int len;};
 
 void main() {
   // struct initialisation with array and length
-  int ar[3] = {input(), input(), input()};
+  int first = input();
+  int second = input();
+  int third = input();
+  int ar[3] = {first, second, third};
   struct array_with_len array = {.ar_pntr=ar, .len=3};
   int i;
   // struct definition

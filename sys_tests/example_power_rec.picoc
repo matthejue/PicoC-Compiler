@@ -12,5 +12,7 @@ int power(int a, int n) {
 }
 
 void main() {
-  print(power(input(), input()));
+  int a = input();
+  int n = input();
+  print(power(a, n));
 }

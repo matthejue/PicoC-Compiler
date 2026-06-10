@@ -6,7 +6,9 @@
 
 int main() {
     struct Data d;
-    make_data(&d, input(), input());
+    int x = input();
+    int y = input();
+    make_data(&d, x, y);
     int r = add(d.x, d.y);
     print(r);
     return 1;

@@ -13,5 +13,7 @@ int power_efficient(int a, int n) {
 }
 
 void main() {
-  print(power_efficient(input(), input()));
+  int a = input();
+  int n = input();
+  print(power_efficient(a, n));
 }

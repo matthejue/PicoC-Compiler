@@ -17,8 +17,16 @@ int is_less_equal_without_overflow(int x, int y) {
 }
 
 void main() {
-  print(is_less_equal_without_overflow(input(), input()));
-  print(is_less_equal_without_overflow(input(), input()));
-  print(is_less_equal_without_overflow(input(), input()));
-  print(is_less_equal_without_overflow(input(), input()));
+  int x = input();
+  int y = input();
+  print(is_less_equal_without_overflow(x, y));
+  x = input();
+  y = input();
+  print(is_less_equal_without_overflow(x, y));
+  x = input();
+  y = input();
+  print(is_less_equal_without_overflow(x, y));
+  x = input();
+  y = input();
+  print(is_less_equal_without_overflow(x, y));
 }
