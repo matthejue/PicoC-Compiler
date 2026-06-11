@@ -5,6 +5,8 @@ from src.utils.util_funs_dependent import throw_error
 
 
 class RetiPass:
+    IVTE_BASE = 2**31
+
     def _negated_rel(self, rel):
         match rel:
             case rn.Eq():
@@ -81,6 +83,33 @@ class RetiPass:
     def _has_symbolic_operand(self, operands):
         return any(isinstance(operand, (rn.Name, rn.BinOp)) for operand in operands)
 
+    def _ivte_target_address(self, target):
+        match target:
+            case rn.Name(name):
+                if name not in self.all_blocks:
+                    throw_error(f"Unknown block target for IVTE: {name}")
+                return int(self.all_blocks[name].instrs_before.val)
+            case rn.BinOp(rn.Name(name), op, constant):
+                if name not in self.all_blocks:
+                    throw_error(f"Unknown block target for IVTE: {name}")
+                address = int(self.all_blocks[name].instrs_before.val)
+                match op:
+                    case rn.Add():
+                        return address + int(constant)
+                    case rn.Sub():
+                        return address - int(constant)
+                    case _:
+                        throw_error(op)
+            case _:
+                throw_error(f"Unsupported IVTE target: {target}")
+
+    def _resolve_ivte(self, entry):
+        match entry:
+            case rn.Ivte((rn.Name() | rn.BinOp()) as target):
+                return rn.Im(str(self.IVTE_BASE + self._ivte_target_address(target)))
+            case _:
+                return entry
+
     def _expand_loadi32(self, reg, operand, idx, current_block):
         return self._write_large_immediate_in_register(
             reg, self._symbolic_operand_value(operand, idx, current_block)
@@ -141,6 +170,9 @@ class RetiPass:
                 # JUMP32 expansion length depends on relation and target kind:
                 # conditional jumps add a guard, label targets add CS, immediates do not.
                 return instrs, idx + self.count_instrs(instrs)
+            # Example: IVTE handler writes the SRAM address 2^31 + handler.
+            case rn.Ivte(rn.Name() | rn.BinOp()):
+                return [self._resolve_ivte(instr)], idx + 1
             # Resolve symbolic interrupt values, e.g. INT syscall_name.
             case rn.Int(rn.Name() | rn.BinOp() as num):
                 instr.num = self._resolve_symbolic_operand(num, idx, current_block)
@@ -232,7 +264,10 @@ class RetiPass:
                     "datasegment_start": self._entries_size(ivt_entries)
                     + self._entries_size(text_entries),
                 }
-                output_entries = ivt_entries + text_entries + data_entries
+                output_entries = [
+                    self._resolve_ivte(entry)
+                    for entry in ivt_entries + text_entries + data_entries
+                ]
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti"),
                     output_entries,

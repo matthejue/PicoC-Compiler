@@ -139,6 +139,8 @@ JUMP32== 234567
 JUMP32 target_block
 PUSH ACC
 POP IN1
+IVTE 7
+IVTE target_block
 
 ---
 
@@ -173,4 +175,13 @@ POP IN1
     (instruction
       (stack_instruction
         (pop_instruction
-          (register))))))
+          (register)))))
+  (statement
+    (instruction
+      (ivte_instruction
+        (immediate))))
+  (statement
+    (instruction
+      (ivte_instruction
+        (symbolic_operand
+          (symbol))))))

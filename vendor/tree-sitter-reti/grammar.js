@@ -95,6 +95,7 @@ module.exports = grammar({
       $.compute_instruction,
       $.stack_instruction,
       $.syscall_instruction,
+      $.ivte_instruction,
       $.return_from_interrupt_instruction,
     ),
 
@@ -232,6 +233,14 @@ module.exports = grammar({
     interrupt_instruction: $ => seq(
       field('opcode', 'INT'),
       field('value', choice(
+        $.immediate,
+        $.symbolic_operand,
+      )),
+    ),
+
+    ivte_instruction: $ => seq(
+      field('opcode', 'IVTE'),
+      field('target', choice(
         $.immediate,
         $.symbolic_operand,
       )),

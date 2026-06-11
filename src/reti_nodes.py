@@ -88,6 +88,20 @@ class Int(ASTNode):
     __match_args__ = ("num",)
 
 
+class Ivte(ASTNode):
+    def __init__(self, target):
+        self.target = target
+
+    def __repr__(self, depth=0):
+        instr_str = f"\n{' ' * depth}IVTE {self.target}"
+        origin_visible = _source_origin_visible(self)
+        if origin_visible is not None:
+            instr_str += f" # {origin_visible}"
+        return instr_str
+
+    __match_args__ = ("target",)
+
+
 class RawInstr(ASTNode):
     def __init__(self, code):
         self.code = code

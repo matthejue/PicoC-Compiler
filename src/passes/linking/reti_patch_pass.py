@@ -5,6 +5,7 @@ from src.utils.util_funs_dependent import throw_error
 
 
 class RetiPatchPass:
+    SRAM_BASE = 2**31
     SIGNED_22_MIN = -(2**21)
     SIGNED_22_MAX = 2**21 - 1
     SIGNED_32_MIN = -(2**31)
@@ -45,8 +46,14 @@ class RetiPatchPass:
                     cnt += 1
         return cnt
 
+    def _resolve_immediate_ivte(self, val):
+        return rn.Im(str(self.SRAM_BASE + int(val)))
+
     def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
         match instr:
+            # Example: IVTE 5 writes the SRAM address 2^31 + 5.
+            case rn.Ivte(rn.Im(val)):
+                return [self._resolve_immediate_ivte(val)]
             # Only unconditional jumps can be omitted when their target is the
             # next emitted block; conditional jumps still encode a branch decision.
             # PicoC emits JUMP32, but user-written .reti_blocks or asm()
@@ -141,13 +148,18 @@ class RetiPatchPass:
     def _reti_patch_section(self, section):
         match section:
             case pn.Section(_, entries):
+                patched_entries = []
                 for entry in entries:
                     match entry:
                         case pn.Block():
                             self._reti_patch_block(entry)
+                            patched_entries.append(entry)
                         case _:
-                            # interrupt_vector_table/data entries need no patching.
-                            pass
+                            patched_entries += self._inherit_origin_many(
+                                self._reti_patch_instr(entry, None, False),
+                                entry,
+                            )
+                entries[:] = patched_entries
             case _:
                 throw_error(section)
 
