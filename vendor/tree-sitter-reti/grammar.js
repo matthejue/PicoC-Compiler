@@ -54,7 +54,10 @@ module.exports = grammar({
       field('label', $.label),
       ':',
       repeat($.directive),
-      repeat($.statement),
+      repeat(choice(
+        $.statement,
+        $.data_value,
+      )),
     )),
 
     label: $ => $.symbol,

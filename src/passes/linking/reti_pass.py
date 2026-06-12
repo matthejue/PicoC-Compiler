@@ -84,15 +84,19 @@ class RetiPass:
         return any(isinstance(operand, (rn.Name, rn.BinOp)) for operand in operands)
 
     def _ivte_target_address(self, target):
+        def block_address(block):
+            section_start = getattr(block, "section_start", pn.Num("0"))
+            return int(section_start.val) + int(block.instrs_before.val)
+
         match target:
             case rn.Name(name):
                 if name not in self.all_blocks:
                     throw_error(f"Unknown block target for IVTE: {name}")
-                return int(self.all_blocks[name].instrs_before.val)
+                return block_address(self.all_blocks[name])
             case rn.BinOp(rn.Name(name), op, constant):
                 if name not in self.all_blocks:
                     throw_error(f"Unknown block target for IVTE: {name}")
-                address = int(self.all_blocks[name].instrs_before.val)
+                address = block_address(self.all_blocks[name])
                 match op:
                     case rn.Add():
                         return address + int(constant)
@@ -206,7 +210,7 @@ class RetiPass:
             case _:
                 return [instr], idx + 1
 
-    def _flatten_text_blocks(self, entries):
+    def _flatten_section_blocks(self, entries):
         instrs_block_free = []
         for entry in entries:
             match entry:
@@ -250,13 +254,17 @@ class RetiPass:
                 for section in sections:
                     match section:
                         case pn.Section("interrupt_vector_table", section_entries):
-                            ivt_entries.extend(section_entries)
+                            ivt_entries.extend(
+                                self._flatten_section_blocks(section_entries)
+                            )
                         case pn.Section("text", section_entries):
                             text_entries.extend(
-                                self._flatten_text_blocks(section_entries)
+                                self._flatten_section_blocks(section_entries)
                             )
                         case pn.Section("data", section_entries):
-                            data_entries.extend(section_entries)
+                            data_entries.extend(
+                                self._flatten_section_blocks(section_entries)
+                            )
                         case _:
                             throw_error(section)
                 self.reti_sections = {

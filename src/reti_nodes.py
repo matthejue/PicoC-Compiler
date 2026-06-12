@@ -388,8 +388,12 @@ class NOp(ASTNode):
 
 # --------------------------- Jump Instructions ---------------------------
 class Rti(ASTNode):
-    def __repr__(self):
-        return "RTI"
+    def __repr__(self, depth=0):
+        instr_str = f"\n{' ' * depth}RTI"
+        origin_visible = _source_origin_visible(self)
+        if origin_visible is not None:
+            instr_str += f" # {origin_visible}"
+        return instr_str
 
 
 # ------------------------------- Registers -------------------------------

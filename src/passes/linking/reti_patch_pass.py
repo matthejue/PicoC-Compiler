@@ -125,40 +125,45 @@ class RetiPatchPass:
             case _:
                 return [instr]
 
-    def _reti_patch_block(self, block):
+    def _reti_patch_block(self, block, section_name, section_start):
         match block:
             case pn.Block(name, instrs):
                 current_block_name = name
                 patched_instrs = []
-                for instr in instrs:
+                for instr_idx, instr in enumerate(instrs):
                     patched_instrs += self._inherit_origin_many(
                         self._reti_patch_instr(
                             instr,
                             current_block_name,
-                            instr == instrs[-1],
+                            instr_idx == len(instrs) - 1,
                         ),
                         instr,
                     )
                 block.stmts_instrs[:] = patched_instrs
-                block.instrs_before = pn.Num(str(self.instrs_cnt))
+                block.section_name = section_name
+                block.section_start = pn.Num(str(section_start))
+                block.instrs_before = pn.Num(str(self.instrs_cnt - section_start))
                 num_instrs = self.count_instrs(block.stmts_instrs)
                 block.num_instrs = pn.Num(str(num_instrs))
                 self.instrs_cnt += num_instrs
 
     def _reti_patch_section(self, section):
         match section:
-            case pn.Section(_, entries):
+            case pn.Section(section_name, entries):
+                section_start = self.instrs_cnt
                 patched_entries = []
                 for entry in entries:
                     match entry:
                         case pn.Block():
-                            self._reti_patch_block(entry)
+                            self._reti_patch_block(entry, section_name, section_start)
                             patched_entries.append(entry)
                         case _:
-                            patched_entries += self._inherit_origin_many(
+                            patched = self._inherit_origin_many(
                                 self._reti_patch_instr(entry, None, False),
                                 entry,
                             )
+                            patched_entries += patched
+                            self.instrs_cnt += self.count_instrs(patched)
                 entries[:] = patched_entries
             case _:
                 throw_error(section)
@@ -169,10 +174,8 @@ class RetiPatchPass:
                 self.instrs_cnt = 0
                 for section in sections:
                     match section:
-                        case pn.Section("text", _):
+                        case pn.Section(_, _):
                             self._reti_patch_section(section)
-                        case pn.Section():
-                            pass
                         case pn.SingleLineComment():
                             pass
                         case _:

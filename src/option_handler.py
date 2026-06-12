@@ -7,6 +7,7 @@ import shutil
 from src.ast_node import ASTNode
 from src.ast_transformers import TransformerPicoC, TransformerRetiBlocks
 from src.passes import Passes
+from src.passes.compilation import opt_level_1
 from src.utils.util_funs_dependent import (
     remove_ext,
     throw_error,
@@ -352,6 +353,13 @@ class OptionHandler:
             return pn.File(pn.Name(global_vars.args.output_name), _merge_sectioned_items([]))
 
         merged_decls_defs_blocks_instrs = _merge_sectioned_items(asts)
+        if opt_level_1.enabled(global_vars.args) and symbol_table is not None:
+            for item in merged_decls_defs_blocks_instrs:
+                match item:
+                    case pn.Section("data", entries):
+                        item.entries = opt_level_1.ordered_data_entries(
+                            entries, symbol_table
+                        )
 
         # return a new merged File node
         return pn.File(pn.Name(global_vars.args.output_name), merged_decls_defs_blocks_instrs)
@@ -829,6 +837,21 @@ def _parse_cli_args():
         action="store_true",
         help="Write <output>.debuginfo for linked '.picoc' inputs",
     )
+    parser.add_argument(
+        "-O0",
+        dest="optimization_level",
+        action="store_const",
+        const=0,
+        default=0,
+        help="Disable optimizations (default)",
+    )
+    parser.add_argument(
+        "-O1",
+        dest="optimization_level",
+        action="store_const",
+        const=1,
+        help="Enable compile-time global initializer data generation",
+    )
 
     global_vars.args = parser.parse_args()
 
@@ -883,6 +906,7 @@ def _print_args_if_verbose():
         "supress_errors",
         "binary",
         "metadata_comments",
+        "optimization_level",
     ]
 
     print(subheading("CLI options", "-"))

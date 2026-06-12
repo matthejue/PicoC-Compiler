@@ -1,6 +1,7 @@
 from src import global_vars
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src.passes.compilation import opt_level_1
 from src.utils.util_funs_dependent import throw_error
 import copy
 
@@ -714,7 +715,28 @@ class RetiBlocksPass:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(_, blocks):
+                data_entries = []
+                if opt_level_1.enabled(global_vars.args):
+                    for block in blocks:
+                        match block:
+                            case pn.Block("_global_inits", _):
+                                data_entries = opt_level_1.split_global_inits(
+                                    block,
+                                    self.symbol_table,
+                                    self._char_literal_code,
+                                )
+                                break
+
                 reti_blocks = []
+                blocks = [
+                    block
+                    for block in blocks
+                    if not (
+                        isinstance(block, pn.Block)
+                        and block.name == "_global_inits"
+                        and not block.stmts_instrs
+                    )
+                ]
                 for block in blocks:
                     match block:
                         case pn.Block(_, stmts):
@@ -731,7 +753,7 @@ class RetiBlocksPass:
                     [
                         pn.Section("interrupt_vector_table", []),
                         pn.Section("text", blocks),
-                        pn.Section("data", []),
+                        pn.Section("data", data_entries),
                     ],
                 )
             case _:
