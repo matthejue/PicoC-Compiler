@@ -286,8 +286,21 @@ class OptionHandler:
 
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
         passes = Passes()
-        global_inits = []
 
+        main_func = None
+        for symbol_table in symbol_tables:
+            if symbol_table.contains("main", scope="global"):
+                main_func = symbol_table._table["global"]["main"]
+                break
+
+        if main_func is None:
+            print(
+                "[warning] No main function found; no _start block will be generated, so the output may not be directly executable.",
+                file=sys.stderr,
+            )
+            return
+
+        global_inits = []
         for file_ast in asts:
             match file_ast:
                 case pn.File(_, items):
@@ -301,18 +314,6 @@ class OptionHandler:
                         file=sys.stderr,
                     )
                     sys.exit(1)
-
-        main_func = None
-        for symbol_table in symbol_tables:
-            if symbol_table.contains("main", scope="global"):
-                main_func = symbol_table._table["global"]["main"]
-                break
-
-        if main_func is None:
-            print(
-                "[error] No 'main' function found in any symbol table.", file=sys.stderr
-            )
-            sys.exit(1)
 
         passes.symbol_table.declare("main", main_func, scope="global")
 
