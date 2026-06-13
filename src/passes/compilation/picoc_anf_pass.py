@@ -6,6 +6,21 @@ import copy
 
 
 class PicocAnfPass:
+    def _epilogue_label(self, fun_name):
+        return f"{fun_name}_epilogue"
+
+    def _append_epilogue_block(self, blocks_out, fun_name, section):
+        epilogue = pn.Block(
+            self._epilogue_label(fun_name),
+            [
+                pn.RestoreStackframe(),
+                pn.RestoreReturnAddress(),
+            ],
+        )
+        epilogue.section = section
+        self._register_block(epilogue, fun_name)
+        blocks_out.append(epilogue)
+
     # This strips repeated final ".<id>" and "_cont" parts, so the next label
     # becomes if_cont.7, not if.4_cont.6_cont.7 
     def _block_label_base(self, block_name):
@@ -368,7 +383,7 @@ class PicocAnfPass:
                         remove_arguments,
                     ]
                     + (
-                        [pn.Exp(rn.Reg(rn.Acc()))]
+                        [pn.Exp(rn.Reg(rn.In2()))]
                         if not isinstance(return_type, pn.VoidType)
                         else []
                     )
@@ -496,20 +511,14 @@ class PicocAnfPass:
                 return [stmt]
             case pn.Return(pn.Empty()):
                 return [
-                    pn.RestoreStackframe(),
-                    pn.RestoreReturnAddress(),
+                    pn.Exp(pn.GoTo(pn.Name(self._epilogue_label(self.current_scope))))
                 ]
             case pn.Return(exp):
                 exps_anf = self._picoc_anf_exp(exp)
-                return (
-                    self._single_line_comment(stmt, "//")
-                    + exps_anf
-                    + [
-                        pn.Assign(rn.Reg(rn.Acc()), pn.Stack(pn.Num("1"))),
-                        pn.RestoreStackframe(),
-                        pn.RestoreReturnAddress(),
-                    ]
-                )
+                return exps_anf + [
+                    pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
+                    pn.Exp(pn.GoTo(pn.Name(self._epilogue_label(self.current_scope)))),
+                ]
             # ---------------------------- L_Block ----------------------------
             case pn.GoTo(pn.Name(val)):
                 return [pn.Exp(stmt)]
@@ -524,12 +533,27 @@ class PicocAnfPass:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), blocks):
                 blocks_anf = []
+                current_function = None
+                current_function_section = None
                 for block in blocks:
                     label = block.name
-                    self.current_scope = self.block_scopes.get(label, "global")
+                    block_scope = self.block_scopes.get(label, "global")
+                    if current_function is not None and block_scope != current_function:
+                        self._append_epilogue_block(
+                            blocks_anf,
+                            current_function,
+                            current_function_section,
+                        )
+                        current_function = None
+                        current_function_section = None
+
+                    self.current_scope = block_scope
                     self.next_local_addr = self.fun_local_sizes.get(self.current_scope, 0)
                     match block:
                         case pn.Block(_, stmts):
+                            if block_scope != "global":
+                                current_function = block_scope
+                                current_function_section = getattr(block, "section", None)
                             stmts_anf = []
                             for stmt in stmts:
                                 stmts_anf += self._inherit_origin_many(
@@ -539,6 +563,12 @@ class PicocAnfPass:
                             self._split_call_continuations(block, blocks_anf)
                         case _:
                             throw_error(block)
+                if current_function is not None:
+                    self._append_epilogue_block(
+                        blocks_anf,
+                        current_function,
+                        current_function_section,
+                    )
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".picoc_anf"),
                     blocks_anf,
