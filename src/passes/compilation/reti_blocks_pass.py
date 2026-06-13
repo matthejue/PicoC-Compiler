@@ -7,6 +7,12 @@ import copy
 
 
 class RetiBlocksPass:
+    def _global_base_reg(self, symbol_name):
+        symbol, _ = self.symbol_table.resolve(symbol_name, scope="global")
+        if isinstance(symbol, dict) and symbol.get("section") == "interrupt_vector_table":
+            return rn.Reg(rn.Cs())
+        return rn.Reg(rn.Ds())
+
     def _stackframe_access_offset(self, loc, tmp_idx=0):
         tmp_idx = int(tmp_idx)
         match loc:
@@ -113,7 +119,7 @@ class RetiBlocksPass:
                         reti_instrs += [
                             rn.Instr(
                                 rn.Loadin(),
-                                [rn.Reg(rn.Ds()), rn.Reg(rn.Acc()), name],
+                                [self._global_base_reg(val2), rn.Reg(rn.Acc()), name],
                             ),
                         ]
                     case pn.StackframeLocalVar() | pn.StackframeParam():
@@ -141,7 +147,7 @@ class RetiBlocksPass:
                         name = rn.Name(val)
                         reti_instrs += [
                             rn.Instr(rn.Loadi32(), [rn.Reg(rn.In1()), name]),
-                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), rn.Reg(rn.Ds())]),
+                            rn.Instr(rn.Add(), [rn.Reg(rn.In1()), self._global_base_reg(val)]),
                         ]
                     case pn.StackframeLocalVar() | pn.StackframeParam():
                         offset = self._stackframe_access_offset(exp)
@@ -429,7 +435,7 @@ class RetiBlocksPass:
                                 rn.Instr(
                                     rn.Loadin(),
                                     [
-                                        rn.Reg(rn.Ds()),
+                                        self._global_base_reg(val2),
                                         rn.Reg(rn.Acc()),
                                         # rn.Im(str(int(val2) + int(val1))),
                                         (
@@ -493,7 +499,7 @@ class RetiBlocksPass:
                                 rn.Instr(
                                     rn.Storein(),
                                     [
-                                        rn.Reg(rn.Ds()),
+                                        self._global_base_reg(val1),
                                         rn.Reg(rn.Acc()),
                                         rn.Name(val1),
                                     ],
@@ -538,7 +544,7 @@ class RetiBlocksPass:
                                 rn.Instr(
                                     rn.Storein(),
                                     [
-                                        rn.Reg(rn.Ds()),
+                                        self._global_base_reg(val1),
                                         rn.Reg(rn.Acc()),
                                         # rn.Im(
                                         #     str(
@@ -715,11 +721,17 @@ class RetiBlocksPass:
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(_, blocks):
+                ivt_entries = []
                 data_entries = []
                 if opt_level_1.enabled(global_vars.args):
                     for block in blocks:
                         match block:
                             case pn.Block("_global_inits", _):
+                                ivt_entries = opt_level_1.split_interrupt_vector_table_data(
+                                    block,
+                                    self.symbol_table,
+                                    self._char_literal_code,
+                                )
                                 data_entries = opt_level_1.split_global_inits(
                                     block,
                                     self.symbol_table,
@@ -727,7 +739,7 @@ class RetiBlocksPass:
                                 )
                                 break
 
-                reti_blocks = []
+                text_blocks = []
                 blocks = [
                     block
                     for block in blocks
@@ -746,13 +758,17 @@ class RetiBlocksPass:
                                     self._reti_blocks_stmt(stmt), stmt
                                 )
                             block.stmts_instrs[:] = instrs
+                            if getattr(block, "section", None) == "interrupt_vector_table":
+                                ivt_entries.append(block)
+                            else:
+                                text_blocks.append(block)
                         case _:
                             throw_error(block)
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
                     [
-                        pn.Section("interrupt_vector_table", []),
-                        pn.Section("text", blocks),
+                        pn.Section("interrupt_vector_table", ivt_entries),
+                        pn.Section("text", text_blocks),
                         pn.Section("data", data_entries),
                     ],
                 )

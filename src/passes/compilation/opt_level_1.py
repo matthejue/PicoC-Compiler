@@ -1,5 +1,8 @@
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src.utils.util_funs_dependent import throw_error
+
+INTERRUPT_VECTOR_TABLE_SECTION = "interrupt_vector_table"
 
 
 def enabled(args) -> bool:
@@ -32,6 +35,18 @@ def global_storage_symbols(symbol_table):
             yield name, symbol
 
 
+def data_storage_symbols(symbol_table):
+    for name, symbol in global_storage_symbols(symbol_table):
+        if symbol.get("section", "data") == "data":
+            yield name, symbol
+
+
+def interrupt_vector_table_symbols(symbol_table):
+    for name, symbol in global_storage_symbols(symbol_table):
+        if symbol.get("section") == INTERRUPT_VECTOR_TABLE_SECTION:
+            yield name, symbol
+
+
 def split_global_inits(block, symbol_table, char_literal_code):
     optimized_values = {}
     runtime_stmts = []
@@ -55,8 +70,43 @@ def split_global_inits(block, symbol_table, char_literal_code):
     return _data_blocks(symbol_table, optimized_values)
 
 
+def split_interrupt_vector_table_data(block, symbol_table, char_literal_code):
+    ivt_symbols = {
+        symbol_name
+        for symbol_name, _ in interrupt_vector_table_symbols(symbol_table)
+    }
+    if not ivt_symbols:
+        return []
+
+    optimized_values = {}
+    runtime_stmts = []
+    pending = []
+
+    for stmt in block.stmts_instrs:
+        match stmt:
+            case pn.Assign(pn.Global(pn.Name(var_name)), pn.Stack(pn.Num(size))) if var_name in ivt_symbols:
+                values = _compile_time_values(pending, char_literal_code)
+                if values is None or len(values) != int(size):
+                    throw_error(
+                        f"Initializer for '{var_name}' in section "
+                        f"'{INTERRUPT_VECTOR_TABLE_SECTION}' must be compile-time constant"
+                    )
+                optimized_values[var_name] = values
+                pending = []
+            case _:
+                pending.append(stmt)
+
+    runtime_stmts.extend(pending)
+    block.stmts_instrs[:] = runtime_stmts
+    return _data_blocks(
+        symbol_table,
+        optimized_values,
+        storage_symbols=interrupt_vector_table_symbols(symbol_table),
+    )
+
+
 def ordered_data_entries(entries, symbol_table):
-    storage_symbols = list(global_storage_symbols(symbol_table))
+    storage_symbols = list(data_storage_symbols(symbol_table))
     symbol_names = {symbol_name for symbol_name, _ in storage_symbols}
     by_symbol = {}
     other_entries = []
@@ -103,9 +153,11 @@ def _compile_time_value(exp, char_literal_code):
             return None
 
 
-def _data_blocks(symbol_table, optimized_values):
+def _data_blocks(symbol_table, optimized_values, *, storage_symbols=None):
     blocks = []
-    for symbol_name, symbol in global_storage_symbols(symbol_table):
+    if storage_symbols is None:
+        storage_symbols = data_storage_symbols(symbol_table)
+    for symbol_name, symbol in storage_symbols:
         size = int(symbol["size"])
         entries = optimized_values.get(symbol_name)
         if entries is None:

@@ -321,19 +321,29 @@ class ToBool(ASTNode):
 
 # ----------------------------- L_Assign_Alloc ----------------------------
 class Alloc(ASTNode):
-    def __init__(self, type_qual, datatype, name):
+    def __init__(self, type_qual, datatype, name, section=None):
         self.type_qual = type_qual
         self.datatype = datatype
         self.name = name
+        self.section = section
         # default is LocalVar()
         self.local_var_or_param = "local_var"
 
     @property
     def visible(self):
-        return [self.type_qual, self.datatype, self.name, self.local_var_or_param]
+        base = [self.type_qual, self.datatype, self.name]
+        if self.section is not None:
+            base.append(f"section={self.section}")
+        return base + [self.local_var_or_param]
             
 
-    __match_args__ = ("type_qual", "datatype", "name", "local_var_or_param")
+    __match_args__ = (
+        "type_qual",
+        "datatype",
+        "name",
+        "local_var_or_param",
+        "section",
+    )
 
 
 class Assign(ASTNode):
@@ -675,24 +685,35 @@ class FunPtrDecl(ASTNode):
 
 
 class FunDef(ASTNode):
-    def __init__(self, storage_class_specifiers, datatype, name, allocs, stmts_blocks):
+    def __init__(self, storage_class_specifiers, datatype, name, allocs, stmts_blocks, section=None):
         self.storage_class_specifiers = storage_class_specifiers
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
         self.stmts_blocks = stmts_blocks
+        self.section = section
 
     @property
     def visible(self):
-        return [
+        base = [
             self.storage_class_specifiers,
             self.datatype,
             self.name,
             self.allocs,
             self.stmts_blocks,
         ]
+        if self.section is not None:
+            base.append(f"section={self.section}")
+        return base
 
-    __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs", "stmts_blocks")
+    __match_args__ = (
+        "storage_class_specifiers",
+        "datatype",
+        "name",
+        "allocs",
+        "stmts_blocks",
+        "section",
+    )
 
 
 class NewStackframe(ASTNode):

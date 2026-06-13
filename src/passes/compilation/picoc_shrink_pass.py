@@ -19,7 +19,7 @@ class PicocShrinkPass:
         self.inline_functions = {}
         for decl_def in decls_defs:
             match decl_def:
-                case pn.FunDef(_, _, pn.Name(fun_name), allocs, stmts):
+                case pn.FunDef(_, _, pn.Name(fun_name), allocs, stmts, _):
                     if not self._is_static_inline(decl_def):
                         continue
                     match stmts:
@@ -78,7 +78,7 @@ class PicocShrinkPass:
 
     def _should_omit_inlined_fun_def(self, decl_def):
         match decl_def:
-            case pn.FunDef(_, _, pn.Name(fun_name), _, _):
+            case pn.FunDef(_, _, pn.Name(fun_name), _, _, _):
                 return fun_name in self.inline_functions
         return False
 
@@ -264,7 +264,7 @@ class PicocShrinkPass:
             case pn.ToBool(exp):
                 return pn.ToBool(self._picoc_shrink_exp(exp))
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Alloc(type_qual, datatype, name, local_var_or_param):
+            case pn.Alloc(type_qual, datatype, name, local_var_or_param, section):
                 if isinstance(datatype, pn.ArrayDecl) and isinstance(datatype.const_exp, pn.Empty):
                     throw_error(
                         "Array declarations with omitted size require a valid initializer"
@@ -273,6 +273,7 @@ class PicocShrinkPass:
                     type_qual,
                     self._picoc_shrink_datatype(datatype),
                     name,
+                    section=section,
                 )
                 alloc.local_var_or_param = local_var_or_param
                 return alloc
@@ -392,11 +393,16 @@ class PicocShrinkPass:
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Assign(pn.Alloc(type_qual, datatype, name), exp):
+            case pn.Assign(pn.Alloc(type_qual, datatype, name, _, section), exp):
                 # char str[] = "..." becomes a regular array and can be put on the stack.
                 datatype, exp = self._infer_unsized_array_size_from_initializer(datatype, exp)
                 return pn.Assign(
-                    pn.Alloc(type_qual, self._picoc_shrink_datatype(datatype), name),
+                    pn.Alloc(
+                        type_qual,
+                        self._picoc_shrink_datatype(datatype),
+                        name,
+                        section=section,
+                    ),
                     self._picoc_shrink_exp(exp),
                 )
             case pn.Assign(lhs, exp):
@@ -476,7 +482,7 @@ class PicocShrinkPass:
                     match decl_def:
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
-                        case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts):
+                        case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts, section):
                             if isinstance(datatype, pn.StructSpec):
                                 throw_error(
                                     "Returning structs by value is not supported; use "
@@ -503,6 +509,7 @@ class PicocShrinkPass:
                                 name,
                                 allocs_shrinked,
                                 stmts_shrinked,
+                                section,
                             )
                             decls_defs_shrinked += [
                                 self._inherit_origin(fun_def, decl_def)

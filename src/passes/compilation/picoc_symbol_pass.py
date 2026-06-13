@@ -5,6 +5,15 @@ import copy
 
 
 class PicocSymbolPass:
+    _SECTION = "interrupt_vector_table"
+
+    def _validated_section(self, section_name):
+        if section_name is None:
+            return None
+        if section_name != self._SECTION:
+            throw_error(f"Unsupported allocation section '{section_name}'")
+        return section_name
+
     def _is_variadic_params(self, allocs) -> bool:
         return bool(allocs) and isinstance(allocs[-1], pn.VariadicParam)
 
@@ -59,7 +68,7 @@ class PicocSymbolPass:
         match alloc:
             case pn.VoidType():
                 return
-            case pn.Alloc(type_qual, datatype, pn.Name(val1), _):
+            case pn.Alloc(type_qual, datatype, pn.Name(val1), _, section):
                 var_name = val1
                 datatype_copy = copy.deepcopy(datatype)
                 # Parameters of array type decay to pointers to their first element type.
@@ -73,7 +82,12 @@ class PicocSymbolPass:
                     case "global":
                         addr = pn.Empty()
                         frame_kind = "global"
+                        section_name = self._validated_section(section)
                     case _:
+                        if section is not None:
+                            throw_error(
+                                "section attributes are only supported on global declarations"
+                            )
                         if is_param:
                             # Parameter symbols keep a non-negative logical slot
                             # index starting at 0; RetiBlocksPass applies the
@@ -85,6 +99,7 @@ class PicocSymbolPass:
                             addr = self.next_local_addr + size - 1
                             self.next_local_addr += size
                             frame_kind = "local_var"
+                        section_name = None
 
                 self.symbol_table.declare(
                     var_name,
@@ -95,6 +110,7 @@ class PicocSymbolPass:
                         "addr": addr,
                         "size": size,
                         "frame_kind": frame_kind,
+                        **({"section": section_name} if section_name else {}),
                         **({"val": initial_val} if initial_val is not None else {}),
                     },
                     scope=self.current_scope,
@@ -322,11 +338,9 @@ class PicocSymbolPass:
     def _picoc_symbol_stmt(self, stmt):
         match stmt:
             # ------------------------- L_Assign_Alloc ------------------------
-            case pn.Assign(
-                pn.Alloc(pn.Const() as type_qual, datatype, pn.Name(val1)), num
-            ):
+            case pn.Assign(pn.Alloc(pn.Const(), _, pn.Name()) as alloc, num):
                 self._declare_alloc(
-                    pn.Alloc(type_qual, datatype, pn.Name(val1)),
+                    alloc,
                     initial_val=copy.deepcopy(num),
                 )
                 return self._single_line_comment(stmt, "//")

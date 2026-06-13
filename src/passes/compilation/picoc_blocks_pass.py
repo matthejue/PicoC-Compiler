@@ -7,6 +7,8 @@ import copy
 
 
 class PicocBlocksPass:
+    FUNCTION_SECTION = "interrupt_vector_table"
+
     COMMENT_VISIBLE_FILTERS = {
         rn.Instr: (),
         pn.Array: (),
@@ -289,7 +291,9 @@ class PicocBlocksPass:
     def _picoc_blocks_def(self, decl_def):
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
-            case pn.FunDef(storage_class_specifiers, datatype, pn.Name(val) as name, allocs, stmts):
+            case pn.FunDef(storage_class_specifiers, datatype, pn.Name(val) as name, allocs, stmts, section):
+                if section is not None and section != self.FUNCTION_SECTION:
+                    throw_error(f"Unsupported function section '{section}'")
                 fun_name = val
                 blocks = dict()
                 processed_stmts = []
@@ -306,6 +310,8 @@ class PicocBlocksPass:
                     add_id=False,
                     show_id_comment=True,
                 )
+                for block in blocks.values():
+                    block.section = section
                 self.all_blocks |= blocks
                 fun_def = pn.FunDef(
                     storage_class_specifiers,
@@ -318,6 +324,7 @@ class PicocBlocksPass:
                             key=lambda block: -int(block.block_idx),
                         )
                     ),
+                    section,
                 )
                 return [
                     self._inherit_origin(fun_def, decl_def)

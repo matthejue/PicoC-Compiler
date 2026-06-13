@@ -69,6 +69,19 @@ def _without_storage_class_specifiers(children):
     return [child for child in children if not isinstance(child, (pn.Inline, pn.Static))]
 
 
+def _take_section_attribute(children):
+    section_name = None
+    kept_children = []
+    for child in children:
+        if child is None:
+            continue
+        if not (isinstance(child, tuple) and len(child) == 2 and child[0] == "section"):
+            kept_children.append(child)
+            continue
+        section_name = child[1]
+    return section_name, kept_children
+
+
 class _TreeSitterTransformer:
     def __init__(self, language: Language):
         self.parser = Parser()
@@ -227,13 +240,14 @@ class TransformerPicoC(_TreeSitterTransformer):
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
     def function_definition(self, _, children):
+        section, children = _take_section_attribute(children)
         storage_class_specifiers = _storage_class_specifiers(children)
         children = _without_storage_class_specifiers(children)
         base_datatype = children[0]
         declarator = children[1]
         match declarator:
             case pn.FunDecl(_, _, name, allocs):
-                return pn.FunDef(storage_class_specifiers, base_datatype, name, allocs, children[2])
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, allocs, children[2], section)
             case [*fragments, pn.FunDecl(_, _, name, allocs)]:
                 datatype = base_datatype
                 for fragment in fragments:
@@ -242,13 +256,14 @@ class TransformerPicoC(_TreeSitterTransformer):
                 # cannot return arrays, only pointers to arrays/functions.
                 if isinstance(datatype, pn.ArrayDecl):
                     throw_error(datatype)
-                return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2])
+                return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2], section)
             case [pn.Name() as name, params]:
-                return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2])
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2], section)
         throw_error(declarator)
 
     def function_declarator(self, _, children):
-        match children:
+        declarator, params, *_ = children
+        match [declarator, params]:
             case [pn.Name() as name, params]:
                 return pn.FunDecl([], pn.Placeholder(), name, params)
             case [declarator, params]:
@@ -333,6 +348,7 @@ class TransformerPicoC(_TreeSitterTransformer):
         return children
 
     def declaration(self, _, children):
+        section, children = _take_section_attribute(children)
         storage_class_specifiers = _storage_class_specifiers(children)
         children = _without_storage_class_specifiers(children)
         if len(children) == 2:
@@ -346,10 +362,17 @@ class TransformerPicoC(_TreeSitterTransformer):
         match init_or_decl:
             case pn.Assign(pn.Alloc(_, _, declarator), val):
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
-                return pn.Assign(pn.Alloc(type_qual, full_datatype, name), val)
+                return pn.Assign(
+                    pn.Alloc(type_qual, full_datatype, name, section=section),
+                    val,
+                )
             case pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs):
+                if section is not None:
+                    throw_error("section attributes are only supported on allocations")
                 return pn.FunDecl(storage_class_specifiers, base_datatype, name, allocs)
             case [*fragments, pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs)]:
+                if section is not None:
+                    throw_error("section attributes are only supported on allocations")
                 full_datatype = base_datatype
                 for fragment in fragments:
                     full_datatype = self._apply_declarator_fragment(
@@ -362,8 +385,16 @@ class TransformerPicoC(_TreeSitterTransformer):
                 return pn.FunDecl(storage_class_specifiers, full_datatype, name, allocs)
             case [pn.FunPtrDecl() | pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
-                return pn.Exp(pn.Alloc(type_qual, full_datatype, name))
+                return pn.Exp(
+                    pn.Alloc(type_qual, full_datatype, name, section=section)
+                )
         throw_error(init_or_decl)
+
+    def attribute_specifier(self, _, children):
+        match children:
+            case [[pn.Call(pn.Name("section"), [pn.String(name)])]]:
+                return ("section", name)
+        return None
 
     def type_qualifier(self, node, _):
         match self.value(node):

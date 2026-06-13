@@ -438,12 +438,16 @@ class OptionHandler:
         merged_table.setdefault("global", {})
         merged_parents.setdefault("global", None)
 
-        # Assign distinct addresses only for globals that have BOTH 'addr' and 'size'
-        current_addr = 0
+        data_addr = 0
+        interrupt_vector_table_addr = 0
         for sym_name, sym in merged_table["global"].items():
             if "addr" in sym and "size" in sym:
-                sym["addr"] = current_addr
-                current_addr += sym["size"]
+                if sym.get("section") == "interrupt_vector_table":
+                    sym["addr"] = interrupt_vector_table_addr
+                    interrupt_vector_table_addr += sym["size"]
+                else:
+                    sym["addr"] = data_addr
+                    data_addr += sym["size"]
 
         # Build final merged SymbolTable object
         merged_st = st.SymbolTable()

@@ -98,6 +98,7 @@ class PicocAnfPass:
                             blocks_out.append(block)
 
                             cont_block = pn.Block(cont_label, cont_stmts)
+                            cont_block.section = getattr(block, "section", None)
                             self._register_block(
                                 cont_block,
                                 self.block_scopes.get(block_name, "global"),

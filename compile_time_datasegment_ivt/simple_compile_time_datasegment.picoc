@@ -1,15 +1,12 @@
 // in:
 // expected:3 5 7 11 22 1 2 1 2
+int first_value();
 
-int first_value() {
-  return 1;
-}
+int second_value();
 
-int second_value() {
-  return 2;
-}
-
+__attribute__((section("interrupt_vector_table")))
 int numbers[3] = {3, 5, 7};
+__attribute__((section("interrupt_vector_table")))
 int (*operations[2])() = {first_value, second_value};
 
 struct pair {
@@ -18,7 +15,18 @@ struct pair {
   int (*right)();
 };
 
+__attribute__((section("interrupt_vector_table")))
 struct pair data = {.values = {11, 22}, .left = first_value, .right = second_value};
+
+__attribute__((section("interrupt_vector_table")))
+int first_value() {
+  return 1;
+}
+
+__attribute__((section("interrupt_vector_table")))
+int second_value() {
+  return 2;
+}
 
 void main() {
   print(numbers[0]);
