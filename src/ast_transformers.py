@@ -946,6 +946,11 @@ class TransformerRetiBlocks(_TreeSitterTransformer):
     def ivte_instruction(self, _, children):
         return rn.Ivte(children[0])
 
+    def nop_instruction(self, _, children):
+        if children:
+            throw_error(children)
+        return rn.Nop()
+
     def return_from_interrupt_instruction(self, _, children):
         if children:
             throw_error(children)

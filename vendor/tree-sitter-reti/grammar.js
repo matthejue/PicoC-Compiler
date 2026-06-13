@@ -99,6 +99,7 @@ module.exports = grammar({
       $.stack_instruction,
       $.syscall_instruction,
       $.ivte_instruction,
+      $.nop_instruction,
       $.return_from_interrupt_instruction,
     ),
 
@@ -248,6 +249,8 @@ module.exports = grammar({
         $.symbolic_operand,
       )),
     ),
+
+    nop_instruction: $ => 'NOP',
 
     return_from_interrupt_instruction: $ => 'RTI',
 

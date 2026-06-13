@@ -32,6 +32,8 @@
 
 (ivte_instruction "IVTE" @keyword)
 
+(nop_instruction) @keyword
+
 (jump "JUMP" @keyword)
 
 (return_from_interrupt_instruction) @keyword

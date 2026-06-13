@@ -7,6 +7,7 @@ SUBI SP 2
 STOREIN BAF ACC 0
 TSL DS ACC 0
 JUMP== 3
+NOP
 RTI
 
 ---
@@ -47,6 +48,9 @@ RTI
       (relation)
       (jump_target
         (immediate))))
+  (statement
+    (instruction
+      (nop_instruction)))
   (statement
     (instruction
       (return_from_interrupt_instruction))))
