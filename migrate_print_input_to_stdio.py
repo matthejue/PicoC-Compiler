@@ -7,8 +7,8 @@ import argparse
 from pathlib import Path
 
 
-DEFAULT_STDIO_PICOC = "/home/areo/Documents/Studium/Pico-OS/lib/stdio/stdio.picoc"
-DEFAULT_STDIO_HEADER = "/home/areo/Documents/Studium/Pico-OS/lib/stdio/stdio.header"
+DEFAULT_STDIO_PICOC = "../../Pico-OS/lib/stdio/stdio.picoc"
+DEFAULT_STDIO_HEADER = "../../Pico-OS/lib/stdio/stdio.header"
 
 
 def is_ident_start(ch: str) -> bool:
@@ -182,7 +182,7 @@ def add_metadata(code: str, dependency: str, header: str) -> str:
             insert_at = 0
             for idx, line in enumerate(lines):
                 stripped = line.strip()
-                if stripped.startswith("//") or stripped == "":
+                if stripped.startswith("//"):
                     insert_at = idx + 1
                     continue
                 break
@@ -192,13 +192,32 @@ def add_metadata(code: str, dependency: str, header: str) -> str:
         insert_at = 0
         for idx, line in enumerate(lines):
             stripped = line.strip()
-            if stripped.startswith("//") or stripped == "":
+            if stripped.startswith("//"):
                 insert_at = idx + 1
                 continue
             break
         lines.insert(insert_at, include_line)
 
     return "".join(lines)
+
+
+def compact_metadata_layout(code: str, dependency: str, header: str) -> str:
+    include_line = f'#include "{header}"'
+    lines = code.splitlines(keepends=True)
+    compacted = []
+
+    for idx, line in enumerate(lines):
+        stripped = line.strip()
+        next_line = lines[idx + 1] if idx + 1 < len(lines) else ""
+        if stripped == "" and (
+            line_has_dependency(next_line, dependency)
+            or next_line.strip() == include_line
+        ):
+            continue
+
+        compacted.append(line)
+
+    return "".join(compacted)
 
 
 def rewrite_code(code: str, dependency: str, header: str) -> str:
@@ -214,8 +233,8 @@ def rewrite_code(code: str, dependency: str, header: str) -> str:
 
     rewritten = "".join(out_lines)
     if rewritten == code:
-        return code
-    return add_metadata(rewritten, dependency, header)
+        return compact_metadata_layout(code, dependency, header)
+    return compact_metadata_layout(add_metadata(rewritten, dependency, header), dependency, header)
 
 
 def iter_picoc_files(paths):

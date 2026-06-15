@@ -12,7 +12,6 @@ MAX_EMULATOR_DURATION_SECONDS=5
 
 ./space_replacer.py
 ./extract_input_and_expected.sh $2
-./convert_to_c.py $2
 
 verification_res=$(./verify_tests.sh $1 $2)
 

@@ -21,6 +21,7 @@ _clean-pycache:
 	find . -type d -name "__pycache__" -delete
 
 _clean-files:
+	find . -type f -wholename "./sys_tests/*.pre" -delete
 	find . -type f -wholename "./sys_tests/*.tokens" -delete
 	find . -type f -wholename "./sys_tests/*.rtokens" -delete
 	find . -type f -wholename "./sys_tests/*.ps" -delete
@@ -53,8 +54,8 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.eprom" -delete
 	find . -type f -wholename "./sys_tests/*.c" -delete
 	find . -type f -wholename "./sys_tests/*.res" -delete
-	find ./vendor/tree-sitter-reti/src -type f \( -name "grammar.json" -o -name "node-types.json" -o -name "parser.c" \) -delete
-	find ./vendor/tree-sitter-reti/src -type d -name "tree_sitter" -exec rm -rf {} +
+	# find ./vendor/tree-sitter-reti/src -type f \( -name "grammar.json" -o -name "node-types.json" -o -name "parser.c" \) -delete
+	# find ./vendor/tree-sitter-reti/src -type d -name "tree_sitter" -exec rm -rf {} +
 
 test: _test _clean-pycache
 test-clean: _test clean
