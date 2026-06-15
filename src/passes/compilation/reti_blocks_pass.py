@@ -320,25 +320,6 @@ class RetiBlocksPass:
                         rn.Storein(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im("1")]
                     )
                 ]
-            case pn.Exp(pn.Call(pn.Name("input"), [])):
-                return self._single_line_comment(stmt, "#") + [
-                    # rn.Call(rn.Name("INPUT"), rn.Reg(rn.Acc())),
-                    rn.Int(rn.Im("2")),
-                    rn.Instr(rn.Push(), [rn.Reg(rn.Acc())]),
-                ]
-            case pn.Exp(pn.Call(pn.Name("print"), [pn.Stack(pn.Num(val))])):
-                if str(val) == "1":
-                    return self._single_line_comment(stmt, "#") + [
-                        rn.Instr(rn.Pop(), [rn.Reg(rn.Acc())]),
-                        rn.Int(rn.Im("0")),
-                    ]
-                return self._single_line_comment(stmt, "#") + [
-                    rn.Instr(
-                        rn.Loadin(), [rn.Reg(rn.Sp()), rn.Reg(rn.Acc()), rn.Im(val)]
-                    ),
-                    rn.Instr(rn.Addi(), [rn.Reg(rn.Sp()), rn.Im("1")]),
-                    rn.Int(rn.Im("0")),
-                ]
             case pn.Exp(pn.Asm(pn.String(code))):
                 return self._single_line_comment(stmt, "#") + [rn.RawInstr(code.strip())]
             case pn.Exp(pn.Cast(_, pn.Stack())):

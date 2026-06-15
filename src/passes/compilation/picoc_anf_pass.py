@@ -167,11 +167,6 @@ class PicocAnfPass:
                 return [pn.Exp(exp)]
             case pn.FunRef():
                 return [pn.Exp(exp)]
-            case pn.Call(pn.Name("print") as name, [exp]):
-                exp_anf = self._picoc_anf_exp(exp)
-                return exp_anf + [pn.Exp(pn.Call(name, [pn.Stack(pn.Num("1"))]))]
-            case pn.Call(pn.Name("input"), []):
-                return [pn.Exp(exp)]
             case pn.Asm():
                 return [pn.Exp(exp)]
             case pn.SizeOf(exp_datatype):

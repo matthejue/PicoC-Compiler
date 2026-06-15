@@ -118,32 +118,6 @@ class PicocSymbolPass:
             case _:
                 throw_error(alloc)
 
-    def _declare_input_builtin(self):
-        if self.symbol_table.contains("input", scope="global"):
-            return
-        self.symbol_table.declare(
-            "input",
-            {
-                "datatype": pn.FunDecl([], pn.IntType(), pn.Name("input"), []),
-                "name": "input",
-                "param_size": 0,
-            },
-            scope="global",
-        )
-
-    def _declare_print_builtin(self):
-        if self.symbol_table.contains("print", scope="global"):
-            return
-        self.symbol_table.declare(
-            "print",
-            {
-                "datatype": pn.FunDecl([], pn.VoidType(), pn.Name("print"), []),
-                "name": "print",
-                "param_size": 0,
-            },
-            scope="global",
-        )
-
     def _function_pointer_datatype(self, fun_decl):
         match fun_decl:
             case pn.FunDecl(_, ret_dt, _, params):
@@ -255,16 +229,6 @@ class PicocSymbolPass:
                             throw_error(init_pair)
                 return pn.Struct(init_pairs_out)
             case pn.Call(pn.Name() as fun_name, exps):
-                if fun_name.val == "input":
-                    self._declare_input_builtin()
-                    return pn.Call(
-                        fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
-                    )
-                elif fun_name.val == "print":
-                    self._declare_print_builtin()
-                    return pn.Call(
-                        fun_name, [self._picoc_rewrite_exp(inner) for inner in exps]
-                    )
                 symbol, _ = self.symbol_table.resolve(fun_name.val, scope="global")
                 if isinstance(symbol, dict) and isinstance(
                     symbol.get("datatype"), pn.FunDecl

@@ -415,7 +415,7 @@ Main tasks:
 - Resolves struct attribute types and array element types.
   Example: `point.x` gets the datatype declared for field `x`.
 - Annotates function calls with their return type.
-  Example: `input()` gets type `IntType`.
+  Example: a declared `printf(...)` call gets the return type from its declaration.
 - Stores the inferred datatype information directly on AST nodes.
   Example: a `BinOp` node receives a `.datatype` field.
 
@@ -455,7 +455,7 @@ Main tasks:
   Example: `Exp(BinOp(Stack(2), Add(), Stack(1)))` means "take the top two stack values, add them, and leave the result on the stack". It is lowered to RETI steps that load the two operands from stack memory into registers, execute `ADD`, store the result back to the stack, and then adjust the stack pointer.
 - Emits RETI instructions for arithmetic, logic, comparisons, loads, stores, stack operations, calls, returns, and jumps.
   Example: a return becomes instructions that restore state and jump via the saved return address.
-- Handles special cases such as pointer arithmetic, dereference, `input`, `print`, `sizeof`, and boolean conversion.
+- Handles special cases such as pointer arithmetic, dereference, `sizeof`, and boolean conversion.
   Example: pointer addition scales the index by element size before adding.
 
 ### Linking / Multi-File Handling
