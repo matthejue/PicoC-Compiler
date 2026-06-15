@@ -685,13 +685,24 @@ class FunPtrDecl(ASTNode):
 
 
 class FunDef(ASTNode):
-    def __init__(self, storage_class_specifiers, datatype, name, allocs, stmts_blocks, section=None):
+    def __init__(
+        self,
+        storage_class_specifiers,
+        datatype,
+        name,
+        allocs,
+        stmts_blocks,
+        section=None,
+        *,
+        naked=False,
+    ):
         self.storage_class_specifiers = storage_class_specifiers
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
         self.stmts_blocks = stmts_blocks
         self.section = section
+        self.naked = naked
 
     @property
     def visible(self):
@@ -704,6 +715,8 @@ class FunDef(ASTNode):
         ]
         if self.section is not None:
             base.append(f"section={self.section}")
+        if self.naked:
+            base.append("naked")
         return base
 
     __match_args__ = (

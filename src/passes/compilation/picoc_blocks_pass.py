@@ -292,6 +292,7 @@ class PicocBlocksPass:
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
             case pn.FunDef(storage_class_specifiers, datatype, pn.Name(val) as name, allocs, stmts, section):
+                naked = getattr(decl_def, "naked", False)
                 if section is not None and section != self.FUNCTION_SECTION:
                     throw_error(f"Unsupported function section '{section}'")
                 fun_name = val
@@ -325,6 +326,7 @@ class PicocBlocksPass:
                         )
                     ),
                     section,
+                    naked=naked,
                 )
                 return [
                     self._inherit_origin(fun_def, decl_def)

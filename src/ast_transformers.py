@@ -69,17 +69,24 @@ def _without_storage_class_specifiers(children):
     return [child for child in children if not isinstance(child, (pn.Inline, pn.Static))]
 
 
-def _take_section_attribute(children):
+def _take_attributes(children):
     section_name = None
+    naked = False
     kept_children = []
     for child in children:
         if child is None:
             continue
-        if not (isinstance(child, tuple) and len(child) == 2 and child[0] == "section"):
+        if not (isinstance(child, tuple) and len(child) == 2):
             kept_children.append(child)
             continue
-        section_name = child[1]
-    return section_name, kept_children
+        match child:
+            case ("section", name):
+                section_name = name
+            case ("naked", True):
+                naked = True
+            case _:
+                kept_children.append(child)
+    return section_name, naked, kept_children
 
 
 class _TreeSitterTransformer:
@@ -240,14 +247,14 @@ class TransformerPicoC(_TreeSitterTransformer):
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
     def function_definition(self, _, children):
-        section, children = _take_section_attribute(children)
+        section, naked, children = _take_attributes(children)
         storage_class_specifiers = _storage_class_specifiers(children)
         children = _without_storage_class_specifiers(children)
         base_datatype = children[0]
         declarator = children[1]
         match declarator:
             case pn.FunDecl(_, _, name, allocs):
-                return pn.FunDef(storage_class_specifiers, base_datatype, name, allocs, children[2], section)
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, allocs, children[2], section, naked=naked)
             case [*fragments, pn.FunDecl(_, _, name, allocs)]:
                 datatype = base_datatype
                 for fragment in fragments:
@@ -256,9 +263,9 @@ class TransformerPicoC(_TreeSitterTransformer):
                 # cannot return arrays, only pointers to arrays/functions.
                 if isinstance(datatype, pn.ArrayDecl):
                     throw_error(datatype)
-                return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2], section)
+                return pn.FunDef(storage_class_specifiers, datatype, name, allocs, children[2], section, naked=naked)
             case [pn.Name() as name, params]:
-                return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2], section)
+                return pn.FunDef(storage_class_specifiers, base_datatype, name, params, children[2], section, naked=naked)
         throw_error(declarator)
 
     def function_declarator(self, _, children):
@@ -348,7 +355,9 @@ class TransformerPicoC(_TreeSitterTransformer):
         return children
 
     def declaration(self, _, children):
-        section, children = _take_section_attribute(children)
+        section, naked, children = _take_attributes(children)
+        if naked:
+            throw_error("naked attributes are only supported on function definitions")
         storage_class_specifiers = _storage_class_specifiers(children)
         children = _without_storage_class_specifiers(children)
         if len(children) == 2:
@@ -394,6 +403,8 @@ class TransformerPicoC(_TreeSitterTransformer):
         match children:
             case [[pn.Call(pn.Name("section"), [pn.String(name)])]]:
                 return ("section", name)
+            case [[pn.Name("naked")]]:
+                return ("naked", True)
         return None
 
     def type_qualifier(self, node, _):

@@ -130,6 +130,32 @@ This configuration:
 - maps `.reti`, `.reti_blocks`, and `.reti_patch` files to the `reti` parser
 - loads the vendored Tree-sitter query files for highlighting and tags
 
+## PicoC Attributes and Entry Points
+
+PicoC supports a small subset of GNU-style attributes for low-level RETI programs:
+
+- `__attribute__((section("interrupt_vector_table")))` may be placed before a global variable declaration or function definition. The attribute string omits the dot, but the generated output section is `.interrupt_vector_table`; other section names are rejected. This is intended for interrupt vector tables and interrupt service routines. With `-O1`, compile-time global data with this attribute is emitted into `.interrupt_vector_table` instead of `.data`; references to globals in this section use `CS` as their base register, while ordinary globals still use `DS`.
+- `__attribute__((naked))` may be placed before a function definition. Naked functions do not get the compiler-generated stack-frame prologue or shared `<function>_epilogue` block. `return;` emits no epilogue jump, and `return expr;` only evaluates the expression and places the result in `IN2`, so the function must provide its own low-level return/control-flow sequence.
+- Non-naked functions get one shared `<function>_epilogue` block directly after the function's other blocks. `return expr;` stores the return value in `IN2` and jumps to that epilogue; call continuations read non-void return values from `IN2`.
+- If no global `main` exists in the supplied PicoC files, the compiler prints a warning and does not generate `_start`. The output can still be produced, but it is not directly executable through the usual `_start -> main` entry path.
+
+Example:
+
+```c
+int keypress_interrupt(void);
+
+__attribute__((section("interrupt_vector_table")))
+int (*interrupt_vector_table[])(void) = {
+    keypress_interrupt
+};
+
+__attribute__((section("interrupt_vector_table")))
+__attribute__((naked))
+int keypress_interrupt(void) {
+    /* low-level interrupt return sequence */
+}
+```
+
 ## Compiler Pipeline Overview
 
 This section summarizes how the compiler processes PicoC source files, covering preprocessing, lexing, parsing, AST passes, and final RETI output.
@@ -406,7 +432,7 @@ Main tasks:
 - Lowers function calls into explicit stack-frame setup, jump, and return-value handling.
   Example: a call saves a labeled return address, evaluates the callee address, jumps with `GoTo(Stack(1))`, and continues in a generated continuation block.
 - Lowers assignments, dereferences, struct access, conditions, and returns into simple stack-based operations.
-  Example: `return x + 1;` becomes evaluate `x`, evaluate `1`, add, move the result to `ACC`, restore the stack frame, and restore the return address.
+  Example: `return x + 1;` becomes evaluate `x`, evaluate `1`, add, move the result to `IN2`, and jump to the function's shared `<function>_epilogue` block.
 
 #### Function Calls and Stack Frames
 
@@ -459,7 +485,7 @@ Main tasks:
 - Collects every `_global_inits` block from the per-file ASTs and removes those blocks from their original files.
   Example: global initializations from `a.picoc` and `b.picoc` are moved into the start sequence.
 - Searches the merged symbol tables for a global `main`.
-  Example: if no `main` exists in any file, compilation stops with an error.
+  Example: if no `main` exists in any file, compilation continues with a warning and no `_start` block is generated.
 - Builds a synthetic `_start` block that calls `main` and then exits.
   Example: `_start` contains the ANF form of `main()` followed by `Exit(0)`.
 - Lowers this synthetic start file through `reti_blocks`.

@@ -470,6 +470,7 @@ class PicocSymbolPass:
                 )
                 return []
             case pn.FunDef(_, datatype, pn.Name(fun_name) as name, allocs, blocks):
+                naked = getattr(decl_def, "naked", False)
                 fun_blocks_out = []
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
@@ -509,23 +510,25 @@ class PicocSymbolPass:
                                     for inner in typed_out
                                 ]
                             block.stmts_instrs = rewritten_stmts_instrs
+                            block.naked = naked
                             fun_blocks_out.append(block)
                             self.block_scopes[block.name] = fun_name
                         case _:
                             throw_error(block)
 
-                match fun_blocks_out:
-                    case [pn.Block(_, entry_stmts), *_]:
-                        # Symbol pass knows the final local-frame size after declaring locals,
-                        # so NewStackframe is inserted here instead of in ANF.
-                        entry_stmts[:0] = [
-                            self._inherit_origin(
-                                pn.NewStackframe(pn.Num(str(self.next_local_addr))),
-                                decl_def,
-                            )
-                        ]
-                    case _:
-                        throw_error(fun_blocks_out)
+                if not naked:
+                    match fun_blocks_out:
+                        case [pn.Block(_, entry_stmts), *_]:
+                            # Symbol pass knows the final local-frame size after declaring
+                            # locals, so NewStackframe is inserted here instead of in ANF.
+                            entry_stmts[:0] = [
+                                self._inherit_origin(
+                                    pn.NewStackframe(pn.Num(str(self.next_local_addr))),
+                                    decl_def,
+                                )
+                            ]
+                        case _:
+                            throw_error(fun_blocks_out)
 
                 match blocks[-1]:
                     case pn.Block(_, stmts) if stmts and isinstance(

@@ -483,6 +483,7 @@ class PicocShrinkPass:
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
                         case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts, section):
+                            naked = getattr(decl_def, "naked", False)
                             if isinstance(datatype, pn.StructSpec):
                                 throw_error(
                                     "Returning structs by value is not supported; use "
@@ -510,6 +511,7 @@ class PicocShrinkPass:
                                 allocs_shrinked,
                                 stmts_shrinked,
                                 section,
+                                naked=naked,
                             )
                             decls_defs_shrinked += [
                                 self._inherit_origin(fun_def, decl_def)

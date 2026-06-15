@@ -114,6 +114,7 @@ class PicocAnfPass:
 
                             cont_block = pn.Block(cont_label, cont_stmts)
                             cont_block.section = getattr(block, "section", None)
+                            cont_block.naked = getattr(block, "naked", False)
                             self._register_block(
                                 cont_block,
                                 self.block_scopes.get(block_name, "global"),
@@ -510,11 +511,17 @@ class PicocAnfPass:
                 stmt.indirect_call = False
                 return [stmt]
             case pn.Return(pn.Empty()):
+                if getattr(self, "current_function_naked", False):
+                    return []
                 return [
                     pn.Exp(pn.GoTo(pn.Name(self._epilogue_label(self.current_scope))))
                 ]
             case pn.Return(exp):
                 exps_anf = self._picoc_anf_exp(exp)
+                if getattr(self, "current_function_naked", False):
+                    return exps_anf + [
+                        pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
+                    ]
                 return exps_anf + [
                     pn.Assign(rn.Reg(rn.In2()), pn.Stack(pn.Num("1"))),
                     pn.Exp(pn.GoTo(pn.Name(self._epilogue_label(self.current_scope)))),
@@ -535,25 +542,30 @@ class PicocAnfPass:
                 blocks_anf = []
                 current_function = None
                 current_function_section = None
+                current_function_naked = False
                 for block in blocks:
                     label = block.name
                     block_scope = self.block_scopes.get(label, "global")
                     if current_function is not None and block_scope != current_function:
-                        self._append_epilogue_block(
-                            blocks_anf,
-                            current_function,
-                            current_function_section,
-                        )
+                        if not current_function_naked:
+                            self._append_epilogue_block(
+                                blocks_anf,
+                                current_function,
+                                current_function_section,
+                            )
                         current_function = None
                         current_function_section = None
+                        current_function_naked = False
 
                     self.current_scope = block_scope
+                    self.current_function_naked = getattr(block, "naked", False)
                     self.next_local_addr = self.fun_local_sizes.get(self.current_scope, 0)
                     match block:
                         case pn.Block(_, stmts):
                             if block_scope != "global":
                                 current_function = block_scope
                                 current_function_section = getattr(block, "section", None)
+                                current_function_naked = getattr(block, "naked", False)
                             stmts_anf = []
                             for stmt in stmts:
                                 stmts_anf += self._inherit_origin_many(
@@ -563,7 +575,7 @@ class PicocAnfPass:
                             self._split_call_continuations(block, blocks_anf)
                         case _:
                             throw_error(block)
-                if current_function is not None:
+                if current_function is not None and not current_function_naked:
                     self._append_epilogue_block(
                         blocks_anf,
                         current_function,
