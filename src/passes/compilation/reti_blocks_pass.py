@@ -1,12 +1,29 @@
 from src import global_vars
 from src import picoc_nodes as pn
 from src import reti_nodes as rn
+from src.ast_transformers import TransformerRetiBlocks
 from src.passes.compilation import opt_level_1
 from src.utils.util_funs_dependent import throw_error
 import copy
 
 
 class RetiBlocksPass:
+    def _parse_asm(self, code):
+        if not code.strip():
+            return []
+        transformer = TransformerRetiBlocks()
+        asm_code = "_asm:\n" + code.strip() + "\n"
+        tree = transformer.parse_tree(asm_code)
+        if tree.root_node.has_error:
+            throw_error(f"Invalid RETI asm: {code}")
+        file = transformer.build_ast(tree, asm_code)
+
+        match file:
+            case pn.File(_, [pn.Block("_asm", instrs)]):
+                return instrs
+            case _:
+                throw_error(f"Unsupported asm block: {code}")
+
     def _global_base_reg(self, symbol_name):
         symbol, _ = self.symbol_table.resolve(symbol_name, scope="global")
         if isinstance(symbol, dict) and symbol.get("section") == "interrupt_vector_table":
@@ -321,7 +338,7 @@ class RetiBlocksPass:
                     )
                 ]
             case pn.Exp(pn.Asm(pn.String(code))):
-                return self._single_line_comment(stmt, "#") + [rn.RawInstr(code.strip())]
+                return self._single_line_comment(stmt, "#") + self._parse_asm(code)
             case pn.Exp(pn.Cast(_, pn.Stack())):
                 return self._single_line_comment(stmt, "# // cast no-op")
             case pn.Exp(pn.Debug()):

@@ -1,0 +1,13 @@
+// in:
+// expected:
+
+__attribute__((naked))
+void jump_to_main_epilogue(void) {
+  asm("JUMP32 main_epilogue");
+  return;
+}
+
+int main() {
+  jump_to_main_epilogue();
+  return 0;
+}
