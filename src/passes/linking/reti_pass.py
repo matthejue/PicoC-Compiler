@@ -271,6 +271,7 @@ class RetiPass:
                     "codesegment_start": self._entries_size(ivt_entries),
                     "datasegment_start": self._entries_size(ivt_entries)
                     + self._entries_size(text_entries),
+                    "stack_start": -1,
                 }
                 output_entries = [
                     self._resolve_ivte(entry)
