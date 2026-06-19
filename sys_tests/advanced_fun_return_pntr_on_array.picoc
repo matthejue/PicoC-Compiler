@@ -1,16 +1,20 @@
 // in:42
-// expected:42 7
+// expected: 42 7
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int (*get_values(int (*values)[3]))[3] {
   return values;
 }
 
 void main() {
-  int values[3] = {1, input(), 7};
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int values[3] = {1, __picoc_input_0, 7};
   int (*returned_values)[3];
 
   returned_values = get_values(&values);
 
-  print((*returned_values)[1]);
-  print((*returned_values)[2]);
+  printf(" %d", (*returned_values)[1]);
+  printf(" %d", (*returned_values)[2]);
 }

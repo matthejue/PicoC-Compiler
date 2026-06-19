@@ -1,5 +1,7 @@
 // in:41
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define A /* block */ 8 * 5
 
@@ -10,6 +12,6 @@
 #define RESULT /* mixed */ (A + B) / C
 
 int main() {
-    print(RESULT);
+    printf(" %d", RESULT);
     return 0;
 }

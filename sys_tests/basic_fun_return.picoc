@@ -1,21 +1,25 @@
 // in:38
-// expected:40 42
+// expected: 40 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int fun(int param);
 
 void main() {
-  int local_var1 = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int local_var1 = __picoc_input_0;
   debug;
   int local_var2 = fun(local_var1);
   debug;
-  print(local_var2 + 2);
+  printf(" %d", local_var2 + 2);
 }
 
 int fun(int param) {
   int local_var1 = 2;
   int local_var2 = param + local_var1;
   debug;
-  print(local_var2);
+  printf(" %d", local_var2);
   debug;
   return local_var2;
 }

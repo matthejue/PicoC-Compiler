@@ -1,8 +1,12 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   int ar[2][2] = {{1, 2}, {3, 4}};
-  *(*(ar + 1) + 1) = input();
-  print(ar[1][1]);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  *(*(ar + 1) + 1) = __picoc_input_0;
+  printf(" %d", ar[1][1]);
 }

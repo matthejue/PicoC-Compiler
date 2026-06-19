@@ -1,7 +1,9 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   int x = 5 % 4;
-  print(x + 41);
+  printf(" %d", x + 41);
 }

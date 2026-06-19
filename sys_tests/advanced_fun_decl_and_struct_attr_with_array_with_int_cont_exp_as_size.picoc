@@ -1,5 +1,7 @@
 // in:41
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define SIZE (3 * 2)
 
@@ -17,11 +19,13 @@ int last_element(int arr[SIZE]) {
 int main() {
     struct Box b;
 
-    int x = input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    int x = __picoc_input_0;
     b.data[SIZE - 1] = x + 1;
 
     debug;
-    print(last_element(b.data));
+    printf(" %d", last_element(b.data));
 
     return 0;
 }

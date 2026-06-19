@@ -1,16 +1,20 @@
 // in:1
-// expected:4 7
+// expected: 4 7
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   int f[3][4]; //zweidimensionales Feld f
   int g;
   // ...
-  g = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  g = __picoc_input_0;
   // ...
   /** Zugriff mit arithmetischen Ausdruecken **/
   f[1 + g][2] = 4;
-  print(f[1 + g][2]);
+  printf(" %d", f[1 + g][2]);
   g = 3 + f[2][1 + g];
-  print(g);
+  printf(" %d", g);
 }

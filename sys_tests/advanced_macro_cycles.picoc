@@ -1,5 +1,7 @@
 // in:22
-// expected:10 20 5 32 42 27
+// expected: 10 20 5 32 42 27
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define A B
 #define B A
@@ -11,19 +13,21 @@ int main()
     int B = 20;
     int X = 5;
 
-    print(A);   // must print 10
-    print(B);   // must print 20
-    print(X);   // must print 5
+    printf(" %d", A);   // must print 10
+    printf(" %d", B);   // must print 20
+    printf(" %d", X);   // must print 5
 
-    int v = input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    int v = __picoc_input_0;
 
     A = A + v;
     B = B + v;
     X = X + v;
 
-    print(A);   // must print 10 + v
-    print(B);   // must print 20 + v
-    print(X);   // must print 5  + v
+    printf(" %d", A);   // must print 10 + v
+    printf(" %d", B);   // must print 20 + v
+    printf(" %d", X);   // must print 5  + v
 
     return 0;
 }

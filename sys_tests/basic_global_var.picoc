@@ -1,16 +1,18 @@
 // in:
-// expected:42 314
+// expected: 42 314
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int global_var;
 
 void fun() {
-  print(global_var);
+  printf(" %d", global_var);
 }
 
 int global_var2 = 42;
 
 void main() {
-  print(global_var2);
+  printf(" %d", global_var2);
   global_var = 314;
   fun();
 }

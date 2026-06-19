@@ -1,10 +1,14 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main(){
-  int var = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
   int *pntr = &var;
   int ar[3][3][2] = {{{0 + 1, 2}, {3, 4}, {4+1, 5}}, {{7, *pntr}, {10, 10+1}, {11, 12}}, {{13, 14}, {15, 16}, {16+1, 17+1}}};
 
-  print(*(ar[1][0]+3-2));
+  printf(" %d", *(ar[1][0]+3-2));
 }

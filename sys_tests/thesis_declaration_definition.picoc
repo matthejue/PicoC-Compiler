@@ -1,5 +1,7 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void fun_declared_before(int *param);
 
@@ -10,7 +12,7 @@ int fun_defined(int param) {
 void main() {
   int res = fun_defined(22);
   fun_declared_before(&res);
-  print(res);
+  printf(" %d", res);
 }
 
 void fun_declared_before(int *param) {

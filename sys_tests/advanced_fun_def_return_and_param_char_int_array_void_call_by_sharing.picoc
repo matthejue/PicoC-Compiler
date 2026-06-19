@@ -1,5 +1,7 @@
 // in:42
-// expected:1 2 3 42 42
+// expected: 1 2 3 42 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int print_all(int ar_ref[3], int len);
 
@@ -8,16 +10,18 @@ void main() {
   int ar[3] = {1, 2, 3};
 
   print_all(ar, 3);
-  print(ar[2]);
+  printf(" %d", ar[2]);
 }
 
 int print_all(int ar_ref[3], int len) {
   int i = 0;
   while (i < len) {
-    print(ar_ref[i]);
+    printf(" %d", ar_ref[i]);
     i = i + 1;
   }
-  ar_ref[2] = input();
-  print(ar_ref[2]);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  ar_ref[2] = __picoc_input_0;
+  printf(" %d", ar_ref[2]);
   return 1;
 }

@@ -1,5 +1,7 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int add_one_if_larger_40(int value) {
   if (value > 40) {
@@ -11,5 +13,5 @@ int add_one_if_larger_40(int value) {
 
 void main() {
   int result = add_one_if_larger_40(41);
-  print(result);
+  printf(" %d", result);
 }

@@ -1,9 +1,11 @@
 // in:
-// expected:2
+// expected: 2
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct pos {int x; int y;};
 
 void main() {
   struct pos st = {.x=4, .y=2};
-  print(st.y);
+  printf(" %d", st.y);
 }

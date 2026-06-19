@@ -1,5 +1,7 @@
 // in:21 2 6 7
-// expected:42 42
+// expected: 42 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #include "./include/basic_pragma_once_a.header"
 #include "./include/basic_pragma_once_b.header"
@@ -12,10 +14,18 @@ int main() {
     struct str_b b;
 
     b.ptr = &b.a.value;
-    x = input();
-    y = input();
-    arr[0] = input();
-    arr[1] = input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    x = __picoc_input_0;
+    int __picoc_input_1;
+    scanf(" %d", &__picoc_input_1);
+    y = __picoc_input_1;
+    int __picoc_input_2;
+    scanf(" %d", &__picoc_input_2);
+    arr[0] = __picoc_input_2;
+    int __picoc_input_3;
+    scanf(" %d", &__picoc_input_3);
+    arr[1] = __picoc_input_3;
     b.ptr = &b.a.value;
     b.a.value = x + y + arr[0] + arr[1];
 
@@ -25,7 +35,7 @@ int main() {
         }
     } 
 
-    print(*b.ptr);
-    print(b.a.value);
+    printf(" %d", *b.ptr);
+    printf(" %d", b.a.value);
     return 0;
 }

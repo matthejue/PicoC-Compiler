@@ -1,12 +1,16 @@
 // in:41
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int main() {
   int one = 1;
   int ar[3 * 5];   // must be accepted as a constant expression
 
-  ar[3 * 5 - one] = input();
-  print(ar[3 * 5 - one]+one);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  ar[3 * 5 - one] = __picoc_input_0;
+  printf(" %d", ar[3 * 5 - one]+one);
 
   return 0;
 }

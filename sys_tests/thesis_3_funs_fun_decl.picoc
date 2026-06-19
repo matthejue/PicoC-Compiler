@@ -1,5 +1,7 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int fun2(int var);
 
@@ -13,6 +15,6 @@ void main() {
 }
 
 int fun2(int var) {
-  print(var);
+  printf(" %d", var);
   return var;
 }

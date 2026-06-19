@@ -1,5 +1,7 @@
 // in:
-// expected:314 42
+// expected: 314 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void fun(int ar[2]) {
   ar[1] = 42;
@@ -7,7 +9,7 @@ void fun(int ar[2]) {
 
 void main() {
   int ar[2] = {314, 314};
-  print(ar[1]);
+  printf(" %d", ar[1]);
   fun(ar);
-  print(ar[1]);
+  printf(" %d", ar[1]);
 }

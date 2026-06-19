@@ -1,6 +1,8 @@
 // in:30
-// expected:2 3 5 7 11 13 17 19 23 29
+// expected: 2 3 5 7 11 13 17 19 23 29
 // from the Introduction to Programming Lecture by Peter Thiemann
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int ar[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int len = 10;
@@ -33,9 +35,11 @@ void primes(int *primes, int n) {
 
 void main() {
   int i = 0;
-  primes(ar, input());
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  primes(ar, __picoc_input_0);
   while (i < len) {
-    print(ar[i]);
+    printf(" %d", ar[i]);
     i = i + 1;
   }
 }

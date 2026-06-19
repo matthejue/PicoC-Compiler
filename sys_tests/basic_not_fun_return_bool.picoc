@@ -1,23 +1,29 @@
 // in:0 5
-// expected:1 4
+// expected: 1 4
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int func_return_bool(int val) {
   return val;
 }
 
 void main() {
-  int val1 = input();
-  int val2 = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int val1 = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int val2 = __picoc_input_1;
 
   if (!func_return_bool(val1)) {
-    print(1);
+    printf(" %d", 1);
   } else {
-    print(2);
+    printf(" %d", 2);
   }
 
   if (!func_return_bool(val2)) {
-    print(3);
+    printf(" %d", 3);
   } else {
-    print(4);
+    printf(" %d", 4);
   }
 }

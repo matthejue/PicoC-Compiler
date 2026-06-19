@@ -1,8 +1,12 @@
 // in:42
-// expected:1 42 3 1 42 3 1 42 3
+// expected: 1 42 3 1 42 3 1 42 3
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
-  int ar[3] = {1, input(), 3};
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int ar[3] = {1, __picoc_input_0, 3};
   int *ar2;
   int i;
   int *ar3;
@@ -13,14 +17,14 @@ void main() {
   // print array
   i = 0;
   while (i < 3) {
-    print(ar2[i]);
+    printf(" %d", ar2[i]);
     i = i + 1;
   }
   ar3 = ar;
   // print array
   i = 0;
   while (i < 3) {
-    print(ar3[i]);
+    printf(" %d", ar3[i]);
     i = i + 1;
   }
   // ---------------------------- assign with loop ----------------------------
@@ -34,7 +38,7 @@ void main() {
   // print array
   i = 0;
   while (i < 3) {
-    print(ar3[i]);
+    printf(" %d", ar3[i]);
     i = i + 1;
   }
 }

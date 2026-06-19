@@ -1,11 +1,15 @@
 // in:41
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 static inline int add_one(int value) {
   return value + 1;
 }
 
 void main() {
-  int number = input();
-  print(add_one(number));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int number = __picoc_input_0;
+  printf(" %d", add_one(number));
 }

@@ -1,7 +1,11 @@
 // in:2
-// expected:-2
+// expected: -2
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
-  int a[2] = {1, input()};
-  print(-a[1]);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int a[2] = {1, __picoc_input_0};
+  printf(" %d", -a[1]);
 }

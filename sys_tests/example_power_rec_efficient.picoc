@@ -1,6 +1,8 @@
 // in:2 9
-// expected:512
+// expected: 512
 // from the Introduction to Programming Lecture by Peter Thiemann
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int power_efficient(int a, int n) {
   if (n == 0) {
@@ -13,7 +15,11 @@ int power_efficient(int a, int n) {
 }
 
 void main() {
-  int a = input();
-  int n = input();
-  print(power_efficient(a, n));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int a = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int n = __picoc_input_1;
+  printf(" %d", power_efficient(a, n));
 }

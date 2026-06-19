@@ -1,5 +1,7 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int attr1; int attr2[2];};
 
@@ -13,5 +15,5 @@ void main() {
 }
 
 void stack_fun(struct st param[2][3]) {
-  print(param[1][3]);
+  printf(" %d", param[1][3]);
 }

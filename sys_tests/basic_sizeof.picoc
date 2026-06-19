@@ -1,5 +1,7 @@
 // in:
-// expected:42 2 2
+// expected: 42 2 2
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct Point {
     int x;
@@ -10,9 +12,9 @@ int main() {
     int a = 42;
     struct Point p = {10, 20};
 
-    print(sizeof(a) + 41);
-    print(sizeof(p));
-    print(sizeof(struct Point));
+    printf(" %d", sizeof(a) + 41);
+    printf(" %d", sizeof(p));
+    printf(" %d", sizeof(struct Point));
 
     return 0;
 }

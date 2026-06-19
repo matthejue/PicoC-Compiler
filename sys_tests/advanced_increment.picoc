@@ -1,15 +1,19 @@
 // in:10
-// expected:10 11 1 3
+// expected: 10 11 1 3
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int main() {
-  int val = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int val = __picoc_input_0;
   int arr[2];
   int i = 0;
 
-  print(val++);
-  print(val);
+  printf(" %d", val++);
+  printf(" %d", val);
 
   arr[i++] = 3;
-  print(i);
-  print(arr[0]);
+  printf(" %d", i);
+  printf(" %d", arr[0]);
 }

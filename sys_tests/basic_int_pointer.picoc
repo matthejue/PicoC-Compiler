@@ -1,5 +1,7 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct Pair {
   int first;
@@ -9,11 +11,13 @@ struct Pair p;
 
 int *fun_return_void_pointer() {
   p.first  = 66;
-  p.second = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  p.second = __picoc_input_0;
   return (void *)&p;
 }
 
 void main() {
   int var = fun_return_void_pointer()[1];
-  print(var);
+  printf(" %d", var);
 }

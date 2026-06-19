@@ -1,15 +1,21 @@
 // in:2 42
-// expected:21 2 42
+// expected: 21 2 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct str1 {int attr1[3]; int attr2;};
 struct str2 {int attr1; struct str1 attr2;};
 
 void main() {
-  int attr1_middle = input();
-  int attr2 = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int attr1_middle = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int attr2 = __picoc_input_1;
   struct str2 some_str = {.attr1=21, .attr2={.attr1={1, attr1_middle, 3}, .attr2=attr2}};
 
-  print(some_str.attr1);
-  print(some_str.attr2.attr1[1]);
-  print(some_str.attr2.attr2);
+  printf(" %d", some_str.attr1);
+  printf(" %d", some_str.attr2.attr1[1]);
+  printf(" %d", some_str.attr2.attr2);
 }

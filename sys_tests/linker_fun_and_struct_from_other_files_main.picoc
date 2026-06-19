@@ -1,15 +1,21 @@
-// input:2 3
-// expected:5
+// input: 2 3
+// expected: 5
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #include "./include/linker_fun_and_struct_from_other_files_a.header"
 #include "./include/linker_fun_and_struct_from_other_files_b.header"
 
 int main() {
     struct Data d;
-    int x = input();
-    int y = input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    int x = __picoc_input_0;
+    int __picoc_input_1;
+    scanf(" %d", &__picoc_input_1);
+    int y = __picoc_input_1;
     make_data(&d, x, y);
     int r = add(d.x, d.y);
-    print(r);
+    printf(" %d", r);
     return 1;
 }

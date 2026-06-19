@@ -1,21 +1,25 @@
 // in:10
-// expected:2 4 6 10
+// expected: 2 4 6 10
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   const int level1 = 2;
   const int level2 = 4;
   const int level3 = 6;
-  int max_level = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int max_level = __picoc_input_0;
   int i = 0;
   while (i < max_level) {
     if (i == level1) {
-      print(i);
+      printf(" %d", i);
     } else if (i == level2) {
-      print(i);
+      printf(" %d", i);
     } else if (i == level3) {
-      print(i);
+      printf(" %d", i);
     }
     i = i + 1;
   }
-  print(i);
+  printf(" %d", i);
 }

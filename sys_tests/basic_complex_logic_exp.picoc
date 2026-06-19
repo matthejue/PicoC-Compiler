@@ -1,10 +1,12 @@
 // in:10
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   int var = 10;
   int boolean = 0 || 1 && var || (var < 10 && 1);
   if (boolean) {
-    print(42);
+    printf(" %d", 42);
   }
 }

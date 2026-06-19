@@ -1,9 +1,13 @@
 // in:10 10 10 10 10 10 10 10 10 10
-// expected:10
+// expected: 10
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int rec_fun_call(int arg) {
   debug;
-  if (arg == input()) {
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  if (arg == __picoc_input_0) {
     return arg;
   }
   debug;
@@ -12,6 +16,6 @@ int rec_fun_call(int arg) {
 
 void main() {
   debug;
-  print(rec_fun_call(1));
+  printf(" %d", rec_fun_call(1));
   debug;
 }

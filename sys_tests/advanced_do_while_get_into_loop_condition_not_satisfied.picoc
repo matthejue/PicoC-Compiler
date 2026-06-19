@@ -1,10 +1,14 @@
 // in:-42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   const int min = 0;
-  int i = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int i = __picoc_input_0;
   do {
-    print(-i);
+    printf(" %d", -i);
   } while (i > min);
 }

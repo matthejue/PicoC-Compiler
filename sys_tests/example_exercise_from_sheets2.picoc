@@ -1,6 +1,8 @@
 // in:3 15
-// expected:3
+// expected: 3
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // Deklarationsteil
@@ -9,11 +11,15 @@ void main() {
   const int z = 2;
 
   // Anweisungsteil
-  y = input();
-  x = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  y = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  x = __picoc_input_1;
 
   while(x >= z * y) {
     x = x - 3;
   }
-  print(x);
+  printf(" %d", x);
 }

@@ -1,6 +1,8 @@
 // in:10 5
-// expected:10 5 1 5 10
+// expected: 10 5 1 5 10
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int b;
 int x;
@@ -17,11 +19,15 @@ int ps(int *x, int *y) {
 }
 void main() {
   int b; int res;
-  x = input(); b = input();
-  print(x);
-  print(b);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  x = __picoc_input_0; b = __picoc_input_1;
+  printf(" %d", x);
+  printf(" %d", b);
   res = ps(&x, &b);
-  print(res);
-  print(x);
-  print(b);
+  printf(" %d", res);
+  printf(" %d", x);
+  printf(" %d", b);
 }

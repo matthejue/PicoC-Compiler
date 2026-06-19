@@ -1,5 +1,7 @@
 // in:10
-// expected:55
+// expected: 55
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int fib(int fib_nr) {
   int i = 2;
@@ -16,5 +18,7 @@ int fib(int fib_nr) {
 }
 
 void main() {
-  print(fib(input()));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", fib(__picoc_input_0));
 }

@@ -1,15 +1,19 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define true 1
 #define false 0
 #define NULL 0
 
 int main() {
-    int x = input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    int x = __picoc_input_0;
 
     if (true == 1 && false == 0 && NULL == 0) {
-        print(x);
+        printf(" %d", x);
     }
 
     return 0;

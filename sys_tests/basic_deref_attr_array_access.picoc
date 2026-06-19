@@ -1,5 +1,7 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct Data {
     int arr0[2];
@@ -7,10 +9,12 @@ struct Data {
 };
 
 void main() {
-    struct Data obj = {.arr0={1, 2}, .arr1={3, input()}};
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    struct Data obj = {.arr0={1, 2}, .arr1={3, __picoc_input_0}};
     struct Data *ptr = &obj;
 
     int x = (*ptr).arr1[1];
 
-    print(x);
+    printf(" %d", x);
 }

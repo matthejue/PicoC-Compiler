@@ -1,6 +1,8 @@
 // in:42 24 42 -24 -42 24 -42 -24
-// expected:0 0 1 1
+// expected: 0 0 1 1
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int is_less_equal_without_overflow(int x, int y) {
   if((x > 0) ^ (y > 0)) {
@@ -17,16 +19,32 @@ int is_less_equal_without_overflow(int x, int y) {
 }
 
 void main() {
-  int x = input();
-  int y = input();
-  print(is_less_equal_without_overflow(x, y));
-  x = input();
-  y = input();
-  print(is_less_equal_without_overflow(x, y));
-  x = input();
-  y = input();
-  print(is_less_equal_without_overflow(x, y));
-  x = input();
-  y = input();
-  print(is_less_equal_without_overflow(x, y));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int x = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int y = __picoc_input_1;
+  printf(" %d", is_less_equal_without_overflow(x, y));
+  int __picoc_input_2;
+  scanf(" %d", &__picoc_input_2);
+  x = __picoc_input_2;
+  int __picoc_input_3;
+  scanf(" %d", &__picoc_input_3);
+  y = __picoc_input_3;
+  printf(" %d", is_less_equal_without_overflow(x, y));
+  int __picoc_input_4;
+  scanf(" %d", &__picoc_input_4);
+  x = __picoc_input_4;
+  int __picoc_input_5;
+  scanf(" %d", &__picoc_input_5);
+  y = __picoc_input_5;
+  printf(" %d", is_less_equal_without_overflow(x, y));
+  int __picoc_input_6;
+  scanf(" %d", &__picoc_input_6);
+  x = __picoc_input_6;
+  int __picoc_input_7;
+  scanf(" %d", &__picoc_input_7);
+  y = __picoc_input_7;
+  printf(" %d", is_less_equal_without_overflow(x, y));
 }

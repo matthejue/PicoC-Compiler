@@ -1,17 +1,25 @@
 // in:3 2 1
-// expected:5 42
+// expected: 5 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // multidimensional array initialisation
-  int var[2][3] = {{1, 2, 3},{1, 2 + input(), 3}};
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var[2][3] = {{1, 2, 3},{1, 2 + __picoc_input_0, 3}};
   // array definition
   int var2[2];
   // array store
-  var2[0] = input();
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  var2[0] = __picoc_input_1;
   // array_load
-  print(var[input()][2 - 1]);
+  int __picoc_input_2;
+  scanf(" %d", &__picoc_input_2);
+  printf(" %d", var[__picoc_input_2][2 - 1]);
   // array load + store, complex array assign
   var2[1] = var[1][2 - 1] * 8;
   // final result
-  print(var2[0] + var2[1]);
+  printf(" %d", var2[0] + var2[1]);
 }

@@ -1,5 +1,7 @@
 // in:
-// expected:60
+// expected: 60
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int sum(int count, ...);
 
@@ -21,5 +23,5 @@ int sum(int count, ...) {
 
 void main() {
   debug;
-  print(sum(3, 10, 20, 30));
+  printf(" %d", sum(3, 10, 20, 30));
 }

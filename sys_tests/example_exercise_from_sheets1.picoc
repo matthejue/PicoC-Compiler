@@ -1,6 +1,8 @@
 // in:3 2
-// expected:27
+// expected: 27
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // Deklarationsteil
@@ -9,9 +11,13 @@ void main() {
   const int z = 5;
 
   // Anweisungsteil
-  y = input();
-  x = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  y = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  x = __picoc_input_1;
 
   x = (x + ((y * z) + 10)); // vollstaendig geklammerter Ausdruck
-  print(x);
+  printf(" %d", x);
 }

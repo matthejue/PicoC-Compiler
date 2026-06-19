@@ -1,1 +1,1 @@
-./sys_tests/basic_several_fun_calls_in_one_function_block.picoc
+./sys_tests/basic_string.picoc

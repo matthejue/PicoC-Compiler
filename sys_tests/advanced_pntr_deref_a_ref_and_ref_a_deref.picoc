@@ -1,14 +1,18 @@
 // in:42
-// expected:42 42
+// expected: 42 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // deref a ref
-  int var = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
   int *pntr;
   var = *&var;
-  print(var);
+  printf(" %d", var);
   // ref a deref
   pntr = &var;
   pntr = &*pntr;
-  print(*pntr);
+  printf(" %d", *pntr);
 }

@@ -1,6 +1,8 @@
 // in:7 4
-// expected:7 4 7 7 7 4 2 1 0 0
+// expected: 7 4 7 7 7 4 2 1 0 0
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct point {
   int x;
@@ -21,10 +23,14 @@ void main() {
   //st(p2) = (struct, x -> (int,0), y -> (int,1), 15)
   struct point p2;
   a = &(p2.x);
-  p2.x = input();
-  p2.y = input();
-  print(*a);
-  print(*(a+1));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  p2.x = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  p2.y = __picoc_input_1;
+  printf(" %d", *a);
+  printf(" %d", *(a+1));
 
   /*** MARKE 1 ***/
 
@@ -32,29 +38,29 @@ void main() {
   // p1 = (struct point *) malloc(sizeof(struct point));
   p1 = &heap_space;
   (*p1).y = *a;
-  print(heap_space.y);
+  printf(" %d", heap_space.y);
   p3 = p1;
-  print((*p3).y);
+  printf(" %d", (*p3).y);
   p1 = &p2;
-  print((*p1).x);
-  print((*p1).y);
+  printf(" %d", (*p1).x);
+  printf(" %d", (*p1).y);
 
   /*** MARKE 2 ***/
 
   if((*p1).y > 5) {
-    print(1);
+    printf(" %d", 1);
     *a = 42;
   } else {
-    print(2);
+    printf(" %d", 2);
     *a = 1;
   }
-  print(p2.x);
+  printf(" %d", p2.x);
 
   /*** MARKE 3 ***/
 
   // free(p3);
   (*p3).x = 0;
   (*p3).y = 0;
-  print(heap_space.x);
-  print(heap_space.y);
+  printf(" %d", heap_space.x);
+  printf(" %d", heap_space.y);
 }

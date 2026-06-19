@@ -1,16 +1,18 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
-  print(42);
+  printf(" %d", 42);
   return;
 }
 
 void fun1() {
-  print(42);
+  printf(" %d", 42);
 }
 
 int fun2() {
-  print(42);
+  printf(" %d", 42);
   return 1;
 }

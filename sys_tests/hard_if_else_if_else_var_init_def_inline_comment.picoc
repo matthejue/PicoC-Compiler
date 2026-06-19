@@ -1,9 +1,13 @@
 // in:41
-// expected:24 42
+// expected: 24 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // complex initialisation
-  int var = input() + 1;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0 + 1;
   // variable definition, char datatype
   char var2;
   int i = 1;
@@ -23,7 +27,7 @@ void main() {
       var2 = 24;
     // several if after another
     if (4 + 2 || 0) {
-      print(var2);
+      printf(" %d", var2);
     } else {
       // else with braces
       // empty else

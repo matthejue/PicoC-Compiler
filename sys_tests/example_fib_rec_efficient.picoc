@@ -1,6 +1,8 @@
 // in:10
-// expected:55
+// expected: 55
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -17,5 +19,7 @@ int fib_efficient(int n, int* res){
 }
 
 void main() {
-  print(fib_efficient(input(), ar));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", fib_efficient(__picoc_input_0, ar));
 }

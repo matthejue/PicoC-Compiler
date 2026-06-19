@@ -1,5 +1,7 @@
 // in:42
-// expected:1 2 3 4 5 6 42
+// expected: 1 2 3 4 5 6 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct array_with_len {int ar[3]; int len;};
 
@@ -12,19 +14,21 @@ void main() {
   int len;
   len = 3;
   print_all_pntr(&len, ar, &st_ar);
-  print(st_ar.ar[2]);
+  printf(" %d", st_ar.ar[2]);
 }
 
 void print_all_pntr(int *len_ref, int *ar_ref, struct array_with_len *st_ar_ref) {
   int i = 0;
   while (i < *len_ref) {
-    print(ar_ref[i]);
+    printf(" %d", ar_ref[i]);
     i = i + 1;
   }
   i = 0;
   while (i < (*st_ar_ref).len) {
-    print((*st_ar_ref).ar[i]);
+    printf(" %d", (*st_ar_ref).ar[i]);
     i = i + 1;
   }
-  (*st_ar_ref).ar[2] = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  (*st_ar_ref).ar[2] = __picoc_input_0;
 }

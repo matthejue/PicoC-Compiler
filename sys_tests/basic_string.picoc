@@ -1,16 +1,16 @@
-// in:
-// expected:whatever1 whatever2
+// in: heyhoho1 heyhoho2
+// expected: whatever1 whatever2
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc ../../Pico-OS/lib/string/string.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
+#include "../../Pico-OS/lib/string/string.header"
 
 int main() {
 
   char *str = "whatever1";
   char stack_str[] = "whatever2";
 
-  asm("LOADIN BAF ACC 0");
-  asm("INT 1");
-  asm("MOVE BAF ACC");
-  asm("SUBI ACC 10");
-  asm("INT 1");
+  printf(" %s", str);
+  printf(" %s", stack_str);
 
   return 0;
 }

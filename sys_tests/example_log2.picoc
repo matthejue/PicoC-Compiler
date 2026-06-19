@@ -1,6 +1,8 @@
 // in:128
-// expected:7
+// expected: 7
 // from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int log2(int a) {
     int b = -1;
@@ -12,5 +14,7 @@ int log2(int a) {
 }
 
 void main() {
-  print(log2(input()));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", log2(__picoc_input_0));
 }

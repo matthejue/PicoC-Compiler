@@ -1,10 +1,12 @@
 // in:
-// expected:123
+// expected: 123
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define A B
 #define B 123
 
 int main() {
-    print(A);
+    printf(" %d", A);
     return 0;
 }

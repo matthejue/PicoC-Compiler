@@ -1,5 +1,7 @@
 // in:12
-// expected:42 314
+// expected: 42 314
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int len; int ar[2];};
 
@@ -9,7 +11,7 @@ void print_ar(struct st param_st) {
   // scope test, local i has higher priority
   int i = 0;
   while (i < param_st.len) {
-    print(param_st.ar[i]);
+    printf(" %d", param_st.ar[i]);
     i = i + 1;
   }
 }

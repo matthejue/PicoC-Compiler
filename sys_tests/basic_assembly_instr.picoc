@@ -1,10 +1,10 @@
-// in:41 42
-// expected:41 42
+// in:42
+// expected:42
 
 int main() {
-  asm("INT 2");
+  asm("INT 1");
   asm("INT 0");
-  asm("INT 2");
+  asm("INT 1");
   asm("INT 0");
   return 0;
 }

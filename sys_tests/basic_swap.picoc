@@ -1,5 +1,7 @@
 // in:
-// expected:4 42 -2 42
+// expected: 4 42 -2 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct stt {int len; int *ar;};
 
@@ -16,9 +18,9 @@ int swap(int *x, int *y) {
 
 void main() {
   swap(&st_ar.ar[2], &st_ar.ar[3]);
-  print(st_ar.ar[2]);
-  print(st_ar.ar[3]);
+  printf(" %d", st_ar.ar[2]);
+  printf(" %d", st_ar.ar[3]);
   swap(&st_ar.ar[3], &st_ar.ar[4]);
-  print(st_ar.ar[3]);
-  print(st_ar.ar[4]);
+  printf(" %d", st_ar.ar[3]);
+  printf(" %d", st_ar.ar[4]);
 }

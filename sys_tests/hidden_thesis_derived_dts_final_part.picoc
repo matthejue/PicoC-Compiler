@@ -1,5 +1,7 @@
 // in:
-// expected:-2147483569 0 -2147483565
+// expected: -2147483569 0 -2147483565
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int attr[2];};
 
@@ -10,7 +12,7 @@ void main() {
   int *pntr1 = &var;
   int **complex_var3 = &pntr1;
 
-  print(complex_var1[0]);
-  print(complex_var2[0]);
-  print(*complex_var3);
+  printf(" %d", complex_var1[0]);
+  printf(" %d", complex_var2[0]);
+  printf(" %d", *complex_var3);
 }

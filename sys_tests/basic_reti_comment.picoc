@@ -1,12 +1,16 @@
 // in:42
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   // # begin
-  int var = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
   //  # this shouldn't be visible
   // # this should be visible
   //# this should be visible
-  print(var);
+  printf(" %d", var);
   // # end
 }

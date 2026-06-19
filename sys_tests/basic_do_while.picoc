@@ -1,12 +1,16 @@
 // in:1 2 3 4 5 6 7 8
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
   const int min = 6;
   const int max = 42;
   int i = 6;
   do {
-    i = i + input();
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    i = i + __picoc_input_0;
   } while (i > min && i < max);
-  print(i);
+  printf(" %d", i);
 }

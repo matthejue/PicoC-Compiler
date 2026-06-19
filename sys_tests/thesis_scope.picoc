@@ -1,10 +1,12 @@
 // in:
-// expected:4 2
+// expected: 4 2
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void fun_scope(int param) {
   int local_var = 2;
-  print(param);
-  print(local_var);
+  printf(" %d", param);
+  printf(" %d", local_var);
 }
 
 void main() {

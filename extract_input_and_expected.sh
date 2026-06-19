@@ -10,10 +10,7 @@ fi
 
 for test in "${paths[@]}"; do
   sed -n '1p' "$test" | sed -e 's/^\/\/ in://' > "${test%.picoc}.input"
+
   expected=$(sed -n '2p' "$test" | sed -e 's/^\/\/ expected://')
-  if [[ "$expected" == '' ]]; then
-    echo -n '' > "${test%.picoc}.expected_output"
-  else
-    echo "$expected" | tr '\n' ' ' > "${test%.picoc}.expected_output"
-  fi
+  printf '%s' "$expected" > "${test%.picoc}.expected_output"
 done

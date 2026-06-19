@@ -373,6 +373,38 @@ class OptionHandler:
         merged_table = {}
         merged_parents = {}
 
+        def symbol_signature(value):
+            match value:
+                case pn.ASTNode():
+                    return (
+                        value.__class__.__name__,
+                        tuple(
+                            sorted(
+                                (attr_name, symbol_signature(attr_value))
+                                for attr_name, attr_value in vars(value).items()
+                                if attr_name not in {
+                                    "source_file",
+                                    "source_line",
+                                    "suppress_source_origin",
+                                }
+                            )
+                        ),
+                    )
+                case dict():
+                    return tuple(
+                        sorted(
+                            (key, symbol_signature(item))
+                            for key, item in value.items()
+                        )
+                    )
+                case list():
+                    return tuple(symbol_signature(item) for item in value)
+                case _:
+                    return value
+
+        def symbols_equivalent(existing, incoming):
+            return symbol_signature(existing) == symbol_signature(incoming)
+
         def struct_completeness(symbol):
             datatype = symbol.get("datatype") if isinstance(symbol, dict) else None
             if isinstance(datatype, pn.StructDecl):
@@ -420,6 +452,11 @@ class OptionHandler:
                 # because declarations may omit parameter names. In PicoC,
                 # however, function declarations require named parameters.
                 # Syntax checking rejects duplicate definitions before merging.
+                return
+            elif scope != "global" and symbols_equivalent(existing, incoming):
+                # Re-including the same source file can replay the same function
+                # scope symbols. If the merged payload is identical, keep the
+                # existing entry instead of treating it as a conflict.
                 return
             else:
                 throw_error(f"Duplicate symbol '{name}' in scope '{scope}'")
@@ -549,21 +586,23 @@ class OptionHandler:
 
     def _reti_with_metadata(self, pass_ast: pn.File, heading, sections):
         metadata_entries = []
-        if global_vars.args.metadata_comments and global_vars.metadata_comments:
-            for key in ("input", "expected", "datasegment"):
-                value = global_vars.metadata_comments.get(key)
-                if value is not None:
-                    metadata_entries.append(pn.SingleLineComment("#", f"{key}: {value}"))
-        else:
-            metadata_entries = [
-                pn.SingleLineComment(
+        # Prefer raw metadata_comments strings (from // in: and // expected: comments)
+        for key in ("input", "expected", "datasegment"):
+            value = global_vars.metadata_comments.get(key) if global_vars.metadata_comments else None
+            if value is not None:
+                metadata_entries.append(pn.SingleLineComment("#", f"{key}:{value}"))
+        
+        # Fallback: reconstruct from parsed input/expected if not in metadata_comments
+        if "input" not in (global_vars.metadata_comments or {}):
+            if global_vars.input:
+                metadata_entries.append(pn.SingleLineComment(
                     "#", f"input: {' '.join(map(lambda x: str(x), global_vars.input))}"
-                ),
-                pn.SingleLineComment(
-                    "#",
-                    f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}",
-                ),
-            ]
+                ))
+        if "expected" not in (global_vars.metadata_comments or {}):
+            if global_vars.expected:
+                metadata_entries.append(pn.SingleLineComment(
+                    "#", f"expected: {' '.join(map(lambda x: str(x), global_vars.expected))}"
+                ))
 
         pass_ast.decls_defs_blocks_instrs[:0] = metadata_entries
 

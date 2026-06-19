@@ -1,10 +1,12 @@
 // in:
-// expected:42
+// expected: 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int len; int ar[2];};
 
 void main() {
   struct st st_var;
   st_var.ar[1] = 42;
-  print(st_var.ar[1]);
+  printf(" %d", st_var.ar[1]);
 }

@@ -1,6 +1,8 @@
 // in:10 5
-// expected:10 5 1 5 10
+// expected: 10 5 1 5 10
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 
 int pairsort(int *x, int *y) {
@@ -14,12 +16,16 @@ int pairsort(int *x, int *y) {
 
 void main() {
   int res;
-  int a = input();
-  int b = input();
-  print(a);
-  print(b);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int a = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int b = __picoc_input_1;
+  printf(" %d", a);
+  printf(" %d", b);
   res = pairsort(&a, &b);
-  print(res);
-  print(a);
-  print(b);
+  printf(" %d", res);
+  printf(" %d", a);
+  printf(" %d", b);
 }

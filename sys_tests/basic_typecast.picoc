@@ -1,5 +1,7 @@
 // input:
-// expected:42 -42
+// expected: 42 -42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define NULL ((void *)0)
 
@@ -22,8 +24,8 @@ int main() {
     *size = 3 * 38;
     struct BlockHeader *new_block = ((struct BlockHeader *)(data_start + (*current).size) + 3);
 
-    print(new_block - current);
-    print(current - new_block);
+    printf(" %d", new_block - current);
+    printf(" %d", current - new_block);
 
     return 0;
 }

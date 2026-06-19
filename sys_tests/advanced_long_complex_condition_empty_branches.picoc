@@ -1,20 +1,24 @@
 // in:42
-// expected:42 42 42
+// expected: 42 42 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
-  int var = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
   if (var < 42 && -var + 42 || 1) {
-    print(42);
+    printf(" %d", 42);
   } else {
   }
 
   if (var > 42 && (var - 42 || 1)) {
   } else {
-    print(42);
+    printf(" %d", 42);
   }
 
   if (var + 1 && (var != 42 || 0) + 1) {
-    print(42);
+    printf(" %d", 42);
   } else {
   }
 

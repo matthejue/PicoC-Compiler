@@ -1,14 +1,18 @@
 // in:4
-// expected:24
+// expected: 24
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 
 void main() {
-  int n = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int n = __picoc_input_0;
   int res = 1;
   while (n != 1) {
     res = n * res;
     n = n - 1;
   }
-  print(res);
+  printf(" %d", res);
 }

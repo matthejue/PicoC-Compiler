@@ -1,6 +1,8 @@
 // in:12 9 16 12
-// expected:3 4
+// expected: 3 4
 // from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann and was also needed in one exercise sheet in the Operating Systems Lecture by Prof. Dr. Scholl
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int gcd(int a, int b) {
   int c;
@@ -13,10 +15,18 @@ int gcd(int a, int b) {
 }
 
 void main() {
-  int a = input();
-  int b = input();
-  print(gcd(a, b));
-  a = input();
-  b = input();
-  print(gcd(a, b));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int a = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int b = __picoc_input_1;
+  printf(" %d", gcd(a, b));
+  int __picoc_input_2;
+  scanf(" %d", &__picoc_input_2);
+  a = __picoc_input_2;
+  int __picoc_input_3;
+  scanf(" %d", &__picoc_input_3);
+  b = __picoc_input_3;
+  printf(" %d", gcd(a, b));
 }

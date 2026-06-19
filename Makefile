@@ -1,4 +1,4 @@
-.PHONY: test run clean run_send_keypresses
+.PHONY: test test-clean test_not_passed run clean run_send_keypresses
 
 TEST_PATTERN ?= $(shell cat ./opts/test_pattern.txt)
 RUN_PATH ?= $(shell cat ./opts/run_path.txt)
@@ -9,6 +9,7 @@ EXTRA_EMU_ARGS ?=
 full-install: install-dependencies install-global
 
 SHELL := /bin/bash
+
 install-dependencies:
 	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt && sed -i "s|#!.*|#!$(realpath .)/.virtualenv/bin/python|" ./src/main.py && chmod 500 ./src/main.py
 
@@ -16,6 +17,7 @@ install-global:
 	@sudo bash -c "if [ -L /usr/local/bin/picoc_compiler ]; then rm -f /usr/local/bin/picoc_compiler; fi && sudo ln -s $(realpath .)/run.py /usr/local/bin/picoc_compiler"
 
 clean: _clean-pycache _clean-files
+
 _clean-pycache:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
@@ -58,12 +60,21 @@ _clean-files:
 	# find ./vendor/tree-sitter-reti/src -type d -name "tree_sitter" -exec rm -rf {} +
 
 test: _test _clean-pycache
+
 test-clean: _test clean
+
+test_not_passed: _test_not_passed _clean-pycache
+
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
 	./run_sys_tests.sh $${COLUMNS} "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+
+_test_not_passed:
+	# Run the whitespace-separated test paths from ./opts/not_passed_tests.txt
+	./export_environment_vars_for_makefile.sh;\
+	./run_sys_tests.sh --not-passed "$${COLUMNS}" "" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 run:
 	./run.sh "$(RUN_PATH)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"

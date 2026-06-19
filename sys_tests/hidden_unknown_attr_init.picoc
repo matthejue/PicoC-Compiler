@@ -1,5 +1,5 @@
 // in:
-// expected:UnknownAttribute
+// expected: UnknownAttribute
 
 struct stt {int attr1; int attr2[2];};
 

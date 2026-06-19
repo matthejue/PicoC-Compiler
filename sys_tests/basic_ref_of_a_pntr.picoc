@@ -1,10 +1,14 @@
 // in:42
-// expected:42 42
+// expected: 42 42
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {
-  int var = input();
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
   int *pntr1 = &var;
   int **pntr2 = &pntr1;
-  print(*pntr1);
-  print(**pntr2);
+  printf(" %d", *pntr1);
+  printf(" %d", **pntr2);
 }

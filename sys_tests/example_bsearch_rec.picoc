@@ -1,6 +1,8 @@
 // in:41 42
-// expected:-1 5
+// expected: -1 5
 // from the Introduction to Programming Lecture by Peter Thiemann
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct ar_with_lent {int len; int *ar;};
 
@@ -22,6 +24,10 @@ int bsearch_rec(int *ar, int key, int lo, int hi) {
 }
 
 void main() {
-  print(bsearch_rec(ar_with_len.ar, input(), 0, ar_with_len.len - 1));
-  print(bsearch_rec(ar_with_len.ar, input(), 0, ar_with_len.len - 1));
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", bsearch_rec(ar_with_len.ar, __picoc_input_0, 0, ar_with_len.len - 1));
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  printf(" %d", bsearch_rec(ar_with_len.ar, __picoc_input_1, 0, ar_with_len.len - 1));
 }

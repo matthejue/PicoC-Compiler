@@ -1,5 +1,7 @@
 // in:
-// expected:9 4
+// expected: 9 4
+// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int add(int left, int right) {
   return left + right;
@@ -21,8 +23,8 @@ void main() {
   int (*operation)(int, int);
 
   operation = get_operation(0);
-  print(operation(4, 5));
+  printf(" %d", operation(4, 5));
 
   operation = get_operation(1);
-  print(operation(9, 5));
+  printf(" %d", operation(9, 5));
 }
