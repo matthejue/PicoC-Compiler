@@ -40,7 +40,7 @@ module.exports = grammar({
     )),
 
     section_name: _ => token.immediate(choice(
-      'interrupt_vector_table',
+      'ivt',
       'text',
       'data',
     )),

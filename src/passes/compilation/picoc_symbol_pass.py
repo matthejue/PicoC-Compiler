@@ -5,7 +5,7 @@ import copy
 
 
 class PicocSymbolPass:
-    _SECTION = "interrupt_vector_table"
+    _SECTION = "ivt"
 
     def _validated_section(self, section_name):
         if section_name is None:

@@ -2,7 +2,7 @@ from src import picoc_nodes as pn
 from src import reti_nodes as rn
 from src.utils.util_funs_dependent import throw_error
 
-INTERRUPT_VECTOR_TABLE_SECTION = "interrupt_vector_table"
+IVT_SECTION = "ivt"
 
 
 def enabled(args) -> bool:
@@ -41,9 +41,9 @@ def data_storage_symbols(symbol_table):
             yield name, symbol
 
 
-def interrupt_vector_table_symbols(symbol_table):
+def ivt_storage_symbols(symbol_table):
     for name, symbol in global_storage_symbols(symbol_table):
-        if symbol.get("section") == INTERRUPT_VECTOR_TABLE_SECTION:
+        if symbol.get("section") == IVT_SECTION:
             yield name, symbol
 
 
@@ -70,10 +70,10 @@ def split_global_inits(block, symbol_table, char_literal_code):
     return _data_blocks(symbol_table, optimized_values)
 
 
-def split_interrupt_vector_table_data(block, symbol_table, char_literal_code):
+def split_ivt_data(block, symbol_table, char_literal_code):
     ivt_symbols = {
         symbol_name
-        for symbol_name, _ in interrupt_vector_table_symbols(symbol_table)
+        for symbol_name, _ in ivt_storage_symbols(symbol_table)
     }
     if not ivt_symbols:
         return []
@@ -89,7 +89,7 @@ def split_interrupt_vector_table_data(block, symbol_table, char_literal_code):
                 if values is None or len(values) != int(size):
                     throw_error(
                         f"Initializer for '{var_name}' in section "
-                        f"'{INTERRUPT_VECTOR_TABLE_SECTION}' must be compile-time constant"
+                        f"'{IVT_SECTION}' must be compile-time constant"
                     )
                 optimized_values[var_name] = values
                 pending = []
@@ -101,7 +101,7 @@ def split_interrupt_vector_table_data(block, symbol_table, char_literal_code):
     return _data_blocks(
         symbol_table,
         optimized_values,
-        storage_symbols=interrupt_vector_table_symbols(symbol_table),
+        storage_symbols=ivt_storage_symbols(symbol_table),
     )
 
 

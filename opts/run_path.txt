@@ -1,1 +1,1 @@
-./sys_tests/basic_string.picoc
+./sys_tests/advanced_3_funs.picoc

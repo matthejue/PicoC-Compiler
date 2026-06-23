@@ -7,7 +7,7 @@ import copy
 
 
 class PicocBlocksPass:
-    FUNCTION_SECTION = "interrupt_vector_table"
+    FUNCTION_SECTION = "ivt"
 
     COMMENT_VISIBLE_FILTERS = {
         rn.Instr: (),

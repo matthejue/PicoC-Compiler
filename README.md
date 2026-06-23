@@ -134,7 +134,7 @@ This configuration:
 
 PicoC supports a small subset of GNU-style attributes for low-level RETI programs:
 
-- `__attribute__((section("interrupt_vector_table")))` may be placed before a global variable declaration or function definition. The attribute string omits the dot, but the generated output section is `.interrupt_vector_table`; other section names are rejected. This is intended for interrupt vector tables and interrupt service routines. With `-O1`, compile-time global data with this attribute is emitted into `.interrupt_vector_table` instead of `.data`; references to globals in this section use `CS` as their base register, while ordinary globals still use `DS`.
+- `__attribute__((section("ivt")))` may be placed before a global variable declaration or function definition. The attribute string omits the dot, but the generated output section is `.ivt`; other section names are rejected. This is intended for interrupt vector tables and interrupt service routines. With `-O1`, compile-time global data with this attribute is emitted into `.ivt` instead of `.data`; references to globals in this section use `CS` as their base register, while ordinary globals still use `DS`.
 - `__attribute__((naked))` may be placed before a function definition. Naked functions do not get the compiler-generated stack-frame prologue or shared `<function>_epilogue` block. `return;` emits no epilogue jump, and `return expr;` only evaluates the expression and places the result in `IN2`, so the function must provide its own low-level return/control-flow sequence.
 - Non-naked functions get one shared `<function>_epilogue` block directly after the function's other blocks. `return expr;` stores the return value in `IN2` and jumps to that epilogue; call continuations read non-void return values from `IN2`.
 - If no global `main` exists in the supplied PicoC files, the compiler prints a warning and does not generate `_start`. The output can still be produced, but it is not directly executable through the usual `_start -> main` entry path.
@@ -144,12 +144,12 @@ Example:
 ```c
 int keypress_interrupt(void);
 
-__attribute__((section("interrupt_vector_table")))
-int (*interrupt_vector_table[])(void) = {
+__attribute__((section("ivt")))
+int (*ivt[])(void) = {
     keypress_interrupt
 };
 
-__attribute__((section("interrupt_vector_table")))
+__attribute__((section("ivt")))
 __attribute__((naked))
 int keypress_interrupt(void) {
     /* low-level interrupt return sequence */

@@ -253,7 +253,7 @@ class RetiPass:
                 data_entries = []
                 for section in sections:
                     match section:
-                        case pn.Section("interrupt_vector_table", section_entries):
+                        case pn.Section("ivt", section_entries):
                             ivt_entries.extend(
                                 self._flatten_section_blocks(section_entries)
                             )

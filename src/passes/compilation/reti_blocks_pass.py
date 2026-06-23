@@ -26,7 +26,7 @@ class RetiBlocksPass:
 
     def _global_base_reg(self, symbol_name):
         symbol, _ = self.symbol_table.resolve(symbol_name, scope="global")
-        if isinstance(symbol, dict) and symbol.get("section") == "interrupt_vector_table":
+        if isinstance(symbol, dict) and symbol.get("section") == "ivt":
             return rn.Reg(rn.Cs())
         return rn.Reg(rn.Ds())
 
@@ -725,7 +725,7 @@ class RetiBlocksPass:
                     for block in blocks:
                         match block:
                             case pn.Block("_global_inits", _):
-                                ivt_entries = opt_level_1.split_interrupt_vector_table_data(
+                                ivt_entries = opt_level_1.split_ivt_data(
                                     block,
                                     self.symbol_table,
                                     self._char_literal_code,
@@ -756,7 +756,7 @@ class RetiBlocksPass:
                                     self._reti_blocks_stmt(stmt), stmt
                                 )
                             block.stmts_instrs[:] = instrs
-                            if getattr(block, "section", None) == "interrupt_vector_table":
+                            if getattr(block, "section", None) == "ivt":
                                 ivt_entries.append(block)
                             else:
                                 text_blocks.append(block)
@@ -765,7 +765,7 @@ class RetiBlocksPass:
                 return pn.File(
                     pn.Name(global_vars.tstate.path_without_ext + ".reti_blocks"),
                     [
-                        pn.Section("interrupt_vector_table", ivt_entries),
+                        pn.Section("ivt", ivt_entries),
                         pn.Section("text", text_blocks),
                         pn.Section("data", data_entries),
                     ],
