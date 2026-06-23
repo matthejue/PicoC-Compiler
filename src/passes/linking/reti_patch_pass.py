@@ -49,7 +49,18 @@ class RetiPatchPass:
     def _resolve_immediate_ivte(self, val):
         return rn.Im(str(self.SRAM_BASE + int(val)))
 
-    def _reti_patch_instr(self, instr, current_block_name, is_last_instr):
+    def _next_emitted_block_name(self, entries, start_idx):
+        for entry in entries[start_idx + 1 :]:
+            match entry:
+                case pn.SingleLineComment():
+                    continue
+                case pn.Block(name, _):
+                    return name
+                case _:
+                    return None
+        return None
+
+    def _reti_patch_instr(self, instr, next_block_name, is_last_instr):
         match instr:
             # Example: IVTE 5 writes the SRAM address 2^31 + 5.
             case rn.Ivte(rn.Im(val)):
@@ -68,12 +79,8 @@ class RetiPatchPass:
                 if not is_last_instr:
                     return [instr]
 
-                current_block = self.all_blocks[current_block_name]
-                target_block = self.all_blocks[target_block_name]
                 # Remove an unnecessary jump to the next emitted block.
-                target_is_next_block = current_block.block_idx - 1 == target_block.block_idx
-
-                if target_is_next_block:
+                if target_block_name == next_block_name:
                     return self._single_line_comment(instr, "# // not included")
                 return [instr]
             # Expand stack pseudo instructions while blocks still exist, so
@@ -125,16 +132,15 @@ class RetiPatchPass:
             case _:
                 return [instr]
 
-    def _reti_patch_block(self, block, section_name, section_start):
+    def _reti_patch_block(self, block, next_block_name, section_name, section_start):
         match block:
-            case pn.Block(name, instrs):
-                current_block_name = name
+            case pn.Block(_, instrs):
                 patched_instrs = []
                 for instr_idx, instr in enumerate(instrs):
                     patched_instrs += self._inherit_origin_many(
                         self._reti_patch_instr(
                             instr,
-                            current_block_name,
+                            next_block_name,
                             instr_idx == len(instrs) - 1,
                         ),
                         instr,
@@ -152,10 +158,15 @@ class RetiPatchPass:
             case pn.Section(section_name, entries):
                 section_start = self.instrs_cnt
                 patched_entries = []
-                for entry in entries:
+                for entry_idx, entry in enumerate(entries):
                     match entry:
                         case pn.Block():
-                            self._reti_patch_block(entry, section_name, section_start)
+                            self._reti_patch_block(
+                                entry,
+                                self._next_emitted_block_name(entries, entry_idx),
+                                section_name,
+                                section_start,
+                            )
                             patched_entries.append(entry)
                         case _:
                             patched = self._inherit_origin_many(
