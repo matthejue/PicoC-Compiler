@@ -659,11 +659,6 @@ class RetiBlocksPass:
                 return self._single_line_comment(stmt, "#") + [
                     rn.Jump32(rn.Always(), rn.Name(block_name))
                 ]
-            case pn.Exp(pn.GoTo(rn.Reg() as reg)):
-                instr = rn.Instr(rn.Move(), [reg, rn.Reg(rn.Pc())])
-                return self._single_line_comment(stmt, "#") + [
-                    instr
-                ]
             case pn.Exp(pn.GoTo(pn.Stack(pn.Num(val)))):
                 if str(val) != "1":
                     throw_error(
