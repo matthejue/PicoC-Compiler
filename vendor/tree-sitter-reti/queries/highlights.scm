@@ -36,6 +36,8 @@
 
 (jump "JUMP" @keyword)
 
+(jump32 "JUMP32" @keyword)
+
 (return_from_interrupt_instruction) @keyword
 
 (symbol) @variable
