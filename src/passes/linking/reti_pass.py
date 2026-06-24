@@ -271,6 +271,18 @@ class RetiPass:
     def _entries_size(self, entries):
         return sum(self._entry_size(entry) for entry in entries)
 
+    def _leading_numeric_entries_size(self, entries):
+        size = 0
+        for entry in entries:
+            match self._resolve_ivte(entry):
+                case pn.SingleLineComment():
+                    continue
+                case rn.Im():
+                    size += 1
+                case _:
+                    return size
+        return size
+
     def _set_codesegment_start(self, sections):
         self.codesegment_start = 0
         for section in sections:
@@ -306,12 +318,18 @@ class RetiPass:
                             )
                         case _:
                             throw_error(section)
-                self.reti_sections = {
+                leading_numeric_ivt_size = self._leading_numeric_entries_size(ivt_entries)
+                self.reti_sections = {}
+                if leading_numeric_ivt_size > 0:
+                    self.reti_sections["interrupt_service_routines_start"] = (
+                        leading_numeric_ivt_size
+                    )
+                self.reti_sections.update({
                     "codesegment_start": self._entries_size(ivt_entries),
                     "datasegment_start": self._entries_size(ivt_entries)
                     + self._entries_size(text_entries),
                     "stack_start": -1,
-                }
+                })
                 output_entries = [
                     self._resolve_ivte(entry)
                     for entry in ivt_entries + text_entries + data_entries
