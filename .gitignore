@@ -59,3 +59,4 @@ vendor/tree-sitter-reti/src/
 doc/passes.md
 test_examples/minimal_function_call.picoc
 test_examples/minimal_function_call.reti_blocks_backup
+doc/chats/compiler_attributes_qa.md

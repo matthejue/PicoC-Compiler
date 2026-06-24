@@ -36,9 +36,18 @@ class RetiPass:
                 "addr": addr,
                 "size": _,
             }:
-                return addr
+                if symbol.get("section") == "ivt":
+                    return int(addr) - self.codesegment_start
+                return int(addr)
             case _:
                 throw_error(symbol)
+
+    def _block_absolute_address(self, block):
+        section_start = getattr(block, "section_start", pn.Num("0"))
+        return int(section_start.val) + int(block.instrs_before.val)
+
+    def _block_cs_relative_address(self, block):
+        return self._block_absolute_address(block) - self.codesegment_start
 
     def _symbolic_operand_value(self, operand, idx, current_block):
         match operand:
@@ -47,14 +56,34 @@ class RetiPass:
                 return int(val)
             case rn.Name(name):
                 if name in self.all_blocks:
-                    return int(self.all_blocks[name].instrs_before.val)
+                    return self._block_cs_relative_address(self.all_blocks[name])
                 return int(self._symbol_addr(name))
             case rn.BinOp(rn.Name(name), op, constant):
                 if name in self.all_blocks:
-                    value = int(self.all_blocks[name].instrs_before.val)
+                    value = self._block_cs_relative_address(self.all_blocks[name])
                 else:
                     value = int(self._symbol_addr(name))
 
+                match op:
+                    case rn.Add():
+                        return value + int(constant)
+                    case rn.Sub():
+                        return value - int(constant)
+                    case _:
+                        throw_error(op)
+            case _:
+                throw_error(f"Unsupported symbolic operand: {operand}")
+
+    def _symbolic_operand_absolute_value(self, operand):
+        match operand:
+            case rn.Name(name):
+                if name not in self.all_blocks:
+                    throw_error(f"Unknown block target: {name}")
+                return self._block_absolute_address(self.all_blocks[name])
+            case rn.BinOp(rn.Name(name), op, constant):
+                if name not in self.all_blocks:
+                    throw_error(f"Unknown block target: {name}")
+                value = self._block_absolute_address(self.all_blocks[name])
                 match op:
                     case rn.Add():
                         return value + int(constant)
@@ -84,19 +113,15 @@ class RetiPass:
         return any(isinstance(operand, (rn.Name, rn.BinOp)) for operand in operands)
 
     def _ivte_target_address(self, target):
-        def block_address(block):
-            section_start = getattr(block, "section_start", pn.Num("0"))
-            return int(section_start.val) + int(block.instrs_before.val)
-
         match target:
             case rn.Name(name):
                 if name not in self.all_blocks:
                     throw_error(f"Unknown block target for IVTE: {name}")
-                return block_address(self.all_blocks[name])
+                return self._block_absolute_address(self.all_blocks[name])
             case rn.BinOp(rn.Name(name), op, constant):
                 if name not in self.all_blocks:
                     throw_error(f"Unknown block target for IVTE: {name}")
-                address = block_address(self.all_blocks[name])
+                address = self._block_absolute_address(self.all_blocks[name])
                 match op:
                     case rn.Add():
                         return address + int(constant)
@@ -121,8 +146,8 @@ class RetiPass:
 
     def _jump_target_distance(self, target, idx, current_block):
         return (
-            self._symbolic_operand_value(target, idx, current_block)
-            - int(current_block.instrs_before.val)
+            self._symbolic_operand_absolute_value(target)
+            - self._block_absolute_address(current_block)
             - idx
         )
 
@@ -238,16 +263,30 @@ class RetiPass:
         match entry:
             case pn.SingleLineComment():
                 return 0
+            case pn.Block():
+                return int(entry.num_instrs.val)
             case _:
                 return 1
 
     def _entries_size(self, entries):
         return sum(self._entry_size(entry) for entry in entries)
 
+    def _set_codesegment_start(self, sections):
+        self.codesegment_start = 0
+        for section in sections:
+            match section:
+                case pn.Section("text", _):
+                    return
+                case pn.Section(_, entries):
+                    self.codesegment_start += self._entries_size(entries)
+                case _:
+                    throw_error(section)
+
     def reti(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), sections):
+                self._set_codesegment_start(sections)
                 ivt_entries = []
                 text_entries = []
                 data_entries = []
