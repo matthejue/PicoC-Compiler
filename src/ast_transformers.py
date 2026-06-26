@@ -148,7 +148,9 @@ class _TreeSitterTransformer:
             isinstance(result, pn.ASTNode) or isinstance(result, rn.ASTNode)
         ):
             # Tree-sitter rows are 0-based; store 1-based lines for debuginfo.
-            set_source_origin(result, Path(source_path).name, node.start_point[0] + 1)
+            set_source_origin(
+                result, str(Path(source_path).resolve()), node.start_point[0] + 1
+            )
         return result
 
 
