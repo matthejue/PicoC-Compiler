@@ -33,11 +33,17 @@ TEXT_SECTION = "text"
 DATA_SECTION = "data"
 
 
-def _section_entries(file_ast: pn.File, section_name: str):
-    for item in file_ast.decls_defs_blocks_instrs:
-        if isinstance(item, pn.Section) and item.name == section_name:
-            return item.entries
-    return []
+def _flatten_reti_entries(entries):
+    flat_entries = []
+    for entry in entries:
+        match entry:
+            case pn.Section(_, section_entries):
+                flat_entries.extend(_flatten_reti_entries(section_entries))
+            case pn.Block(_, block_entries):
+                flat_entries.extend(_flatten_reti_entries(block_entries))
+            case _:
+                flat_entries.append(entry)
+    return flat_entries
 
 
 def _pass_output_text(pass_ast: pn.File):
@@ -334,7 +340,7 @@ class OptionHandler:
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI", passes.reti_sections)
         if global_vars.args.generate_debuginfo:
-            self._write_debuginfo(reti, passes.symbol_table)
+            self._write_debuginfo(reti, passes.symbol_table, passes.reti_sections)
 
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
         passes = Passes()
@@ -724,13 +730,28 @@ class OptionHandler:
 
         return variables, arguments
 
-    def _write_debuginfo(self, pass_ast: pn.File, symbol_table: st.SymbolTable):
+    def _debug_target_in_text_section(
+        self,
+        symbol_table: st.SymbolTable,
+        target_function,
+    ):
+        if target_function is None:
+            return False
+        symbol, _ = symbol_table.resolve(target_function, scope="global")
+        return not isinstance(symbol, dict) or symbol.get("section") != "ivt"
+
+    def _write_debuginfo(
+        self,
+        pass_ast: pn.File,
+        symbol_table: st.SymbolTable,
+        sections,
+    ):
         match pass_ast:
             case pn.File(pn.Name(val), instrs):
                 variables, arguments = self._debug_runtime_symbols(symbol_table)
-                text_instrs = _section_entries(pass_ast, "text")
-                if any(isinstance(entry, pn.Section) for entry in instrs):
-                    instrs = text_instrs
+                codesegment_start = sections.get("codesegment_start", 0)
+                datasegment_start = sections.get("datasegment_start")
+                instrs = _flatten_reti_entries(instrs)
                 files = []
                 file_ids = {}
                 ranges = []
@@ -739,25 +760,38 @@ class OptionHandler:
                 current_range = None
                 # Instruction line numbers in the .debuginfo file are 1-based,
                 # matching source-code line numbers.
-                line_no = 0
+                instr_idx = 0
 
                 for instr in instrs:
                     if isinstance(instr, pn.SingleLineComment):
                         continue
-                    line_no += 1
+                    absolute_addr = instr_idx
+                    instr_idx += 1
+                    if absolute_addr < codesegment_start:
+                        continue
+                    if (
+                        datasegment_start is not None
+                        and absolute_addr >= datasegment_start
+                    ):
+                        break
+                    text_addr = absolute_addr - codesegment_start
+                    line_no = text_addr + 1
 
                     call_target_function = getattr(instr, "call_target_function", None)
                     indirect_call = getattr(instr, "indirect_call", False)
-                    if call_target_function is not None or indirect_call:
+                    if indirect_call or self._debug_target_in_text_section(
+                        symbol_table,
+                        call_target_function,
+                    ):
                         call_jumps.append(
                             {
-                                "address": line_no - 1,
+                                "address": text_addr,
                                 "target_function": call_target_function,
                                 "indirect": indirect_call,
                             }
                         )
                     if getattr(instr, "return_statement", False):
-                        return_addresses.append(line_no - 1)
+                        return_addresses.append(text_addr)
 
                     source_file = getattr(instr, "source_file", None)
                     source_line = getattr(instr, "source_line", None)
