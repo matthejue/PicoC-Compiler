@@ -659,17 +659,27 @@ class Return(ASTNode):
 
 
 class FunDecl(ASTNode):
-    def __init__(self, storage_class_specifiers, datatype, name, allocs):
+    def __init__(self, storage_class_specifiers, datatype, name, allocs, section=None):
         self.storage_class_specifiers = storage_class_specifiers
         self.datatype = datatype
         self.name = name
         self.allocs = allocs
+        self.section = section
 
     @property
     def visible(self):
-        return [self.storage_class_specifiers, self.datatype, self.name, self.allocs]
+        base = [self.storage_class_specifiers, self.datatype, self.name, self.allocs]
+        if self.section is not None:
+            base.append(f"section={self.section}")
+        return base
 
-    __match_args__ = ("storage_class_specifiers", "datatype", "name", "allocs")
+    __match_args__ = (
+        "storage_class_specifiers",
+        "datatype",
+        "name",
+        "allocs",
+        "section",
+    )
 
 
 class FunPtrDecl(ASTNode):

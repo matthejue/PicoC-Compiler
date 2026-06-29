@@ -17,8 +17,7 @@ int main() {
   return 0;
 }
 
-int fun2(int param)
-{
+int fun2(int param) {
   int local_var = 2;
   debug;
   return param + local_var;

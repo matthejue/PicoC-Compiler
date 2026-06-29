@@ -378,12 +378,14 @@ class TransformerPicoC(_TreeSitterTransformer):
                     val,
                 )
             case pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs):
-                if section is not None:
-                    throw_error("section attributes are only supported on allocations")
-                return pn.FunDecl(storage_class_specifiers, base_datatype, name, allocs)
+                return pn.FunDecl(
+                    storage_class_specifiers,
+                    base_datatype,
+                    name,
+                    allocs,
+                    section=section,
+                )
             case [*fragments, pn.FunDecl(_, pn.Placeholder(), pn.Name() as name, allocs)]:
-                if section is not None:
-                    throw_error("section attributes are only supported on allocations")
                 full_datatype = base_datatype
                 for fragment in fragments:
                     full_datatype = self._apply_declarator_fragment(
@@ -393,7 +395,13 @@ class TransformerPicoC(_TreeSitterTransformer):
                 # cannot return arrays, only pointers to arrays/functions.
                 if isinstance(full_datatype, pn.ArrayDecl):
                     throw_error(full_datatype)
-                return pn.FunDecl(storage_class_specifiers, full_datatype, name, allocs)
+                return pn.FunDecl(
+                    storage_class_specifiers,
+                    full_datatype,
+                    name,
+                    allocs,
+                    section=section,
+                )
             case [pn.FunPtrDecl() | pn.PntrDecl() | pn.ArrayDecl(), *_] | pn.Name():
                 full_datatype, name = self._seperate_name_and_datatype(base_datatype, init_or_decl)
                 return pn.Exp(

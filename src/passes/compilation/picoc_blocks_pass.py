@@ -288,14 +288,29 @@ class PicocBlocksPass:
             case _:
                 return [stmt] + processed_stmts
 
+    def _function_decl_sections(self, decls_defs):
+        sections = {}
+        for decl_def in decls_defs:
+            match decl_def:
+                case pn.FunDecl(_, _, pn.Name(fun_name), _, section) if section is not None:
+                    if section != self.FUNCTION_SECTION:
+                        throw_error(f"Unsupported function section '{section}'")
+                    sections[fun_name] = section
+                case pn.FunDef(_, _, pn.Name(fun_name), _, _, section) if section is not None:
+                    if section != self.FUNCTION_SECTION:
+                        throw_error(f"Unsupported function section '{section}'")
+                    sections[fun_name] = section
+                case _:
+                    pass
+        return sections
+
     def _picoc_blocks_def(self, decl_def):
         match decl_def:
             # ----------------------------- L_Fun -----------------------------
             case pn.FunDef(storage_class_specifiers, datatype, pn.Name(val) as name, allocs, stmts, section):
                 naked = getattr(decl_def, "naked", False)
-                if section is not None and section != self.FUNCTION_SECTION:
-                    throw_error(f"Unsupported function section '{section}'")
                 fun_name = val
+                section = section or self.function_decl_sections.get(fun_name)
                 blocks = dict()
                 processed_stmts = []
                 for stmt in reversed(stmts):
@@ -341,6 +356,7 @@ class PicocBlocksPass:
             # ----------------------------- L_File ----------------------------
             case pn.File(pn.Name(val), decls_defs):
                 decls_defs_blocks = []
+                self.function_decl_sections = self._function_decl_sections(decls_defs)
                 for decl_def in decls_defs:
                     decls_defs_blocks += self._picoc_blocks_def(decl_def)
                 return pn.File(

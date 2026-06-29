@@ -1,0 +1,13 @@
+// in:
+// expected:
+
+__attribute__((section("ivt")))
+int ivt_from_decl(void);
+
+int ivt_from_decl(void) {
+  return 1;
+}
+
+int main(void) {
+  return ivt_from_decl();
+}

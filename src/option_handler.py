@@ -87,6 +87,58 @@ def _merge_sectioned_items(asts):
     return [pn.Section(name, sections[name]) for name in SECTION_ORDER]
 
 
+def _function_block_owner(block_name: str, function_names):
+    matches = [
+        fun_name
+        for fun_name in function_names
+        if (
+            block_name == fun_name
+            or block_name.startswith(f"{fun_name}_")
+            or block_name.startswith(f"{fun_name}.")
+        )
+    ]
+    if not matches:
+        return None
+    return max(matches, key=len)
+
+
+def _apply_function_sections(items, symbol_table):
+    function_names = set()
+    sectioned_functions = set()
+    for fun_name, sym in symbol_table._table.get("global", {}).items():
+        datatype = sym.get("datatype") if isinstance(sym, dict) else None
+        if isinstance(datatype, pn.FunDecl):
+            function_names.add(fun_name)
+            if sym.get("section") == "ivt":
+                sectioned_functions.add(fun_name)
+
+    if not sectioned_functions:
+        return
+
+    sections = {
+        item.name: item.entries
+        for item in items
+        if isinstance(item, pn.Section)
+    }
+    ivt_entries = sections.get("ivt", [])
+    text_entries = sections.get("text", [])
+    text_kept = []
+
+    for entry in text_entries:
+        owner = (
+            _function_block_owner(entry.name, function_names)
+            if isinstance(entry, pn.Block)
+            else None
+        )
+        if owner in sectioned_functions:
+            entry.section = "ivt"
+            ivt_entries.append(entry)
+        else:
+            text_kept.append(entry)
+
+    text_entries[:] = text_kept
+
+
 class OptionHandler:
     def __init__(self):
         _set_terminal_size()
@@ -354,6 +406,8 @@ class OptionHandler:
             return pn.File(pn.Name(global_vars.args.output_name), _merge_sectioned_items([]))
 
         merged_decls_defs_blocks_instrs = _merge_sectioned_items(asts)
+        if symbol_table is not None:
+            _apply_function_sections(merged_decls_defs_blocks_instrs, symbol_table)
         if opt_level_1.enabled(global_vars.args) and symbol_table is not None:
             for item in merged_decls_defs_blocks_instrs:
                 match item:
@@ -452,6 +506,9 @@ class OptionHandler:
                 # because declarations may omit parameter names. In PicoC,
                 # however, function declarations require named parameters.
                 # Syntax checking rejects duplicate definitions before merging.
+                if existing.get("section") is None and incoming.get("section") is not None:
+                    existing["section"] = incoming["section"]
+                    existing_dt.section = incoming["section"]
                 return
             elif scope != "global" and symbols_equivalent(existing, incoming):
                 # Re-including the same source file can replay the same function

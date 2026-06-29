@@ -374,7 +374,7 @@ class PicocShrinkPass:
                         case _:
                             throw_error(param)
                 return pn.FunPtrDecl(self._picoc_shrink_datatype(ret_dt), params_shrunk)
-            case pn.FunDecl(_, ret_dt, name, allocs):
+            case pn.FunDecl(_, ret_dt, name, allocs, section):
                 if allocs and isinstance(allocs[0], pn.VoidType):
                     allocs_shrunk = []
                 else:
@@ -384,7 +384,7 @@ class PicocShrinkPass:
                         else a
                         for a in allocs
                     ]
-                return pn.FunDecl([], ret_dt, name, allocs_shrunk)
+                return pn.FunDecl([], ret_dt, name, allocs_shrunk, section=section)
             case pn.StructSpec() | pn.IntType() | pn.CharType() | pn.VoidType():
                 return datatype
             case _:
@@ -523,7 +523,7 @@ class PicocShrinkPass:
                             decls_defs_shrinked += [
                                 pn.StructDecl(name, allocs_shrinked)
                             ]
-                        case pn.FunDecl(storage_class_specifiers, datatype, pn.Name() as name, allocs):
+                        case pn.FunDecl(storage_class_specifiers, datatype, pn.Name() as name, allocs, section):
                             if isinstance(datatype, pn.StructSpec):
                                 throw_error(
                                     "Returning structs by value is not supported; use "
@@ -553,6 +553,7 @@ class PicocShrinkPass:
                                     datatype,
                                     name,
                                     allocs_shrinked,
+                                    section=section,
                                 )
                             ]
                         case pn.Exp() | pn.Assign():

@@ -420,7 +420,8 @@ class PicocSymbolPass:
                     scope=self.current_scope,
                 )
                 return []
-            case pn.FunDecl(_, datatype, pn.Name(fun_name), allocs):
+            case pn.FunDecl(_, datatype, pn.Name(fun_name), allocs, section):
+                section_name = self._validated_section(section)
                 param_size = self._param_size(allocs)
                 self.symbol_table.declare(
                     fun_name,
@@ -429,12 +430,14 @@ class PicocSymbolPass:
                         "name": fun_name,
                         "param_size": param_size,
                         "variadic": self._is_variadic_params(allocs),
+                        **({"section": section_name} if section_name else {}),
                     },
                     scope="global",
                 )
                 return []
-            case pn.FunDef(_, datatype, pn.Name(fun_name) as name, allocs, blocks):
+            case pn.FunDef(_, datatype, pn.Name(fun_name) as name, allocs, blocks, section):
                 naked = getattr(decl_def, "naked", False)
+                section_name = self._validated_section(section)
                 fun_blocks_out = []
                 self.current_scope = fun_name
                 self.symbol_table.set_parent(fun_name, "global")
@@ -446,13 +449,21 @@ class PicocSymbolPass:
                     self.symbol_table.declare(
                         fun_name,
                         {
-                            "datatype": pn.FunDecl([], datatype, name, allocs),
+                            "datatype": pn.FunDecl(
+                                [], datatype, name, allocs, section=section_name
+                            ),
                             "name": fun_name,
                             "param_size": param_size,
                             "variadic": self._is_variadic_params(allocs),
+                            **({"section": section_name} if section_name else {}),
                         },
                         scope="global",
                     )
+                elif section_name:
+                    symbol, _ = self.symbol_table.resolve(fun_name, scope="global")
+                    symbol["section"] = section_name
+                    if isinstance(symbol.get("datatype"), pn.FunDecl):
+                        symbol["datatype"].section = section_name
 
                 for alloc in self._fixed_params(allocs):
                     self._declare_alloc(alloc, is_param=True)
