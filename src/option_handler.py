@@ -740,6 +740,12 @@ class OptionHandler:
         symbol, _ = symbol_table.resolve(target_function, scope="global")
         return not isinstance(symbol, dict) or symbol.get("section") != "ivt"
 
+    def _debug_source_file(self, source_file):
+        source_path = Path(source_file)
+        if source_path.suffix == ".picoc":
+            return str(source_path.with_suffix(".pre"))
+        return source_file
+
     def _write_debuginfo(
         self,
         pass_ast: pn.File,
@@ -802,6 +808,7 @@ class OptionHandler:
                     if source_file is None:
                         current_range = None
                         continue
+                    source_file = self._debug_source_file(source_file)
 
                     file_id = file_ids.get(source_file)
                     if file_id is None:
