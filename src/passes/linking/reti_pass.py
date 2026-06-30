@@ -271,6 +271,20 @@ class RetiPass:
     def _entries_size(self, entries):
         return sum(self._entry_size(entry) for entry in entries)
 
+    def _data_segment_symbol_size(self):
+        size = 0
+        for symbol in self.symbol_table._table.get("global", {}).values():
+            if not (
+                isinstance(symbol, dict)
+                and symbol.get("frame_kind") == "global"
+                and symbol.get("section", "data") == "data"
+                and "addr" in symbol
+                and "size" in symbol
+            ):
+                continue
+            size = max(size, int(symbol["addr"]) + int(symbol["size"]))
+        return size
+
     def _leading_numeric_entries_size(self, entries):
         size = 0
         for entry in entries:
@@ -324,10 +338,16 @@ class RetiPass:
                     self.reti_sections["interrupt_service_routines_start"] = (
                         leading_numeric_ivt_size
                     )
+                datasegment_start = self._entries_size(ivt_entries) + self._entries_size(
+                    text_entries
+                )
                 self.reti_sections.update({
                     "codesegment_start": self._entries_size(ivt_entries),
-                    "datasegment_start": self._entries_size(ivt_entries)
-                    + self._entries_size(text_entries),
+                    "datasegment_start": datasegment_start,
+                    "heap_start": datasegment_start + max(
+                        self._entries_size(data_entries),
+                        self._data_segment_symbol_size(),
+                    ),
                     "stack_start": -1,
                 })
                 output_entries = [
