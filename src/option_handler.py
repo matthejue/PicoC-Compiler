@@ -17,7 +17,6 @@ from src.utils.util_funs_dependent import (
 from src.utils.util_funs_independent import convert_to_single_line
 import subprocess, os, platform
 import re
-import argparse
 import shlex
 import json
 from src.preprocessor import Preprocessor
@@ -26,11 +25,25 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import traceback
 from typing import cast
+from src.cli_args import build_parser
 
 
 SECTION_ORDER = ["ivt", "text", "data"]
 TEXT_SECTION = "text"
 DATA_SECTION = "data"
+KERNEL_HEADER_NAME = "sections.header"
+KERNEL_HEADER_GENERATED_DEFINES = {
+    "KERNEL_CS_START": "codesegment_start",
+    "KERNEL_DS_START": "datasegment_start",
+    "KERNEL_HEAP_START": "heap_start",
+}
+KERNEL_HEADER_DEFINE_ORDER = [
+    "KERNEL_CS_START",
+    "KERNEL_DS_START",
+    "SRAM_SIZE",
+    "KERNEL_HEAP_START",
+    "PROCESS_MEMORY_START",
+]
 
 
 def _flatten_reti_entries(entries):
@@ -162,7 +175,10 @@ class OptionHandler:
         if global_vars.args.generate_debuginfo and global_vars.args.compile:
             print("[ERROR] '-g/--generate_debuginfo' is not supported together with '--compile'")
             exit(1)
-        if global_vars.args.generate_debuginfo and any(
+        if global_vars.args.kernelheader and global_vars.args.compile:
+            print("[ERROR] '-k/--kernelheader' requires linking and is not supported together with '--compile'")
+            exit(1)
+        if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader and any(
             target["kind"] != "picoc" for target in build_targets
         ):
             print("[ERROR] '-g/--generate_debuginfo' only works when all inputs are '.picoc' files")
@@ -339,7 +355,7 @@ class OptionHandler:
         )
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI", passes.reti_sections)
-        if global_vars.args.generate_debuginfo:
+        if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader:
             self._write_debuginfo(reti, passes.symbol_table, passes.reti_sections)
 
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
@@ -563,7 +579,7 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(leaf_tokens)
 
-        if global_vars.args.write_files:
+        if global_vars.args.write_files and not global_vars.args.kernelheader:
             with open(
                 global_vars.tstate.path_without_ext + ".tokens",
                 "w",
@@ -581,7 +597,7 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(formatted_tree)
 
-        if global_vars.args.write_files:
+        if global_vars.args.write_files and not global_vars.args.kernelheader:
             with open(
                 global_vars.tstate.path_without_ext + ".ps",
                 "w",
@@ -594,7 +610,7 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(_pass_output_text(pass_ast))
 
-        if global_vars.args.write_files or compl_opt_active:
+        if (global_vars.args.write_files or compl_opt_active) and not global_vars.args.kernelheader:
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
@@ -609,7 +625,7 @@ class OptionHandler:
         print(subheading("Combined RETI Blocks", "-"))
         print(_pass_output_text(pass_ast))
 
-        if global_vars.args.write_files:
+        if global_vars.args.write_files and not global_vars.args.kernelheader:
             output_path = remove_ext(global_vars.args.output_name) + "_combined.reti_blocks"
             with open(output_path, "w", encoding="utf-8") as fout:
                 fout.write(_pass_output_text(pass_ast))
@@ -619,7 +635,7 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(text)
 
-        if global_vars.args.write_files:
+        if global_vars.args.write_files and not global_vars.args.kernelheader:
             with open(
                 global_vars.tstate.path_without_ext + suffix,
                 "w",
@@ -639,7 +655,7 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(json_symbol_table)
 
-        if global_vars.args.write_files or compl_opt_active:
+        if (global_vars.args.write_files or compl_opt_active) and not global_vars.args.kernelheader:
             with open(
                 global_vars.tstate.path_without_ext + ".st",
                 "w",
@@ -673,6 +689,10 @@ class OptionHandler:
             print(subheading(heading, "-"))
             print(_pass_output_text(pass_ast))
 
+        if global_vars.args.kernelheader:
+            self._write_kernel_header(sections)
+            return
+
         match pass_ast:
             case pn.File(pn.Name(val)):
                 # insert at the beginning of the file
@@ -696,6 +716,54 @@ class OptionHandler:
         sections_path = Path(reti_path).with_suffix(".sections")
         with open(sections_path, "w", encoding="utf-8") as fout:
             fout.write(sections_text + "\n")
+
+    def _kernel_header_path(self) -> Path:
+        output_path = Path(global_vars.args.output_name)
+        return output_path.parent / KERNEL_HEADER_NAME
+
+    def _kernel_header_define_line(self, macro: str, sections) -> str:
+        section_key = KERNEL_HEADER_GENERATED_DEFINES.get(macro)
+        value = "" if section_key is None else str(sections[section_key])
+        return f"#define {macro}" if value == "" else f"#define {macro} {value}"
+
+    def _write_kernel_header(self, sections):
+        header_path = self._kernel_header_path()
+        define_pattern = re.compile(r"^(\s*#\s*define\s+)([A-Za-z_][A-Za-z0-9_]*)\b.*$")
+        seen_macros = set()
+
+        if header_path.exists():
+            lines = header_path.read_text(encoding="utf-8").splitlines()
+            updated_lines = []
+            for line in lines:
+                match = define_pattern.match(line)
+                macro = match.group(2) if match else None
+                if macro in KERNEL_HEADER_GENERATED_DEFINES:
+                    updated_lines.append(self._kernel_header_define_line(macro, sections))
+                    seen_macros.add(macro)
+                elif macro in KERNEL_HEADER_DEFINE_ORDER:
+                    updated_lines.append(line)
+                    seen_macros.add(macro)
+                else:
+                    updated_lines.append(line)
+
+            missing_macros = [
+                macro
+                for macro in KERNEL_HEADER_DEFINE_ORDER
+                if macro not in seen_macros
+            ]
+            if missing_macros and updated_lines and updated_lines[-1] != "":
+                updated_lines.append("")
+            updated_lines.extend(
+                self._kernel_header_define_line(macro, sections)
+                for macro in missing_macros
+            )
+        else:
+            updated_lines = [
+                self._kernel_header_define_line(macro, sections)
+                for macro in KERNEL_HEADER_DEFINE_ORDER
+            ]
+
+        header_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
 
     def _debug_json_value(self, value):
         if isinstance(value, pn.Empty):
@@ -881,121 +949,7 @@ def _format_tree(node, code, depth: int = 0, *, include_unnamed: bool = False):
 
 
 def _parse_cli_args():
-    parser = argparse.ArgumentParser(
-        prog="picoc-compiler",
-        description="Plain CLI tool — no shell. Processes an input file with flags.",
-    )
-    parser.add_argument(
-        "infiles",
-        nargs="+",
-        help="Path(s) to input file(s), or '-' for stdin",
-    )
-    parser.add_argument(
-        "-i",
-        "--intermediate_stages",
-        action="store_true",
-        help="Emit or keep intermediate stages",
-    )
-    parser.add_argument(
-        "-w",
-        "--write_files",
-        dest="write_files",
-        action="store_true",
-        help="Write output to files",
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Create comments for immediate stages",
-    )
-    parser.add_argument(
-        "-vv",
-        "--double_verbose",
-        action="store_true",
-        help="Additionaly makes formatting wider",  # and adds datatype to ref and adds BuiltinTypes char and int to SymbolTable"
-    )
-    parser.add_argument(
-        "-t",
-        "--testmode",
-        action="store_true",
-        help="Read input and expected output from .input and .expected_output files",
-    )
-    parser.add_argument(
-        "-T",
-        "--traceback",
-        action="store_true",
-        help="Show full tracebacks on errors",
-    )
-    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument(
-        "-s",
-        "--supress_errors",
-        action="store_true",
-        help="Suppress non-critical errors",
-    )  # kept original spelling
-    parser.add_argument(
-        "-b", "--binary", action="store_true", help="Produce binary output"
-    )
-    parser.add_argument(
-        "-m",
-        "--metadata_comments",
-        action="store_true",
-        help="Include metadata comments from first specified .picoc file into final .reti file",
-    )
-    # ------------------------------- Preprocessor ----------------------------
-    parser.add_argument(
-        "-I",
-        "--include",
-        dest="I",
-        action="append",
-        default=[],
-        help="Add an include path (can be used multiple times)",
-    )
-    parser.add_argument(
-        "-M",
-        "--max-depth",
-        type=int,
-        default=200,
-        help="Maximum include depth",
-    )
-    # ---------------------------------- Linker -------------------------------
-    parser.add_argument(
-        "-o",
-        "--output_name",
-        type=str,
-        default="a.reti",
-        help="Name of the output binary (default: a.reti)",
-    )
-    parser.add_argument(
-        "-c",
-        "--compile",
-        action="store_true",
-        help="Compile source files without linking (like gcc -c)",
-    )
-    parser.add_argument(
-        "-g",
-        "--generate_debuginfo",
-        action="store_true",
-        help="Write <output>.debuginfo for linked '.picoc' inputs",
-    )
-    parser.add_argument(
-        "-O0",
-        dest="optimization_level",
-        action="store_const",
-        const=0,
-        default=0,
-        help="Disable optimizations (default)",
-    )
-    parser.add_argument(
-        "-O1",
-        dest="optimization_level",
-        action="store_const",
-        const=1,
-        help="Enable compile-time global initializer data generation",
-    )
-
-    global_vars.args = parser.parse_args()
+    global_vars.args = build_parser().parse_args()
 
 
 def _set_terminal_size():
@@ -1040,7 +994,6 @@ def _print_args_if_verbose():
     fields = [
         "infiles",
         "intermediate_stages",
-        "print",
         "verbose",
         "double_verbose",
         "traceback",
@@ -1048,6 +1001,7 @@ def _print_args_if_verbose():
         "supress_errors",
         "binary",
         "metadata_comments",
+        "kernelheader",
         "optimization_level",
     ]
 

@@ -130,6 +130,39 @@ This configuration:
 - maps `.reti`, `.reti_blocks`, and `.reti_patch` files to the `reti` parser
 - loads the vendored Tree-sitter query files for highlighting and tags
 
+## Command-Line Options
+
+The compiler command accepts one or more input files and produces linked RETI output by default.
+
+Example:
+
+```bash
+./run.py -s -O1 -o kernel.reti kernel/kernel.picoc
+```
+
+| Option | Argument | Description |
+| --- | --- | --- |
+| `FILE` | one or more paths | Input files. Supported units are `.picoc`, `.reti_blocks`, or matching `.st` metadata files. |
+| `-h`, `--help` | none | Prints the command-line help. |
+| `-i`, `--intermediate_stages` | none | Prints intermediate compiler stages to the terminal. This also builds files sequentially so diagnostic output stays ordered. |
+| `-w`, `--write_files` | none | Writes intermediate stages to side files such as `.tokens`, `.ps`, `.st`, and `.reti_blocks` where applicable. |
+| `-v`, `--verbose` | none | Adds comments and prints parsed CLI options. |
+| `-vv`, `--double_verbose` | none | Shows wider parse trees and extra AST/type details. |
+| `-t`, `--testmode` | none | Reads test metadata from `<input>.input` and `<input>.expected_output`. |
+| `-T`, `--traceback` | none | Shows full Python tracebacks on errors. |
+| `-d`, `--debug` | none | Enables debug mode and installs the post-mortem exception hook. |
+| `-s`, `--supress_errors` | none | Skips the external C syntax check. The spelling is kept for compatibility. |
+| `-b`, `--binary` | none | Enables binary output mode where supported. |
+| `-m`, `--metadata_comments` | none | Copies top-of-file input, expected, and datasegment comments into the final `.reti` output. |
+| `-I`, `--include` | `PATH` | Adds an include search path. This option can be used multiple times. |
+| `-M`, `--max-depth` | `DEPTH` | Sets the maximum include depth. The default is `200`. |
+| `-o`, `--output_name` | `OUTPUT` | Sets the linked RETI output path. The default is `a.reti`. |
+| `-c`, `--compile` | none | Compiles source files without linking. This writes per-file `.reti_blocks` and `.st` outputs. |
+| `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
+| `-k`, `--kernelheader` | none | Runs linking far enough to compute section addresses, then writes only `sections.header` next to the `-o` output path. The header contains generated `KERNEL_CS_START`, `KERNEL_DS_START`, and `KERNEL_HEAP_START` values, plus user-owned `SRAM_SIZE` and `PROCESS_MEMORY_START` placeholders. Existing headers keep user-owned values and only refresh the generated address macros. |
+| `-O0` | none | Disables optimizations. This is the default optimization level. |
+| `-O1` | none | Enables compile-time global initializer data generation. |
+
 ## PicoC Attributes and Entry Points
 
 PicoC supports a small subset of GNU-style attributes for low-level RETI programs:

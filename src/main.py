@@ -1,12 +1,14 @@
 import sys
-from src.option_handler import OptionHandler, open_documentation
-from src. utils.util_funs_dependent import remove_filename, filename_without_ext, remove_ext
 
 
 def main():
     if set(["-h", "--help"]).intersection(sys.argv):
-        open_documentation()
+        from src.cli_args import build_parser
+
+        build_parser().print_help()
         return
+
+    from src.option_handler import OptionHandler
 
     compiler = OptionHandler()
     compiler.build_all()
