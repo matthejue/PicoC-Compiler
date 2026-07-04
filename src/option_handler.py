@@ -31,19 +31,11 @@ from src.cli_args import build_parser
 SECTION_ORDER = ["ivt", "text", "data"]
 TEXT_SECTION = "text"
 DATA_SECTION = "data"
-KERNEL_HEADER_NAME = "sections.header"
-KERNEL_HEADER_GENERATED_DEFINES = {
-    "KERNEL_CS_START": "codesegment_start",
-    "KERNEL_DS_START": "datasegment_start",
-    "KERNEL_HEAP_START": "heap_start",
-}
-KERNEL_HEADER_DEFINE_ORDER = [
-    "KERNEL_CS_START",
-    "KERNEL_DS_START",
-    "SRAM_SIZE",
-    "KERNEL_HEAP_START",
-    "PROCESS_MEMORY_START",
-]
+MEMORY_CONSTANTS_HEADER_NAME = "memory_constants.header"
+SRAM_BASE_ADDRESS = -(2**31)
+SRAM_SIZE = 2**18
+SRAM_MAX_ADDRESS = SRAM_SIZE - 1
+DEFAULT_KERNEL_STACK_START = 15000
 
 
 def _flatten_reti_entries(entries):
@@ -690,7 +682,7 @@ class OptionHandler:
             print(_pass_output_text(pass_ast))
 
         if global_vars.args.kernelheader:
-            self._write_kernel_header(sections)
+            self._write_memory_constants_header(sections)
             return
 
         match pass_ast:
@@ -717,52 +709,59 @@ class OptionHandler:
         with open(sections_path, "w", encoding="utf-8") as fout:
             fout.write(sections_text + "\n")
 
-    def _kernel_header_path(self) -> Path:
+    def _memory_constants_header_path(self) -> Path:
         output_path = Path(global_vars.args.output_name)
-        return output_path.parent / KERNEL_HEADER_NAME
+        return output_path.parent / MEMORY_CONSTANTS_HEADER_NAME
 
-    def _kernel_header_define_line(self, macro: str, sections) -> str:
-        section_key = KERNEL_HEADER_GENERATED_DEFINES.get(macro)
-        value = "" if section_key is None else str(sections[section_key])
-        return f"#define {macro}" if value == "" else f"#define {macro} {value}"
+    def _sram_address(self, offset: int) -> int:
+        return SRAM_BASE_ADDRESS + offset
 
-    def _write_kernel_header(self, sections):
-        header_path = self._kernel_header_path()
-        define_pattern = re.compile(r"^(\s*#\s*define\s+)([A-Za-z_][A-Za-z0-9_]*)\b.*$")
-        seen_macros = set()
+    def _kernel_stack_start(self, sections) -> int:
+        stack_start = int(sections["stack_start"])
+        if stack_start == -1:
+            return DEFAULT_KERNEL_STACK_START
+        return stack_start
 
-        if header_path.exists():
-            lines = header_path.read_text(encoding="utf-8").splitlines()
-            updated_lines = []
-            for line in lines:
-                match = define_pattern.match(line)
-                macro = match.group(2) if match else None
-                if macro in KERNEL_HEADER_GENERATED_DEFINES:
-                    updated_lines.append(self._kernel_header_define_line(macro, sections))
-                    seen_macros.add(macro)
-                elif macro in KERNEL_HEADER_DEFINE_ORDER:
-                    updated_lines.append(line)
-                    seen_macros.add(macro)
-                else:
-                    updated_lines.append(line)
+    def _sram_memory_constants_lines(self, sections) -> List[str]:
+        codesegment_start = int(sections["codesegment_start"])
+        datasegment_start = int(sections["datasegment_start"])
+        heap_start = int(sections["heap_start"])
+        stack_start = self._kernel_stack_start(sections)
+        cs_start_address = self._sram_address(codesegment_start)
+        ds_start_address = self._sram_address(datasegment_start)
+        sp_start_address = self._sram_address(stack_start)
+        return [
+            "#define SRAM_BASE (-2147483647 - 1) // -2^31",
+            f"#define SRAM_MAX_ADDRESS {SRAM_MAX_ADDRESS} // 2^18 - 1",
+            f"#define KERNEL_HEAP_START {heap_start} // heap_start",
+            f"#define PROCESS_MEMORY_START {sp_start_address + 1} // -2^31 + stack_start + 1",
+            f'#define KERNEL_CS_START_ASM "LOADI32 CS {cs_start_address}" // -2^31 + codesegment_start',
+            f'#define KERNEL_DS_START_ASM "LOADI32 DS {ds_start_address}" // -2^31 + datasegment_start',
+            f'#define KERNEL_SP_START_ASM "LOADI32 SP {sp_start_address}" // -2^31 + stack_start',
+            f'#define KERNEL_CS_ACC_ASM "LOADI32 ACC {cs_start_address}" // -2^31 + codesegment_start',
+        ]
 
-            missing_macros = [
-                macro
-                for macro in KERNEL_HEADER_DEFINE_ORDER
-                if macro not in seen_macros
-            ]
-            if missing_macros and updated_lines and updated_lines[-1] != "":
-                updated_lines.append("")
-            updated_lines.extend(
-                self._kernel_header_define_line(macro, sections)
-                for macro in missing_macros
-            )
-        else:
-            updated_lines = [
-                self._kernel_header_define_line(macro, sections)
-                for macro in KERNEL_HEADER_DEFINE_ORDER
-            ]
+    def _eprom_memory_constants_lines(self, sections) -> List[str]:
+        datasegment_start = int(sections["datasegment_start"])
+        eprom_stack_address = self._sram_address(SRAM_MAX_ADDRESS)
+        return [
+            f"#define SRAM_MAX_ADDRESS {SRAM_MAX_ADDRESS} // 2^18 - 1",
+            f'#define EPROM_DS_START_ASM "LOADI32 DS {datasegment_start}" // datasegment_start',
+            f'#define EPROM_STACK_START_ASM "LOADI32 SP {eprom_stack_address}" // -2^31 + 2^18 - 1',
+        ]
 
+    def _memory_constants_lines(self, sections) -> List[str]:
+        match global_vars.args.kernelheader:
+            case "sram":
+                return self._sram_memory_constants_lines(sections)
+            case "eprom":
+                return self._eprom_memory_constants_lines(sections)
+            case _:
+                throw_error(f"Unknown kernel header mode: {global_vars.args.kernelheader}")
+
+    def _write_memory_constants_header(self, sections):
+        header_path = self._memory_constants_header_path()
+        updated_lines = self._memory_constants_lines(sections)
         header_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
 
     def _debug_json_value(self, value):

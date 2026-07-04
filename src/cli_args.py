@@ -105,8 +105,9 @@ def build_parser():
     parser.add_argument(
         "-k",
         "--kernelheader",
-        action="store_true",
-        help="Write only sections.header with generated kernel section addresses",
+        choices=("sram", "eprom"),
+        metavar="{sram,eprom}",
+        help="Write only memory_constants.header for an SRAM or EPROM program",
     )
     parser.add_argument(
         "-O0",

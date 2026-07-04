@@ -159,7 +159,7 @@ Example:
 | `-o`, `--output_name` | `OUTPUT` | Sets the linked RETI output path. The default is `a.reti`. |
 | `-c`, `--compile` | none | Compiles source files without linking. This writes per-file `.reti_blocks` and `.st` outputs. |
 | `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
-| `-k`, `--kernelheader` | none | Runs linking far enough to compute section addresses, then writes only `sections.header` next to the `-o` output path. The header contains generated `KERNEL_CS_START`, `KERNEL_DS_START`, and `KERNEL_HEAP_START` values, plus user-owned `SRAM_SIZE` and `PROCESS_MEMORY_START` placeholders. Existing headers keep user-owned values and only refresh the generated address macros. |
+| `-k`, `--kernelheader` | `sram` or `eprom` | Runs linking far enough to compute section addresses, then writes only `memory_constants.header` next to the `-o` output path. `-k sram` generates SRAM-based kernel constants and `LOADI32` setup strings for `CS`, `DS`, `SP`, and `ACC`. `-k eprom` generates EPROM start-program constants with an SRAM maximum address, an EPROM data-segment setup string, and an SRAM-top stack setup string. |
 | `-O0` | none | Disables optimizations. This is the default optimization level. |
 | `-O1` | none | Enables compile-time global initializer data generation. |
 
