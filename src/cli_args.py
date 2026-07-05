@@ -88,7 +88,10 @@ def build_parser():
         metavar="OUTPUT",
         type=str,
         default="a.reti",
-        help="Name of the linked RETI output file (default: a.reti)",
+        help=(
+            "Name of the linked RETI output file, or the path used for "
+            "memory_constants.header with -k (default: a.reti)"
+        ),
     )
     parser.add_argument(
         "-c",
@@ -107,7 +110,10 @@ def build_parser():
         "--kernelheader",
         choices=("sram", "eprom"),
         metavar="{sram,eprom}",
-        help="Write only memory_constants.header for an SRAM or EPROM program",
+        help=(
+            "Write only memory_constants.header for an SRAM or EPROM program; "
+            "-o chooses the header path, not a .reti output path"
+        ),
     )
     parser.add_argument(
         "-O0",

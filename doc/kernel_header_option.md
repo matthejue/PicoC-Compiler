@@ -1,6 +1,6 @@
 # Kernel Header Option
 
-The `-k` / `--kernelheader` compiler option runs the normal linking path far enough to compute the final RETI section addresses, then writes only `memory_constants.header` next to the `-o` output path.
+The `-k` / `--kernelheader` compiler option runs the normal linking path far enough to compute the final RETI section addresses, then writes only `memory_constants.header`. In this mode, `-o` selects the path used for `memory_constants.header`, not a `.reti` output path.
 
 `-k sram` generates SRAM-based kernel constants:
 
