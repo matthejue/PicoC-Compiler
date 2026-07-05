@@ -175,6 +175,13 @@ class OptionHandler:
         ):
             print("[ERROR] '-g/--generate_debuginfo' only works when all inputs are '.picoc' files")
             exit(1)
+        if global_vars.args.generate_debuginfo and not (
+            global_vars.args.intermediate_stages and global_vars.args.write_files
+        ):
+            print(
+                "[warning] '-g/--generate_debuginfo' needs '-i/--intermediate_stages' "
+                "and '-w/--write_files' to create the .pre file needed for debugging."
+            )
 
         picoc_files = [f for f in files if get_ext(f) == "picoc"]
         if picoc_files:
