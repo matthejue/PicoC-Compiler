@@ -1,7 +1,7 @@
 // in:128
 // expected: 7
 // from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int log2(int a) {

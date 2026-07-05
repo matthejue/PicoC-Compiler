@@ -1,6 +1,6 @@
 // in:21
 // expected: 42
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 void _fun120(char c, int i);

@@ -1,6 +1,6 @@
 // input: 2 3
 // expected: 5
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 #include "./include/linker_fun_and_struct_from_other_files_a.header"

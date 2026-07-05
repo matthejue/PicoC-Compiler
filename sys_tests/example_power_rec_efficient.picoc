@@ -1,7 +1,7 @@
 // in:2 9
 // expected: 512
 // from the Introduction to Programming Lecture by Peter Thiemann
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int power_efficient(int a, int n) {

@@ -1,6 +1,6 @@
 // in:24 12 6 3 10 5
 // expected: 3 5
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {

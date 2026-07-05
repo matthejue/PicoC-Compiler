@@ -1,6 +1,6 @@
 // in:10
 // expected: 55
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int fib(int num_fibs, int *ar) {

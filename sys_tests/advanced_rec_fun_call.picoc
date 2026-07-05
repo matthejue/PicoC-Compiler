@@ -1,6 +1,6 @@
 // in:10 10 10 10 10 10 10 10 10 10
 // expected: 10
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int rec_fun_call(int arg) {

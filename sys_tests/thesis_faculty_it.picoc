@@ -1,7 +1,7 @@
 // in:
 // expected: 24
 // based on a example program from Christoph Scholl's Operating Systems lecture
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int faculty(int n){

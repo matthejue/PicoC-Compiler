@@ -1,6 +1,6 @@
 // in:1 45 8 12
 // expected: 1 45 8 12 78 5
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct str {int attr1; char attr2[3];};

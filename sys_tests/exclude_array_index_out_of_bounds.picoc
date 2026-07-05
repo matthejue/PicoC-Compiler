@@ -1,7 +1,7 @@
 // in:
 // expected: -2147418113
 // it reads the return address form the stackframe of the main function
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {

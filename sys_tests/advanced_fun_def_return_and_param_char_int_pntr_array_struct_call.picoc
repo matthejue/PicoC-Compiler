@@ -1,6 +1,6 @@
 // in:42
 // expected: 1 2 3 4 5 6 42
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct array_with_len {int ar[3]; int len;};

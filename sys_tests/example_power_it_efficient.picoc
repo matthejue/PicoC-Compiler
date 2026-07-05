@@ -1,7 +1,7 @@
 // in:2 10
 // expected: 1024
 // from the Introduction to Programming Lecture by Peter Thiemann
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int fast_efficient_iterative(int a, int n, int acc) {

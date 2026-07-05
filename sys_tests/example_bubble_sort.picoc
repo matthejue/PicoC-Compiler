@@ -1,7 +1,7 @@
 // in:0 5
 // expected: -2 314
 // based on a function from the Operating Systems Lecture by Prof. Dr. Christoph Scholl and https://de.wikipedia.org/wiki/Bubblesort
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct stt {int len; int *ar;};

@@ -1,6 +1,6 @@
 // in: heyhoho1 heyhoho2
 // expected: whatever1 whatever2
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc ../../Pico-OS/lib/string/string.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc ../../Pico-OS/lib/string/libstring.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 #include "../../Pico-OS/lib/string/string.header"
 

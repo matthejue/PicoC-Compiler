@@ -1,7 +1,7 @@
 // in:2 11
 // expected: 2048
 // from the Introduction to Programming Lecture by Peter Thiemann
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 

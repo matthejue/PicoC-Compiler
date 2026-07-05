@@ -1,7 +1,7 @@
 // in:
 // expected: -2 4 5 42 42 314
 // from the Algorithms and Datastructures Lecture by Prof. Dr. Bast
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct stt {int len; int *ar;};

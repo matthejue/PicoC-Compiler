@@ -1,6 +1,6 @@
 // in:22
 // expected: 10 20 5 32 42 27
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 #define A B

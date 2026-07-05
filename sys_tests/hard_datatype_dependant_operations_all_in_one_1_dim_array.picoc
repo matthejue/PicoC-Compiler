@@ -1,6 +1,6 @@
 // in:42
 // expected: 7 42
-// dependencies: ../../Pico-OS/lib/stdio/stdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct compl_dt {int waste_space; int (*ar[1][2])[2];};
