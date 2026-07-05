@@ -1,1 +1,1 @@
-./sys_tests/advanced_3_funs.picoc
+./sys_tests/basic_static_inline_asm_function.picoc

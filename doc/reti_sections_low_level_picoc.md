@@ -5,4 +5,5 @@
 - Use `__attribute__((section("ivt")))` on globals/functions to place them in `.ivt`.
 - Use `-O1` so known global initializer values can be emitted into data/IVT sections at compile time.
 - Use `__attribute__((naked))` + `asm("...");` for exact assembly blocks: function name becomes label, no prologue/epilogue.
+- Use no-arg `static inline` functions with only `asm("...");` statements for inline asm helpers: the helper body is copied into each statement-form call site and no standalone helper function is emitted.
 - Naked asm functions are useful as interrupt hubs: handle register-passed ISR args, then jump/call real handler functions.

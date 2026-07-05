@@ -10,76 +10,50 @@ class PicocShrinkPass:
 
     def _is_static_inline(self, node):
         specifiers = getattr(node, "storage_class_specifiers", [])
-        # C allows both orders: static inline and inline static.
-        if specifiers == [pn.Inline()]:
-            throw_error("'inline' functions without 'static' are not supported")
         return specifiers in ([pn.Static(), pn.Inline()], [pn.Inline(), pn.Static()])
 
-    def _collect_inline_functions(self, decls_defs):
-        self.inline_functions = {}
+    def _has_no_params(self, allocs):
+        return not allocs or (len(allocs) == 1 and isinstance(allocs[0], pn.VoidType))
+
+    def _is_asm_only_function(self, stmts):
+        return bool(stmts) and all(
+            isinstance(stmt, pn.Exp)
+            and isinstance(stmt.exp, pn.Asm)
+            and isinstance(stmt.exp.code, pn.String)
+            for stmt in stmts
+        )
+
+    def _collect_static_asm_inline_functions(self, decls_defs):
+        self.static_asm_inline_functions = {}
         for decl_def in decls_defs:
             match decl_def:
                 case pn.FunDef(_, _, pn.Name(fun_name), allocs, stmts, _):
-                    if not self._is_static_inline(decl_def):
+                    if not (
+                        self._is_static_inline(decl_def)
+                        and self._is_asm_only_function(stmts)
+                    ):
                         continue
-                    match stmts:
-                        # Excludes variadic functions like f(int x, ...);
-                        # the simple inliner only substitutes named params.
-                        case [pn.Return(exp)] if (
-                            not isinstance(exp, pn.Empty)
-                            and all(isinstance(alloc, pn.Alloc) for alloc in allocs)
-                        ):
-                            self.inline_functions[fun_name] = {
-                                "allocs": allocs,
-                                "return_exp": exp,
-                            }
-                        case _:
-                            pass
-
-    def _inline_static_call(self, fun_name, exps):
-        inline_fun = self.inline_functions.get(fun_name)
-        if inline_fun is None:
-            return None
-
-        allocs = inline_fun["allocs"]
-        replacements = {}
-        for alloc, exp in zip(allocs, exps):
-            match alloc:
-                case pn.Alloc(_, _, pn.Name(param_name)):
-                    replacements[param_name] = exp
+                    if not self._has_no_params(allocs):
+                        throw_error("static inline asm functions with parameters are not supported")
+                    self.static_asm_inline_functions[fun_name] = stmts
                 case _:
+                    pass
+
+    def _inline_static_asm_call(self, stmt):
+        match stmt:
+            case pn.Exp(pn.Call(pn.Name(fun_name), exps)):
+                inline_stmts = self.static_asm_inline_functions.get(fun_name)
+                if inline_stmts is None:
                     return None
+                if exps:
+                    throw_error("static inline asm functions with arguments are not supported")
+                return copy.deepcopy(inline_stmts)
+        return None
 
-        return self._replace_inline_params(inline_fun["return_exp"], replacements)
-
-    def _replace_inline_params(self, node, replacements):
-        match node:
-            # Handles return arg directly, and Name attributes reached while
-            # walking a bigger return expression like return arg + 1;.
-            case pn.Name(val) if val in replacements:
-                return copy.deepcopy(replacements[val])
-            # Handles list attributes reached while walking an AST node, e.g.
-            # the argument list in Call(..., exps).
-            case list():
-                return [self._replace_inline_params(elem, replacements) for elem in node]
-            # Walk a compound expression node, e.g. BinOp(left, op, right). Its
-            # attributes are passed back into this function and may hit cases above.
-            case pn.ASTNode():
-                node_copy = copy.deepcopy(node)
-                for key, value in vars(node_copy).items():
-                    setattr(
-                        node_copy,
-                        key,
-                        self._replace_inline_params(value, replacements),
-                    )
-                return node_copy
-            case _:
-                return copy.deepcopy(node)
-
-    def _should_omit_inlined_fun_def(self, decl_def):
+    def _should_omit_static_asm_inline_fun_def(self, decl_def):
         match decl_def:
             case pn.FunDef(_, _, pn.Name(fun_name), _, _, _):
-                return fun_name in self.inline_functions
+                return fun_name in self.static_asm_inline_functions
         return False
 
     def _fits_int32(self, val: int) -> bool:
@@ -324,10 +298,6 @@ class PicocShrinkPass:
                 return pn.Struct(init_pairs_shrinked)
             # ----------------------------- L_Fun -----------------------------
             case pn.Call(fun_exp, exps):
-                if isinstance(fun_exp, pn.Name):
-                    inline_exp = self._inline_static_call(fun_exp.val, exps)
-                    if inline_exp is not None:
-                        return self._picoc_shrink_exp(inline_exp)
                 return pn.Call(
                     self._picoc_shrink_exp(fun_exp),
                     [self._picoc_shrink_exp(exp) for exp in exps],
@@ -421,7 +391,7 @@ class PicocShrinkPass:
             case pn.If(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
+                    stmts_shrinked += self._picoc_shrink_stmt_many(stmt)
                 return pn.If(
                     self._inherit_origin(self._picoc_shrink_exp(exp), exp),
                     stmts_shrinked,
@@ -429,10 +399,10 @@ class PicocShrinkPass:
             case pn.IfElse(exp, stmts1, stmts2):
                 stmts_shrinked1 = []
                 for stmt1 in stmts1:
-                    stmts_shrinked1 += [self._inherit_origin(self._picoc_shrink_stmt(stmt1), stmt1)]
+                    stmts_shrinked1 += self._picoc_shrink_stmt_many(stmt1)
                 stmts_shrinked2 = []
                 for stmt2 in stmts2:
-                    stmts_shrinked2 += [self._inherit_origin(self._picoc_shrink_stmt(stmt2), stmt2)]
+                    stmts_shrinked2 += self._picoc_shrink_stmt_many(stmt2)
                 return pn.IfElse(
                     self._inherit_origin(self._picoc_shrink_exp(exp), exp),
                     stmts_shrinked1,
@@ -442,7 +412,7 @@ class PicocShrinkPass:
             case pn.While(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
+                    stmts_shrinked += self._picoc_shrink_stmt_many(stmt)
                 return pn.While(
                     self._inherit_origin(self._picoc_shrink_exp(exp), exp),
                     stmts_shrinked,
@@ -450,7 +420,7 @@ class PicocShrinkPass:
             case pn.DoWhile(exp, stmts):
                 stmts_shrinked = []
                 for stmt in stmts:
-                    stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
+                    stmts_shrinked += self._picoc_shrink_stmt_many(stmt)
                 return pn.DoWhile(
                     self._inherit_origin(self._picoc_shrink_exp(exp), exp),
                     stmts_shrinked,
@@ -466,6 +436,15 @@ class PicocShrinkPass:
             case _:
                 throw_error(stmt)
 
+    def _picoc_shrink_stmt_many(self, stmt):
+        inline_stmts = self._inline_static_asm_call(stmt)
+        if inline_stmts is not None:
+            return self._inherit_origin_many(
+                [self._picoc_shrink_stmt(inline_stmt) for inline_stmt in inline_stmts],
+                stmt,
+            )
+        return [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
+
     def picoc_shrink(self, file: pn.File):
         match file:
             # ----------------------------- L_File ----------------------------
@@ -474,10 +453,10 @@ class PicocShrinkPass:
                 self.generated_string_literals = {}
                 self.generated_string_defs = []
                 self.generated_string_counter = 0
-                self._collect_inline_functions(decls_defs)
+                self._collect_static_asm_inline_functions(decls_defs)
                 decls_defs_shrinked = []
                 for decl_def in decls_defs:
-                    if self._should_omit_inlined_fun_def(decl_def):
+                    if self._should_omit_static_asm_inline_fun_def(decl_def):
                         continue
                     match decl_def:
                         case pn.StructSpec() as structspec:
@@ -494,7 +473,7 @@ class PicocShrinkPass:
                                 )
                             stmts_shrinked = []
                             for stmt in stmts:
-                                stmts_shrinked += [self._inherit_origin(self._picoc_shrink_stmt(stmt), stmt)]
+                                stmts_shrinked += self._picoc_shrink_stmt_many(stmt)
                             if allocs and isinstance(allocs[0], pn.VoidType):
                                 allocs_shrinked = []
                             else:

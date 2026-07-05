@@ -15,9 +15,6 @@ class PassStateMixin:
         self.generated_string_defs = []
         # Counter for unique string literal names like __strlit_0.
         self.generated_string_counter = 0
-        # Inline function definitions collected before shrink rewriting.
-        # Shrink uses them to replace inline calls with their body/expression.
-        self.inline_functions = {}
 
         # -------------------------------- PicoC_Blocks ---------------------------------
         # Counter for generated block labels and block ordering metadata.
