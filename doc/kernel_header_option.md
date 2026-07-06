@@ -7,13 +7,15 @@ The `-k` / `--kernelheader` compiler option runs the normal linking path far eno
 ```c
 #define SRAM_BASE (-2147483647 - 1) // -2^31
 #define SRAM_MAX_ADDRESS 262143 // 2^18 - 1
-#define KERNEL_HEAP_START <heap_start> // heap_start
+#define KERNEL_HEAP_START <sram_base + heap_start> // -2^31 + heap_start
 #define PROCESS_MEMORY_START <sram_base + stack_start + 1> // -2^31 + stack_start + 1
 #define KERNEL_CS_START_ASM "LOADI32 CS <sram_base + codesegment_start>" // -2^31 + codesegment_start
 #define KERNEL_DS_START_ASM "LOADI32 DS <sram_base + datasegment_start>" // -2^31 + datasegment_start
 #define KERNEL_SP_START_ASM "LOADI32 SP <sram_base + stack_start>" // -2^31 + stack_start
 #define KERNEL_CS_ACC_ASM "LOADI32 ACC <sram_base + codesegment_start>" // -2^31 + codesegment_start
 ```
+
+`KERNEL_HEAP_START` and `PROCESS_MEMORY_START` are absolute SRAM addresses, not section offsets.
 
 `-k eprom` generates EPROM start-program constants:
 

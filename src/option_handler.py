@@ -736,11 +736,12 @@ class OptionHandler:
         stack_start = self._kernel_stack_start(sections)
         cs_start_address = self._sram_address(codesegment_start)
         ds_start_address = self._sram_address(datasegment_start)
+        heap_start_address = self._sram_address(heap_start)
         sp_start_address = self._sram_address(stack_start)
         return [
             "#define SRAM_BASE (-2147483647 - 1) // -2^31",
             f"#define SRAM_MAX_ADDRESS {SRAM_MAX_ADDRESS} // 2^18 - 1",
-            f"#define KERNEL_HEAP_START {heap_start} // heap_start",
+            f"#define KERNEL_HEAP_START {heap_start_address} // -2^31 + heap_start",
             f"#define PROCESS_MEMORY_START {sp_start_address + 1} // -2^31 + stack_start + 1",
             f'#define KERNEL_CS_START_ASM "LOADI32 CS {cs_start_address}" // -2^31 + codesegment_start',
             f'#define KERNEL_DS_START_ASM "LOADI32 DS {ds_start_address}" // -2^31 + datasegment_start',
