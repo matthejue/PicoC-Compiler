@@ -150,6 +150,82 @@ def _apply_function_sections(items, symbol_table):
     text_entries[:] = text_kept
 
 
+def _startup_source_path() -> Optional[str]:
+    startup_source = getattr(global_vars.args, "startup_source", None)
+    if startup_source is None:
+        return None
+
+    if get_ext(startup_source) != "picoc":
+        print(
+            f"[ERROR] Startup source '{startup_source}' must be a .picoc file",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    if not os.path.isfile(startup_source):
+        print(
+            f"[ERROR] Startup source '{startup_source}' was not found",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return os.path.normpath(startup_source)
+
+
+def _startup_entry_name(startup_source: str) -> str:
+    source_name = Path(startup_source).stem
+    identifier = re.sub(r"\W", "_", source_name)
+    if not identifier:
+        identifier = "startup"
+    if not re.match(r"[A-Za-z_]", identifier):
+        identifier = "_" + identifier
+    return f"__{identifier}_start_main"
+
+
+def _append_unique_path(files: List[str], path: str) -> List[str]:
+    path_key = os.path.abspath(path)
+    if any(os.path.abspath(file) == path_key for file in files):
+        return files
+    return files + [path]
+
+
+def _mark_startup_source_target(build_targets, startup_source: Optional[str]) -> None:
+    if startup_source is None:
+        return
+
+    startup_key = os.path.abspath(startup_source)
+    for target in build_targets:
+        if target["kind"] == "picoc" and os.path.abspath(target["path"]) == startup_key:
+            target["start_main_name"] = global_vars.args.startup_entry_name
+            return
+
+    print(
+        f"[ERROR] Startup source '{startup_source}' was not selected for compilation",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
+def _rename_startup_main_definition(ast, start_main_name: str) -> None:
+    renamed = 0
+    match ast:
+        case pn.File(_, decls_defs):
+            for decl_def in decls_defs:
+                match decl_def:
+                    case pn.FunDef(_, _, pn.Name("main") as name, _, _, _):
+                        name.val = start_main_name
+                        renamed += 1
+                    case _:
+                        pass
+        case _:
+            throw_error(ast)
+
+    if renamed != 1:
+        print(
+            f"[ERROR] Startup source must define exactly one main function, found {renamed}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 class OptionHandler:
     def __init__(self):
         _set_terminal_size()
@@ -161,8 +237,20 @@ class OptionHandler:
 
     def build_all(self, max_workers=None):
         files = _expand_dependency_metadata(list(global_vars.args.infiles))
+        startup_source = _startup_source_path()
+        global_vars.args.startup_entry_name = None
+        if startup_source is not None:
+            if global_vars.args.compile:
+                print(
+                    "[ERROR] '-C/--startup-source' requires linking and is not "
+                    "supported together with '--compile'"
+                )
+                exit(1)
+            global_vars.args.startup_entry_name = _startup_entry_name(startup_source)
+            files = _append_unique_path(files, startup_source)
         global_vars.args.infiles = files
         build_targets = _normalize_input_units(files)
+        _mark_startup_source_target(build_targets, startup_source)
 
         if global_vars.args.generate_debuginfo and global_vars.args.compile:
             print("[ERROR] '-g/--generate_debuginfo' is not supported together with '--compile'")
@@ -243,7 +331,7 @@ class OptionHandler:
         match target_kind:
             case "picoc":
                 preprocessed_code = self._preprocess(path)
-                return self._compl(preprocessed_code)
+                return self._compl(preprocessed_code, target.get("start_main_name"))
             case "reti_blocks":
                 return self._load_external_reti_blocks(path, target["st_path"])
             case _:
@@ -289,7 +377,7 @@ class OptionHandler:
         )
         return preprocessor.preprocess(code, path)
 
-    def _compl(self, code):
+    def _compl(self, code, start_main_name=None):
         self._output_preprocess(code, "Preprocessed Code", ".pre")
 
         transformer = TransformerPicoC()
@@ -308,6 +396,8 @@ class OptionHandler:
             if global_vars.args.traceback:
                 traceback.print_exc()
             exit(1)
+        if start_main_name is not None:
+            _rename_startup_main_definition(ast, start_main_name)
 
         self._output_pass(ast, "Abstract Syntax Tree")
 
@@ -360,17 +450,25 @@ class OptionHandler:
     def _insert_start_fun(self, asts, symbol_tables, all_file_blocks):
         passes = Passes()
 
+        start_fun_name = global_vars.args.startup_entry_name or "main"
         main_func = None
         for symbol_table in symbol_tables:
-            if symbol_table.contains("main", scope="global"):
-                main_func = symbol_table._table["global"]["main"]
+            if symbol_table.contains(start_fun_name, scope="global"):
+                main_func = symbol_table._table["global"][start_fun_name]
                 break
 
         if main_func is None:
-            print(
-                "[warning] No main function found; no _start block will be generated, so the output may not be directly executable.",
-                file=sys.stderr,
-            )
+            if global_vars.args.startup_entry_name:
+                print(
+                    f"[error] Startup source has no renamed entry function '{start_fun_name}'.",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            else:
+                print(
+                    "[warning] No main function found; no _start block will be generated, so the output may not be directly executable.",
+                    file=sys.stderr,
+                )
             return
 
         global_inits = []
@@ -388,11 +486,11 @@ class OptionHandler:
                     )
                     sys.exit(1)
 
-        passes.symbol_table.declare("main", main_func, scope="global")
+        passes.symbol_table.declare(start_fun_name, main_func, scope="global")
 
         start_block = pn.Block(
             "_start",
-            passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name("main"), [])))
+            passes._picoc_anf_stmt(pn.Exp(pn.Call(pn.Name(start_fun_name), [])))
             + [pn.Exit(pn.Num("0"))],
         )
         start_block.show_id_comment = True
@@ -1009,6 +1107,7 @@ def _print_args_if_verbose():
         "supress_errors",
         "binary",
         "metadata_comments",
+        "startup_source",
         "kernelheader",
         "optimization_level",
     ]

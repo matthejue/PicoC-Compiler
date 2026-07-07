@@ -158,6 +158,7 @@ Example:
 | `-M`, `--max-depth` | `DEPTH` | Sets the maximum include depth. The default is `200`. |
 | `-o`, `--output_name` | `OUTPUT` | Sets the linked RETI output path. With `-k`, this selects the path used for `memory_constants.header` instead of a `.reti` output path. The default is `a.reti`. |
 | `-c`, `--compile` | none | Compiles source files without linking. This writes per-file `.reti_blocks` and `.st` outputs. |
+| `-C`, `--startup-source` | `PATH` | Links an additional PicoC startup source. Its `main` definition is renamed to `__<source-name>_start_main`, `_start` calls that renamed function, and `_start` finishes with syscall `9` via `INT 4`. |
 | `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
 | `-k`, `--kernelheader` | `sram` or `eprom` | Runs linking far enough to compute section addresses, then writes only `memory_constants.header`; in this mode `-o` selects the header path, not a `.reti` output path. `-k sram` generates SRAM-based kernel constants and `LOADI32` setup strings for `CS`, `DS`, `SP`, and `ACC`. `-k eprom` generates EPROM start-program constants with an SRAM maximum address, an EPROM data-segment setup string, and an SRAM-top stack setup string. |
 | `-O0` | none | Disables optimizations. This is the default optimization level. |
@@ -517,10 +518,10 @@ Main tasks:
 
 - Collects every `_global_inits` block from the per-file ASTs and removes those blocks from their original files.
   Example: global initializations from `a.picoc` and `b.picoc` are moved into the start sequence.
-- Searches the merged symbol tables for a global `main`.
-  Example: if no `main` exists in any file, compilation continues with a warning and no `_start` block is generated.
-- Builds a synthetic `_start` block that calls `main` and then exits.
-  Example: `_start` contains the ANF form of `main()` followed by `Exit(0)`.
+- Searches the merged symbol tables for a global `main`, or for `__<source-name>_start_main` when `-C` is used.
+  Example: if no `main` exists in any file and no startup source is active, compilation continues with a warning and no `_start` block is generated.
+- Builds a synthetic `_start` block that calls the selected entry function and then exits.
+  Example: normal `_start` contains the ANF form of `main()` followed by `Exit(0)`; with `-C`, it calls the renamed startup function and exits with syscall `9`.
 - Lowers this synthetic start file through `reti_blocks`.
   Example: `_start` becomes RETI blocks just like normal compiled code.
 - Prepends the collected global initializers to `_start` so they run before `main`.

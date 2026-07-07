@@ -100,6 +100,15 @@ def build_parser():
         help="Compile source files without linking (like gcc -c)",
     )
     parser.add_argument(
+        "-C",
+        "--startup-source",
+        metavar="PATH",
+        help=(
+            "Link an additional PicoC startup source; its main definition is "
+            "renamed to __<source-name>_start_main and _start calls it"
+        ),
+    )
+    parser.add_argument(
         "-g",
         "--generate_debuginfo",
         action="store_true",

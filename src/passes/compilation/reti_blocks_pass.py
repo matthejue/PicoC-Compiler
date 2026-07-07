@@ -346,6 +346,11 @@ class RetiBlocksPass:
                     rn.Int(rn.Im("3")),
                 ]
             case pn.Exit(pn.Num(val)):
+                if getattr(global_vars.args, "startup_entry_name", None):
+                    return self._single_line_comment(stmt, "#") + [
+                        rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im("9")]),
+                        rn.Int(rn.Im("4")),
+                    ]
                 return self._single_line_comment(stmt, "#") + [
                     rn.Instr(rn.Loadi(), [rn.Reg(rn.Acc()), rn.Im(val)]),
                     rn.Jump(rn.Always(), rn.Im("0")),
