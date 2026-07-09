@@ -104,8 +104,8 @@ def build_parser():
         "--startup-source",
         metavar="PATH",
         help=(
-            "Link an additional PicoC startup source; its main definition is "
-            "renamed to __<source-name>_start_main and _start calls it"
+            "Link an additional PicoC startup source; if it defines _start, "
+            "that function replaces the generated default _start"
         ),
     )
     parser.add_argument(
