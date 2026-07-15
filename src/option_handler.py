@@ -1,6 +1,7 @@
 from src import global_vars
 from src import symbol_table as st
 from src import picoc_nodes as pn
+from src import reti_nodes as rn
 from src import debug as db
 import sys
 import shutil
@@ -32,6 +33,7 @@ SECTION_ORDER = ["ivt", "text", "data"]
 TEXT_SECTION = "text"
 DATA_SECTION = "data"
 MEMORY_CONSTANTS_HEADER_NAME = "memory_constants.header"
+STRING_LITERAL_SYMBOL_RE = re.compile(r"^__strlit_(\d+)$")
 SRAM_BASE_ADDRESS = -(2**31)
 SRAM_SIZE = 2**18
 SRAM_MAX_ADDRESS = SRAM_SIZE - 1
@@ -300,6 +302,7 @@ class OptionHandler:
         _get_test_metadata()
 
         if not global_vars.args.compile:
+            self._namespace_string_literal_symbols(asts, symbol_tables)
             self._insert_start_fun(
                 asts, symbol_tables, all_file_blocks, startup_target_index
             )
@@ -426,6 +429,43 @@ class OptionHandler:
         self._reti_with_metadata(reti, "RETI", passes.reti_sections)
         if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader:
             self._write_debuginfo(reti, passes.symbol_table, passes.reti_sections)
+
+    def _namespace_string_literal_symbols(self, asts, symbol_tables):
+        if len(symbol_tables) < 2:
+            return
+
+        def rename_reti_names(value, renames):
+            if isinstance(value, rn.Name):
+                value.val = renames.get(value.val, value.val)
+            elif isinstance(value, list):
+                for item in value:
+                    rename_reti_names(item, renames)
+            elif isinstance(value, ASTNode):
+                if isinstance(value, pn.Block):
+                    value.name = renames.get(value.name, value.name)
+                    if hasattr(value, "data_symbol_name"):
+                        value.data_symbol_name = renames.get(
+                            value.data_symbol_name, value.data_symbol_name
+                        )
+                for item in vars(value).values():
+                    rename_reti_names(item, renames)
+
+        for unit_index, (ast, symbol_table) in enumerate(zip(asts, symbol_tables)):
+            global_symbols = symbol_table._table.get("global", {})
+            renames = {}
+            for name in global_symbols:
+                match = STRING_LITERAL_SYMBOL_RE.fullmatch(name)
+                if match is not None:
+                    renames[name] = f"__strlit_{unit_index}_{match.group(1)}"
+
+            if not renames:
+                continue
+
+            rename_reti_names(ast, renames)
+            for old_name, new_name in renames.items():
+                symbol = global_symbols.pop(old_name)
+                symbol["name"] = new_name
+                global_symbols[new_name] = symbol
 
     def _insert_start_fun(
         self, asts, symbol_tables, all_file_blocks, startup_target_index

@@ -1,0 +1,12 @@
+// expected: 209
+// dependencies: ./include/linker_string_literals_dependency.picoc ../../Pico-OS/lib/stdio/libstdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
+
+char *dependency_string();
+
+int main() {
+    char *main_string = "main";
+    char *other_string = dependency_string();
+    printf(" %d", main_string[0] + other_string[0]);
+    return 0;
+}

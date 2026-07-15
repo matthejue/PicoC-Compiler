@@ -1,0 +1,3 @@
+char *dependency_string() {
+    return "dependency";
+}

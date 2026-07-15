@@ -1,1 +1,1 @@
-./sys_tests/basic_ivt_text_function_addresses.picoc
+./sys_tests/basic_ivt_function_decl_section.picoc ./sys_tests/basic_ivt_text_function_addresses.picoc
