@@ -2,9 +2,15 @@
 // expected:42
 
 int main() {
-  asm("INT 1");
+  asm("LOADI ACC 1");
   asm("INT 0");
-  asm("INT 1");
+  asm("MOVE ACC IN1");
+  asm("LOADI ACC 0");
+  asm("INT 0");
+  asm("LOADI ACC 1");
+  asm("INT 0");
+  asm("MOVE ACC IN1");
+  asm("LOADI ACC 0");
   asm("INT 0");
   return 0;
 }

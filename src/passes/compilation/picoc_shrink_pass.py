@@ -135,7 +135,20 @@ class PicocShrinkPass:
         return 1 if res else 0
 
     def _string_literal_to_array(self, literal: pn.String):
-        return pn.Array([pn.Char(ch) for ch in literal.val] + [pn.Char("\\0")])
+        characters = []
+        index = 0
+
+        while index < len(literal.val):
+            character = literal.val[index]
+
+            if character == "\\" and index + 1 < len(literal.val):
+                characters.append(pn.Char(literal.val[index : index + 2]))
+                index += 2
+            else:
+                characters.append(pn.Char(character))
+                index += 1
+
+        return pn.Array(characters + [pn.Char("\\0")])
 
     def _globalize_string_literal(self, literal: pn.String):
         cached_name = self.generated_string_literals.get(literal.val)
@@ -149,7 +162,7 @@ class PicocShrinkPass:
 
         array_exp = self._string_literal_to_array(literal)
         array_dt = pn.ArrayDecl(
-            pn.Num(str(len(literal.val) + 1)),
+            pn.Num(str(len(array_exp.exps))),
             pn.CharType(),
         )
         self.generated_string_defs.append(
@@ -168,12 +181,13 @@ class PicocShrinkPass:
             case pn.ArrayDecl(pn.Empty(), inner_dt):
                 match initializer:
                     case pn.String() as literal:
+                        array_exp = self._string_literal_to_array(literal)
                         return (
                             pn.ArrayDecl(
-                                pn.Num(str(len(literal.val) + 1)),
+                                pn.Num(str(len(array_exp.exps))),
                                 copy.deepcopy(inner_dt),
                             ),
-                            self._string_literal_to_array(literal),
+                            array_exp,
                         )
                     case pn.Array(exps):
                         return (

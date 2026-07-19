@@ -1,5 +1,7 @@
 // in:
-// expected:
+// expected: 3
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+#include "../../Pico-OS/lib/stdio/stdio.header"
 
 int text_fun(void) {
   return 1;
@@ -18,5 +20,6 @@ int ivt_target(void) {
 int main(void) {
   int (*fp)(void);
   fp = ivt_target;
-  return ivt_caller() + fp();
+  printf(" %d", ivt_caller() + fp());
+  return 0;
 }

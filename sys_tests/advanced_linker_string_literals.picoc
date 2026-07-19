@@ -1,3 +1,4 @@
+// in:
 // expected: 209
 // dependencies: ./include/linker_string_literals_dependency.picoc ../../Pico-OS/lib/stdio/libstdio.picoc
 #include "../../Pico-OS/lib/stdio/stdio.header"
