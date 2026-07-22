@@ -647,6 +647,18 @@ class ParamDecl(ASTNode):
     __match_args__ = ("type_qual", "datatype")
 
 
+class Typedef(ASTNode):
+    def __init__(self, datatype, name):
+        self.datatype = datatype
+        self.name = name
+
+    @property
+    def visible(self):
+        return [self.datatype, self.name]
+
+    __match_args__ = ("datatype", "name")
+
+
 class Return(ASTNode):
     def __init__(self, exp=Empty()):
         self.exp = exp

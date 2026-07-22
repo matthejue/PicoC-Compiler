@@ -248,6 +248,11 @@ class TransformerPicoC(_TreeSitterTransformer):
     def translation_unit(self, _, children):
         return pn.File(pn.Name(global_vars.tstate.path_without_ext + ".ast"), children)
 
+    def type_definition(self, _, children):
+        base_datatype, declarator = children
+        datatype, name = self._seperate_name_and_datatype(base_datatype, declarator)
+        return pn.Typedef(datatype, name)
+
     def function_definition(self, _, children):
         section, naked, children = _take_attributes(children)
         storage_class_specifiers = _storage_class_specifiers(children)
@@ -324,6 +329,10 @@ class TransformerPicoC(_TreeSitterTransformer):
                 return pn.IntType()
             case "char":
                 return pn.CharType()
+            case "bool":
+                # Tree-sitter recognizes bool as a type even when it is the
+                # name being introduced by a typedef
+                return pn.Name("bool")
             case _:
                 return pn.Error()
 

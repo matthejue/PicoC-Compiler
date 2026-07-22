@@ -640,7 +640,13 @@ class OptionHandler:
             existing_dt = existing.get("datatype")
             incoming_dt = incoming.get("datatype")
 
-            if existing_struct and incoming_struct:
+            if (
+                existing.get("kind") == "typedef"
+                and incoming.get("kind") == "typedef"
+                and symbols_equivalent(existing, incoming)
+            ):
+                return
+            elif existing_struct and incoming_struct:
                 # Structs are compile-time types, so repeated
                 # header-provided definitions can share the existing entry.
                 if existing_struct == "complete" and incoming_struct == "complete":

@@ -346,7 +346,14 @@ class PicocBlocksPass:
                 return [
                     self._inherit_origin(fun_def, decl_def)
                 ]
-            case pn.StructSpec() | pn.FunDecl() | pn.StructDecl() | pn.Exp() | pn.Assign():
+            case (
+                pn.Typedef()
+                | pn.StructSpec()
+                | pn.FunDecl()
+                | pn.StructDecl()
+                | pn.Exp()
+                | pn.Assign()
+            ):
                 return [decl_def]
             case _:
                 throw_error(decl_def)

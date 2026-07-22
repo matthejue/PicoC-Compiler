@@ -7,6 +7,57 @@ import copy
 class PicocSymbolPass:
     _SECTION = "ivt"
 
+    def _resolve_datatype(self, datatype):
+        match datatype:
+            case pn.Name(type_name):
+                symbol, _ = self.symbol_table.resolve(
+                    type_name, scope=self.current_scope
+                )
+                if symbol is None or symbol.get("kind") != "typedef":
+                    throw_error(f"Unknown type name '{type_name}'")
+                return copy.deepcopy(symbol["datatype"])
+            case pn.ArrayDecl(const_exp, inner_datatype):
+                return pn.ArrayDecl(
+                    const_exp, self._resolve_datatype(inner_datatype)
+                )
+            case pn.PntrDecl(inner_datatype):
+                return pn.PntrDecl(self._resolve_datatype(inner_datatype))
+            case pn.FunPtrDecl(return_datatype, params):
+                return pn.FunPtrDecl(
+                    self._resolve_datatype(return_datatype),
+                    self._resolve_param_datatypes(params),
+                )
+            case _:
+                return datatype
+
+    def _resolve_param_datatypes(self, params):
+        for param in params:
+            match param:
+                case pn.Alloc(_, datatype):
+                    param.datatype = self._resolve_datatype(datatype)
+                case pn.ParamDecl(_, datatype):
+                    param.datatype = self._resolve_datatype(datatype)
+                case pn.VoidType() | pn.VariadicParam():
+                    pass
+                case _:
+                    throw_error(param)
+        return params
+
+    def _declare_typedef(self, typedef):
+        match typedef:
+            case pn.Typedef(datatype, pn.Name(type_name)):
+                self.symbol_table.declare(
+                    type_name,
+                    {
+                        "kind": "typedef",
+                        "datatype": self._resolve_datatype(datatype),
+                        "name": type_name,
+                    },
+                    scope=self.current_scope,
+                )
+            case _:
+                throw_error(typedef)
+
     def _validated_section(self, section_name):
         if section_name is None:
             return None
@@ -37,6 +88,7 @@ class PicocSymbolPass:
         return size
 
     def _datatype_size(self, datatype) -> int:
+        datatype = self._resolve_datatype(datatype)
         match datatype:
             # ------------------------ L_Arith + L_Pntr -----------------------
             case pn.IntType() | pn.CharType() | pn.PntrDecl() | pn.FunPtrDecl():
@@ -70,7 +122,7 @@ class PicocSymbolPass:
                 return
             case pn.Alloc(type_qual, datatype, pn.Name(val1), _, section):
                 var_name = val1
-                datatype_copy = copy.deepcopy(datatype)
+                datatype_copy = copy.deepcopy(self._resolve_datatype(datatype))
                 # Parameters of array type decay to pointers to their first element type.
                 if is_param and isinstance(
                     datatype_copy, pn.ArrayDecl
@@ -195,7 +247,10 @@ class PicocSymbolPass:
             case pn.PostDec(inner_exp):
                 return pn.PostDec(self._picoc_rewrite_exp(inner_exp))
             case pn.Cast(datatype, exp):
-                return pn.Cast(datatype, self._picoc_rewrite_exp(exp))
+                return pn.Cast(
+                    self._resolve_datatype(datatype),
+                    self._picoc_rewrite_exp(exp),
+                )
             case pn.ToBool(inner_exp):
                 return pn.ToBool(self._picoc_rewrite_exp(inner_exp))
             case pn.Atom(left_exp, rel, right_exp):
@@ -301,6 +356,9 @@ class PicocSymbolPass:
 
     def _picoc_symbol_stmt(self, stmt):
         match stmt:
+            case pn.Typedef():
+                self._declare_typedef(stmt)
+                return self._single_line_comment(stmt, "//")
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Alloc(pn.Const(), _, pn.Name()) as alloc, num):
                 self._declare_alloc(
@@ -365,6 +423,9 @@ class PicocSymbolPass:
 
     def _picoc_symbol_decl_def(self, decl_def):
         match decl_def:
+            case pn.Typedef():
+                self._declare_typedef(decl_def)
+                return []
             case pn.StructSpec(pn.Name(struct_name)):
                 existing, _ = self.symbol_table.resolve(
                     struct_name, scope=self.current_scope
@@ -390,6 +451,8 @@ class PicocSymbolPass:
                 for alloc in allocs:
                     match alloc:
                         case pn.Alloc(pn.Writeable(), datatype, pn.Name(attr_name)):
+                            datatype = self._resolve_datatype(datatype)
+                            alloc.datatype = datatype
                             attr_size = self._datatype_size(datatype)
                             self.symbol_table.declare(
                                 attr_name,
@@ -421,6 +484,9 @@ class PicocSymbolPass:
                 )
                 return []
             case pn.FunDecl(_, datatype, pn.Name(fun_name), allocs, section):
+                datatype = self._resolve_datatype(datatype)
+                allocs = self._resolve_param_datatypes(allocs)
+                decl_def.datatype = datatype
                 section_name = self._validated_section(section)
                 param_size = self._param_size(allocs)
                 self.symbol_table.declare(
@@ -436,6 +502,9 @@ class PicocSymbolPass:
                 )
                 return []
             case pn.FunDef(_, datatype, pn.Name(fun_name) as name, allocs, blocks, section):
+                datatype = self._resolve_datatype(datatype)
+                allocs = self._resolve_param_datatypes(allocs)
+                decl_def.datatype = datatype
                 naked = getattr(decl_def, "naked", False)
                 section_name = self._validated_section(section)
                 fun_blocks_out = []

@@ -376,6 +376,8 @@ class PicocShrinkPass:
 
     def _picoc_shrink_stmt(self, stmt):
         match stmt:
+            case pn.Typedef(datatype, name):
+                return pn.Typedef(self._picoc_shrink_datatype(datatype), name)
             # ------------------------- L_Assign_Alloc ------------------------
             case pn.Assign(pn.Alloc(type_qual, datatype, name, _, section), exp):
                 # char str[] = "..." becomes a regular array and can be put on the stack.
@@ -473,6 +475,10 @@ class PicocShrinkPass:
                     if self._should_omit_static_asm_inline_fun_def(decl_def):
                         continue
                     match decl_def:
+                        case pn.Typedef(datatype, name):
+                            decls_defs_shrinked.append(
+                                pn.Typedef(self._picoc_shrink_datatype(datatype), name)
+                            )
                         case pn.StructSpec() as structspec:
                             decls_defs_shrinked += [structspec]
                         case pn.FunDef(storage_class_specifiers, datatype, pn.Name() as name, allocs, stmts, section):
