@@ -1,0 +1,23 @@
+// in:
+// expected: 7 8 12 10 13 9 11 92 39 34 63
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+
+#include "../../Pico-OS/lib/stdio/stdio.header"
+
+int main(void) {
+    printf(
+        " %d %d %d %d %d %d %d %d %d %d %d",
+        '\a',
+        '\b',
+        '\f',
+        '\n',
+        '\r',
+        '\t',
+        '\v',
+        '\\',
+        '\'',
+        '\"',
+        '\?'
+    );
+    return 0;
+}

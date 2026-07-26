@@ -72,12 +72,17 @@ class PicocBlocksPass:
         if len(val) == 2 and val[0] == "\\":
             escape_map = {
                 "0": 0,
+                "a": 7,
+                "b": 8,
+                "f": 12,
                 "n": 10,
-                "t": 9,
                 "r": 13,
+                "t": 9,
+                "v": 11,
                 "\\": 92,
                 "'": 39,
                 '"': 34,
+                "?": 63,
             }
             return escape_map.get(val[1], ord(val[1]))
         return ord(val)
