@@ -127,6 +127,7 @@ fi
 num_tests=0
 failing=()
 not_passed=()
+timed_out=()
 
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$columns" "="
@@ -147,7 +148,7 @@ for test in "${paths[@]}"; do
 
   if [[ -f "${test%.picoc}.reti" ]]; then
     # shellcheck disable=SC2046,SC2086
-    timeout --preserve-status \
+    timeout \
       "${MAX_EMULATOR_DURATION_SECONDS}s" \
       reti_emulator \
       $(cat ./opts/test_emu_opts.txt) \
@@ -157,8 +158,8 @@ for test in "${paths[@]}"; do
     emulator_status=$?
 
     if [[ $emulator_status -eq 124 ]]; then
-      echo \
-        "Emulator timed out after ${MAX_EMULATOR_DURATION_SECONDS}s for $test"
+      timed_out+=("$test")
+      echo "Test timed out after ${MAX_EMULATOR_DURATION_SECONDS}s: $test"
     fi
   fi
 
@@ -205,6 +206,12 @@ echo "Passed: $((num_tests - ${#not_passed[@]})) / $num_tests" |
   tee -a ./sys_tests/tests.res
 
 echo "Not passed: ${not_passed[*]}" |
+  tee -a ./sys_tests/tests.res
+
+echo "Timed out: ${#timed_out[@]} / $num_tests" |
+  tee -a ./sys_tests/tests.res
+
+echo "Timed-out tests: ${timed_out[*]}" |
   tee -a ./sys_tests/tests.res
 
 echo "Updated test list: $NOT_PASSED_TESTS_FILE"
