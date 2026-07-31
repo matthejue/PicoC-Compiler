@@ -425,6 +425,10 @@ class OptionHandler:
             reti_patch,
             "RETI Patch",
         )
+        passes.all_blocks = {
+            block.name: block
+            for block in _walk_blocks(reti_patch.decls_defs_blocks_instrs)
+        }
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI", passes.reti_sections)
         if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader:
