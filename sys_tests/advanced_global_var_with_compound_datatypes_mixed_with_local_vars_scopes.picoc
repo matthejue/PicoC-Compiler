@@ -1,6 +1,6 @@
 // in:12
 // expected: 42 314
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int len; int ar[2];};

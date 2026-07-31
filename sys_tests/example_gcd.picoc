@@ -1,7 +1,7 @@
 // in:12 9 16 12
 // expected: 3 4
 // from the Introduction to Programming Lecture by Prof. Dr. Peter Thiemann and was also needed in one exercise sheet in the Operating Systems Lecture by Prof. Dr. Scholl
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 int gcd(int a, int b) {

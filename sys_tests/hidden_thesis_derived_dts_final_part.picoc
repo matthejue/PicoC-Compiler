@@ -1,6 +1,6 @@
 // in:
 // expected: -2147483569 0 -2147483565
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct st {int attr[2];};

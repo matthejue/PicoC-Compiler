@@ -1,6 +1,6 @@
 // in:1 2 3 4
 // expected: 1 2 3 4
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 void connect(int **pntr, int (*ar)[2], int len);

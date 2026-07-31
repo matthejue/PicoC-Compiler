@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NOT_PASSED_TESTS_FILE="./opts/not_passed_tests.txt"
+NOT_PASSED_TESTS_FILE="${NOT_PASSED_TESTS_FILE:-./opts/not_passed_tests.txt}"
 use_not_passed_tests=false
 
 usage() {
@@ -71,6 +71,76 @@ trap cleanup SIGINT
 MAX_EMULATOR_DURATION_SECONDS=5
 
 paths=()
+dependency_sources=()
+dependency_blocks=()
+
+collect_dependencies() {
+  local test="$1"
+  local line
+  local dependency
+  local dependency_source
+  local source_relative_to_test
+  local found
+  local existing_source
+  local -a declared_dependencies=()
+
+  dependency_sources=()
+  dependency_blocks=()
+
+  while IFS= read -r line; do
+    if [[ ! "$line" =~ ^[[:space:]]*//[[:space:]]*dependencies[[:space:]]*:[[:space:]]*(.*)$ ]]; then
+      continue
+    fi
+
+    read -r -a declared_dependencies <<< "${BASH_REMATCH[1]}"
+    for dependency in "${declared_dependencies[@]}"; do
+      if [[ "$dependency" != *.reti_blocks ]]; then
+        echo "Dependency must be a .reti_blocks file: $dependency" >&2
+        return 1
+      fi
+
+      dependency_source="${dependency%.reti_blocks}.picoc"
+      source_relative_to_test="$(dirname "$test")/$dependency_source"
+      if [[ -f "$dependency_source" ]]; then
+        dependency_source="$(realpath "$dependency_source")"
+      elif [[ -f "$source_relative_to_test" ]]; then
+        dependency_source="$(realpath "$source_relative_to_test")"
+      else
+        echo "Dependency source not found for $dependency" >&2
+        return 1
+      fi
+
+      found=false
+      for existing_source in "${dependency_sources[@]}"; do
+        if [[ "$existing_source" == "$dependency_source" ]]; then
+          found=true
+          break
+        fi
+      done
+      if [[ "$found" == true ]]; then
+        continue
+      fi
+
+      dependency_sources+=("$dependency_source")
+      dependency_blocks+=("${dependency_source%.picoc}.reti_blocks")
+    done
+  done < "$test"
+}
+
+prepend_test_metadata() {
+  local test="$1"
+  local reti="$2"
+  local metadata_file
+
+  metadata_file="$(mktemp)"
+  sed -nE \
+    -e 's@^[[:space:]]*//[[:space:]]*(input|in)[[:space:]]*:[[:space:]]*(.*)$@# input:\2@p' \
+    -e 's@^[[:space:]]*//[[:space:]]*(expected|exp)[[:space:]]*:[[:space:]]*(.*)$@# expected:\2@p' \
+    -e 's@^[[:space:]]*//[[:space:]]*(datasegment|data)[[:space:]]*:[[:space:]]*(.*)$@# datasegment:\2@p' \
+    "$test" > "$metadata_file"
+  cat "$reti" >> "$metadata_file"
+  mv "$metadata_file" "$reti"
+}
 
 if [[ "$use_not_passed_tests" == true ]]; then
   if [[ ! -f "$NOT_PASSED_TESTS_FILE" ]]; then
@@ -132,21 +202,56 @@ timed_out=()
 for test in "${paths[@]}"; do
   ./heading_subheadings.py "heading" "$test" "$columns" "="
 
-  # The intentional unquoted expansion permits multiple options in the
-  # option files and EXTRA_CPL_ARGS.
-  # shellcheck disable=SC2046,SC2086
-  ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
-    "$test" -o "${test%.picoc}.reti"
+  rm -f \
+    "${test%.picoc}.reti" \
+    "${test%.picoc}.sections" \
+    "${test%.picoc}.output" \
+    "${test%.picoc}.error"
 
-  compile_status=$?
+  compile_status=0
+  if ! collect_dependencies "$test"; then
+    compile_status=1
+  fi
+
+  if [[ $compile_status -eq 0 ]]; then
+    for dependency_source in "${dependency_sources[@]}"; do
+      # The intentional unquoted expansion permits multiple options in the
+      # option files and EXTRA_CPL_ARGS
+      # shellcheck disable=SC2046,SC2086
+      if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
+        -c "$dependency_source"; then
+        compile_status=1
+        break
+      fi
+    done
+  fi
+
+  if [[ $compile_status -eq 0 ]]; then
+    # shellcheck disable=SC2046,SC2086
+    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
+      -c "$test"; then
+      compile_status=1
+    fi
+  fi
+
+  if [[ $compile_status -eq 0 ]]; then
+    linker_inputs=("${test%.picoc}.reti_blocks" "${dependency_blocks[@]}")
+    # shellcheck disable=SC2046,SC2086
+    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
+      "${linker_inputs[@]}" -o "${test%.picoc}.reti"; then
+      compile_status=1
+    else
+      prepend_test_metadata "$test" "${test%.picoc}.reti"
+    fi
+  fi
 
   if [[ $compile_status -ne 0 ]]; then
     failing+=("$test")
   fi
 
-  emulator_status=0
+  emulator_status=$compile_status
 
-  if [[ -f "${test%.picoc}.reti" ]]; then
+  if [[ $compile_status -eq 0 && -f "${test%.picoc}.reti" ]]; then
     # shellcheck disable=SC2046,SC2086
     timeout \
       "${MAX_EMULATOR_DURATION_SECONDS}s" \
@@ -161,6 +266,8 @@ for test in "${paths[@]}"; do
       timed_out+=("$test")
       echo "Test timed out after ${MAX_EMULATOR_DURATION_SECONDS}s: $test"
     fi
+  elif [[ $compile_status -eq 0 ]]; then
+    emulator_status=1
   fi
 
   output_status=0

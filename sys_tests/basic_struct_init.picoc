@@ -1,6 +1,6 @@
 // in:2 42
 // expected: 21 2 42
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 struct str1 {int attr1[3]; int attr2;};

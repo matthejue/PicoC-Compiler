@@ -1,7 +1,7 @@
 // in:3 15
 // expected: 3
 // from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
-// dependencies: ../../Pico-OS/lib/stdio/libstdio.picoc
+// dependencies: ../../Pico-OS/lib/stdio/libstdio.reti_blocks
 #include "../../Pico-OS/lib/stdio/stdio.header"
 
 void main() {

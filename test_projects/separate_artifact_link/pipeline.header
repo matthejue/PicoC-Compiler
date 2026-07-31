@@ -1,0 +1,5 @@
+#pragma once
+
+#include "arithmetic.header"
+
+int project_value(struct NumberPair *values);
