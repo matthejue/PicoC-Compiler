@@ -20,6 +20,7 @@ import subprocess, os, platform
 import re
 import shlex
 import json
+import copy
 from src.preprocessor import Preprocessor
 from typing import Iterable, List, Optional, Dict, Any, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -38,6 +39,7 @@ SRAM_BASE_ADDRESS = -(2**31)
 SRAM_SIZE = 2**18
 SRAM_MAX_ADDRESS = SRAM_SIZE - 1
 DEFAULT_KERNEL_STACK_START = 15000
+DEBUG_METADATA_PREFIX = "@picoc-debug "
 
 
 def _flatten_reti_entries(entries):
@@ -64,6 +66,67 @@ def _walk_blocks(items):
                 yield from _walk_blocks(entries)
             case pn.Block():
                 yield item
+
+
+def _debug_metadata(node):
+    metadata = {}
+    source_file = getattr(node, "source_file", None)
+    source_line = getattr(node, "source_line", None)
+    if source_file is not None and source_line is not None:
+        metadata["source_file"] = source_file
+        metadata["source_line"] = source_line
+
+    call_target = getattr(node, "call_target_function", None)
+    if call_target is not None:
+        metadata["call_target_function"] = call_target
+    if getattr(node, "indirect_call", False):
+        metadata["indirect_call"] = True
+    if getattr(node, "return_statement", False):
+        metadata["return_statement"] = True
+    return metadata
+
+
+def _reti_blocks_with_debug_metadata(pass_ast: pn.File):
+    output_ast = copy.deepcopy(pass_ast)
+    for block in _walk_blocks(output_ast.decls_defs_blocks_instrs):
+        entries = []
+        for entry in block.stmts_instrs:
+            metadata = _debug_metadata(entry)
+            if metadata:
+                entries.append(
+                    pn.SingleLineComment(
+                        "#",
+                        DEBUG_METADATA_PREFIX
+                        + json.dumps(metadata, separators=(",", ":")),
+                    )
+                )
+            entries.append(entry)
+        block.stmts_instrs = entries
+    return output_ast
+
+
+def _restore_debug_metadata(pass_ast: pn.File):
+    for block in _walk_blocks(pass_ast.decls_defs_blocks_instrs):
+        entries = []
+        pending_metadata = None
+        for entry in block.stmts_instrs:
+            for name in ("source_file", "source_line"):
+                if hasattr(entry, name):
+                    delattr(entry, name)
+            if (
+                isinstance(entry, pn.SingleLineComment)
+                and entry.content.startswith(DEBUG_METADATA_PREFIX)
+            ):
+                pending_metadata = json.loads(
+                    entry.content.removeprefix(DEBUG_METADATA_PREFIX)
+                )
+                continue
+            if pending_metadata is not None:
+                for name, value in pending_metadata.items():
+                    setattr(entry, name, value)
+                pending_metadata = None
+            entries.append(entry)
+        block.stmts_instrs = entries
 
 
 def _remove_blocks_named(items, block_name: str):
@@ -157,9 +220,10 @@ def _startup_source_path() -> Optional[str]:
     if startup_source is None:
         return None
 
-    if get_ext(startup_source) != "picoc":
+    if get_ext(startup_source) not in {"picoc", "reti_blocks"}:
         print(
-            f"[ERROR] Startup source '{startup_source}' must be a .picoc file",
+            f"[ERROR] Startup source '{startup_source}' must be a .picoc or "
+            ".reti_blocks file",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -187,7 +251,7 @@ def _startup_source_target_index(
 
     startup_key = os.path.abspath(startup_source)
     for index, target in enumerate(build_targets):
-        if target["kind"] == "picoc" and os.path.abspath(target["path"]) == startup_key:
+        if os.path.abspath(target["path"]) == startup_key:
             return index
 
     print(
@@ -237,16 +301,8 @@ class OptionHandler:
             build_targets, startup_source
         )
 
-        if global_vars.args.generate_debuginfo and global_vars.args.compile:
-            print("[ERROR] '-g/--generate_debuginfo' is not supported together with '--compile'")
-            exit(1)
         if global_vars.args.kernelheader and global_vars.args.compile:
             print("[ERROR] '-k/--kernelheader' requires linking and is not supported together with '--compile'")
-            exit(1)
-        if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader and any(
-            target["kind"] != "picoc" for target in build_targets
-        ):
-            print("[ERROR] '-g/--generate_debuginfo' only works when all inputs are '.picoc' files")
             exit(1)
         if global_vars.args.generate_debuginfo and not (
             global_vars.args.intermediate_stages and global_vars.args.write_files
@@ -332,6 +388,7 @@ class OptionHandler:
         transformer = TransformerRetiBlocks()
         ts_tree = transformer.parse_tree(code)
         reti_blocks = transformer.build_ast(ts_tree, code)
+        _restore_debug_metadata(reti_blocks)
 
         symbol_table = st.SymbolTable.load_json(st_path)
         all_blocks = {}
@@ -425,18 +482,20 @@ class OptionHandler:
             reti_patch,
             "RETI Patch",
         )
-        data_block_names = {
+        storage_block_names = {
             name
-            for name, _ in opt_level_1.data_storage_symbols(
+            for name, _ in opt_level_1.global_storage_symbols(
                 passes.symbol_table
             )
         }
-        # Uses final code locations while retaining DS-relative data symbols
+        # Uses symbol-table addresses for storage and block locations for code
+        for name in storage_block_names:
+            passes.all_blocks.pop(name, None)
         passes.all_blocks.update(
             {
                 block.name: block
                 for block in _walk_blocks(reti_patch.decls_defs_blocks_instrs)
-                if block.name not in data_block_names
+                if block.name not in storage_block_names
             }
         )
         reti = passes.reti(reti_patch)
@@ -762,15 +821,23 @@ class OptionHandler:
                 fout.write(formatted_tree)
 
     def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
+        output_ast = pass_ast
+        if (
+            heading == "RETI Blocks"
+            and global_vars.args.compile
+            and global_vars.args.generate_debuginfo
+        ):
+            output_ast = _reti_blocks_with_debug_metadata(pass_ast)
+
         if global_vars.args.intermediate_stages:
             print(subheading(heading, "-"))
-            print(_pass_output_text(pass_ast))
+            print(_pass_output_text(output_ast))
 
         if (global_vars.args.write_files or compl_opt_active) and not global_vars.args.kernelheader:
             match pass_ast:
                 case pn.File(pn.Name(val)):
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(_pass_output_text(pass_ast))
+                        fout.write(_pass_output_text(output_ast))
                 case _:
                     throw_error(pass_ast)
 

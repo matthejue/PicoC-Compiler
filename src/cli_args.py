@@ -104,15 +104,15 @@ def build_parser():
         "--startup-source",
         metavar="PATH",
         help=(
-            "Link an additional PicoC startup source; if it defines _start, "
-            "that function replaces the generated default _start"
+            "Link an additional PicoC startup source or .reti_blocks file; if "
+            "it defines _start, that function replaces the generated default _start"
         ),
     )
     parser.add_argument(
         "-g",
         "--generate_debuginfo",
         action="store_true",
-        help="Write <output>.debuginfo for linked '.picoc' inputs",
+        help="Preserve debug metadata when compiling or write <output>.debuginfo when linking",
     )
     parser.add_argument(
         "-k",

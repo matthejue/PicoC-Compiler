@@ -62,7 +62,6 @@ class SymbolTable:
         return json.dumps(
             payload,
             indent=2 if pretty else None,
-            sort_keys=pretty,
             ensure_ascii=False,
             default=_json_default,  # stringify unknown/custom types
         )
