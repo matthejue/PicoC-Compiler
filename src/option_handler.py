@@ -425,10 +425,20 @@ class OptionHandler:
             reti_patch,
             "RETI Patch",
         )
-        passes.all_blocks = {
-            block.name: block
-            for block in _walk_blocks(reti_patch.decls_defs_blocks_instrs)
+        data_block_names = {
+            name
+            for name, _ in opt_level_1.data_storage_symbols(
+                passes.symbol_table
+            )
         }
+        # Uses final code locations while retaining DS-relative data symbols
+        passes.all_blocks.update(
+            {
+                block.name: block
+                for block in _walk_blocks(reti_patch.decls_defs_blocks_instrs)
+                if block.name not in data_block_names
+            }
+        )
         reti = passes.reti(reti_patch)
         self._reti_with_metadata(reti, "RETI", passes.reti_sections)
         if global_vars.args.generate_debuginfo and not global_vars.args.kernelheader:
