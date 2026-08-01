@@ -79,6 +79,7 @@ cleanup() {
 trap cleanup SIGINT
 
 MAX_EMULATOR_DURATION_SECONDS=5
+SECONDS=0
 
 paths=()
 dependency_sources=()
@@ -340,6 +341,9 @@ echo "Timed out: ${#timed_out[@]} / $num_tests" |
   tee -a ./sys_tests/tests.res
 
 echo "Timed-out tests: ${timed_out[*]}" |
+  tee -a ./sys_tests/tests.res
+
+printf 'Runtime: %02d:%02d\n' "$((SECONDS / 60))" "$((SECONDS % 60))" |
   tee -a ./sys_tests/tests.res
 
 echo "Updated test list: $NOT_PASSED_TESTS_FILE"
