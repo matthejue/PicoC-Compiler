@@ -100,6 +100,14 @@ def build_parser():
         help="Compile source files without linking (like gcc -c)",
     )
     parser.add_argument(
+        "--direct-source-link",
+        action="store_true",
+        help=(
+            "Compile and link only explicitly listed .picoc inputs without "
+            "dependency metadata or cached artifacts"
+        ),
+    )
+    parser.add_argument(
         "-C",
         "--startup-source",
         metavar="PATH",

@@ -158,11 +158,34 @@ Example:
 | `-M`, `--max-depth` | `DEPTH` | Sets the maximum include depth. The default is `200`. |
 | `-o`, `--output_name` | `OUTPUT` | Sets the linked RETI output path. With `-k`, this selects the path used for `memory_constants.header` instead of a `.reti` output path. The default is `a.reti`. |
 | `-c`, `--compile` | none | Compiles source files without linking. This writes per-file `.reti_blocks` and `.st` outputs. |
+| `--direct-source-link` | none | Compiles and links only the explicitly listed `.picoc` inputs without reading dependency metadata or reusing compiled artifacts. |
 | `-C`, `--startup-source` | `PATH` | Links an additional PicoC startup source. If that file defines `_start`, its definition replaces the generated default and is placed first in `.text`; otherwise the default `_start` is generated. With `-C`, `Exit()` finishes with syscall `9` via `INT 4`. |
 | `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
 | `-k`, `--kernelheader` | `sram` or `eprom` | Runs linking far enough to compute section addresses, then writes only `memory_constants.header`; in this mode `-o` selects the header path, not a `.reti` output path. `-k sram` generates SRAM-based kernel constants and `LOADI32` setup strings for `CS`, `DS`, `SP`, and `ACC`. `-k eprom` generates EPROM start-program constants with an SRAM maximum address, an EPROM data-segment setup string, and an SRAM-top stack setup string. |
 | `-O0` | none | Disables optimizations. This is the default optimization level. |
 | `-O1` | none | Enables compile-time global initializer data generation. |
+
+Previously compiled `.reti_blocks` and `.st` files are reused automatically
+when a `.picoc` input, its included headers, and its compilation options have
+not changed. Cache information is stored in the `.reti_blocks` file itself.
+Requests using `-i` or `-w` compile the source again so the requested
+intermediate output can be printed or written. Every cache hit prints the
+reused `.reti_blocks` and `.st` pair.
+
+The system tests use staged compilation by default. Each `.picoc` file is
+first compiled into `.reti_blocks` and `.st` files, which are then linked into
+the final `.reti` file. To run the tests with the earlier direct source-linking
+workflow instead, use:
+
+```bash
+make test TEST_BUILD_MODE=direct
+```
+
+The same option works with the saved failure list:
+
+```bash
+make test_not_passed TEST_BUILD_MODE=direct
+```
 
 ## PicoC Attributes and Entry Points
 

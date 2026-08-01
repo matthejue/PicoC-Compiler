@@ -11,6 +11,7 @@ class ThreadState(threading.local):
         # runs once per thread (on first access in that thread)
         self.path_without_ext: str = ""   # or Optional[str] if it can be unset
         self.input_path: str = ""
+        self.compile_cache_metadata = None
 
 tstate = ThreadState()
 

@@ -2,6 +2,7 @@
 
 NOT_PASSED_TESTS_FILE="${NOT_PASSED_TESTS_FILE:-./opts/not_passed_tests.txt}"
 use_not_passed_tests=false
+direct_compile=false
 
 usage() {
   cat <<EOF
@@ -15,12 +16,17 @@ Options:
 
       TEST_PATTERN is ignored when this option is active.
 
+  --direct
+      Compile each test and its .picoc dependencies directly into the final
+      .reti file. The default compiles .reti_blocks and .st files first.
+
   -h, --help
       Show this help message.
 
 Examples:
   $0 120 all
   $0 120 basic
+  $0 --direct 120 basic
   $0 --not-passed 120
 
 After the test run, all tests that did not pass are written as
@@ -33,6 +39,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --not-passed)
       use_not_passed_tests=true
+      shift
+      ;;
+    --direct)
+      direct_compile=true
       shift
       ;;
     -h|--help)
@@ -213,7 +223,18 @@ for test in "${paths[@]}"; do
     compile_status=1
   fi
 
-  if [[ $compile_status -eq 0 ]]; then
+  if [[ $compile_status -eq 0 && "$direct_compile" == true ]]; then
+    # The intentional unquoted expansion permits multiple options in the
+    # option files and EXTRA_CPL_ARGS
+    # shellcheck disable=SC2046,SC2086
+    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
+      --direct-source-link "$test" "${dependency_sources[@]}" \
+      -o "${test%.picoc}.reti"; then
+      compile_status=1
+    fi
+  fi
+
+  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
     for dependency_source in "${dependency_sources[@]}"; do
       # The intentional unquoted expansion permits multiple options in the
       # option files and EXTRA_CPL_ARGS
@@ -226,7 +247,7 @@ for test in "${paths[@]}"; do
     done
   fi
 
-  if [[ $compile_status -eq 0 ]]; then
+  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
     # shellcheck disable=SC2046,SC2086
     if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
       -c "$test"; then
@@ -234,7 +255,7 @@ for test in "${paths[@]}"; do
     fi
   fi
 
-  if [[ $compile_status -eq 0 ]]; then
+  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
     linker_inputs=("${test%.picoc}.reti_blocks" "${dependency_blocks[@]}")
     # shellcheck disable=SC2046,SC2086
     if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \

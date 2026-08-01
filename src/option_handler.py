@@ -21,6 +21,7 @@ import re
 import shlex
 import json
 import copy
+import hashlib
 from src.preprocessor import Preprocessor
 from typing import Iterable, List, Optional, Dict, Any, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -40,6 +41,120 @@ SRAM_SIZE = 2**18
 SRAM_MAX_ADDRESS = SRAM_SIZE - 1
 DEFAULT_KERNEL_STACK_START = 15000
 DEBUG_METADATA_PREFIX = "@picoc-debug "
+COMPILE_CACHE_PREFIX = "# @picoc-cache "
+COMPILE_CACHE_VERSION = 1
+
+
+def _compile_cache_options():
+    return {
+        "optimization_level": global_vars.args.optimization_level,
+        "generate_debuginfo": global_vars.args.generate_debuginfo,
+        "verbose": global_vars.args.verbose,
+        "double_verbose": global_vars.args.double_verbose,
+        "include_paths": [
+            os.path.realpath(os.path.abspath(path)) for path in global_vars.args.I
+        ],
+        "max_depth": global_vars.args.max_depth,
+    }
+
+
+def _compile_cache_metadata(source_path: str, source_hashes: Dict[str, str]):
+    return {
+        "version": COMPILE_CACHE_VERSION,
+        "source": os.path.realpath(os.path.abspath(source_path)),
+        "options": _compile_cache_options(),
+        "inputs": [
+            {"path": path, "sha256": digest}
+            for path, digest in sorted(source_hashes.items())
+        ],
+    }
+
+
+def _source_digest(path: str) -> str:
+    with open(path, encoding="utf-8", errors="replace") as fin:
+        return hashlib.sha256(fin.read().encode("utf-8")).hexdigest()
+
+
+def _read_compile_cache_metadata(reti_blocks_path: str):
+    try:
+        with open(reti_blocks_path, encoding="utf-8") as fin:
+            first_line = fin.readline()
+        if not first_line.startswith(COMPILE_CACHE_PREFIX):
+            return None
+        return json.loads(first_line.removeprefix(COMPILE_CACHE_PREFIX))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None
+
+
+def _cached_compilation_target(target: Dict[str, str]):
+    source_path = target["path"]
+    base_path = remove_ext(source_path)
+    reti_blocks_path = base_path + ".reti_blocks"
+    st_path = base_path + ".st"
+    if not os.path.isfile(reti_blocks_path) or not os.path.isfile(st_path):
+        return None
+
+    metadata = _read_compile_cache_metadata(reti_blocks_path)
+    if not isinstance(metadata, dict):
+        return None
+    if metadata.get("version") != COMPILE_CACHE_VERSION:
+        return None
+    if metadata.get("source") != os.path.realpath(os.path.abspath(source_path)):
+        return None
+    if metadata.get("options") != _compile_cache_options():
+        return None
+
+    inputs = metadata.get("inputs")
+    if not isinstance(inputs, list) or not inputs:
+        return None
+    try:
+        input_hashes = {
+            item["path"]: item["sha256"]
+            for item in inputs
+            if isinstance(item, dict)
+        }
+        if len(input_hashes) != len(inputs):
+            return None
+        source = metadata["source"]
+        if source not in input_hashes:
+            return None
+        for path, expected_digest in input_hashes.items():
+            if _source_digest(path) != expected_digest:
+                return None
+    except (KeyError, OSError, UnicodeError, TypeError):
+        return None
+
+    return {
+        "kind": "reti_blocks",
+        "path": reti_blocks_path,
+        "st_path": st_path,
+    }
+
+
+def _reuse_cached_compilations(build_targets):
+    if (
+        global_vars.args.direct_source_link
+        or global_vars.args.intermediate_stages
+        or global_vars.args.write_files
+    ):
+        return build_targets
+
+    resolved_targets = []
+    for target in build_targets:
+        cached_target = (
+            _cached_compilation_target(target)
+            if target["kind"] == "picoc"
+            else None
+        )
+        if cached_target is None:
+            resolved_targets.append(target)
+            continue
+        print(
+            f"[cache] Reusing .reti_blocks/.st pair: "
+            f"'{cached_target['path']}', '{cached_target['st_path']}'"
+        )
+        resolved_targets.append(cached_target)
+    return resolved_targets
 
 
 def _flatten_reti_entries(entries):
@@ -285,7 +400,24 @@ class OptionHandler:
             open_documentation()
 
     def build_all(self, max_workers=None):
-        files = _expand_dependency_metadata(list(global_vars.args.infiles))
+        files = list(global_vars.args.infiles)
+        if global_vars.args.direct_source_link:
+            non_source_files = [path for path in files if get_ext(path) != "picoc"]
+            if non_source_files:
+                print(
+                    "[ERROR] '--direct-source-link' only accepts .picoc inputs",
+                    file=sys.stderr,
+                )
+                exit(1)
+            if global_vars.args.compile:
+                print(
+                    "[ERROR] '--direct-source-link' links its inputs and cannot "
+                    "be used with '--compile'",
+                    file=sys.stderr,
+                )
+                exit(1)
+        else:
+            files = _expand_dependency_metadata(files)
         startup_source = _startup_source_path()
         if startup_source is not None:
             if global_vars.args.compile:
@@ -300,6 +432,7 @@ class OptionHandler:
         startup_target_index = _startup_source_target_index(
             build_targets, startup_source
         )
+        build_targets = _reuse_cached_compilations(build_targets)
 
         if global_vars.args.kernelheader and global_vars.args.compile:
             print("[ERROR] '-k/--kernelheader' requires linking and is not supported together with '--compile'")
@@ -312,7 +445,11 @@ class OptionHandler:
                 "and '-w/--write_files' to create the .pre file needed for debugging."
             )
 
-        picoc_files = [f for f in files if get_ext(f) == "picoc"]
+        picoc_files = [
+            target["path"]
+            for target in build_targets
+            if target["kind"] == "picoc"
+        ]
         if picoc_files:
             _syntax_check(picoc_files)
         if not files:
@@ -384,6 +521,8 @@ class OptionHandler:
     def _load_external_reti_blocks(self, path: str, st_path: str):
         with open(path, encoding="utf-8") as fin:
             code = fin.read()
+        if code.startswith(COMPILE_CACHE_PREFIX):
+            code = code.partition("\n")[2]
 
         transformer = TransformerRetiBlocks()
         ts_tree = transformer.parse_tree(code)
@@ -418,7 +557,11 @@ class OptionHandler:
         preprocessor = Preprocessor(
             include_paths=global_vars.args.I, max_depth=global_vars.args.max_depth
         )
-        return preprocessor.preprocess(code, path)
+        preprocessed_code = preprocessor.preprocess(code, path)
+        global_vars.tstate.compile_cache_metadata = _compile_cache_metadata(
+            path, preprocessor.source_hashes
+        )
+        return preprocessed_code
 
     def _compl(self, code):
         self._output_preprocess(code, "Preprocessed Code", ".pre")
@@ -821,10 +964,20 @@ class OptionHandler:
                 fout.write(formatted_tree)
 
     def _output_pass(self, pass_ast: pn.File, heading, *, compl_opt_active=False):
+        is_compile_artifact = False
+        if heading == "RETI Blocks":
+            match pass_ast:
+                case pn.File(pn.Name(val)):
+                    is_compile_artifact = (
+                        os.path.realpath(remove_ext(val))
+                        == os.path.realpath(global_vars.tstate.path_without_ext)
+                    )
+                case _:
+                    pass
+
         output_ast = pass_ast
         if (
-            heading == "RETI Blocks"
-            and global_vars.args.compile
+            is_compile_artifact
             and global_vars.args.generate_debuginfo
         ):
             output_ast = _reti_blocks_with_debug_metadata(pass_ast)
@@ -836,8 +989,21 @@ class OptionHandler:
         if (global_vars.args.write_files or compl_opt_active) and not global_vars.args.kernelheader:
             match pass_ast:
                 case pn.File(pn.Name(val)):
+                    output_text = _pass_output_text(output_ast)
+                    cache_metadata = global_vars.tstate.compile_cache_metadata
+                    if is_compile_artifact and cache_metadata is not None:
+                        output_text = (
+                            COMPILE_CACHE_PREFIX
+                            + json.dumps(
+                                cache_metadata,
+                                separators=(",", ":"),
+                                sort_keys=True,
+                            )
+                            + "\n"
+                            + output_text
+                        )
                     with open(val, "w", encoding="utf-8") as fout:
-                        fout.write(_pass_output_text(output_ast))
+                        fout.write(output_text)
                 case _:
                     throw_error(pass_ast)
 

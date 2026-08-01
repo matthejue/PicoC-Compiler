@@ -5,6 +5,13 @@ RUN_PATH ?= $(shell cat ./opts/run_path.txt)
 DEBUG_PATH ?= $(shell cat ./opts/debug_path.txt)
 EXTRA_CPL_ARGS ?=
 EXTRA_EMU_ARGS ?=
+TEST_BUILD_MODE ?= staged
+
+VALID_TEST_BUILD_MODES := staged direct
+ifeq ($(filter $(TEST_BUILD_MODE),$(VALID_TEST_BUILD_MODES)),)
+$(error TEST_BUILD_MODE must be 'staged' or 'direct')
+endif
+TEST_BUILD_OPTION := $(if $(filter direct,$(TEST_BUILD_MODE)),--direct,)
 
 full-install: install-dependencies install-global
 
@@ -69,12 +76,12 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh $${COLUMNS} "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	./run_sys_tests.sh $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 _test_not_passed:
 	# Run the whitespace-separated test paths from ./opts/not_passed_tests.txt
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh --not-passed "$${COLUMNS}" "" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	./run_sys_tests.sh --not-passed $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 run:
 	./run.sh "$(RUN_PATH)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"

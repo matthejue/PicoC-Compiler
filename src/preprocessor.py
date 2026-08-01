@@ -1,4 +1,5 @@
 from __future__ import annotations
+import hashlib
 import os
 from enum import Enum, auto
 from dataclasses import dataclass
@@ -61,6 +62,7 @@ class Preprocessor:
         )
         self.state = _State(once_marked=set(), max_depth=max_depth)
         self.macros: dict[str, str] = {}
+        self.source_hashes: dict[str, str] = {}
 
     # -------- Public API --------
 
@@ -68,6 +70,7 @@ class Preprocessor:
         """Clear #pragma once state (useful if reusing the instance)."""
         self.state.once_marked.clear()
         self.macros.clear()
+        self.source_hashes.clear()
 
     def preprocess_file(self, file_path: str, depth: int = 0) -> str:
         """Load source from disk and preprocess it (follows #include by filesystem)."""
@@ -79,6 +82,9 @@ class Preprocessor:
         if depth > self.state.max_depth:
             raise PreprocError(f"include recursion depth exceeded at {file_path}")
         file_path = self._canonical(file_path)
+        self.source_hashes[file_path] = hashlib.sha256(
+            code.encode("utf-8")
+        ).hexdigest()
 
         # Fast-skip if this file was already marked with #pragma once
         if file_path in self.state.once_marked:
