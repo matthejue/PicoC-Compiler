@@ -86,6 +86,28 @@ def _read_compile_cache_metadata(reti_blocks_path: str):
         return None
 
 
+def _make_path(path: str) -> str:
+    return path.replace("$", "$$").replace("#", r"\#").replace(" ", r"\ ")
+
+
+def _write_make_dependencies(reti_blocks_path: str, metadata) -> None:
+    dependency_file = global_vars.args.dependency_file
+    if dependency_file is None:
+        return
+
+    inputs = [item["path"] for item in metadata["inputs"]]
+    targets = [reti_blocks_path, remove_ext(reti_blocks_path) + ".st", dependency_file]
+    with open(dependency_file, "w", encoding="utf-8") as fout:
+        fout.write(
+            " ".join(_make_path(path) for path in targets)
+            + ": "
+            + " ".join(_make_path(path) for path in inputs)
+            + "\n"
+        )
+    os.utime(reti_blocks_path)
+    os.utime(remove_ext(reti_blocks_path) + ".st")
+
+
 def _cached_compilation_target(target: Dict[str, str]):
     source_path = target["path"]
     base_path = remove_ext(source_path)
@@ -124,10 +146,12 @@ def _cached_compilation_target(target: Dict[str, str]):
     except (KeyError, OSError, UnicodeError, TypeError):
         return None
 
+    _write_make_dependencies(reti_blocks_path, metadata)
     return {
         "kind": "reti_blocks",
         "path": reti_blocks_path,
         "st_path": st_path,
+        "compile_cache_hit": True,
     }
 
 
@@ -401,6 +425,17 @@ class OptionHandler:
 
     def build_all(self, max_workers=None):
         files = list(global_vars.args.infiles)
+        if global_vars.args.dependency_file and (
+            not global_vars.args.compile
+            or len(files) != 1
+            or get_ext(files[0]) != "picoc"
+        ):
+            print(
+                "[ERROR] '--dependency-file' requires one .picoc input and "
+                "'--compile'",
+                file=sys.stderr,
+            )
+            exit(1)
         if global_vars.args.direct_source_link:
             non_source_files = [path for path in files if get_ext(path) != "picoc"]
             if non_source_files:
@@ -416,7 +451,7 @@ class OptionHandler:
                     file=sys.stderr,
                 )
                 exit(1)
-        else:
+        elif not global_vars.args.compile:
             files = _expand_dependency_metadata(files)
         startup_source = _startup_source_path()
         if startup_source is not None:
@@ -433,6 +468,25 @@ class OptionHandler:
             build_targets, startup_source
         )
         build_targets = _reuse_cached_compilations(build_targets)
+
+        if global_vars.args.show_input_files:
+            for target in build_targets:
+                if target["kind"] == "picoc":
+                    print(f"[input] Using .picoc file: '{target['path']}'")
+                else:
+                    print(
+                        "[input] Using .reti_blocks/.st pair: "
+                        f"'{target['path']}', '{target['st_path']}'"
+                    )
+
+        # A compile-only cache hit already has every requested output
+        # Loading the artifacts would only rebuild objects that are discarded
+        if global_vars.args.compile:
+            build_targets = [
+                target
+                for target in build_targets
+                if not target.get("compile_cache_hit")
+            ]
 
         if global_vars.args.kernelheader and global_vars.args.compile:
             print("[ERROR] '-k/--kernelheader' requires linking and is not supported together with '--compile'")
@@ -609,6 +663,11 @@ class OptionHandler:
         self._output_pass(
             reti_blocks, "RETI Blocks", compl_opt_active=global_vars.args.compile
         )
+        if global_vars.args.compile and global_vars.args.dependency_file:
+            _write_make_dependencies(
+                global_vars.tstate.path_without_ext + ".reti_blocks",
+                global_vars.tstate.compile_cache_metadata,
+            )
         return reti_blocks, passes.symbol_table, passes.all_blocks
 
     def _link(self, asts, symbol_tables, all_file_blocks):

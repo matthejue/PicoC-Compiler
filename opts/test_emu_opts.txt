@@ -1,1 +1,1 @@
--m -f /tmp -i ./opts/isrs.reti -I 30 -t 
+-m -i ./opts/isrs.reti -I 30 -t

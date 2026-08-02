@@ -158,7 +158,9 @@ Example:
 | `-M`, `--max-depth` | `DEPTH` | Sets the maximum include depth. The default is `200`. |
 | `-o`, `--output_name` | `OUTPUT` | Sets the linked RETI output path. With `-k`, this selects the path used for `memory_constants.header` instead of a `.reti` output path. The default is `a.reti`. |
 | `-c`, `--compile` | none | Compiles source files without linking. This writes per-file `.reti_blocks` and `.st` outputs. |
+| `--dependency-file` | path | With `-c` and one `.picoc` input, writes a Make dependency file for the source and every included file. |
 | `--direct-source-link` | none | Compiles and links only the explicitly listed `.picoc` inputs without reading dependency metadata or reusing compiled artifacts. |
+| `--show-input-files` | none | Prints the `.picoc` files or `.reti_blocks`/`.st` pairs used for the build. |
 | `-C`, `--startup-source` | `PATH` | Links an additional PicoC startup source. If that file defines `_start`, its definition replaces the generated default and is placed first in `.text`; otherwise the default `_start` is generated. With `-C`, `Exit()` finishes with syscall `9` via `INT 4`. |
 | `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
 | `-k`, `--kernelheader` | `sram` or `eprom` | Runs linking far enough to compute section addresses, then writes only `memory_constants.header`; in this mode `-o` selects the header path, not a `.reti` output path. `-k sram` generates SRAM-based kernel constants and `LOADI32` setup strings for `CS`, `DS`, `SP`, and `ACC`. `-k eprom` generates EPROM start-program constants with an SRAM maximum address, an EPROM data-segment setup string, and an SRAM-top stack setup string. |
@@ -174,8 +176,17 @@ reused `.reti_blocks` and `.st` pair.
 
 The system tests use staged compilation by default. Each `.picoc` file is
 first compiled into `.reti_blocks` and `.st` files, which are then linked into
-the final `.reti` file. To run the tests with the earlier direct source-linking
-workflow instead, use:
+the final `.reti` file. Make validates every unique compilation unit once,
+shares common dependencies such as `libstdio` between tests, and runs
+independent compilation, linking, emulation, and host-C verification jobs in
+parallel. `TEST_JOBS` controls the parallelism and defaults to the number of
+available processors:
+
+```bash
+make test TEST_JOBS=4
+```
+
+To run the tests with the earlier direct source-linking workflow instead, use:
 
 ```bash
 make test TEST_BUILD_MODE=direct

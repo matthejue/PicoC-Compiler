@@ -100,12 +100,22 @@ def build_parser():
         help="Compile source files without linking (like gcc -c)",
     )
     parser.add_argument(
+        "--dependency-file",
+        metavar="PATH",
+        help="Write Make dependencies for a single compile-only input",
+    )
+    parser.add_argument(
         "--direct-source-link",
         action="store_true",
         help=(
             "Compile and link only explicitly listed .picoc inputs without "
             "dependency metadata or cached artifacts"
         ),
+    )
+    parser.add_argument(
+        "--show-input-files",
+        action="store_true",
+        help="Print the source files or .reti_blocks/.st pairs being used",
     )
     parser.add_argument(
         "-C",

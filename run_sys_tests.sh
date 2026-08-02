@@ -78,80 +78,10 @@ cleanup() {
 
 trap cleanup SIGINT
 
-MAX_EMULATOR_DURATION_SECONDS=5
 SECONDS=0
 
 paths=()
-dependency_sources=()
-dependency_blocks=()
-
-collect_dependencies() {
-  local test="$1"
-  local line
-  local dependency
-  local dependency_source
-  local source_relative_to_test
-  local found
-  local existing_source
-  local -a declared_dependencies=()
-
-  dependency_sources=()
-  dependency_blocks=()
-
-  while IFS= read -r line; do
-    if [[ ! "$line" =~ ^[[:space:]]*//[[:space:]]*dependencies[[:space:]]*:[[:space:]]*(.*)$ ]]; then
-      continue
-    fi
-
-    read -r -a declared_dependencies <<< "${BASH_REMATCH[1]}"
-    for dependency in "${declared_dependencies[@]}"; do
-      if [[ "$dependency" != *.reti_blocks ]]; then
-        echo "Dependency must be a .reti_blocks file: $dependency" >&2
-        return 1
-      fi
-
-      dependency_source="${dependency%.reti_blocks}.picoc"
-      source_relative_to_test="$(dirname "$test")/$dependency_source"
-      if [[ -f "$dependency_source" ]]; then
-        dependency_source="$(realpath "$dependency_source")"
-      elif [[ -f "$source_relative_to_test" ]]; then
-        dependency_source="$(realpath "$source_relative_to_test")"
-      else
-        echo "Dependency source not found for $dependency" >&2
-        return 1
-      fi
-
-      found=false
-      for existing_source in "${dependency_sources[@]}"; do
-        if [[ "$existing_source" == "$dependency_source" ]]; then
-          found=true
-          break
-        fi
-      done
-      if [[ "$found" == true ]]; then
-        continue
-      fi
-
-      dependency_sources+=("$dependency_source")
-      dependency_blocks+=("${dependency_source%.picoc}.reti_blocks")
-    done
-  done < "$test"
-}
-
-prepend_test_metadata() {
-  local test="$1"
-  local reti="$2"
-  local metadata_file
-
-  metadata_file="$(mktemp)"
-  sed -nE \
-    -e 's@^[[:space:]]*//[[:space:]]*(input|in)[[:space:]]*:[[:space:]]*(.*)$@# input:\2@p' \
-    -e 's@^[[:space:]]*//[[:space:]]*(expected|exp)[[:space:]]*:[[:space:]]*(.*)$@# expected:\2@p' \
-    -e 's@^[[:space:]]*//[[:space:]]*(datasegment|data)[[:space:]]*:[[:space:]]*(.*)$@# datasegment:\2@p' \
-    "$test" > "$metadata_file"
-  cat "$reti" >> "$metadata_file"
-  mv "$metadata_file" "$reti"
-}
+verify_paths=()
 
 if [[ "$use_not_passed_tests" == true ]]; then
   if [[ ! -f "$NOT_PASSED_TESTS_FILE" ]]; then
@@ -185,131 +115,90 @@ done
 
 ./space_replacer.py
 
-verification_results=()
-
 if [[ "$use_not_passed_tests" == true ]]; then
-  # The helper scripts accept a test pattern rather than a list of paths.
-  # Run them once per listed test using the exact filename without .picoc.
-  for test in "${paths[@]}"; do
-    exact_test_pattern="$(basename "${test%.picoc}")"
-
-    ./extract_input_and_expected.sh "$exact_test_pattern"
-    verification_results+=(
-      "$(./verify_tests.sh "$columns" "$exact_test_pattern")"
-    )
-  done
-
-  verification_res="$(printf '%s\n' "${verification_results[@]}")"
+  verify_paths=("${paths[@]}")
+elif [[ "$test_pattern" == "all" ]]; then
+  verify_paths=(./sys_tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.picoc)
 else
-  ./extract_input_and_expected.sh "$test_pattern"
-  verification_res="$(./verify_tests.sh "$columns" "$test_pattern")"
+  verify_paths=("${paths[@]}")
 fi
 
-num_tests=0
+for test in "${paths[@]}"; do
+  sed -n '1p' "$test" | sed -e 's/^\/\/ in://' > "${test%.picoc}.input"
+  expected="$(sed -n '2p' "$test" | sed -e 's/^\/\/ expected://')"
+  printf '%s' "$expected" > "${test%.picoc}.expected_output"
+done
+
+result_dir="$(mktemp -d)"
+cleanup_result_dir() {
+  rm -r "$result_dir"
+}
+trap cleanup_result_dir EXIT
+
+test_sources="${paths[*]}"
+verify_sources="${verify_paths[*]}"
+if [[ "$direct_compile" == true ]]; then
+  test_build_mode=direct
+else
+  test_build_mode=staged
+fi
+
+export TEST_CPL_OPTIONS
+export TEST_EMU_OPTIONS
+export EXTRA_CPL_ARGS="$extra_cpl_args"
+export EXTRA_EMU_ARGS="$extra_emu_args"
+TEST_CPL_OPTIONS="$(< ./opts/test_cpl_opts.txt)"
+TEST_EMU_OPTIONS="$(< ./opts/test_emu_opts.txt)"
+
+test_jobs="${TEST_JOBS:-$(nproc)}"
+make_status=0
+COLUMNS="$columns" make \
+  --no-print-directory \
+  --output-sync=target \
+  --keep-going \
+  --jobs "$test_jobs" \
+  -f ./sys_tests/Makefile \
+  TEST_BUILD_MODE="$test_build_mode" \
+  TEST_SOURCES="$test_sources" \
+  VERIFY_SOURCES="$verify_sources" \
+  RESULT_DIR="$result_dir" \
+  all || make_status=$?
+
+num_tests=${#paths[@]}
 failing=()
 not_passed=()
 timed_out=()
 
 for test in "${paths[@]}"; do
-  ./heading_subheadings.py "heading" "$test" "$columns" "="
-
-  rm -f \
-    "${test%.picoc}.reti" \
-    "${test%.picoc}.sections" \
-    "${test%.picoc}.output" \
-    "${test%.picoc}.error"
-
-  compile_status=0
-  if ! collect_dependencies "$test"; then
-    compile_status=1
+  status_file="$result_dir/test/$(basename "${test%.picoc}").status"
+  if [[ ! -f "$status_file" ]]; then
+    failing+=("$test")
+    not_passed+=("$test")
+    continue
   fi
 
-  if [[ $compile_status -eq 0 && "$direct_compile" == true ]]; then
-    # The intentional unquoted expansion permits multiple options in the
-    # option files and EXTRA_CPL_ARGS
-    # shellcheck disable=SC2046,SC2086
-    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
-      --direct-source-link "$test" "${dependency_sources[@]}" \
-      -o "${test%.picoc}.reti"; then
-      compile_status=1
-    fi
-  fi
-
-  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
-    for dependency_source in "${dependency_sources[@]}"; do
-      # The intentional unquoted expansion permits multiple options in the
-      # option files and EXTRA_CPL_ARGS
-      # shellcheck disable=SC2046,SC2086
-      if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
-        -c "$dependency_source"; then
-        compile_status=1
-        break
-      fi
-    done
-  fi
-
-  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
-    # shellcheck disable=SC2046,SC2086
-    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
-      -c "$test"; then
-      compile_status=1
-    fi
-  fi
-
-  if [[ $compile_status -eq 0 && "$direct_compile" == false ]]; then
-    linker_inputs=("${test%.picoc}.reti_blocks" "${dependency_blocks[@]}")
-    # shellcheck disable=SC2046,SC2086
-    if ! ./run.py $(cat ./opts/test_cpl_opts.txt) $extra_cpl_args \
-      "${linker_inputs[@]}" -o "${test%.picoc}.reti"; then
-      compile_status=1
-    else
-      prepend_test_metadata "$test" "${test%.picoc}.reti"
-    fi
-  fi
-
+  read -r compile_status output_status timeout_status < "$status_file"
   if [[ $compile_status -ne 0 ]]; then
     failing+=("$test")
   fi
-
-  emulator_status=$compile_status
-
-  if [[ $compile_status -eq 0 && -f "${test%.picoc}.reti" ]]; then
-    # shellcheck disable=SC2046,SC2086
-    timeout \
-      "${MAX_EMULATOR_DURATION_SECONDS}s" \
-      reti_emulator \
-      $(cat ./opts/test_emu_opts.txt) \
-      $extra_emu_args \
-      "${test%.picoc}.reti"
-
-    emulator_status=$?
-
-    if [[ $emulator_status -eq 124 ]]; then
-      timed_out+=("$test")
-      echo "Test timed out after ${MAX_EMULATOR_DURATION_SECONDS}s: $test"
-    fi
-  elif [[ $compile_status -eq 0 ]]; then
-    emulator_status=1
-  fi
-
-  output_status=0
-
-  if [[ $emulator_status -eq 0 ]]; then
-    diff \
-      "${test%.picoc}.expected_output" \
-      "${test%.picoc}.output"
-
-    output_status=$?
-  else
-    output_status=1
-  fi
-
   if [[ $output_status -ne 0 ]]; then
     not_passed+=("$test")
   fi
-
-  ((num_tests++))
+  if [[ $timeout_status -ne 0 ]]; then
+    timed_out+=("$test")
+  fi
 done
+
+not_verified=()
+for test in "${verify_paths[@]}"; do
+  status_file="$result_dir/verify/$(basename "${test%.picoc}").status"
+  if [[ ! -f "$status_file" ]] || [[ "$(< "$status_file")" -ne 0 ]]; then
+    not_verified+=("$test")
+  fi
+done
+
+verification_res="Verified: $((${#verify_paths[@]} - ${#not_verified[@]})) / ${#verify_paths[@]}
+Not verified: ${not_verified[*]}"
 
 # Overwrite the test list with the tests that failed during this run.
 # The paths are written on one line and separated by spaces.
@@ -350,6 +239,6 @@ echo "Updated test list: $NOT_PASSED_TESTS_FILE"
 
 ./space_inserter.py
 
-if [[ ${#not_passed[@]} -ne 0 ]]; then
+if [[ $make_status -ne 0 || ${#not_passed[@]} -ne 0 ]]; then
   exit 1
 fi

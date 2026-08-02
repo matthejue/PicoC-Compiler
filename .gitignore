@@ -51,6 +51,7 @@ compiler_pipeline_overview.md
 *.gdb_history
 *.venv/
 .virtualenv/
+/.test_dependencies/
 
 # Generated tree-sitter artifacts for the vendored grammars
 vendor/tree-sitter-picoc/src/

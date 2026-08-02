@@ -6,6 +6,7 @@ DEBUG_PATH ?= $(shell cat ./opts/debug_path.txt)
 EXTRA_CPL_ARGS ?=
 EXTRA_EMU_ARGS ?=
 TEST_BUILD_MODE ?= staged
+TEST_JOBS ?= $(shell nproc)
 
 VALID_TEST_BUILD_MODES := staged direct
 ifeq ($(filter $(TEST_BUILD_MODE),$(VALID_TEST_BUILD_MODES)),)
@@ -63,6 +64,8 @@ _clean-files:
 	find . -type f -wholename "./sys_tests/*.eprom" -delete
 	find . -type f -wholename "./sys_tests/*.c" -delete
 	find . -type f -wholename "./sys_tests/*.res" -delete
+	find . -type f -wholename "./.test_dependencies/*.d" -delete
+	find . -type d -wholename "./.test_dependencies" -empty -delete
 	# find ./vendor/tree-sitter-reti/src -type f \( -name "grammar.json" -o -name "node-types.json" -o -name "parser.c" \) -delete
 	# find ./vendor/tree-sitter-reti/src -type d -name "tree_sitter" -exec rm -rf {} +
 
@@ -76,12 +79,12 @@ _test:
 	# start with 'make test-arg ARG=file_basename'
 	# DEBUG=-d for debugging
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	TEST_JOBS="$(TEST_JOBS)" ./run_sys_tests.sh $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "$(TEST_PATTERN)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 _test_not_passed:
 	# Run the whitespace-separated test paths from ./opts/not_passed_tests.txt
 	./export_environment_vars_for_makefile.sh;\
-	./run_sys_tests.sh --not-passed $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
+	TEST_JOBS="$(TEST_JOBS)" ./run_sys_tests.sh --not-passed $(TEST_BUILD_OPTION) "$${COLUMNS:-120}" "" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
 
 run:
 	./run.sh "$(RUN_PATH)" "$(EXTRA_CPL_ARGS)" "$(EXTRA_EMU_ARGS)"
