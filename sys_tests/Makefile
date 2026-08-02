@@ -19,7 +19,10 @@ endif
 FORCE:
 
 dependency_specs = $(strip $(shell sed -nE 's@^[[:space:]]*//[[:space:]]*dependencies[[:space:]]*:[[:space:]]*(.*)$$@\1@p' "$(1)"))
-resolved_dependency = $(firstword $(realpath $(1)) $(realpath $(dir $(2))$(1)))
+resolved_path = $(firstword $(realpath $(1)) $(realpath $(dir $(2))$(1)))
+resolved_dependency = $(or \
+  $(call resolved_path,$(1),$(2)), \
+  $(patsubst %.picoc,%.reti_blocks,$(call resolved_path,$(patsubst %.reti_blocks,%.picoc,$(1)),$(2))))
 checked_dependency = \
   $(if $(filter %.reti_blocks,$(1)), \
     $(if $(call resolved_dependency,$(1),$(2)), \

@@ -179,11 +179,25 @@ first compiled into `.reti_blocks` and `.st` files, which are then linked into
 the final `.reti` file. Make validates every unique compilation unit once,
 shares common dependencies such as `libstdio` between tests, and runs
 independent compilation, linking, emulation, and host-C verification jobs in
-parallel. `TEST_JOBS` controls the parallelism and defaults to the number of
-available processors:
+parallel. When started from a terminal, the test runner asks whether it may
+use all CPU cores or how many cores it should use. Non-interactive runs use
+two jobs. `TEST_JOBS` skips the question and sets the parallelism directly:
 
 ```bash
 make test TEST_JOBS=4
+```
+
+`TEST_CPU_CORES` caps the number of simultaneous CPU-heavy test jobs while
+keeping the tests parallel. For example:
+
+```bash
+make test TEST_CPU_CORES=2
+```
+
+For maximum parallelism, use all available processors:
+
+```bash
+make test TEST_JOBS=$(nproc)
 ```
 
 To run the tests with the earlier direct source-linking workflow instead, use:

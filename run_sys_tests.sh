@@ -150,7 +150,38 @@ export EXTRA_EMU_ARGS="$extra_emu_args"
 TEST_CPL_OPTIONS="$(< ./opts/test_cpl_opts.txt)"
 TEST_EMU_OPTIONS="$(< ./opts/test_emu_opts.txt)"
 
-test_jobs="${TEST_JOBS:-$(nproc)}"
+if [[ -n "${TEST_CPU_CORES:-}" ]] && [[ ! "$TEST_CPU_CORES" =~ ^[1-9][0-9]*$ ]]; then
+  echo "TEST_CPU_CORES must be a positive integer." >&2
+  exit 2
+fi
+
+if [[ -n "${TEST_JOBS:-}" ]]; then
+  test_jobs="$TEST_JOBS"
+elif [[ -n "${TEST_CPU_CORES:-}" ]]; then
+  test_jobs="$TEST_CPU_CORES"
+elif [[ -t 0 ]]; then
+  max_test_jobs="$(nproc)"
+  read -r -p "Run system tests on all ${max_test_jobs} CPU cores? [y/N] " use_all_cores
+  if [[ "$use_all_cores" =~ ^[Yy]$ ]]; then
+    test_jobs="$max_test_jobs"
+  else
+    while true; do
+      read -r -p "Number of CPU cores to use [2]: " test_jobs
+      test_jobs="${test_jobs:-2}"
+      if [[ "$test_jobs" =~ ^[1-9][0-9]*$ ]] && ((test_jobs <= max_test_jobs)); then
+        break
+      fi
+      echo "Enter a number from 1 to ${max_test_jobs}." >&2
+    done
+  fi
+else
+  test_jobs=2
+fi
+if [[ -n "${TEST_CPU_CORES:-}" ]]; then
+  if (( test_jobs > TEST_CPU_CORES )); then
+    test_jobs="$TEST_CPU_CORES"
+  fi
+fi
 make_status=0
 COLUMNS="$columns" make \
   --no-print-directory \
