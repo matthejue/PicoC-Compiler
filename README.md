@@ -187,13 +187,6 @@ two jobs. `TEST_JOBS` skips the question and sets the parallelism directly:
 make test TEST_JOBS=4
 ```
 
-`TEST_CPU_CORES` caps the number of simultaneous CPU-heavy test jobs while
-keeping the tests parallel. For example:
-
-```bash
-make test TEST_CPU_CORES=2
-```
-
 For maximum parallelism, use all available processors:
 
 ```bash
