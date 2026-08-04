@@ -40,6 +40,7 @@ SRAM_BASE_ADDRESS = -(2**31)
 SRAM_SIZE = 2**18
 SRAM_MAX_ADDRESS = SRAM_SIZE - 1
 DEFAULT_KERNEL_STACK_START = 15000
+DEFAULT_KERNEL_HEAP_SIZE = 4096
 DEBUG_METADATA_PREFIX = "@picoc-debug "
 COMPILE_CACHE_PREFIX = "# @picoc-cache "
 COMPILE_CACHE_VERSION = 1
@@ -1178,10 +1179,17 @@ class OptionHandler:
             return DEFAULT_KERNEL_STACK_START
         return stack_start
 
+    def _kernel_heap_size(self, sections) -> int:
+        heap_size = int(sections["heap_size"])
+        if heap_size == -1:
+            return DEFAULT_KERNEL_HEAP_SIZE
+        return heap_size
+
     def _sram_memory_constants_lines(self, sections) -> List[str]:
         codesegment_start = int(sections["codesegment_start"])
         datasegment_start = int(sections["datasegment_start"])
         heap_start = int(sections["heap_start"])
+        heap_size = self._kernel_heap_size(sections)
         stack_start = self._kernel_stack_start(sections)
         cs_start_address = self._sram_address(codesegment_start)
         ds_start_address = self._sram_address(datasegment_start)
@@ -1192,6 +1200,7 @@ class OptionHandler:
             "#define SRAM_BASE (-2147483647 - 1) // -2^31",
             f"#define SRAM_MAX_ADDRESS_IN_MEMORY_MAP {sram_max_address_in_memory_map} // -2^31 + 2^18 - 1",
             f"#define KERNEL_HEAP_START {heap_start_address} // -2^31 + heap_start",
+            f"#define KERNEL_HEAP_SIZE {heap_size} // heap_size",
             f"#define PROCESS_MEMORY_START {sp_start_address + 1} // -2^31 + stack_start + 1",
             f'#define KERNEL_CS_START_ASM "LOADI32 CS {cs_start_address}" // -2^31 + codesegment_start',
             f'#define KERNEL_DS_START_ASM "LOADI32 DS {ds_start_address}" // -2^31 + datasegment_start',
