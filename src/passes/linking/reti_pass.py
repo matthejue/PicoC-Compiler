@@ -348,6 +348,7 @@ class RetiPass:
                         self._entries_size(data_entries),
                         self._data_segment_symbol_size(),
                     ),
+                    "heap_size": -1,
                     "stack_start": -1,
                 })
                 output_entries = [

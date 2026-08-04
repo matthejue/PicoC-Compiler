@@ -1,6 +1,7 @@
 # RETI Sections / Low-Level PicoC (hubs/direct RETI asm)
 
 - Sections: `.ivt`, `.text`, `.data`.
+- The generated `.sections` sidecar records `codesegment_start`, `datasegment_start`, `heap_start`, `heap_size`, and `stack_start`. `heap_size` and `stack_start` default to `-1`; edit either value before assembling when the loader should use an explicit layout instead of its defaults.
 - Periphery details: `/home/areo/Documents/Studium/RETI-Emulator/doc/address_space.md`; `10`/`11` are SRAM.
 - Use `__attribute__((section("ivt")))` on globals/functions to place them in `.ivt`.
 - Use `-O1` so known global initializer values can be emitted into data/IVT sections at compile time.
