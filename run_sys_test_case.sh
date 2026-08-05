@@ -10,7 +10,7 @@ reti="${test%.picoc}.reti"
 output="${test%.picoc}.output"
 expected="${test%.picoc}.expected_output"
 # Creates isolated peripheral storage for each emulator process
-peripherals_root="/tmp/reti_emulator"
+peripherals_root="/tmp"
 mkdir -p "$peripherals_root" || exit 1
 peripherals_dir="$(mktemp -d "$peripherals_root/sys_test.XXXXXX")" || exit 1
 
