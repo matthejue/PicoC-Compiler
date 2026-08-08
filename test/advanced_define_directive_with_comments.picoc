@@ -1,0 +1,17 @@
+// in:41
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+#define A /* block */ 8 * 5
+
+#define B 1 + 1 // addition with comment
+
+#define C 1 /* mid */ + /* mid */ 0
+
+#define RESULT /* mixed */ (A + B) / C
+
+int main() {
+    printf(" %d", RESULT);
+    return 0;
+}

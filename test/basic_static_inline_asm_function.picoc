@@ -1,0 +1,27 @@
+// in:41
+// expected: 41
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int asm_input;
+int asm_output;
+
+static inline void asm_inline(void) {
+  asm("LOADIN DS ACC asm_input");
+  asm("PUSH ACC");
+}
+
+__attribute__((naked))
+void asm_block(void) {
+  asm_inline();
+  asm("POP IN1");
+  asm("STOREIN DS IN1 asm_output");
+  asm("POP ACC");
+  asm("MOVE ACC PC");
+}
+
+void main(void) {
+  scanf(" %d", &asm_input);
+  asm_block();
+  printf(" %d", asm_output);
+}

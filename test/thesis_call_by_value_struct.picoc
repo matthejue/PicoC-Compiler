@@ -1,0 +1,18 @@
+// in:
+// expected: 314 314
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st {int ar[2];};
+
+void fun(struct st copyable_ar) {
+  copyable_ar.ar[1] = 42;
+}
+
+void main() {
+  struct st copyable_ar = {.ar={314, 314}};
+  printf(" %d", copyable_ar.ar[1]);
+  fun(copyable_ar);
+  printf(" %d", copyable_ar.ar[1]);
+}
+

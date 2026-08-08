@@ -1,0 +1,27 @@
+// in:3 4
+// expected: 6 24
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int fakul(int n) {
+  int res_f; int h;
+  if (n == 1) {
+    res_f = 1;
+  } else {
+    h = fakul(n-1);
+    res_f = n * h;
+  }
+  return res_f;
+}
+
+void main() {
+  int res;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", fakul(__picoc_input_0));
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  res = fakul(__picoc_input_1);
+  printf(" %d", res);
+}

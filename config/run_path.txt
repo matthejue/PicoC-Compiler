@@ -1,0 +1,1 @@
+./test/basic_static_inline_asm_function.picoc

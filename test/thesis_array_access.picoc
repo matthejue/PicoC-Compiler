@@ -1,0 +1,17 @@
+// in:
+// expected: 42 3
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void fun();
+
+void main() {
+  int ar[1] = {42};
+  printf(" %d", ar[0]);
+  fun();
+}
+
+void fun() {
+  int ar[3] = {1, 2, 3};
+  printf(" %d", ar[1+1]);
+}

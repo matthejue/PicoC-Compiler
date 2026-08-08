@@ -1,0 +1,18 @@
+// in:4
+// expected: 24
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+
+void main() {
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int n = __picoc_input_0;
+  int res = 1;
+  while (n != 1) {
+    res = n * res;
+    n = n - 1;
+  }
+  printf(" %d", res);
+}

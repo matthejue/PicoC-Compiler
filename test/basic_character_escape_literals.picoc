@@ -1,0 +1,23 @@
+// in:
+// expected: 7 8 12 10 13 9 11 92 39 34 63
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int main(void) {
+    printf(
+        " %d %d %d %d %d %d %d %d %d %d %d",
+        '\a',
+        '\b',
+        '\f',
+        '\n',
+        '\r',
+        '\t',
+        '\v',
+        '\\',
+        '\'',
+        '\"',
+        '\?'
+    );
+    return 0;
+}

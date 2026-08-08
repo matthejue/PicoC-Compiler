@@ -1,0 +1,20 @@
+// in:3
+// expected: 3
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct array_with_len {int *ar; int len;};
+
+void main() {
+  // pointer definition
+  int **pntr_on_pntr;  // pointer on pointers
+  // reference and dereference operator on variable
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int ar[3] = {4, 2, __picoc_input_0};
+  struct array_with_len st_ar = {.ar=ar, .len=3};
+
+  // reference operator on a attribute operation
+  pntr_on_pntr = &st_ar.ar;
+  printf(" %d", *(*pntr_on_pntr + st_ar.len - 1));
+}

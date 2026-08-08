@@ -1,0 +1,16 @@
+// in: heyhoho1 heyhoho2
+// expected: whatever1 whatever2
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks ../../Pico-OS/library/string/libstring.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+#include "../../Pico-OS/library/string/string.header"
+
+int main() {
+
+  char *str = "whatever1";
+  char stack_str[] = "whatever2";
+
+  printf(" %s", str);
+  printf(" %s", stack_str);
+
+  return 0;
+}

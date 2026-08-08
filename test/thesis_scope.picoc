@@ -1,0 +1,15 @@
+// in:
+// expected: 4 2
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void fun_scope(int param) {
+  int local_var = 2;
+  printf(" %d", param);
+  printf(" %d", local_var);
+}
+
+void main() {
+  int local_var = 4;
+  fun_scope(local_var);
+}

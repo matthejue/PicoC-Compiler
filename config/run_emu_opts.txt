@@ -1,0 +1,1 @@
+-m -f /tmp -i ./config/isrs.reti -I 30 -K -v -d -u -c 

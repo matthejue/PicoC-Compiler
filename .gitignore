@@ -2,7 +2,7 @@ __pycache__/
 .bak/
 .tach/
 .pytest_ache/
-dist/
+binary/
 dist_old/
 dist_old_2/
 dist_old_3/
@@ -57,7 +57,7 @@ compiler_pipeline_overview.md
 vendor/tree-sitter-picoc/src/
 vendor/tree-sitter-reti/src/
 .vscode/tasks.json
-doc/passes.md
+documentation/passes.md
 test_examples/minimal_function_call.picoc
 test_examples/minimal_function_call.reti_blocks_backup
-doc/chats/compiler_attributes_qa.md
+documentation/chats/compiler_attributes_qa.md

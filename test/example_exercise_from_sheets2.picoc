@@ -1,0 +1,25 @@
+// in:3 15
+// expected: 3
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  // Deklarationsteil
+  int x;
+  int y;
+  const int z = 2;
+
+  // Anweisungsteil
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  y = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  x = __picoc_input_1;
+
+  while(x >= z * y) {
+    x = x - 3;
+  }
+  printf(" %d", x);
+}

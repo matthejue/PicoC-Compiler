@@ -1,0 +1,20 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void fun_declared_before(int *param);
+
+int fun_defined(int param) {
+  return param + 10;
+}
+
+void main() {
+  int res = fun_defined(22);
+  fun_declared_before(&res);
+  printf(" %d", res);
+}
+
+void fun_declared_before(int *param) {
+  *param = *param + 10;
+}

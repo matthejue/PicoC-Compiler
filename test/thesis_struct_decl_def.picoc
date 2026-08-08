@@ -1,0 +1,12 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st {int len; int ar[2];};
+
+void main() {
+  struct st st_var;
+  st_var.ar[1] = 42;
+  printf(" %d", st_var.ar[1]);
+}

@@ -20,11 +20,11 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ $2 == "all" ]]; then
-  paths+=(./sys_tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.picoc)
+  paths+=(./test/{basic,advanced,example,hard,thesis,tobias,hidden}*.picoc)
 elif [[ -n "$2" ]]; then
-  paths=(./sys_tests/*$2*.picoc)
+  paths=(./test/*$2*.picoc)
 else
-  paths+=(./sys_tests/{basic,advanced,example,hard,thesis,tobias}*.picoc)
+  paths+=(./test/{basic,advanced,example,hard,thesis,tobias}*.picoc)
 fi
 
 for test in "${paths[@]}"; do
@@ -33,10 +33,10 @@ for test in "${paths[@]}"; do
   tmp_exe_file=$(mktemp)
   {
     printf '#include <stdio.h>\n'
-    sed '/#include "\.\.\/\.\.\/Pico-OS\/lib\/stdio\/stdio\.header"/d' "$test"
+    sed '/#include "\.\.\/\.\.\/Pico-OS\/library\/[^"]*\.header"/d' "$test"
   } > "$tmp_c_file"
   sed -i '/^[[:space:]]*debug;[[:space:]]*$/d' "$tmp_c_file"
-  if ! gcc -Wno-incompatible-pointer-types "$tmp_c_file" -o "$tmp_exe_file"; then
+  if ! gcc -iquote "$(dirname "$test")" -Wno-incompatible-pointer-types "$tmp_c_file" -o "$tmp_exe_file"; then
     not_verified+=("$test");
     ((num_tests++));
     rm -f "$tmp_c_file" "$tmp_exe_file"

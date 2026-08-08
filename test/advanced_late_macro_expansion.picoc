@@ -1,0 +1,12 @@
+// in:
+// expected: 123
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+#define A B
+#define B 123
+
+int main() {
+    printf(" %d", A);
+    return 0;
+}

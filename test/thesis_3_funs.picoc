@@ -1,0 +1,18 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  printf(" %d", 42);
+  return;
+}
+
+void fun1() {
+  printf(" %d", 42);
+}
+
+int fun2() {
+  printf(" %d", 42);
+  return 1;
+}

@@ -1,0 +1,33 @@
+// input:
+// expected: 42 -42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+#define NULL ((void *)0)
+
+struct BlockHeader {
+    int free;
+    int size;
+    int next;
+};
+
+int main() {
+    struct BlockHeader block = {
+        .free = 1,
+        .size = 0,
+        .next = (int)NULL
+    };
+
+    struct BlockHeader *current = &block;
+    int *data_start = (int *)(current + 1);
+    int *size = ((int *)current + 1);
+    *size = 3 * 38;
+    struct BlockHeader *new_block = ((struct BlockHeader *)(data_start + (*current).size) + 3);
+
+    printf(" %d", new_block - current);
+    printf(" %d", current - new_block);
+
+    return 0;
+}
+
+

@@ -1,0 +1,20 @@
+// in:21
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void _fun120(char c, int i);
+
+void main(){
+  debug;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  _fun120('b', __picoc_input_0);
+  debug;
+}
+
+void _fun120(char c, int i){
+  debug;
+  printf(" %d", i * (100 + -c));
+  debug;
+}

@@ -1,0 +1,26 @@
+// in:1
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct stt {int attr1; int attr2[2];};
+
+struct stt ar_of_sts[3][2];
+
+int fun(struct stt (*param)[3][2]);
+
+void main() {
+  struct stt (*pntr_on_ar_of_sts)[3][2] = &ar_of_sts;
+  int res = fun(pntr_on_ar_of_sts);
+  if (res) {
+    printf(" %d", (*(*pntr_on_ar_of_sts+2))[1].attr2[1]);
+  }
+}
+
+int fun(struct stt (*param)[3][2]){
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  (*(*param+2))[1].attr2[__picoc_input_0] = 42;
+  return 1;
+}
+

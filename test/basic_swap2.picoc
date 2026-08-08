@@ -1,0 +1,19 @@
+// in:
+// expected: 4 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct stt {int len; int *ar;};
+
+int ar[6] = {314, 42, 4, 42, -2, 5};
+
+struct stt st_ar = {.len=6, .ar=ar};
+
+int call_by_reference(int *x, int *y) {
+  printf(" %d", *x);
+  printf(" %d", *y);
+}
+
+void main() {
+  call_by_reference(&st_ar.ar[2], &st_ar.ar[3]);
+}

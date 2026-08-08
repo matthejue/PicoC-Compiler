@@ -1,0 +1,41 @@
+// in:0 5
+// expected: -2 314
+// based on a function from the Operating Systems Lecture by Prof. Dr. Christoph Scholl and https://de.wikipedia.org/wiki/Bubblesort
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct stt {int len; int *ar;};
+
+int ar[6] = {314, 42, 4, 42, -2, 5};
+
+struct stt st_ar = {.len=6, .ar=ar};
+
+int swap(int *x, int *y) {
+  // in the lecture this function is called pairsort
+  int h;
+  int swapped = 0;
+  if (*x > *y) {
+    h = *x; *x = *y; *y = h; swapped = 1;
+  }
+  return swapped;
+}
+
+void main() {
+  int swapped;
+  int i;
+  int n = st_ar.len-1;
+  do {
+    i = 0;
+    while (i < n) {
+      swapped = swap(&st_ar.ar[i], &st_ar.ar[i+1]);
+      i = i + 1;
+    }
+    n = n - 1;
+  } while(swapped);
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", st_ar.ar[__picoc_input_0]);
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  printf(" %d", st_ar.ar[__picoc_input_1]);
+}

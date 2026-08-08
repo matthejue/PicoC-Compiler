@@ -1,0 +1,41 @@
+// in:21 2 6 7
+// expected: 42 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+#include "./include/basic_pragma_once_a.header"
+#include "./include/basic_pragma_once_b.header"
+
+
+int main() {
+    int x;
+    int y;
+    int arr[2];
+    struct str_b b;
+
+    b.ptr = &b.a.value;
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    x = __picoc_input_0;
+    int __picoc_input_1;
+    scanf(" %d", &__picoc_input_1);
+    y = __picoc_input_1;
+    int __picoc_input_2;
+    scanf(" %d", &__picoc_input_2);
+    arr[0] = __picoc_input_2;
+    int __picoc_input_3;
+    scanf(" %d", &__picoc_input_3);
+    arr[1] = __picoc_input_3;
+    b.ptr = &b.a.value;
+    b.a.value = x + y + arr[0] + arr[1];
+
+    if (*b.ptr > 10) {
+        while (*b.ptr < 42) {
+            *b.ptr = *b.ptr + 1;
+        }
+    } 
+
+    printf(" %d", *b.ptr);
+    printf(" %d", b.a.value);
+    return 0;
+}

@@ -1,0 +1,20 @@
+// in:42
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct Data {
+    int arr0[2];
+    int arr1[2];
+};
+
+void main() {
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    struct Data obj = {.arr0={1, 2}, .arr1={3, __picoc_input_0}};
+    struct Data *ptr = &obj;
+
+    int x = (*ptr).arr1[1];
+
+    printf(" %d", x);
+}

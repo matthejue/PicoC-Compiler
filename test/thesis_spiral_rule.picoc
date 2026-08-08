@@ -1,0 +1,12 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st {int attr;};
+
+void main() {
+  struct st st_var[2] = {{.attr=314}, {.attr=42}};
+  struct st (*complex_var[1][2])[2] = {{&st_var, &st_var}};
+  printf(" %d", (*complex_var[0][1])[1].attr);
+}

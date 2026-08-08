@@ -1,0 +1,45 @@
+// in:3 1 4
+// expected: 3 1 4 4 2 5
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+// array struct declaration
+struct array_with_len {int *ar_pntr; int len;};
+
+// fixed length array struct declaration
+struct array_with_fixed_len {int ar_pntr[3]; int len;};
+
+void main() {
+  // struct initialisation with array and length
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int first = __picoc_input_0;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  int second = __picoc_input_1;
+  int __picoc_input_2;
+  scanf(" %d", &__picoc_input_2);
+  int third = __picoc_input_2;
+  int ar[3] = {first, second, third};
+  struct array_with_len array = {.ar_pntr=ar, .len=3};
+  int i;
+  // struct definition
+  struct array_with_fixed_len array2;
+  // print all array elements using it's length
+  i = 0;
+  while (i < array.len) {
+    printf(" %d", array.ar_pntr[i]);
+    i = i + 1;
+  }
+  // copy array with all elements incremented
+  array2.ar_pntr[0] = array.ar_pntr[0] + 1;
+  array2.ar_pntr[1] = array.ar_pntr[1] + 1;
+  array2.ar_pntr[2] = array.ar_pntr[2] + 1;
+  array2.len = array.len;
+  // print all array elements using it's length
+  i = 0;
+  while (i < array2.len) {
+    printf(" %d", array2.ar_pntr[i]);
+    i = i + 1;
+  }
+}

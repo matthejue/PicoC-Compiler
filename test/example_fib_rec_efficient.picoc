@@ -1,0 +1,25 @@
+// in:10
+// expected: 55
+// from the Operating Systems Lecture by Prof. Dr. Christoph Scholl
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int ar[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+int fib_efficient(int n, int* res){
+    if (n == 0)
+        return 0;
+    else if (n == 1){
+        res[0] = 0;
+        res[1] = 1;
+        return 1;
+    }
+    res[n] = fib_efficient(n - 1, res) + res[n - 2];
+    return res[n];
+}
+
+void main() {
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  printf(" %d", fib_efficient(__picoc_input_0, ar));
+}

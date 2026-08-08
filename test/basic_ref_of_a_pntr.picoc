@@ -1,0 +1,14 @@
+// in:42
+// expected: 42 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
+  int *pntr1 = &var;
+  int **pntr2 = &pntr1;
+  printf(" %d", *pntr1);
+  printf(" %d", **pntr2);
+}

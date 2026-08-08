@@ -1,1 +1,0 @@
--m -f /tmp -i ./opts/isrs.reti -v -d

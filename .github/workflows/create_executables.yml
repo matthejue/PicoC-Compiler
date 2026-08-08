@@ -44,7 +44,7 @@ jobs:
 
       - name: Get Documentation
         run: |
-          cd src
+          cd source
           git clone https://github.com/matthejue/Bachelorarbeit_Dokumentation_out --depth=1
 
       - name: Set up Python
@@ -58,18 +58,18 @@ jobs:
           python -m pip install -U -r requirements.txt
 
       - name: Run Pyinstaller
-        run: pyinstaller src/main.spec
+        run: pyinstaller source/main.spec --distpath=./binary
 
       - name: Tar files
         run: |
-          cd dist
+          cd binary
           tar -zcvf ${{ matrix.asset_name }} picoc_compiler
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact_name }}
-          path: ./dist/${{ matrix.asset_name }}
+          path: ./binary/${{ matrix.asset_name }}
 
   release:
     needs: build

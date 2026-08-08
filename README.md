@@ -3,7 +3,7 @@
 
 <div align="center">
   <a href="https://github.com/matthejue/PicoC-Compiler">
-    <img src="./doc/logo.png" alt="Logo" height="80px">
+    <img src="./documentation/logo.png" alt="Logo" height="80px">
   </a>
   <p align="center">
     Compiles the programming language <strong>PicoC</strong> (a subset of C) into the <strong>RETI</strong> assembler.
@@ -13,19 +13,19 @@
     ·
     <a href="https://github.com/matthejue/Bachelorarbeit_Praesentation_out/blob/main/Main.pdf">Colloquium Presentation Slides</a>
     <br />
-    <a href="./doc/getting_started.md">Getting Started</a>
+    <a href="./documentation/getting_started.md">Getting Started</a>
     ·
     <a href="https://github.com/matthejue/Bachelorarbeit_Dokumentation_out/blob/main/Dokumentation.pdf">Documentation</a>
     ·
-    <a href="./doc/references.md">References</a>
+    <a href="./documentation/references.md">References</a>
   </p>
 </div>
 
 [![asciicast](https://asciinema.org/a/526542.svg)](https://asciinema.org/a/526542)
 
-<!-- <a href="./doc/abstract_syntax.txt">Abstract Syntax</a> -->
+<!-- <a href="./documentation/abstract_syntax.txt">Abstract Syntax</a> -->
 <!-- · -->
-<!-- <a href="./doc/help-page.txt">Usage</a> -->
+<!-- <a href="./documentation/help-page.txt">Usage</a> -->
 
 ## Local Tree-sitter Parsers
 
@@ -237,10 +237,10 @@ This section summarizes how the compiler processes PicoC source files, covering 
 
 The relevant implementation lives mainly in:
 
-- [`src/preprocessor.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/preprocessor.py)
-- [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py)
-- [`src/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/)
-- [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py)
+- [`source/preprocessor.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/preprocessor.py)
+- [`source/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py)
+- [`source/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/source/passes/)
+- [`source/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/ast_transformers.py)
 
 ### Overall Flow
 
@@ -257,7 +257,7 @@ Example:
 
 ### Preprocessing
 
-The preprocessing stage is implemented in [`src/preprocessor.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/preprocessor.py) and is called from [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py).
+The preprocessing stage is implemented in [`source/preprocessor.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/preprocessor.py) and is called from [`source/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py).
 
 #### What It Supports
 
@@ -330,7 +330,7 @@ Examples:
 
 ### Per-File Compilation in `option_handler.py`
 
-The entry point is [`OptionHandler.build_all`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py#L31), which reads the CLI input files and compiles them.
+The entry point is [`OptionHandler.build_all`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py#L31), which reads the CLI input files and compiles them.
 
 #### Building Multiple Files
 
@@ -369,7 +369,7 @@ The result returned for each file is:
 
 ### Lexing, Tokens, and Parse Tree Generation
 
-`_compl(code)` in [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py) runs the parser frontend and then the lowering pipeline.
+`_compl(code)` in [`source/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py) runs the parser frontend and then the lowering pipeline.
 
 #### Lexing / Token Generation
 
@@ -377,7 +377,7 @@ The frontend tokenizes the preprocessed source.
 
 Main points:
 
-- The frontend is implemented in [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py), mainly by `TransformerPicoC`.
+- The frontend is implemented in [`source/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/ast_transformers.py), mainly by `TransformerPicoC`.
 - `TransformerPicoC` uses the vendored Tree-sitter C grammar from `vendor/tree-sitter-c/c.so` through the `tree_sitter` Python bindings.
 - `TransformerPicoC.parse_tree(code)` performs the actual Tree-sitter parse.
 - `OptionHandler._tokens_option(...)` extracts the leaf tokens from the Tree-sitter parse result.
@@ -399,8 +399,8 @@ The parse tree is converted into the compiler's PicoC AST.
 
 Main points:
 
-- `transformer.build_ast(ts_tree, code)` in [`src/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/ast_transformers.py) walks the Tree-sitter parse tree and builds the compiler's PicoC AST.
-- The AST construction logic therefore lives in `ast_transformers.py`, while the later lowering logic lives in `src/passes/`.
+- `transformer.build_ast(ts_tree, code)` in [`source/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/ast_transformers.py) walks the Tree-sitter parse tree and builds the compiler's PicoC AST.
+- The AST construction logic therefore lives in `ast_transformers.py`, while the later lowering logic lives in `source/passes/`.
 
 ### Symbol Table Output and `.st` Files
 
@@ -417,7 +417,7 @@ Main points:
 
 ### The Main AST/Lowering Passes
 
-The pass pipeline is defined in [`src/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/) and run from [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py).
+The pass pipeline is defined in [`source/passes/`](/home/areo/Documents/Studium/PicoC-Compiler/source/passes/) and run from [`source/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py).
 
 #### `picoc_shrink`
 
@@ -535,7 +535,7 @@ Main tasks:
 
 ### Linking / Multi-File Handling
 
-Each source file is compiled separately up to `reti_blocks`. The combination of multiple compilation units is the linking stage in this project, and that linker logic lives in [`src/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/src/option_handler.py).
+Each source file is compiled separately up to `reti_blocks`. The combination of multiple compilation units is the linking stage in this project, and that linker logic lives in [`source/option_handler.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/option_handler.py).
 
 #### Per-File Result Collection
 
@@ -583,11 +583,11 @@ Main tasks:
 
 #### When Symbolic Names Become Concrete Addresses
 
-Part of linking / multi-file handling is preparing one merged symbol table with final global addresses, but the actual replacement of symbolic names inside RETI instructions happens later in the final [`reti`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/linking/reti_pass.py) pass.
+Part of linking / multi-file handling is preparing one merged symbol table with final global addresses, but the actual replacement of symbolic names inside RETI instructions happens later in the final [`reti`](/home/areo/Documents/Studium/PicoC-Compiler/source/passes/linking/reti_pass.py) pass.
 
 Relevant place in the code:
 
-- [`Passes._reti_instr()`](/home/areo/Documents/Studium/PicoC-Compiler/src/passes/linking/reti_pass.py) resolves symbolic RETI operands with `self.symbol_table.resolve(...)`
+- [`Passes._reti_instr()`](/home/areo/Documents/Studium/PicoC-Compiler/source/passes/linking/reti_pass.py) resolves symbolic RETI operands with `self.symbol_table.resolve(...)`
   Example: `Instr(Loadin(), [Ds, Acc, Name("x")])` becomes `Instr(Loadin(), [Ds, Acc, Im(addr_of_x)])`.
 - The same method also handles offsets built on top of symbolic names.
   Example: `BinOp(Name("arr"), Add(), 3)` becomes `Im(addr_of_arr + 3)`.

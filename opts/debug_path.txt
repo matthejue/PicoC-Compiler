@@ -1,1 +1,0 @@
-./sys_tests/basic_do_while.picoc

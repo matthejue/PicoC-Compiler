@@ -1,0 +1,19 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st {int attr1; int attr2[2];};
+
+void stack_fun(struct st param[2][3]);
+
+void main() {
+  struct st local_var[2][3];
+  int local_var2 = 42;
+  stack_fun(local_var);
+  return;
+}
+
+void stack_fun(struct st param[2][3]) {
+  printf(" %d", param[1][3]);
+}

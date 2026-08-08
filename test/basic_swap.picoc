@@ -1,0 +1,26 @@
+// in:
+// expected: 4 42 -2 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct stt {int len; int *ar;};
+
+int ar[6] = {314, 42, 4, 42, -2, 5};
+
+struct stt st_ar = {.len=6, .ar=ar};
+
+int swap(int *x, int *y) {
+  int h;
+  if (*x > *y) {
+    h = *x; *x = *y; *y = h;
+  }
+}
+
+void main() {
+  swap(&st_ar.ar[2], &st_ar.ar[3]);
+  printf(" %d", st_ar.ar[2]);
+  printf(" %d", st_ar.ar[3]);
+  swap(&st_ar.ar[3], &st_ar.ar[4]);
+  printf(" %d", st_ar.ar[3]);
+  printf(" %d", st_ar.ar[4]);
+}

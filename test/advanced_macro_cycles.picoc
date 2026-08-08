@@ -1,0 +1,33 @@
+// in:22
+// expected: 10 20 5 32 42 27
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+#define A B
+#define B A
+#define X X
+
+int main()
+{
+    int A = 10;
+    int B = 20;
+    int X = 5;
+
+    printf(" %d", A);   // must print 10
+    printf(" %d", B);   // must print 20
+    printf(" %d", X);   // must print 5
+
+    int __picoc_input_0;
+    scanf(" %d", &__picoc_input_0);
+    int v = __picoc_input_0;
+
+    A = A + v;
+    B = B + v;
+    X = X + v;
+
+    printf(" %d", A);   // must print 10 + v
+    printf(" %d", B);   // must print 20 + v
+    printf(" %d", X);   // must print 5  + v
+
+    return 0;
+}

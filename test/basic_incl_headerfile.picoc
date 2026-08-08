@@ -1,0 +1,10 @@
+// in:
+// expected: 12
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+#include "./include/basic_incl_headerfile.header"
+
+void main() {
+  struct ExStrc exstrc = {.attr1='c', .attr2=12};
+  printf(" %d", exstrc.attr2);
+}

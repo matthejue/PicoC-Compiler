@@ -13,12 +13,12 @@ trap cleanup EXIT
 
 {
   printf '#include <stdio.h>\n'
-  sed '/#include "\.\.\/\.\.\/Pico-OS\/lib\/stdio\/stdio\.header"/d' "$test"
+  sed '/#include "\.\.\/\.\.\/Pico-OS\/library\/[^"]*\.header"/d' "$test"
 } > "$tmp_c_file"
 sed -i '/^[[:space:]]*debug;[[:space:]]*$/d' "$tmp_c_file"
 
 verified=0
-if ! gcc -Wno-incompatible-pointer-types "$tmp_c_file" -o "$tmp_exe_file"; then
+if ! gcc -iquote "$(dirname "$test")" -Wno-incompatible-pointer-types "$tmp_c_file" -o "$tmp_exe_file"; then
   verified=1
 else
   input_file="${test%.picoc}.input"

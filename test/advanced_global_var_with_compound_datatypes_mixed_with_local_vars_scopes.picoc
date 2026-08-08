@@ -1,0 +1,30 @@
+// in:12
+// expected: 42 314
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st {int len; int ar[2];};
+
+int i;
+
+void print_ar(struct st param_st) {
+  // scope test, local i has higher priority
+  int i = 0;
+  while (i < param_st.len) {
+    printf(" %d", param_st.ar[i]);
+    i = i + 1;
+  }
+}
+
+struct st global_st;
+
+void main() {
+  int ar[2] = {42, 314};
+  i = 0;
+  while (i < 2) {
+    global_st.ar[i] = ar[i];
+    i = i + 1;
+  }
+  global_st.len = i;
+  print_ar(global_st);
+}

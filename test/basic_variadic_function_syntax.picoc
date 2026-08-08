@@ -1,0 +1,27 @@
+// in:
+// expected: 60
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int sum(int count, ...);
+
+int sum(int count, ...) {
+  debug;
+  int total = 0;
+  int *arg = &count + 1;
+  debug;
+
+  while (count) {
+    total = total + *arg;
+    arg = arg + 1;
+    count = count - 1;
+  }
+
+  debug;
+  return total;
+}
+
+void main() {
+  debug;
+  printf(" %d", sum(3, 10, 20, 30));
+}

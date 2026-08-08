@@ -1,8 +1,0 @@
-#include "pipeline.header"
-
-int pipeline_offset = 9;
-
-int project_value(struct NumberPair *values) {
-    char *pipeline_tag = "pipe";
-    return weighted_sum(values) + pipeline_offset + pipeline_tag[0];
-}

@@ -1,0 +1,18 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int fun_with_return_value() {
+  return 21 * 2;
+}
+
+void fun_no_return_value() {
+  return;
+}
+
+void main() {
+  int var = fun_with_return_value();
+  printf(" %d", var);
+  fun_no_return_value();
+}

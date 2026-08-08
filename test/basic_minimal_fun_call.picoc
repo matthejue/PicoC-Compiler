@@ -1,0 +1,17 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int add_one_if_larger_40(int value) {
+  if (value > 40) {
+    return value + 1;
+  } else {
+    return value;
+  }
+}
+
+void main() {
+  int result = add_one_if_larger_40(41);
+  printf(" %d", result);
+}

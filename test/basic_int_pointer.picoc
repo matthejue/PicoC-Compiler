@@ -1,0 +1,23 @@
+// in:42
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct Pair {
+  int first;
+  int second;
+};
+struct Pair p;
+
+int *fun_return_void_pointer() {
+  p.first  = 66;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  p.second = __picoc_input_0;
+  return (void *)&p;
+}
+
+void main() {
+  int var = fun_return_void_pointer()[1];
+  printf(" %d", var);
+}

@@ -1,0 +1,16 @@
+// in:41
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int main() {
+  int one = 1;
+  int ar[3 * 5];   // must be accepted as a constant expression
+
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  ar[3 * 5 - one] = __picoc_input_0;
+  printf(" %d", ar[3 * 5 - one]+one);
+
+  return 0;
+}

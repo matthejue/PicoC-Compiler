@@ -1,0 +1,28 @@
+// in:24 12 6 3 10 5
+// expected: 3 5
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  // variable initialisation
+  int var = 0;
+  // constant initialisation
+  const char inc = 1;  // single line comment
+  /* multi
+  line
+  comment */
+  // while
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  while(var < __picoc_input_0) {
+    var = var + inc;
+  }
+  printf(" %d", var);
+  // do while
+  do {
+    var = var + inc;
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  } while(var < __picoc_input_1);
+  printf(" %d", var);
+}

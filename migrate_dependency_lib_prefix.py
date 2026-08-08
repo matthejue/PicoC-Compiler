@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument(
         "test_dir",
         nargs="?",
-        default="sys_tests",
+        default="test",
         type=Path,
         help="directory containing .picoc system tests",
     )

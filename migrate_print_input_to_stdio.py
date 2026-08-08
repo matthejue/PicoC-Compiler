@@ -8,8 +8,8 @@ import re
 from pathlib import Path
 
 
-DEFAULT_STDIO_PICOC = "../../Pico-OS/lib/stdio/stdio.picoc"
-DEFAULT_STDIO_HEADER = "../../Pico-OS/lib/stdio/stdio.header"
+DEFAULT_STDIO_PICOC = "../../Pico-OS/library/stdio/stdio.picoc"
+DEFAULT_STDIO_HEADER = "../../Pico-OS/library/stdio/stdio.header"
 
 TEST_COMMENT_SPACING_RE = re.compile(
     r"^(//[ \t]*(?:expected|input):)(?=\S)"

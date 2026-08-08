@@ -1,0 +1,60 @@
+// in:3 11 20 42
+// expected: 0 10 20 30
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  int var;
+  int i = 0;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  var = __picoc_input_0;
+  if (var < 10) {
+    printf(" %d", 0);
+  } else if (var >= 10 && var < 20) {
+    printf(" %d", 10);
+  } else if (var >= 20 && var < 30) {
+    printf(" %d", 20);
+  } else {  // var >= 30
+    printf(" %d", 30);
+  }
+
+  int __picoc_input_1;
+  scanf(" %d", &__picoc_input_1);
+  var = __picoc_input_1;
+  if (var < 10) {
+    printf(" %d", 0);
+  } else if (var >= 10 && var < 20) {
+    printf(" %d", 10);
+  } else if (var >= 20 && var < 30) {
+    printf(" %d", 20);
+  } else {  // var >= 30
+    printf(" %d", 30);
+  }
+
+  int __picoc_input_2;
+  scanf(" %d", &__picoc_input_2);
+  var = __picoc_input_2;
+  if (var < 10) {
+    printf(" %d", 0);
+  } else if (var >= 10 && var < 20) {
+    printf(" %d", 10);
+  } else if (var >= 20 && var < 30) {
+    printf(" %d", 20);
+  } else {  // var >= 30
+    printf(" %d", 30);
+  }
+
+  int __picoc_input_3;
+  scanf(" %d", &__picoc_input_3);
+  var = __picoc_input_3;
+  if (var < 10) {
+    printf(" %d", 0);
+  } else if (var >= 10 && var < 20) {
+    printf(" %d", 10);
+  } else if (var >= 20 && var < 30) {
+    printf(" %d", 20);
+  } else {  // var >= 30
+    printf(" %d", 30);
+  }
+}

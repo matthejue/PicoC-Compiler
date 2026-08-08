@@ -1,0 +1,15 @@
+// in:10
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var = __picoc_input_0;
+  int bool1 = 0 || -(10 - var || 0) + 1 && var || (var < 10 && 1);
+  int bool2 = -42 && -(11 - var || 0) + 1 || !var || (var == 10 && 1);
+  if (bool1 && bool2) {
+    printf(" %d", 42);
+  }
+}

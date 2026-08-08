@@ -1,0 +1,10 @@
+// in:
+// expected: -2147418113
+// it reads the return address form the stackframe of the main function
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  int ar[3] = {1, 2, 3};
+  printf(" %d", ar[4]); // this jumps 2 cells to wide, ar[3] is already out of bounds
+}

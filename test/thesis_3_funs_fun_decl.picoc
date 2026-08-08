@@ -1,0 +1,20 @@
+// in:
+// expected: 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+int fun2(int var);
+
+void fun1() {
+}
+
+void main() {
+  int var = fun2(42);
+  fun1();
+  return;
+}
+
+int fun2(int var) {
+  printf(" %d", var);
+  return var;
+}

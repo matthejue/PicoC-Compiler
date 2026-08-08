@@ -1,0 +1,17 @@
+// in:
+// expected: 42 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+struct st1 {int (*ar)[1];};
+struct st2 {struct st1 *st;};
+
+void main() {
+  int var[1] = {42};
+  struct st1 st_first = {.ar=&var};
+  struct st2 st_second = {.st=&st_first};
+  printf(" %d", (*st_first.ar)[0]);
+  printf(" %d", (*(*st_second.st).ar)[0]);
+}
+
+

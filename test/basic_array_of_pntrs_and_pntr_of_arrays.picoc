@@ -1,0 +1,17 @@
+// in:42
+// expected: 42 42
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void main() {
+  int var1 = 1;
+  int __picoc_input_0;
+  scanf(" %d", &__picoc_input_0);
+  int var2 = __picoc_input_0;
+  int var3 = 3;
+  int *ar_of_pntrs[3] = {&var1, &var2, &var3};
+  int *(*pntr_on_ars)[3] = &ar_of_pntrs;
+
+  printf(" %d", *ar_of_pntrs[1]);
+  printf(" %d", *(*pntr_on_ars)[1]);
+}

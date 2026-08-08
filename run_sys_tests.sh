@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NOT_PASSED_TESTS_FILE="${NOT_PASSED_TESTS_FILE:-./opts/not_passed_tests.txt}"
+NOT_PASSED_TESTS_FILE="${NOT_PASSED_TESTS_FILE:-./config/not_passed_tests.txt}"
 use_not_passed_tests=false
 direct_compile=false
 
@@ -94,11 +94,11 @@ if [[ "$use_not_passed_tests" == true ]]; then
       sed '/^[[:space:]]*$/d'
   )
 elif [[ "$test_pattern" == "all" ]]; then
-  paths=(./sys_tests/*.picoc)
+  paths=(./test/*.picoc)
 elif [[ -n "$test_pattern" ]]; then
-  paths=(./sys_tests/*"$test_pattern"*.picoc)
+  paths=(./test/*"$test_pattern"*.picoc)
 else
-  paths=(./sys_tests/{basic,advanced,example,hard,thesis,tobias}*.picoc)
+  paths=(./test/{basic,advanced,example,hard,thesis,tobias}*.picoc)
 fi
 
 if [[ ${#paths[@]} -eq 0 ]]; then
@@ -118,7 +118,7 @@ done
 if [[ "$use_not_passed_tests" == true ]]; then
   verify_paths=("${paths[@]}")
 elif [[ "$test_pattern" == "all" ]]; then
-  verify_paths=(./sys_tests/{basic,advanced,example,hard,thesis,tobias,hidden}*.picoc)
+  verify_paths=(./test/{basic,advanced,example,hard,thesis,tobias,hidden}*.picoc)
 else
   verify_paths=("${paths[@]}")
 fi
@@ -147,8 +147,8 @@ export TEST_CPL_OPTIONS
 export TEST_EMU_OPTIONS
 export EXTRA_CPL_ARGS="$extra_cpl_args"
 export EXTRA_EMU_ARGS="$extra_emu_args"
-TEST_CPL_OPTIONS="$(< ./opts/test_cpl_opts.txt)"
-TEST_EMU_OPTIONS="$(< ./opts/test_emu_opts.txt)"
+TEST_CPL_OPTIONS="$(< ./config/test_cpl_opts.txt)"
+TEST_EMU_OPTIONS="$(< ./config/test_emu_opts.txt)"
 
 if [[ -n "${TEST_JOBS:-}" ]]; then
   if [[ ! "$TEST_JOBS" =~ ^[1-9][0-9]*$ ]]; then
@@ -180,7 +180,7 @@ TEST_JOBS="$test_jobs" COLUMNS="$columns" make \
   --output-sync=target \
   --keep-going \
   --jobs "$test_jobs" \
-  -f ./sys_tests/Makefile \
+  -f ./test/Makefile \
   TEST_BUILD_MODE="$test_build_mode" \
   TEST_SOURCES="$test_sources" \
   VERIFY_SOURCES="$verify_sources" \
@@ -235,28 +235,28 @@ else
 fi
 
 echo "$verification_res" |
-  tee ./sys_tests/tests.res
+  tee ./test/tests.res
 
 echo "Not failing: $((num_tests - ${#failing[@]})) / $num_tests" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Failing: ${failing[*]}" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Passed: $((num_tests - ${#not_passed[@]})) / $num_tests" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Not passed: ${not_passed[*]}" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Timed out: ${#timed_out[@]} / $num_tests" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Timed-out tests: ${timed_out[*]}" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 printf 'Runtime: %02d:%02d\n' "$((SECONDS / 60))" "$((SECONDS % 60))" |
-  tee -a ./sys_tests/tests.res
+  tee -a ./test/tests.res
 
 echo "Updated test list: $NOT_PASSED_TESTS_FILE"
 

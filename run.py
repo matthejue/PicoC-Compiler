@@ -1,14 +1,14 @@
 #!/home/areo/Documents/Studium/PicoC-Compiler/.virtualenv/bin/python
-from src.main import main
+from source.main import main
 
 if __name__ == "__main__":
     main()
 
-# from src.test import build_ast_from_string
-# # from src.picoc_nodes import Name, Num, BinOp, Mul
-# from src import global_vars
+# from source.test import build_ast_from_string
+# # from source.picoc_nodes import Name, Num, BinOp, Mul
+# from source import global_vars
 # import inspect
-# import src.picoc_nodes as picoc_nodes
+# import source.picoc_nodes as picoc_nodes
 #
 # if __name__ == "__main__":
 #     class ARGS:
@@ -18,7 +18,7 @@ if __name__ == "__main__":
 #
 #     global_vars.args.double_verbose = False
 #
-# # Automatically collect all classes defined in src.picoc_nodes
+# # Automatically collect all classes defined in source.picoc_nodes
 #     node_classes = {
 #         name: cls
 #         for name, cls in inspect.getmembers(picoc_nodes, inspect.isclass)
