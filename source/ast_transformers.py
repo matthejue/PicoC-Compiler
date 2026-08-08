@@ -1,4 +1,5 @@
 import ctypes
+import sys
 from pathlib import Path
 from typing import Sequence
 
@@ -11,7 +12,15 @@ from source.ast_node import set_source_origin
 from source.utils.util_funs_dependent import throw_error
 
 
-def _load_ts_language(grammar_dir: str, library_name: str, symbol_name: str) -> Language:
+def _grammar_library_name(stem: str) -> str:
+    if sys.platform == "win32":
+        return f"{stem}.dll"
+    if sys.platform == "darwin":
+        return f"{stem}.dylib"
+    return f"{stem}.so"
+
+
+def _load_ts_language(grammar_dir: str, library_stem: str, symbol_name: str) -> Language:
     """
     Load a vendored Tree-sitter grammar so local grammar changes are used
     instead of the PyPI wheel.
@@ -20,7 +29,7 @@ def _load_ts_language(grammar_dir: str, library_name: str, symbol_name: str) -> 
         Path(__file__).resolve().parent.parent
         / "vendor"
         / grammar_dir
-        / library_name
+        / _grammar_library_name(library_stem)
     )
     if not grammar_lib.exists():
         raise FileNotFoundError(
@@ -44,7 +53,7 @@ def _load_picoc_ts_language() -> Language:
     if _TS_PICOC_LANGUAGE is None:
         _TS_PICOC_LANGUAGE = _load_ts_language(
             "tree-sitter-picoc",
-            "picoc.so",
+            "picoc",
             "tree_sitter_picoc",
         )
     return _TS_PICOC_LANGUAGE
@@ -55,7 +64,7 @@ def _load_reti_ts_language() -> Language:
     if _TS_RETI_LANGUAGE is None:
         _TS_RETI_LANGUAGE = _load_ts_language(
             "tree-sitter-reti",
-            "reti.so",
+            "reti",
             "tree_sitter_reti",
         )
     return _TS_RETI_LANGUAGE

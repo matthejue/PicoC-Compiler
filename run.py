@@ -1,4 +1,20 @@
-#!/home/areo/Documents/Studium/PicoC-Compiler/.virtualenv/bin/python
+#!/usr/bin/env python3
+import os
+import sys
+from pathlib import Path
+
+
+project_root = Path(__file__).resolve().parent
+local_python = project_root / ".virtualenv" / (
+    "Scripts/python.exe" if os.name == "nt" else "bin/python"
+)
+local_environment = local_python.parent.parent
+if local_python.exists() and Path(sys.prefix).resolve() != local_environment.resolve():
+    os.execv(
+        local_python,
+        [str(local_python), str(Path(__file__).resolve()), *sys.argv[1:]],
+    )
+
 from source.main import main
 
 if __name__ == "__main__":

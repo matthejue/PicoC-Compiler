@@ -53,9 +53,17 @@ compiler_pipeline_overview.md
 .virtualenv/
 /.test_dependencies/
 
-# Generated tree-sitter artifacts for the vendored grammars
-vendor/tree-sitter-picoc/src/
-vendor/tree-sitter-reti/src/
+# Keep the generated parser sources required for clean cross-platform builds
+vendor/tree-sitter-picoc/src/*
+!vendor/tree-sitter-picoc/src/parser.c
+!vendor/tree-sitter-picoc/src/tree_sitter/
+vendor/tree-sitter-picoc/src/tree_sitter/*
+!vendor/tree-sitter-picoc/src/tree_sitter/parser.h
+vendor/tree-sitter-reti/src/*
+!vendor/tree-sitter-reti/src/parser.c
+!vendor/tree-sitter-reti/src/tree_sitter/
+vendor/tree-sitter-reti/src/tree_sitter/*
+!vendor/tree-sitter-reti/src/tree_sitter/parser.h
 .vscode/tasks.json
 documentation/passes.md
 test_examples/minimal_function_call.picoc

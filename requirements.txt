@@ -1,6 +1,1 @@
-pyinstaller
-bitstring
-pudb
-tree-sitter
-tree-sitter-picoc @ file:vendor/tree-sitter-picoc
-tree-sitter-reti @ file:vendor/tree-sitter-reti
+tree-sitter>=0.25,<0.26

@@ -1,40 +1,40 @@
-name: run system tests
+name: Run system tests
 
 on:
-  push:
-    branches: [ master ]
-    tags:
-      - "*"
-  pull_request:
-    branches: [ master ]
-    tags:
-      - "*"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  system-tests:
+    name: PicoC system tests
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        cd ${GITHUB_WORKSPACE}
-        make install-dependencies
-    - name: Install RETI-Interpeter
-      run: |
-        git clone https://github.com/matthejue/RETI-Interpreter.git
-        cd RETI-Interpreter
-        make install-linux-local
-    - name: Test with Shellscript
-      run: |
-        cd ${GITHUB_WORKSPACE}
-        ./run_sys_tests.sh 79
+      - uses: actions/checkout@v6
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install compiler dependencies
+        run: |
+          python -m pip install --upgrade -r requirements.txt
+          make ci-build PYTHON=python
+
+      - name: Build RETI Emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libncurses-dev
+          git clone --depth 1 https://github.com/matthejue/Pico-OS.git ../Pico-OS
+          git clone --depth 1 https://github.com/matthejue/RETI-Emulator.git ../RETI-Emulator
+          make -C ../RETI-Emulator LINUX=1 RELEASE=1
+          mkdir -p .ci-bin
+          ln -s "$(realpath ../RETI-Emulator/bin/reti_emulator_main)" .ci-bin/reti_emulator
+          echo "$GITHUB_WORKSPACE/.ci-bin" >> "$GITHUB_PATH"
+
+      - name: Run system tests
+        env:
+          TEST_JOBS: "2"
+        run: ./run_sys_tests.sh 120

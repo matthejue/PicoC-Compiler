@@ -1,2 +1,4 @@
+set -eu
+
 tree-sitter generate
-tree-sitter build -o picoc.so
+python ../../scripts/build_tree_sitter.py tree-sitter-picoc

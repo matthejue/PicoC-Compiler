@@ -1730,10 +1730,11 @@ def _syntax_check(
     chosen = compiler or shutil.which("clang") or shutil.which("gcc")
     if not chosen:
         print(
-            "syntax_check: no suitable C compiler found (need clang or gcc)",
+            "[warning] Skipping the external C syntax check because neither "
+            "clang nor gcc was found",
             file=sys.stderr,
         )
-        os._exit(2)
+        return
 
     flags: List[str] = [
         "-x",

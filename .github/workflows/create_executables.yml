@@ -1,89 +1,200 @@
-# resources: https://github.com/qutebrowser/qutebrowser/blob/master/.github/workflows/nightly.yml
-# https://github.com/JackMcKew/pyinstaller-action-windows,
-# https://github.com/Nuitka/Nuitka-Action
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
-# https://github.com/svenstaro/upload-release-action
-# https://blog.knoldus.com/manual-trigger-in-github-actions/
-
-name: create executables
+name: Build release artifacts
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+  push:
+    branches:
+      - master
     tags:
-      - "*"
+      - "v*"
+  pull_request:
+    branches:
+      - master
 
 permissions:
-  contents: write
-
+  contents: read
 
 jobs:
   build:
-    name: Package for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            artifact_name: PicoC-Compiler-Linux
-            asset_name: picoc_compiler_linux_amd64.tar.gz
-          - os: windows-latest
-            artifact_name: PicoC-Compiler-Windows
-            asset_name: picoc_compiler_windows_amd64.tar.gz
-          - os: macos-latest  # macos-12
-            artifact_name: PicoC-Compiler-MacOs
-            asset_name: picoc_compiler_macos_amd64.tar.gz
+          - name: Linux x86-64
+            runner: ubuntu-22.04
+            platform: linux
+            architecture: x64
+            archive: picoc-compiler-linux-x86_64.tar.gz
+          - name: Windows x86-64
+            runner: windows-2022
+            platform: windows
+            architecture: x64
+            archive: picoc-compiler-windows-x86_64.zip
+          - name: macOS 11+ x86-64
+            runner: macos-15-intel
+            platform: macos
+            architecture: x64
+            archive: picoc-compiler-macos-x86_64.tar.gz
+          - name: macOS 11+ arm64
+            runner: macos-15
+            platform: macos
+            architecture: arm64
+            archive: picoc-compiler-macos-arm64.tar.gz
 
     steps:
-      - name: Checkout Master Branch
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
         with:
-          ref: "master"
+          python-version: "3.11"
+          architecture: ${{ matrix.architecture }}
+          cache: pip
 
-      - name: Get Documentation
-        run: |
-          cd source
-          git clone https://github.com/matthejue/Bachelorarbeit_Dokumentation_out --depth=1
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install Windows C compiler
+        if: matrix.platform == 'windows'
+        uses: msys2/setup-msys2@v2
         with:
-          python-version: "3.12"
-          architecture: "x64"
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc
 
-      - name: Install dependencies
+      - name: Install build dependencies
+        run: python -m pip install --upgrade -r requirements-build.txt
+
+      - name: Install Linux static packaging support
+        if: matrix.platform == 'linux'
         run: |
-          python -m pip install -U -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y patchelf
+          python -m pip install --upgrade staticx
 
-      - name: Run Pyinstaller
-        run: pyinstaller source/main.spec --distpath=./binary
-
-      - name: Tar files
+      - name: Build Windows executable
+        if: matrix.platform == 'windows'
+        shell: pwsh
         run: |
-          cd binary
-          tar -zcvf ${{ matrix.asset_name }} picoc_compiler
+          $env:CC = "C:\msys64\ucrt64\bin\gcc.exe"
+          python scripts/build_tree_sitter.py
+          python -m compileall -q source
+          python -m PyInstaller --clean --noconfirm --distpath=binary --workpath=binary/build source/main.spec
+          python scripts/smoke_test.py binary\picoc_compiler.exe
+          Compress-Archive -Path binary\picoc_compiler.exe -DestinationPath "binary\${{ matrix.archive }}"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Build Unix executable
+        if: matrix.platform != 'windows'
+        env:
+          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.platform == 'macos' && '11.0' || '' }}
+        run: |
+          make package PYTHON=python
+          if [ "${{ matrix.platform }}" = linux ]; then
+            staticx binary/picoc_compiler binary/picoc_compiler-static
+            mv binary/picoc_compiler-static binary/picoc_compiler
+          fi
+          python scripts/smoke_test.py binary/picoc_compiler
+          tar -C binary -czf "$GITHUB_WORKSPACE/binary/${{ matrix.archive }}" picoc_compiler
+
+      - uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ./binary/${{ matrix.asset_name }}
+          name: ${{ matrix.archive }}
+          path: binary/${{ matrix.archive }}
+          if-no-files-found: error
+
+  android:
+    name: Android 7+ arm64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager --install "ndk;27.2.12479018"
+
+      - name: Download pinned Android build inputs
+        run: |
+          mkdir -p binary/downloads
+          curl --fail --location --retry 3 \
+            https://www.python.org/ftp/python/3.14.6/python-3.14.6-aarch64-linux-android.tar.gz \
+            --output binary/downloads/python-3.14.6-aarch64-linux-android.tar.gz
+          curl --fail --location --retry 3 \
+            https://www.python.org/ftp/python/3.14.6/python-3.14.6-x86_64-linux-android.tar.gz \
+            --output binary/downloads/python-3.14.6-x86_64-linux-android.tar.gz
+          curl --fail --location --retry 3 \
+            https://files.pythonhosted.org/packages/66/7c/0350cfc47faadc0d3cf7d8237a4e34032b3014ddf4a12ded9933e1648b55/tree-sitter-0.25.2.tar.gz \
+            --output binary/downloads/tree-sitter-0.25.2.tar.gz
+          echo "38bbe77d3167b5cd554e03b1021324926f09f3825202b065951dd7638e9c37e5  binary/downloads/python-3.14.6-aarch64-linux-android.tar.gz" | sha256sum --check
+          echo "e04eb26607627e68d148f89de793372f54a345c91b13628567f24abcdd3bfa3e  binary/downloads/python-3.14.6-x86_64-linux-android.tar.gz" | sha256sum --check
+          echo "fe43c158555da46723b28b52e058ad444195afd1db3ca7720c59a254544e9c20  binary/downloads/tree-sitter-0.25.2.tar.gz" | sha256sum --check
+
+      - name: Validate compiler sources on the build host
+        run: |
+          python -m pip install --upgrade -r requirements.txt
+          make ci-build PYTHON=python
+
+      - name: Build self-contained arm64 package
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/27.2.12479018
+        run: |
+          make android-package PYTHON=python
+          tar -tzf binary/picoc-compiler-android-arm64.tar.gz | grep 'runtime/lib/libpython3.14.so' >/dev/null
+          tar -tzf binary/picoc-compiler-android-arm64.tar.gz | grep 'tree_sitter/_binding.*.so' >/dev/null
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h \
+            binary/android-aarch64/picoc-compiler/libexec/picoc_compiler | grep AArch64 >/dev/null
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h \
+            binary/android-aarch64/picoc-compiler/app/vendor/tree-sitter-picoc/picoc.so | grep AArch64 >/dev/null
+
+      - name: Build x86-64 package for emulator validation
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/27.2.12479018
+        run: |
+          python scripts/package_android.py \
+            --ndk "$ANDROID_NDK_HOME" \
+            --arch x86_64 \
+            --api 24 \
+            --python-runtime binary/downloads/python-3.14.6-x86_64-linux-android.tar.gz \
+            --tree-sitter-source binary/downloads/tree-sitter-0.25.2.tar.gz \
+            --output binary/picoc-compiler-android-x86_64-smoke.tar.gz
+
+      - name: Allow the Android emulator to use KVM
+        run: sudo chmod 666 /dev/kvm
+
+      - name: Smoke test the Android package
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          arch: x86_64
+          target: default
+          disable-animations: true
+          script: |
+            adb push binary/android-x86_64/picoc-compiler /data/local/tmp/picoc-compiler
+            adb push test/basic_assembly_instr.picoc /data/local/tmp/smoke.picoc
+            adb shell chmod 755 /data/local/tmp/picoc-compiler/picoc_compiler /data/local/tmp/picoc-compiler/libexec/picoc_compiler
+            adb shell "cd /data/local/tmp && ./picoc-compiler/picoc_compiler --direct-source-link smoke.picoc -o smoke.reti"
+            adb shell test -s /data/local/tmp/smoke.reti
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: picoc-compiler-android-arm64.tar.gz
+          path: binary/picoc-compiler-android-arm64.tar.gz
+          if-no-files-found: error
 
   release:
-    needs: build
-    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, android]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          ./PicoC-Compiler-Linux/picoc_compiler_linux_amd64.tar.gz
-          ./PicoC-Compiler-Windows/picoc_compiler_windows_amd64.tar.gz
-          ./PicoC-Compiler-MacOs/picoc_compiler_macos_amd64.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v7
+        with:
+          path: release-artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*

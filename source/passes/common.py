@@ -1,7 +1,6 @@
 from source.ast_node import copy_source_origin, copy_source_origin_to_many
 from source import reti_nodes as rn
 from source.symbol_table import SymbolTable
-from bitstring import Bits
 
 
 class PassStateMixin:
@@ -67,14 +66,11 @@ class PassStateMixin:
         if s_num < -(2**31) or s_num > 2**32 - 1:
             raise ValueError(f"{s_num} does not fit in 32 bits")
 
-        if s_num < 0:
-            bits = Bits(int=s_num, length=32).bin
-        else:
-            bits = Bits(uint=s_num, length=32).bin
-        h_bits = bits[0:22]
-        l_bits = bits[22:32]
-        h_num = Bits(bin=h_bits).int
-        l_num = Bits(bin="0" + l_bits).int
+        bits = s_num & 0xFFFFFFFF
+        h_num = bits >> 10
+        if h_num & (1 << 21):
+            h_num -= 1 << 22
+        l_num = bits & 0x3FF
         return self._single_line_comment(reg, "# write large immediate into") + [
             rn.Instr(rn.Loadi(), [reg, rn.Im(str(h_num))]),
             rn.Instr(rn.Multi(), [reg, rn.Im(str(2**10))]),

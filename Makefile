@@ -1,4 +1,11 @@
-.PHONY: test test-clean test_not_passed run clean run_send_keypresses
+.PHONY: test test-clean test_not_passed run clean run_send_keypresses grammars ci-build package android-package
+
+PYTHON ?= python3
+ANDROID_API ?= 24
+ANDROID_ARCH ?= aarch64
+ANDROID_PYTHON_ARCHIVE ?= binary/downloads/python-3.14.6-aarch64-linux-android.tar.gz
+ANDROID_TREE_SITTER_ARCHIVE ?= binary/downloads/tree-sitter-0.25.2.tar.gz
+ANDROID_ARCHIVE ?= binary/picoc-compiler-android-arm64.tar.gz
 
 TEST_PATTERN ?= $(shell cat ./config/test_pattern.txt)
 RUN_PATH ?= $(shell cat ./config/run_path.txt)
@@ -15,10 +22,33 @@ TEST_BUILD_OPTION := $(if $(filter direct,$(TEST_BUILD_MODE)),--direct,)
 
 full-install: install-dependencies install-global
 
+grammars:
+	$(PYTHON) ./scripts/build_tree_sitter.py
+
+ci-build: grammars
+	$(PYTHON) -m compileall -q ./source
+	$(PYTHON) ./scripts/smoke_test.py
+
+package: ci-build
+	$(PYTHON) -m PyInstaller --clean --noconfirm --distpath=./binary --workpath=./binary/build ./source/main.spec
+
+android-package:
+	test -d "$(ANDROID_NDK_HOME)"
+	test -f "$(ANDROID_PYTHON_ARCHIVE)"
+	test -f "$(ANDROID_TREE_SITTER_ARCHIVE)"
+	$(PYTHON) ./scripts/package_android.py \
+		--ndk "$(ANDROID_NDK_HOME)" \
+		--arch "$(ANDROID_ARCH)" \
+		--api "$(ANDROID_API)" \
+		--python-runtime "$(ANDROID_PYTHON_ARCHIVE)" \
+		--tree-sitter-source "$(ANDROID_TREE_SITTER_ARCHIVE)" \
+		--output "$(ANDROID_ARCHIVE)"
+
 SHELL := /bin/bash
 
 install-dependencies:
-	python -m venv .virtualenv && source .virtualenv/bin/activate && pip install -r requirements.txt && sed -i "s|#!.*|#!$(realpath .)/.virtualenv/bin/python|" ./source/main.py && chmod 500 ./source/main.py
+	$(PYTHON) -m venv .virtualenv
+	.virtualenv/bin/python -m pip install -r requirements-dev.txt
 
 install-global:
 	@sudo bash -c "if [ -L /usr/local/bin/picoc_compiler ]; then rm -f /usr/local/bin/picoc_compiler; fi && sudo ln -s $(realpath .)/run.py /usr/local/bin/picoc_compiler"

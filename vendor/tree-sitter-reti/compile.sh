@@ -1,2 +1,4 @@
+set -eu
+
 tree-sitter generate
-tree-sitter build -o reti.so
+python ../../scripts/build_tree_sitter.py tree-sitter-reti

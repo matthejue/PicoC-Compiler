@@ -8,8 +8,13 @@ fallback) only when the flag is active.
 Call `install_post_mortem_hook()` to have unhandled exceptions drop into pdb.
 """
 
-import sys
-import pudb
+import pdb
+
+try:
+    import pudb
+except ImportError:
+    pudb = None
+
 from source import global_vars
 
 _debug_enabled = False
@@ -36,8 +41,14 @@ def debug():
     if not (_debug_enabled and global_vars.args.debug) or _debug_triggered:
         return
     _debug_triggered = True
-    pudb.set_trace()
+    if pudb is None:
+        pdb.set_trace()
+    else:
+        pudb.set_trace()
 
 
-def debug_excepthook(exc_type, value, tb):
-    pudb.post_mortem(tb)
+def debug_excepthook(_exc_type, _value, tb):
+    if pudb is None:
+        pdb.post_mortem(tb)
+    else:
+        pudb.post_mortem(tb)
