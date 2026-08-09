@@ -27,6 +27,29 @@
 <!-- · -->
 <!-- <a href="./documentation/help-page.txt">Usage</a> -->
 
+## Installation and First Build
+
+The one-step installation target creates `.virtualenv`, installs the Python
+dependencies, adjusts the compiler entry point to use that environment, and
+installs the global `picoc_compiler` symlink:
+
+```bash
+$ cd PicoC-Compiler
+$ make full-install
+```
+
+`make full-install` may ask for administrator authentication while installing
+the symlink in `/usr/local/bin`. Once installed, compile one or more PicoC
+files directly:
+
+```bash
+$ picoc_compiler -O1 -o app.reti app.picoc
+```
+
+The default link produces `a.reti`; `-o` selects another output path. The
+compiler accepts source files, separately compiled RETI-block artifacts, or a
+mixture of both.
+
 ## Local Tree-sitter Parsers
 
 The repository vendors the custom Tree-sitter grammars for RETI and PicoC in:
@@ -39,17 +62,17 @@ To generate and build the parser libraries, change into each directory and run t
 For RETI:
 
 ```bash
-cd /path/to/repo/vendor/tree-sitter-reti
-tree-sitter generate
-tree-sitter build -o reti.so
+$ cd /path/to/repo/vendor/tree-sitter-reti
+$ tree-sitter generate
+$ tree-sitter build -o reti.so
 ```
 
 For PicoC:
 
 ```bash
-cd /path/to/repo/vendor/tree-sitter-picoc
-tree-sitter generate
-tree-sitter build -o picoc.so
+$ cd /path/to/repo/vendor/tree-sitter-picoc
+$ tree-sitter generate
+$ tree-sitter build -o picoc.so
 ```
 
 This produces the shared libraries expected by the local Neovim setup described below.
@@ -137,7 +160,7 @@ The compiler command accepts one or more input files and produces linked RETI ou
 Example:
 
 ```bash
-./run.py -s -O1 -o kernel.reti kernel/kernel.picoc
+$ ./run.py -s -O1 -o kernel.reti kernel/kernel.picoc
 ```
 
 | Option | Argument | Description |
@@ -176,6 +199,57 @@ Requests using `-i` or `-w` compile the source again so the requested
 intermediate output can be printed or written. Every cache hit prints the
 reused `.reti_blocks` and `.st` pair.
 
+### Separate Compilation and Dependency Tracking
+
+`-c` compiles each PicoC unit once and stops before linking. The resulting
+`.reti_blocks` file carries structured RETI plus cache/debug metadata, while
+the matching `.st` file carries its symbol table:
+
+```bash
+$ picoc_compiler -c lib/stdio/stdio.picoc --dependency-file build/stdio.d
+$ picoc_compiler app.picoc lib/stdio/stdio.reti_blocks -o app.reti
+```
+
+```mermaid
+flowchart LR
+    source_a["app.picoc"] --> compile_a["Per-file compilation"]
+    source_b["stdio.picoc"] --> compile_b["Per-file compilation"]
+    compile_a --> artifact_a["app.reti_blocks + app.st"]
+    compile_b --> artifact_b["stdio.reti_blocks + stdio.st"]
+    artifact_a --> linker["Program-wide linker"]
+    artifact_b --> linker
+    linker --> output["app.reti + app.sections"]
+```
+
+A primary source may declare additional link inputs in its leading comments:
+
+```c
+// dependencies: lib/stdio/stdio.reti_blocks drivers/uart.picoc
+```
+
+The metadata may follow blank lines or other leading comments. Dependency
+paths may name `.picoc`, `.reti_blocks`, or matching `.st` files and are
+resolved from the working directory or primary source directory.
+`--direct-source-link` ignores both this metadata and cached artifacts.
+
+With one `.picoc` input, `--dependency-file PATH` writes a Make dependency
+file covering the source and every included header. To see whether a build
+selected source or compiled artifacts, use:
+
+```bash
+$ picoc_compiler --show-input-files app.picoc lib/stdio/stdio.reti_blocks
+```
+
+Compiled artifacts are reused only when their recorded source, included-file
+hashes, and relevant compiler options still match. A source/header change or a
+different ABI, optimization, or debug setting recompiles the unit. `-i`, `-w`,
+and `--direct-source-link` deliberately bypass reuse.
+
+Staged artifacts preserve source/debug metadata, code-versus-data block kinds,
+global declaration order, and `DS`-relative data references. Consequently a
+link made only from `.reti_blocks`/`.st` pairs behaves like its direct-source
+equivalent; `-C` may also select a compiled startup artifact.
+
 The system tests use staged compilation by default. Each `.picoc` file is
 first compiled into `.reti_blocks` and `.st` files, which are then linked into
 the final `.reti` file. Make validates every unique compilation unit once,
@@ -186,26 +260,132 @@ use all CPU cores or how many cores it should use. Non-interactive runs use
 two jobs. `TEST_JOBS` skips the question and sets the parallelism directly:
 
 ```bash
-make test TEST_JOBS=4
+$ make test TEST_JOBS=4
 ```
 
 For maximum parallelism, use all available processors:
 
 ```bash
-make test TEST_JOBS=$(nproc)
+$ make test TEST_JOBS=$(nproc)
 ```
 
 To run the tests with the earlier direct source-linking workflow instead, use:
 
 ```bash
-make test TEST_BUILD_MODE=direct
+$ make test TEST_BUILD_MODE=direct
 ```
 
 The same option works with the saved failure list:
 
 ```bash
-make test_not_passed TEST_BUILD_MODE=direct
+$ make test_not_passed TEST_BUILD_MODE=direct
 ```
+
+## PicoC Language Support
+
+PicoC intentionally implements a practical C subset for RETI programs. The
+following features are especially useful to Pico-OS and separately compiled
+libraries. The [Pico-OS feature notes](./documentation/new_features_for_pico_os.md)
+provide the chronological history and OS-specific consequences in more detail.
+
+| Feature | Supported behavior |
+| --- | --- |
+| Declarations | Local declarations may be mixed with statements and placed in nested blocks |
+| Macros | Recursive object-like `#define` expansion; cycles stop safely; strings and character literals are not expanded internally |
+| Constant expressions | Integer expressions are folded for array sizes and other compile-time uses |
+| Types | Explicit casts, pointer return types, `void *`, `(void)` parameter lists, and scoped `typedef` names |
+| Aggregate types | Global struct forward declarations, repeated compatible header declarations, arrays, and structs passed by value |
+| Pointers | Datatype-scaled pointer arithmetic, dereference/member conditions, function pointers, and indirect calls |
+| Arrays and strings | String literals, writable stack strings, and outer array sizes inferred from initializers |
+| Expressions | `sizeof`, postfix `++` with its normal old-value result, and direct negation of function results |
+| Functions | Trailing variadic `...` syntax and calls whose actual argument count controls stack allocation |
+| Character escapes | `\0`, `\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`, quotes, backslash, and `\?` |
+
+### Types, Allocation, and Pointer Arithmetic
+
+Casts normally change the type used by later compiler decisions rather than
+emitting a separate conversion instruction. The pointed-to type still controls
+the scale used for pointer arithmetic:
+
+```c
+#define NULL ((void *)0)
+
+struct Header;
+
+struct Header {
+    int size;
+    struct Header *next;
+};
+
+void *kmalloc(int cells);
+
+struct Header *allocate_header(void) {
+    struct Header *header = (struct Header *)kmalloc(sizeof(struct Header));
+    int *payload = (int *)(header + 1);
+    header->next = (struct Header *)(payload + header->size);
+    return header;
+}
+```
+
+Forward declarations must be global. Compatible struct definitions, struct
+attributes, and function declarations may safely recur through headers used by
+several compilation units.
+
+### Arrays, Strings, and Expressions
+
+An omitted outer array size is inferred from a valid initializer. Local
+character arrays hold writable stack data, whereas a pointer to a string
+literal refers to a null-terminated compiler-generated global:
+
+```c
+#define ROWS 3
+#define COLS 5
+
+int cells[ROWS * COLS];
+int device_ready(void);
+
+int process(char *pointer) {
+    char message[] = "ready\n";
+    int values[] = {10, 20, 30};
+    int index = 0;
+
+    if (*pointer && values[index++]) {
+        return sizeof(message);
+    }
+    return !device_ready();
+}
+```
+
+String escapes are decoded before array sizing, so `message` above includes
+one newline cell and one terminating null cell. Identical literals within one
+compilation unit share a generated global; literals from different units get
+collision-free linker names.
+
+### Function Pointers and Variadic Functions
+
+Function pointers can be declared, stored in arrays, passed through typedefs,
+and called indirectly. Parameter names are omitted inside the pointer type:
+
+```c
+typedef int (*operation_t)(int, int);
+
+int add(int left, int right);
+int sub(int left, int right);
+int printf(char *format, ...);
+
+operation_t operations[] = {add, sub};
+
+int calculate(int selected) {
+    int result = operations[selected](7, 4);
+    printf("result: %d\n", result);
+    return result;
+}
+```
+
+Calls evaluate and push arguments from right to left. Variadic functions access
+the extra cells through the same stack-frame layout described below; Pico-OS
+`printf(format, ...)` starts its extra arguments at `BAF + 4` and
+`fprintf(stream, format, ...)` at `BAF + 5`.
 
 ## PicoC Attributes and Entry Points
 
@@ -233,6 +413,198 @@ int keypress_interrupt(void) {
 }
 ```
 
+### Inline RETI Assembly and Debug Traps
+
+`asm("...");` accepts one string containing one or more RETI instructions. The
+contents are parsed into the normal RETI AST, so symbolic operands are resolved
+after every compilation unit and section has been laid out:
+
+```c
+void transfer_to_kernel(void) {
+    debug; /* Lowers to INT 3 */
+    asm("LOADI32 ACC start_loaded_kernel");
+    asm("ADD ACC CS");
+    asm("MOVE ACC PC");
+}
+```
+
+`debug;` is an explicit emulator/debugger trap rather than a logging call.
+Structured RETI and inline assembly also support `NOP` and these
+pseudoinstructions:
+
+| Pseudoinstruction | Purpose | Expansion timing |
+| --- | --- | --- |
+| `LOADI32 reg operand` | Loads a 32-bit immediate or resolved symbol | After symbolic addresses are known |
+| `JUMP32 rel target` | Reaches a target beyond a normal jump offset | After final block positions are known |
+| `PUSH reg` | Runs `SUBI SP 1`, then `STOREIN SP reg 1` | During RETI patching |
+| `POP reg` | Runs `LOADIN SP reg 1`, then `ADDI SP 1` | During RETI patching |
+
+The push updates `SP` before storing and the pop reads before updating `SP`.
+This order prevents an interrupt between the two instructions from overwriting
+a live stack cell.
+
+### `static inline` Assembly Helpers
+
+The supported inlining form is a no-argument `static inline` function whose
+body contains only assembly statements:
+
+```c
+static inline void save_acc(void) {
+    asm("PUSH ACC");
+}
+```
+
+A statement-form `save_acc();` call is replaced by those assembly statements,
+and no separate function is emitted. Parameters, call arguments, and ordinary
+C bodies are not supported by this inlining form.
+
+## Runtime ABI and Startup
+
+Calls push arguments from right to left. The caller reserves space based on
+the actual arguments and releases it after the callee returns; the callee saves
+and restores `BAF`. From higher to lower addresses, a typical two-argument
+frame is:
+
+| Address relative to `BAF` | Contents | Owner |
+| --- | --- | --- |
+| `BAF + 4` | Second argument or first variadic argument | Caller |
+| `BAF + 3` | First argument | Caller |
+| `BAF + 2` | Return address | Caller |
+| `BAF + 1` | Saved previous `BAF` | Callee |
+| `BAF` | First local variable | Callee |
+| `BAF - 1` | Later local variable | Callee |
+| `SP` | Free cell below the occupied frame | Stack boundary |
+
+Multi-cell arrays and structs occupy their full width in this direction. A
+struct passed by value uses its base cell as its logical address, keeping
+member access and forwarding consistent.
+
+Every ordinary function has one `<function>_epilogue` block. All source
+returns converge there; a non-void result is kept in `IN2`, leaving `ACC`
+available to expand a long jump:
+
+```mermaid
+flowchart LR
+    return_a["return expression A"] --> epilogue["function_epilogue"]
+    return_b["return expression B"] --> epilogue
+    return_void["return"] --> epilogue
+    epilogue --> restore["Restore BAF"]
+    restore --> caller["Jump to saved return address"]
+```
+
+When no custom startup is selected, the compiler collects global runtime
+initializers, generates `_start`, calls a global `main`, and emits the normal
+exit sequence. `main` is compiled as an ordinary stack-framed function rather
+than receiving special global-style storage. If no `main` exists, linking
+continues with a warning and no generated `_start`, which is useful for
+libraries and loader-managed units.
+
+`-C PATH` links an additional PicoC or compiled RETI-block startup unit. If it
+defines `_start`, that function replaces the default and is placed first in
+`.text`; otherwise the compiler still generates the normal entry point. Global
+initializers precede either form, and `Exit()` uses syscall 9 through `INT 4`
+while `-C` is active.
+
+For example, a naked EPROM startup can initialize the register bases and jump
+to OS code without a compiler-generated frame:
+
+```c
+__attribute__((naked))
+void _start(void) {
+    asm(EPROM_STACK_START_ASM);
+    asm("MOVE SP BAF");
+    asm(EPROM_DS_START_ASM);
+    asm("ADD DS CS");
+    asm("LOADI32 ACC boot_main");
+    asm("ADD ACC CS");
+    asm("MOVE ACC PC");
+}
+```
+
+```mermaid
+flowchart TD
+    globals["Global runtime initializers"] --> selection{"Startup source defines _start?"}
+    selection -->|No| generated["Generate _start and call main"]
+    selection -->|Yes| supplied["Use supplied naked _start"]
+    generated --> normal_exit["Generated exit"]
+    supplied --> os_entry["Initialize registers and transfer control"]
+```
+
+## Linked Images, Debug Information, and Memory Metadata
+
+Linked output separates interrupt vectors, instructions, and global data. The
+linker writes a matching `.sections` file so the emulator, loader, and header
+generator can interpret those addresses correctly.
+
+| Start address | Region | Addressing and purpose |
+| --- | --- | --- |
+| `0` | `.ivt` | Hardware-readable interrupt vector cells |
+| `codesegment_start` | `.text` | `PC`/`CS`-relative instructions |
+| `datasegment_start` | `.data` | `DS`-relative global storage |
+| `heap_start` | Free memory | First cell after all static global storage |
+
+RETI-block IVT entries may be numeric or name a handler directly. A numeric
+`IVTE i` becomes `2^31 + i`; `IVTE timer_interrupt` becomes `2^31` plus the
+resolved section-relative handler address. With `-O1`, compile-time-known
+scalar, aggregate, string, and function addresses are emitted directly into
+ordered `.data` or `.ivt` blocks. Under `-O0`, the default, `_start` performs
+the stores. Runtime-dependent globals remain startup work at either level.
+
+### Debug and Intermediate Artifacts
+
+`-g` writes `<output>.debuginfo` with source ranges, global addresses,
+`BAF`-relative locals and arguments, call sites, return addresses, and frame
+information. Debug locations refer to the generated `.pre` source, so use
+`-i -w` when source-correlated emulator debugging is needed:
+
+```bash
+$ picoc_compiler -O1 -g -i -w -o kernel.reti kernel.picoc
+$ less kernel_startprogram.reti_blocks
+$ less kernel_combined.reti_blocks
+```
+
+The first RETI-block file exposes generated startup code; the second exposes
+the merged program before block flattening. With `-i -vv`, intermediate ASTs
+include source file and line information. Generated labels include their owner,
+such as `schedule_while_branch.9`, and `-m` preserves supported leading
+metadata comments in final RETI output.
+
+### Loader Metadata and Kernel Headers
+
+A `.sections` file records values such as:
+
+```json
+{
+  "interrupt_service_routines_start": 4,
+  "codesegment_start": 4,
+  "datasegment_start": 32705,
+  "heap_start": 33189,
+  "heap_size": -1,
+  "stack_start": 40000
+}
+```
+
+| Memory area | Boundary or direction |
+| --- | --- |
+| Static data | Ends at `heap_start - 1` |
+| Kernel heap | `heap_start` through `heap_start + heap_size - 1` |
+| Kernel stack | Grows downward from `stack_start` |
+| Process memory | Begins at `stack_start + 1` |
+
+`-1` lets the loader or header generator apply its configured default.
+`interrupt_service_routines_start` appears when handler code follows a leading
+numeric IVT. It tells the loader where that code begins.
+`-k sram` and `-k eprom` link far enough to calculate this layout and then
+write only `memory_constants.header`; in this mode `-o` selects the header
+path. SRAM headers provide tagged memory-map constants and `LOADI32` strings
+for `CS`, `DS`, `SP`, and `ACC`; an unspecified heap size becomes `4096` cells.
+EPROM headers provide the SRAM maximum and the assembly strings needed for
+EPROM data-segment and SRAM stack setup.
+
+```bash
+$ picoc_compiler -O1 -k sram -o build/memory_constants.header kernel.picoc
+```
+
 ## Compiler Pipeline Overview
 
 This section summarizes how the compiler processes PicoC source files, covering preprocessing, lexing, parsing, AST passes, and final RETI output.
@@ -248,7 +620,50 @@ The relevant implementation lives mainly in:
 
 For PicoC input files, the high-level pipeline is:
 
-`raw file -> preprocessing -> lexing / token stream -> parse tree -> AST -> picoc_shrink -> picoc_blocks -> picoc_symbol -> picoc_typing -> picoc_anf -> reti_blocks -> linking / multi-file handling -> reti_patch -> reti`
+```mermaid
+flowchart LR
+    source[PicoC source]
+
+    subgraph preprocessing[Preprocessing]
+        preprocessor[Includes, macros, and line splicing]
+        preprocessed[Preprocessed source]
+    end
+
+    subgraph frontend[Lexing and parsing]
+        tokens[Token stream]
+        parse_tree[Tree-sitter parse tree]
+        ast[PicoC AST]
+    end
+
+    subgraph compilation[Per-file compilation passes]
+        shrink[picoc_shrink]
+        blocks[picoc_blocks]
+        symbol[picoc_symbol]
+        typing[picoc_typing]
+        anf[picoc_anf]
+        reti_blocks[reti_blocks]
+    end
+
+    subgraph linking[Program-wide linking passes]
+        merge[Merge units, symbols, and startup]
+        patch[reti_patch]
+        reti[reti]
+    end
+
+    output[Flat RETI output]
+
+    source --> preprocessor --> preprocessed --> tokens --> parse_tree --> ast
+    ast --> shrink --> blocks --> symbol --> typing --> anf --> reti_blocks
+    reti_blocks --> merge --> patch --> reti --> output
+```
+
+| Stage | Scope | Main output |
+| --- | --- | --- |
+| Preprocessing | Per source file | Expanded PicoC source and include dependencies |
+| Lexing and parsing | Per source file | Tokens, parse tree, and PicoC AST |
+| PicoC lowering | Per source file | Typed, block-based RETI intermediate representation |
+| Linking | Whole program | Merged symbols, sections, and resolved labels |
+| RETI lowering | Whole program | Flat `.reti` instruction stream |
 
 Example:
 
@@ -280,17 +695,11 @@ It does not implement full C preprocessing with function-like macros or conditio
 
 Include resolution depends on whether the include is quoted or angled.
 
-- Quoted includes search:
-  Example: `#include "defs.header"` searches:
-  1. the directory of the including file
-  2. the `-I` include paths
-  3. the system include paths
-- Angled includes search:
-  Example: `#include <defs.header>` searches:
-  1. the `-I` include paths
-  2. the system include paths
-- Absolute include paths are used directly.
-  Example: `#include "/tmp/defs.header"`
+| Include form | Search order |
+| --- | --- |
+| `#include "defs.header"` | Including file's directory, then `-I` paths, then system include paths |
+| `#include <defs.header>` | `-I` paths, then system include paths |
+| `#include "/tmp/defs.header"` | Use the absolute path directly |
 
 #### `#pragma once`
 
@@ -380,7 +789,7 @@ The frontend tokenizes the preprocessed source.
 Main points:
 
 - The frontend is implemented in [`source/ast_transformers.py`](/home/areo/Documents/Studium/PicoC-Compiler/source/ast_transformers.py), mainly by `TransformerPicoC`.
-- `TransformerPicoC` uses the vendored Tree-sitter C grammar from `vendor/tree-sitter-c/c.so` through the `tree_sitter` Python bindings.
+- `TransformerPicoC` uses the vendored PicoC grammar from `vendor/tree-sitter-picoc/picoc.so` through the `tree_sitter` Python bindings.
 - `TransformerPicoC.parse_tree(code)` performs the actual Tree-sitter parse.
 - `OptionHandler._tokens_option(...)` extracts the leaf tokens from the Tree-sitter parse result.
 - When token output is enabled, those tokens can be printed or written to a `.tokens` file.
