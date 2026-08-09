@@ -36,6 +36,7 @@ compiler_pipeline_overview.md
 *.picoc_symbol
 *.error
 *.c
+!.github/release/android/picoc_compiler.c
 *.c_output
 *.reti_tokens
 *.reti_ast
