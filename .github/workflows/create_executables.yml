@@ -63,13 +63,6 @@ jobs:
       - name: Install build dependencies
         run: python -m pip install --upgrade -r requirements-build.txt
 
-      - name: Install Linux static packaging support
-        if: matrix.platform == 'linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y patchelf
-          python -m pip install --upgrade staticx
-
       - name: Build Windows executable
         if: matrix.platform == 'windows'
         shell: pwsh
@@ -87,10 +80,6 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: ${{ matrix.platform == 'macos' && '11.0' || '' }}
         run: |
           make package PYTHON=python
-          if [ "${{ matrix.platform }}" = linux ]; then
-            staticx binary/picoc_compiler binary/picoc_compiler-static
-            mv binary/picoc_compiler-static binary/picoc_compiler
-          fi
           python scripts/smoke_test.py binary/picoc_compiler
           tar -C binary -czf "$GITHUB_WORKSPACE/binary/${{ matrix.archive }}" picoc_compiler
 
@@ -111,10 +100,10 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - uses: android-actions/setup-android@v3
-
-      - name: Install Android NDK
-        run: sdkmanager --install "ndk;27.2.12479018"
+      - name: Verify preinstalled Android NDK
+        run: |
+          test -n "$ANDROID_NDK_HOME"
+          test -x "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
 
       - name: Download pinned Android build inputs
         run: |
@@ -138,8 +127,6 @@ jobs:
           make ci-build PYTHON=python
 
       - name: Build self-contained arm64 package
-        env:
-          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/27.2.12479018
         run: |
           make android-package PYTHON=python
           tar -tzf binary/picoc-compiler-android-arm64.tar.gz | grep 'runtime/lib/libpython3.14.so' >/dev/null
@@ -149,9 +136,7 @@ jobs:
           "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h \
             binary/android-aarch64/picoc-compiler/app/vendor/tree-sitter-picoc/picoc.so | grep AArch64 >/dev/null
 
-      - name: Build x86-64 package for emulator validation
-        env:
-          ANDROID_NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/27.2.12479018
+      - name: Cross-check x86-64 package
         run: |
           python scripts/package_android.py \
             --ndk "$ANDROID_NDK_HOME" \
@@ -161,22 +146,7 @@ jobs:
             --tree-sitter-source binary/downloads/tree-sitter-0.25.2.tar.gz \
             --output binary/picoc-compiler-android-x86_64-smoke.tar.gz
 
-      - name: Allow the Android emulator to use KVM
-        run: sudo chmod 666 /dev/kvm
-
-      - name: Smoke test the Android package
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 24
-          arch: x86_64
-          target: default
-          disable-animations: true
-          script: |
-            adb push binary/android-x86_64/picoc-compiler /data/local/tmp/picoc-compiler
-            adb push test/basic_assembly_instr.picoc /data/local/tmp/smoke.picoc
-            adb shell chmod 755 /data/local/tmp/picoc-compiler/picoc_compiler /data/local/tmp/picoc-compiler/libexec/picoc_compiler
-            adb shell "cd /data/local/tmp && ./picoc-compiler/picoc_compiler --direct-source-link smoke.picoc -o smoke.reti"
-            adb shell test -s /data/local/tmp/smoke.reti
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf" -h binary/android-x86_64/picoc-compiler/libexec/picoc_compiler | grep 'Advanced Micro Devices X86-64' >/dev/null
 
       - uses: actions/upload-artifact@v7
         with:

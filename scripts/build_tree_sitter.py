@@ -40,6 +40,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def split_compiler_command(compiler: str, platform_name: str) -> list[str]:
+    if platform_name == "win32":
+        return [compiler]
+    return shlex.split(compiler)
+
+
 def main() -> None:
     args = parse_args()
     selected_grammars = set(args.grammars)
@@ -48,7 +54,8 @@ def main() -> None:
     if unknown_grammars:
         raise SystemExit(f"unknown grammar: {', '.join(sorted(unknown_grammars))}")
 
-    compiler = shlex.split(os.environ.get("CC", "cc"))
+    compiler_value = os.environ.get("CC", "cc")
+    compiler = split_compiler_command(compiler_value, sys.platform)
     for directory_name, library_stem in GRAMMARS:
         if selected_grammars and directory_name not in selected_grammars:
             continue
