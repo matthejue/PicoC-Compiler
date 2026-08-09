@@ -1,6 +1,6 @@
 # Kernel Header Option
 
-The `-k` / `--kernelheader` compiler option runs the normal linking path far enough to compute the final RETI section addresses, then writes only `memory_constants.header`. In this mode, `-o` selects the path used for `memory_constants.header`, not a `.reti` output path.
+The `-k` / `--kernelheader` compiler option runs the normal linking path far enough to compute the final RETI section addresses, then writes only `memory_constants.header`. In this mode, `-o` selects the path used for `memory_constants.header`, not a `.reti` output path. The paired `--heap-size CELLS` and `--stack-size CELLS` options set `heap_size` and calculate `stack_start` as `heap_start + heap_size + stack_size`. The same options set these fields directly in the `.sections` file during a normal linked build.
 
 `-k sram` generates SRAM-based kernel constants:
 
@@ -16,7 +16,7 @@ The `-k` / `--kernelheader` compiler option runs the normal linking path far eno
 #define KERNEL_CS_ACC_ASM "LOADI32 ACC <sram_base + codesegment_start>" // -2^31 + codesegment_start
 ```
 
-`SRAM_MAX_ADDRESS_IN_MEMORY_MAP`, `KERNEL_HEAP_START`, and `PROCESS_MEMORY_START` are absolute SRAM addresses, not section offsets. `KERNEL_HEAP_SIZE` is a number of SRAM cells and defaults to `4096` when the generated section value is `-1`.
+`SRAM_MAX_ADDRESS_IN_MEMORY_MAP`, `KERNEL_HEAP_START`, and `PROCESS_MEMORY_START` are absolute SRAM addresses, not section offsets. `KERNEL_HEAP_SIZE` is a number of SRAM cells and defaults to `4096` when the generated section value is `-1`. Supplying the two size options makes `KERNEL_HEAP_SIZE`, `KERNEL_SP_START_ASM`, and `PROCESS_MEMORY_START` use the requested layout without post-processing the header.
 
 `-k eprom` generates EPROM start-program constants:
 

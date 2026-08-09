@@ -143,6 +143,18 @@ def build_parser():
         ),
     )
     parser.add_argument(
+        "--heap-size",
+        metavar="CELLS",
+        type=int,
+        help="Set heap_size in linked memory metadata",
+    )
+    parser.add_argument(
+        "--stack-size",
+        metavar="CELLS",
+        type=int,
+        help="Place stack_start this many cells above the configured heap",
+    )
+    parser.add_argument(
         "-O0",
         dest="optimization_level",
         action="store_const",

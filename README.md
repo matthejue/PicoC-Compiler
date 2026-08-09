@@ -164,6 +164,8 @@ Example:
 | `-C`, `--startup-source` | `PATH` | Links an additional PicoC startup source. If that file defines `_start`, its definition replaces the generated default and is placed first in `.text`; otherwise the default `_start` is generated. With `-C`, `Exit()` finishes with syscall `9` via `INT 4`. |
 | `-g`, `--generate_debuginfo` | none | Writes `<output>.debuginfo` for linked `.picoc` inputs. |
 | `-k`, `--kernelheader` | `sram` or `eprom` | Runs linking far enough to compute section addresses, then writes only `memory_constants.header`; in this mode `-o` selects the header path, not a `.reti` output path. `-k sram` generates SRAM-based kernel constants and `LOADI32` setup strings for `CS`, `DS`, `SP`, and `ACC`. `-k eprom` generates EPROM start-program constants with an SRAM maximum address, an EPROM data-segment setup string, and an SRAM-top stack setup string. |
+| `--heap-size` | `CELLS` | Sets `heap_size` in linked memory metadata. Must be used together with `--stack-size`. |
+| `--stack-size` | `CELLS` | Sets the number of cells between the end of the configured heap and `stack_start`. Must be used together with `--heap-size`. |
 | `-O0` | none | Disables optimizations. This is the default optimization level. |
 | `-O1` | none | Enables compile-time global initializer data generation. |
 

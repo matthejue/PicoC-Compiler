@@ -426,6 +426,31 @@ class OptionHandler:
 
     def build_all(self, max_workers=None):
         files = list(global_vars.args.infiles)
+        memory_sizes = (global_vars.args.heap_size, global_vars.args.stack_size)
+        if (memory_sizes[0] is None) != (memory_sizes[1] is None):
+            print(
+                "[ERROR] '--heap-size' and '--stack-size' must be used together",
+                file=sys.stderr,
+            )
+            exit(1)
+        if any(size is not None and size < 0 for size in memory_sizes):
+            print(
+                "[ERROR] '--heap-size' and '--stack-size' cannot be negative",
+                file=sys.stderr,
+            )
+            exit(1)
+        if memory_sizes[0] is not None and global_vars.args.compile:
+            print(
+                "[ERROR] '--heap-size' and '--stack-size' require linking",
+                file=sys.stderr,
+            )
+            exit(1)
+        if memory_sizes[0] is not None and global_vars.args.kernelheader == "eprom":
+            print(
+                "[ERROR] '--heap-size' and '--stack-size' do not apply to EPROM headers",
+                file=sys.stderr,
+            )
+            exit(1)
         if global_vars.args.dependency_file and (
             not global_vars.args.compile
             or len(files) != 1
@@ -1113,6 +1138,7 @@ class OptionHandler:
                 fout.write(str(json_symbol_table))
 
     def _reti_with_metadata(self, pass_ast: pn.File, heading, sections):
+        self._apply_memory_sizes(sections)
         metadata_entries = []
         # Prefer raw metadata_comments strings (from // in: and // expected: comments)
         for key in ("input", "expected", "datasegment"):
@@ -1165,6 +1191,16 @@ class OptionHandler:
         sections_path = Path(reti_path).with_suffix(".sections")
         with open(sections_path, "w", encoding="utf-8") as fout:
             fout.write(sections_text + "\n")
+
+    def _apply_memory_sizes(self, sections) -> None:
+        heap_size = global_vars.args.heap_size
+        if heap_size is None:
+            return
+
+        sections["heap_size"] = heap_size
+        sections["stack_start"] = (
+            int(sections["heap_start"]) + heap_size + global_vars.args.stack_size
+        )
 
     def _memory_constants_header_path(self) -> Path:
         output_path = Path(global_vars.args.output_name)
@@ -1469,6 +1505,8 @@ def _print_args_if_verbose():
         "metadata_comments",
         "startup_source",
         "kernelheader",
+        "heap_size",
+        "stack_size",
         "optimization_level",
     ]
 
