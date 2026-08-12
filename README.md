@@ -250,7 +250,7 @@ global declaration order, and `DS`-relative data references. Consequently a
 link made only from `.reti_blocks`/`.st` pairs behaves like its direct-source
 equivalent; `-C` may also select a compiled startup artifact.
 
-The system tests use staged compilation by default. Each `.picoc` file is
+The tests use staged compilation by default. Each `.picoc` file is
 first compiled into `.reti_blocks` and `.st` files, which are then linked into
 the final `.reti` file. Make validates every unique compilation unit once,
 shares common dependencies such as `libstdio` between tests, and runs

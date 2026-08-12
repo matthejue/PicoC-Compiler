@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 TEST_BUILD_MODE ?= staged
-RESULT_DIR ?= /tmp/picoc-system-tests
+RESULT_DIR ?= /tmp/picoc-tests
 DEPENDENCY_DIR ?= .test_dependencies
 TEST_SOURCES ?=
 VERIFY_SOURCES ?= $(TEST_SOURCES)

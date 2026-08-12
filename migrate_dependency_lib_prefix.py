@@ -42,7 +42,7 @@ def main() -> None:
         nargs="?",
         default="test",
         type=Path,
-        help="directory containing .picoc system tests",
+        help="directory containing .picoc tests",
     )
     args = parser.parse_args()
 

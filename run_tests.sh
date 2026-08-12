@@ -158,7 +158,7 @@ if [[ -n "${TEST_JOBS:-}" ]]; then
   test_jobs="$TEST_JOBS"
 elif [[ -t 0 ]]; then
   max_test_jobs="$(nproc)"
-  read -r -p "Run system tests on all ${max_test_jobs} CPU cores? [y/N] " use_all_cores
+  read -r -p "Run tests on all ${max_test_jobs} CPU cores? [y/N] " use_all_cores
   if [[ "$use_all_cores" =~ ^[Yy]$ ]]; then
     test_jobs="$max_test_jobs"
   else

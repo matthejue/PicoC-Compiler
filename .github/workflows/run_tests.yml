@@ -1,4 +1,4 @@
-name: Run system tests
+name: Run tests
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ defaults:
     working-directory: PicoC-Compiler
 
 jobs:
-  system-tests:
-    name: PicoC system tests
+  tests:
+    name: PicoC tests
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout PicoC-Compiler
@@ -73,7 +73,7 @@ jobs:
             ../Pico-OS/interrupt_service_routines/isrs.reti \
             config/isrs.reti
 
-      - name: Run system tests
+      - name: Run tests
         env:
           TEST_JOBS: "2"
-        run: ./run_sys_tests.sh 120
+        run: ./run_tests.sh 120
