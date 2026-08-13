@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 defaults:
   run:
@@ -77,3 +78,17 @@ jobs:
         env:
           TEST_JOBS: "2"
         run: ./run_tests.sh 120
+
+      - name: Publish test status
+        if: always()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status == 'success' && 'success' || 'failure' }}',
+              context: 'PicoC tests',
+              description: '${{ job.status == 'success' && 'Tests passed' || 'Tests failed' }}'
+            })
