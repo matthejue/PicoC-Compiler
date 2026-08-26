@@ -4,12 +4,12 @@
 int main() {
   asm("LOADI ACC 1");
   asm("INT 0");
-  asm("MOVE ACC IN1");
+  asm("MOVE IN2 IN1");
   asm("LOADI ACC 0");
   asm("INT 0");
   asm("LOADI ACC 1");
   asm("INT 0");
-  asm("MOVE ACC IN1");
+  asm("MOVE IN2 IN1");
   asm("LOADI ACC 0");
   asm("INT 0");
   return 0;

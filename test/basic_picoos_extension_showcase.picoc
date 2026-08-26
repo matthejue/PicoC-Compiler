@@ -1,0 +1,39 @@
+// in:7
+// expected: 12 8 6
+// dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks ../../Pico-OS/library/stdlib/libstdlib.reti_blocks
+#include "../../Pico-OS/library/stdio/stdio.header"
+
+void *malloc(int size);
+void free(void *ptr);
+
+#define CELLS 3
+
+struct Header {
+  int size;
+  int *next;
+};
+
+int add(int left, int right) {
+  return left + right;
+}
+
+void main(void) {
+  int values[] = {4, 5, 6};
+  int index = 0;
+  char text[] = "PicoOS\n";
+  int (*operation)(int, int) = add;
+  int *heap_values = (int *)malloc(CELLS * sizeof(int));
+  scanf(" %d", &heap_values[0]);
+  heap_values[1] = values[1];
+  heap_values[2] = values[2];
+  struct Header header = {sizeof(text), heap_values};
+  int first = heap_values[index++];
+
+  printf(
+    " %d %d %d",
+    operation(first, values[1]),
+    header.size,
+    *(header.next + (CELLS - 1))
+  );
+  free(heap_values);
+}
