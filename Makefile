@@ -1,4 +1,4 @@
-.PHONY: test test-clean test_not_passed run clean run_send_keypresses grammars ci-build package android-package
+.PHONY: test test-clean test_not_passed run clean run_send_keypresses grammars ci-build package android-package build-version
 
 PYTHON ?= python3
 ANDROID_API ?= 24
@@ -19,6 +19,7 @@ ifeq ($(filter $(TEST_BUILD_MODE),$(VALID_TEST_BUILD_MODES)),)
 $(error TEST_BUILD_MODE must be 'staged' or 'direct')
 endif
 TEST_BUILD_OPTION := $(if $(filter direct,$(TEST_BUILD_MODE)),--direct,)
+BUILD_VERSION := source/build_version.py
 
 full-install: install-dependencies install-global
 
@@ -29,10 +30,15 @@ ci-build: grammars
 	$(PYTHON) -m compileall -q ./source
 	$(PYTHON) ./scripts/smoke_test.py
 
-package: ci-build
+package: ci-build build-version
 	$(PYTHON) -m PyInstaller --clean --noconfirm --distpath=./binary --workpath=./binary/build ./source/main.spec
 
-android-package:
+build-version: $(BUILD_VERSION)
+
+$(BUILD_VERSION): config/compiler-release.txt
+	@printf 'VERSION = "%s"\n' "$$(cat $<)" > $@
+
+android-package: build-version
 	test -d "$(ANDROID_NDK_HOME)"
 	test -f "$(ANDROID_PYTHON_ARCHIVE)"
 	test -f "$(ANDROID_TREE_SITTER_ARCHIVE)"
