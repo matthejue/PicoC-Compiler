@@ -34,6 +34,7 @@ for test in "${paths[@]}"; do
   {
     printf '#include <stdio.h>\n'
     sed '/#include "\.\.\/\.\.\/Pico-OS\/library\/[^"]*\.header"/d' "$test"
+    sed -nE 's@^[[:space:]]*//[[:space:]]*c-verifier-stub:[[:space:]]*(.*)$@\1@p' "$test"
   } > "$tmp_c_file"
   sed -i '/^[[:space:]]*debug;[[:space:]]*$/d' "$tmp_c_file"
   if ! gcc -iquote "$(dirname "$test")" -Wno-incompatible-pointer-types "$tmp_c_file" -o "$tmp_exe_file"; then

@@ -1,10 +1,12 @@
 // in:7
 // expected: 12 8 6
 // dependencies: ../../Pico-OS/library/stdio/libstdio.reti_blocks ../../Pico-OS/library/stdlib/libstdlib.reti_blocks
+// c-verifier-stub: void init_process_heap(void) {}
 #include "../../Pico-OS/library/stdio/stdio.header"
 
 void *malloc(int size);
 void free(void *ptr);
+void init_process_heap(void);
 
 #define CELLS 3
 
@@ -22,6 +24,7 @@ void main(void) {
   int index = 0;
   char text[] = "PicoOS\n";
   int (*operation)(int, int) = add;
+  init_process_heap();
   int *heap_values = (int *)malloc(CELLS * sizeof(int));
   scanf(" %d", &heap_values[0]);
   heap_values[1] = values[1];
