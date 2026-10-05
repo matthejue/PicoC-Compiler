@@ -959,3 +959,20 @@ output metadata. Short symbolic jumps become relative offsets.
 Symbolic addresses that may exceed a short instruction's range need the
 explicit long form. The final pass does not automatically widen every
 short symbolic instruction.
+
+# AI Usage
+
+The PicoC-Compiler was originally written entirely by hand. Most of the
+important changes needed to extend it so that it could compile PicoOS were
+also implemented without AI in 2025. At that time, I had not looked much into
+AI, and AI models did not produce good enough code yet. Writing the code myself
+was therefore the better option if I wanted to avoid major problems later.
+
+During 2026, AI models became increasingly capable and produced results that
+made using them for this work worthwhile. Thus, starting in June 2026, I
+increasingly used AI to help with further extensions. PicoOS was the actual
+subject of my Master's project. The PicoC-Compiler was an inconvenience that
+had to be extended and that further slowed the already very time-consuming
+development of PicoOS, at a time when I thought I could finally focus on PicoOS
+because in April 2026 I thought I was finally done with all the features needed
+to compile PicoOS.
